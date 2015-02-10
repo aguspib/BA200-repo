@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksWSRequiredElementsDAO
-        Inherits DAOBase
+        '  
 
 #Region "CRUD Methods"
 
@@ -166,8 +166,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -203,8 +203,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -250,8 +250,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -298,8 +298,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadAllPatientDilutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadAllPatientDilutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -433,8 +433,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -481,8 +481,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadAll", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -530,8 +530,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ChangeSampleIDToPatientID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ChangeSampleIDToPatientID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -595,7 +595,10 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         ElseIf (pRotorType = "REAGENTS") Then
                             'In Reagents Rotor, all not positioned Elements are included in the total
-                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
+                            'cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
+
+                            'AG 15/10/2014 BA-1519 error in previous change. the WASH_SOL has not to be excluded here because  when RotorType = REAGENTS during reagents autopositioning process (See bug number BA-1968)
+                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT', 'WASH_SOL') " & vbCrLf
 
                         Else
                             If (Not pExcludePatients) Then
@@ -624,8 +627,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.CountNotPositionedElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.CountNotPositionedElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -677,8 +680,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GenerateElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GenerateElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -735,8 +738,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetAddittionalSolutionElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetAddittionalSolutionElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -795,8 +798,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetByPatientAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetByPatientAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -860,8 +863,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetCalibratorElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetCalibratorElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -923,8 +926,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetCalibratorElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetCalibratorElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -980,8 +983,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetControlElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetControlElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1038,8 +1041,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetElemIDForAlternativeCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetElemIDForAlternativeCalibrator", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1091,8 +1094,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetLISPatientElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetLISPatientElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1149,8 +1152,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetMultipointCalibratorElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetMultipointCalibratorElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1191,7 +1194,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim var As New GlobalBase
 
                         '(1) BT #1519 - Subquery to get REAGENTS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         Dim cmdText As String = " SELECT RE.TubeContent AS SampleClass, R.ReagentName AS SampleName, NULL AS SampleType, 1 AS Position, RE.ElementID " & vbCrLf & _
@@ -1216,7 +1218,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND   RE.ElementFinished = 0 " & vbCrLf & _
                                    " AND   RE.TubeContent = 'SPEC_SOL' " & vbCrLf & _
                                    " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                   " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                                   " AND   MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
                                    " AND   OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
 
                         '(3) BT #1519 - Subquery to get SPECIAL SOLUTIONS (needed for Blanks) that are not positioned (or without enough volume) but that are still needed 
@@ -1230,7 +1232,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND   RE.ElementFinished = 0 " & vbCrLf & _
                                    " AND   RE.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
                                    " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                   " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
+                                   " AND   MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
 
                         ''(4) BT #1519 - Subquery to get WASHING SOLUTIONS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         ''               (to avoid Contaminations between Reagents)
@@ -1287,8 +1289,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetNotPositionedElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetNotPositionedElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1344,8 +1346,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetNotPositionedPredilutionSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetNotPositionedPredilutionSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1447,8 +1449,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetPatientElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetPatientElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1509,8 +1511,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRequiredElementsDAO.GetProgrammedReagentVol", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRequiredElementsDAO.GetProgrammedReagentVol", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1570,8 +1572,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetReagentElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetReagentElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1627,8 +1629,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetReagentElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetReagentElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1679,10 +1681,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS") Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) " & vbCrLf
                             End If
                         End If
 
@@ -1706,8 +1713,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredCalibratorsDetails", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredCalibratorsDetails", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1756,10 +1763,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS") Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) "
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) "
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) "
                             End If
                         End If
                         If (pOnlyNotFinished) Then cmdText &= " AND RE.ElementFinished = 0 " & vbCrLf
@@ -1782,8 +1794,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredControlsDetails", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredControlsDetails", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1845,10 +1857,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS" AndAlso Not pGetAllNoPos) Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) " & vbCrLf
                             End If
                         End If
                         If (pOnlyNotFinished) Then cmdText &= " AND RE.ElementFinished = 0 " & vbCrLf
@@ -1871,8 +1888,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredPatientSamplesElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredPatientSamplesElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1915,6 +1932,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 02/08/2011 - LotNumber and ExpirationDate are get from tparHistoryReagentBottles
                         'OLD 2on line: " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus, R.LotNumber, R.ExpirationDate " & _
 
+                        'AJG
+                        'Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
+                        '                               " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
+                        '                        " FROM   twksWSRequiredElements RE INNER JOIN tparReagents R      ON RE.ReagentID = R.ReagentID " & vbCrLf & _
+                        '                                                         " INNER JOIN tparTestReagents TR ON RE.ReagentID = TR.ReagentID " & vbCrLf & _
+                        '                                                         " INNER JOIN tparTests T         ON TR.TestID    = T.TestID " & vbCrLf & _
+                        '                        " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    RE.TubeContent   = 'REAGENT' " & vbCrLf & _
+                        '                        " AND    TR.TestID IN (SELECT OT.TestID " & vbCrLf & _
+                        '                                             " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+
                         Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
                                                        " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
                                                 " FROM   twksWSRequiredElements RE INNER JOIN tparReagents R      ON RE.ReagentID = R.ReagentID " & vbCrLf & _
@@ -1922,9 +1951,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                  " INNER JOIN tparTests T         ON TR.TestID    = T.TestID " & vbCrLf & _
                                                 " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    RE.TubeContent   = 'REAGENT' " & vbCrLf & _
-                                                " AND    TR.TestID IN (SELECT OT.TestID " & vbCrLf & _
-                                                                     " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                     " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+                                                " AND    EXISTS (SELECT OT.TestID " & vbCrLf & _
+                                                                " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' AND TR.TestID = OT.TestID) " & vbCrLf
 
                         'Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
                         '                               " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
@@ -1962,8 +1991,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredReagentsDetails", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredReagentsDetails", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2005,8 +2034,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not dataToReturn.HasError) AndAlso (Not dataToReturn.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim var As New GlobalBase
-                        Dim cmdText As String
+                        'Dim var As New GlobalBase
+                        Dim cmdText As String = String.Empty
                         cmdText &= "SELECT   RE.TubeContent, RE.ElementID, RE.SolutionCode, RE.ElementStatus, MR.ResourceText AS SolutionName, " & vbCrLf
                         cmdText &= "         RE.RequiredVolume, PMD.Position AS SortElement, 1 AS SortGroup " & vbCrLf
                         cmdText &= "FROM     twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD  " & vbCrLf
@@ -2015,7 +2044,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "WHERE    RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
                         cmdText &= "  AND    RE.TubeContent = 'SPEC_SOL' " & vbCrLf
                         cmdText &= "  AND    PMD.SubTableID = 'SPECIAL_SOLUTIONS' "
-                        cmdText &= "  AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'"
+                        cmdText &= "  AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'"
 
                         'Link to the Query the optional parameters when they are informed 
                         If (pElementID > 0) Then cmdText &= "  AND RE.ElementID = " & pElementID & vbCrLf
@@ -2032,7 +2061,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "  AND    RE.SolutionCode <> 'SALINESOL' " & vbCrLf
                         cmdText &= "  AND    RE.SolutionCode <> 'DISTW' " & vbCrLf
                         cmdText &= "  AND    PMD.SubTableID = 'DIL_SOLUTIONS' " & vbCrLf
-                        cmdText &= "  AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'"
+                        cmdText &= "  AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'"
 
                         'Link to the Query the optional parameters when they are informed 
                         If (pElementID > 0) Then cmdText &= "  AND RE.ElementID = " & pElementID & vbCrLf
@@ -2047,7 +2076,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "WHERE    RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
                         cmdText &= "  AND    RE.TubeContent = 'WASH_SOL' " & vbCrLf
                         cmdText &= "  AND    PMD.SubTableID = 'WASHING_SOLUTIONS' " & vbCrLf
-                        cmdText &= "  AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'"
+                        cmdText &= "  AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'"
 
                         'Link to the Query the optional parameters when they are informed 
                         If (pElementID > 0) Then cmdText &= "  AND RE.ElementID = " & pElementID & vbCrLf
@@ -2072,8 +2101,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredSolutionsDetails", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredSolutionsDetails", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2106,7 +2135,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim var As New GlobalBase
+                        'Dim var As New GlobalBase
                         Dim cmdText As String = String.Empty
                         cmdText &= "SELECT   RE.TubeContent, RE.ElementID, RE.SolutionCode, RE.ElementStatus, MR.ResourceText AS SolutionName, " & vbCrLf
                         cmdText &= "         RE.RequiredVolume, PMD.Position AS SortElement, 1 AS SortGroup, RE.TubeType " & vbCrLf
@@ -2115,7 +2144,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "WHERE    RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
                         cmdText &= "  AND    RE.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf
                         cmdText &= "  AND    PMD.SubTableID = 'SPECIAL_SOLUTIONS' "
-                        cmdText &= "  AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
+                        cmdText &= "  AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
 
                         'Link to the Query the optional parameters when they are informed 
                         If (pElementID > 0) Then cmdText &= "  AND RE.ElementID = " & pElementID & vbCrLf
@@ -2131,7 +2160,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "WHERE    RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
                         cmdText &= "  AND    RE.TubeContent = 'TUBE_WASH_SOL' " & vbCrLf
                         cmdText &= "  AND    PMD.SubTableID = 'WASHING_SOLUTIONS' " & vbCrLf
-                        cmdText &= "  AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
+                        cmdText &= "  AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
 
                         'Link to the Query the optional parameters when they are informed 
                         If (pElementID > 0) Then cmdText &= "  AND RE.ElementID = " & pElementID & vbCrLf
@@ -2157,8 +2186,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredTubeSolutionsDetails", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetRequiredTubeSolutionsDetails", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2218,8 +2247,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetSampleDilutionElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetSampleDilutionElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2256,22 +2285,37 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
+                        '                        " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                        " AND    RP.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
+                        '                        " AND    RP.SolutionCode IN (SELECT BlankMode FROM tparTests " & vbCrLf & _
+                        '                                                   " WHERE  TestID = " & pOrderTestDetailsRow.TestID & ") " & vbCrLf
+
                         Dim cmdText As String = " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
                                                 " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND    RP.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
-                                                " AND    RP.SolutionCode IN (SELECT BlankMode FROM tparTests " & vbCrLf & _
-                                                                           " WHERE  TestID = " & pOrderTestDetailsRow.TestID & ") " & vbCrLf
+                                                " AND    EXISTS (SELECT BlankMode FROM tparTests " & vbCrLf & _
+                                                                           " WHERE  TestID = " & pOrderTestDetailsRow.TestID & " AND RP.SolutionCode = BlankMode) " & vbCrLf
 
                         If (pOrderTestDetailsRow.SampleClass = "PATIENT") Then
                             If (Not pOrderTestDetailsRow.IsPredilutionModeNull AndAlso pOrderTestDetailsRow.PredilutionMode = "INST") Then
                                 'For patient samples with automatic dilution, get the needed Diluent Solution...
+                                'AJG
+                                'cmdText &= " UNION " & vbCrLf & _
+                                '           " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
+                                '           " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '           " AND    RP.TubeContent = 'SPEC_SOL' " & vbCrLf & _
+                                '           " AND    RP.SolutionCode IN (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
+                                '                                      " WHERE  TestID = " & pOrderTestDetailsRow.TestID & vbCrLf & _
+                                '                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "') " & vbCrLf
                                 cmdText &= " UNION " & vbCrLf & _
                                            " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
                                            " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                            " AND    RP.TubeContent = 'SPEC_SOL' " & vbCrLf & _
-                                           " AND    RP.SolutionCode IN (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
+                                           " AND    EXISTS (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
                                                                       " WHERE  TestID = " & pOrderTestDetailsRow.TestID & vbCrLf & _
-                                                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "') " & vbCrLf
+                                                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "' AND RP.SolutionCode = DiluentSolution) " & vbCrLf
                             End If
                         End If
 
@@ -2292,8 +2336,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetSpecialSolutionElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetSpecialSolutionElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2361,8 +2405,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadElemIDByCodeTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ReadElemIDByCodeTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2399,8 +2443,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2445,8 +2489,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateElementFinished", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateElementFinished", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2477,19 +2521,34 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    SpecimenIDList = SampleID " & vbCrLf & _
+                    '                        " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
+                    '                        " AND    SampleType  = '" & pSampleType.Trim & "' " & vbCrLf & _
+                    '                        " AND    SpecimenIDList IS NULL " & vbCrLf & _
+                    '                        " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                             " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf & _
+                    '                        " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    PatientID = " & IIf(pSampleIDType = "DB", "N'" & pSampleID.Trim.Replace("'", "''") & "', ", "NULL,").ToString & vbCrLf & _
+                    '                        "        SampleID  = " & IIf(pSampleIDType = "MAN", "N'" & pSampleID.Trim.Replace("'", "''") & "' ", "NULL").ToString & vbCrLf & _
+                    '                        " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
+                    '                        " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                             " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    SpecimenIDList = SampleID " & vbCrLf & _
                                             " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
                                             " AND    SampleType  = '" & pSampleType.Trim & "' " & vbCrLf & _
                                             " AND    SpecimenIDList IS NULL " & vbCrLf & _
-                                            " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                 " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                            " WHERE  OT.OrderID = '" & pOrderID.Trim & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf & _
                                             " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    PatientID = " & IIf(pSampleIDType = "DB", "N'" & pSampleID.Trim.Replace("'", "''") & "', ", "NULL,").ToString & vbCrLf & _
                                             "        SampleID  = " & IIf(pSampleIDType = "MAN", "N'" & pSampleID.Trim.Replace("'", "''") & "' ", "NULL").ToString & vbCrLf & _
                                             " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
-                                            " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                 " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf
+                                            " AND    EXISTS (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                            " WHERE  OT.OrderID = '" & pOrderID.Trim & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf
 
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
@@ -2503,8 +2562,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdatePatientSampleFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdatePatientSampleFields", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2545,8 +2604,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRequiredElementsDAO.UpdateStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRequiredElementsDAO.UpdateStatus", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2604,8 +2663,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateStatusAndTubeType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateStatusAndTubeType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2633,12 +2692,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    ElementStatus = 'NOPOS' " & vbCrLf & _
+                    '                        " WHERE  ElementID IN (SELECT DISTINCT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                    '                                             " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
+                    '                                             " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                             " AND    RotorType = '" & pRotorType & "') " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    ElementStatus = 'NOPOS' " & vbCrLf & _
-                                            " WHERE  ElementID IN (SELECT DISTINCT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
-                                                                 " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
-                                                                 " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                 " AND    RotorType = '" & pRotorType & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT  ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                                            " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
+                                                            " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                            " AND    RotorType = '" & pRotorType & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -2650,8 +2717,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateStatusByResetRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateStatusByResetRotor", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2699,8 +2766,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetControlID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.GetControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2762,8 +2829,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetControlsElements", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElementsDelegate.GetControlsElements", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

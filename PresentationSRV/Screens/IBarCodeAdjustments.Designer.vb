@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IBarCodeAdjustments
+Partial Class UiBarCodeAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IBarCodeAdjustments
         Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IBarCodeAdjustments))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiBarCodeAdjustments))
         Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.ProgressBar1 = New Biosystems.Ax00.Controls.UserControls.BSProgressBar
         Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
@@ -46,7 +46,7 @@ Partial Class IBarCodeAdjustments
         Me.ReadedValueLabel = New System.Windows.Forms.Label
         Me.StartReadingButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.CenterRotorGroupBox = New System.Windows.Forms.GroupBox
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.BsAdjust = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
         Me.AdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
@@ -313,7 +313,7 @@ Partial Class IBarCodeAdjustments
         '
         'CenterRotorGroupBox
         '
-        Me.CenterRotorGroupBox.Controls.Add(Me.CancelButton)
+        Me.CenterRotorGroupBox.Controls.Add(Me.ButtonCancel)
         Me.CenterRotorGroupBox.Controls.Add(Me.SaveButton)
         Me.CenterRotorGroupBox.Controls.Add(Me.BsAdjust)
         Me.CenterRotorGroupBox.Controls.Add(Me.AdjustButton)
@@ -326,13 +326,13 @@ Partial Class IBarCodeAdjustments
         '
         'CancelButton
         '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.CancelButton.Location = New System.Drawing.Point(687, 102)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 17
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonCancel.Location = New System.Drawing.Point(687, 102)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 17
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'SaveButton
         '
@@ -552,7 +552,7 @@ Partial Class IBarCodeAdjustments
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IBarCodeAdjustments"
+        Me.Name = "UiBarCodeAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = ""
         Me.BsMessagesPanel.ResumeLayout(False)
@@ -594,7 +594,7 @@ Partial Class IBarCodeAdjustments
     Friend WithEvents CenterRotorGroupBox As System.Windows.Forms.GroupBox
     Friend WithEvents AdjustButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsAdjust As Biosystems.Ax00.Controls.UserControls.BSAdjustControl
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SaveButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents ReadingBCGroupBox As System.Windows.Forms.GroupBox
     Friend WithEvents StartReadingButton As Biosystems.Ax00.Controls.UserControls.BSButton

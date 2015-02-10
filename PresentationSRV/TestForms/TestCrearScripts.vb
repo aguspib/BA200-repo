@@ -72,7 +72,7 @@ Public Class TestCrearScripts
                 myXMLpath = .FileName
             End With
 
-            If res = Windows.Forms.DialogResult.OK Then
+            If res = DialogResult.OK Then
                 IsLoadingAttr = True
                 Dim myGlobal As New GlobalDataTO
                 myGlobal = Importar(OriginalScriptsData.GetType, myXMLpath)
@@ -114,14 +114,14 @@ Public Class TestCrearScripts
                     End If
 
                     'version
-                    Dim myUtil As New Utilities
-                    myGlobal = myUtil.GetSoftwareVersion
+                    'Dim myUtil As New Utilities.
+                    myGlobal = GetSoftwareVersion
                     If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                         Dim myVersion As String = CStr(myGlobal.SetDatos)
                         Dim myRes As DialogResult = MessageBox.Show("La versión actual del software es: " & myVersion & vbCrLf & "¿Asignar esta versión?", Me.Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
-                        If myRes = Windows.Forms.DialogResult.Yes Then
+                        If myRes = DialogResult.Yes Then
                             Me.BsVersionTextBox.Text = myVersion
-                        ElseIf myRes = Windows.Forms.DialogResult.Cancel Then
+                        ElseIf myRes = DialogResult.Cancel Then
                             Exit Sub
                         End If
                     Else
@@ -138,7 +138,7 @@ Public Class TestCrearScripts
                         myXMLpath = .FileName
                     End With
 
-                    If res = Windows.Forms.DialogResult.OK Then
+                    If res = DialogResult.OK Then
                         If File.Exists(myXMLpath) Then
                             File.Delete(myXMLpath)
                         End If
@@ -593,7 +593,7 @@ Public Class TestCrearScripts
     Private Function Exportar(ByVal pScriptsData As FwScriptsDataTO, ByVal pPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -620,7 +620,7 @@ Public Class TestCrearScripts
     Private Function Importar(ByVal pScriptsDataType As Type, ByVal pPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
             Dim myScripts As New FwScripts
@@ -644,10 +644,10 @@ Public Class TestCrearScripts
             If ChangesMade Then
                 Dim res As DialogResult
                 res = MessageBox.Show("Cambios sin guardar!" & vbCrLf & "¿Guardar?", Text, MessageBoxButtons.YesNoCancel)
-                If res = Windows.Forms.DialogResult.Cancel Then
+                If res = DialogResult.Cancel Then
                     Exit Sub
                 End If
-                If res = Windows.Forms.DialogResult.Yes Then
+                If res = DialogResult.Yes Then
                     AddDataToXMLFile()
                 End If
 
@@ -740,6 +740,7 @@ Public Class TestCrearScripts
                 Return ""
             End If
 
+            Return ""
         Catch ex As Exception
             MessageBox.Show(ex.Message)
             Return ""
@@ -747,15 +748,15 @@ Public Class TestCrearScripts
     End Function
 
 
-    Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsImportarButton.Click
+    Private Sub BsButton1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsImportarButton.Click
         Try
             If ChangesMade Then
                 Dim res As DialogResult
                 res = MessageBox.Show("Cambios sin guardar!" & vbCrLf & "¿Guardar?", Text, MessageBoxButtons.YesNoCancel)
-                If res = Windows.Forms.DialogResult.Cancel Then
+                If res = DialogResult.Cancel Then
                     Exit Sub
                 End If
-                If res = Windows.Forms.DialogResult.Yes Then
+                If res = DialogResult.Yes Then
                     Me.AddDataToXMLFile()
                 End If
             End If
@@ -769,7 +770,7 @@ Public Class TestCrearScripts
     End Sub
 
 
-    Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExportarButton.Click
+    Private Sub BsButton2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsExportarButton.Click
         Try
             ValidateGrid()
             If Not ValidationError Then
@@ -789,7 +790,7 @@ Public Class TestCrearScripts
    
 
     'SGM
-    Private Sub BSScriptsDGV_CellValidated(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles BSScriptsDGV.CellValidated
+    Private Sub BSScriptsDGV_CellValidated(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles BSScriptsDGV.CellValidated
         Try
             Dim myGlobal As New GlobalDataTO
 
@@ -812,7 +813,7 @@ Public Class TestCrearScripts
 
    
     'BORRAR FILA
-    Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsBorrarButton.Click
+    Private Sub BsButton3_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsBorrarButton.Click
         Try
             Dim rowIndex As Integer
             If BSScriptsDGV.SelectedCells.Count > 0 Then
@@ -830,7 +831,7 @@ Public Class TestCrearScripts
 
 
 
-    Private Sub BsButton5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsNuevoAnalizadorButton.Click
+    Private Sub BsButton5_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsNuevoAnalizadorButton.Click
         Try
             AgregarAnalizador()
         Catch ex As Exception
@@ -840,7 +841,7 @@ Public Class TestCrearScripts
     End Sub
 
 
-    Private Sub BSScriptsDGV_CellEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles BSScriptsDGV.CellEnter
+    Private Sub BSScriptsDGV_CellEnter(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles BSScriptsDGV.CellEnter
         Try
             'SGM
             'If BSScriptsDGV.Rows(e.RowIndex).IsNewRow Or Me.IsLoading Then Exit Sub
@@ -861,7 +862,7 @@ Public Class TestCrearScripts
     End Sub
 
     'SGM
-    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
         Try
            
            
@@ -871,12 +872,12 @@ Public Class TestCrearScripts
         End Try
     End Sub
 
-    Private Sub TestCrearScripts_Shown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Shown
+    Private Sub TestCrearScripts_Shown(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Shown
         Try
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
-            myGlobal = myUtil.GetSoftwareVersion
+            'Dim myUtil As New Utilities.
+            myGlobal = GetSoftwareVersion
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 BsVersionTextBox.Text = CStr(myGlobal.SetDatos)
             Else
@@ -893,7 +894,7 @@ Public Class TestCrearScripts
     End Sub
 
     'SGM
-    Private Sub BsNuevoButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsNuevoButton.Click
+    Private Sub BsNuevoButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsNuevoButton.Click
         Try
             If CurrentAnalyzer.Length > 0 Then
                 If Not ValidationError And Not IsAdding Then
@@ -912,7 +913,7 @@ Public Class TestCrearScripts
     End Sub
 
     'SGM
-    Private Sub BsAnalyzerComboBox_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsAnalyzerComboBox.SelectedIndexChanged
+    Private Sub BsAnalyzerComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsAnalyzerComboBox.SelectedIndexChanged
         Try
             If Not IsLoading And OriginalScriptsData IsNot Nothing Then
                 If BsAnalyzerComboBox.Items.Count > 0 Then
@@ -928,7 +929,7 @@ Public Class TestCrearScripts
 
     End Sub
 
-    Private Sub BSScriptsDGV_CellBeginEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellCancelEventArgs) Handles BSScriptsDGV.CellBeginEdit
+    Private Sub BSScriptsDGV_CellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs) Handles BSScriptsDGV.CellBeginEdit
         Try
             IsEditing = True
 
@@ -937,7 +938,7 @@ Public Class TestCrearScripts
         End Try
     End Sub
 
-    Private Sub EncriptadoCheckBox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EncriptadoCheckBox.CheckedChanged
+    Private Sub EncriptadoCheckBox_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles EncriptadoCheckBox.CheckedChanged
         Try
             EncryptingAttr = EncriptadoCheckBox.Checked
         Catch ex As Exception
@@ -945,7 +946,7 @@ Public Class TestCrearScripts
         End Try
     End Sub
 
-    Private Sub BsButton1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub BsButton1_Click_1(ByVal sender As Object, ByVal e As EventArgs)
         Try
             ValidateGrid()
             If Not ValidationError Then
@@ -957,7 +958,7 @@ Public Class TestCrearScripts
         End Try
     End Sub
 
-    Private Sub BSScriptsDGV_CellValueChanged(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles BSScriptsDGV.CellValueChanged
+    Private Sub BSScriptsDGV_CellValueChanged(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles BSScriptsDGV.CellValueChanged
         Try
             If Not IsLoading And IsEditing Then
                 ChangesMadeAttr = True
@@ -968,7 +969,7 @@ Public Class TestCrearScripts
         End Try
     End Sub
 
-    Private Sub BsButton1_Click_2(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
+    Private Sub BsButton1_Click_2(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton1.Click
         Try
             
             CrearNuevo()
@@ -979,7 +980,7 @@ Public Class TestCrearScripts
     End Sub
 
 
-    Private Sub BSScriptsDGV_EditingControlShowing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewEditingControlShowingEventArgs) Handles BSScriptsDGV.EditingControlShowing
+    Private Sub BSScriptsDGV_EditingControlShowing(ByVal sender As Object, ByVal e As DataGridViewEditingControlShowingEventArgs) Handles BSScriptsDGV.EditingControlShowing
         Try
 
             If Not TypeOf e.Control Is TextBox Then Return
@@ -997,7 +998,7 @@ Public Class TestCrearScripts
     End Sub
 
     'PENDING
-    Private Sub dgvTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs)
+    Private Sub dgvTextBox_KeyUp(ByVal sender As Object, ByVal e As KeyEventArgs)
         Try
 
             Select Case e.KeyCode

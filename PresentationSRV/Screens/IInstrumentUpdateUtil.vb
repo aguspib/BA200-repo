@@ -26,7 +26,7 @@ Imports Biosystems.Ax00.App
 'FWUTIL
 
 
-Public Class IInstrumentUpdateUtil
+Public Class UiInstrumentUpdateUtil
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 
@@ -309,7 +309,7 @@ Public Class IInstrumentUpdateUtil
                 Else
                     MyClass.AdjustmentsEditionChangesMade = False
                     Me.BsAdjustmentsRTextBox.BackColor = Color.LightYellow
-                    MyClass.HideCaret(Me.BsAdjustmentsRTextBox.Handle)
+                    HideCaret(Me.BsAdjustmentsRTextBox.Handle)
                 End If
             End If
 
@@ -379,7 +379,7 @@ Public Class IInstrumentUpdateUtil
             Me.BsFwUpdateCaptionLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_FWUTIL_UPDATE", currentLanguage)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -389,24 +389,24 @@ Public Class IInstrumentUpdateUtil
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjOpenFileButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_OPEN", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjSaveAsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_SAVE", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjBackupButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_BK", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_RES", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjRestoreFactoryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_FAC", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsFwUpdateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_FW_UPT", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjOpenFileButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_OPEN", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjSaveAsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_SAVE", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjBackupButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_BK", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_RES", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjRestoreFactoryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_FAC", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsFwUpdateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_FW_UPT", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
 
             If MyClass.EditionAllowed Then
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_NEW", currentLanguage))
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_EDIT", currentLanguage))
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjUndoButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_UNDO", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_NEW", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_EDIT", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjUndoButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_UNDO", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -435,7 +435,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -461,7 +461,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".EnableButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".EnableButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -500,7 +500,7 @@ Public Class IInstrumentUpdateUtil
 
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -525,7 +525,7 @@ Public Class IInstrumentUpdateUtil
                 myAdjustmentsMasterDataDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentsMasterData", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -567,7 +567,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WarnIfAdjustmentsEditionChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WarnIfAdjustmentsEditionChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WarnIfAdjustmentsEditionChanges", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -598,7 +598,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateAdjustmentsData", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -627,7 +627,7 @@ Public Class IInstrumentUpdateUtil
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckAdjustmentsCompatibility", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckAdjustmentsCompatibility", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckAdjustmentsCompatibility", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myRes
@@ -686,7 +686,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustmentsFileAs ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustmentsFileAs ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveAdjustmentsFileAs", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -730,7 +730,7 @@ Public Class IInstrumentUpdateUtil
 
 
                 'deserialize decrypted data
-                Dim myUtility As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myOpenAdjustmentsDS As New SRVAdjustmentsDS
                 myTempPath = path.Replace(FwAdjustmentsDelegate.AdjustmentCryptedFileExtension, FwAdjustmentsDelegate.AdjustmentDecryptedFileExtension)
 
@@ -806,7 +806,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OpenAdjustmentsFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenAdjustmentsFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".OpenAdjustmentsFile", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -831,7 +831,7 @@ Public Class IInstrumentUpdateUtil
 
         Dim resultData As New GlobalDataTO
 
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
 
         Try
             'delete if previously exists
@@ -858,8 +858,8 @@ Public Class IInstrumentUpdateUtil
                 'encrypt the file
                 If File.Exists(pTempFilePath) Then
 
-                    Dim myUtil As New Utilities
-                    resultData = myUtil.EncryptFile(pTempFilePath, pFilePath)
+                    'Dim Utilities As New Utilities
+                    resultData = Utilities.EncryptFile(pTempFilePath, pFilePath)
 
                 Else
                     Throw New Exception(GlobalEnumerates.Messages.SYSTEM_ERROR.ToString)
@@ -871,7 +871,7 @@ Public Class IInstrumentUpdateUtil
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExportAdjustmentsDataset ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExportAdjustmentsDataset ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExportAdjustmentsDataset", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             'delete the temp file
@@ -893,7 +893,7 @@ Public Class IInstrumentUpdateUtil
     ''' <remarks>Created by SGM 23/06/2011</remarks>
     Private Function ImportAdjustmentsDataset(ByVal pAdjustmentsDatasetType As Type, ByVal pFilePath As String, ByVal pTempFilePath As String, ByVal pDecrypt As Boolean) As GlobalDataTO
         Dim resultData As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
         ' 
         Dim FS As FileStream = Nothing
 
@@ -907,7 +907,7 @@ Public Class IInstrumentUpdateUtil
                     File.Delete(pTempFilePath)
                 End If
 
-                resultData = myUtil.DecryptFile(pFilePath, pTempFilePath)
+                resultData = Utilities.DecryptFile(pFilePath, pTempFilePath)
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     If File.Exists(pTempFilePath) Then
@@ -935,7 +935,7 @@ Public Class IInstrumentUpdateUtil
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsDataset ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsDataset ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ImportAdjustmentsDataset", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             If Not FS Is Nothing Then
@@ -1029,7 +1029,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestAdjustFromInstrument ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestAdjustFromInstrument ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestAdjustFromInstrument", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1047,12 +1047,12 @@ Public Class IInstrumentUpdateUtil
     '    Dim myGlobal As New GlobalDataTO
 
     '    Try
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
 
 
     '        With Me.BackupFileDialog
     '            .Title = "Backup Adjustments"
-    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & myGlobalbase.FwAdjustmentsPath)
+    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & GlobalBase.FwAdjustmentsPath)
     '            .Filter = "Text files|*.txt|All files|*.*"
     '            .CheckPathExists = True
     '            .OverwritePrompt = True
@@ -1079,7 +1079,7 @@ Public Class IInstrumentUpdateUtil
     '        myGlobal.HasError = True
     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        myGlobal.ErrorMessage = ex.Message
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustmentsBackupFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustmentsBackupFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".SaveAdjustmentsBackupFile", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
 
@@ -1211,7 +1211,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestRestoreAction ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestRestoreAction ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestRestoreAction ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1266,7 +1266,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RestoreAdjustments ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1303,7 +1303,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RestoreFactoryAdjustments ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1357,7 +1357,7 @@ Public Class IInstrumentUpdateUtil
             Me.BsWaitProgressBar.Refresh()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ManageFwUpdateInitialProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ManageFwUpdateInitialProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ManageFwUpdateInitialProgress ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1389,7 +1389,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TryUpdateFirmware ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TryUpdateFirmware ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TryUpdateFirmware ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsFwUpdateRequested = False
 
@@ -1428,7 +1428,7 @@ Public Class IInstrumentUpdateUtil
                     MyClass.ManageFwUpdateInitialProgress()
                     MyBase.DisplayLabel("Working", "LBL_SRV_FW_UPDATE_START")
 
-                    MyBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " update started", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " update started", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
                 End If
             End If
@@ -1438,7 +1438,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateFirmware ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateFirmware ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateFirmware ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1496,7 +1496,7 @@ Public Class IInstrumentUpdateUtil
             MyClass.PrepareArea()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateFirmwareUpdate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateFirmwareUpdate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulateFirmwareUpdate ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1510,7 +1510,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             With Me.OpenFwFileDialog
                 .Title = Me.BsTabPagesControl.TabPages(1).Text ' "Update Firmware"
@@ -1552,7 +1552,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OpenFirmwareFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenFirmwareFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".OpenFirmwareFile", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1585,7 +1585,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ResetAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ResetAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ResetAnalyzer ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1611,7 +1611,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StandbyAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StandbyAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StandbyAnalyzer ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1637,7 +1637,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SleepAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SleepAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SleepAnalyzer ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1736,7 +1736,7 @@ Public Class IInstrumentUpdateUtil
             Application.DoEvents()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1814,7 +1814,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1839,7 +1839,7 @@ Public Class IInstrumentUpdateUtil
             Me.BsExitButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsReadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsReadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustmentsReadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
         End Try
@@ -1864,7 +1864,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsRestoringMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsRestoringMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustmentsRestoringMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             'MyClass.EndWaitTimer()
             Me.BsWaitProgressBar.Visible = False
@@ -1952,7 +1952,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsRestoredMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsRestoredMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustmentsRestoredMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1980,7 +1980,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareUpdatingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareUpdatingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareFirmwareUpdatingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
         End Try
@@ -2114,7 +2114,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             'Dim s As String = ex.StackTrace
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFwUtilReceivedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFwUtilReceivedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareFwUtilReceivedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2163,7 +2163,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             'Dim s As String = ex.StackTrace
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateFirmwareItems ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateFirmwareItems ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateFirmwareItems ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2178,13 +2178,13 @@ Public Class IInstrumentUpdateUtil
                 Case FW_GENERIC_RESULT.KO
                     MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.FW_UPDATE_ERROR.ToString)
                     MyBase.DisplayMessage(Messages.FW_UPDATE_ERROR.ToString)
-                    MyBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " is NOT updated", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " is NOT updated", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
                 Case FW_GENERIC_RESULT.OK
                     Me.BsFwCurrentVersionLabel.Text = myScreenDelegate.FWFileHeaderVersion
                     MyBase.DisplayMessage(Messages.SRV_FW_UPDATED.ToString)
 
-                    MyBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " updated Ok", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " updated Ok", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
                     AnalyzerController.Instance.Analyzer.IsFwSwCompatible = True '#REFACTORING
                     MyBase.ActivateMDIMenusButtons(True, False, True)
@@ -2211,7 +2211,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareFirmwareUpdatedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
         End Try
@@ -2251,7 +2251,7 @@ Public Class IInstrumentUpdateUtil
             Me.BsExitButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareStandByDoingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareStandByDoingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareStandByDoingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
         End Try
@@ -2348,7 +2348,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareStandByDoneMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareStandByDoneMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareStandByDoneMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsRestoringRequested = False
         End Try
@@ -2382,7 +2382,7 @@ Public Class IInstrumentUpdateUtil
         '    Me.BsExitButton.Enabled = False
 
         'Catch ex As Exception
-        '    MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSleepDoingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSleepDoingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         '    MyBase.ShowMessage(Me.Name & ".PrepareSleepDoingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         '    Me.BsWaitProgressBar.Visible = False
         'End Try
@@ -2459,7 +2459,7 @@ Public Class IInstrumentUpdateUtil
         '    End If
 
         'Catch ex As Exception
-        '    MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSleepDoneMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSleepDoneMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         '    MyBase.ShowMessage(Me.Name & ".PrepareSleepDoneMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         '    MyClass.IsFwUpdateRequested = False
         'End Try
@@ -2485,7 +2485,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerResetingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerResetingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAnalyzerResetingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
         End Try
@@ -2521,7 +2521,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerIsResetMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerIsResetMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAnalyzerIsResetMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2628,7 +2628,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustmentsReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustmentsReadedMode ", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
     End Sub
@@ -2652,7 +2652,7 @@ Public Class IInstrumentUpdateUtil
             MyBase.DisplayMessage(Messages.SRV_READ_FIRMWARE.ToString)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareReadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareReadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareFirmwareReadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2706,7 +2706,7 @@ Public Class IInstrumentUpdateUtil
         '    myGlobal.HasError = True
         '    myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '    myGlobal.ErrorMessage = ex.Message
-        '    MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFirmwareReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         '    MyBase.ShowMessage(Me.Name & ".PrepareFirmwareReadedMode ", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         'End Try
     End Sub
@@ -2755,7 +2755,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2792,7 +2792,7 @@ Public Class IInstrumentUpdateUtil
             Me.Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2818,7 +2818,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartActionTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartActionTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -2843,7 +2843,7 @@ Public Class IInstrumentUpdateUtil
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnActionTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnActionTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2877,7 +2877,7 @@ Public Class IInstrumentUpdateUtil
     '        myGlobal.HasError = True
     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        myGlobal.ErrorMessage = ex.Message
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & " StartWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     '    Return myGlobal
@@ -2903,7 +2903,7 @@ Public Class IInstrumentUpdateUtil
     '        myGlobal.HasError = True
     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        myGlobal.ErrorMessage = ex.Message
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & " OnWaitTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWaitTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -2928,7 +2928,7 @@ Public Class IInstrumentUpdateUtil
     '        myGlobal.HasError = True
     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        myGlobal.ErrorMessage = ex.Message
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & " EndWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " EndWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     '    Return myGlobal
@@ -2967,7 +2967,7 @@ Public Class IInstrumentUpdateUtil
             'Next
             'Me.WaitingProgressBar.Visible = False
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateWaiting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateWaiting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulateWaiting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
 
@@ -3017,7 +3017,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3026,8 +3026,8 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'user permissions
             MyBase.GetUserNumericalLevel()
@@ -3102,7 +3102,7 @@ Public Class IInstrumentUpdateUtil
             'BsAdjUndoButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3121,7 +3121,7 @@ Public Class IInstrumentUpdateUtil
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_Selected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3153,7 +3153,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Deselecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Deselecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_Deselecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3184,7 +3184,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabControl_Selecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3220,7 +3220,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsTabPagesControl_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsTabPagesControl_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsTabPagesControl_SelectedIndexChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3229,7 +3229,7 @@ Public Class IInstrumentUpdateUtil
         Try
             Me.Close()
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3241,7 +3241,7 @@ Public Class IInstrumentUpdateUtil
                 HideCaret(Me.BsAdjustmentsRTextBox.Handle)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_GotFocus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_GotFocus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAdjustmentsRTextBox_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3259,7 +3259,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAdjustmentsRTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3272,7 +3272,7 @@ Public Class IInstrumentUpdateUtil
                 HideCaret(Me.BsAdjustmentsRTextBox.Handle)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAdjustmentsRTextBox_MouseDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3283,7 +3283,7 @@ Public Class IInstrumentUpdateUtil
                 HideCaret(Me.BsAdjustmentsRTextBox.Handle)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAdjustmentsRTextBox_MouseDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3294,7 +3294,7 @@ Public Class IInstrumentUpdateUtil
                 e.Handled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustmentsRTextBox_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAdjustmentsRTextBox_KeyPress ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3321,7 +3321,7 @@ Public Class IInstrumentUpdateUtil
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsAdjOpenFileButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsAdjOpenFileButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsAdjOpenFileButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
     End Sub
@@ -3346,7 +3346,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsAdjSaveAsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsAdjSaveAsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsAdjSaveAsButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
 
@@ -3358,7 +3358,7 @@ Public Class IInstrumentUpdateUtil
             MyBase.DisplayMessage("")
             MyClass.AdjustmentsEditionMode = True
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsAdjEditButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsAdjEditButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsAdjEditButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
     End Sub
@@ -3392,7 +3392,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsBackupButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsBackupButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsBackupButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
     End Sub
@@ -3444,7 +3444,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsRestoreButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsRestoreButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsRestoreButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             MyClass.IsRestoringRequested = False
         End Try
@@ -3477,7 +3477,7 @@ Public Class IInstrumentUpdateUtil
         '    End If
 
         'Catch ex As Exception
-        '    MyBase.CreateLogActivity(ex.Message, Name & ".BsRestoreFactoryButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    GlobalBase.CreateLogActivity(ex.Message, Name & ".BsRestoreFactoryButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         '    MyBase.ShowMessage(Name & ".BsRestoreFactoryButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         '    MyClass.IsRestoringToFactoryRequested = False
         'End Try
@@ -3514,7 +3514,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsAdjNewButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsAdjNewButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsAdjNewButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
     End Sub
@@ -3537,7 +3537,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsAdjCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsAdjCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsAdjCancelButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage)
         End Try
     End Sub
@@ -3560,7 +3560,7 @@ Public Class IInstrumentUpdateUtil
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".bsPrintButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             Me.BsAdjPrintButton.Enabled = True
         End Try
@@ -3587,7 +3587,7 @@ Public Class IInstrumentUpdateUtil
                 Me.BsAdjPrintButton.Enabled = False
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".PrintDocument1_PrintPage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".PrintDocument1_PrintPage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".PrintDocument1_PrintPage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             e.HasMorePages = False
             Me.BsAdjPrintButton.Enabled = True
@@ -3665,7 +3665,7 @@ Public Class IInstrumentUpdateUtil
             MyClass.myScreenDelegate.ManageHistoryResults()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3681,7 +3681,7 @@ Public Class IInstrumentUpdateUtil
             MyClass.ReportHistory(InstrumentUpdateUtilDelegate.HISTORY_RESULTS._ERROR)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistoryError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3698,7 +3698,7 @@ Public Class IInstrumentUpdateUtil
 
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3728,7 +3728,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsUpdateFwButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsUpdateFwButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsUpdateFwButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             MyClass.IsFwUpdateRequested = False
         End Try
@@ -3737,7 +3737,7 @@ Public Class IInstrumentUpdateUtil
     Private Sub BsOpenFileButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsFwOpenFileButton.Click
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -3753,7 +3753,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".BsOpenFileButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".BsOpenFileButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".BsOpenFileButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             MyClass.IsFwUpdateRequested = False
         End Try
@@ -3854,7 +3854,7 @@ Public Class IInstrumentUpdateUtil
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
@@ -4059,7 +4059,7 @@ Public Class IInstrumentUpdateUtil
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -4102,7 +4102,7 @@ Public Class IInstrumentUpdateUtil
 
             End Select
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ProcessDialogKey ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ProcessDialogKey ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ProcessDialogKey ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -4158,7 +4158,7 @@ Public Class IInstrumentUpdateUtil
 
         Catch ex As Exception
             MyClass.StopProgress()
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StartProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StartProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StartProgress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4189,7 +4189,7 @@ Public Class IInstrumentUpdateUtil
             MyClass.IsInprogress = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopProgress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4201,7 +4201,7 @@ Public Class IInstrumentUpdateUtil
             Me.BsWaitProgressBar.Value = Me.BsWaitProgressBar.Minimum
             Me.BsWaitProgressBar.Refresh()
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".HideProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HideProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".HideProgress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4220,7 +4220,7 @@ Public Class IInstrumentUpdateUtil
             End If
         Catch ex As Exception
             MyClass.StopProgress()
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateProgress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateProgress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4243,7 +4243,7 @@ Public Class IInstrumentUpdateUtil
 
         Catch ex As Exception
             MyClass.StopProgress()
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnWaitTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnWaitTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".OnWaitTimerTick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4267,7 +4267,7 @@ Public Class IInstrumentUpdateUtil
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

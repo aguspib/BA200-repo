@@ -1,10 +1,7 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
+﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IMotorsPumpsValvesTest
+Partial Class UiMotorsPumpsValvesTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -30,7 +27,7 @@ Partial Class IMotorsPumpsValvesTest
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IMotorsPumpsValvesTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiMotorsPumpsValvesTest))
         Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
@@ -366,7 +363,7 @@ Partial Class IMotorsPumpsValvesTest
         Me.BsHomingSimulationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsSimulateContinuousTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsCollisionSimulationTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Me.bsScreenToolTips2 = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
@@ -7551,7 +7548,7 @@ Partial Class IMotorsPumpsValvesTest
         Me.Controls.Add(Me.BsTabPagesControl)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IMotorsPumpsValvesTest"
+        Me.Name = "UiMotorsPumpsValvesTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "MotorsTest"
         Me.BsMessagesPanel.ResumeLayout(False)
@@ -7943,7 +7940,7 @@ Partial Class IMotorsPumpsValvesTest
     'Friend WithEvents Col_StartButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents Enco_EncoderPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents Enco_UnitsLabel As System.Windows.Forms.Label
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
+    Friend WithEvents bsScreenToolTips2 As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents WSAsp_UpDownButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents WSDisp_UpDownButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsInfoInDoXPSViewer As BsXPSViewer

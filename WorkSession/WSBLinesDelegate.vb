@@ -52,8 +52,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -109,8 +109,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Exists", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.Exists", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -134,7 +134,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
         ''' AG 29/10/2014 BA-2057 parameter pWellUsed, pType
         ''' </remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function Read(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                              ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -154,8 +154,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetByWaveLength", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -172,7 +172,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: GDS 21/05/2010
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -202,8 +202,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -231,7 +231,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType) (renamed, old name GetBaseLineValues)
         ''' AG 19/11/2014 BA-2064 reinterprete the formula and get the correct information for calculations using dynamic base line
         ''' </remarks>
-        Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                   ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaselineAdjustID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -257,8 +257,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ReadValuesForCalculations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -310,8 +310,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetByWaveLength", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetCurrentBaseLineValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -355,8 +355,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.IsComplete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -396,8 +396,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -416,7 +416,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  AG 04/05/2011
         '''              AG 04/11/2014 BA-2065 (adapt well rejection for STATIC or DYNAMIC base line)
         ''' </remarks>
-        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
+        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -435,8 +435,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetCurrentBaseLineValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.ReadValuesForCalculations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -464,7 +464,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 21/11/2014 BA-2062 when Reset the ALIGHT results reset also the table twksWSBLinesByWell
         ''' AG 15/01/2015 BA-2212 skip the process for delete not used baseline records when pBaseLineTypeForCalculation = DYNAMIC and parameter RDI_CUMULATE_ALL_BASELINES = 1
         ''' </remarks>
-        Public Function DeleteBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function DeleteBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pType As String, ByVal pBaseLineTypeForCalculation As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -530,8 +530,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.DeleteBLinesValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetAdjustsBLines", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -549,7 +549,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: SA 26/09/2012
         ''' </remarks>
-        Public Function VerifyBLMovedToHistoric(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function VerifyBLMovedToHistoric(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                                 ByVal pAdjustBaseLineID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -569,8 +569,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.VerifyBLMovedToHistoric", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -619,8 +619,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.UpdateMovedToHistoric", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.UpdateMovedToHistoric", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -638,7 +638,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerModel"></param>
         ''' <returns></returns>
         ''' <remarks>AG 15/01/2015 BA-2212</remarks>
-        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
                               ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -723,8 +723,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetWSForDynamicBL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.VerifyBLMovedToHistoric", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -1,7 +1,8 @@
 ﻿'Created by AG 10/08/2010 - Based on ResultFormAG
 
-Option Explicit On
 Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports System.Text
 Imports Biosystems.Ax00.BL
@@ -15,7 +16,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports DevExpress.XtraCharts
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IResultsCalibCurve
+Public Class UiResultsCalibCurve
 
 #Region "Declarations"
 
@@ -89,7 +90,8 @@ Public Class IResultsCalibCurve
     Private SampleTypeSelectedTextField As String = String.Empty
     Private AcceptedRerunNumberField As Integer = 0
     Private HistoricalModeField As Boolean = False 'AG 16/10/2012
-
+    Private SelectedOrderTestIDField As Integer ' XB 30/07/2014 - BA-1863
+    Private SelectedTestVersionNumberField As Integer ' XB 25/09/2014 - BA-1863
 #End Region
 
 #Region "Properties"
@@ -190,6 +192,23 @@ Public Class IResultsCalibCurve
         End Set
     End Property
 
+    Public Property SelectedOrderTestID As Integer   ' XB 30/07/2014 - BA-1863
+        Get
+            Return SelectedOrderTestIDField
+        End Get
+        Set(ByVal value As Integer)
+            SelectedOrderTestIDField = value
+        End Set
+    End Property
+
+    Public Property SelectedTestVersionNumber As Integer   ' XB 25/09/2014 - BA-1863
+        Get
+            Return SelectedTestVersionNumberField
+        End Get
+        Set(ByVal value As Integer)
+            SelectedTestVersionNumberField = value
+        End Set
+    End Property
 #End Region
 
 #Region "Events"
@@ -206,7 +225,7 @@ Public Class IResultsCalibCurve
                 bsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveResultForm_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveResultForm_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CurveResultForm_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -218,7 +237,7 @@ Public Class IResultsCalibCurve
         Try
             InitializeScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveResultForm_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveResultForm_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CurveResultForm_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -230,7 +249,7 @@ Public Class IResultsCalibCurve
         Try
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -258,7 +277,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorsDataGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorsDataGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -298,7 +317,7 @@ Public Class IResultsCalibCurve
                     dgv.Cursor = Cursors.Default
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseEnter", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseEnter", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibratorsDataGridView_CellMouseEnter", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -313,7 +332,7 @@ Public Class IResultsCalibCurve
                 dgv.Cursor = Cursors.Default
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseLeave", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseLeave", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibratorsDataGridView_CellMouseLeave", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -437,7 +456,7 @@ Public Class IResultsCalibCurve
             'END AG 08/08/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorsDataGridView_CellMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibratorsDataGridView_CellMouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -468,7 +487,7 @@ Public Class IResultsCalibCurve
             'END AG 03/09/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveCombos_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveCombos_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CurveCombos_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -491,7 +510,7 @@ Public Class IResultsCalibCurve
             'END AG 03/09/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveReactionType_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CurveReactionType_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CurveReactionType_CheckedChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -506,7 +525,7 @@ Public Class IResultsCalibCurve
         Try
             RemoveResultsChart()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResultsChart_Validated ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResultsChart_Validated ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResultsChart_Validated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -521,7 +540,7 @@ Public Class IResultsCalibCurve
         Try
             RemoveResultsChart()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResultsChart_Exit ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResultsChart_Exit ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResultsChart_Exit", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -530,7 +549,8 @@ Public Class IResultsCalibCurve
     ''' Generate the report when the Print Button is clicked
     ''' </summary>
     ''' <remarks>
-    ''' Created by: RH 20/10/2010
+    ''' Created by:  RH 20/10/2010
+    ''' Modified by: XB 30/07/2014 - Code moved to a private function - BA-1863
     ''' </remarks>
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
         Try
@@ -601,19 +621,24 @@ Public Class IResultsCalibCurve
 
             'AG 30/04/2014 - #1608 if informed use ReportName instead of TestName
             'XRManager.ShowResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedTestName, AcceptedRerunNumber)
-            Dim myList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDSField.vwksResults _
-                                           Where row.TestName = SelectedTestName AndAlso row.SampleType = SampleTypeSelectedTextField _
-                                           AndAlso Not row.IsTestLongNameNull Select row).ToList
-            Dim myTestReportName As String = ""
-            If myList.Count > 0 AndAlso Not myList(0).IsTestLongNameNull Then
-                myTestReportName = myList(0).TestLongName
-            End If
-            XRManager.ShowResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedTestName, AcceptedRerunNumber, myTestReportName)
-            myList.Clear()
-            myList = Nothing
+
+            ' XB 30/07/2014 - BA-1863
+            'Dim myList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDSField.vwksResults _
+            '                               Where row.TestName = SelectedTestName AndAlso row.SampleType = SampleTypeSelectedTextField _
+            '                               AndAlso Not row.IsTestLongNameNull Select row).ToList
+            'Dim myTestReportName As String = ""
+            'If myList.Count > 0 AndAlso Not myList(0).IsTestLongNameNull Then
+            '    myTestReportName = myList(0).TestLongName
+            'End If
+            'XRManager.ShowResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedTestName, AcceptedRerunNumber, myTestReportName)
+            'myList.Clear()
+            'myList = Nothing
+
+            Me.PrintReport()
+            ' XB 30/07/2014 - BA-1863
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -675,7 +700,7 @@ Public Class IResultsCalibCurve
             labelCalibCurveNotCalculated = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_CALIBCURVE_NOT_CALCULATED", LanguageID)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -755,7 +780,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadExecutionsResults", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -777,8 +802,8 @@ Public Class IResultsCalibCurve
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()
@@ -814,7 +839,7 @@ Public Class IResultsCalibCurve
             DrawChart()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -842,7 +867,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DXChartControl_ObjectHotTracked", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DXChartControl_ObjectHotTracked", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DXChartControl_ObjectHotTracked", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -993,7 +1018,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DrawChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DrawChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1071,7 +1096,7 @@ Public Class IResultsCalibCurve
             bsIncreasingRadioButton.Checked = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "LoadCombos " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "LoadCombos " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadCombos", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1122,7 +1147,7 @@ Public Class IResultsCalibCurve
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetResultAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetResultAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -1158,7 +1183,7 @@ Public Class IResultsCalibCurve
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetExecutionAlarmDescription ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
         End Try
@@ -1196,7 +1221,7 @@ Public Class IResultsCalibCurve
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".HIST_GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".HIST_GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".HIST_GetExecutionAlarmDescription ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
         End Try
@@ -1243,7 +1268,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateCurrentGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateCurrentGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateCurrentGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             'Finally
             '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1256,6 +1281,7 @@ Public Class IResultsCalibCurve
     ''' <remarks>
     ''' Created by:  TR 30/04/2010
     ''' Modified by: DL 21/06/2010 - Load the Icon in Image Property instead of in BackgroundImage
+    '''              XB 30/07/2014 - remove code that disable and hide the Print Button when the screen has been open from Historic Module - BA-1863
     ''' </remarks>
     Private Sub PrepareButtons()
         Try
@@ -1265,12 +1291,12 @@ Public Class IResultsCalibCurve
 
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("FREECELL")
@@ -1305,13 +1331,15 @@ Public Class IResultsCalibCurve
                 AddIconToImageList(SampleIconList, auxIconName)
             End If
 
-            If HistoricalModeField Then 'AG 17/10/2012
-                bsPrintButton.Enabled = False
-                bsPrintButton.Visible = False
-            End If
+            ' XB 30/07/2014 - BA-1863
+            'If HistoricalModeField Then 'AG 17/10/2012
+            '    bsPrintButton.Enabled = False
+            '    bsPrintButton.Visible = False
+            'End If
+            ' XB 30/07/2014 - BA-1863
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1393,12 +1421,45 @@ Public Class IResultsCalibCurve
             End If 'DL 16/05/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateCollapse ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateCollapse ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateCollapse", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             finalResultOK = False
         End Try
         Return finalResultOK
     End Function
+
+    ''' <summary>
+    ''' Print a report
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 30/07/2014 - BA-1863
+    ''' </remarks>
+    Private Sub PrintReport()
+        Try
+
+            If HistoricalModeField Then
+                XRManager.ShowHISTResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedOrderTestIDField, SelectedTestName)
+            Else
+                Dim myList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDSField.vwksResults _
+                                           Where row.TestName = SelectedTestName AndAlso row.SampleType = SampleTypeSelectedTextField _
+                                           AndAlso Not row.IsTestLongNameNull Select row).ToList
+                Dim myTestReportName As String = ""
+                If myList.Count > 0 AndAlso Not myList(0).IsTestLongNameNull Then
+                    myTestReportName = myList(0).TestLongName
+                End If
+
+                XRManager.ShowResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedTestName, AcceptedRerunNumber, myTestReportName)
+
+                myList.Clear()
+                myList = Nothing
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".PrintReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
 #End Region
 
 #Region "CalibratorsDataGridView Methods"
@@ -1532,7 +1593,7 @@ Public Class IResultsCalibCurve
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeCalibratorsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeCalibratorsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1545,12 +1606,21 @@ Public Class IResultsCalibCurve
     ''' <remarks>
     ''' Created by: AG 03/08/2010 (based on UpdateCalibratorsDataGrid)
     ''' Modified by RH 08/10/2010
-    ''' AG 18/072012 - filter also by sample type
+    '''             AG 18/07/2012 - filter also by sample type
+    '''             XB 30/07/2014 - BA-1863
+    '''             XB 23/09/2014 - Add TestVersion field to can filter by it when select the calibrator chart result from Historics - BA-1863
+    '''             XB 26/11/2014 - correction of last point, because from current results this field maybe 0 or 1 - BA-2141
     ''' </remarks>
     Private Sub UpdateCalibratorsMuliItemDataGrid(ByVal pTestName As String, ByVal pSampleType As String)
         Try
             Dim dgv As BSDataGridView = CalibratorsDataGridView
             Dim Remark As String = String.Empty
+
+            'XB 30/07/2014 - BA-1863
+            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = Nothing
+            Dim myOrderTestID As Integer
+            Dim myTestVersion As Integer
+            ' XB 30/07/2014 - BA-1863
 
             Me.Enabled = False
             Cursor = Cursors.WaitCursor
@@ -1559,31 +1629,68 @@ Public Class IResultsCalibCurve
 
             'dgv.Rows.Clear()
             'Set the rows count for the Collapse Column
+
+            ' XB 26/11/2014 - BA-2141
+            Dim TheoreticalConcList As List(Of Single)
+
             If Not HistoricalModeField Then 'AG 17/10/2012 - collapse only when current WS results
                 CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).RowsCount = 0
+
+                TestList = (From row In ExecutionResults.vwksWSExecutionsResults _
+                             Where row.TestName = pTestName AndAlso row.SampleClass = "CALIB" _
+                             AndAlso row.SampleType = pSampleType AndAlso row.RerunNumber = AcceptedRerunNumber _
+                             Select row).ToList()
+
+                If TestList.Count = 0 Then
+                    For j As Integer = 0 To dgv.Rows.Count - 1
+                        dgv.Rows(j).Visible = False
+                    Next
+                    'dgv.Visible = True
+                    Return
+                End If
+
+                'RH 31/05/2011 Update SelectedSampleType
+                SelectedSampleType = TestList.First().SampleType
+
+                myOrderTestID = TestList(0).OrderTestID
+
+                ' XB 26/11/2014 - here TestVersion field is not required - BA-2141
+                '' From Current Results, TestVersion is always = 0
+                'myTestVersion = 0
+                '' XB 30/07/2014 - BA-1863
+                TheoreticalConcList = (From row In AverageResults.vwksResults _
+                                       Where row.OrderTestID = myOrderTestID _
+                                       AndAlso (Not row.IsTestVersionNull) _
+                                       Select row.TheoricalConcentration Distinct).ToList()
+                ' XB 26/11/2014 - BA-2141
+            Else
+                myOrderTestID = SelectedOrderTestIDField
+
+                myTestVersion = SelectedTestVersionNumberField
+                ' XB 30/07/2014 - BA-1863
+
+                ' XB 26/11/2014 - BA-2141
+                TheoreticalConcList = (From row In AverageResults.vwksResults _
+                                        Where row.OrderTestID = myOrderTestID _
+                                        AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
+                                        Select row.TheoricalConcentration Distinct).ToList()
+                ' XB 26/11/2014 - BA-2141
+
             End If
 
-            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = _
-                        (From row In ExecutionResults.vwksWSExecutionsResults _
-                         Where row.TestName = pTestName AndAlso row.SampleClass = "CALIB" _
-                         AndAlso row.SampleType = pSampleType AndAlso row.RerunNumber = AcceptedRerunNumber _
-                         Select row).ToList()
-
-            If TestList.Count = 0 Then
-                For j As Integer = 0 To dgv.Rows.Count - 1
-                    dgv.Rows(j).Visible = False
-                Next
-                'dgv.Visible = True
-                Return
-            End If
-
-            'RH 31/05/2011 Update SelectedSampleType
-            SelectedSampleType = TestList.First().SampleType
-
-            Dim TheoreticalConcList As List(Of Single) = _
-                            (From row In AverageResults.vwksResults _
-                             Where row.OrderTestID = TestList(0).OrderTestID _
-                             Select row.TheoricalConcentration Distinct).ToList()
+            ' XB 26/11/2014 - correction: this query is moved above inside every case, current results or historic results - BA-2141
+            '' XB 30/07/2014 - BA-1863
+            ''Dim TheoreticalConcList As List(Of Single) = _
+            ''                (From row In AverageResults.vwksResults _
+            ''                 Where row.OrderTestID = TestList(0).OrderTestID _
+            ''                 Select row.TheoricalConcentration Distinct).ToList()
+            'Dim TheoreticalConcList As List(Of Single) = _
+            '      (From row In AverageResults.vwksResults _
+            '       Where row.OrderTestID = myOrderTestID _
+            '     AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
+            '       Select row.TheoricalConcentration Distinct).ToList()
+            '' XB 30/07/2014 - BA-1863
+            ' XB 26/11/2014 - BA-2141
 
             If TheoreticalConcList.Count = 0 Then
                 For j As Integer = 0 To dgv.Rows.Count - 1
@@ -1607,40 +1714,60 @@ Public Class IResultsCalibCurve
                 'itempoint -= 1
                 itempoint += 1
 
+                ' XB 30/07/2014 - BA-1863
+                If Not HistoricalModeField Then
+                    myOrderTestID = TestList(0).OrderTestID
+                Else
+                    myOrderTestID = SelectedOrderTestIDField
+                End If
+                ' XB 30/07/2014 - BA-1863
+
+                ' XB 30/07/2014 - BA-1863
+                'Dim AverageList As List(Of ResultsDS.vwksResultsRow) = _
+                '                (From row In AverageResults.vwksResults _
+                '                 Where row.OrderTestID = TestList(0).OrderTestID _
+                '                 AndAlso row.SampleType = pSampleType _
+                '                 AndAlso row.TheoricalConcentration = myTheoreticalConc _
+                '                 AndAlso row.MultiPointNumber = itempoint _
+                '                 AndAlso row.RerunNumber = AcceptedRerunNumber _
+                '                 Select row).ToList()
                 Dim AverageList As List(Of ResultsDS.vwksResultsRow) = _
-                                (From row In AverageResults.vwksResults _
-                                 Where row.OrderTestID = TestList(0).OrderTestID _
-                                 AndAlso row.SampleType = pSampleType _
-                                 AndAlso row.TheoricalConcentration = myTheoreticalConc _
-                                 AndAlso row.MultiPointNumber = itempoint _
-                                 AndAlso row.RerunNumber = AcceptedRerunNumber _
-                                 Select row).ToList()
+                 (From row In AverageResults.vwksResults _
+                  Where row.OrderTestID = myOrderTestID _
+                  AndAlso row.SampleType = pSampleType _
+                  AndAlso row.TheoricalConcentration = myTheoreticalConc _
+                  AndAlso row.MultiPointNumber = itempoint _
+                  AndAlso row.RerunNumber = AcceptedRerunNumber _
+                  Select row).ToList()
+                ' XB 30/07/2014 - BA-1863
 
                 'END AG 08/08/2010
 
-                With AverageList(0)
-                    PointAbsorbance(0) = .CalibratorBlankAbsUsed
+                If AverageList.Count > 0 Then   ' XB 23/09/2014 - Protection - BA-1863
+                    With AverageList(0)
+                        PointAbsorbance(0) = .CalibratorBlankAbsUsed
 
-                    'AG 16/10/2012
-                    'CurveResultsID = .CurveResultsID
-                    If Not HistoricalModeField Then
-                        CurveResultsID = .CurveResultsID
-                    Else
-                        HistOrderTestID = .OrderTestID
-                    End If
+                        'AG 16/10/2012
+                        'CurveResultsID = .CurveResultsID
+                        If Not HistoricalModeField Then
+                            CurveResultsID = .CurveResultsID
+                        Else
+                            HistOrderTestID = .OrderTestID
+                        End If
 
-                    ChartTestName = .TestName
-                    ChartSampleType = .SampleType
-                    ChartRerunNumber = .RerunNumber
-                    PointAbsorbance.Add(.ABSValue)
-                    PointConcentration.Add(.TheoricalConcentration)
-                    CurveGrowthType = .CurveGrowthType
-                    CurveType = .CurveType
-                    CurveAxisXType = .CurveAxisXType
-                    CurveAxisYType = .CurveAxisYType
-                    DecimalsAllowed = .DecimalsAllowed
-                    MonotonousCurve = String.IsNullOrEmpty(.CalibrationError)
-                End With
+                        ChartTestName = .TestName
+                        ChartSampleType = .SampleType
+                        ChartRerunNumber = .RerunNumber
+                        PointAbsorbance.Add(.ABSValue)
+                        PointConcentration.Add(.TheoricalConcentration)
+                        CurveGrowthType = .CurveGrowthType
+                        CurveType = .CurveType
+                        CurveAxisXType = .CurveAxisXType
+                        CurveAxisYType = .CurveAxisYType
+                        DecimalsAllowed = .DecimalsAllowed
+                        MonotonousCurve = String.IsNullOrEmpty(.CalibrationError)
+                    End With
+                End If
 
                 For Each resultRow As ResultsDS.vwksResultsRow In AverageList
                     If Not IsAverageDone.ContainsKey(resultRow.MultiPointNumber) Then
@@ -1855,8 +1982,10 @@ Public Class IResultsCalibCurve
                         Next
 
                         If Not Striked Then
-                            MergeCells(dgv, "TheorConc", i + 1, TestList.Count)
-                            MergeCells(dgv, "Unit", i + 1, TestList.Count)
+                            If TestList.Count > 0 Then ' XB 30/07/2014 - BA-1863
+                                MergeCells(dgv, "TheorConc", i + 1, TestList.Count)
+                                MergeCells(dgv, "Unit", i + 1, TestList.Count)
+                            End If
                         End If
 
                         If Not HistoricalModeField Then 'AG 17/10/2012 - collapse only when current WS results
@@ -1894,7 +2023,7 @@ Public Class IResultsCalibCurve
             'dgv.Visible = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCalibratorsMuliItemDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCalibratorsMuliItemDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1924,7 +2053,7 @@ Public Class IResultsCalibCurve
 
         Try
 
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
                 myForm.AnalyzerID = AnalyzerIDField
                 myForm.WorkSessionID = WorkSessionIDField
                 myForm.MultiItemNumber = pMultiItemNumber
@@ -1939,14 +2068,14 @@ Public Class IResultsCalibCurve
                 'myForm.SourceCalled = GraphicalAbsScreenCallMode.CURVE_RESULTS_MULTIPLE
                 'End If
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 'myForm.ShowInfo()  ' 25/05/2011
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ShowResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ShowResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1972,7 +2101,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RemoveResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RemoveResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RemoveResultsChart", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1988,7 +2117,7 @@ Public Class IResultsCalibCurve
             CType(dgv(SpanColName, RowIndex), DataGridViewTextBoxSpanCell).RowSpan = RowSpan
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " MergeCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " MergeCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2004,7 +2133,7 @@ Public Class IResultsCalibCurve
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).CollapseAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CollapseAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CollapseAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2020,7 +2149,7 @@ Public Class IResultsCalibCurve
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).ExpandAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExpandAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExpandAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2040,7 +2169,7 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " IsSubHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " IsSubHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -2104,209 +2233,13 @@ Public Class IResultsCalibCurve
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
 
     End Sub
 
-#End Region
-
-
-#Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES"
-    ''' <summary>
-    ''' Changes the InUse flag of a replicate and updates the DataGridView
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: RH - 07/16/2010
-    ''' Modified by AG 26/07/2010 - Use re calculations class
-    ''' Modified by RH - 07/28/2010 - Renamed from SetStrike()
-    ''' Modified by AG - 03/09/2010 - re draw chart and use only 1 connection
-    '''             PG - 18/10/2010 - Get the current language
-    ''' Modified by: RH 20/10/2010 - Remove the currentLanguage local variable/parameter.
-    ''' </remarks>
-    Private Sub ChangeInUseFlagReplicate(ByRef dgv As BSDataGridView, ByVal RowIndex As Integer)
-        Try
-            Me.Cursor = Cursors.WaitCursor 'RH 20/10/2010
-
-            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow
-
-            If Not dgv.Rows(RowIndex).Tag Is Nothing Then
-                ExecutionResultRow = CType(dgv.Rows(RowIndex).Tag, ExecutionsDS.vwksWSExecutionsResultsRow)
-            Else
-                Return
-            End If
-
-            'AG 15/09/2010 - dont allow discard replicates with ErrorAbs (same as A25)
-            If Not ExecutionResultRow.IsABS_ErrorNull Then
-                If ExecutionResultRow.ABS_Error <> "" Then Return
-            End If
-            'END AG 15/09/2010
-
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-            myRecalDelegate.AnalyzerModel = AnalyzerModel
-            Dim myGlobal As GlobalDataTO
-
-            'Me.Cursor = Cursors.WaitCursor   'RH 20/10/2010  'AG 14/10/2010
-            myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
-
-            Dim actionAllowed As Boolean = False
-            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                actionAllowed = CType(myGlobal.SetDatos, Boolean)
-
-                If actionAllowed Then
-                    'Update screen global DS with the affected results
-                    Me.LoadExecutionsResults()
-                    Me.UpdateCurrentResultsGrid(False)
-                    Me.DrawChart() 'PG 18/10/2010  'AG 030/09/2010 - redraw curve after recalculations
-                End If
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ChangeInUseFlagReplicate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-            'Me.Cursor = Cursors.Default 'RH 20/10/2010   'AG 14/10/2010
-
-        Finally
-            Me.Cursor = Cursors.Default  'RH 20/10/2010
-
-        End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' User changes some curve definition parameter
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>
-    ''' Created by: RH 27/05/2011 Based on a previous version by AG 03/09/2010
-    ''' AG 03/07/2012 - Use Nothing instead of Connection
-    ''' </remarks>
-    Private Function RecalculateCurveAfterDefinitionChanges() As GlobalDataTO
-        Dim resultData As GlobalDataTO
-        'Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        Try
-            Dim OperationSuccess As Boolean = False
-
-            Cursor = Cursors.WaitCursor
-
-            'resultData = DAOBase.GetOpenDBTransaction(Nothing)
-            'If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
-            '    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-            '1) Get the current TestId and SampleType
-            Dim testInformation As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = _
-                        (From row In ExecutionResults.vwksWSExecutionsResults _
-                         Where row.TestName = SelectedTestName AndAlso row.SampleClass = "CALIB" _
-                         And row.RerunNumber = AcceptedRerunNumber _
-                         AndAlso row.SampleType = SelectedSampleType _
-                         Select row).ToList()
-
-            If testInformation.Count > 0 Then
-                Dim myTestID As Integer = testInformation.First.TestID
-                Dim mySampleType As String = testInformation.First.SampleType
-                Dim myOrderTestID As Integer = testInformation.First.OrderTestID
-
-                '2) Get the test calibration programming current definition
-                Dim myTestCalibratorsDelegate As New TestCalibratorsDelegate
-                resultData = myTestCalibratorsDelegate.GetTestCalibratorByTestID(Nothing, myTestID, mySampleType)
-
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(1)
-                    Dim myLocalTestCalibDS As New TestCalibratorsDS
-                    myLocalTestCalibDS = CType(resultData.SetDatos, TestCalibratorsDS)
-
-                    If myLocalTestCalibDS.tparTestCalibrators.Rows.Count > 0 Then
-                        With myLocalTestCalibDS.tparTestCalibrators(0)
-                            .BeginEdit()
-                            .CurveType = CalibrationCurveCombo.SelectedValue.ToString()
-                            .CurveAxisXType = XAxisCombo.SelectedValue.ToString()
-                            .CurveAxisYType = YAxisCombo.SelectedValue.ToString()
-                            If bsDecreasingRadioButton.Checked Then
-                                .CurveGrowthType = "DEC"
-                            Else
-                                .CurveGrowthType = "INC"
-                            End If
-                            .EndEdit()
-                        End With
-
-                        '3) Update test calibration programming
-                        Dim mypTestCalibratorsDelegate As New TestCalibratorsDelegate
-                        resultData = mypTestCalibratorsDelegate.Update(Nothing, myLocalTestCalibDS)
-                        If Not resultData.HasError Then '(2)
-
-                            '4) Call recalculations class (we need the executions owner of the max replicate and max multipointnumber
-                            'Get the maximum replicate belongs the selected OrderTestID, RerunNumber 
-                            Dim maxItemNumber As Integer = _
-                                            (From row In ExecutionResults.vwksWSExecutionsResults _
-                                             Where row.OrderTestID = myOrderTestID _
-                                             And row.RerunNumber = AcceptedRerunNumber _
-                                             Select row.MultiItemNumber).Max
-
-                            Dim maxReplicate As Integer = _
-                                        (From row In ExecutionResults.vwksWSExecutionsResults _
-                                         Where row.OrderTestID = myOrderTestID _
-                                         And row.RerunNumber = AcceptedRerunNumber _
-                                         Select row.ReplicateNumber).Max
-
-                            Dim executionToRecalculate As Integer = _
-                                        (From row In ExecutionsResultsDSField.vwksWSExecutionsResults _
-                                         Where row.OrderTestID = myOrderTestID _
-                                         And row.RerunNumber = AcceptedRerunNumber _
-                                         And row.MultiItemNumber = maxItemNumber _
-                                         And row.ReplicateNumber = maxReplicate _
-                                         Select row.ExecutionID).Max
-
-                            Dim myRecalDelegate As New RecalculateResultsDelegate
-                            myRecalDelegate.AnalyzerModel = AnalyzerModel
-                            resultData = myRecalDelegate.RecalculateResults(Nothing, AnalyzerIDField, WorkSessionIDField, executionToRecalculate, True)
-
-                            If Not resultData.HasError Then
-                                OperationSuccess = True
-                            End If
-                        End If 'If Not resultData.HasError Then (3)
-                    End If 'If Not resultData.HasError Then (2)
-                End If 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then (1)
-
-                If OperationSuccess Then
-                    'DAOBase.CommitTransaction(dbConnection)
-                Else
-                    'If Not dbConnection Is Nothing Then DAOBase.RollbackTransaction(dbConnection)
-                End If
-
-            End If
-            'End If
-
-            'RH 27/05/2011
-            If OperationSuccess Then
-                'Update screen global DS with the affected results if no error
-                If Not resultData.HasError Then
-                    Me.LoadExecutionsResults()
-                    Me.UpdateCurrentResultsGrid(False)
-                    Me.DrawChart()
-                End If
-            End If
-
-        Catch ex As Exception
-            'If Not dbConnection Is Nothing Then DAOBase.RollbackTransaction(dbConnection)
-
-            resultData = New GlobalDataTO()
-            resultData.HasError = True
-            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-            resultData.ErrorMessage = ex.Message
-
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChanges", EventLogEntryType.Error, False)
-
-        Finally
-            'If Not dbConnection Is Nothing Then dbConnection.Close()
-            Me.Cursor = Cursors.Default
-
-        End Try
-
-        Return resultData
-    End Function
 #End Region
 
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
@@ -2347,7 +2280,7 @@ Public Class IResultsCalibCurve
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeInUseFlagReplicateNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeInUseFlagReplicateNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ChangeInUseFlagReplicateNEW", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             Me.Cursor = Cursors.Default
@@ -2360,6 +2293,7 @@ Public Class IResultsCalibCurve
     ''' <returns>GlobalDataTO containing success/error information</returns>
     ''' <remarks>
     ''' Created by:  SA - Based in RecalculateCurveAfterDefinitionChanges
+    ''' AG 15/10/2014 BA-2011 inform the new required parameters
     ''' </remarks>
     Private Function RecalculateCurveAfterDefinitionChangesNEW() As GlobalDataTO
         Dim resultData As GlobalDataTO
@@ -2421,6 +2355,7 @@ Public Class IResultsCalibCurve
 
                         Dim myRecalDelegate As New RecalculateResultsDelegate
                         myRecalDelegate.AnalyzerModel = AnalyzerModel
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
                         resultData = myRecalDelegate.RecalculateResultsNEW(Nothing, selectedExecRow, executionRowToRecalculate, True, False)
                         'resultData = myRecalDelegate.RecalculateResults(Nothing, AnalyzerIDField, WorkSessionIDField, executionToRecalculate, True)
 
@@ -2441,8 +2376,8 @@ Public Class IResultsCalibCurve
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
         Finally
             Me.Cursor = Cursors.Default
         End Try

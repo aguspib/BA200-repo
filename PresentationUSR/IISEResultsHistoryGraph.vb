@@ -1,18 +1,20 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
-Imports Biosystems.Ax00.PresentationCOM
 Imports System.Globalization
+Imports DevExpress.Utils
 
-Public Class IISEResultsHistoryGraph
+Public Class UiISEResultsHistoryGraph
 
 #Region " Declarations "
     ' Language
     Private currentLanguage As String
     Private myCultureInfo As CultureInfo
-    Private myElectrodesFilter As IISEResultsHistory.ElectrodesFilter
+    Private myElectrodesFilter As UiISEResultsHistory.ElectrodesFilter
     Private myDataSource As DataTable
     Private LocalPoint As Point
 
@@ -32,7 +34,7 @@ Public Class IISEResultsHistoryGraph
 #End Region
 
 #Region " Public Methods "
-    Public Sub SetData(ByVal pElectrodesFilter As IISEResultsHistory.ElectrodesFilter, ByVal pDatasource As DataTable)
+    Public Sub SetData(ByVal pElectrodesFilter As UiISEResultsHistory.ElectrodesFilter, ByVal pDatasource As DataTable)
         SetElectrodeFilter(pElectrodesFilter)
         myDataSource = pDatasource
         myCultureInfo = My.Computer.Info.InstalledUICulture
@@ -40,7 +42,7 @@ Public Class IISEResultsHistoryGraph
 #End Region
 
 #Region "Private Methods"
-    Private Sub SetElectrodeFilter(ByVal filter As IISEResultsHistory.ElectrodesFilter)
+    Private Sub SetElectrodeFilter(ByVal filter As UiISEResultsHistory.ElectrodesFilter)
         myElectrodesFilter = filter
 
         bsElectrodeNaCheck.Checked = filter.electrodeNa
@@ -67,9 +69,9 @@ Public Class IISEResultsHistoryGraph
         auxIconName = GetIconName(pKey)
         If Not String.IsNullOrEmpty(auxIconName) Then
             If mImageDict.ContainsKey(pKey) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
 
@@ -99,26 +101,40 @@ Public Class IISEResultsHistoryGraph
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 31/07/2012
+    ''' Created by:  JB 31/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
             Me.bsTitleLabel.Text = GetText("TITLE_ISE_HistoricalCalibGraph")
 
-            bsElectrodeNaCheck.Text = GetText("LBL_Sodium")
-            bsElectrodeKCheck.Text = GetText("LBL_Potassium")
-            bsElectrodeClCheck.Text = GetText("LBL_Chlorine")
-            bsElectrodeLiCheck.Text = GetText("LBL_Lithium")
+            ' XB 05/09/2014 - BA-1902
+            'bsElectrodeNaCheck.Text = GetText("LBL_Sodium")
+            'bsElectrodeKCheck.Text = GetText("LBL_Potassium")
+            'bsElectrodeClCheck.Text = GetText("LBL_Chlorine")
+            'bsElectrodeLiCheck.Text = GetText("LBL_Lithium")
+
+            'bsLegend.Text = GetText("LBL_Legend")
+            'bsElectrodeNaLabel.Text = GetText("LBL_Sodium")
+            'bsElectrodeKLabel.Text = GetText("LBL_Potassium")
+            'bsElectrodeClLabel.Text = GetText("LBL_Chlorine")
+            'bsElectrodeLiLabel.Text = GetText("LBL_Lithium")
+
+            Dim ISETestList As New ISETestsDelegate
+            bsElectrodeNaCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodeKCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodeClCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodeLiCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
 
             bsLegend.Text = GetText("LBL_Legend")
-            bsElectrodeNaLabel.Text = GetText("LBL_Sodium")
-            bsElectrodeKLabel.Text = GetText("LBL_Potassium")
-            bsElectrodeClLabel.Text = GetText("LBL_Chlorine")
-            bsElectrodeLiLabel.Text = GetText("LBL_Lithium")
-
+            bsElectrodeNaLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodeKLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodeClLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodeLiLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -130,17 +146,39 @@ Public Class IISEResultsHistoryGraph
     ''' Created by: JB 31/07/2012
     ''' </remarks>
     Private Sub PrepareButtons()
-        Dim myToolTipsControl As New ToolTip
+        Dim myToolTipsControl As New Windows.Forms.ToolTip
         Try
             'EXIT Button
             bsExitButton.Image = GetImage("CANCEL")
             myToolTipsControl.SetToolTip(bsExitButton, GetText("BTN_CloseScreen"))
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Adds a serie to the graph passed as parameter
+    ''' </summary>
+    ''' <param name="pGraph">Graph that will contain the new serie</param>
+    ''' <param name="serieName">name of the serie to be added to the chart</param>
+    ''' <param name="viewType">type of the view desired to this serie</param>
+    ''' <param name="thisColor">color of the line of the serie</param>
+    ''' <remarks></remarks>
+    Private Sub AddSerieToGraph(ByVal pGraph As ChartControl, ByVal serieName As String, ByVal viewType As ViewType, ByVal thisColor As Color)
+        pGraph.Series.Add(serieName, viewType)
+
+        With pGraph.Series(serieName)
+            .ShowInLegend = True
+            .LabelsVisibility = DefaultBoolean.False
+            .ArgumentScaleType = ScaleType.Qualitative
+            .View.Color = thisColor
+        End With
+
+        CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+    End Sub
+
 
     ''' <summary>
     ''' Initializes the Graph
@@ -152,46 +190,23 @@ Public Class IISEResultsHistoryGraph
         Try
             pGraph.ClearCache()
             pGraph.Series.Clear()
-            pGraph.Legend.Visible = False
+            pGraph.Legend.Visibility = DefaultBoolean.False
             pGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
             pGraph.BackColor = Color.White
             pGraph.AppearanceName = "Light"
 
+            pGraph.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            pGraph.RuntimeHitTesting = True
+            pGraph.SeriesTemplate.ArgumentScaleType = ScaleType.Qualitative
+
             'Na+
-            pGraph.Series.Add("MeanNa", ViewType.Line)
-            With pGraph.Series("MeanNa")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Green
-            End With
-
+            AddSerieToGraph(pGraph, "MeanNa", ViewType.Line, Color.Green)
             'K+
-            pGraph.Series.Add("MeanK", ViewType.Line)
-            With pGraph.Series("MeanK")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Blue
-            End With
-
+            AddSerieToGraph(pGraph, "MeanK", ViewType.Line, Color.Blue)
             'Cl-
-            pGraph.Series.Add("MeanCl", ViewType.Line)
-            With pGraph.Series("MeanCl")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkOrange
-            End With
-
+            AddSerieToGraph(pGraph, "MeanCl", ViewType.Line, Color.DarkOrange)
             'Li+
-            pGraph.Series.Add("MeanLi", ViewType.Line)
-            With pGraph.Series("MeanLi")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkViolet
-            End With
+            AddSerieToGraph(pGraph, "MeanLi", ViewType.Line, Color.DarkViolet)
 
             Dim myDiagram As New XYDiagram
 
@@ -207,7 +222,7 @@ Public Class IISEResultsHistoryGraph
             myDiagram.Margins.Right = 5
 
             'Set the Title for each axis
-            myDiagram.AxisX.Title.Visible = True
+            myDiagram.AxisX.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisX.Title.Antialiasing = False
             myDiagram.AxisX.Title.TextColor = Color.Black
             myDiagram.AxisX.Title.Alignment = StringAlignment.Center
@@ -219,7 +234,7 @@ Public Class IISEResultsHistoryGraph
             'myDiagram.AxisX.Label.Antialiasing = True
 
 
-            myDiagram.AxisY.Title.Visible = True
+            myDiagram.AxisY.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisY.Title.Antialiasing = False
             myDiagram.AxisY.Title.TextColor = Color.Black
             myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -228,7 +243,7 @@ Public Class IISEResultsHistoryGraph
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -246,8 +261,8 @@ Public Class IISEResultsHistoryGraph
             mTextDict = New Dictionary(Of String, String)()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()
             PrepareButtons()
@@ -259,7 +274,7 @@ Public Class IISEResultsHistoryGraph
 
             Me.loaded = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -272,7 +287,8 @@ Public Class IISEResultsHistoryGraph
     ''' <param name="pGraph"></param>
     ''' <param name="pData"></param>
     ''' <remarks>
-    ''' Created by: JB 31/07/2012
+    ''' Created by:  JB 31/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub SetDataToGraph(ByVal pGraph As ChartControl, ByVal pData As DataTable)
         Try
@@ -292,32 +308,61 @@ Public Class IISEResultsHistoryGraph
             Dim rows = From r In pData Order By CDate(r("CalibrationDate")) Ascending
 
             For Each row As DataRow In rows 'pData.Rows
+
+                ' XB 05/09/2014 - BA-1902
+                'Na+
+                'pGraph.Series("MeanNa").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanNa")))
+                'pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = GetText("LBL_Sodium") & ": " & _
+                '                                                                               row("ResultsNa").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''K+
+                'pGraph.Series("MeanK").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanK")))
+                'pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = GetText("LBL_Potassium") & ": " & _
+                '                                                                             row("ResultsK").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                             CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''Cl-
+                'pGraph.Series("MeanCl").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanCl")))
+                'pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = GetText("LBL_Chlorine") & ": " & _
+                '                                                                               row("ResultsCl").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''Li+
+                'pGraph.Series("MeanLi").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanLi")))
+                'pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = GetText("LBL_Lithium") & ": " & _
+                '                                                                               row("ResultsLi").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                Dim ISETestList As New ISETestsDelegate
                 'Na+
                 pGraph.Series("MeanNa").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanNa")))
-                pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = GetText("LBL_Sodium") & ": " & _
+                pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Na) & ": " & _
                                                                                                row("ResultsNa").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'K+
                 pGraph.Series("MeanK").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanK")))
-                pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = GetText("LBL_Potassium") & ": " & _
+                pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.K) & ": " & _
                                                                                              row("ResultsK").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                              CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'Cl-
                 pGraph.Series("MeanCl").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanCl")))
-                pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = GetText("LBL_Chlorine") & ": " & _
+                pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Cl) & ": " & _
                                                                                                row("ResultsCl").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'Li+
                 pGraph.Series("MeanLi").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanLi")))
-                pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = GetText("LBL_Lithium") & ": " & _
+                pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Li) & ": " & _
                                                                                                row("ResultsLi").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+                ' XB 05/09/2014 - BA-1902
+
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDataToGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDataToGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetDataToGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -345,10 +390,10 @@ Public Class IISEResultsHistoryGraph
             Dim aux As Single
             For Each serie As Series In pGraph.Series
                 If serie.Visible Then
-                    aux = (From p In serie.Points Select p.Values(0)).Min
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Min)
                     If Not minY.HasValue OrElse aux < minY Then minY = aux
 
-                    aux = (From p In serie.Points Select p.Values(0)).Max
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Max)
                     If Not maxY.HasValue OrElse aux > maxY Then maxY = aux
                 End If
             Next
@@ -357,11 +402,12 @@ Public Class IISEResultsHistoryGraph
             Dim yExtra As Single = 1
             If maxY.HasValue AndAlso minY.HasValue Then
                 yExtra += (maxY.Value - minY.Value) * PERCENTAGE
-                myDiagram.AxisY.Range.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.WholeRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.VisualRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AdaptAxisToVisibleData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AdaptAxisToVisibleData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AdaptAxisToVisibleData ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -375,7 +421,7 @@ Public Class IISEResultsHistoryGraph
         Try
             If (e.KeyCode = Keys.Escape) Then bsExitButton.PerformClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISEResultsHistoryGraph_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISEResultsHistoryGraph_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IISEResultsHistoryGraph_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -389,7 +435,7 @@ Public Class IISEResultsHistoryGraph
             'ResetBorder()
             'Application.DoEvents()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISEResultsHistoryGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISEResultsHistoryGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IISEResultsHistoryGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -409,8 +455,8 @@ Public Class IISEResultsHistoryGraph
                 '    myLocation = Me.Parent.Location
                 'End If
 
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)
@@ -419,7 +465,7 @@ Public Class IISEResultsHistoryGraph
 
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -452,7 +498,7 @@ Public Class IISEResultsHistoryGraph
                 bsToolTipController.HideHint()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsISEResultChartControl_ObjectHotTracked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsISEResultChartControl_ObjectHotTracked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsISEResultChartControl_ObjectHotTracked ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -461,7 +507,7 @@ Public Class IISEResultsHistoryGraph
         Try
             LocalPoint = bsISEResultChartControl.PointToScreen(New Point(e.X, e.Y))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsISEResultChartControl_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsISEResultChartControl_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsISEResultChartControl_MouseMove ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

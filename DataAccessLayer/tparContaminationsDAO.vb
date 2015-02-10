@@ -8,15 +8,14 @@ Imports System.Data.SqlClient
 Imports System.Text
 
 Partial Public Class tparContaminationsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
     ''' <summary>
-    ''' Add a new record in table tparContaminations
+    ''' Create a new Contamination
     ''' </summary>
     ''' <param name="pDBConnection">Open DB Connection</param>
-    ''' <param name="pContaminationRow">Row of typed DataSet ContaminationsDS containing the Contamination 
-    '''                                 information to add</param>
+    ''' <param name="pContaminationRow">Row containing all data of the new Contamination to add</param>
     ''' <returns>GlobalDataTO containing success/error information</returns>
     ''' <remarks>
     ''' Created by:  DL
@@ -48,13 +47,13 @@ Partial Public Class tparContaminationsDAO
                                "NULL, '" & pContaminationRow.ContaminationType.ToString() & "', "
                 End If
 
-                If Not pContaminationRow.IsWashingSolutionR1Null Then
+                If (Not pContaminationRow.IsWashingSolutionR1Null) Then
                     cmdText &= " N'" & pContaminationRow.WashingSolutionR1.Replace("'", "''") & "', "
                 Else
                     cmdText &= "NULL,"
                 End If
 
-                If Not pContaminationRow.IsWashingSolutionR2Null Then
+                If (Not pContaminationRow.IsWashingSolutionR2Null) Then
                     cmdText &= " N'" & pContaminationRow.WashingSolutionR2.Replace("'", "''") & "', "
                 Else
                     cmdText &= "NULL,"
@@ -64,8 +63,8 @@ Partial Public Class tparContaminationsDAO
                     cmdText &= " N'" & pContaminationRow.TS_User.Replace("'", "''") & "', "
                 Else
                     'If TS_User is not informed, then get value of the Current User
-                    Dim myGlobalBase As New GlobalBase
-                    cmdText &= " N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
+                    'Dim myGlobalbase As New GlobalBase
+                    cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                 End If
 
                 If (Not pContaminationRow.IsTS_DateTimeNull) Then
@@ -79,22 +78,14 @@ Partial Public Class tparContaminationsDAO
                     resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                     resultData.HasError = False
                 End Using
-
-                ''Execute the SQL Sentence
-                'Dim dbCmd As New SqlCommand
-                'dbCmd.Connection = pDBConnection
-                'dbCmd.CommandText = cmdText
-
-                'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                'resultData.HasError = False
             End If
         Catch ex As Exception
             resultData.HasError = True
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.Create", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -143,8 +134,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.Delete", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -192,8 +183,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteCuvettes", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteCuvettes", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -238,8 +229,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminationType", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminationType", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -266,10 +257,18 @@ Partial Public Class tparContaminationsDAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 resultData.HasError = True
             Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                '                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                '                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                '                        " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
+                '                        " AND     TestContaminaCuvetteID = " & pTestID & ") "
+
                 Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
                                         " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                        " AND EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                     " WHERE  TestID = " & pTestID & " AND tparContaminations.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                         " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
                                         " AND     TestContaminaCuvetteID = " & pTestID & ") "
 
@@ -291,8 +290,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllByTest", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllByTest", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -336,8 +335,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByReagentContaminatorOrContaminated", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByReagentContaminatorOrContaminated", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -375,6 +374,19 @@ Partial Public Class tparContaminationsDAO
                                             " AND    RE2.WorkSessionID = '" & pWorkSessionID.Trim & "' AND RE2.TubeContent = 'REAGENT' " & vbCrLf
 
                     '(2) Subquery to get Washing Solutions to avoid Well Contaminations caused by Tests requested in the Work Session 
+                    'AJG
+                    'cmdText &= " UNION " & vbCrLf & _
+                    '           " SELECT WashingSolutionR1, WashingSolutionR2 " & vbCrLf & _
+                    '           " FROM   tparContaminations C INNER JOIN twksOrderTests OT ON C.TestContaminaCuvetteID = OT.TestID " & vbCrLf & _
+                    '           " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '           " AND   (C.WashingSolutionR1 IS NOT NULL OR C.WashingSolutionR2 IS NOT NULL) " & vbCrLf & _
+                    '           " AND    OT.TestType = 'STD' " & vbCrLf & _
+                    '           " AND    OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                    '           " AND    OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                    '                                     " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                     " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                    '                                     " AND    ToSendFlag    = 1) " & vbCrLf
+
                     cmdText &= " UNION " & vbCrLf & _
                                " SELECT WashingSolutionR1, WashingSolutionR2 " & vbCrLf & _
                                " FROM   tparContaminations C INNER JOIN twksOrderTests OT ON C.TestContaminaCuvetteID = OT.TestID " & vbCrLf & _
@@ -382,10 +394,10 @@ Partial Public Class tparContaminationsDAO
                                " AND   (C.WashingSolutionR1 IS NOT NULL OR C.WashingSolutionR2 IS NOT NULL) " & vbCrLf & _
                                " AND    OT.TestType = 'STD' " & vbCrLf & _
                                " AND    OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                               " AND    OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                         " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                         " AND    OpenOTFlag    = 0 " & vbCrLf & _
-                                                         " AND    ToSendFlag    = 1) " & vbCrLf
+                               " AND    EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                               " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                               " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                                               " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
 
                     '(3) Subquery to get Washing Solution needed to clean Wells that remain contaminated from the previous Work Session
                     cmdText &= " UNION " & vbCrLf & _
@@ -413,8 +425,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -475,8 +487,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadAllContaminationsByReagentID", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadAllContaminationsByReagentID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -504,12 +516,20 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'AJG
+                    'Dim cmdText As String = " SELECT * FROM tparTestReagents TR " & vbCrLf & _
+                    '                        " WHERE  TR.TestID = " & pContaminatorTestID & vbCrLf & _
+                    '                        " AND    TR.ReagentID IN (SELECT C.ReagentContaminatedID " & vbCrLf & _
+                    '                                                " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
+                    '                                                " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
+                    '                                                " AND    C.ContaminationType = 'R1') " & vbCrLf
+
                     Dim cmdText As String = " SELECT * FROM tparTestReagents TR " & vbCrLf & _
                                             " WHERE  TR.TestID = " & pContaminatorTestID & vbCrLf & _
-                                            " AND    TR.ReagentID IN (SELECT C.ReagentContaminatedID " & vbCrLf & _
-                                                                    " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
-                                                                    " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
-                                                                    " AND    C.ContaminationType = 'R1') " & vbCrLf
+                                            " AND    EXISTS (SELECT C.ReagentContaminatedID " & vbCrLf & _
+                                                            " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
+                                                            " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
+                                                            " AND    C.ContaminationType = 'R1' AND TR.ReagentID = C.ReagentContaminatedID) " & vbCrLf
 
                     Dim myTestReagentsDS As New TestReagentsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -529,8 +549,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadContaminationsBetweenTests", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadContaminationsBetweenTests", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -557,7 +577,7 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
-                    Dim myLocalBase As New GlobalBase
+                    ''Dim myLocalBase As New GlobalBase
                     Dim cmdText As New StringBuilder
                     'Dim cmdText As String = " SELECT DISTINCT T.Testname as Contaminators, C.WashingSolutionR1 as Step1,  C.WashingSolutionR2 as Step2, " & vbCrLf & _
                     '                                        " MLR1.ResourceText AS Step1Desc, MLR2.ResourceText AS Step2Desc " & vbCrLf & _
@@ -568,9 +588,9 @@ Partial Public Class tparContaminationsDAO
                     '                                                  " INNER JOIN tfmwMultiLanguageResources MLR2 ON MLR2.ResourceID = PMD2.ResourceID " & vbCrLf & _
                     '                        " WHERE C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                     '                        " AND   PMD1.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                    '                        " AND   MLR1.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                    '                        " AND   MLR1.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
                     '                        " AND   PMD2.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                    '                        " AND   MLR2.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' "
+                    '                        " AND   MLR2.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' "
                     'TR 14/12/2011 
                     cmdText.Append(" SELECT DISTINCT T.Testname as Contaminators, C.WashingSolutionR1 as Step1,  C.WashingSolutionR2 as Step2 ")
                     cmdText.Append(" FROM tparContaminations C INNER JOIN tparTests T ON C.TestContaminaCuvetteID  = T.TestID ")
@@ -594,8 +614,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsCuv", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsCuv", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -621,7 +641,7 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
-                    Dim myLocalBase As New GlobalBase
+                    'Dim myLocalBase As New GlobalBase
                     Dim cmdText As String = " SELECT T.TestName AS Contaminator, T1.TestName AS Contaminated, C.WashingSolutionR1 AS Wash, NULL AS WashDesc " & vbCrLf & _
                                             " FROM   tparContaminations C INNER JOIN tparTestReagents TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
                                                                         " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
@@ -640,7 +660,7 @@ Partial Public Class tparContaminationsDAO
                                             " WHERE C.ContaminationType = 'R1' " & vbCrLf & _
                                             " AND   C.WashingSolutionR1 IS NOT NULL " & vbCrLf & _
                                             " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                            " AND   MLR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                                            " AND   MLR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
                                             " ORDER BY Contaminator, Contaminated "
 
                     Dim contaminationsDataDS As New ContaminationsAuxR1DS
@@ -660,8 +680,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsR1", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsR1", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -689,12 +709,22 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'Dim cmdText As String = " SELECT C.ContaminationID, C.ContaminationType, C.ReagentContaminatorID, C.ReagentContaminatedID, " & vbCrLf & _
+                    '                               " C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
+                    '                        " FROM   tparContaminations C " & vbCrLf & _
+                    '                        " WHERE  (C.ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                    '                        " AND     C.ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                    '                                                            " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                    '                        " OR     (C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        " AND     C.TestContaminaCuvetteID = " & pTestID & ") " & vbCrLf & _
+                    '                        " ORDER BY C.ContaminationType "
+
                     Dim cmdText As String = " SELECT C.ContaminationID, C.ContaminationType, C.ReagentContaminatorID, C.ReagentContaminatedID, " & vbCrLf & _
                                                    " C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
                                             " FROM   tparContaminations C " & vbCrLf & _
                                             " WHERE  (C.ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                            " AND     C.ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                                " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                            " WHERE  TestID = " & pTestID & " AND C.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                             " OR     (C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             " AND     C.TestContaminaCuvetteID = " & pTestID & ") " & vbCrLf & _
                                             " ORDER BY C.ContaminationType "
@@ -728,8 +758,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestRNAsContaminator", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestRNAsContaminator", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -757,10 +787,17 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'Dim cmdText As String = " SELECT * FROM tparContaminations " & vbCrLf & _
+                    '                        " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                    '                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                    '                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                    '                        " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        " AND     TestContaminaCuvetteID = " & pTestID & ") "
+
                     Dim cmdText As String = " SELECT * FROM tparContaminations " & vbCrLf & _
                                             " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                            " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                              " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                            " WHERE  TestID = " & pTestID & " AND tparContaminations.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                             " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             " AND     TestContaminaCuvetteID = " & pTestID & ") "
 
@@ -793,8 +830,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestID", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -861,8 +898,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByReagentsName", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByReagentsName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -924,8 +961,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestName", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1014,8 +1051,8 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetContaminationsForReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetContaminationsForReport", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1043,14 +1080,24 @@ Partial Public Class tparContaminationsDAO
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'AJG
+                    'Dim cmdText As String = "SELECT COUNT(*) AS NumContaminations " & vbCrLf & _
+                    '                        "FROM   tparContaminations " & vbCrLf & _
+                    '                        "WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        "AND    WashingSolutionR2 = '" & pWashingSolution & "' " & vbCrLf & _
+                    '                        "AND    TestContaminaCuvetteID IN (SELECT DISTINCT TestID FROM vwksWSOrderTests " & vbCrLf & _
+                    '                                                         " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                                         " AND    TestType = 'STD' " & vbCrLf & _
+                    '                                                         " AND    OpenOTFlag = 0) " & vbCrLf
+
                     Dim cmdText As String = "SELECT COUNT(*) AS NumContaminations " & vbCrLf & _
                                             "FROM   tparContaminations " & vbCrLf & _
                                             "WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             "AND    WashingSolutionR2 = '" & pWashingSolution & "' " & vbCrLf & _
-                                            "AND    TestContaminaCuvetteID IN (SELECT DISTINCT TestID FROM vwksWSOrderTests " & vbCrLf & _
-                                                                             " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                             " AND    TestType = 'STD' " & vbCrLf & _
-                                                                             " AND    OpenOTFlag = 0) " & vbCrLf
+                                            "AND    EXISTS (SELECT TestID FROM vwksWSOrderTests " & vbCrLf & _
+                                                           " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                           " AND    TestType = 'STD' " & vbCrLf & _
+                                                           " AND    OpenOTFlag = 0 AND tparContaminations.TestContaminaCuvetteID = TestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                         myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
@@ -1064,8 +1111,8 @@ Partial Public Class tparContaminationsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1074,396 +1121,94 @@ Partial Public Class tparContaminationsDAO
 
 #End Region
 
-#Region "TO REVIEW - DELETE - USED FOR THE PREVIOUS FORM OR NOT USED"
-    ' ''' <summary>
-    ' ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
-    ' ''' Delete all contaminations of the specified type 
-    ' ''' </summary>
-    ' ''' <param name="pDBConnection">Open DB Connection</param>
-    ' ''' <param name="pContaminationType">Type of Contamination to delete</param>
-    ' ''' <returns>GlobalDataTO containing success/error information</returns>
-    ' ''' <remarks>
-    ' ''' Created by:  DL
-    ' ''' Modified by: SA 22/02/2010 - Changed the way of opening the DB Connection/Transaction; it was bad implemented.
-    ' '''              TR 04/05/2010 - Removed the validation of the number of records afected
-    ' ''' </remarks>
-    'Public Function DeleteByContaminationType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationType As String) As GlobalDataTO
-    '    Dim resultData As New GlobalDataTO
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
+    ''' <summary>
+    ''' Delete all R1 Contaminations where both Reagents, the Contaminator and the Contaminated, are used for preloaded 
+    ''' Standard Tests --> Moved from CommonTasks section of TaskList.xml to make the Update Version process more clear  
+    ''' </summary>
+    ''' <param name="pDBConnection">Open DB Connection</param>
+    ''' <returns>GlobalDataTO containing success/error information</returns>
+    ''' <remarks>
+    ''' Created by:  SA 20/10/2014 - BA-1944 (SubTask BA-1986)
+    ''' </remarks>
+    Public Function DeleteAllPreloadedR1Contaminations(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Dim resultData As New GlobalDataTO
 
-    '    Try
-    '        If (pDBConnection Is Nothing) Then
-    '            resultData.HasError = True
-    '            resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-    '        Else
-    '            Dim cmdText As String = ""
-    '            cmdText = " DELETE tparContaminations " & _
-    '                      " WHERE  ContaminationType = '" & pContaminationType & "'"
+        Try
+            If (pDBConnection Is Nothing) Then
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+            Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  ContaminationType = 'R1' " & vbCrLf & _
+                '                        " AND    ReagentContaminatorID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf & _
+                '                        " AND    ReagentContaminatedID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf
 
-    '            'Execute the SQL Sentence
-    '            Dim dbCmd As New SqlCommand
-    '            dbCmd.Connection = pDBConnection
-    '            dbCmd.CommandText = cmdText
+                Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                                        " WHERE  ContaminationType = 'R1' " & vbCrLf & _
+                                        " AND    EXISTS (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1 AND tparContaminations.ReagentContaminatorID = ReagentID) " & vbCrLf & _
+                                        " AND    EXISTS (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1 AND tparContaminations.ReagentContaminatedID = ReagentID) " & vbCrLf
 
-    '            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-    '            resultData.HasError = False
-    '        End If
-    '    Catch ex As Exception
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
+                'Execute the SQL Sentence
+                Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    resultData.HasError = False
+                End Using
+            End If
+        Catch ex As Exception
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            resultData.ErrorMessage = ex.Message
 
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByContaminationType", EventLogEntryType.Error, False)
-    '    End Try
-    '    Return resultData
-    'End Function
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedR1Contaminations", EventLogEntryType.Error, False)
+        End Try
+        Return resultData
+    End Function
 
-    ' ''' <summary>
-    ' ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
-    ' ''' Search all the Contaminations of the informed type in which the specified Reagent acts as contaminator
-    ' ''' </summary>
-    ' ''' <param name="pDBConnection">Open DB Connection</param>
-    ' ''' <param name="pReagentContaminatorID"></param>
-    ' ''' <param name="pContaminationType">Type of Contaminations</param>
-    ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all the Contaminations of the informed type 
-    ' '''          in which the specified Reagent acts as contaminator</returns>
-    ' ''' <remarks>
-    ' ''' Created by:  DL 10/02/2010
-    ' ''' Modified by: SA 22/02/2010 - Parameter ContaminationType was changed from Integer to String
-    ' ''' </remarks>
-    'Public Function ReadByContaminatorIDAndType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
-    '                                            ByVal pContaminationType As String) As GlobalDataTO
-    '    Dim resultData As New GlobalDataTO
-    '    Dim dbConnection As New SqlClient.SqlConnection
+    ''' <summary>
+    ''' Delete all CUVETTES Contaminations for preloaded Standard Tests --> Moved from CommonTasks section of TaskList.xml to 
+    ''' make the Update Version process more clear 
+    ''' </summary>
+    ''' <param name="pDBConnection">Open DB Connection</param>
+    ''' <returns>GlobalDataTO containing success/error information</returns>
+    ''' <remarks>
+    ''' Created by:  SA 20/10/2014 - BA-1944 (SubTask BA-1986)
+    ''' </remarks>
+    Public Function DeleteAllPreloadedCuvettesContaminations(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Dim resultData As New GlobalDataTO
 
-    '    Try
-    '        resultData = GetOpenDBConnection(pDBConnection)
-    '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-    '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-    '            If (Not dbConnection Is Nothing) Then
-    '                Dim cmdText As String = ""
-    '                cmdText = " SELECT ContaminationID, ReagentContaminatorID, ReagentContaminatedID, TestContaminaCuvetteID, ContaminationType " & _
-    '                          " FROM   tparContaminations " & _
-    '                          " WHERE  ReagentContaminatorID = " & pReagentContaminatorID & _
-    '                          " AND    ContaminationType = '" & pContaminationType & "'"
+        Try
+            If (pDBConnection Is Nothing) Then
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+            Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
+                '                        " AND    TestContaminaCuvetteID IN (SELECT TestID FROM tparTests WHERE PreloadedTest = 1) " & vbCrLf
 
-    '                Dim dbCmd As New SqlClient.SqlCommand
-    '                dbCmd.Connection = dbConnection
-    '                dbCmd.CommandText = cmdText
+                Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                                        " WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
+                                        " AND    EXISTS (SELECT TestID FROM tparTests WHERE PreloadedTest = 1 AND tparContaminations.TestContaminaCuvetteID = TestID) " & vbCrLf
 
-    '                'Fill the DataSet to return 
-    '                Dim contaminationsDataDS As New ContaminationsDS
-    '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
+                'Execute the SQL Sentence
+                Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    resultData.HasError = False
+                End Using
+            End If
+        Catch ex As Exception
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            resultData.ErrorMessage = ex.Message
 
-    '                resultData.SetDatos = contaminationsDataDS
-    '                resultData.HasError = False
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminatorIDAndType", EventLogEntryType.Error, False)
-    '    Finally
-    '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    '''' <summary>
-    '''' Delete the Contamination between the informed Reagents
-    '''' </summary>
-    '''' <param name="pDBConnection">Open DB Connection</param>
-    '''' <param name="pContaminatorReagentID">Identifier of the Contaminator Reagent to delete</param>
-    '''' <param name="pContaminatedReagentID">Identifier of the Contaminated Reagent to delete</param>
-    '''' <returns>GlobalDataTO containing success/error information</returns>
-    '''' <remarks>
-    '''' Created by:  TR 30/03/2011
-    '''' </remarks>
-    'Public Function DeletebyContaminatorIDContamintedID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminatorReagentID As Integer, _
-    '                                                                                      ByVal pContaminatedReagentID As Integer) As GlobalDataTO
-    '    Dim resultData As New GlobalDataTO
-
-    '    Try
-    '        If (pDBConnection Is Nothing) Then
-    '            resultData.HasError = True
-    '            resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-    '        Else
-    '            Dim cmdText As String = ""
-    '            cmdText = " DELETE tparContaminations " & _
-    '                      " WHERE  ReagentContaminatorID = " & pContaminatorReagentID & _
-    '                      " AND    ReagentContaminatedID = '" & pContaminatedReagentID & "'"
-
-    '            'Execute the SQL Sentence
-    '            Dim dbCmd As New SqlCommand
-    '            dbCmd.Connection = pDBConnection
-    '            dbCmd.CommandText = cmdText
-
-    '            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-    '            resultData.HasError = False
-    '        End If
-    '    Catch ex As Exception
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeletebyContaminatorIDContamintedID", EventLogEntryType.Error, False)
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    '''' <summary>
-    '''' Delete by the contamination type and the cuvette id  - SAME FUNCTIONALITY AS DeleteCuvettes!!
-    '''' </summary>
-    '''' <param name="pDBConnection"></param>
-    '''' <param name="pContaminationType"></param>
-    '''' <returns></returns>
-    '''' <remarks>CREATED BY: TR 30/03/2011</remarks>
-    'Public Function DeleteByContaminationTypeAndCuvetteID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestContaminaCuvetteID As Integer, _
-    '                                                      ByVal pContaminationType As String) As GlobalDataTO
-    '    Dim resultData As New GlobalDataTO
-
-    '    Try
-    '        If (pDBConnection Is Nothing) Then
-    '            resultData.HasError = True
-    '            resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-    '        Else
-    '            Dim cmdText As String = ""
-    '            cmdText = " DELETE tparContaminations "
-    '            cmdText &= " WHERE  ContaminationType = '" & pContaminationType & "'"
-    '            cmdText &= "AND TestContaminaCuvetteID = " & pTestContaminaCuvetteID
-
-    '            'Execute the SQL Sentence
-    '            Dim dbCmd As New SqlCommand
-    '            dbCmd.Connection = pDBConnection
-    '            dbCmd.CommandText = cmdText
-
-    '            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-    '            resultData.HasError = False
-    '        End If
-    '    Catch ex As Exception
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByContaminationType", EventLogEntryType.Error, False)
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    '''' <summary>
-    '''' Search if the informed Test contaminates Cuvettes
-    '''' </summary>
-    '''' <param name="pDBConnection">Open DB Connection</param>
-    '''' <param name="pTestContaminaCuvette">Identifier of the Contaminator Test</param>
-    '''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with the Contamination defined for the informed TestID</returns>
-    '''' <remarks>
-    '''' Created by:  TR 30/03/2011
-    '''' </remarks>
-    'Public Function ReadByTestContaminaCuvetteID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestContaminaCuvette As Integer) As GlobalDataTO
-    '    Dim resultData As New GlobalDataTO
-    '    Dim dbConnection As New SqlClient.SqlConnection
-
-    '    Try
-    '        resultData = GetOpenDBConnection(pDBConnection)
-    '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-    '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-    '            If (Not dbConnection Is Nothing) Then
-    '                Dim cmdText As String = ""
-    '                cmdText = "  SELECT * FROM tparContaminations "
-    '                cmdText &= " WHERE  TestContaminaCuvetteID = " & pTestContaminaCuvette
-
-    '                Dim dbCmd As New SqlClient.SqlCommand
-    '                dbCmd.Connection = dbConnection
-    '                dbCmd.CommandText = cmdText
-
-    '                'Fill the DataSet to return 
-    '                Dim contaminationsDataDS As New ContaminationsDS
-    '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
-
-    '                resultData.SetDatos = contaminationsDataDS
-    '                resultData.HasError = False
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestContaminaCuvetteID", EventLogEntryType.Error, False)
-    '    Finally
-    '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    ' ''' <summary>
-    ' ''' Search if there is an R1 Contaminamination between the Reagents informed as Contaminator and Contaminated
-    ' ''' </summary>
-    ' ''' <param name="pDBConnection">Open DB Connection</param>
-    ' ''' <param name="pReagentContaminatorID">Identifier of the Contaminator Reagent</param>
-    ' ''' <param name="pReagentContaminatedID">Identifier of the Contaminated Reagent</param>
-    ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with the Contamination between the informed Reagents</returns>
-    ' ''' <remarks>
-    ' ''' Created by:  TR 30/03/2011
-    ' ''' Modified by: SA 24/10/2011 - Changed the function template
-    ' ''' </remarks>
-    'Public Function ReadByContaminatorIDContaminatedID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
-    '                                                   ByVal pReagentContaminatedID As Integer) As GlobalDataTO
-    '    Dim resultData As GlobalDataTO = Nothing
-    '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-    '    Try
-    '        resultData = GetOpenDBConnection(pDBConnection)
-    '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-    '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-    '            If (Not dbConnection Is Nothing) Then
-    '                Dim cmdText As String = " SELECT * FROM   tparContaminations " & vbCrLf & _
-    '                                        " WHERE  ReagentContaminatorID = " & pReagentContaminatorID & vbCrLf & _
-    '                                        " AND    ReagentContaminatedID = " & pReagentContaminatedID
-
-    '                Dim contaminationsDataDS As New ContaminationsDS
-    '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-    '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                        dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
-    '                    End Using
-    '                End Using
-
-    '                resultData.SetDatos = contaminationsDataDS
-    '                resultData.HasError = False
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '        resultData = New GlobalDataTO()
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminatorIDContaminatedID", EventLogEntryType.Error, False)
-    '    Finally
-    '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    ' ''' <summary>
-    ' ''' Get all Contaminations currently defined (both types R1 and CUVETTES)
-    ' ''' </summary>
-    ' ''' <param name="pDBConnection">Open DB Connection</param>
-    ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all Contaminations (R1 and CUVETTES)
-    ' '''          currently defined</returns>
-    ' ''' <remarks>
-    ' ''' Created by:  TR 30/03/2011
-    ' ''' Modified by: SA 24/10/2011 - Changed the function template
-    ' ''' </remarks>
-    'Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-    '    Dim resultData As GlobalDataTO = Nothing
-    '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-    '    Try
-    '        resultData = GetOpenDBConnection(pDBConnection)
-    '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-    '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-    '            If (Not dbConnection Is Nothing) Then
-    '                Dim cmdText As String = " SELECT * FROM tparContaminations "
-
-    '                Dim contaminationsDataDS As New ContaminationsDS
-    '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-    '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                        dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
-    '                    End Using
-    '                End Using
-
-    '                resultData.SetDatos = contaminationsDataDS
-    '                resultData.HasError = False
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '        resultData = New GlobalDataTO()
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadAll", EventLogEntryType.Error, False)
-    '    Finally
-    '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-    '    End Try
-    '    Return resultData
-    'End Function
-
-    ' ''' <summary>
-    ' ''' Get all Standard Tests that contaminate the specified Standard Test
-    ' ''' </summary>
-    ' ''' <param name="pDBConnection">Open DB Connection</param>
-    ' ''' <param name="pTestID">Test Identifier</param>
-    ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all found Contaminations</returns>
-    ' ''' <remarks>
-    ' ''' Created by:  SA 29/11/2010
-    ' ''' Modified by: AG 15/12/2010 - Do not use tparContaminationWashings table
-    ' '''              SA 27/05/2014 - Added USING sentence to manage the SQLCommand
-    ' ''' </remarks>
-    'Public Function ReadTestRNAsContaminated(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
-    '    Dim resultData As GlobalDataTO = Nothing
-    '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-    '    Try
-    '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-    '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-    '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-    '            If (Not dbConnection Is Nothing) Then
-    '                Dim cmdText As String = " SELECT C.ContaminationType, T.TestID, T.TestName, T.PreloadedTest, C.ReagentContaminatorID, " & vbCrLf & _
-    '                                               " C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
-    '                                        " FROM   tparContaminations C INNER JOIN tparTestReagents TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
-    '                                                                    " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
-    '                                        " WHERE  C.ReagentContaminatedID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-    '                                                                           " WHERE  TestID = " & pTestID & ") " & vbCrLf & _
-    '                                        " ORDER BY C.ContaminationType "
-
-    '                Dim contaminationsDataDS As New ContaminationsDS
-    '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-    '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                        dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
-    '                    End Using
-    '                End Using
-
-    '                resultData.SetDatos = contaminationsDataDS
-    '                resultData.HasError = False
-
-    '                '    Dim dbCmd As New SqlClient.SqlCommand
-    '                '    dbCmd.Connection = dbConnection
-    '                '    dbCmd.CommandText = cmdText
-
-    '                '    'Fill the DataSet to return 
-    '                '    Dim contaminationsDataDS As New ContaminationsDS
-    '                '    Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-    '                '    dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
-
-    '                '    resultData.SetDatos = contaminationsDataDS
-    '                '    resultData.HasError = False
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '        resultData = New GlobalDataTO()
-    '        resultData.HasError = True
-    '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '        resultData.ErrorMessage = ex.Message
-
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestRNAsContaminated", EventLogEntryType.Error, False)
-    '    Finally
-    '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-    '    End Try
-    '    Return resultData
-    'End Function
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedCuvettesContaminations", EventLogEntryType.Error, False)
+        End Try
+        Return resultData
+    End Function
 #End Region
 
 End Class

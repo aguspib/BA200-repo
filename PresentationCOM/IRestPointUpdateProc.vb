@@ -5,20 +5,17 @@ Imports System.IO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.App
 
 
-Public Class IRestPointUpdateProc
+Public Class UiRestPointUpdateProc
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"
@@ -92,24 +89,24 @@ Public Class IRestPointUpdateProc
             'OK Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsOKButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL AcceptButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 11/01/2011 -Path Button.
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                bsBrowseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsBrowseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -143,7 +140,7 @@ Public Class IRestPointUpdateProc
             bsScreenToolTips.SetToolTip(bsBrowseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Select", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -159,7 +156,7 @@ Public Class IRestPointUpdateProc
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -209,7 +206,7 @@ Public Class IRestPointUpdateProc
                                 'RH 07/02/2012 Return from the Function.
                                 'Avoid the execution of the next code lines.
                                 'Log the error
-                                CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
+                                GlobalBase.CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
                                                   Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, _
                                                   GetApplicationInfoSession().ActivateSystemLog)
 
@@ -237,7 +234,7 @@ Public Class IRestPointUpdateProc
                     End If
                     'RH 12/11/2010 tempFolder
 
-                    myGlobal = myUtil.ExtractFromZip(RestorePointPath, tempFolder)
+                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
 
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
@@ -312,7 +309,7 @@ Public Class IRestPointUpdateProc
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
@@ -374,7 +371,7 @@ Public Class IRestPointUpdateProc
             Else
                 myErrorMessage = ex.Message
             End If
-            CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -436,7 +433,7 @@ Public Class IRestPointUpdateProc
 
         Catch ex As Exception
             Dim myErrorMessage As String = ex.Message & " - " & ex.InnerException.InnerException.Message
-            CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -469,7 +466,7 @@ Public Class IRestPointUpdateProc
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         Finally
@@ -488,12 +485,12 @@ Public Class IRestPointUpdateProc
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim mySATUtil As New SATReportUtilities
 
             'obtain the APP version
             Dim myAppVersion As String
-            myGlobal = myUtil.GetSoftwareVersion()
+            myGlobal = Utilities.GetSoftwareVersion()
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
@@ -541,7 +538,7 @@ Public Class IRestPointUpdateProc
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         End Try
@@ -608,7 +605,7 @@ Public Class IRestPointUpdateProc
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -640,8 +637,8 @@ Public Class IRestPointUpdateProc
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -703,17 +700,17 @@ Public Class IRestPointUpdateProc
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Not allow move form and mantain the center location in center parent
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: DL 27/07/2011
-    ''' </remarks>
+    ' ''' <summary>
+    ' ''' Not allow move form and mantain the center location in center parent
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by: DL 27/07/2011
+    ' ''' </remarks>
     'Protected Overrides Sub WndProc(ByRef m As Message)
     '    'If m.Msg = WM_WINDOWPOSCHANGING Then
     '    '    Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, _
@@ -784,7 +781,7 @@ Public Class IRestPointUpdateProc
             bsScreenToolTips.SetToolTip(bsSelectedTextBox, bsSelectedTextBox.Text)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BrowseButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -829,11 +826,11 @@ Public Class IRestPointUpdateProc
 
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays) '#REFACTORING
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    myGlobal = ApplicationLogManager.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays)
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
-                        myGlobal = myLogAcciones.DeleteAll()
+                        myGlobal = ApplicationLogManager.DeleteAll()
                     Else
                         'DL 31/05/2013
                         'The Reset process will continue even if errors in ExportLogToXML
@@ -902,7 +899,7 @@ Public Class IRestPointUpdateProc
             '        '    'Save the registry value on the DB.
             '        '    myGlobal = myUserSettingsDelegate.Update(Nothing, UserSettingsEnum.LIS_TRACE_LEVEL.ToString(), RegistryLISTraceValue)
             '        '    'Inform on the application log the change and the previous value.
-            '        '    CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
+            '        '    GlobalBase.CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
             '        'End If
             '    End If
             '    'TR 24/05/2013 -END.
@@ -958,7 +955,7 @@ Public Class IRestPointUpdateProc
             ''IAx00MainMDI.Connect()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".bsOKButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
@@ -969,7 +966,7 @@ Public Class IRestPointUpdateProc
             'IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
 
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
-            CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
+            GlobalBase.CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
                                        EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
         End Try
@@ -992,9 +989,9 @@ Public Class IRestPointUpdateProc
 
             If Not myGlobalDataTO.HasError Then
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
-                Dim currentSession As New GlobalBase
+                'Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
-                myApplicationInfoSessionTO = currentSession.GetSessionInfo()
+                myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.
                 If Not myApplicationInfoSessionTO.ApplicationLanguage = newLanguageID Then
                     'Initialize session information.
@@ -1023,7 +1020,7 @@ Public Class IRestPointUpdateProc
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".LoadRSATConfig", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -1054,7 +1051,7 @@ Public Class IRestPointUpdateProc
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1074,7 +1071,7 @@ Public Class IRestPointUpdateProc
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSATDirListBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

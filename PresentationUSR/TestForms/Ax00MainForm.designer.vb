@@ -24,39 +24,70 @@ Partial Class Ax00MainForm
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.bsTestUpdateVersionProcessButton = New System.Windows.Forms.Button()
+        Me.bsLogFileViewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsXmlEncryptButton = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.SimpleButton2 = New DevExpress.XtraEditors.SimpleButton()
         Me.SimpleButton1 = New DevExpress.XtraEditors.SimpleButton()
         Me.BsButton4 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.BsGenerateISECodesButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.LogFileView = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsOrderRequestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsButton5 = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsAGTestingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton2 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.xmlEncrypt = New System.Windows.Forms.Button()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.Button8 = New System.Windows.Forms.Button()
-        Me.Button7 = New System.Windows.Forms.Button()
-        Me.bsSusanaTest2 = New System.Windows.Forms.Button()
-        Me.bsSusanaButton = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
         Me.butTestSergio = New System.Windows.Forms.Button()
         Me.Button6 = New System.Windows.Forms.Button()
+        Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.SuspendLayout()
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.bsTestUpdateVersionProcessButton)
+        Me.Panel1.Controls.Add(Me.bsLogFileViewButton)
+        Me.Panel1.Controls.Add(Me.bsXmlEncryptButton)
+        Me.Panel1.Controls.Add(Me.bsAGTestingButton)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Left
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(182, 702)
         Me.Panel1.TabIndex = 9
+        '
+        'bsTestUpdateVersionProcessButton
+        '
+        Me.bsTestUpdateVersionProcessButton.Location = New System.Drawing.Point(12, 12)
+        Me.bsTestUpdateVersionProcessButton.Name = "bsTestUpdateVersionProcessButton"
+        Me.bsTestUpdateVersionProcessButton.Size = New System.Drawing.Size(142, 38)
+        Me.bsTestUpdateVersionProcessButton.TabIndex = 25
+        Me.bsTestUpdateVersionProcessButton.Text = "TEST UPDATE VERSION PROCESS"
+        Me.bsTestUpdateVersionProcessButton.UseVisualStyleBackColor = True
+        '
+        'bsLogFileViewButton
+        '
+        Me.bsLogFileViewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsLogFileViewButton.Location = New System.Drawing.Point(12, 100)
+        Me.bsLogFileViewButton.Name = "bsLogFileViewButton"
+        Me.bsLogFileViewButton.Size = New System.Drawing.Size(142, 38)
+        Me.bsLogFileViewButton.TabIndex = 22
+        Me.bsLogFileViewButton.Text = "OPEN LOG FILE"
+        Me.bsLogFileViewButton.UseVisualStyleBackColor = True
+        '
+        'bsXmlEncryptButton
+        '
+        Me.bsXmlEncryptButton.Location = New System.Drawing.Point(12, 56)
+        Me.bsXmlEncryptButton.Name = "bsXmlEncryptButton"
+        Me.bsXmlEncryptButton.Size = New System.Drawing.Size(142, 38)
+        Me.bsXmlEncryptButton.TabIndex = 15
+        Me.bsXmlEncryptButton.Text = "XML FILE ENCRYPT (TASKS)"
+        Me.bsXmlEncryptButton.UseVisualStyleBackColor = True
         '
         'Panel2
         '
@@ -65,14 +96,11 @@ Partial Class Ax00MainForm
         Me.Panel2.Controls.Add(Me.BsButton4)
         Me.Panel2.Controls.Add(Me.Button1)
         Me.Panel2.Controls.Add(Me.BsGenerateISECodesButton)
-        Me.Panel2.Controls.Add(Me.LogFileView)
         Me.Panel2.Controls.Add(Me.BsButton1)
         Me.Panel2.Controls.Add(Me.bsOrderRequestButton)
         Me.Panel2.Controls.Add(Me.BsButton6)
-        Me.Panel2.Controls.Add(Me.BsButton5)
         Me.Panel2.Controls.Add(Me.BsButton3)
         Me.Panel2.Controls.Add(Me.BsButton2)
-        Me.Panel2.Controls.Add(Me.xmlEncrypt)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel2.Location = New System.Drawing.Point(182, 0)
         Me.Panel2.Name = "Panel2"
@@ -124,16 +152,6 @@ Partial Class Ax00MainForm
         Me.BsGenerateISECodesButton.Text = "GenerateISECodes"
         Me.BsGenerateISECodesButton.UseVisualStyleBackColor = True
         '
-        'LogFileView
-        '
-        Me.LogFileView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.LogFileView.Location = New System.Drawing.Point(7, 71)
-        Me.LogFileView.Name = "LogFileView"
-        Me.LogFileView.Size = New System.Drawing.Size(123, 53)
-        Me.LogFileView.TabIndex = 22
-        Me.LogFileView.Text = "Ver Log File "
-        Me.LogFileView.UseVisualStyleBackColor = True
-        '
         'BsButton1
         '
         Me.BsButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
@@ -164,15 +182,15 @@ Partial Class Ax00MainForm
         Me.BsButton6.Text = "Contaminations"
         Me.BsButton6.UseVisualStyleBackColor = True
         '
-        'BsButton5
+        'bsAGTestingButton
         '
-        Me.BsButton5.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsButton5.Location = New System.Drawing.Point(222, 12)
-        Me.BsButton5.Name = "BsButton5"
-        Me.BsButton5.Size = New System.Drawing.Size(107, 23)
-        Me.BsButton5.TabIndex = 15
-        Me.BsButton5.Text = "AG Testings"
-        Me.BsButton5.UseVisualStyleBackColor = True
+        Me.bsAGTestingButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsAGTestingButton.Location = New System.Drawing.Point(12, 144)
+        Me.bsAGTestingButton.Name = "bsAGTestingButton"
+        Me.bsAGTestingButton.Size = New System.Drawing.Size(142, 38)
+        Me.bsAGTestingButton.TabIndex = 15
+        Me.bsAGTestingButton.Text = "AG Testings"
+        Me.bsAGTestingButton.UseVisualStyleBackColor = True
         '
         'BsButton3
         '
@@ -194,28 +212,16 @@ Partial Class Ax00MainForm
         Me.BsButton2.Text = "Close Active Windows"
         Me.BsButton2.UseVisualStyleBackColor = True
         '
-        'xmlEncrypt
-        '
-        Me.xmlEncrypt.Location = New System.Drawing.Point(136, 70)
-        Me.xmlEncrypt.Name = "xmlEncrypt"
-        Me.xmlEncrypt.Size = New System.Drawing.Size(153, 54)
-        Me.xmlEncrypt.TabIndex = 15
-        Me.xmlEncrypt.Text = "XML File Encrypt " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Task)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
-        Me.xmlEncrypt.UseVisualStyleBackColor = True
-        '
         'Panel3
         '
         Me.Panel3.Controls.Add(Me.Button8)
-        Me.Panel3.Controls.Add(Me.Button7)
-        Me.Panel3.Controls.Add(Me.bsSusanaTest2)
-        Me.Panel3.Controls.Add(Me.bsSusanaButton)
         Me.Panel3.Controls.Add(Me.Button4)
         Me.Panel3.Controls.Add(Me.butTestSergio)
         Me.Panel3.Controls.Add(Me.Button6)
         Me.Panel3.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.Panel3.Location = New System.Drawing.Point(182, 593)
+        Me.Panel3.Location = New System.Drawing.Point(182, 513)
         Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(834, 109)
+        Me.Panel3.Size = New System.Drawing.Size(834, 189)
         Me.Panel3.TabIndex = 11
         '
         'Button8
@@ -227,36 +233,9 @@ Partial Class Ax00MainForm
         Me.Button8.Text = "Tomas"
         Me.Button8.UseVisualStyleBackColor = True
         '
-        'Button7
-        '
-        Me.Button7.Location = New System.Drawing.Point(7, 49)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(75, 23)
-        Me.Button7.TabIndex = 25
-        Me.Button7.Text = "Button7"
-        Me.Button7.UseVisualStyleBackColor = True
-        '
-        'bsSusanaTest2
-        '
-        Me.bsSusanaTest2.Location = New System.Drawing.Point(508, 48)
-        Me.bsSusanaTest2.Name = "bsSusanaTest2"
-        Me.bsSusanaTest2.Size = New System.Drawing.Size(100, 39)
-        Me.bsSusanaTest2.TabIndex = 22
-        Me.bsSusanaTest2.Text = "Susana Test2"
-        Me.bsSusanaTest2.UseVisualStyleBackColor = True
-        '
-        'bsSusanaButton
-        '
-        Me.bsSusanaButton.Location = New System.Drawing.Point(508, 3)
-        Me.bsSusanaButton.Name = "bsSusanaButton"
-        Me.bsSusanaButton.Size = New System.Drawing.Size(100, 39)
-        Me.bsSusanaButton.TabIndex = 21
-        Me.bsSusanaButton.Text = "Susana Test"
-        Me.bsSusanaButton.UseVisualStyleBackColor = True
-        '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(421, 3)
+        Me.Button4.Location = New System.Drawing.Point(633, 48)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(81, 39)
         Me.Button4.TabIndex = 20
@@ -265,7 +244,7 @@ Partial Class Ax00MainForm
         '
         'butTestSergio
         '
-        Me.butTestSergio.Location = New System.Drawing.Point(247, 3)
+        Me.butTestSergio.Location = New System.Drawing.Point(97, 3)
         Me.butTestSergio.Name = "butTestSergio"
         Me.butTestSergio.Size = New System.Drawing.Size(81, 39)
         Me.butTestSergio.TabIndex = 18
@@ -301,6 +280,7 @@ Partial Class Ax00MainForm
         Me.MinimumSize = New System.Drawing.Size(1024, 736)
         Me.Name = "Ax00MainForm"
         Me.Text = "Ax00MainForm"
+        Me.Panel1.ResumeLayout(False)
         Me.Panel2.ResumeLayout(False)
         Me.Panel3.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -311,19 +291,17 @@ Partial Class Ax00MainForm
     Friend WithEvents Panel3 As System.Windows.Forms.Panel
     Friend WithEvents BsButton2 As Biosystems.Ax00.Controls.Usercontrols.BSButton
     Friend WithEvents BsButton3 As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents xmlEncrypt As System.Windows.Forms.Button
-    Friend WithEvents BsButton5 As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents bsXmlEncryptButton As System.Windows.Forms.Button
+    Friend WithEvents bsAGTestingButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsButton6 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsOrderRequestButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsButton1 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents butTestSergio As System.Windows.Forms.Button
     Friend WithEvents Button4 As System.Windows.Forms.Button
-    Friend WithEvents bsSusanaButton As System.Windows.Forms.Button
-    Friend WithEvents bsSusanaTest2 As System.Windows.Forms.Button
-    Friend WithEvents LogFileView As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents bsLogFileViewButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents Button6 As System.Windows.Forms.Button
     Friend WithEvents BsGenerateISECodesButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents Button7 As System.Windows.Forms.Button
+    Friend WithEvents bsTestUpdateVersionProcessButton As System.Windows.Forms.Button
     Friend WithEvents Button8 As System.Windows.Forms.Button
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents BsButton4 As Biosystems.Ax00.Controls.UserControls.BSButton

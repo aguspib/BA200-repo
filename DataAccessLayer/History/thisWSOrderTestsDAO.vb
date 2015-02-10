@@ -9,7 +9,7 @@ Imports System.Data.SqlClient
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class thisWSOrderTestsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -22,6 +22,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 19/06/2012 
         ''' Modified by: AG 24/04/2013 - Added new fields: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, 
         '''                              LISPatientID, LISTestName, LISSampleType, LISUnits
+        '''              SA 04/09/2014 - BA-1919 ==> When insert LIS fields, use the N prefix to save correctly texts containing two-bytes characters.
+        '''                                          Use also the Replace function to save correctly texts containing single quotes
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisWSOrderTestsDS As HisWSOrderTestsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -41,9 +43,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText.AppendLine(" (AnalyzerID, WorkSessionID, OrderDateTime, SampleClass, StatFlag, TestType, HistTestID, ")
                             cmdText.AppendLine("  SampleType, TestVersionNumber, ReplicatesNumber, HistCalibratorID, HistPatientID, ")
                             cmdText.AppendLine("  SampleID, MeasureUnit, LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, ")
-                            cmdText.AppendLine(" LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits ) ")
+                            cmdText.AppendLine("  LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits ) ")
 
-                            cmdText.AppendFormat(" VALUES('{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, '{7}', ", _
+                            cmdText.AppendFormat(" VALUES(N'{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, '{7}', ", _
                                                  hisWSOrderTestRow.AnalyzerID.Trim, _
                                                  hisWSOrderTestRow.WorkSessionID.Trim, _
                                                  hisWSOrderTestRow.OrderDateTime.ToString("yyyyMMdd HH:mm:ss"), _
@@ -80,20 +82,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 cmdText.AppendLine("NULL, ")
                             End If
 
-
-                            'AG 24/04/2013 Added fields: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
-                            'If (Not hisWSOrderTestRow.IsMeasureUnitNull) Then
-                            '    cmdText.AppendLine("'" & hisWSOrderTestRow.MeasureUnit.Trim & "') ")
-                            'Else
-                            '    cmdText.AppendLine("NULL)")
-                            'End If
-
                             If (Not hisWSOrderTestRow.IsMeasureUnitNull) Then
                                 cmdText.AppendLine("'" & hisWSOrderTestRow.MeasureUnit.Trim & "' ")
                             Else
                                 cmdText.AppendLine("NULL ")
                             End If
 
+                            'AG 24/04/2013 Added fields: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
                             If (Not hisWSOrderTestRow.IsLISRequestNull) Then
                                 cmdText.Append(", " & IIf(hisWSOrderTestRow.LISRequest, "1", "0").ToString)
                             Else
@@ -107,62 +102,62 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End If
 
                             If (Not hisWSOrderTestRow.IsSpecimenIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.SpecimenID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.SpecimenID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsAwosIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.AwosID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.AwosID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsESOrderIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.ESOrderID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESOrderID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsESPatientIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.ESPatientID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESPatientID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISOrderIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.LISOrderID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISOrderID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISPatientIDNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.LISPatientID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISPatientID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISTestNameNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.LISTestName.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISTestName.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISSampleTypeNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.LISSampleType.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISSampleType.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISUnitsNull) Then
-                                cmdText.AppendLine(", '" & hisWSOrderTestRow.LISUnits.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISUnits.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL")
                             End If
                             cmdText.Append(")")
                             'AG 24/04/2013
 
-                            cmdText.AppendFormat("{0}SELECT SCOPE_IDENTITY()", vbCrLf)
+                            cmdText.AppendFormat("{0} SELECT SCOPE_IDENTITY()", vbCrLf)
 
                             dbCmd.CommandText = cmdText.ToString()
                             HistOrderTestID = CInt(dbCmd.ExecuteScalar())
@@ -182,8 +177,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -233,8 +228,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -279,8 +274,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -317,7 +312,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= "      ,LISTestName = NULL" & vbCrLf
                     cmdText &= "      ,LISSampleType = NULL" & vbCrLf
                     cmdText &= "      ,LISUnits = NULL" & vbCrLf
-                    cmdText &= " WHERE HistOrderTestID IN (SELECT DISTINCT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "')"
+                    'AJG. ADDED THOSE TWO LINES OF CODE
+                    'cmdText &= " WHERE HistOrderTestID IN (SELECT DISTINCT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "')"
+                    cmdText &= " WHERE EXISTS (SELECT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "' " & vbCrLf
+                    cmdText &= " AND thisWSOrderTests.HistOrderTestID = HistOrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -329,8 +327,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -387,8 +385,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountForSTDTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountForSTDTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -447,8 +445,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.GetDataToExportFromHIST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.GetDataToExportFromHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -501,8 +499,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByHistTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByHistTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -554,8 +552,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateBLANKFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateBLANKFields", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -604,11 +602,60 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateCALIBFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateCALIBFields", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' Get TestSamples data information of the specified OrderHistTestID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pHistOrderTestID">Order Test Identifier in Historic Module</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisTestSamplesDS with the related data information</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' </remarks>
+        Public Function ReadByOrderTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistOrderTestID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM thisTestSamples as TS " & vbCrLf & _
+                                                " INNER JOIN thisWSOrderTests as OT on  TS.HistTestID = OT.HistTestID " & vbCrLf & _
+                                                " WHERE  OT.HistOrderTestID = " & pHistOrderTestID & vbCrLf
+
+                        Dim myHisTestSamplesDS As New HisTestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myHisTestSamplesDS.thisTestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myHisTestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "NOT USED"
@@ -647,8 +694,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Delete", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Delete", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -701,8 +748,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountByAnalyzerWS", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountByAnalyzerWS", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

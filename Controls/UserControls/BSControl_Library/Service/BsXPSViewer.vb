@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms.Integration
+﻿
 Imports System.Windows.Xps.Packaging
 Imports System.IO
 
@@ -280,7 +280,7 @@ Public Class BsXPSViewer
 
     Public Property VerticalPageMargin() As Integer
         Get
-            Return Me.XpsViewer1.GetVerticalPageMargin
+            Return CInt(Math.Round(Me.XpsViewer1.GetVerticalPageMargin, 0))
         End Get
         Set(ByVal value As Integer)
             Me.XpsViewer1.SetVerticalPageMargin(value)
@@ -295,25 +295,25 @@ Public Class BsXPSViewer
             IsScrollableAttr = value
         End Set
     End Property
-    Public ReadOnly Property HasNextPage()
+    Public ReadOnly Property HasNextPage() As Boolean
         Get
             Return Me.XpsViewer1.DocumentViewer1.CanGoToNextPage
         End Get
     End Property
 
-    Public ReadOnly Property HasPrevPage()
+    Public ReadOnly Property HasPrevPage() As Boolean
         Get
             Return Me.XpsViewer1.DocumentViewer1.CanGoToPreviousPage
         End Get
     End Property
 
-    Public ReadOnly Property CanZoomIn()
+    Public ReadOnly Property CanZoomIn() As Boolean
         Get
             Return Me.XpsViewer1.DocumentViewer1.CanIncreaseZoom
         End Get
     End Property
 
-    Public ReadOnly Property CanZoomOut()
+    Public ReadOnly Property CanZoomOut() As Boolean
         Get
             Return Me.XpsViewer1.DocumentViewer1.CanDecreaseZoom
         End Get

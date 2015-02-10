@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCCumulateControlResults
+Partial Class UiQCCumulateControlResults
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -33,7 +33,7 @@ Partial Class IQCCumulateControlResults
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCCumulateControlResults))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCCumulateControlResults))
         Me.bsControlListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsControlsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.bsControlsListView = New Biosystems.Ax00.Controls.UserControls.BSListView
@@ -375,7 +375,7 @@ Partial Class IQCCumulateControlResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCCumulateControlResults"
+        Me.Name = "UiQCCumulateControlResults"
         Me.ShowInTaskbar = False
         Me.bsControlListGroupBox.ResumeLayout(False)
         Me.bsControlGroupBox.ResumeLayout(False)

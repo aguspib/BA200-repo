@@ -1,43 +1,202 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
+Imports System.IO
+Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL.UpdateVersion
 
 Public Class UpdateProcessValidation
+    ''' <summary>
+    ''' Execute UPDATE VERSION process for ISE TESTS
+    ''' </summary>
+    Private Sub bsUpdateISETestsButton_Click(sender As Object, e As EventArgs) Handles bsUpdateISETestsButton.Click
+        Dim myGlobal As New GlobalDataTO
+        Dim dbConnection As SqlClient.SqlConnection
+
+        XMLViewer.Clear()
+
+        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
+        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+            If (Not dbConnection Is Nothing) Then
+                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+
+                myGlobal = myUpdateProcessDelegate.SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
+                If (Not myGlobal.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    DAOBase.CommitTransaction(dbConnection)
+
+                    'Write the XML File containing all changes made in CUSTOMER DB
+                    Dim myDirName As String = "C:\Temp\"
+                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & " ISE UPDATE VERSION.xml"
+
+                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+
+                    Dim myTextReader As New StreamReader(myDirName & myFileName)
+                    XMLViewer.Text = myTextReader.ReadToEnd()
+                    myTextReader.Close()
+
+                    MsgBox("ISE TESTS UPDATED", vbOKOnly)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    DAOBase.RollbackTransaction(dbConnection)
+
+                    MsgBox("ERROR UPDATING ISE TESTS: " & myGlobal.ErrorMessage, vbOKOnly)
+                End If
+            End If
+        End If
+    End Sub
 
     ''' <summary>
-    ''' 
+    ''' Execute UPDATE VERSION process for STD TESTS
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>
-    ''' CREATED BY: TR 23/01/2013
-    ''' </remarks>
-    Private Function ExecuteValidationScript() As GlobalDataTO
-        Dim myGlobalDataTO As New GlobalDataTO
-        Try
-            Dim myTestParametersUpdateData As New TestParametersUpdateData
-            myGlobalDataTO = myTestParametersUpdateData.UpdateFromFactoryUpdates(Nothing)
+    Private Sub bsUpdateSTDTestsButton_Click(sender As Object, e As EventArgs) Handles bsUpdateSTDTestsButton.Click
+        Dim myGlobal As New GlobalDataTO
+        Dim dbConnection As SqlClient.SqlConnection
 
-            If Not myGlobalDataTO.HasError Then
-                myGlobalDataTO = myTestParametersUpdateData.UpdateFromFactoryRemoves(Nothing)
+        XMLViewer.Clear()
+
+        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
+        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+            If (Not dbConnection Is Nothing) Then
+                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+
+                myGlobal = myUpdateProcessDelegate.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
+                If (Not myGlobal.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    DAOBase.CommitTransaction(dbConnection)
+
+                    'Write the XML File containing all changes made in CUSTOMER DB
+                    Dim myDirName As String = "C:\Temp\"
+                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & "STD UPDATE VERSION.xml"
+
+                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+
+                    Dim myTextReader As New StreamReader(myDirName & myFileName)
+                    XMLViewer.Text = myTextReader.ReadToEnd()
+                    myTextReader.Close()
+
+                    MsgBox("STD TESTS UPDATED", vbOKOnly)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    DAOBase.RollbackTransaction(dbConnection)
+
+                    MsgBox("ERROR UPDATING STD TESTS: " & myGlobal.ErrorMessage, vbOKOnly)
+                End If
             End If
+        End If
+    End Sub
 
-            'Dim myContaminationsUpdateData As New ContaminationsUpdateData
-            'myGlobalDataTO = myContaminationsUpdateData.UpdateFromFactoryUpdates(Nothing)
-            'If Not myGlobalDataTO.HasError Then
+    ''' <summary>
+    ''' Execute UPDATE VERSION process for OFFS TESTS
+    ''' </summary>
+    Private Sub bsUpdateOFFSTestsButton_Click(sender As Object, e As EventArgs) Handles bsUpdateOFFSTestsButton.Click
+        Dim myGlobal As New GlobalDataTO
+        Dim dbConnection As SqlClient.SqlConnection
 
-            'End If
+        XMLViewer.Clear()
 
-        Catch ex As Exception
-            myGlobalDataTO.HasError = True
-            myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-            myGlobalDataTO.ErrorMessage = ex.Message
-        End Try
-        Return myGlobalDataTO
-    End Function
+        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
+        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+            If (Not dbConnection Is Nothing) Then
+                'Get Application Version from CUSTOMER DB
+                Dim mySwVersion As String = String.Empty
+                Dim myVersionsDelegate As New VersionsDelegate
+                myGlobal = myVersionsDelegate.GetVersionsData(Nothing)
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        ExecuteValidationScript()
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    Dim myVersionsDS As VersionsDS = DirectCast(myGlobal.SetDatos, VersionsDS)
+
+                    If (myVersionsDS.tfmwVersions.Count > 0) Then
+                        'Inform the USER and SERVICE SW Versions to return
+                        mySwVersion = myVersionsDS.tfmwVersions(0).UserSoftware
+                    End If
+                End If
+
+                If (Not myGlobal.HasError) Then
+                    Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+                    Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+
+                    myGlobal = myUpdateProcessDelegate.SetFactoryOFFSTestsProgramming(dbConnection, mySwVersion, myUpdateVersionChangesList)
+                    If (Not myGlobal.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        DAOBase.CommitTransaction(dbConnection)
+
+                        'Write the XML File containing all changes made in CUSTOMER DB
+                        Dim myDirName As String = "C:\Temp\"
+                        Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & "OFFS UPDATE VERSION.xml"
+
+                        myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+
+                        Dim myTextReader As New StreamReader(myDirName & myFileName)
+                        XMLViewer.Text = myTextReader.ReadToEnd()
+                        myTextReader.Close()
+
+                        MsgBox("OFFS TESTS UPDATED", vbOKOnly)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        DAOBase.RollbackTransaction(dbConnection)
+
+                        MsgBox("ERROR UPDATING OFFS TESTS: " & myGlobal.ErrorMessage, vbOKOnly)
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Execute UPDATE VERSION process for CALC TESTS
+    ''' </summary>
+    Private Sub bsUpdateCALCTestsButton_Click(sender As Object, e As EventArgs) Handles bsUpdateCALCTestsButton.Click
+        Dim myGlobal As New GlobalDataTO
+        Dim dbConnection As SqlClient.SqlConnection
+
+        XMLViewer.Clear()
+
+        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
+        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+            If (Not dbConnection Is Nothing) Then
+                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+
+                myGlobal = myUpdateProcessDelegate.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
+                If (Not myGlobal.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    DAOBase.CommitTransaction(dbConnection)
+
+                    'Write the XML File containing all changes made in CUSTOMER DB
+                    Dim myDirName As String = "C:\Temp\"
+                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & "CALC UPDATE VERSION.xml"
+
+                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+
+                    Dim myTextReader As New StreamReader(myDirName & myFileName)
+                    XMLViewer.Text = myTextReader.ReadToEnd()
+                    myTextReader.Close()
+
+                    MsgBox("CALC TESTS UPDATED", vbOKOnly)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    DAOBase.RollbackTransaction(dbConnection)
+                    
+                    MsgBox("ERROR UPDATING CALC TESTS: " & myGlobal.ErrorMessage, vbOKOnly)
+                End If
+            End If
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Close the screen
+    ''' </summary>
+    Private Sub bsExitButton_Click(sender As Object, e As EventArgs) Handles bsExitButton.Click
+        Me.Close()
     End Sub
 End Class

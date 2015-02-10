@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCResultsReview
+Partial Class UiQCResultsReview
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -33,7 +33,7 @@ Partial Class IQCResultsReview
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCResultsReview))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCResultsReview))
         Me.bsTestSampleListView = New Biosystems.Ax00.Controls.UserControls.BSListView
         Me.bsTestSampleGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsTestSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -675,7 +675,7 @@ Partial Class IQCResultsReview
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCResultsReview"
+        Me.Name = "UiQCResultsReview"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = ""

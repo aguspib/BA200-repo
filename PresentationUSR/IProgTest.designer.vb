@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgTest
+Partial Class UiProgTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -18,7 +18,7 @@ Partial Class IProgTest
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
- 
+
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
@@ -38,9 +38,9 @@ Partial Class IProgTest
         Dim DataGridViewCellStyle26 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle27 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle28 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgTest))
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.CancelButton = New System.Windows.Forms.Button()
+        Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.SampleTypePlus2 = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
         Me.SelectedSampleTypeCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
         Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -48,6 +48,8 @@ Partial Class IProgTest
         Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.TestDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.CopyTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.AddButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.PrintTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.DeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -256,7 +258,6 @@ Partial Class IProgTest
         Me.BsNumericUpDown4 = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.TubesBySampleTypeDS1 = New Biosystems.Ax00.Types.TubesBySampleTypeDS()
         Me.BsHelpProvider1 = New Biosystems.Ax00.Controls.UserControls.BSHelpProvider()
-        Me.CopyTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.SampleTypePlus2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsPanel2.SuspendLayout()
         Me.BsPanel1.SuspendLayout()
@@ -328,11 +329,11 @@ Partial Class IProgTest
         '
         'CancelButton
         '
-        Me.CancelButton.Location = New System.Drawing.Point(674, 562)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 24
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Location = New System.Drawing.Point(674, 562)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 24
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'SampleTypePlus2
         '
@@ -407,20 +408,41 @@ Partial Class IProgTest
         '
         'BsPanel1
         '
+        Me.BsPanel1.Controls.Add(Me.CopyTestButton)
+        Me.BsPanel1.Controls.Add(Me.BsCustomOrderButton)
         Me.BsPanel1.Controls.Add(Me.AddButton)
         Me.BsPanel1.Controls.Add(Me.PrintTestButton)
         Me.BsPanel1.Controls.Add(Me.DeleteButton)
         Me.BsPanel1.Controls.Add(Me.EditButton)
-        Me.BsPanel1.Location = New System.Drawing.Point(63, 613)
+        Me.BsPanel1.Location = New System.Drawing.Point(27, 613)
         Me.BsPanel1.Name = "BsPanel1"
-        Me.BsPanel1.Size = New System.Drawing.Size(143, 35)
+        Me.BsPanel1.Size = New System.Drawing.Size(280, 35)
         Me.BsPanel1.TabIndex = 5
+        '
+        'CopyTestButton
+        '
+        Me.CopyTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.CopyTestButton.Location = New System.Drawing.Point(185, 1)
+        Me.CopyTestButton.Name = "CopyTestButton"
+        Me.CopyTestButton.Size = New System.Drawing.Size(32, 32)
+        Me.CopyTestButton.TabIndex = 5
+        Me.CopyTestButton.UseVisualStyleBackColor = True
+        '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(148, 0)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 4
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
         '
         'AddButton
         '
         Me.AddButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.AddButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AddButton.Location = New System.Drawing.Point(0, 0)
+        Me.AddButton.Location = New System.Drawing.Point(37, 0)
         Me.AddButton.Name = "AddButton"
         Me.AddButton.Size = New System.Drawing.Size(32, 32)
         Me.AddButton.TabIndex = 1
@@ -431,10 +453,10 @@ Partial Class IProgTest
         Me.PrintTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.PrintTestButton.Enabled = False
         Me.PrintTestButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.PrintTestButton.Location = New System.Drawing.Point(111, 0)
+        Me.PrintTestButton.Location = New System.Drawing.Point(222, 0)
         Me.PrintTestButton.Name = "PrintTestButton"
         Me.PrintTestButton.Size = New System.Drawing.Size(32, 32)
-        Me.PrintTestButton.TabIndex = 4
+        Me.PrintTestButton.TabIndex = 6
         Me.PrintTestButton.UseVisualStyleBackColor = True
         Me.PrintTestButton.Visible = False
         '
@@ -442,7 +464,7 @@ Partial Class IProgTest
         '
         Me.DeleteButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.DeleteButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.DeleteButton.Location = New System.Drawing.Point(74, 0)
+        Me.DeleteButton.Location = New System.Drawing.Point(111, 0)
         Me.DeleteButton.Name = "DeleteButton"
         Me.DeleteButton.Size = New System.Drawing.Size(32, 32)
         Me.DeleteButton.TabIndex = 3
@@ -452,7 +474,7 @@ Partial Class IProgTest
         '
         Me.EditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.EditButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.EditButton.Location = New System.Drawing.Point(37, 0)
+        Me.EditButton.Location = New System.Drawing.Point(74, 0)
         Me.EditButton.Name = "EditButton"
         Me.EditButton.Size = New System.Drawing.Size(32, 32)
         Me.EditButton.TabIndex = 2
@@ -2803,7 +2825,7 @@ Partial Class IProgTest
         Me.BsGroupBox2.Controls.Add(Me.BsLabel1)
         Me.BsGroupBox2.Controls.Add(Me.TestDescriptionTextBox)
         Me.BsGroupBox2.Controls.Add(Me.SaveButton)
-        Me.BsGroupBox2.Controls.Add(Me.CancelButton)
+        Me.BsGroupBox2.Controls.Add(Me.ButtonCancel)
         Me.BsGroupBox2.Controls.Add(Me.SelectedSampleTypeCombo)
         Me.BsGroupBox2.Controls.Add(Me.SampleTypePlus2)
         Me.BsGroupBox2.Controls.Add(Me.TestDetailsTabs)
@@ -3034,15 +3056,6 @@ Partial Class IProgTest
         Me.TubesBySampleTypeDS1.DataSetName = "TubesBySampleTypeDS"
         Me.TubesBySampleTypeDS1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
-        'CopyTestButton
-        '
-        Me.CopyTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CopyTestButton.Location = New System.Drawing.Point(212, 613)
-        Me.CopyTestButton.Name = "CopyTestButton"
-        Me.CopyTestButton.Size = New System.Drawing.Size(32, 32)
-        Me.CopyTestButton.TabIndex = 34
-        Me.CopyTestButton.UseVisualStyleBackColor = True
-        '
         'IProgTest
         '
         Me.AcceptButton = Me.ExitButton
@@ -3055,7 +3068,6 @@ Partial Class IProgTest
         Me.Appearance.Options.UseForeColor = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(984, 660)
-        Me.Controls.Add(Me.CopyTestButton)
         Me.Controls.Add(Me.BsGroupBox2)
         Me.Controls.Add(Me.BsGroupBox1)
         Me.Controls.Add(Me.BsPanel2)
@@ -3066,7 +3078,7 @@ Partial Class IProgTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgTest"
+        Me.Name = "UiProgTest"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Test Programing"
@@ -3292,7 +3304,7 @@ Partial Class IProgTest
     Friend WithEvents ShortNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents TestNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents NameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents CancelButton As System.Windows.Forms.Button
+    Friend WithEvents ButtonCancel As System.Windows.Forms.Button
     Friend WithEvents CalibratorLotTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents CalibratorNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents LBL_CalibratorName As Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -3358,10 +3370,11 @@ Partial Class IProgTest
     Friend WithEvents BsRadioButton1 As Biosystems.Ax00.Controls.UserControls.BSRadioButton
     Friend WithEvents SubstrateDepleUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
     Friend WithEvents BsHelpProvider1 As Biosystems.Ax00.Controls.UserControls.BSHelpProvider
-    Friend WithEvents CopyTestButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SampleTypeCheckList As Biosystems.Ax00.Controls.UserControls.BSCheckedListBox
     Friend WithEvents SampleTypeCboEx As Biosystems.Ax00.Controls.UserControls.BSComboBoxEx
     Friend WithEvents SampleTypeCboAux As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents AddControlLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents CopyTestButton As Biosystems.Ax00.Controls.UserControls.BSButton
 
 End Class

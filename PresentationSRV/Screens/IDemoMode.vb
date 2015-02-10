@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.App
 
-Public Class IDemoMode
+Public Class UiDemoMode
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -128,7 +128,7 @@ Public Class IDemoMode
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
         Return True
@@ -154,7 +154,7 @@ Public Class IDemoMode
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -179,12 +179,12 @@ Public Class IDemoMode
     '            If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
     '                myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
     '            End If
-    '            CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '            GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '            ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -206,7 +206,7 @@ Public Class IDemoMode
             GetScreenTooltip()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -225,15 +225,15 @@ Public Class IDemoMode
             ' For Tooltips...
 
             If myScreenDelegate.StatusStressMode = STRESS_STATUS.UNFINISHED Then
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
             Else
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -248,12 +248,12 @@ Public Class IDemoMode
         Try
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MyBase.SetButtonImage(BsExitButton, "CANCEL")
@@ -263,7 +263,7 @@ Public Class IDemoMode
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -271,14 +271,14 @@ Public Class IDemoMode
             ' ''TEST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton_TODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton_TODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton_TODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''ABORT TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsTestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
             '' XBC 24/11/2011 - Unify buttons Start and Stop Demo
@@ -286,12 +286,12 @@ Public Class IDemoMode
             ''Info Button
             'auxIconName = GetIconName("RIGHT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -328,7 +328,7 @@ Public Class IDemoMode
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".RequestStressMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestStressMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RequestStressMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -365,7 +365,7 @@ Public Class IDemoMode
             Me.PrepareTestButton()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ReadStressStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadStressStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadStressStatus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -408,7 +408,7 @@ Public Class IDemoMode
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -428,7 +428,7 @@ Public Class IDemoMode
             MyBase.ActivateMDIMenusButtons(True)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -439,7 +439,7 @@ Public Class IDemoMode
         Try
             Me.ReadStressStatus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareStressReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareStressReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareStressReadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -460,7 +460,7 @@ Public Class IDemoMode
             MyBase.ActivateMDIMenusButtons(False) 'SGM 27/09/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -475,7 +475,7 @@ Public Class IDemoMode
             Me.BsTestButton.Enabled = False
             Me.BsExitButton.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestExitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -498,7 +498,7 @@ Public Class IDemoMode
                 myScreenDelegate.InsertReport("UTIL", "DEMO")
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -512,7 +512,7 @@ Public Class IDemoMode
         Try
             myGlobalDataTO = myScreenDelegate.GetParameters(Me.ActiveAnalyzerModel)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -535,7 +535,7 @@ Public Class IDemoMode
 
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -555,7 +555,7 @@ Public Class IDemoMode
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -586,7 +586,7 @@ Public Class IDemoMode
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -598,8 +598,8 @@ Public Class IDemoMode
             MyClass.myScreenDelegate = New DemoModeDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -636,7 +636,7 @@ Public Class IDemoMode
             ResetBorderSRV()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -647,7 +647,7 @@ Public Class IDemoMode
             Me.BsInfoXPSViewer.RefreshPage()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -679,7 +679,7 @@ Public Class IDemoMode
 
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsTestButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsTestButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -757,7 +757,7 @@ Public Class IDemoMode
             PrepareTestButton()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsTestButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsTestButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -769,7 +769,7 @@ Public Class IDemoMode
     Private Sub PrepareTestButton()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -782,16 +782,16 @@ Public Class IDemoMode
                 auxIconName = GetIconName("ADJUSTMENT")
             End If
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim myNewImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myNewImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -805,7 +805,7 @@ Public Class IDemoMode
             GetScreenTooltip()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestButton ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -815,7 +815,7 @@ Public Class IDemoMode
         Try
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -833,7 +833,7 @@ Public Class IDemoMode
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".RequestStatusStressTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestStatusStressTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RequestStatusStressTimer.Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -855,7 +855,7 @@ Public Class IDemoMode
                 BsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -891,7 +891,7 @@ Public Class IDemoMode
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

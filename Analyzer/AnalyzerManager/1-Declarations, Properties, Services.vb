@@ -11,13 +11,15 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Timers
 Imports System.Data
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports System.ComponentModel
+Imports System.Data.SqlClient
+Imports System.Threading 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public MustInherit Class AnalyzerEntity
+    Partial Public MustInherit Class AnalyzerManager
 
 #Region "Declarations"
         'General use Class variables
@@ -27,13 +29,24 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         'Class variables for implement the waiting time processes until Ax00 becomes ready again
-        Private myInstructionsQueue As New List(Of GlobalEnumerates.AnalyzerManagerSwActionList)    ' AG 20/05/2010
+        Private myInstructionsQueue As New List(Of AnalyzerManagerSwActionList)    ' AG 20/05/2010
         Private myParamsQueue As New List(Of Object)    ' XBC 24/05/2010
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
-        Private waitingTimer As New Timer() ' AG 07/05/2010 - waiting time (watchdog)
-        Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
-        Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        Private waitingTimer As New Timers.Timer() ' AG 07/05/2010 - waiting time (watchdog)
+
+        ' XB 09/12/2014 - Parametizers all these values - BA-1872
+        'Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
+        'Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
+        'Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        'Private Const WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
+        Private WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
+        Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
+        Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
+        Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECONDS waiting time for ISE module timeout (E:61) - BA-1872
+        Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECONDS waiting time for ISE repetitions - BA-1872
+        Private SetTimeISEOffsetFirstTime As Boolean = False ' Just set the ISE offset time the first time when receives T=0 by Firmware - BA-1872
+        ' XB 09/12/2014 - Parametizers all these values - BA-1872
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
         'AG 07/10/2011 - Duplicate the refresh variable due:
@@ -42,7 +55,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ' 2) But some instructions (ANSPHR) are treated using 2 threads (main thread for chemical reactions and secondary for well base line). Both generates differents event refresh when finish
         '    (so use variables myUI_RefreshEvent, myUI_RefreshDS and eventDataPendingToTriggerFlag for the main thread)
         '    (and use mySecondaryUI_RefreshEvent, mySecondaryUI_RefreshDS and secondaryEventDataPendingToTriggerFlag for the secondary thread) --> REJECTED!!!! In running refreshs are added in 1 DSet and event is triggered 1 time each machine cycle
-        Private myUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
+        Private myUI_RefreshEvent As New List(Of UI_RefreshEvents)
         Private myUI_RefreshDS As New UIRefreshDS
         Private eventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
 
@@ -80,12 +93,12 @@ Namespace Biosystems.Ax00.Core.Entities
         Dim mySessionFlags As New Dictionary(Of String, String)
 
         'AG 31/03/2011 - Ellapse time for change Warning to Error (performed in Software)
-        Private thermoReactionsRotorWarningTimer As New Timer() 'AG 05/01/2012- Controls thermo ReactionsRotor maximum time allowed for the warning alarm
-        Private thermoFridgeWarningTimer As New Timer() 'AG 05/01/2012- Controls thermo Fridge maximum time allowed for the warning alarm
-        Private wasteDepositTimer As New Timer() 'AG 01/12/2011 - controls the waste deposit removing system
-        Private waterDepositTimer As New Timer() 'AG 01/12/2011 - controls the water deposit incoming system
-        Private thermoR1ArmWarningTimer As New Timer() 'AG 05/01/2012- Controls thermo R1 arm maximum time allowed for the warning alarm
-        Private thermoR2ArmWarningTimer As New Timer() 'AG 05/01/2012- Controls thermo R2 arm maximum time allowed for the warning alarm
+        Private thermoReactionsRotorWarningTimer As New Timers.Timer() 'AG 05/01/2012- Controls thermo ReactionsRotor maximum time allowed for the warning alarm
+        Private thermoFridgeWarningTimer As New Timers.Timer() 'AG 05/01/2012- Controls thermo Fridge maximum time allowed for the warning alarm
+        Private wasteDepositTimer As New Timers.Timer() 'AG 01/12/2011 - controls the waste deposit removing system
+        Private waterDepositTimer As New Timers.Timer() 'AG 01/12/2011 - controls the water deposit incoming system
+        Private thermoR1ArmWarningTimer As New Timers.Timer() 'AG 05/01/2012- Controls thermo R1 arm maximum time allowed for the warning alarm
+        Private thermoR2ArmWarningTimer As New Timers.Timer() 'AG 05/01/2012- Controls thermo R2 arm maximum time allowed for the warning alarm
 
         Private wellBaseLineWorker As New BackgroundWorker 'Worker to perform the well base line process C:\Documents and Settings\Sergio_Garcia\Mis documentos\Ax00_v1.0\FwScriptsManagement\Screen Delegates\PositionsAdjustmentDelegate.vb
         '#REFACTORING Private WithEvents baselineCalcs As BaseLineCalculations 'AG 29/04/2011 - Instance is created in AnalyzerManager constructor
@@ -116,12 +129,19 @@ Namespace Biosystems.Ax00.Core.Entities
         ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
         Private numRepetitionsTimeout As Integer
         Private sendingRepetitions As Boolean
-        Private waitingStartTaskTimer As New Timer()
-        Private myStartTaskInstructionsQueue As New List(Of GlobalEnumerates.AnalyzerManagerSwActionList)
+        Private waitingStartTaskTimer As New Timers.Timer()
+        Private myStartTaskInstructionsQueue As New List(Of AnalyzerManagerSwActionList)
         Private myStartTaskParamsQueue As New List(Of Object)
         Private myStartTaskFwScriptIDsQueue As New List(Of String)
         Private myStartTaskFwScriptParamsQueue As New List(Of List(Of String))
         ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+
+        ' XB 26/09/2014 - BA-1872
+        Private ISECMDLost As Boolean
+        Private RUNNINGLost As Boolean
+        Private numRepetitionsSTATE As Integer
+        Private waitingSTATETimer As New Timers.Timer()
+        Private StartingRunningFirstTime As Boolean
 
         'Public IsDisplayingServiceData As Boolean = True 'SGM 15/09/2011 exclusion flag for avoiding to update data while displaying data
         'SGM 29/09/2011
@@ -177,16 +197,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
         ' AG+XBC 24/05/2012
         'Private AnalyzerStatusAttribute As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
-        Private AnalyzerStatusAttribute As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
+        Private AnalyzerStatusAttribute As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
         ' AG+XBC 24/05/2012
 
-        Private AnalyzerCurrentActionAttribute As GlobalEnumerates.AnalyzerManagerAx00Actions = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION
+        Private AnalyzerCurrentActionAttribute As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.NO_ACTION
 
         Private InstructionSentAttribute As String = "" 'AG 20/10/2010
         Private InstructionReceivedAttribute As String = "" 'AG 20/10/2010
-        Private InstructionTypeReceivedAttribute As GlobalEnumerates.AnalyzerManagerSwActionList
+        Private InstructionTypeReceivedAttribute As AnalyzerManagerSwActionList
 
-        Private myAlarmListAttribute As New List(Of GlobalEnumerates.Alarms) 'AG 16/03/2011
+        Private myAlarmListAttribute As New List(Of Alarms) 'AG 16/03/2011
         Private analyzerFREEZEFlagAttribute As Boolean = False 'AG 31/03/2011 indicates the Fw has become into FREEZE mode (several error code indicates this mode)
         Private analyzerFREEZEModeAttribute As String = "" 'AG 02/03/2010 - indicates if the FREEZE is single element or if applies the whole instrument
 
@@ -199,7 +219,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         'AG 01/04/2011 - Analyzer numerical values attributes (for inform the presentation is needed)
-        Private SensorValuesAttribute As New Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)
+        Private SensorValuesAttribute As New Dictionary(Of AnalyzerSensors, Single)
         Private CurrentWellAttribute As Integer = 1
 
         'AG 05/08/2011 - Allow manage the barcode requests before running
@@ -230,12 +250,12 @@ Namespace Biosystems.Ax00.Core.Entities
         Private LevelDetectedAttr As Integer = -1
 
         'SGM 24/05/2011
-        Private ManifoldValuesAttribute As New Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String)
-        Private FluidicsValuesAttribute As New Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String)
-        Private PhotometricsValuesAttribute As New Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String)
+        Private ManifoldValuesAttribute As New Dictionary(Of MANIFOLD_ELEMENTS, String)
+        Private FluidicsValuesAttribute As New Dictionary(Of FLUIDICS_ELEMENTS, String)
+        Private PhotometricsValuesAttribute As New Dictionary(Of PHOTOMETRICS_ELEMENTS, String)
 
         'XBC 08/06/2011
-        Private CpuValuesAttribute As New Dictionary(Of GlobalEnumerates.CPU_ELEMENTS, String)
+        Private CpuValuesAttribute As New Dictionary(Of CPU_ELEMENTS, String)
 
 
         'SGM 28/07/2011
@@ -322,11 +342,17 @@ Namespace Biosystems.Ax00.Core.Entities
         ' XB 29/01/2014 - Task #1438
         Private BarcodeStartInstrExpectedAttr As Boolean
 
+        ' XB 07/01/2014 - Create these new Attributes - BA-1178
+        Private ShutDownisPendingAttr As Boolean = False
+        Private StartSessionisPendingAttr As Boolean = False
+
+        ' XB 09/01/2014 - Create this new Attribute - BA-2187
+        Private LockISEAttr As Boolean = False
 #End Region
 
 #Region "Properties"
 
-        Public Property classInitializationError() As Boolean Implements IAnalyzerEntity.classInitializationError '15/07/2011 AG
+        Public Property classInitializationError() As Boolean Implements IAnalyzerManager.classInitializationError '15/07/2011 AG
             Get
                 Return classInitializationErrorAttribute
             End Get
@@ -335,7 +361,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property ActiveWorkSession() As String Implements IAnalyzerEntity.ActiveWorkSession   '19/04/2010 AG
+        Public Property ActiveWorkSession() As String Implements IAnalyzerManager.ActiveWorkSession   '19/04/2010 AG
             Get
                 Return WorkSessionIDAttribute
             End Get
@@ -346,14 +372,14 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property WorkSessionStatus() As String Implements IAnalyzerEntity.WorkSessionStatus  ' XBC 14/06/2012
+        Public ReadOnly Property WorkSessionStatus() As String Implements IAnalyzerManager.WorkSessionStatus  ' XBC 14/06/2012
             Get
                 Return WorkSessionStatusAttribute
             End Get
         End Property
 
 
-        Public Property ActiveAnalyzer() As String Implements IAnalyzerEntity.ActiveAnalyzer  '19/04/2010 AG
+        Public Property ActiveAnalyzer() As String Implements IAnalyzerManager.ActiveAnalyzer  '19/04/2010 AG
             Get
                 Return AnalyzerIDAttribute
             End Get
@@ -389,9 +415,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'SGM 22/03/2012 Init ISEManager instance as disconnected mode
                         'it will be replaced by a new instance when Adjustments received
-                        If ISEAnalyzer Is Nothing Then
-                            '#TODO REFACTORING ISEAnalyzer = New ISEManager(Me, MyClass.ActiveAnalyzer, myAnalyzerModel, True)
-                        End If
+                        'REFACTORING
+                        'If ISE_Manager Is Nothing Then
+                        '    ISE_Manager = New ISEManager(Me, ActiveAnalyzer, myAnalyzerModel, True)
+                        'End If
 
                         ''Initialize the FwAdjustments master data
                         'If FwVersionAttribute.Length > 0 Then
@@ -412,7 +439,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If Not GlobalBase.IsServiceAssembly Then
                             ' User Sw
-                            MyClass.InitBaseLineCalculations(Nothing, StartingApplicationAttr)
+                            InitBaseLineCalculations(Nothing, StartingApplicationAttr)
                         End If
                         ' XBC 14/06/2012
                     End If 'AG 20/11/2014 BA-2133
@@ -422,7 +449,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
-        Public Property ActiveFwVersion() As String Implements IAnalyzerEntity.ActiveFwVersion  'SGM 28/11/2011
+        Public Property ActiveFwVersion() As String Implements IAnalyzerManager.ActiveFwVersion  'SGM 28/11/2011
             Get
                 Return FwVersionAttribute
             End Get
@@ -446,7 +473,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property ReadedFwVersion() As String Implements IAnalyzerEntity.ReadedFwVersion  'SGM 28/11/2011
+        Public Property ReadedFwVersion() As String Implements IAnalyzerManager.ReadedFwVersion  'SGM 28/11/2011
             Get
                 Return ReadedFwVersionAttribute
             End Get
@@ -458,7 +485,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property CommThreadsStarted() As Boolean Implements IAnalyzerEntity.CommThreadsStarted    '21/04/2010 AG
+        Public Property CommThreadsStarted() As Boolean Implements IAnalyzerManager.CommThreadsStarted    '21/04/2010 AG
             Get
                 Return CommThreadsStartedAttribute
             End Get
@@ -480,10 +507,10 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
         'END AG 05/05/2010
 
-        Public ReadOnly Property Connected() As Boolean Implements IAnalyzerEntity.Connected    '22/04/2010 AG
+        Public ReadOnly Property Connected() As Boolean Implements IAnalyzerManager.Connected    '22/04/2010 AG
             Get
 
-                If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
+                If REAL_DEVELOPMENT_MODE > 0 Then
                     ConnectedAttribute = True
                 End If
 
@@ -498,7 +525,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 22/09/2011
-        Public Property IsShutDownRequested() As Boolean Implements IAnalyzerEntity.IsShutDownRequested
+        Public Property IsShutDownRequested() As Boolean Implements IAnalyzerManager.IsShutDownRequested
             Get
                 Return IsShutDownRequestedAttribute
             End Get
@@ -508,7 +535,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 22/09/2011
-        Public Property IsUserConnectRequested() As Boolean Implements IAnalyzerEntity.IsUserConnectRequested
+        Public Property IsUserConnectRequested() As Boolean Implements IAnalyzerManager.IsUserConnectRequested
             Get
                 Return IsUserConnectRequestedAttribute
             End Get
@@ -517,7 +544,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property PortName() As String Implements IAnalyzerEntity.PortName  '22/04/2010 AG
+        Public Property PortName() As String Implements IAnalyzerManager.PortName  '22/04/2010 AG
             Get
                 Return PortNameAttribute
             End Get
@@ -527,7 +554,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property Bauds() As String Implements IAnalyzerEntity.Bauds  '22/04/2010 AG
+        Public Property Bauds() As String Implements IAnalyzerManager.Bauds  '22/04/2010 AG
             Get
                 Return BaudsAttribute
             End Get
@@ -537,7 +564,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property AnalyzerIsReady() As Boolean Implements IAnalyzerEntity.AnalyzerIsReady    '19/05/2010 AG
+        Public Property AnalyzerIsReady() As Boolean Implements IAnalyzerManager.AnalyzerIsReady    '19/05/2010 AG
             Get
                 Return AnalyzerIsReadyAttribute
             End Get
@@ -547,27 +574,27 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property AnalyzerStatus() As GlobalEnumerates.AnalyzerManagerStatus Implements IAnalyzerEntity.AnalyzerStatus 'AG 01/06/2010
+        Public Property AnalyzerStatus() As AnalyzerManagerStatus Implements IAnalyzerManager.AnalyzerStatus 'AG 01/06/2010
             Get
                 Return AnalyzerStatusAttribute
             End Get
-            Set(ByVal value As GlobalEnumerates.AnalyzerManagerStatus)
+            Set(ByVal value As AnalyzerManagerStatus)
                 If AnalyzerStatusAttribute <> value Then
                     AnalyzerStatusAttribute = value
                 End If
             End Set
         End Property
 
-        Public Property AnalyzerCurrentAction() As GlobalEnumerates.AnalyzerManagerAx00Actions Implements IAnalyzerEntity.AnalyzerCurrentAction   'AG 01/06/2010
+        Public Property AnalyzerCurrentAction() As AnalyzerManagerAx00Actions Implements IAnalyzerManager.AnalyzerCurrentAction   'AG 01/06/2010
             Get
                 Return AnalyzerCurrentActionAttribute
             End Get
-            Set(ByVal value As GlobalEnumerates.AnalyzerManagerAx00Actions)
+            Set(ByVal value As AnalyzerManagerAx00Actions)
                 AnalyzerCurrentActionAttribute = value
             End Set
         End Property
 
-        Public Property InstructionSent() As String Implements IAnalyzerEntity.InstructionSent    '20/10/2010 AG
+        Public Property InstructionSent() As String Implements IAnalyzerManager.InstructionSent    '20/10/2010 AG
             Get
                 Return InstructionSentAttribute
             End Get
@@ -577,7 +604,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property InstructionReceived() As String Implements IAnalyzerEntity.InstructionReceived    '20/10/2010 AG
+        Public Property InstructionReceived() As String Implements IAnalyzerManager.InstructionReceived    '20/10/2010 AG
             Get
                 Return InstructionReceivedAttribute
             End Get
@@ -587,23 +614,23 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property InstructionTypeReceived() As GlobalEnumerates.AnalyzerManagerSwActionList Implements IAnalyzerEntity.InstructionTypeReceived    '02/11/2010 AG
+        Public Property InstructionTypeReceived() As AnalyzerManagerSwActionList Implements IAnalyzerManager.InstructionTypeReceived    '02/11/2010 AG
             Get
                 Return InstructionTypeReceivedAttribute
             End Get
 
-            Set(ByVal value As GlobalEnumerates.AnalyzerManagerSwActionList)
+            Set(ByVal value As AnalyzerManagerSwActionList)
                 InstructionTypeReceivedAttribute = value
             End Set
         End Property
 
-        Public ReadOnly Property InstructionTypeSent() As GlobalEnumerates.AppLayerEventList Implements IAnalyzerEntity.InstructionTypeSent    '27/03/2012 AG
+        Public ReadOnly Property InstructionTypeSent() As AppLayerEventList Implements IAnalyzerManager.InstructionTypeSent    '27/03/2012 AG
             Get
                 Return AppLayer.LastInstructionTypeSent
             End Get
         End Property
 
-        Public Property ISEModuleIsReady() As Boolean Implements IAnalyzerEntity.ISEModuleIsReady    '18/01/2011 AG
+        Public Property ISEModuleIsReady() As Boolean Implements IAnalyzerManager.ISEModuleIsReady    '18/01/2011 AG
             Get
                 Return ISEModuleIsReadyAttribute
             End Get
@@ -613,14 +640,14 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property Alarms() As List(Of GlobalEnumerates.Alarms) Implements IAnalyzerEntity.Alarms
+        Public ReadOnly Property Alarms() As List(Of Alarms) Implements IAnalyzerManager.Alarms
             Get
                 Return myAlarmListAttribute
             End Get
         End Property
 
         ' XBC 16/10/2012
-        Public ReadOnly Property ErrorCodes() As String Implements IAnalyzerEntity.ErrorCodes
+        Public ReadOnly Property ErrorCodes() As String Implements IAnalyzerManager.ErrorCodes
             Get
                 Dim returnValue As String = ""
 
@@ -638,7 +665,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 22/10/2012 SERVICE
-        Public Property IsServiceAlarmInformed() As Boolean Implements IAnalyzerEntity.IsServiceAlarmInformed
+        Public Property IsServiceAlarmInformed() As Boolean Implements IAnalyzerManager.IsServiceAlarmInformed
             Get
                 Return IsServiceAlarmInformedAttr
             End Get
@@ -648,7 +675,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 09/11/2012 SERVICE
-        Public Property IsServiceRotorMissingInformed() As Boolean Implements IAnalyzerEntity.IsServiceRotorMissingInformed
+        Public Property IsServiceRotorMissingInformed() As Boolean Implements IAnalyzerManager.IsServiceRotorMissingInformed
             Get
                 Return IsServiceRotorMissingInformedAttr
             End Get
@@ -659,7 +686,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'SGM 24/10/2012 SERVICE
-        Public Property IsFwUpdateInProcess() As Boolean Implements IAnalyzerEntity.IsFwUpdateInProcess
+        Public Property IsFwUpdateInProcess() As Boolean Implements IAnalyzerManager.IsFwUpdateInProcess
             Get
                 Return IsFwUpdateInProcessAttr
             End Get
@@ -671,7 +698,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 25/10/2012 SERVICE
-        Public Property IsConfigGeneralProcess() As Boolean Implements IAnalyzerEntity.IsConfigGeneralProcess
+        Public Property IsConfigGeneralProcess() As Boolean Implements IAnalyzerManager.IsConfigGeneralProcess
             Get
                 Return IsConfigGeneralProcessAttr
             End Get
@@ -682,20 +709,20 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property AnalyzerIsFreeze() As Boolean Implements IAnalyzerEntity.AnalyzerIsFreeze
+        Public ReadOnly Property AnalyzerIsFreeze() As Boolean Implements IAnalyzerManager.AnalyzerIsFreeze
             Get
                 Return analyzerFREEZEFlagAttribute
             End Get
         End Property
 
         'AG 02/03/2012
-        Public ReadOnly Property AnalyzerFreezeMode() As String Implements IAnalyzerEntity.AnalyzerFreezeMode
+        Public ReadOnly Property AnalyzerFreezeMode() As String Implements IAnalyzerManager.AnalyzerFreezeMode
             Get
                 Return analyzerFREEZEModeAttribute
             End Get
         End Property
 
-        Public Property SessionFlag(ByVal pFlag As GlobalEnumerates.AnalyzerManagerFlags) As String Implements IAnalyzerEntity.SessionFlag  '19/04/2010 AG
+        Public Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String Implements IAnalyzerManager.SessionFlag  '19/04/2010 AG
             Get
                 Return mySessionFlags(pFlag.ToString)
             End Get
@@ -705,14 +732,14 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property GetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single Implements IAnalyzerEntity.GetSensorValue
+        Public ReadOnly Property GetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single Implements IAnalyzerManager.GetSensorValue
             Get
                 If SensorValuesAttribute.ContainsKey(pSensorID) Then
                     Return SensorValuesAttribute(pSensorID)
                 Else
                     'AG 30/03/2012 - several sensors have a unknown value because Nothing = 0 means alarm)
                     'Return Nothing
-                    If pSensorID = GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS OrElse pSensorID = GlobalEnumerates.AnalyzerSensors.ISE_STATUS Then
+                    If pSensorID = AnalyzerSensors.FRIDGE_STATUS OrElse pSensorID = AnalyzerSensors.ISE_STATUS Then
                         Return SENSORUNKNOWNVALUE
                     Else
                         Return Nothing
@@ -723,7 +750,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
-        Public WriteOnly Property SetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single Implements IAnalyzerEntity.SetSensorValue
+        Public WriteOnly Property SetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single Implements IAnalyzerManager.SetSensorValue
             Set(ByVal pValue As Single)
                 If SensorValuesAttribute.ContainsKey(pSensorID) Then
                     SensorValuesAttribute(pSensorID) = pValue
@@ -753,7 +780,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '    End Get
         'End Property
 
-        Public ReadOnly Property MaxWaitTime() As Integer Implements IAnalyzerEntity.MaxWaitTime
+        Public ReadOnly Property MaxWaitTime() As Integer Implements IAnalyzerManager.MaxWaitTime
             Get
                 Return Me.AppLayer.MaxWaitTime
             End Get
@@ -766,7 +793,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Modify AG 27/11/2014 BA-2066</remarks>
-        Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineInitializationFailedMessage
+        Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerManager.ShowBaseLineInitializationFailedMessage
             Get
                 'Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
                 Return (CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False)) OrElse CBool(IIf(dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES, True, False)))
@@ -775,7 +802,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
 
-        Public ReadOnly Property ShowBaseLineWellRejectionParameterFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineWellRejectionParameterFailedMessage
+        Public ReadOnly Property ShowBaseLineWellRejectionParameterFailedMessage() As Boolean Implements IAnalyzerManager.ShowBaseLineWellRejectionParameterFailedMessage
             Get
                 Dim result As Boolean = CBool(IIf(AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING And WELLbaselineParametersFailuresAttribute, True, False))
                 If result Then WELLbaselineParametersFailuresAttribute = False 'Once the alarm is shown clear this flag
@@ -786,31 +813,31 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 17/05/2011
-        Public ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable Implements IAnalyzerEntity.SensorValueChanged
+        Public ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable Implements IAnalyzerManager.SensorValueChanged
             Get
                 Return Me.myUI_RefreshDS.SensorValueChanged
             End Get
         End Property
 
-        Public ReadOnly Property ValidALIGHT() As Boolean Implements IAnalyzerEntity.ValidALIGHT    '20/05/2011 AG
+        Public ReadOnly Property ValidALIGHT() As Boolean Implements IAnalyzerManager.ValidALIGHT    '20/05/2011 AG
             Get
                 Return validALIGHTAttribute
             End Get
         End Property
 
-        Public ReadOnly Property ExistsALIGHT() As Boolean Implements IAnalyzerEntity.ExistsALIGHT    '20/06/2012 AG
+        Public ReadOnly Property ExistsALIGHT() As Boolean Implements IAnalyzerManager.ExistsALIGHT    '20/06/2012 AG
             Get
                 Return existsALIGHTAttribute
             End Get
         End Property
 
-        Public ReadOnly Property CurrentWell() As Integer Implements IAnalyzerEntity.CurrentWell
+        Public ReadOnly Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
             Get
                 Return CurrentWellAttribute
             End Get
         End Property
 
-        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum Implements IAnalyzerEntity.BarCodeProcessBeforeRunning 'AG 04/08/2011
+        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum Implements IAnalyzerManager.BarCodeProcessBeforeRunning 'AG 04/08/2011
             Get
                 Return BarCodeBeforeRunningProcessStatusAttribute
             End Get
@@ -838,7 +865,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
 
 
-        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetModelValue
+        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
             Get
                 'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
                 Dim returnValue As String = ""
@@ -862,7 +889,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 07/06/2012
-        Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetUpperPartSN
+        Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetUpperPartSN
             Get
                 Dim returnValue As String = ""
 
@@ -875,7 +902,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 07/06/2012
-        Public ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetLowerPartSN
+        Public ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetLowerPartSN
             Get
                 Dim returnValue As String = ""
 
@@ -888,7 +915,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
 
-        Public ReadOnly Property Ringing() As Boolean Implements IAnalyzerEntity.Ringing    '26/10/2011 AG
+        Public ReadOnly Property Ringing() As Boolean Implements IAnalyzerManager.Ringing    '26/10/2011 AG
             Get
                 Return AnalyzerIsRingingAttribute
             End Get
@@ -896,7 +923,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         'SGM 24/11/2011
-        Public Property IsAutoInfoActivated() As Boolean Implements IAnalyzerEntity.IsAutoInfoActivated
+        Public Property IsAutoInfoActivated() As Boolean Implements IAnalyzerManager.IsAutoInfoActivated
             Get
                 Return IsAutoInfoActivatedAttr
             End Get
@@ -906,7 +933,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 26/10/2012 -SERVICE: INFO:Q2 is sent. wait for ANSERR
-        Public Property IsAlarmInfoRequested() As Boolean Implements IAnalyzerEntity.IsAlarmInfoRequested
+        Public Property IsAlarmInfoRequested() As Boolean Implements IAnalyzerManager.IsAlarmInfoRequested
             Get
                 Return IsAlarmInfoRequestedAttr
             End Get
@@ -931,7 +958,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
 
         'SGM 29/10/2012 -SERVICE: E:20 Instruction Rejected Error Received
-        Public Property IsInstructionRejected() As Boolean Implements IAnalyzerEntity.IsInstructionRejected
+        Public Property IsInstructionRejected() As Boolean Implements IAnalyzerManager.IsInstructionRejected
             Get
                 Return IsInstructionRejectedAttr
             End Get
@@ -943,7 +970,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 07/11/2012 -SERVICE: E:22 Recover Failed
-        Public Property IsRecoverFailed() As Boolean Implements IAnalyzerEntity.IsRecoverFailed
+        Public Property IsRecoverFailed() As Boolean Implements IAnalyzerManager.IsRecoverFailed
             Get
                 Return IsRecoverFailedAttr
             End Get
@@ -955,7 +982,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 19/11/2012 -SERVICE: E:22 Instruction Aborted
-        Public Property IsInstructionAborted() As Boolean Implements IAnalyzerEntity.IsInstructionAborted
+        Public Property IsInstructionAborted() As Boolean Implements IAnalyzerManager.IsInstructionAborted
             Get
                 Return IsInstructionAbortedAttr
             End Get
@@ -966,7 +993,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property LevelDetected() As Boolean Implements IAnalyzerEntity.LevelDetected
+        Public Property LevelDetected() As Boolean Implements IAnalyzerManager.LevelDetected
             Get
                 Return (LevelDetectedAttr > 0)
             End Get
@@ -975,39 +1002,39 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property EndRunInstructionSent() As Boolean Implements IAnalyzerEntity.EndRunInstructionSent
+        Public ReadOnly Property EndRunInstructionSent() As Boolean Implements IAnalyzerManager.EndRunInstructionSent
             Get
                 Return endRunAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public ReadOnly Property AbortInstructionSent() As Boolean Implements IAnalyzerEntity.AbortInstructionSent
+        Public ReadOnly Property AbortInstructionSent() As Boolean Implements IAnalyzerManager.AbortInstructionSent
             Get
                 Return abortAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public ReadOnly Property RecoverInstructionSent() As Boolean Implements IAnalyzerEntity.RecoverInstructionSent
+        Public ReadOnly Property RecoverInstructionSent() As Boolean Implements IAnalyzerManager.RecoverInstructionSent
             Get
                 Return recoverAlreadySentFlagAttribute
             End Get
         End Property
 
         ' XB 15/10/2013 - BT #1318
-        Public ReadOnly Property PauseInstructionSent() As Boolean Implements IAnalyzerEntity.PauseInstructionSent
+        Public ReadOnly Property PauseInstructionSent() As Boolean Implements IAnalyzerManager.PauseInstructionSent
             Get
                 Return PauseAlreadySentFlagAttribute
             End Get
         End Property
 
         'TR 25/10/2013 BT #1340
-        Public ReadOnly Property ContinueAlreadySentFlag() As Boolean Implements IAnalyzerEntity.ContinueAlreadySentFlag
+        Public ReadOnly Property ContinueAlreadySentFlag() As Boolean Implements IAnalyzerManager.ContinueAlreadySentFlag
             Get
                 Return ContinueAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public Property InfoActivated() As Integer Implements IAnalyzerEntity.InfoActivated 'AG 14/03/2012
+        Public Property InfoActivated() As Integer Implements IAnalyzerManager.InfoActivated 'AG 14/03/2012
             Get
                 Return AnalyzerIsInfoActivatedAttribute
             End Get
@@ -1037,7 +1064,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         ' XBC 03/05/2012
-        Public Property IsStressing() As Boolean Implements IAnalyzerEntity.IsStressing
+        Public Property IsStressing() As Boolean Implements IAnalyzerManager.IsStressing
             Get
                 Return IsStressingAttribute
             End Get
@@ -1048,7 +1075,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         'SGM 30/05/2012
-        Public Property IsFwSwCompatible() As Boolean Implements IAnalyzerEntity.IsFwSwCompatible
+        Public Property IsFwSwCompatible() As Boolean Implements IAnalyzerManager.IsFwSwCompatible
             Get
                 Return IsFwSwCompatibleAttr
             End Get
@@ -1058,7 +1085,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 21/06/2012
-        Public Property IsFwReaded() As Boolean Implements IAnalyzerEntity.IsFwReaded
+        Public Property IsFwReaded() As Boolean Implements IAnalyzerManager.IsFwReaded
             Get
                 Return IsFwReadedAttr
             End Get
@@ -1068,14 +1095,14 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'AG 07/06/2012 - Informs that well base line calculations has paused the work session (consecutive rejected wells > Limit)
-        Public ReadOnly Property wellBaseLineAutoPausesSession() As Integer Implements IAnalyzerEntity.wellBaseLineAutoPausesSession
+        Public ReadOnly Property wellBaseLineAutoPausesSession() As Integer Implements IAnalyzerManager.wellBaseLineAutoPausesSession
             Get
                 Return BaseLine.exitRunningType
             End Get
         End Property
 
         ' XBC 21/06/2012
-        Public Property IsAnalyzerIDNotLikeWS() As Boolean Implements IAnalyzerEntity.IsAnalyzerIDNotLikeWS
+        Public Property IsAnalyzerIDNotLikeWS() As Boolean Implements IAnalyzerManager.IsAnalyzerIDNotLikeWS
             Get
                 Return IsAnalyzerIDNotLikeWSAttr
             End Get
@@ -1085,7 +1112,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 14/06/2012
-        Public Property StartingApplication() As Boolean Implements IAnalyzerEntity.StartingApplication
+        Public Property StartingApplication() As Boolean Implements IAnalyzerManager.StartingApplication
             Get
                 Return StartingApplicationAttr
             End Get
@@ -1095,14 +1122,14 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XCB 18/06/2012
-        Public ReadOnly Property TemporalAnalyzerConnected() As String Implements IAnalyzerEntity.TemporalAnalyzerConnected
+        Public ReadOnly Property TemporalAnalyzerConnected() As String Implements IAnalyzerManager.TemporalAnalyzerConnected
             Get
                 Return TemporalAnalyzerConnectedAttr
             End Get
         End Property
 
         ' XBC 19/06/2012
-        Public Property ForceAbortSession() As Boolean Implements IAnalyzerEntity.ForceAbortSession
+        Public Property ForceAbortSession() As Boolean Implements IAnalyzerManager.ForceAbortSession
             Get
                 Return ForceAbortSessionAttr
             End Get
@@ -1112,17 +1139,17 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 02/08/2012
-        Public Property DifferentWSType() As String Implements IAnalyzerEntity.DifferentWSType
+        Public Property DifferentWSType() As String Implements IAnalyzerManager.DifferentWSType
             Get
-                Return MyClass.DifferentWSTypeAtrr
+                Return DifferentWSTypeAtrr
             End Get
             Set(ByVal value As String)
-                MyClass.DifferentWSTypeAtrr = value
+                DifferentWSTypeAtrr = value
             End Set
         End Property
 
         ' XBC 03/10/2012
-        Public Property AdjustmentsRead() As Boolean Implements IAnalyzerEntity.AdjustmentsRead
+        Public Property AdjustmentsRead() As Boolean Implements IAnalyzerManager.AdjustmentsRead
             Get
                 Return AdjustmentsReadAttr
             End Get
@@ -1132,7 +1159,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 10/10/2012 - SERVICE
-        Public Property TestingCollidedNeedle() As UTILCollidedNeedles Implements IAnalyzerEntity.TestingCollidedNeedle
+        Public Property TestingCollidedNeedle() As UTILCollidedNeedles Implements IAnalyzerManager.TestingCollidedNeedle
             Get
                 Return TestingCollidedNeedleAttribute
             End Get
@@ -1142,7 +1169,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 10/10/2012 - SERVICE
-        Public Property SaveSNResult() As UTILSNSavedResults Implements IAnalyzerEntity.SaveSNResult
+        Public Property SaveSNResult() As UTILSNSavedResults Implements IAnalyzerManager.SaveSNResult
             Get
                 Return SaveSNResultAttribute
             End Get
@@ -1152,14 +1179,14 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 07/11/2012 - SERVICE
-        Public ReadOnly Property ErrorCodesDisplay() As List(Of ErrorCodesDisplayStruct) Implements IAnalyzerEntity.ErrorCodesDisplay
+        Public ReadOnly Property ErrorCodesDisplay() As List(Of ErrorCodesDisplayStruct) Implements IAnalyzerManager.ErrorCodesDisplay
             Get
                 Return myErrorCodesDisplayAttribute
             End Get
         End Property
 
         'SGM 08/11/2012 SERVICE for refreshing sensors monitor
-        Public Property InfoRefreshFirstTime() As Boolean Implements IAnalyzerEntity.InfoRefreshFirstTime
+        Public Property InfoRefreshFirstTime() As Boolean Implements IAnalyzerManager.InfoRefreshFirstTime
             Get
                 Return InfoRefreshFirstTimeAttr
             End Get
@@ -1178,7 +1205,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'AG 19/03/2013 - Information to export to LIS (using ES) that will be executed from presentation layer
-        Public ReadOnly Property LastExportedResults() As ExecutionsDS Implements IAnalyzerEntity.LastExportedResults
+        Public ReadOnly Property LastExportedResults() As ExecutionsDS Implements IAnalyzerManager.LastExportedResults
             Get
                 SyncLock lockThis
                     Return lastExportedResultsDSAttribute
@@ -1187,20 +1214,20 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
         'AG 19/03/2013
 
-        Public WriteOnly Property autoWSCreationWithLISMode() As Boolean Implements IAnalyzerEntity.autoWSCreationWithLISMode 'AG 11/07/2013
+        Public WriteOnly Property autoWSCreationWithLISMode() As Boolean Implements IAnalyzerManager.autoWSCreationWithLISMode 'AG 11/07/2013
             Set(ByVal value As Boolean)
                 autoWSCreationWithLISModeAttribute = value
             End Set
         End Property
 
-        Public ReadOnly Property AllowScanInRunning() As Boolean Implements IAnalyzerEntity.AllowScanInRunning
+        Public ReadOnly Property AllowScanInRunning() As Boolean Implements IAnalyzerManager.AllowScanInRunning
             Get
                 Return AllowScanInRunningAttribute
             End Get
         End Property
 
         ' XB 29/01/2014 - Task #1438
-        Public Property BarcodeStartInstrExpected As Boolean Implements IAnalyzerEntity.BarcodeStartInstrExpected
+        Public Property BarcodeStartInstrExpected As Boolean Implements IAnalyzerManager.BarcodeStartInstrExpected
             Get
                 Return BarcodeStartInstrExpectedAttr
             End Get
@@ -1209,14 +1236,44 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        ' XB 07/01/2014 - Create these new Properties - BA-1178
+        Public Property ShutDownisPending As Boolean Implements IAnalyzerManager.ShutDownisPending
+            Get
+                Return ShutDownisPendingAttr
+            End Get
+            Set(value As Boolean)
+                ShutDownisPendingAttr = value
+            End Set
+        End Property
+
+        Public Property StartSessionisPending As Boolean Implements IAnalyzerManager.StartSessionisPending
+            Get
+                Return StartSessionisPendingAttr
+            End Get
+            Set(value As Boolean)
+                StartSessionisPendingAttr = value
+            End Set
+        End Property
+        ' XB 07/01/2014 - BA-1178
+
+        ' XB 09/01/2014 - Create this new Property - BA-2187
+        Public Property LockISE As Boolean Implements IAnalyzerManager.LockISE
+            Get
+                Return LockISEAttr
+            End Get
+            Set(value As Boolean)
+                LockISEAttr = value
+            End Set
+        End Property
+
         'SGM 29/05/2012
-        Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerEntity.FWUpdateResponseData '#REFACTORING
-        Public Property AdjustmentsFilePath As String Implements IAnalyzerEntity.AdjustmentsFilePath '#REFACTORING
+        Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerManager.FWUpdateResponseData '#REFACTORING
+        Public Property AdjustmentsFilePath As String Implements IAnalyzerManager.AdjustmentsFilePath '#REFACTORING
         <DefaultValue(GlobalEnumerates.InstructionActions.None)>
-        Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerEntity.CurrentInstructionAction 'BA-2075
+        Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerManager.CurrentInstructionAction 'BA-2075
 
         'IT 19/12/2014 - BA-2143
-        Public Property FlightInitFailures As Integer Implements IAnalyzerEntity.FlightInitFailures
+        Public Property FlightInitFailures As Integer Implements IAnalyzerManager.FlightInitFailures
             Get
                 Return FLIGHT_INIT_FAILURES
             End Get
@@ -1226,7 +1283,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'IT 19/12/2014 - BA-2143
-        Public Property DynamicBaselineInitializationFailures As Integer Implements IAnalyzerEntity.DynamicBaselineInitializationFailures
+        Public Property DynamicBaselineInitializationFailures As Integer Implements IAnalyzerManager.DynamicBaselineInitializationFailures
             Get
                 Return dynamicbaselineInitializationFailuresAttribute
             End Get
@@ -1234,7 +1291,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 dynamicbaselineInitializationFailuresAttribute = value
             End Set
         End Property
-
 
 #End Region
 
@@ -1249,13 +1305,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pTreated"></param>
         ''' <remarks>AG 29/10/2010</remarks>
         Public Event ReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                           ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReceptionEvent '#REFACTORING
+                                           ByVal pUIRefresh_Event As List(Of UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Implements IAnalyzerManager.ReceptionEvent '#REFACTORING
         ''' <summary>
         ''' Event with the instruction sent
         ''' </summary>
         ''' <param name="pInstructionSent"></param>
         ''' <remarks>AG 29/10/2010</remarks>
-        Public Event SendEvent(ByVal pInstructionSent As String) Implements IAnalyzerEntity.SendEvent '#REFACTORING
+        Public Event SendEvent(ByVal pInstructionSent As String) Implements IAnalyzerManager.SendEvent '#REFACTORING
 
         ''' <summary>
         ''' Event to activate/deactivate WatchDog timer - Task #1438
@@ -1263,7 +1319,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pEnable"></param>
         ''' <remarks>XB 29/01/2014</remarks>
 
-        Public Event WatchDogEvent(ByVal pEnable As Boolean) Implements IAnalyzerEntity.WatchDogEvent '#REFACTORING
+        Public Event WatchDogEvent(ByVal pEnable As Boolean) Implements IAnalyzerManager.WatchDogEvent '#REFACTORING
 
         'AG 20/04/2010
         ''' <summary>
@@ -1274,20 +1330,20 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Creation AG 20/04/2010
         ''' </remarks>
-        Public Sub OnManageAnalyzerEvent(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pInstructionReceived As List(Of InstructionParameterTO)) Handles AppLayer.ManageAnalyzer
+        Public Sub OnManageAnalyzerEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pInstructionReceived As List(Of InstructionParameterTO)) Handles AppLayer.ManageAnalyzer
             Try
                 ''Track SGM
                 'Dim myTrackTime As Double = DateTime.Now.Subtract(AppLayer.ResponseTrack).TotalMilliseconds
-                'Dim myLogAcciones2 As New ApplicationLogManager()
-                'myLogAcciones2.CreateLogActivity("AppLayer -- AnalyzerManager (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.OnManageAnalyzerEvent", EventLogEntryType.Information, False)
+                ''Dim myLogAcciones2 As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity("AppLayer -- AnalyzerManager (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.OnManageAnalyzerEvent", EventLogEntryType.Information, False)
                 ''Select Case pAction
                 ''    Case AnalyzerManagerSwActionList.STATUS_RECEIVED, _
                 ''        AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED, _
                 ''        AnalyzerManagerSwActionList.READINGS_RECEIVED
 
                 ''        Dim myTrackTime As Double = DateTime.Now.Subtract(AppLayer.ResponseTrack).TotalMilliseconds
-                ''        Dim myLogAcciones2 As New ApplicationLogManager()
-                ''        myLogAcciones2.CreateLogActivity("Instruccion Received Event Receive (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
+                ''        'Dim myLogAcciones2 As New ApplicationLogManager()
+                ''        GlobalBase.CreateLogActivity("Instruccion Received Event Receive (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
 
                 ''End Select
                 ''end Track
@@ -1295,8 +1351,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 ManageAnalyzer(pAction, False, pInstructionReceived)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageAnalyzerEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageAnalyzerEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1316,7 +1372,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myGlobalDataTO As New GlobalDataTO()
                 Dim TextMessage As String = ""
                 'Get the message on English language.
-                myGlobalDataTO = myMessageDelegate.GetMessageDescription(Nothing, GlobalEnumerates.Messages.ERROR_COMM.ToString(), "ENG")
+                myGlobalDataTO = myMessageDelegate.GetMessageDescription(Nothing, Messages.ERROR_COMM.ToString(), "ENG")
                 If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
                     Dim myMessagesDS As New MessagesDS
                     myMessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
@@ -1325,11 +1381,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(TextMessage, "AnalyzerManager.OnManageCommunicateErrorEvent", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(TextMessage, "AnalyzerManager.OnManageCommunicateErrorEvent", EventLogEntryType.Information, False)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageCommunicateErrorEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageCommunicateErrorEvent", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1348,11 +1404,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Deactivate waiting time control
                 InitializeTimerControl(WAITING_TIME_OFF)
 
-                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED, True)
+                Debug.Print("SALTA TIMER WAITING_TIME_EXPIRED !!!!")
+                ManageAnalyzer(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED, True)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.waitingTimer_Timer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.waitingTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1367,14 +1424,38 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Sub waitingStartTaskTimer_Timer(ByVal source As Object, ByVal e As ElapsedEventArgs)
             Try
                 'Deactivate waiting time control
-                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                MyClass.ClearQueueToSend()
+                InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                ClearQueueToSend()
 
-                MyClass.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
+                Debug.Print("SALTA TIMER START_TASK_TIMEOUT !!!!")
+                ManageAnalyzer(AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.waitingStartTaskTimer_Timer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.waitingStartTaskTimer_Timer", EventLogEntryType.Error, False)
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' Manage the waiting time for STATE instruction
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="e"></param>
+        ''' <remarks>
+        ''' Creation XB 05/11/2014 - timeout limit repetitions for STATE
+        ''' </remarks>
+        Private Sub waitingSTATETimer_Timer(ByVal source As Object, ByVal e As ElapsedEventArgs)
+            Try
+                'Deactivate waiting time control
+                InitializeTimerSTATEControl(WAITING_TIME_OFF)
+                numRepetitionsSTATE += 1
+
+                Debug.Print("SALTA TIMER STATE !!!!")
+                ManageAnalyzer(AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.waitingSTATETimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1391,7 +1472,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 If (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING OrElse pFromDynamicBaseLineProcessingFlag) AndAlso pReactionsRotorWellDS.twksWSReactionsRotor.Rows.Count > 0 Then
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = PrepareUIRefreshEventNum3(Nothing, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, pReactionsRotorWellDS, True) 'AG 12/06/2012 'False)
+                    myGlobal = PrepareUIRefreshEventNum3(Nothing, UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, pReactionsRotorWellDS, True) 'AG 12/06/2012 'False)
 
                     'AG 12/06/2012
                     ''If the ANSPHR instruction has already raise an event for the chemical reactions then generate another for the well base line calculations
@@ -1404,8 +1485,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageWellReactionsChanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnManageWellReactionsChanges", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1414,14 +1495,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ' XBC 16/11/2010
         Public Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
                                                    ByVal pResponseValue As String, _
-                                                   ByVal pTreated As Boolean) Implements IAnalyzerEntity.ReceptionFwScriptEvent
+                                                   ByVal pTreated As Boolean) Implements IAnalyzerManager.ReceptionFwScriptEvent
 
         ' XBC 17/05/2011 - delete redundant Events replaced using AnalyzerManager.ReceptionEvent
         ' SGM 15/04/2011 
         'Public Shared Event SensorValuesChangedEvent(ByVal pSensorValuesChangedDT As UIRefreshDS.SensorValueChangedDataTable)
 
-        Public Event ReceivedStatusInformationEventHandler() Implements IAnalyzerEntity.ReceivedStatusInformationEventHandler 'IT 19/12/2014 - BA-2143
-        Public Event ProcessFlagEventHandler(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) Implements IAnalyzerEntity.ProcessFlagEventHandler 'IT 19/12/2014 - BA-2143
+        Public Event ReceivedStatusInformationEventHandler() Implements IAnalyzerManager.ReceivedStatusInformationEventHandler 'IT 19/12/2014 - BA-2143
+        Public Event ProcessFlagEventHandler(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) Implements IAnalyzerManager.ProcessFlagEventHandler 'IT 19/12/2014 - BA-2143
 
         ''' <summary>
         ''' Detects that the ISE data aimed to be displayed in the Monitor has been changed
@@ -1429,10 +1510,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Created by SGM 15/03/2012</remarks>
         Public Sub OnISEMonitorDataChanged() Handles _iseAnalyzer.ISEMonitorDataChanged
             Try
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED, 1, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_MONITOR_DATA_CHANGED, 1, True)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEOperationFinished", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEOperationFinished", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1442,10 +1523,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Created by SGM 15/03/2012</remarks>
         Public Sub OnISEReadyChanged() Handles _iseAnalyzer.ISEReadyChanged
             Try
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED, 1, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_READY_CHANGED, 1, True)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEReadyChanged", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEReadyChanged", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1455,28 +1536,31 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Created by SGM 15/03/2012</remarks>
         Public Sub OnISESwitchedOnChanged() Handles _iseAnalyzer.ISESwitchedOnChanged
             Try
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED, 1, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_SWITCHON_CHANGED, 1, True)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISESwitchedOnChanged", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISESwitchedOnChanged", EventLogEntryType.Error, False)
             End Try
         End Sub
 
         ''' <summary>
         ''' Detects that the ISE has finished the initial data retrieving process (Ok or not)
         ''' </summary>
-        ''' <remarks>Created by SGM 15/03/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 15/03/2012
+        ''' Modified by XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
+        ''' </remarks>
         Public Sub OnISEConnectionFinished(ByVal pOk As Boolean) Handles _iseAnalyzer.ISEConnectionFinished
             Try
                 Dim myGlobal As New GlobalDataTO
                 Dim myValue As Integer = 0
 
-                Dim myAlarmListTmp As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmListTmp As New List(Of Alarms)
                 Dim myAlarmStatusListTmp As New List(Of Boolean)
-                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobal = ISEAnalyzer.CheckAlarms(MyClass.Connected, myAlarmList, myAlarmStatusList)
+                myGlobal = ISEAnalyzer.CheckAlarms(Connected, myAlarmList, myAlarmStatusList)
 
                 If pOk Then
                     myValue = 1
@@ -1500,6 +1584,52 @@ Namespace Biosystems.Ax00.Core.Entities
                     myAlarmStatusList.Add(False)
                 End If
 
+                ' XB 21/01/2015 - BA-1873
+                If Me.ISEAnalyzer.IsISEModuleInstalled And Me.ISEAnalyzer.IsISEModuleReady Then
+                    ' Check if ISE Electrodes calibration is required
+                    Dim ElectrodesCalibrationRequired As Boolean = False
+                    myGlobal = Me.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                    If ElectrodesCalibrationRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+
+                    ' Check if ISE Pumps calibration is required
+                    Dim PumpsCalibrationRequired As Boolean = False
+                    myGlobal = Me.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                    If PumpsCalibrationRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+
+                    ' Check if ISE Clean is required
+                    Dim CleanRequired As Boolean = False
+                    myGlobal = Me.ISEAnalyzer.CheckCleanIsNeeded
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        CleanRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                    If CleanRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+                End If
+                ' XB 21/01/2015 - BA-1873
+
                 For i As Integer = 0 To myAlarmListTmp.Count - 1
                     PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
                 Next
@@ -1517,11 +1647,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED, myValue, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_CONNECTION_FINISHED, myValue, True)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEConnectionFinished", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEConnectionFinished", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1536,15 +1666,15 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED, 1, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_PROCEDURE_FINISHED, 1, True)
 
 
                 'SGM 12/04/2012 Update ISE conssumption flag in case of Session ended, paused or aborted
-                If ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.WriteConsumption Then
+                If ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.WriteConsumption Then
 
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption, "END")
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEConsumption, "END")
 
                     'SGM 27/09/2012 - not necessary
                     ''If pause in process mark as closed
@@ -1556,19 +1686,19 @@ Namespace Biosystems.Ax00.Core.Entities
                     If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
 
                         AnalyzerIsInfoActivatedAttribute = 0
-                        myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                        myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
 
                     End If
                 End If
                 'end SGM 12/04/2012
 
                 ISEAnalyzer.CurrentCommandTO = Nothing
-                ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.None
+                ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.None
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEProcedureFinished", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEProcedureFinished", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1576,17 +1706,17 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Detects that some maintenance schedule is needed
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISEMaintenanceRequired(ByVal pOperation As ISEAnalyzerEntity.MaintenanceOperations) Handles _iseAnalyzer.ISEMaintenanceRequired
+        Public Sub OnISEMaintenanceRequired(ByVal pOperation As ISEManager.MaintenanceOperations) Handles _iseAnalyzer.ISEMaintenanceRequired
             Try
                 Select Case pOperation
-                    Case ISEAnalyzerEntity.MaintenanceOperations.ElectrodesCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CALB_REQUIRED, 1, True)
-                    Case ISEAnalyzerEntity.MaintenanceOperations.PumpsCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_PUMPCAL_REQUIRED, 1, True)
-                    Case ISEAnalyzerEntity.MaintenanceOperations.Clean : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CLEAN_REQUIRED, 1, True)
+                    Case ISEManager.MaintenanceOperations.ElectrodesCalibration : UpdateSensorValuesAttribute(AnalyzerSensors.ISE_CALB_REQUIRED, 1, True)
+                    Case ISEManager.MaintenanceOperations.PumpsCalibration : UpdateSensorValuesAttribute(AnalyzerSensors.ISE_PUMPCAL_REQUIRED, 1, True)
+                    Case ISEManager.MaintenanceOperations.Clean : UpdateSensorValuesAttribute(AnalyzerSensors.ISE_CLEAN_REQUIRED, 1, True)
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEElectrodeInstalled", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.OnISEElectrodeInstalled", EventLogEntryType.Error, False)
             End Try
         End Sub
         'end SGM 07/03/2012
@@ -1612,6 +1742,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 'XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                 waitingStartTaskTimer.Enabled = False
                 AddHandler waitingStartTaskTimer.Elapsed, AddressOf waitingStartTaskTimer_Timer
+
+                ' XB 05/11/2014 - STATE needs a singular timer because its use is inside another generic instructions (like ISECMD) - BA-1872
+                AddHandler waitingSTATETimer.Elapsed, AddressOf waitingSTATETimer_Timer
 
                 myApplicationName = pApplicationName
                 myAnalyzerModel = pAnalyzerModel 'SGM 04/03/11
@@ -1644,7 +1777,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 wasteDepositTimer.Interval = 60000 'default interval value 1 minute
                 waterDepositTimer.Interval = 60000 'default interval value 1 minute
 
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                     If IsNumeric(myGlobalDataTO.SetDatos) AndAlso CInt(myGlobalDataTO.SetDatos) > 0 Then
                         wasteDepositTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
@@ -1663,12 +1796,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                     thermoReactionsRotorWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
                 End If
 
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                     thermoFridgeWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
                 End If
@@ -1685,7 +1818,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                     thermoR1ArmWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
                     thermoR2ArmWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
@@ -1695,12 +1828,39 @@ Namespace Biosystems.Ax00.Core.Entities
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
                 'END AG 05/01/2012
 
+                ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_OFF.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_OFF = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    SYSTEM_TIME_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_DEFAULT = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_FAST.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_FAST = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_FAST = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                End If
+                ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
+
                 AdjustmentsFilePath = String.Empty '#REFACTORING
 
             Catch ex As Exception
                 classInitializationErrorAttribute = True
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.New", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.New", EventLogEntryType.Error, False)
             End Try
         End Sub
         ' XBC 02/03/2011
@@ -1712,13 +1872,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pStartingApplication" >TRUE when app is starting FALSE when a reportsat is loaded</param>
         ''' <remarks>AG 29/04/2011
         '''          AG 25/10/2011 - add parameter pStartingApplication for differentiate when the application is started and when a reportsat or restore point is loaded</remarks>
-        Public Sub InitBaseLineCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStartingApplication As Boolean) Implements IAnalyzerEntity.InitBaseLineCalculations
+        Public Sub InitBaseLineCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStartingApplication As Boolean) Implements IAnalyzerManager.InitBaseLineCalculations
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
@@ -1764,8 +1924,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
 
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                                myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                Dim myAlarm As Alarms = GlobalEnumerates.Alarms.NONE
+                                myAlarm = CType(resultData.SetDatos, Alarms)
                                 'Update internal alarm list if exists alarm but not saved it into database!!!
                                 If myAlarm <> GlobalEnumerates.Alarms.NONE Then
                                     If Not myAlarmListAttribute.Contains(myAlarm) Then
@@ -1775,8 +1935,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'Wup not in process 
                                         If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
                                             Dim showGlobeFlag As Boolean = False
-                                            If (String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
-                                                String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
+                                            If (String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
+                                                String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
                                                 If Not IgnoreAlarmWhileWarmUp(myAlarm) Then
                                                     showGlobeFlag = True
                                                 End If
@@ -1794,7 +1954,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         'AG 13/02/2012
                                         'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
-                                        resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                                        resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
                                         If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
                                             InstructionReceivedAttribute = ""
                                             RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
@@ -1810,11 +1970,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.InitBaseLineCalculations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitBaseLineCalculations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1827,13 +1987,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks>AG 26/10/2011 - Create and move business code from constructor (New)</remarks>
-        Private Function InitClassStructuresFromDataBase(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function InitClassStructuresFromDataBase(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
@@ -1848,28 +2008,28 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             Dim myQRes As New List(Of ParametersDS.tfmwSwParametersRow)
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.CONTAMIN_REAGENT_PERSIS.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 REAGENT_CONTAMINATION_PERSISTANCE = CInt(myQRes(0).ValueNumeric)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.MULTIPLE_ERROR_CODE.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.MULTIPLE_ERROR_CODE.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 MULTIPLE_ERROR_CODE = CInt(myQRes(0).ValueNumeric)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.BLINE_INIT_FAILURES.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.BLINE_INIT_FAILURES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 ALIGHT_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.SENSORUNKNOWNVALUE.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.SENSORUNKNOWNVALUE.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 SENSORUNKNOWNVALUE = CInt(myQRes(0).ValueNumeric)
@@ -1877,14 +2037,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'AG 31/05/2012
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.PREDILUTION_CYCLES.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.PREDILUTION_CYCLES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 WELL_OFFSET_FOR_PREDILUTION = CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False) = 0 Select a).ToList
+                                      Where String.Compare(a.ParameterName, SwParameters.MAX_REACTROTOR_WELLS.ToString, False) = 0 Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 MAX_REACTROTOR_WELLS = CInt(myQRes(0).ValueNumeric)
@@ -1893,14 +2053,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'AG 12/07/2012
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.ISETEST_CYCLES_SERPLM.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.ISETEST_CYCLES_SERPLM.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 WELL_OFFSET_FOR_ISETEST_SERPLM = CInt(myQRes(0).ValueNumeric)  'Well offset for ise test (ser or plm) (cycles until Fw activates the biochemical request after receive an SER or PLM isetest)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
-                                      Where a.ParameterName = GlobalEnumerates.SwParameters.ISETEST_CYCLES_URI.ToString Select a).ToList
+                                      Where a.ParameterName = SwParameters.ISETEST_CYCLES_URI.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
                                 WELL_OFFSET_FOR_ISETEST_URI = CInt(myQRes(0).ValueNumeric)  'Well offset for ise test (uri) (cycles until Fw activates the biochemical request after receive an URI isetest)
@@ -1932,11 +2092,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.InitClassStructuresFromDataBase", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitClassStructuresFromDataBase", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1954,7 +2114,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pPooling"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Start(ByVal pPooling As Boolean) As Boolean Implements IAnalyzerEntity.Start
+        Public Function Start(ByVal pPooling As Boolean) As Boolean Implements IAnalyzerManager.Start
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -1967,8 +2127,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.Start", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.Start", EventLogEntryType.Error, False)
             End Try
             Return myReturn
         End Function
@@ -1978,7 +2138,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 04/07/2012</remarks>
-        Public Function SynchronizeComm() As Boolean Implements IAnalyzerEntity.SynchronizeComm
+        Public Function SynchronizeComm() As Boolean Implements IAnalyzerManager.SynchronizeComm
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -1992,8 +2152,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SynchronizeComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SynchronizeComm", EventLogEntryType.Error, False)
             End Try
             Return myReturn
         End Function
@@ -2003,7 +2163,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Terminate() As Boolean Implements IAnalyzerEntity.Terminate
+        Public Function Terminate() As Boolean Implements IAnalyzerManager.Terminate
             Dim myReturn As Boolean = False
             Try
                 CommThreadsStartedAttribute = False
@@ -2011,8 +2171,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myReturn = True
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.Terminate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.Terminate", EventLogEntryType.Error, False)
                 myReturn = False
             End Try
             Return myReturn
@@ -2022,7 +2182,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Stop communications channel
         ''' </summary>
         ''' <remarks>Created by XBC 18/06/2012</remarks>
-        Public Function StopComm() As Boolean Implements IAnalyzerEntity.StopComm
+        Public Function StopComm() As Boolean Implements IAnalyzerManager.StopComm
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -2031,12 +2191,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myReturn = CType(myGlobal.SetDatos, Boolean)
-                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True)
+                    UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 0, True)
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.StopComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StopComm", EventLogEntryType.Error, False)
                 myReturn = False
             End Try
             Return myReturn
@@ -2046,7 +2206,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Start communications channel after a previous Stop
         ''' </summary>
         ''' <remarks>Created by XBC 18/06/2012</remarks>
-        Public Function StartComm() As Boolean Implements IAnalyzerEntity.StartComm
+        Public Function StartComm() As Boolean Implements IAnalyzerManager.StartComm
             Dim myReturn As Boolean = False
             Dim myGlobal As New GlobalDataTO
             Try
@@ -2054,8 +2214,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
                 'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If Not GlobalBase.IsServiceAssembly Then
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady, "") 'AG 20/06/2012
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WaitForAnalyzerReady, "") 'AG 20/06/2012
                 End If
 
                 'Update analyzer session flags into DataBase
@@ -2074,13 +2234,13 @@ Namespace Biosystems.Ax00.Core.Entities
                         myReturn = CType(myGlobal.SetDatos, Boolean)
                         CommThreadsStartedAttribute = myReturn
                         ConnectedAttribute = myReturn
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True)
+                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True)
                     End If
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.StartComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StartComm", EventLogEntryType.Error, False)
                 myReturn = False
             End Try
             Return myReturn
@@ -2094,14 +2254,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Creation AG 22/04/2010
         ''' </remarks>
-        Public Function ReadRegistredPorts() As GlobalDataTO Implements IAnalyzerEntity.ReadRegistredPorts
+        Public Function ReadRegistredPorts() As GlobalDataTO Implements IAnalyzerManager.ReadRegistredPorts
             Dim myReturn As New GlobalDataTO
             Try
                 myReturn = AppLayer.ReadRegistredPorts  'Pending to develop!!
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadRegistredPorts", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadRegistredPorts", EventLogEntryType.Error, False)
             End Try
             Return myReturn
         End Function
@@ -2111,7 +2271,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' When a worksession finish clear the DS with the last reagents prepared
         ''' </summary>
         ''' <remarks>AG 19/01/2011</remarks>
-        Public Sub ResetWorkSession() Implements IAnalyzerEntity.ResetWorkSession
+        Public Sub ResetWorkSession() Implements IAnalyzerManager.ResetWorkSession
             Try
                 If Not mySentPreparationsDS Is Nothing Then
                     mySentPreparationsDS.Clear()
@@ -2137,8 +2297,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 28/11/2013
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ResetWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ResetWorkSession", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2147,7 +2307,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pMainThread"></param>
         ''' <remarks></remarks>
-        Public Sub ReadyToClearUIRefreshDS(ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReadyToClearUIRefreshDS
+        Public Sub ReadyToClearUIRefreshDS(ByVal pMainThread As Boolean) Implements IAnalyzerManager.ReadyToClearUIRefreshDS
             Try
                 If pMainThread Then
                     eventDataPendingToTriggerFlag = False
@@ -2157,8 +2317,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadyToClearUIRefreshDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadyToClearUIRefreshDS", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2187,13 +2347,15 @@ Namespace Biosystems.Ax00.Core.Entities
         '''          XB 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
         '''          XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
         '''          AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
+        '''          XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
+        '''          XB 06/11/2014 - Implement Start Task Timeout for RUNNING instruction - BA-1872
         '''          AG 11/12/2014 BA-2170 Analyzer does not becomes ready when receives an ANSFBLD instruction. This is an exception to the general rule!!
         ''' </remarks>
-        Public Function ManageAnalyzer(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
+        Public Function ManageAnalyzer(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                        Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
                                        Optional ByVal pSwAdditionalParameters As Object = Nothing, _
                                        Optional ByVal pFwScriptID As String = "", _
-                                       Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerEntity.ManageAnalyzer
+                                       Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerManager.ManageAnalyzer
 
             Dim myGlobal As New GlobalDataTO
 
@@ -2205,8 +2367,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If Not GlobalBase.IsServiceAssembly Then
                         ' User Sw
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
-                            mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" AndAlso _
+                        If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
+                            mySessionFlags(AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" AndAlso _
                             Not pSendingEvent AndAlso pAction <> AnalyzerManagerSwActionList.STATUS_RECEIVED Then
 
                             Return myGlobal
@@ -2216,15 +2378,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'AG 26/11/2010 - Empty UI refresh information
                     'myUI_RefreshEvent.Clear()
-                    If pAction = GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT OrElse pAction = GlobalEnumerates.AnalyzerManagerSwActionList.RECOVER Then AnalyzerIsReadyAttribute = True
+                    If pAction = AnalyzerManagerSwActionList.CONNECT OrElse pAction = AnalyzerManagerSwActionList.RECOVER Then AnalyzerIsReadyAttribute = True
 
                     'AG 27/01/2012 - Treat other special cases a part from WAITING TIME EXPIRED: SOUND, ENDSOUND
-                    If pAction <> GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED AndAlso pAction <> GlobalEnumerates.AnalyzerManagerSwActionList.SOUND _
-                        AndAlso pAction <> GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND AndAlso pSendingEvent AndAlso Not AnalyzerIsReadyAttribute Then
+                    If pAction <> AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED AndAlso pAction <> AnalyzerManagerSwActionList.SOUND _
+                        AndAlso pAction <> AnalyzerManagerSwActionList.ENDSOUND AndAlso pSendingEvent AndAlso Not AnalyzerIsReadyAttribute Then
                         'AG 27/01/2012
 
                         'AG 04/08/2011 - New condition: The NEXT_PREP event has not be put in queue!!
-                        If pAction <> GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION Then
+                        If pAction <> AnalyzerManagerSwActionList.NEXT_PREPARATION Then
                             'If analyzer is busy dont send nothing, add in queue
                             Debug.Print(" ADD ACTION TO QUEUE : [" & pAction.ToString & "] count : " & myInstructionsQueue.Count.ToString)
                             myInstructionsQueue.Add(pAction)
@@ -2260,16 +2422,26 @@ Namespace Biosystems.Ax00.Core.Entities
                             If Not AnalyzerIsReadyAttribute Then
                                 Select Case pAction
                                     'AG 26/03/2012 - all reception instructions except status set analyzerisready = True (exception Running)
-                                    Case GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
+                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.BASELINE_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED, _
+                                    '    GlobalEnumerates.AnalyzerManagerSwActionList.ANSERR_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED
+
+                                    '    AnalyzerIsReadyAttribute = True
+
+                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
+                                    '    If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    '        AnalyzerIsReadyAttribute = True
+                                    '    End If
+                                    'Case Else
+                                    Case AnalyzerManagerSwActionList.STATUS_RECEIVED
                                         'Do nothing ... when the status instruction is treated the Software updates the AnalyzerIsReadyAttribute
 
                                         'AG 11/12/2014 BA-2170
-                                    Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                    Case AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
                                         'Exception: The analyzer will be ready when receives STATUS with A:47
                                         'AG 11/12/2014
 
                                     Case Else
-                                        If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                        If AnalyzerStatusAttribute <> AnalyzerManagerStatus.RUNNING Then
                                             AnalyzerIsReadyAttribute = True
                                         End If
                                         'AG 26/03/2012
@@ -2285,8 +2457,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If GlobalBase.IsServiceAssembly Then
-                                If MyClass.IsAlarmInfoRequested Then
-                                    System.Threading.Thread.Sleep(1000)
+                                If IsAlarmInfoRequested Then
+                                    Thread.Sleep(1000)
                                 End If
                             End If
                         End If
@@ -2309,9 +2481,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             '''''''''''''''
                             'SEND EVENTS!!!
                             '''''''''''''''
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT
+                            Case AnalyzerManagerSwActionList.CONNECT
                                 ' Set Waiting Timer Current Instruction OFF
-                                If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
+                                If REAL_DEVELOPMENT_MODE > 0 Then
                                     ClearQueueToSend()
                                 Else
                                     myGlobal = ProcessConnection(pSwAdditionalParameters, False)
@@ -2319,42 +2491,51 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 'AG 06/05/2010 - Short instructions (generical)
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SLEEP)
+                            Case AnalyzerManagerSwActionList.SLEEP
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SLEEP)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STANDBY)
+                            Case AnalyzerManagerSwActionList.STANDBY
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STANDBY)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.SKIP
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SKIP)
+                            Case AnalyzerManagerSwActionList.SKIP
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SKIP)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RUNNING)
+                            Case AnalyzerManagerSwActionList.RUNNING
+                                ' XB 06/11/2014 - BA-1872
+                                If Not sendingRepetitions Then
+                                    numRepetitionsTimeout = 0
+                                End If
+                                InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                                StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                ' XB 06/11/2014 - BA-1872
+
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RUNNING)
+
                                 Exit Select
 
                                 ' XB 10/10/2013 - BT #1317
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE
-                                If AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute Then
+                            Case AnalyzerManagerSwActionList.PAUSE
+                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
+                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute Then
 
                                     'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_START Then
-                                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                                         If Not myInstructionsQueue.Contains(pAction) Then
                                             myInstructionsQueue.Add(pAction)
                                             myParamsQueue.Add(pSwAdditionalParameters)
                                         End If
                                     Else
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.PAUSE)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.PAUSE)
                                         If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
                                     End If
                                 End If
 
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.START
+                            Case AnalyzerManagerSwActionList.START
                                 'AG 06/03/20102 - add into queue and send after receive status instruction
                                 'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
                                 '    If Not myGlobal.HasError Then
@@ -2366,9 +2547,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'AG 15/04/2014 - #1591 - Condition ContinueAlreadySentFlagAttribute using another IF (besides add protection for not send START when analyzer is starting pause)
                                 'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso Not ContinueAlreadySentFlagAttribute Then
-                                If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                                     If Not ContinueAlreadySentFlagAttribute AndAlso _
-                                        (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") AndAlso Not myInstructionsQueue.Contains(GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE) Then
+                                        (mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") AndAlso Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.PAUSE) Then
                                         'AG 15/04/2014 - #1591
                                         If Not myInstructionsQueue.Contains(pAction) Then
                                             myInstructionsQueue.Add(pAction)
@@ -2377,7 +2558,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If 'AG 15/04/2014 - #1591
 
                                 Else
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.START)
                                     If Not myGlobal.HasError Then
                                         endRunAlreadySentFlagAttribute = False 'AG 13/01/2012
                                         abortAlreadySentFlagAttribute = False
@@ -2387,7 +2568,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'AG 06/03/2012
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN
+                            Case AnalyzerManagerSwActionList.ENDRUN
                                 'AG 08/07/2011 - Special case for sending ENDRUN during RUNNING initialization
                                 'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDRUN)
                                 'If Not myGlobal.HasError Then
@@ -2396,13 +2577,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'Exit Select
                                 'AG 09/12/2013 - Add action <> STANDBY_START (for case partial freeze appears during recover results)
                                 ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute - BT #1318
-                                If AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START AndAlso Not endRunAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START Then
+                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START AndAlso Not endRunAlreadySentFlagAttribute AndAlso _
+                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
+                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
+                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.STANDBY_START Then
 
                                     'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_START Then
-                                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                                         'AG 30/10/2013 - in pause mode if SwAdditionalParameter = TRue means EndUser has decided to stop worksession
                                         '1st send START, later END - Task #1342
                                         'If Not myInstructionsQueue.Contains(pAction) Then
@@ -2421,7 +2602,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     If stopRequestedByUserInPauseModeFlag AndAlso _
                                                        (AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.START_INSTRUCTION_START OrElse _
                                                         AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.STANDBY_END OrElse _
-                                                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartRunning.ToString) = "INI") Then
+                                                        mySessionFlags(AnalyzerManagerFlags.StartRunning.ToString) = "INI") Then
                                                         stopRequestedByUserInPauseModeFlag = False
                                                     End If
                                                     'AG 12/11/2013
@@ -2438,10 +2619,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 myParamsQueue.Add(Nothing)
                                             End If
                                         Else
-                                            Dim myLogAcciones As New ApplicationLogManager()
-                                            myLogAcciones.CreateLogActivity("In paused mode user decides stop the Worksession, 1st add START instruction into queue (or recovery results while analyzer is in pause mode)", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
-                                            If Not myInstructionsQueue.Contains(GlobalEnumerates.AnalyzerManagerSwActionList.START) Then
-                                                myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.START)
+                                            'Dim myLogAcciones As New ApplicationLogManager()
+                                            GlobalBase.CreateLogActivity("In paused mode user decides stop the Worksession, 1st add START instruction into queue (or recovery results while analyzer is in pause mode)", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
+                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.START) Then
+                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.START)
                                                 myParamsQueue.Add(Nothing)
                                             End If
                                         End If
@@ -2449,21 +2630,21 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     Else
                                         'Death code. The ENDRUN instruction has no sense out of Running (it is here for develop. testings)
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDRUN)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDRUN)
                                         If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
                                     End If
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.NROTOR)
+                            Case AnalyzerManagerSwActionList.NROTOR
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.NROTOR)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ABORT
-                                If AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute Then
+                            Case AnalyzerManagerSwActionList.ABORT
+                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute Then
                                     'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ABORT)
                                     'If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
-                                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                                         If Not myInstructionsQueue.Contains(pAction) Then
                                             myInstructionsQueue.Add(pAction)
                                             myParamsQueue.Add(pSwAdditionalParameters)
@@ -2476,60 +2657,61 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ' XB 06/11/2013 - Remove END instructions from the queue when ABORT instruction is performed
                                         RemoveItemFromQueue(AnalyzerManagerSwActionList.ENDRUN)
 
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ABORT)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ABORT)
                                         If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
                                     End If
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.SOUND
+                            Case AnalyzerManagerSwActionList.SOUND
                                 'AG 26/01/2012 - In Running the SOUND instruction is sent only after receive a STATUS instruction
                                 'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SOUND)
-                                If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso Not AnalyzerIsRingingAttribute Then
+                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso Not AnalyzerIsRingingAttribute Then
                                     If Not myInstructionsQueue.Contains(pAction) Then
                                         myInstructionsQueue.Add(pAction)
                                         myParamsQueue.Add(pSwAdditionalParameters)
                                         'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
                                     End If
                                 Else
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SOUND)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SOUND)
                                 End If
                                 'AG 26/01/2012
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND
+                            Case AnalyzerManagerSwActionList.ENDSOUND
                                 'AG 26/01/2012 - In Running the SOUND instruction is sent only after receive a STATUS instruction
                                 'AG 03/09/2012 - during conection (running) force sent always endsound, do not use queue
                                 'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDSOUND)
-                                If (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerIsRingingAttribute) _
-                                AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) <> "INPROCESS" Then
+                                If (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso AnalyzerIsRingingAttribute) _
+                                AndAlso mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) <> "INPROCESS" Then
                                     If Not myInstructionsQueue.Contains(pAction) Then
                                         myInstructionsQueue.Add(pAction)
                                         myParamsQueue.Add(pSwAdditionalParameters)
                                         'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
                                     End If
                                 Else
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDSOUND)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDSOUND)
                                 End If
                                 'AG 26/01/2012
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RESULTSRECOVER
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RESRECOVER)
+                            Case AnalyzerManagerSwActionList.RESULTSRECOVER
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RESRECOVER)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.STATE
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
+                            Case AnalyzerManagerSwActionList.STATE
+
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
                                 Exit Select
                                 'END AG 06/05/2010
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.WASH
+                            Case AnalyzerManagerSwActionList.WASH
                                 'AG 02/03/2011 - By now implement only the conditioning case. When the wash utility has defined
                                 'probably an specific parameter will be required
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.WASH)
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.WASH)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION
+                            Case AnalyzerManagerSwActionList.NEXT_PREPARATION
                                 ''ConnectedAttribute = True 'AG 07/02/2012 - Uncomment this line only for testings
                                 'If ConnectedAttribute Then
                                 Dim nextWell As Integer = 0
@@ -2554,7 +2736,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 'AG 18/05/2010
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT
+                            Case AnalyzerManagerSwActionList.ADJUST_LIGHT
                                 If ConnectedAttribute Then
                                     Dim nextWell As Integer = 0
                                     If IsNumeric(pSwAdditionalParameters) Then
@@ -2569,7 +2751,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                                 'IT 29/10/2014: BA-2061
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT
+                            Case AnalyzerManagerSwActionList.ADJUST_FLIGHT
                                 If ConnectedAttribute Then
                                     If Not pParams Is Nothing Then
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, Nothing, String.Empty, String.Empty, pParams)
@@ -2580,7 +2762,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.INFO
 
                                 If ConnectedAttribute Then
-                                    Dim queryMode As Integer = GlobalEnumerates.Ax00InfoInstructionModes.ALR
+                                    Dim queryMode As Integer = Ax00InfoInstructionModes.ALR
                                     If IsNumeric(pSwAdditionalParameters) Then
                                         queryMode = CInt(pSwAdditionalParameters)
                                     End If
@@ -2609,27 +2791,27 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If GlobalBase.IsServiceAssembly Then
 
                                         'SGM 06/11/2012 - remove if the current action is alredy in queue
-                                        Dim myInstructionsQueueTemp As New List(Of GlobalEnumerates.AnalyzerManagerSwActionList)
+                                        Dim myInstructionsQueueTemp As New List(Of AnalyzerManagerSwActionList)
                                         Dim myParamsQueueTemp As New List(Of Object)
 
-                                        For Each A As GlobalEnumerates.AnalyzerManagerSwActionList In myInstructionsQueue
+                                        For Each A As AnalyzerManagerSwActionList In myInstructionsQueue
                                             Dim j As Integer = myInstructionsQueue.IndexOf(A)
                                             myInstructionsQueueTemp.Add(A)
                                             myParamsQueueTemp.Add(myParamsQueue(j))
                                         Next
-                                        For Each A As GlobalEnumerates.AnalyzerManagerSwActionList In myInstructionsQueueTemp
-                                            If A = GlobalEnumerates.AnalyzerManagerSwActionList.INFO Then
-                                                Dim myInfoType As GlobalEnumerates.Ax00InfoInstructionModes = CType(queryMode, GlobalEnumerates.Ax00InfoInstructionModes)
+                                        For Each A As AnalyzerManagerSwActionList In myInstructionsQueueTemp
+                                            If A = AnalyzerManagerSwActionList.INFO Then
+                                                Dim myInfoType As Ax00InfoInstructionModes = CType(queryMode, Ax00InfoInstructionModes)
                                                 Dim j As Integer = myInstructionsQueueTemp.IndexOf(A)
-                                                If CType(myParamsQueueTemp(j), GlobalEnumerates.Ax00InfoInstructionModes) = myInfoType Then
+                                                If CType(myParamsQueueTemp(j), Ax00InfoInstructionModes) = myInfoType Then
                                                     myInstructionsQueue.RemoveAt(j)
                                                     myParamsQueue.RemoveAt(j)
                                                 End If
                                             End If
                                         Next
 
-                                        If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STR Or queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then
-                                            allowToSendFlag = Not MyClass.IsAlarmInfoRequested 'SGM 26/10/2012
+                                        If queryMode = Ax00InfoInstructionModes.STR Or queryMode = Ax00InfoInstructionModes.STP Then
+                                            allowToSendFlag = Not IsAlarmInfoRequested 'SGM 26/10/2012
                                             If Not allowToSendFlag Then
                                                 myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
                                                 myParamsQueue.Add(CInt(pSwAdditionalParameters)) 'AG 11/12/2012 - add cint to querymode
@@ -2645,37 +2827,37 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                         'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                         If GlobalBase.IsServiceAssembly Then
-                                            If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then
+                                            If queryMode = Ax00InfoInstructionModes.STP Then
                                                 ClearQueueToSend()
                                             End If
                                         End If
 
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.INFO, CInt(queryMode)) 'AG 11/12/2012 - add cint to querymode
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.INFO, CInt(queryMode)) 'AG 11/12/2012 - add cint to querymode
 
                                         'SGM 07/11/2012
                                         If Not myGlobal.HasError Then
 
-                                            If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STR Then
+                                            If queryMode = Ax00InfoInstructionModes.STR Then
                                                 AnalyzerIsInfoActivatedAttribute = 1
-                                                MyClass.IsAlarmInfoRequested = False
+                                                IsAlarmInfoRequested = False
                                             End If
 
-                                            If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then
+                                            If queryMode = Ax00InfoInstructionModes.STP Then
                                                 AnalyzerIsInfoActivatedAttribute = 0
-                                                MyClass.IsAlarmInfoRequested = False
+                                                IsAlarmInfoRequested = False
                                             End If
 
-                                            If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.ALR Then
+                                            If queryMode = Ax00InfoInstructionModes.ALR Then
                                                 AnalyzerIsInfoActivatedAttribute = 0
                                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                                 If GlobalBase.IsServiceAssembly Then
-                                                    MyClass.IsAlarmInfoRequested = True
+                                                    IsAlarmInfoRequested = True
                                                 End If
                                             End If
 
                                         Else
-                                            MyClass.IsAlarmInfoRequested = False
+                                            IsAlarmInfoRequested = False
                                         End If
 
 
@@ -2694,24 +2876,24 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL
+                            Case AnalyzerManagerSwActionList.WASH_STATION_CTRL
                                 If ConnectedAttribute Then
-                                    Dim queryMode As Integer = GlobalEnumerates.Ax00WashStationControlModes.UP
+                                    Dim queryMode As Integer = Ax00WashStationControlModes.UP
                                     If IsNumeric(pSwAdditionalParameters) Then
                                         queryMode = CInt(pSwAdditionalParameters)
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.WSCTRL, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.WSCTRL, queryMode)
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST
+                            Case AnalyzerManagerSwActionList.BARCODE_REQUEST
                                 If ConnectedAttribute Then
                                     'AG 16/10/2013 - In Running add the barcoderequest and the BarcodeRequestDS into queue, the instruction will be sent after STATUS reception
                                     'myBarcodeRequestDS = CType(pSwAdditionalParameters, AnalyzerManagerDS)
                                     'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
 
-                                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                                        If (AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute) _
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                                        If (AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute) _
                                             AndAlso (AllowScanInRunning) Then
                                             If Not myInstructionsQueue.Contains(pAction) Then
                                                 myInstructionsQueue.Add(pAction)
@@ -2723,10 +2905,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                         End If
                                     Else
                                         myBarcodeRequestDS = CType(pSwAdditionalParameters, AnalyzerManagerDS)
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
 
                                         ' XB 29/01/2014 - Task #1438
-                                        MyClass.BarcodeStartInstrExpected = True
+                                        BarcodeStartInstrExpected = True
                                     End If
                                     'AG 16/10/2013
 
@@ -2735,14 +2917,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 'AG 23/11/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG
+                            Case AnalyzerManagerSwActionList.CONFIG
                                 If ConnectedAttribute Then
                                     Dim anSetts As New AnalyzerSettingsDelegate
                                     myGlobal = anSetts.ReadAll(Nothing, AnalyzerIDAttribute)
                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                         Dim mySettingsDS As New AnalyzerSettingsDS
                                         mySettingsDS = CType(myGlobal.SetDatos, AnalyzerSettingsDS)
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.CONFIG, mySettingsDS)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.CONFIG, mySettingsDS)
                                     End If
                                 End If
                                 Exit Select
@@ -2750,27 +2932,27 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                                 ' XBC 03/05/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.READADJ
+                            Case AnalyzerManagerSwActionList.READADJ
                                 If ConnectedAttribute Then
                                     Dim queryMode As String = ""
                                     If Not pSwAdditionalParameters Is Nothing Then
                                         queryMode = pSwAdditionalParameters.ToString
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.READADJ, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.READADJ, queryMode)
                                 End If
                                 Exit Select
 
 
                                 ' SGM 12/12/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD
+                            Case AnalyzerManagerSwActionList.ISE_CMD
                                 If ConnectedAttribute Then
                                     Dim myISECommand As ISECommandTO
                                     myISECommand = CType(pSwAdditionalParameters, ISECommandTO)
-                                    If myISECommand.ISEMode <> GlobalEnumerates.ISEModes.None Then
+                                    If myISECommand.ISEMode <> ISEModes.None Then
 
 
                                         ' XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
-                                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                                             If Not myInstructionsQueue.Contains(pAction) Then
                                                 myInstructionsQueue.Add(pAction)
                                                 myParamsQueue.Add(pSwAdditionalParameters)
@@ -2779,13 +2961,24 @@ Namespace Biosystems.Ax00.Core.Entities
                                         Else
                                             ' XB 03/04/2014 
 
-                                            myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ISE_CMD, myISECommand)
-
-                                            ' XBC 05/09/2012 - Start Timeout for ISE commands must emplaced inside ManageAnalyzer
-                                            If Not myGlobal.HasError Then
-                                                myGlobal = ISEAnalyzer.StartInstructionStartedTimer
+                                            ' XB 26/09/2014 - BA-1872
+                                            SetTimeISEOffsetFirstTime = False
+                                            If Not sendingRepetitions Then
+                                                numRepetitionsTimeout = 0
                                             End If
-                                            ' XBC 05/09/2012 
+                                            InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                                            StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                            ' XB 26/09/2014 - BA-1872
+
+                                            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myISECommand)
+
+                                            ' XB 26/09/2014 - BA-1872
+                                            '' XBC 05/09/2012 - Start Timeout for ISE commands must emplaced inside ManageAnalyzer
+                                            'If Not myGlobal.HasError Then
+                                            '    myGlobal = ISEAnalyzer.StartInstructionStartedTimer
+                                            'End If
+                                            '' XBC 05/09/2012 
+                                            ' XB 26/09/2014 - BA-1872
 
                                         End If ' XB 03/04/2014 
 
@@ -2795,33 +2988,33 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 ' SGM 12/12/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.FW_UTIL
+                            Case AnalyzerManagerSwActionList.FW_UTIL
                                 If ConnectedAttribute Then
                                     Dim myFWAction As FWUpdateRequestTO
                                     myFWAction = CType(pSwAdditionalParameters, FWUpdateRequestTO)
-                                    If myFWAction.ActionType <> GlobalEnumerates.FwUpdateActions.None Then
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FW_UTIL, myFWAction)
+                                    If myFWAction.ActionType <> FwUpdateActions.None Then
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FW_UTIL, myFWAction)
                                     End If
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RECOVER 'AG 22/02/2012
+                            Case AnalyzerManagerSwActionList.RECOVER 'AG 22/02/2012 
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If GlobalBase.IsServiceAssembly Then
                                     SensorValuesAttribute.Clear() 'SGM 08/11/2012
                                 End If
                                 ClearQueueToSend() 'Before sent recover instruction clear the instructions in queue to be sent
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RECOVER)
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RECOVER)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLRD  'AG 31/07/2012
+                            Case AnalyzerManagerSwActionList.POLLRD  'AG 31/07/2012 
                                 If ConnectedAttribute Then
-                                    Dim ActionMode As Integer = GlobalEnumerates.Ax00PollRDAction.Biochemical
+                                    Dim ActionMode As Integer = Ax00PollRDAction.Biochemical
                                     If IsNumeric(pSwAdditionalParameters) Then
                                         ActionMode = CInt(pSwAdditionalParameters)
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.POLLRD, ActionMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLRD, ActionMode)
                                 End If
                                 Exit Select
 
@@ -2830,21 +3023,21 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' 
 
                                 ' XBC 08/11/2010  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND
+                            Case AnalyzerManagerSwActionList.COMMAND
 
 
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pParams)
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pParams)
 
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If GlobalBase.IsServiceAssembly Then
                                     ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                                     If Not myGlobal.HasError Then
-                                        If Not MyClass.sendingRepetitions Then
-                                            MyClass.numRepetitionsTimeout = 0
+                                        If Not sendingRepetitions Then
+                                            numRepetitionsTimeout = 0
                                         End If
-                                        MyClass.InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
-                                        MyClass.StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                        InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
+                                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
                                     End If
                                     ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                                 End If
@@ -2853,7 +3046,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                                 ' XBC 03/05/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ
+                            Case AnalyzerManagerSwActionList.LOADADJ
                                 If ConnectedAttribute Then
                                     Dim queryMode As String = ""
                                     If Not pSwAdditionalParameters Is Nothing Then
@@ -2888,61 +3081,61 @@ Namespace Biosystems.Ax00.Core.Entities
                                         '"M1WVR:4250;  {Estación de Lavado - Vertical Relativo a R1SV}"
 
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.LOADADJ, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.LOADADJ, queryMode)
                                 End If
                                 Exit Select
 
                                 ' XBC 20/04/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_BLIGHT
+                            Case AnalyzerManagerSwActionList.ADJUST_BLIGHT
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BLIGHT, Nothing, "", "", pParams)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BLIGHT, Nothing, "", "", pParams)
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.TANKS_TEST
+                            Case AnalyzerManagerSwActionList.TANKS_TEST
                                 If ConnectedAttribute Then
                                     Dim queryMode As String = ""
                                     If Not pSwAdditionalParameters Is Nothing Then
                                         queryMode = pSwAdditionalParameters.ToString
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.TANKSTEST, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.TANKSTEST, queryMode)
                                 End If
                                 Exit Select
 
 
                                 ' XBC 23/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.SDMODE
+                            Case AnalyzerManagerSwActionList.SDMODE
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SDMODE, Nothing, "", "", pParams)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SDMODE, Nothing, "", "", pParams)
                                 End If
                                 Exit Select
 
                                 ' XBC 23/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.SDPOLL
+                            Case AnalyzerManagerSwActionList.SDPOLL
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SDPOLL)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SDPOLL)
                                 End If
                                 Exit Select
 
                                 'XBC 25/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLFW
+                            Case AnalyzerManagerSwActionList.POLLFW
                                 If ConnectedAttribute Then
-                                    Dim queryMode As GlobalEnumerates.POLL_IDs
+                                    Dim queryMode As POLL_IDs
                                     If Not pSwAdditionalParameters Is Nothing Then
-                                        queryMode = CType(pSwAdditionalParameters, GlobalEnumerates.POLL_IDs)
+                                        queryMode = CType(pSwAdditionalParameters, POLL_IDs)
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.POLLFW, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLFW, queryMode)
                                 End If
                                 Exit Select
 
                                 'XBC 31/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLHW
+                            Case AnalyzerManagerSwActionList.POLLHW
                                 If ConnectedAttribute Then
-                                    Dim queryMode As GlobalEnumerates.POLL_IDs
+                                    Dim queryMode As POLL_IDs
                                     If Not pSwAdditionalParameters Is Nothing Then
-                                        queryMode = CType(pSwAdditionalParameters, GlobalEnumerates.POLL_IDs)
+                                        queryMode = CType(pSwAdditionalParameters, POLL_IDs)
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.POLLHW, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLHW, queryMode)
                                 End If
                                 Exit Select
 
@@ -2961,69 +3154,69 @@ Namespace Biosystems.Ax00.Core.Entities
                                 '    Exit Select
 
                                 ' SGM 01/07/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RESET_ANALYZER
+                            Case AnalyzerManagerSwActionList.RESET_ANALYZER
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RESET_ANALYZER, Nothing)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RESET_ANALYZER, Nothing)
                                 End If
                                 Exit Select
 
                                 ' SGM 01/07/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.LOADFACTORYADJ
+                            Case AnalyzerManagerSwActionList.LOADFACTORYADJ
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.LOADFACTORYADJ, Nothing)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.LOADFACTORYADJ, Nothing)
                                 End If
                                 Exit Select
 
                                 ' SGM 05/07/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.UPDATEFW
+                            Case AnalyzerManagerSwActionList.UPDATEFW
                                 If ConnectedAttribute Then
                                     Dim queryMode() As Byte = Nothing
                                     If Not pSwAdditionalParameters Is Nothing Then
                                         queryMode = CType(pSwAdditionalParameters, Byte())
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.UPDATE_FIRMWARE, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.UPDATE_FIRMWARE, queryMode)
                                 End If
                                 Exit Select
 
                                 ' SGM 27/07/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.READCYCLES
+                            Case AnalyzerManagerSwActionList.READCYCLES
                                 If ConnectedAttribute Then
                                     Dim queryMode As String = ""
                                     If Not pSwAdditionalParameters Is Nothing Then
                                         queryMode = pSwAdditionalParameters.ToString
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.READCYC, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.READCYC, queryMode)
                                 End If
                                 Exit Select
 
                                 'SGM 27/07/2011  
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.WRITECYCLES
+                            Case AnalyzerManagerSwActionList.WRITECYCLES
                                 If ConnectedAttribute Then
                                     Dim queryMode As String = ""
                                     If Not pSwAdditionalParameters Is Nothing Then
                                         queryMode = pSwAdditionalParameters.ToString
                                     End If
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.WRITECYC, queryMode)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.WRITECYC, queryMode)
                                 End If
                                 Exit Select
 
 
                                 ' XBC 04/06/2012
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.UTIL
+                            Case AnalyzerManagerSwActionList.UTIL
                                 If ConnectedAttribute Then
                                     Dim myUtilCommand As UTILCommandTO
                                     myUtilCommand = CType(pSwAdditionalParameters, UTILCommandTO)
-                                    If myUtilCommand.ActionType <> GlobalEnumerates.UTILInstructionTypes.None Then
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.UTIL, myUtilCommand)
+                                    If myUtilCommand.ActionType <> UTILInstructionTypes.None Then
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.UTIL, myUtilCommand)
                                     End If
                                 End If
                                 Exit Select
 
 
                                 ' XBC 30/07/2012
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLSN
+                            Case AnalyzerManagerSwActionList.POLLSN
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.POLLSN)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLSN)
                                     runningConnectionPollSnSent = True
                                 End If
                                 Exit Select
@@ -3035,7 +3228,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ''''''''''''''''''''''''''''''''''''''''
                                 'TIME OUT: HOW ARE YOU? <SEND EVENTS!!!>
                                 ''''''''''''''''''''''''''''''''''''''''
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED
+                            Case AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED
 
                                 'If myApplicationName.ToUpper.Contains("SERVICE") Then
                                 '    ' XBC 05/05/2011 - timeout limit repetitions
@@ -3056,85 +3249,198 @@ Namespace Biosystems.Ax00.Core.Entities
                                 '    ' XBC 05/05/2011 - timeout limit repetitions
                                 'End If
 
-                                ' XBC 11/05/2012
-                                RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                ' XBC 11/05/2012
 
-                                If ConnectedAttribute Then ' XBC 07/09/2012 - correction : Sw can't send instructions when is no connected
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
-                                End If
-                                Exit Select
+                                ' XB 26/09/2014 - BA-1872
+                                If myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.ISE_CMD) Then
+                                    ISECMDLost = True
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("ISE CMD lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                                    Exit Select
+
+                                    ' XB 10/12/2014 - BA-1872
+                                ElseIf myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                                    Debug.Print("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...")
+                                    RUNNINGLost = True
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                                    Exit Select
+                                    ' XB 10/12/2014 - BA-1872
+
+                                Else
+                                    ' XB 26/09/2014 - BA-1872
+
+                                    ' XBC 11/05/2012
+                                    RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                    ' XBC 11/05/2012
+
+                                    If ConnectedAttribute Then ' XBC 07/09/2012 - correction : Sw can't send instructions when is no connected
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                                    End If
+                                    Exit Select
+
+                                End If   ' XB 26/09/2014 - BA-1872
+
 
                                 ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.START_TASK_TIMEOUT
+                            Case AnalyzerManagerSwActionList.START_TASK_TIMEOUT
 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' Set Waiting Timer Current Instruction OFF
-                                    'Me.InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
-                                    MyClass.sendingRepetitions = True
-                                    ClearQueueToSend()
-                                    MyClass.numRepetitionsTimeout += 1
-                                    If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                        waitingStartTaskTimer.Enabled = False
-                                        MyClass.sendingRepetitions = False
+                                ' XB 26/09/2014 - BA-1872
+                                If myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.ISE_CMD) Then
+                                    ' ISE COMMAND Instructions
+                                    ISECMDLost = True
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("ISE CMD lost !!! [START_TASK_TIMEOUT] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
 
-                                        ConnectedAttribute = False
-                                        InfoRefreshFirstTime = True
-                                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(ConnectedAttribute), True)
+                                    If numRepetitionsSTATE > GlobalBase.MaxRepetitionsTimeout Then
+                                        GlobalBase.CreateLogActivity("Num of Repetitions for STATE timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
 
-                                        RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                        Exit Try
+                                        ' Activates Alarm begin
+                                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                        Dim alarmStatus As Boolean = False
+                                        Dim myAlarmList As New List(Of Alarms)
+                                        Dim myAlarmStatusList As New List(Of Boolean)
 
+                                        alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                        alarmStatus = True
+                                        ISEAnalyzer.IsTimeOut = True
+
+                                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                        If myAlarmList.Count > 0 Then
+                                            ' Note that this alarm is common on User and Service !
+                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                        End If
+                                        ' Activates Alarm end
+
+                                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
                                         ' Instruction has not started by Fw, so is need to send it again
-                                        'Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
-                                        Dim myLogAcciones As New ApplicationLogManager()
-                                        myLogAcciones.CreateLogActivity("Repeat Start Task Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
-                                        myGlobal = MyClass.SendStartTaskinQueue()
+                                        GlobalBase.CreateLogActivity("Repeat STATE Instruction [" & numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                                        InitializeTimerSTATEControl(WAITING_TIME_FAST)
                                     End If
-                                End If
 
-                                Exit Select
-                                ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+                                    Exit Select
+
+                                    ' XB 06/11/2014 - BA-1872
+                                ElseIf myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                                    ' RUNNING Instruction
+                                    RUNNINGLost = True
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("RUNNING lost !!! [START_TASK_TIMEOUT] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                                    If numRepetitionsSTATE > GlobalBase.MaxRepetitionsTimeout Then
+                                        GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                                        ' Activates Alarm begin
+                                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                        Dim alarmStatus As Boolean = False
+                                        Dim myAlarmList As New List(Of Alarms)
+                                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                                        alarmStatus = True
+                                        ISEAnalyzer.IsTimeOut = True
+
+                                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                        If myAlarmList.Count > 0 Then
+                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                        End If
+                                        ' Activates Alarm end
+
+                                        Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                                        'Update internal flags. Basically used by the running normal business
+                                        If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                            'Update analyzer session flags into DataBase
+                                            If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                            End If
+                                        End If
+
+                                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                    Else
+                                        ' Instruction has not started by Fw, so is need to send it again
+                                        GlobalBase.CreateLogActivity("Repeat STATE Instruction [" & numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                                        InitializeTimerSTATEControl(WAITING_TIME_FAST)
+                                    End If
+
+                                Else
+                                    ' Another Instructions
+                                    ' XB 26/09/2014 - BA-1872
+
+                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                                    If GlobalBase.IsServiceAssembly Then
+                                        ' Set Waiting Timer Current Instruction OFF
+                                        'Me.InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
+                                        sendingRepetitions = True
+                                        ClearQueueToSend()
+                                        numRepetitionsTimeout += 1
+                                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                            waitingStartTaskTimer.Enabled = False
+                                            sendingRepetitions = False
+
+                                            ConnectedAttribute = False
+                                            InfoRefreshFirstTime = True
+                                            UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(ConnectedAttribute), True)
+
+                                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                            Exit Try
+
+                                        Else
+                                            ' Instruction has not started by Fw, so is need to send it again
+                                            'Dim myLogAcciones As New ApplicationLogManager()
+                                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
+                                            myGlobal = SendStartTaskinQueue()
+                                        End If
+                                    End If
+
+                                    Exit Select
+                                    ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+
+                                End If   ' XB 26/09/2014 - BA-1872
 
 
                                 ''''''''''''''''''''
                                 'RECEPTION EVENTS!!!
                                 ''''''''''''''''''''
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
+                            Case AnalyzerManagerSwActionList.STATUS_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.STATUS_RECEIVED
                                 myGlobal = Me.ProcessStatusReceived(pInstructionReceived)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSERR_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSERR_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSERR_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSERR_RECEIVED
                                 myGlobal = Me.ProcessHwAlarmDetailsReceived(pInstructionReceived)
 
                                 'SGM 26/10/2012 - force Auto ANSINF
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If GlobalBase.IsServiceAssembly Then
-                                    MyClass.IsAlarmInfoRequested = False
-                                    If MyClass.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                    IsAlarmInfoRequested = False
+                                    If AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
                                     End If
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED
-                                If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) <> 0 Then
-                                    InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSINF_RECEIVED
+                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) <> 0 Then
+                                    InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSINF_RECEIVED
                                     myGlobal = Me.ProcessInformationStatusReceived(pInstructionReceived)
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.READINGS_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.READINGS_RECEIVED
+                            Case AnalyzerManagerSwActionList.READINGS_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.READINGS_RECEIVED
                                 'AG 27/08/2012 - readings are received in running or when recovery results process is working
                                 'myGlobal = Me.ProcessReadingsReceived(pInstructionReceived)
-                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
+                                If mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
                                     myGlobal = Me.ProcessReadingsReceived(pInstructionReceived)
                                 Else
                                     bufferInstructionsRESULTSRECOVERYProcess.Add(pInstructionReceived)
@@ -3142,8 +3448,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 'AG 18/05/2010 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.BASELINE_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.BASELINE_RECEIVED
+                            Case AnalyzerManagerSwActionList.BASELINE_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.BASELINE_RECEIVED
                                 ' XBC 02/03/2011
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -3158,7 +3464,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'AG 29/10/2014 BA-2062 - Dynamic base line results
                             Case AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
                                 If GlobalBase.IsServiceAssembly Then
 
                                 Else
@@ -3167,9 +3473,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'AG 29/10/2014 BA-2062
 
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSCBR_RECEIVED
                                 Dim myBarCodeRotorTypeRead As String = ""
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSCBR_RECEIVED
                                 myGlobal = Me.ProcessCodeBarInstructionReceived(pInstructionReceived, myBarCodeRotorTypeRead)
 
                                 If Not myGlobal.HasError Then
@@ -3185,7 +3491,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             If myBarcodeRequestDS.barCodeRequests.Rows.Count > 1 Then
                                                 myBarcodeRequestDS.barCodeRequests(0).Delete() 'Remove the 1st row (already sent and with results treated)
                                                 myBarcodeRequestDS.AcceptChanges()
-                                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
+                                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
                                             Else
                                                 myBarcodeRequestDS.Clear()
                                                 BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE 'Barcode free for more work
@@ -3196,7 +3502,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     myGlobal = dlgBarcode.ExistBarcodeCriticalWarnings(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "SAMPLES")
                                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                                         If CType(myGlobal.SetDatos, Boolean) = True Then 'No critical errors ... Sw can send the go to running instruction
-                                                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS, 1, True) 'Samples barcode warnings
+                                                            UpdateSensorValuesAttribute(AnalyzerSensors.BARCODE_WARNINGS, 1, True) 'Samples barcode warnings
                                                         End If
                                                     End If
 
@@ -3213,28 +3519,28 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                                 'TR 03/01/2010 -ISE RESULTS
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
+                            Case AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
                                 'ISEModuleIsReadyAttribute = True 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 - ISE module becomes available again)
 
                                 'AG 27/08/2012 - ISE results are received in running or when recovery results process is working
                                 'If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                 '    myGlobal = Me.ProcessRecivedISEResult(pInstructionReceived)
                                 '    'SGM 07/03/2012
-                                '    myGlobal = MyClass.ProcessISEManagerProcedures
+                                '    myGlobal = ProcessISEManagerProcedures
                                 'End If
 
                                 ' XB 09/01/2014 - Complete a new case for Recover Results Process - Task #1449
                                 ' If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS") Or _
-                                   (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso _
-                                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ResRecoverISE.ToString) = "END") Then
+                                If (mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS") Or _
+                                   (mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso _
+                                    mySessionFlags(AnalyzerManagerFlags.ResRecoverISE.ToString) = "END") Then
                                     ' XB 09/01/2014
 
-                                    If ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                                        myGlobal = Me.ProcessRecivedISEResult(pInstructionReceived)
+                                    If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                                        myGlobal = ProcessRecivedISEResult(pInstructionReceived)
                                         'SGM 07/03/2012
-                                        myGlobal = MyClass.ProcessISEManagerProcedures
+                                        myGlobal = ProcessISEManagerProcedures()
                                     End If
                                 Else
                                     bufferInstructionsRESULTSRECOVERYProcess.Add(pInstructionReceived)
@@ -3244,29 +3550,29 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED
+                            Case AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED
                                 myGlobal = Me.ProcessArmStatusRecived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 30/07/2012 - serial number in running
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSPSN_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSPSN_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSPSN_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSPSN_RECEIVED
                                 myGlobal = Me.ProcessSerialNumberReceived(pInstructionReceived)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED 'AG 31/07/2012
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSTIN_RECEIVED 'AG 31/07/2012 
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSTIN_RECEIVED
                                 'AG 27/08/2012 - readings are received in running or when recovery results process is working
-                                If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString), "INPROCESS", False) <> 0 Then
+                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString), "INPROCESS", False) <> 0 Then
                                     myGlobal = Me.ProcessANSTINInstructionReceived(pInstructionReceived)
                                 Else
                                     bufferInstructionsRESULTSRECOVERYProcess.Add(pInstructionReceived)
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSPRD_RECEIVED  'AG 31/07/2012
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSPRD_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSPRD_RECEIVED  'AG 31/07/2012 
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSPRD_RECEIVED
                                 myGlobal = Me.ProcessANSPRDReceived(pInstructionReceived)
                                 Exit Select
 
@@ -3276,22 +3582,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' 
 
                                 ' XBC 16/11/2010 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND_RECEIVED
+                            Case AnalyzerManagerSwActionList.COMMAND_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.COMMAND_RECEIVED
                                 myGlobal = Me.ProcessFwCommandAnswerReceived(pInstructionReceived)
 
                                 Exit Select
 
                                 ' XBC 16/11/2010 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUSTMENTS_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ADJUSTMENTS_RECEIVED
+                            Case AnalyzerManagerSwActionList.ADJUSTMENTS_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ADJUSTMENTS_RECEIVED
                                 myGlobal = Me.ProcessFwAdjustmentsReceived(pInstructionReceived)
 
                                 Exit Select
 
                                 ' SGM 27/07/2011 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.CYCLES_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.CYCLES_RECEIVED
+                            Case AnalyzerManagerSwActionList.CYCLES_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.CYCLES_RECEIVED
                                 myGlobal = Me.PDT_ProcessHwCyclesReceived(pInstructionReceived)
 
                                 Exit Select
@@ -3311,108 +3617,108 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XBC 17/05/2011 - delete redundant Events replaced using AnalyzerManager.ReceptionEvent
 
                                 ' XBC 22/03/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSSDM
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSSDM
+                            Case AnalyzerManagerSwActionList.ANSSDM
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSSDM
                                 myGlobal = Me.ProcessStressModeReceived_SRV(pInstructionReceived)
                                 Exit Select
 
                                 'XBC 08/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSCPU_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSCPU_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSCPU_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSCPU_RECEIVED
                                 myGlobal = Me.ProcessHwCpuStatusReceived(pInstructionReceived)
                                 Exit Select
 
                                 'SGM 24/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSJEX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSJEX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSJEX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSJEX_RECEIVED
                                 myGlobal = Me.ProcessHwManifoldStatusReceived(pInstructionReceived)
                                 Exit Select
 
                                 'SGM 24/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSSFX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSSFX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSSFX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSSFX_RECEIVED
                                 myGlobal = Me.ProcessHwFluidicsStatusReceived(pInstructionReceived)
                                 Exit Select
 
                                 'SGM 24/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSGLF_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSGLF_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSGLF_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSGLF_RECEIVED
                                 myGlobal = Me.ProcessHwPhotometricsStatusReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFCP_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFCP_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFCP_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFCP_RECEIVED
                                 myGlobal = Me.ProcessFwCPUDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFBX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFBX_RECEIVED
                                 myGlobal = Me.ProcessFwARMDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFDX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFDX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFDX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFDX_RECEIVED
                                 myGlobal = Me.ProcessFwPROBEDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFRX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFRX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFRX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFRX_RECEIVED
                                 myGlobal = Me.ProcessFwROTORDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFGL_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFGL_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFGL_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFGL_RECEIVED
                                 myGlobal = Me.ProcessFwPHOTOMETRICDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFJE_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFJE_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFJE_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFJE_RECEIVED
                                 myGlobal = Me.ProcessFwMANIFOLDDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 ' XBC 02/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFSF_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFSF_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFSF_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFSF_RECEIVED
                                 myGlobal = Me.ProcessFwFLUIDICSDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 'XBC 31/05/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSBXX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSBXX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSBXX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSBXX_RECEIVED
                                 myGlobal = Me.ProcessHwARMDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 'XBC 01/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSDXX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSDXX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSDXX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSDXX_RECEIVED
                                 myGlobal = Me.ProcessHwPROBEDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 'XBC 01/06/2011
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSRXX_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSRXX_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSRXX_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSRXX_RECEIVED
                                 myGlobal = Me.ProcessHwROTORDetailsReceived(pInstructionReceived)
                                 Exit Select
 
                                 'SGM 04/10/2012 -ANSUTIL RECEIVED
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSUTIL_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSUTIL_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSUTIL_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSUTIL_RECEIVED
                                 myGlobal = Me.ProcessANSUTILReceived(pInstructionReceived)
                                 Exit Select
 
                                 'SGM 25/05/2012 -ANSFWU RECEIVED
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFWU_RECEIVED
-                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFWU_RECEIVED
+                            Case AnalyzerManagerSwActionList.ANSFWU_RECEIVED
+                                InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFWU_RECEIVED
                                 myGlobal = Me.ProcessFirmwareUtilReceived(pInstructionReceived)
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                    MyClass.FWUpdateResponseData = CType(myGlobal.SetDatos, FWUpdateResponseTO)
-                                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED, 1, True)
+                                    FWUpdateResponseData = CType(myGlobal.SetDatos, FWUpdateResponseTO)
+                                    UpdateSensorValuesAttribute(AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED, 1, True)
                                 End If
                                 Exit Select
                                 'end SGM 25/05/2012
@@ -3461,18 +3767,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             If pSendingEvent Then
                                 If myGlobal.HasError OrElse Not ConnectedAttribute Then
-                                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
-                                    MyClass.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.NONE
+                                    UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
+                                    InstructionTypeReceived = AnalyzerManagerSwActionList.NONE
                                     ' Set Waiting Timer Current Instruction OFF
                                     ClearQueueToSend()
-                                    RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                    RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                 End If
                             Else
-                                If InstructionTypeReceivedAttribute <> GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED And InstructionTypeReceivedAttribute <> GlobalEnumerates.AnalyzerManagerSwActionList.NONE Then
-                                    If MyClass.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then 'SGM 14/11/2011
+                                If InstructionTypeReceivedAttribute <> AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED And InstructionTypeReceivedAttribute <> AnalyzerManagerSwActionList.NONE Then
+                                    If AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then 'SGM 14/11/2011
                                         If Not ConnectedAttribute Then
                                             ConnectedAttribute = True
-                                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 1, True) 'Prepare UI refresh event when Connected changes
+                                            UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 1, True) 'Prepare UI refresh event when Connected changes
                                         End If
                                     End If
                                 End If
@@ -3483,7 +3789,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'AG 14/10/2011 -check if instruction has been successfully sent
                             If pSendingEvent Then
                                 If myGlobal.HasError OrElse Not ConnectedAttribute Then
-                                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
+                                    UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
                                 End If
                             End If
                             'AG 14/10/2011
@@ -3501,7 +3807,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'AG 27/03/2012
 
                             Dim addText As String = ""
-                            If pAction = GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED Then
+                            If pAction = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED Then
                                 addText = "Time expired!!. "
                             End If
 
@@ -3509,8 +3815,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If GlobalBase.IsServiceAssembly Then
-                                If pAction = GlobalEnumerates.AnalyzerManagerSwActionList.START_TASK_TIMEOUT Then
-                                    addText = GlobalEnumerates.AnalyzerManagerSwActionList.TRYING_CONNECTION.ToString & ". (" & numRepetitionsTimeout.ToString & ") "
+                                If pAction = AnalyzerManagerSwActionList.START_TASK_TIMEOUT Then
+                                    addText = AnalyzerManagerSwActionList.TRYING_CONNECTION.ToString & ". (" & numRepetitionsTimeout.ToString & ") "
                                 End If
 
                                 RaiseEvent SendEvent(addText & InstructionSentAttribute) 'AG 22/02/2012 moved only for service 
@@ -3531,7 +3837,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 '        RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS)
                                 '        eventDataPendingToTriggerFlag = False 'AG 07/10/2011 - inform not exists information in UI_RefreshDS to be send to the event
                                 'End Select
-                                If (Not ConnectedAttribute OrElse pAction = GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT) AndAlso eventDataPendingToTriggerFlag Then
+                                If (Not ConnectedAttribute OrElse pAction = AnalyzerManagerSwActionList.CONNECT) AndAlso eventDataPendingToTriggerFlag Then
                                     RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
                                     'eventDataPendingToTriggerFlag = False 'AG 07/10/2011 - inform not exists information in UI_RefreshDS to be send to the event
                                 End If
@@ -3550,7 +3856,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             ' XB 21/10/2013 - ANSCBR must launch the ReceptionEvent to Presentation also when RUNNING - BT #1334
                             Dim RefreshPresentation As Boolean = False
-                            If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                            If AnalyzerStatusAttribute <> AnalyzerManagerStatus.RUNNING Then
                                 RefreshPresentation = True
                             ElseIf pAction = AnalyzerManagerSwActionList.ANSCBR_RECEIVED Then
                                 RefreshPresentation = True
@@ -3562,8 +3868,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                                 ' XB 30/01/2014 - Refresh Presentation with SCAN Barcode answer instruction - Task #1438
-                            ElseIf AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                                AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED Then
+                            ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso _
+                                AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED Then
                                 RefreshPresentation = True
                                 ' XB 30/01/2014 
                             End If
@@ -3575,7 +3881,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
                                 ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
-                                RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+
+                                If Not sendingRepetitions Then    ' XB 30/09/2014 - BA-1872
+                                    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                End If
 
                                 'AG 12/06/2012 - comment this part. Now the running refresh event is unique and called from wellBaseLineWorker_DoWork
                                 'normal case in RUNNING: only photometric readings instruction received raises event to presentation
@@ -3587,7 +3896,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ElseIf analyzerFREEZEFlagAttribute _
                               AndAlso (String.Equals(analyzerFREEZEModeAttribute, "TOTAL") _
                               OrElse String.Equals(analyzerFREEZEModeAttribute, "RESET")) _
-                              AndAlso AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                              AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
 
                                 'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
                                 ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
@@ -3598,9 +3907,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'TR 03/08/2012 -Validate if the key value is on the dictionary before searching inside
                                 ' XBC 02/08/2012 - when Connecting on RUNNING WS andalso Recovery Results is in process 
                                 'then every instruction received raises event to presentation
-                            ElseIf String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString), "INPROCESS", False) = 0 _
-                                   AndAlso AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING _
-                                   AndAlso (InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED OrElse InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSPSN_RECEIVED) Then
+                            ElseIf String.Compare(mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString), "INPROCESS", False) = 0 _
+                                   AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING _
+                                   AndAlso (InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.STATUS_RECEIVED OrElse InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSPSN_RECEIVED) Then
 
                                 'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
                                 ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
@@ -3615,14 +3924,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             'AG 17/04/2012 - Remove from IF the following condition "...AndAlso Not analyzerFREEZEFlagAttribute ..."
                             'XB 09/12/2013 - Add condition  mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" - Task #1429
                             'Debug.Print("RUNNINGprocess [" & mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess.ToString) & "]")
-                            If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+                            If AnalyzerStatusAttribute <> AnalyzerManagerStatus.RUNNING AndAlso _
                                 AnalyzerIsReadyAttribute AndAlso myInstructionsQueue.Count > 0 AndAlso _
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
-                                Dim queuedAction As New GlobalEnumerates.AnalyzerManagerSwActionList
+                                mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
+                                Dim queuedAction As New AnalyzerManagerSwActionList
                                 Dim queuedParam As Object
                                 queuedAction = Me.GetFirstFromQueue
                                 queuedParam = Me.GetFirstParametersFromQueue
-                                If queuedAction <> GlobalEnumerates.AnalyzerManagerSwActionList.NONE Then
+                                If queuedAction <> AnalyzerManagerSwActionList.NONE Then
                                     If queuedParam Is Nothing Then
                                         myGlobal = ManageAnalyzer(queuedAction, True)
                                     Else
@@ -3642,22 +3951,22 @@ Namespace Biosystems.Ax00.Core.Entities
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
-                        MyClass.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.NONE
+                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
+                        InstructionTypeReceived = AnalyzerManagerSwActionList.NONE
                         ' Set Waiting Timer Current Instruction OFF
                         ClearQueueToSend()
-                        RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.NO_THREADS.ToString)
+                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.NO_THREADS.ToString)
                     End If
                     'SGM 17/11/2011
                 End If
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3667,10 +3976,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Remove any instruction from the queue
         ''' </summary>
         ''' <remarks>Created by XB 06/11/2013</remarks>
-        Public Sub RemoveItemFromQueue(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList) Implements IAnalyzerEntity.RemoveItemFromQueue
+        Public Sub RemoveItemFromQueue(ByVal pAction As AnalyzerManagerSwActionList) Implements IAnalyzerManager.RemoveItemFromQueue
             Try
                 Dim j As Integer = -1
-                For Each A As GlobalEnumerates.AnalyzerManagerSwActionList In myInstructionsQueue
+                For Each A As AnalyzerManagerSwActionList In myInstructionsQueue
                     If A = pAction Then
                         j = myInstructionsQueue.IndexOf(A)
                         Exit For
@@ -3684,8 +3993,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveItemFromQueue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveItemFromQueue", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -3695,22 +4004,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by AG 29/10/2010</remarks>
-        Public Function ClearQueueToSend() As GlobalDataTO Implements IAnalyzerEntity.ClearQueueToSend
+        Public Function ClearQueueToSend() As GlobalDataTO Implements IAnalyzerManager.ClearQueueToSend
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Me.InitializeTimerControl(WAITING_TIME_OFF)
+                InitializeTimerControl(WAITING_TIME_OFF)
                 myInstructionsQueue.Clear()
                 myParamsQueue.Clear()   ' XBC 24/05/2011
                 AnalyzerIsReadyAttribute = True
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ClearQueueToSend", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ClearQueueToSend", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3723,14 +4032,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInstruction"></param>
         ''' <returns>Boolean</returns>
         ''' <remarks>AG 26/03/2012 - creation</remarks>
-        Public Function QueueContains(ByVal pInstruction As GlobalEnumerates.AnalyzerManagerSwActionList) As Boolean Implements IAnalyzerEntity.QueueContains
+        Public Function QueueContains(ByVal pInstruction As AnalyzerManagerSwActionList) As Boolean Implements IAnalyzerManager.QueueContains
             Dim returnValue As Boolean = False
             Try
                 returnValue = myInstructionsQueue.Contains(pInstruction)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.QueueContains", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.QueueContains", EventLogEntryType.Error, False)
                 returnValue = False
             End Try
             Return returnValue
@@ -3741,18 +4050,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Scripts</returns>
         ''' <remarks>Created by XBC 08/11/2010</remarks>
-        Public Function ReadFwScriptData() As GlobalDataTO Implements IAnalyzerEntity.ReadFwScriptData
+        Public Function ReadFwScriptData() As GlobalDataTO Implements IAnalyzerManager.ReadFwScriptData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadFwScriptData()
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadFwScriptList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadFwScriptList", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3764,7 +4073,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SG 24/11/10</remarks>
-        Public Function LoadAppFwScriptsData() As GlobalDataTO Implements IAnalyzerEntity.LoadAppFwScriptsData
+        Public Function LoadAppFwScriptsData() As GlobalDataTO Implements IAnalyzerManager.LoadAppFwScriptsData
             Dim myGlobal As New GlobalDataTO
             Try
 
@@ -3772,11 +4081,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.LoadAppFwScriptsData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.LoadAppFwScriptsData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3790,18 +4099,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by XBC : 30/09/2011 - Add Master data feature
         ''' Modified by SGM : 24/11/2011 - Get Master data from resources if SimulationMode
         ''' </remarks>
-        Public Function LoadFwAdjustmentsMasterData(Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.LoadFwAdjustmentsMasterData
+        Public Function LoadFwAdjustmentsMasterData(Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.LoadFwAdjustmentsMasterData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.LoadFwAdjustmentsMasterData("MasterData", pSimulationMode)
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3811,18 +4120,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>DS with FW Adjustments</returns>
         ''' <remarks>Created by SG 26/01/11</remarks>
-        Public Function ReadFwAdjustmentsDS() As GlobalDataTO Implements IAnalyzerEntity.ReadFwAdjustmentsDS
+        Public Function ReadFwAdjustmentsDS() As GlobalDataTO Implements IAnalyzerManager.ReadFwAdjustmentsDS
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadFwAdjustmentsDS
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3831,15 +4140,15 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Updates FW Adjustments DS
         ''' </summary>
         ''' <remarks>Created by SG 26/01/11</remarks>
-        Public Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDS As SRVAdjustmentsDS) As GlobalDataTO Implements IAnalyzerEntity.UpdateFwAdjustmentsDS
+        Public Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDS As SRVAdjustmentsDS) As GlobalDataTO Implements IAnalyzerManager.UpdateFwAdjustmentsDS
             Dim myGlobal As New GlobalDataTO
             Try
                 If pAdjustmentsDS IsNot Nothing Then
 
                     'SGM 05/12/2011
-                    pAdjustmentsDS.AnalyzerModel = MyClass.myAnalyzerModel
-                    pAdjustmentsDS.AnalyzerID = MyClass.ActiveAnalyzer
-                    pAdjustmentsDS.FirmwareVersion = MyClass.FwVersionAttribute
+                    pAdjustmentsDS.AnalyzerModel = myAnalyzerModel
+                    pAdjustmentsDS.AnalyzerID = ActiveAnalyzer
+                    pAdjustmentsDS.FirmwareVersion = FwVersionAttribute
                     pAdjustmentsDS.ReadedDatetime = DateTime.Now
                     'end SGM 05/12/2011
 
@@ -3849,10 +4158,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateFwAdjustmentsDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3873,8 +4182,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.LoadFwSensorsMasterData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.LoadFwSensorsMasterData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -3895,8 +4204,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetGlobalSensorsMasterData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetGlobalSensorsMasterData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -3945,8 +4254,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadSensorsData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadSensorsData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -3957,18 +4266,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Photometry</returns>
         ''' <remarks>Created by XBC 28/02/2011</remarks>
-        Public Function ReadPhotometryData() As GlobalDataTO Implements IAnalyzerEntity.ReadPhotometryData
+        Public Function ReadPhotometryData() As GlobalDataTO Implements IAnalyzerManager.ReadPhotometryData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadPhotometryData()
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadPhotometryData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadPhotometryData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3980,18 +4289,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pPhotometryData">GlobalDataTo with the data of the Photometry</param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 02/03/2011</remarks>
-        Public Function SetPhotometryData(ByVal pPhotometryData As PhotometryDataTO) As GlobalDataTO Implements IAnalyzerEntity.SetPhotometryData
+        Public Function SetPhotometryData(ByVal pPhotometryData As PhotometryDataTO) As GlobalDataTO Implements IAnalyzerManager.SetPhotometryData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.SetPhotometryData(pPhotometryData)
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SetPhotometryData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetPhotometryData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4001,18 +4310,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Stress Mode</returns>
         ''' <remarks>Created by XBC 22/03/2011</remarks>
-        Public Function ReadStressModeData() As GlobalDataTO Implements IAnalyzerEntity.ReadStressModeData
+        Public Function ReadStressModeData() As GlobalDataTO Implements IAnalyzerManager.ReadStressModeData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadStressModeData()
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadStressModeData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadStressModeData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4024,18 +4333,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pStressModeData">GlobalDataTo with the data of the Stress Mode</param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 22/03/2011</remarks>
-        Public Function SetStressModeData(ByVal pStressModeData As StressDataTO) As GlobalDataTO Implements IAnalyzerEntity.SetStressModeData
+        Public Function SetStressModeData(ByVal pStressModeData As StressDataTO) As GlobalDataTO Implements IAnalyzerManager.SetStressModeData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.SetStressModeData(pStressModeData)
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SetStressModeData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetStressModeData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4055,8 +4364,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetAbsorbanceScanData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetAbsorbanceScanData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -4067,18 +4376,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Optic centering</returns>
         ''' <remarks>Created by XBC 12/05/2011</remarks>
-        Public Function ReadOpticCenterData() As GlobalDataTO Implements IAnalyzerEntity.ReadOpticCenterData
+        Public Function ReadOpticCenterData() As GlobalDataTO Implements IAnalyzerManager.ReadOpticCenterData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal.SetDatos = Me.OpticCenterResultsAttr
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadOpticCenterData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadOpticCenterData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4088,8 +4397,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' USB connection cable has been disconnected and presentation inform this to AnalyzerManager class
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Modified by XBC 06/09/2012 - Add new parameter pConnectionCompleted</remarks>
-        Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.ProcessUSBCableDisconnection
+        ''' <remarks>
+        ''' Modified by XB 06/09/2012 - Add new parameter pConnectionCompleted
+        '''             XB 06/11/2014 - ISE Timeout management - BA-1872
+        ''' </remarks>
+        Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.ProcessUSBCableDisconnection
             Dim myGlobal As New GlobalDataTO
             Try
                 ConnectedAttribute = False
@@ -4097,9 +4409,17 @@ Namespace Biosystems.Ax00.Core.Entities
                 ' XBC 16/01/2013 - Prepare ISE Object to reset it after a disconnection communications (Bugs tracking #1109)
                 If Not ISEAnalyzer Is Nothing Then
                     ISEAnalyzer.IsAnalyzerDisconnected = True
-                    MyClass.ISEAlreadyStarted = False
+                    ISEAlreadyStarted = False
                 End If
                 ' XBC 16/01/2013
+
+                ' XB 06/11/2014 - BA-1872
+                ISECMDLost = False
+                RUNNINGLost = False
+                sendingRepetitions = False
+                InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                ClearStartTaskQueueToSend()
+                ' XB 06/11/2014 - BA-1872
 
                 ' XBC 26/10/2011
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -4108,7 +4428,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ' Set Waiting Timer Current Instruction OFF
                     SensorValuesAttribute.Clear() 'SGM 08/11/2012
                     ClearQueueToSend()
-                    RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                    RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                 End If
                 ' XBC 26/10/2011
 
@@ -4124,18 +4444,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 'So we only update the sensor and the presentation method is who shows the message and add alarm into database
 
                 'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True)'AG 10/02/2012
-                If Not SensorValuesAttribute.ContainsKey(GlobalEnumerates.AnalyzerSensors.CONNECTED) Then
-                    SensorValuesAttribute.Add(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0)
+                If Not SensorValuesAttribute.ContainsKey(AnalyzerSensors.CONNECTED) Then
+                    SensorValuesAttribute.Add(AnalyzerSensors.CONNECTED, 0)
                 Else
-                    SensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED) = 0
+                    SensorValuesAttribute(AnalyzerSensors.CONNECTED) = 0
                 End If
                 'AG 13/02/2012
 
                 ' XBC 06/09/2012
                 Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS 'AG 09/09/2013
-                If pConnectionCompleted AndAlso String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) = 0 Then
+                If pConnectionCompleted AndAlso String.Compare(mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) = 0 Then
                     'Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS 'AG 09/09/2013
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
 
                     ''AG 09/09/2013 'Update analyzer session flags into DataBase
                     'If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
@@ -4164,11 +4484,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessUSBCableDisconnection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessUSBCableDisconnection", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4179,22 +4499,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <param name="pForceEndSound">Force End Sound.</param>
         ''' <remarks>create by: TR 28/10/2011</remarks>
-        Public Function StopAnalyzerRinging(Optional ByVal pForceEndSound As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.StopAnalyzerRinging
+        Public Function StopAnalyzerRinging(Optional ByVal pForceEndSound As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.StopAnalyzerRinging
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 'Send the sound off only when is ringing
                 If ConnectedAttribute AndAlso (AnalyzerIsRingingAttribute OrElse pForceEndSound) Then
-                    myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True)
-                    System.Threading.Thread.Sleep(500)
+                    myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.ENDSOUND, True)
+                    Thread.Sleep(500)
                 End If
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.StopAnalyzerRinging", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StopAnalyzerRinging", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -4205,7 +4525,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pForceSound"></param>
         ''' <returns></returns>
         ''' <remarks>AG 22/07/2013 - based and adapted from StopAnalyzerRinging</remarks>
-        Public Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.StartAnalyzerRinging
+        Public Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.StartAnalyzerRinging
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 'Check the alarm sound setting is not disabled
@@ -4215,19 +4535,19 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
                         'Send the sound ON only when analyzer is not still ringing
                         If ConnectedAttribute AndAlso (Not AnalyzerIsRingingAttribute OrElse pForceSound) Then
-                            myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
-                            System.Threading.Thread.Sleep(500)
+                            myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
+                            Thread.Sleep(500)
                         End If
                     End If
                 End If
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.StartAnalyzerRinging", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StartAnalyzerRinging", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -4237,23 +4557,23 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/07/2012</remarks>
-        Public Function StopAnalyzerInfo() As GlobalDataTO Implements IAnalyzerEntity.StopAnalyzerInfo
+        Public Function StopAnalyzerInfo() As GlobalDataTO Implements IAnalyzerManager.StopAnalyzerInfo
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 If ConnectedAttribute AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                    myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+                    myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, _
                                                              True, _
                                                              Nothing, _
-                                                             GlobalEnumerates.Ax00InfoInstructionModes.STP)
+                                                             Ax00InfoInstructionModes.STP)
                 End If
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.StopAnalyzerInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StopAnalyzerInfo", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -4272,7 +4592,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAdjust"></param>
         ''' <returns>String with the adjust value (String due this field is saved as nvarchar into database</returns>
         ''' <remarks>Created by AG 23 11 2011</remarks>
-        Public Function ReadAdjustValue(ByVal pAdjust As GlobalEnumerates.Ax00Adjustsments) As String Implements IAnalyzerEntity.ReadAdjustValue
+        Public Function ReadAdjustValue(ByVal pAdjust As Ax00Adjustsments) As String Implements IAnalyzerManager.ReadAdjustValue
             Dim myGlobal As New GlobalDataTO
             Dim returnValue As String = ""
 
@@ -4311,14 +4631,14 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                                           Status is Running. This is to allow block/unblock Executions when elements have been positioned/unpositioned 
         '''                                           during the Pause
         ''' </remarks>
-        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO Implements IAnalyzerEntity.ManageBarCodeRequestBeforeRUNNING
+        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO Implements IAnalyzerManager.ManageBarCodeRequestBeforeRUNNING
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -4330,7 +4650,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             readBarCodeBeforeRunningPerformedFlag = False
 
                             Dim usSettingsDelg As New UserSettingsDelegate
-                            resultData = usSettingsDelg.GetCurrentValueBySettingID(dbConnection, GlobalEnumerates.UserSettingsEnum.BARCODE_BEFORE_START_WS.ToString())
+                            resultData = usSettingsDelg.GetCurrentValueBySettingID(dbConnection, UserSettingsEnum.BARCODE_BEFORE_START_WS.ToString())
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
                                 Dim barcodeReadBeforeRunningFlag As Boolean = CType(resultData.SetDatos, Boolean)
 
@@ -4346,12 +4666,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Else
                                     'BARCODE_BEFORE_START_WS active
                                     '1st) If Reagents Barcode is active -> send a request for full Reagents Rotor scanning
-                                    Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+                                    Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
                                     If (Not barcodeDisabled) Then
                                         BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING
                                     Else
                                         '2nd) If Samples Barcode is active -> send a request for full Samples Rotor scanning
-                                        barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                                        barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                                         If (Not barcodeDisabled) Then
                                             BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                         Else
@@ -4365,7 +4685,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'After receive Reagents Barcode results, evaluate if Samples Barcode is active
                             'If Samples Barcode is active -> send a request for full Samples Rotor scanning
                             readBarCodeBeforeRunningPerformedFlag = True
-                            Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                            Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                             If (Not samplesBarcodeDisabled) Then
                                 BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                             Else
@@ -4395,16 +4715,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                                     With rowBarCode
                                         .RotorType = rotorType
-                                        .Action = GlobalEnumerates.Ax00CodeBarAction.FULL_ROTOR
+                                        .Action = Ax00CodeBarAction.FULL_ROTOR
                                         .Position = 0
                                     End With
                                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                                     BarCodeDS.AcceptChanges()
 
-                                    resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
+                                    resultData = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
 
                                     If (Not resultData.HasError AndAlso ConnectedAttribute) Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess, "INPROCESS")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BarcodeSTARTWSProcess, "INPROCESS")
                                         SetAnalyzerNotReady()
                                     End If
 
@@ -4417,7 +4737,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim dlgBarcode As New BarcodeWSDelegate
                                     resultData = dlgBarcode.ExistBarcodeCriticalWarnings(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "SAMPLES")
                                     If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess, "CLOSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BarcodeSTARTWSProcess, "CLOSED")
 
                                         'AG 12/07/2013 - Special case for automate the WS creation with LIS (force the HQ monitor screen to be open)
                                         'AG 01/04/2014 - #1565 add also FORCE_ENTER_RUNNING_AUTO_WS_CREATION
@@ -4450,8 +4770,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     'AG 31/03/2014 - #1565 add trace + inform the real analyzer status!!
                                                     'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, False, -1, _
                                                     'String.Empty, iseModuleReady)
-                                                    Dim myLogAcciones As New ApplicationLogManager()
-                                                    myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Information, False)
+                                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                                    GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Information, False)
 
                                                     'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (runningMode + new parameter AllowScanInRunning)
                                                     'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
@@ -4460,7 +4780,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     ''Create the Executions
                                                     'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
                                                     '                                                String.Empty, iseModuleReady)
-                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING)
 
                                                     'Create the Executions
                                                     resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
@@ -4472,7 +4792,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                                 If (Not resultData.HasError) Then
                                                     'Prepare UI for refresh Presentation layer screen (first execution)
-                                                    resultData = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, 1, 0, Nothing, False)
+                                                    resultData = PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.EXECUTION_STATUS, 1, 0, Nothing, False)
 
                                                     Dim execucionsCount As Integer = 0
                                                     Dim pendingExecutionsLeft As Boolean = False
@@ -4523,12 +4843,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 Dim iseAutoConditioning As Boolean = False
 
                                                 If (iseAutoConditioning) Then
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess, "INPROCESS")
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "")
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "")
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEConditioningProcess, "INPROCESS")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "")
                                                 Else
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
                                                 End If
 
                                                 If (Not resultData.HasError) Then
@@ -4537,14 +4857,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Else
                                                 'Do not use resultData for not lose error if exists
                                                 Dim resultDataAux As New GlobalDataTO
-                                                resultDataAux = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True)    'Running can not be sent. Ask for status for reactivate UI
+                                                resultDataAux = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)    'Running can not be sent. Ask for status for reactivate UI
 
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS, 2, True)     'Not pending executions to be sent
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due scan barcode warnings
+                                                UpdateSensorValuesAttribute(AnalyzerSensors.BARCODE_WARNINGS, 2, True)     'Not pending executions to be sent
+                                                UpdateSensorValuesAttribute(AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due scan barcode warnings
                                             End If
                                         Else
-                                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS, 1, True)     'Samples barcode warnings
-                                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due scan barcode warnings
+                                            UpdateSensorValuesAttribute(AnalyzerSensors.BARCODE_WARNINGS, 1, True)     'Samples barcode warnings
+                                            UpdateSensorValuesAttribute(AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due scan barcode warnings
                                         End If
                                     End If
                             End Select
@@ -4559,11 +4879,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4578,7 +4898,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>AG 20/02/2012</remarks>
         ''' Modified by: JV 23/01/2014 #1467
-        Public Function ExistBottleAlarms() As Boolean Implements IAnalyzerEntity.ExistBottleAlarms
+        Public Function ExistBottleAlarms() As Boolean Implements IAnalyzerManager.ExistBottleAlarms
             Dim returnValue As Boolean = False
             Try
                 'JV 23/01/2014 #1467
@@ -4611,8 +4931,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 'JV 23/01/2014 #1467
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ExistBottleAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistBottleAlarms", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -4626,24 +4946,24 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC : 11/06/2012
         ''' Modified by XB : 12/11/2013 - Allow Sw Service the full functionality about WorkSession - BT #169 SERVICE
         ''' </remarks>
-        Public Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.ProcessUpdateWSByAnalyzerID
+        Public Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.ProcessUpdateWSByAnalyzerID
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 Dim myWSAnalyzerID As String = ""
 
                 ' open db transaction
                 myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(myGlobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         ' Insert (if not exists) the Analyzer identifier connected
-                        Dim myLogAccionesAux As New ApplicationLogManager()
-                        myLogAccionesAux.CreateLogActivity("(Analyzer Change) Insert Connect Analyzer ", "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
+                        'Dim myLogAccionesAux As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("(Analyzer Change) Insert Connect Analyzer ", "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
 
-                        myGlobal = MyClass.InsertConnectedAnalyzer(dbConnection)
+                        myGlobal = InsertConnectedAnalyzer(dbConnection)
 
                         ' XBC 06/07/2012
                         ' Initialize Adjustments
@@ -4669,12 +4989,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                     WorkSessionStatusAttribute = myWSAnalyzersDS.twksWSAnalyzers(0).WSStatus
                                     myWSAnalyzerID = myWSAnalyzersDS.twksWSAnalyzers(0).AnalyzerID
 
-                                    Dim myLogAcciones As New ApplicationLogManager()
+                                    'Dim myLogAcciones As New ApplicationLogManager()
                                     Select Case WorkSessionStatusAttribute
 
                                         Case "EMPTY"
                                             If Not String.Compare(myWSAnalyzerID, ActiveAnalyzer, False) = 0 Then
-                                                myLogAcciones.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
+                                                GlobalBase.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
                                                 ' Update field AnalyzerID in table Analyzers WS
                                                 myGlobal = myWSAnalyzersDelegate.UpdateWSAnalyzerID(dbConnection, ActiveAnalyzer, ActiveWorkSession)
                                                 If Not myGlobal.HasError Then
@@ -4693,7 +5013,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         Case "OPEN"
                                             If Not String.Compare(myWSAnalyzerID, ActiveAnalyzer, False) = 0 Then
-                                                myLogAcciones.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
+                                                GlobalBase.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
                                                 ' Update field AnalyzerID in table Analyzers WS
                                                 myGlobal = myWSAnalyzersDelegate.UpdateWSAnalyzerID(dbConnection, ActiveAnalyzer, ActiveWorkSession)
                                                 If Not myGlobal.HasError Then
@@ -4718,15 +5038,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         Case "PENDING"
                                             If Not myWSAnalyzerID = ActiveAnalyzer Then
-                                                myLogAcciones.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
-                                                myGlobal = MyClass.ProcessToMountTheNewSession(dbConnection, myWSAnalyzerID)
+                                                GlobalBase.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
+                                                myGlobal = ProcessToMountTheNewSession(dbConnection, myWSAnalyzerID)
 
                                                 ' XBC 06/07/2012
                                                 If Not myGlobal.HasError Then
                                                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
 
-                                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, GlobalEnumerates.Ax00Adjustsments.ALL)
+                                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.READADJ, True, Nothing, Ax00Adjustsments.ALL)
 
                                                     If Not myGlobal.HasError AndAlso myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                                                         Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
@@ -4738,16 +5058,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         Case Else
                                             If Not myWSAnalyzerID = ActiveAnalyzer Then
-                                                myLogAcciones.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
-                                                myGlobal = MyClass.ProcessToMountTheNewSession(dbConnection, myWSAnalyzerID)
+                                                GlobalBase.CreateLogActivity("Change AnalyzerID : case " & WorkSessionStatusAttribute, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Information, False)
+                                                myGlobal = ProcessToMountTheNewSession(dbConnection, myWSAnalyzerID)
                                                 ForceAbortSessionAttr = True
 
                                                 ' XBC 06/07/2012
                                                 If Not myGlobal.HasError Then
                                                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
+                                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
 
-                                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, GlobalEnumerates.Ax00Adjustsments.ALL)
+                                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.READADJ, True, Nothing, Ax00Adjustsments.ALL)
 
                                                     If Not myGlobal.HasError AndAlso myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                                                         Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
@@ -4795,11 +5115,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4817,7 +5137,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  XBC 12/06/2012
         ''' Modified by: XBC 25/04/2013 - Add value = FALSE for the new optional pSaveLISPendingOrders parameter to indicate that the process to Save the LIS orders not processed Is NOT required
         ''' </remarks>
-        Public Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO Implements IAnalyzerEntity.ProcessToMountTheNewSession
+        Public Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO Implements IAnalyzerManager.ProcessToMountTheNewSession
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -4842,7 +5162,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         myGlobal = myWSDelegate.ResetWSNEW(pDBConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     End If
-                    If (Not myGlobal.HasError) Then MyClass.ResetWorkSession()
+                    If (Not myGlobal.HasError) Then ResetWorkSession()
                 End If
 
                 If (Not myGlobal.HasError) Then
@@ -4878,11 +5198,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessToMountTheNewSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessToMountTheNewSession", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4893,32 +5213,32 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 13/06/2012</remarks>
-        Public Function InsertConnectedAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.InsertConnectedAnalyzer
+        Public Function InsertConnectedAnalyzer(ByVal pDBConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.InsertConnectedAnalyzer
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myLogAccionesAux As New ApplicationLogManager()
+                'Dim myLogAccionesAux As New ApplicationLogManager()
                 If Not myTmpConnectedAnalyzerDS Is Nothing Then
 
-                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) 1st condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) 1st condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                     If myTmpConnectedAnalyzerDS.tcfgAnalyzers.Count > 0 Then
-                        myLogAccionesAux.CreateLogActivity("(Analyzer Change) 2nd condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("(Analyzer Change) 2nd condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                         If Not myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).IsIsNewNull Then
-                            myLogAccionesAux.CreateLogActivity("(Analyzer Change) 3rd condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("(Analyzer Change) 3rd condition ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                             If myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).IsNew Then
                                 Dim confAnalyzers As New AnalyzersDelegate
-                                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Insert Analyzer ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("(Analyzer Change) Insert Analyzer ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                                 myGlobal = confAnalyzers.InsertAnalyzer(pDBConnection, myTmpConnectedAnalyzerDS.tcfgAnalyzers(0))
 
                                 If Not myGlobal.HasError Then
-                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Copy Analyzer Settings ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
-                                    MyClass.CopyAnalyzerSettings(pDBConnection, myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID)
-                                    MyClass.ActiveAnalyzer = myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID
-                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Active Analyzer OK [" & MyClass.ActiveAnalyzer & "] ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Copy Analyzer Settings ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                                    CopyAnalyzerSettings(pDBConnection, myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID)
+                                    ActiveAnalyzer = myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Active Analyzer OK [" & ActiveAnalyzer & "] ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                                 End If
                             End If
                         Else
-                            MyClass.ActiveAnalyzer = myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID
-                            myLogAccionesAux.CreateLogActivity("(Analyzer Change) Active Analyzer [" & MyClass.ActiveAnalyzer & "] ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
+                            ActiveAnalyzer = myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID
+                            GlobalBase.CreateLogActivity("(Analyzer Change) Active Analyzer [" & ActiveAnalyzer & "] ", "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Information, False)
                         End If
 
                     End If
@@ -4926,11 +5246,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InsertConnectedAnalyzer", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4941,21 +5261,21 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 06/07/2012</remarks>
-        Public Function ReadAdjustments(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.ReadAdjustments
+        Public Function ReadAdjustments(ByVal pDBConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.ReadAdjustments
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 ' open db transaction
                 myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(myGlobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
+                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
 
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, GlobalEnumerates.Ax00Adjustsments.ALL)
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.READADJ, True, Nothing, Ax00Adjustsments.ALL)
 
                         If Not myGlobal.HasError AndAlso myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                             Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
@@ -4978,11 +5298,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadAdjustments", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadAdjustments", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4993,7 +5313,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Remove the DS with information with the results automatically exported
         ''' </summary>
         ''' <remarks>AG 02/04/2013 - Creation</remarks>
-        Public Sub ClearLastExportedResults() Implements IAnalyzerEntity.ClearLastExportedResults
+        Public Sub ClearLastExportedResults() Implements IAnalyzerManager.ClearLastExportedResults
             SyncLock lockThis
                 lastExportedResultsDSAttribute.Clear()
             End SyncLock
@@ -5008,7 +5328,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 29/05/2012 - when analyzer is FREEZE software can not send the START instruction (added to IF)
         ''' AG 19/06/2012 - add CLOT_DETECTION_ERR alarm
         ''' AG 21/10/2013 - Method moved from MDI.ExistSomeAlarmThatRequiresSendENDRUN to analyzer manager class and adapted (remove parameter pCurrentAlarmList and use attribute myAlarmListAttribute) </remarks>
-        Public Function ExistSomeAlarmThatRequiresStopWS() As Boolean Implements IAnalyzerEntity.ExistSomeAlarmThatRequiresStopWS
+        Public Function ExistSomeAlarmThatRequiresStopWS() As Boolean Implements IAnalyzerManager.ExistSomeAlarmThatRequiresStopWS
             Dim returnValue As Boolean = False
             Try
                 If myAlarmListAttribute.Count > 0 Then
@@ -5028,8 +5348,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ExistSomeAlarmThatRequiresStopWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistSomeAlarmThatRequiresStopWS", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -5046,13 +5366,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInitialWell"></param>
         ''' <returns></returns>
         ''' <remarks>AG 20/11/2014 BA-2065</remarks>
-        Public Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IAnalyzerEntity.ProcessDynamicBaseLine
+        Public Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IAnalyzerManager.ProcessDynamicBaseLine
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = BaseLine.ControlDynamicBaseLine(pDBConnection, pWorkSessionID, pInitialWell)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessDynamicBaseLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessDynamicBaseLine", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function

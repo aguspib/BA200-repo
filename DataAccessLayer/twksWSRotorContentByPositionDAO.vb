@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksWSRotorContentByPositionDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 
@@ -105,8 +105,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If twksWSRotorContentByPositionDR("TS_USER") Is DBNull.Value Then
-                            Dim myGlobalBase As New GlobalBase
-                            values &= " N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
+                            'Dim myGlobalbase As New GlobalBase
+                            values &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                         Else
                             values &= " N'" & twksWSRotorContentByPositionDR("TS_User").ToString().Replace("'", "''") & "', "
                         End If
@@ -121,8 +121,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                             If twksWSRotorContentByPositionDR("RotorType").ToString() = "REAGENTS" Then
                                 If Not twksWSRotorContentByPositionDR("Status") Is DBNull.Value Then
                                     If Not twksWSRotorContentByPositionDR("Status").ToString() = "FREE" Then
-                                        Dim myLogAccionesAux As New ApplicationLogManager()
-                                        myLogAccionesAux.CreateLogActivity("A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
+                                        'Dim myLogAccionesAux As New ApplicationLogManager()
+                                        GlobalBase.CreateLogActivity("A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
                                     End If
                                 End If
                             End If
@@ -137,8 +137,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -187,8 +187,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -247,8 +247,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Read", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -302,8 +302,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -356,8 +356,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDList", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -413,8 +413,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -518,8 +518,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         values &= "TS_User = "
                         If twksWSRotorContentByPositionDR.IsTS_UserNull Then
-                            Dim myGlobalBase As New GlobalBase
-                            values &= " N'" & myGlobalBase.GetSessionInfo().UserName & "', "
+                            'Dim myGlobalbase As New GlobalBase
+                            values &= " N'" & GlobalBase.GetSessionInfo().UserName & "', "
                         Else
                             values &= " N'" & twksWSRotorContentByPositionDR.TS_User.ToString().Replace("'", "''") & "',"
                         End If
@@ -553,8 +553,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -593,8 +593,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -649,8 +649,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionByStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -708,8 +708,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionedReagentsBottlesByElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionedReagentsBottlesByElementID", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -767,8 +767,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistBarcodeInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistBarcodeInfo", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -824,8 +824,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistOtherPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistOtherPosition", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -860,6 +860,29 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.WorkSessionID, RCP.RotorType, RCP.CellNumber, " & vbCrLf & _
+                        '                              " (CASE WHEN RE.PatientID IS NULL THEN RE.SampleID ELSE RE.PatientID END) AS ExternalPID, " & vbCrLf & _
+                        '                              "  RE.SampleType, REOT.StatFlag, NULL AS PatientID, 1 AS CompletedFlag, 0 AS NotSampleType, " & vbCrLf & _
+                        '                              "  'COMPLETED' AS LISStatus, RCP.BarCodeInfo, NULL AS MessageID, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
+                        '                        " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSRequiredElements RE ON RCP.ElementID = RE.ElementID " & vbCrLf & _
+                        '                                                                                                    " AND RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
+                        '                                                                                                    " AND RE.TubeContent = 'PATIENT' " & vbCrLf & _
+                        '                                                                " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                        '                                                                " INNER JOIN twksWSAnalyzers WSA ON RCP.AnalyzerID    = WSA.AnalyzerID " & vbCrLf & _
+                        '                                                                                              " AND RCP.WorkSessionID = WSA.WorkSessionID " & vbCrLf & _
+                        '                        " WHERE  RCP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                        " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                        " AND    RCP.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                        '                        " AND   (RCP.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
+                        '                        " AND    RCP.BarcodeInfo IN (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
+                        '                                                   " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                                   " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                                   " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                                                   " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                        '                                                   " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf
+
                         Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.WorkSessionID, RCP.RotorType, RCP.CellNumber, " & vbCrLf & _
                                                       " (CASE WHEN RE.PatientID IS NULL THEN RE.SampleID ELSE RE.PatientID END) AS ExternalPID, " & vbCrLf & _
                                                       "  RE.SampleType, REOT.StatFlag, NULL AS PatientID, 1 AS CompletedFlag, 0 AS NotSampleType, " & vbCrLf & _
@@ -875,14 +898,32 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
                                                 " AND    RCP.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
                                                 " AND   (RCP.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
-                                                " AND    RCP.BarcodeInfo IN (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
-                                                                           " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                                           " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                           " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                           " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
-                                                                           " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf
+                                                " AND    EXISTS (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
+                                                                " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                                " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                                " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
+                                                                " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                                                                " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
+                                                                " AND    RCP.BarcodeInfo = RC.BarcodeInfo " & vbCrLf
 
                         If (pExcludeDuplicates) Then cmdText &= " GROUP BY RC.BarcodeInfo HAVING COUNT(*) = 1 " & vbCrLf
+                        'AJG
+                        'cmdText &= " ) UNION " & vbCrLf & _
+                        '           " SELECT BPW.*, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
+                        '           " FROM   twksWSBarcodePositionsWithNoRequests BPW INNER JOIN twksWSRotorContentByPosition RCP ON BPW.AnalyzerID    = RCP.AnalyzerID " & vbCrLf & _
+                        '                                                                                                      " AND BPW.WorkSessionID = RCP.WorkSessionID " & vbCrLf & _
+                        '                                                                                                      " AND BPW.RotorType     = RCP.RotorType " & vbCrLf & _
+                        '                                                                                                      " AND BPW.CellNumber    = RCP.CellNumber " & vbCrLf & _
+                        '                                                           " INNER JOIN twksWSAnalyzers WSA ON BPW.AnalyzerID    = WSA.AnalyzerID " & vbCrLf & _
+                        '                                                                                         " AND BPW.WorkSessionID = WSA.WorkSessionID " & vbCrLf & _
+                        '           " WHERE  BPW.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '           " AND    BPW.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '           " AND    BPW.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '           " AND    BPW.BarcodeInfo IN (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                        '                                      " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                      " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                      " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf
+
                         cmdText &= " ) UNION " & vbCrLf & _
                                    " SELECT BPW.*, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
                                    " FROM   twksWSBarcodePositionsWithNoRequests BPW INNER JOIN twksWSRotorContentByPosition RCP ON BPW.AnalyzerID    = RCP.AnalyzerID " & vbCrLf & _
@@ -894,10 +935,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " WHERE  BPW.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND    BPW.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                    " AND    BPW.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                   " AND    BPW.BarcodeInfo IN (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
-                                                              " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                              " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                              " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf
+                                   " AND    EXISTS (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                                                   " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                   " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                   " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf & _
+                                                   " AND    BPW.BarcodeInfo  = BP.BarcodeInfo " & vbCrLf
 
                         If (pExcludeDuplicates) Then cmdText &= " GROUP BY BP.BarcodeInfo HAVING COUNT(*) = 1 " & vbCrLf
                         cmdText &= " ) ORDER BY ExternalPID, SampleType " & vbCrLf
@@ -919,8 +961,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPatientTubesForHQ", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPatientTubesForHQ", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -975,8 +1017,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPositionedElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPositionedElements", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1031,8 +1073,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMinFreeCellByRing", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMinFreeCellByRing", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1084,8 +1126,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMaxFreeCellByRing", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMaxFreeCellByRing", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1142,8 +1184,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMultiPointCalibratorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMultiPointCalibratorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1194,8 +1236,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPlacedTubesByElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPlacedTubesByElement", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1261,8 +1303,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPositionedReagentVolume", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPositionedReagentVolume", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1270,7 +1312,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
-        ''' <summary>
+        	''' <summary>
         ''' Get information of all non free positions in the Reagents Rotor for the active WorkSession, including those that contain
         ''' Not In Use elements. Used to save the rotor as an internal Virtual Rotor before reset the WS (due to the Reagents Rotor
         ''' is not phisically discharged after finishing each WS) 
@@ -1287,6 +1329,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 03/02/2012 - Changed the query to get also the position status (field Status)
         '''              SA 06/02/2012 - Changed the function template; for NOT IN USE Positions, get field Status from table twksWSNotInUseRotorPositions
         '''                              instead of from table twksWSRotorContentByPosition
+        '''              SA 08/01/2015 - BA-1999 ==> Changed the second subquery to remove the filter by Position Status = 'NO_INUSE', to allow to get also 
+        '''                                          NOT IN USE Positions with Status DEPLETED, FEW or LOCKED
+        '''              SA 09/01/2015 - BA-1999 ==> Added a new subquery to get also NOT IN USE Positions with Barcode Status UNKNOWN or ERROR
         ''' </remarks>
         Public Function GetReagentsRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -1305,7 +1350,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE   RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                                 " AND     RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND     RCP.RotorType     = 'REAGENTS' " & vbCrLf & _
-                                                " AND     RCP.Status NOT IN ('NO_INUSE', 'FREE') " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT " & pVirtualRotorID.ToString & " AS VirtualRotorID, RCP.RingNumber, RCP.CellNumber, NIU.TubeContent, RCP.TubeType, " & vbCrLf & _
                                                          " RCP.MultiTubeNumber, NIU.ReagentID, NIU.SolutionCode, NIU.MultiItemNumber, RCP.RealVolume, NIU.Status, " & vbCrLf & _
@@ -1318,7 +1362,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                                 " AND   RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND   RCP.RotorType     = 'REAGENTS' " & vbCrLf & _
-                                                " AND   RCP.Status        = 'NO_INUSE' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
+                                                " SELECT " & pVirtualRotorID.ToString & " AS VirtualRotorID, RCP.RingNumber, RCP.CellNumber, NULL AS TubeContent, RCP.TubeType, " & vbCrLf & _
+                                                         " RCP.MultiTubeNumber, NULL AS ReagentID, NULL AS SolutionCode, NULL AS MultiItemNumber, RCP.RealVolume, RCP.Status, " & vbCrLf & _
+                                                         " RCP.BarcodeInfo, RCP.BarcodeStatus, RCP.ScannedPosition, 'BIOSYSTEMS' AS TS_User, GETDATE() AS TS_DateTime " & vbCrLf & _
+                                                " FROM   twksWSRotorContentByPosition RCP " & vbCrLf & _
+                                                " WHERE RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
+                                                " AND   RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                " AND   RCP.RotorType     = 'REAGENTS' " & vbCrLf & _
+                                                " AND   RCP.BarcodeInfo IS NOT NULL " & vbCrLf & _
+                                                " AND   RCP.BarcodeStatus IN ('UNKNOWN', 'ERROR') " & vbCrLf & _
                                                 " ORDER BY RCP.RingNumber, RCP.CellNumber "
 
                         Dim myVRotorPosDS As New VirtualRotorPosititionsDS
@@ -1338,8 +1391,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetReagentsRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetReagentsRotorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1363,13 +1416,18 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 26/01/2010 - Changed the way of opening the DB Connection to fulfill the new template
         '''              SA 30/03/2012 - Changed subquery for NOT IN USE positions: value of Barcode fields has to be get from table
         '''                              twksWSNotInUseRotorPositions instead of from table twksWSRotorContentByPosition
-        '''              SA 08/11/2013 - BT #1358 ==> Changed both subqueries to get also field CalibratorID
-        '''              JV 08/11/2013 - BT #1358 ==> Changed both subqueries to get also fields MultiItemNumber, ReagentID and SolutionCode
-        '''              TR 18/11/2013 - BT #1359 ==> In the first subquery, added a Left Join with table twksWSRotorPositionsInProcess to allow inform
-        '''                                           flag InProcessElement = TRUE for those elements that are still needed for the execution of the 
-        '''                                           active Work Session. Only second Reagents and Washing Solutions needed to avoid R2 Well Contaminations
-        '''                                           will have information in table twksWSRotorPositionsInProcess; for any other element (IN USE or NOT IN USE)
-        '''                                           flag InProcessElement will be returned as FALSE
+        '''              SA 08/11/2013 - BA-1358 ==> Changed both subqueries to get also field CalibratorID
+        '''              JV 08/11/2013 - BA-1358 ==> Changed both subqueries to get also fields MultiItemNumber, ReagentID and SolutionCode
+        '''              TR 18/11/2013 - BA-1359 ==> In the first subquery, added a Left Join with table twksWSRotorPositionsInProcess to allow inform
+        '''                                          flag InProcessElement = TRUE for those elements that are still needed for the execution of the 
+        '''                                          active Work Session. Only second Reagents and Washing Solutions needed to avoid R2 Well Contaminations
+        '''                                          will have information in table twksWSRotorPositionsInProcess; for any other element (IN USE or NOT IN USE)
+        '''                                          flag InProcessElement will be returned as FALSE
+        '''              SA 08/01/2015 - BA-1999 ==> Changed the first subquery to get only Positions with ElementID different of NULL when Status is different
+        '''                                          of NOT IN USE (to exclude NOT IN USE Positions with Status DEPLETED, FEW or LOCKED), and to add a new condition 
+        '''                                          to get also FREE Positions (which include Positions with BarcodeStatus ERROR or UNKNOWN).. 
+        '''                                          Changed the second subquery by removing the filter by Status (it is not needed due to an INNER JOIN is used) to 
+        '''                                          allow also to get NOT IN USE Positions with Status DEPLETED, FEW or LOCKED); besides, return NO_INUSE as Status.  
         ''' </remarks>
         Public Function GetRotorContentPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
@@ -1394,11 +1452,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                     " AND RCP.CellNumber = RIP.CellNumber " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " AND  ((RCP.Status       <> 'NO_INUSE' AND RCP.ElementID IS NOT NULL) " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'FREE')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT DISTINCT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, " & vbCrLf & _
                                                                 " RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & vbCrLf & _
-                                                                " RCP.Status, NU.ScannedPosition, NU.BarcodeInfo, NU.BarcodeStatus, NU.TubeContent, " & vbCrLf & _
+                                                                " 'NO_INUSE' AS Status, NU.ScannedPosition, NU.BarcodeInfo, NU.BarcodeStatus, NU.TubeContent, " & vbCrLf & _
                                                                 " NULL as ElementStatus, NU.CalibratorID, NU.MultiItemNumber, NU.ReagentID, " & vbCrLf & _
                                                                 " NU.SolutionCode, 0 AS InProcessElement  " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSNotInUseRotorPositions NU " & vbCrLf & _
@@ -1408,8 +1467,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                " AND RCP.CellNumber    = NU.CellNumber " & vbCrLf & _
                                                                                                " AND RCP.WorkSessionID = NU.WorkSessionID " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status        = 'NO_INUSE' " & vbCrLf
+                                                " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
 
                         Dim resultData As New WSRotorContentByPositionDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1428,8 +1486,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1447,8 +1505,17 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''          all the Analyzer Rotors, without session.
         ''' </returns>
         ''' <remarks>
-        ''' Created by: JV 03/12/2013 #1384
-        ''' </remarks>
+        ''' Created by:  JV 03/12/2013 - BA-1384
+        ''' Modified by: SA 16/12/2014 - BA-1972 ==> Changed both sub-queries to get also field ControlID (positions with NOT IN USE Controls should indicate 
+        '''                                          the ID of the Control)
+        '''              SA 08/01/2015 - BA-1999 ==> Changed the first subquery to get only Positions with ElementID different of NULL when Status is different
+        '''                                          of NOT IN USE (to exclude NOT IN USE Positions with Status DEPLETED or FEW), and to add a new condition 
+        '''                                          to get also FREE Positions (which include Positions with BarcodeStatus ERROR or UNKNOWN). 
+        '''                                          Changed the second subquery by removing the filter by Status (it is not needed due to an INNER JOIN is used) to 
+        '''                                          allow also to get NOT IN USE Positions with Status DEPLETED or FEW)
+        '''              SA 09/01/2015 - BA-1999 ==> Changed the first subquery to remove the LEFT OUTER JOIN with table twksWSRotorPositionsInProcess due to this 
+        '''                                          function is called when the WorkSession Status is EMPTY or OPEN and there are not Positions In Process
+        '''         ''' </remarks>
         Public Function GetRotorContentPositionsResetDone(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1462,23 +1529,21 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, " & vbCrLf & _
                                                        " RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, " & vbCrLf & _
                                                        " RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, RE.TubeContent, RE.ElementStatus, RE.CalibratorID, " & vbCrLf & _
-                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, " & vbCrLf & _
-                                                       "(CASE WHEN RIP.InProcessTestsNumber IS NULL THEN 0 ELSE 1 END) AS InProcessElement " & vbCrLf & _
+                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, RE.ControlID, 0 AS InProcessElement " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE " & vbCrLf & _
                                                                                                      " ON RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
                                                                                                     " AND RCP.ElementID     = RE.ElementID " & vbCrLf & _
-                                                                                        " LEFT OUTER JOIN twksWSRotorPositionsInProcess RIP " & vbCrLf & _
-                                                                                                     " ON RCP.RotorType  = RIP.RotorType " & vbCrLf & _
-                                                                                                    " AND RCP.CellNumber = RIP.CellNumber " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " AND  ((RCP.Status        <> 'NO_INUSE' AND RCP.ElementID IS NOT NULL) " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'FREE')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT DISTINCT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, " & vbCrLf & _
                                                                 " RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & vbCrLf & _
-                                                                " (CASE WHEN NU.Status IS NULL THEN RCP.Status ELSE NU.Status END), NU.ScannedPosition, NU.BarcodeInfo, NU.BarcodeStatus, NU.TubeContent, " & vbCrLf & _
+                                                                " (CASE WHEN NU.Status IS NULL THEN RCP.Status ELSE NU.Status END), NU.ScannedPosition, " & vbCrLf & _
+                                                                " NU.BarcodeInfo, NU.BarcodeStatus, NU.TubeContent, " & vbCrLf & _
                                                                 " NULL as ElementStatus, NU.CalibratorID, NU.MultiItemNumber, NU.ReagentID, " & vbCrLf & _
-                                                                " NU.SolutionCode, 0 AS InProcessElement  " & vbCrLf & _
+                                                                " NU.SolutionCode, NU.ControlID, 0 AS InProcessElement  " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSNotInUseRotorPositions NU " & vbCrLf & _
                                                                                                 " ON RCP.AnalyzerID    = NU.AnalyzerID " & vbCrLf & _
                                                                                                " AND RCP.RotorType     = NU.RotorType " & vbCrLf & _
@@ -1486,8 +1551,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                " AND RCP.CellNumber    = NU.CellNumber " & vbCrLf & _
                                                                                                " AND RCP.WorkSessionID = NU.WorkSessionID " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status        = 'NO_INUSE' " & vbCrLf
+                                                " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
 
                         Dim resultData As New WSRotorContentByPositionDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1506,8 +1570,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositionsResetDone", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositionsResetDone", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1567,8 +1631,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorPositionsByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorPositionsByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1643,8 +1707,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorTypeContentPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorTypeContentPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1652,7 +1716,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
-        ''' <summary>
+       	''' <summary>
         ''' Get information of all non free positions in the Samples Rotor for the active WorkSession, including those that contain
         ''' Not In Use elements. Used to save the rotor as an internal Virtual Rotor before reset the WS 
         ''' </summary>
@@ -1667,6 +1731,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 03/02/2012 - Changed the query to get also the position status (field Status)
         '''              SA 06/02/2012 - Changed the function template; for NOT IN USE Positions, get field Status from table twksWSNotInUseRotorPositions
         '''                              instead of from table twksWSRotorContentByPosition
+        '''              SA 08/01/2015 - BA-1999 ==> Changed the second subquery to remove the filter by Position Status = 'NO_INUSE', to allow to get also 
+        '''                                          NOT IN USE Positions with Status DEPLETED
         ''' </remarks>
         Public Function GetSamplesRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -1685,7 +1751,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE   RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                                 " AND     RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND     RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                " AND     RCP.Status NOT IN ('NO_INUSE', 'FREE') " & vbCrLf & _
                                                 " AND     RE.TubeContent <> 'PATIENT' " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT " & pVirtualRotorID.ToString & " AS VirtualRotorID, RCP.RingNumber, RCP.CellNumber, NIU.TubeContent, RCP.TubeType, " & vbCrLf & _
@@ -1699,7 +1764,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                                 " AND   RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND   RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                " AND   RCP.Status        = 'NO_INUSE' " & vbCrLf & _
                                                 " AND   NIU.TubeContent  <> 'PATIENT' " & vbCrLf & _
                                                 " ORDER BY RCP.RingNumber, RCP.CellNumber "
 
@@ -1720,14 +1784,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetSamplesRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetSamplesRotorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
 
         ''' <summary>
         ''' Get the Rotor Cells containing bottles of the specified Washing Solution
@@ -1773,8 +1838,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1795,6 +1860,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 05/09/2011 - Chanqed Query to also return TubeContent (different tables depending if InUse or NOT InUse)
         '''              SA 05/09/2011 - Changed the query to return also the Tube Content of Not InUse cells that already exist in table
         '''                              of NotInUseRotorPositions (those loaded from the previous saved Rotor). Removed parameter pNotInUsedCreatedFlag
+        '''              SA 07/01/2015 - BA-1999 ==> When value of parameter pGetNotInUseStatus is FALSE (default case), all NOT IN USE Positions are returned
+        '''                                          with Status = NO_INUSE (also for Rotor Positions saved as DEPLETED, LOCKED or FEW). Changed the condition
+        '''                                          to get NOT IN USE Positions: (Status different of FREE AND ElementID = NULL) instead of Status = NO_INUSE. 
+        '''                                          Added a new subquery to get only FREE Positions. Changed the second subquery to get only INUSE Positions
+        '''                                          (searching Positions with Status different of FREE AND ElementID different of NULL)  
         ''' </remarks>
         Public Function ReadByCellNumber(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                          ByVal pRotorType As String, ByVal pCellNumber As Integer, Optional ByVal pGetNotInUseStatus As Boolean = False) As GlobalDataTO
@@ -1806,13 +1876,59 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        ''Not INUSE
+                        ''SA + JV - 12/12/2013 - #1384
+                        'Dim notInUseStatus As String = String.Empty
+                        'If (Not pGetNotInUseStatus) Then
+                        '    notInUseStatus = "RCP.Status, "
+                        'Else
+                        '    notInUseStatus = "(CASE WHEN NU.Status IS NULL THEN RCP.Status ELSE NU.Status END) AS Status, "
+                        'End If
+
+                        'cmdText = " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, RCP.MultiTubeNumber, " & vbCrLf & _
+                        '                 " RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & notInUseStatus & vbCrLf & _
+                        '                 " NU.TubeContent, RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, " & vbCrLf & _
+                        '                 " RCP.TS_User, RCP.TS_DateTime, NULL AS ElementStatus, NU.ReagentID, NU.SolutionCode, NU.CalibratorID, NU.ControlID, NU.MultiItemNumber " & vbCrLf & _
+                        '              " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSNotInUseRotorPositions NU ON RCP.AnalyzerID = NU.AnalyzerID " & vbCrLf & _
+                        '                                                                                                     " AND RCP.RotorType  = NU.RotorType " & vbCrLf & _
+                        '                                                                                                     " AND RCP.RingNumber = NU.RingNumber " & vbCrLf & _
+                        '                                                                                                     " AND RCP.CellNumber = NU.CellNumber  " & vbCrLf & _
+                        '              " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
+                        '              " AND    RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '              " AND    RCP.RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                        '              " AND    RCP.Status        = 'NO_INUSE' " & vbCrLf
+
+                        'If (pCellNumber <> -1) Then cmdText &= " AND   RCP.CellNumber = " & pCellNumber.ToString() & " " & vbCrLf
+                        ''FIN 12/12/2013
+
+                        ''OTHERS: INUSE, FREE, ...
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, " & vbCrLf & _
+                        '                  " RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, RE.TubeContent, RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, " & vbCrLf & _
+                        '                  " RCP.TS_User, RCP.TS_DateTime, RE.ElementStatus, RE.ReagentID, RE.SolutionCode, RE.CalibratorID, RE.ControlID, RE.MultiItemNumber " & vbCrLf & _
+                        '           " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE ON RCP.ElementID = RE.ElementID " & vbCrLf & _
+                        '           " WHERE  RCP.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf & _
+                        '           " AND    RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '           " AND    RCP.RotorType = '" & pRotorType & "' " & vbCrLf & _
+                        '           " AND    RCP.Status <> 'NO_INUSE' "
+
+                        'If (pCellNumber <> -1) Then cmdText &= " AND   RCP.CellNumber = " & pCellNumber.ToString() & " " & vbCrLf
+
+                        'BA-1999: Changes in the way the Rotor Positions are obtained
                         Dim cmdText As String = String.Empty
 
-                        'Not INUSE
-                        'SA + JV - 12/12/2013 - #1384
+                        '(1) GET NOT INUSE ROTOR POSITIONS ==> NOT FREE Positions with field ElementID NOT INFORMED
+                        'For NOT IN USE Positions, the Status of the Rotor Position will be obtained in the following way:
+                        '** If the Status of the active WS is EMPTY or OPEN (pGetNotInUseStatus is FALSE): 
+                        '    - The NO_INUSE Status is returned (instead of field Status from twksWSRotorContentByPosition due to it can be FEW, DEPLETED or LOCKED)
+                        '** Else (pGetNotInUseStatus is TRUE): 
+                        '    - Field Status from table twksWSNotInUseRotorPositions if it is informed (only when the Not In Use Position is FEW, DEPLETED or LOCKED)
+                        '    - Otherwise, field Status from table twksWSRotorContentByPosition (in this case it will be always NO_INUSE)
                         Dim notInUseStatus As String = String.Empty
                         If (Not pGetNotInUseStatus) Then
-                            notInUseStatus = "RCP.Status, "
+                            'NOT IN USE Positions can have Status LOCKED, FEW or DEPLETED; in this case, the NO_INUSE Status has to be returned 
+                            'due to the Status of the active WorkSession is PENDING, INPROCESS or CLOSED
+                            notInUseStatus = "'NO_INUSE' AS Status, "
                         Else
                             notInUseStatus = "(CASE WHEN NU.Status IS NULL THEN RCP.Status ELSE NU.Status END) AS Status, "
                         End If
@@ -1821,30 +1937,42 @@ Namespace Biosystems.Ax00.DAL.DAO
                                          " RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & notInUseStatus & vbCrLf & _
                                          " NU.TubeContent, RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, " & vbCrLf & _
                                          " RCP.TS_User, RCP.TS_DateTime, NULL AS ElementStatus, NU.ReagentID, NU.SolutionCode, NU.CalibratorID, NU.ControlID, NU.MultiItemNumber " & vbCrLf & _
-                                      " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSNotInUseRotorPositions NU ON RCP.AnalyzerID = NU.AnalyzerID " & vbCrLf & _
-                                                                                                                             " AND RCP.RotorType  = NU.RotorType " & vbCrLf & _
-                                                                                                                             " AND RCP.RingNumber = NU.RingNumber " & vbCrLf & _
-                                                                                                                             " AND RCP.CellNumber = NU.CellNumber  " & vbCrLf & _
-                                      " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
-                                      " AND    RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                      " AND    RCP.RotorType     = '" & pRotorType & "' " & vbCrLf & _
-                                      " AND    RCP.Status        = 'NO_INUSE' " & vbCrLf
-
+                                  " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSNotInUseRotorPositions NU ON RCP.AnalyzerID = NU.AnalyzerID " & vbCrLf & _
+                                                                                                                         " AND RCP.RotorType  = NU.RotorType " & vbCrLf & _
+                                                                                                                         " AND RCP.RingNumber = NU.RingNumber " & vbCrLf & _
+                                                                                                                         " AND RCP.CellNumber = NU.CellNumber  " & vbCrLf & _
+                                  " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                  " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                  " AND    RCP.RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                                  " AND   (RCP.Status <> 'FREE' AND RCP.ElementID IS NULL) " & vbCrLf
                         If (pCellNumber <> -1) Then cmdText &= " AND   RCP.CellNumber = " & pCellNumber.ToString() & " " & vbCrLf
-                        'FIN 12/12/2013
 
-                        'OTHERS: INUSE, FREE, ...
+                        '(2) GET INUSE ROTOR POSITIONS ==> NOT FREE Positions with field ElementID INFORMED (INNER JOIN with table twksWSRequiredElements)
                         cmdText &= " UNION " & vbCrLf & _
                                    " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, " & vbCrLf & _
                                           " RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, RE.TubeContent, RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, " & vbCrLf & _
                                           " RCP.TS_User, RCP.TS_DateTime, RE.ElementStatus, RE.ReagentID, RE.SolutionCode, RE.CalibratorID, RE.ControlID, RE.MultiItemNumber " & vbCrLf & _
-                                   " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE ON RCP.ElementID = RE.ElementID " & vbCrLf & _
-                                   " WHERE  RCP.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf & _
+                                   " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSRequiredElements RE ON RCP.ElementID = RE.ElementID " & vbCrLf & _
+                                   " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                    " AND    RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                   " AND    RCP.RotorType = '" & pRotorType & "' " & vbCrLf & _
-                                   " AND    RCP.Status <> 'NO_INUSE' "
-
+                                   " AND    RCP.RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                                   " AND    RCP.Status       <> 'NO_INUSE' " & vbCrLf
                         If (pCellNumber <> -1) Then cmdText &= " AND   RCP.CellNumber = " & pCellNumber.ToString() & " " & vbCrLf
+
+                        '(3) GET FREE ROTOR POSITIONS
+                        cmdText &= " UNION " & vbCrLf & _
+                                   " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, " & vbCrLf & _
+                                          " RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, NULL AS TubeContent, RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, " & vbCrLf & _
+                                          " RCP.TS_User, RCP.TS_DateTime, NULL AS ElementStatus, NULL AS ReagentID, NULL AS SolutionCode, NULL AS CalibratorID, NULL AS ControlID, NULL AS MultiItemNumber " & vbCrLf & _
+                                " FROM   twksWSRotorContentByPosition RCP " & vbCrLf & _
+                                " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
+                                " AND    RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                " AND    RCP.RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                                " AND    RCP.Status        = 'FREE' " & vbCrLf
+                        If (pCellNumber <> -1) Then cmdText &= " AND   RCP.CellNumber = " & pCellNumber.ToString() & " " & vbCrLf
+
+                        '(4) SORT ROTOR POSITIONS BY CELL NUMBER
+                        cmdText &= " ORDER BY RCP.CellNumber " & vbCrLf
 
                         Dim resultData As New WSRotorContentByPositionDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1863,8 +1991,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByCellNumber", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1929,8 +2057,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetRotor", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1971,8 +2099,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2007,10 +2135,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " MultiTubeNumber = NULL "
                     cmdText &= " WHERE RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "' "
                     cmdText &= " AND (Status = 'NO_INUSE' "
-                    cmdText &= " AND CellNumber NOT IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
-                    cmdText &= "                        WHERE AnalyzerID = '" & pAnalyzerID & "' "
-                    cmdText &= "                        AND WorkSessionID = '" & pWorkSessionID & "' "
-                    cmdText &= "                        AND RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "')) "
+                    'AJG
+                    'cmdText &= " AND CellNumber NOT IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
+                    cmdText &= " AND NOT EXISTS (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
+                    cmdText &= "                WHERE AnalyzerID = '" & pAnalyzerID & "' "
+                    'AJG
+                    cmdText &= "                AND twksWSRotorContentByPosition.CellNumber = CellNumber"
+                    cmdText &= "                AND WorkSessionID = '" & pWorkSessionID & "' "
+                    cmdText &= "                AND RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "')) "
                     cmdText &= " OR BarcodeStatus = 'ERROR' "
 
                     If (cmdText <> "") Then
@@ -2024,8 +2156,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.SetScannedPositionToFREE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.SetScannedPositionToFREE", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2167,8 +2299,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateBarCodeFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateBarCodeFields", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2234,8 +2366,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRotorContentByPositionDAO.UpdateByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRotorContentByPositionDAO.UpdateByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -2268,21 +2400,38 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = " UPDATE twksWSRotorContentByPosition " & vbCrLf
                     If (pNewElementStatus <> String.Empty) Then
                         'It is an IN USE Calibrator, update fields Status and TubeType for all Calibrator kit positions - search them in table of required WS Elements
+                        'AJG
+                        'cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "', " & vbCrLf & _
+                        '                  " Status   = '" & pNewElementStatus.Trim & "' " & vbCrLf & _
+                        '           " WHERE (ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                        '                                " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                " AND    TubeContent   = 'CALIB' " & vbCrLf & _
+                        '                                " AND    CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+
                         cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "', " & vbCrLf & _
                                           " Status   = '" & pNewElementStatus.Trim & "' " & vbCrLf & _
-                                   " WHERE (ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                                   " WHERE EXISTS (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
                                                         " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                         " AND    TubeContent   = 'CALIB' " & vbCrLf & _
-                                                        " AND    CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+                                                        " AND    CalibratorID  = " & pCalibratorID.ToString & " AND twksWSRotorContentByPosition.ElementID = ElementID) " & vbCrLf
                     Else
                         'It is a NOT IN USE Calibrator, update field TubeType for all Calibrator kit positions - search them in table of not in use WS Elements
+                        'AJG
+                        'cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "' " & vbCrLf & _
+                        '           " WHERE  (CellNumber IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
+                        '                                  " WHERE AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                  " AND   WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                  " AND   RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                                  " AND   TubeContent   = 'CALIB' " & vbCrLf & _
+                        '                                  " AND   CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+
                         cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "' " & vbCrLf & _
-                                   " WHERE  (CellNumber IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
+                                   " WHERE  EXISTS (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
                                                           " WHERE AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                           " AND   WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                           " AND   RotorType     = 'SAMPLES' " & vbCrLf & _
                                                           " AND   TubeContent   = 'CALIB' " & vbCrLf & _
-                                                          " AND   CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+                                                          " AND   CalibratorID  = " & pCalibratorID.ToString & " AND twksWSRotorContentByPosition.CellNumber = CellNumber) " & vbCrLf
                     End If
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
@@ -2295,8 +2444,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateCalibStatusAndTubeType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateCalibStatusAndTubeType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2345,8 +2494,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateNotInUseRotorPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateNotInUseRotorPosition", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2401,8 +2550,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.VerifyTubesByElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.VerifyTubesByElement", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2467,8 +2616,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadReactions", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadReactions", EventLogEntryType.Error, False)
         '    Finally
         '        'When Database Connection was opened locally, it has to be closed 
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

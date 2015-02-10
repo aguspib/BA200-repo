@@ -1,14 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwHelpFilesSettingDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Read the table tfmwHelpFilesSetting by the ID and the Language.
@@ -53,8 +52,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwHelpFilesSettingDAO.ReadByIDAndLanguage", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwHelpFilesSettingDAO.ReadByIDAndLanguage", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

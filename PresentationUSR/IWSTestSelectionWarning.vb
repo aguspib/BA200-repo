@@ -1,12 +1,12 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL
 
-Public Class IWSTestSelectionWarning
+Public Class UiWSTestSelectionWarning
 
 #Region "Declarations"
 
@@ -45,14 +45,14 @@ Public Class IWSTestSelectionWarning
     Private Sub ScreenLoad()
         Try
             'DL 28/07/2011
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             PrepareButtons()
 
@@ -61,7 +61,7 @@ Public Class IWSTestSelectionWarning
             MemoEdit1.EditValue = Message
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -80,7 +80,7 @@ Public Class IWSTestSelectionWarning
             'EXIT Button
             auxIconName = GetIconName("ACCEPT1")
             If auxIconName <> "" Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'For Tooltips...
@@ -88,7 +88,7 @@ Public Class IWSTestSelectionWarning
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", LanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -116,7 +116,7 @@ Public Class IWSTestSelectionWarning
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTitleLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTitleLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadTitleLabel", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -132,7 +132,7 @@ Public Class IWSTestSelectionWarning
             MemoEdit1 = Nothing
             '-----------------------------------------------
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -154,7 +154,7 @@ Public Class IWSTestSelectionWarning
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSNotPosWarning_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -164,7 +164,7 @@ Public Class IWSTestSelectionWarning
             ScreenLoad()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSNotPosWarning_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -184,8 +184,8 @@ Public Class IWSTestSelectionWarning
         Try
             If m.Msg = WM_WINDOWPOSCHANGING Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)
@@ -194,7 +194,7 @@ Public Class IWSTestSelectionWarning
 
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

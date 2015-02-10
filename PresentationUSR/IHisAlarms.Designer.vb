@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IHisAlarms
+Partial Class UiHisAlarms
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -350,10 +350,10 @@ Partial Class IHisAlarms
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IHisAlarms"
+        Me.Name = "UiHisAlarms"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "IHisAlarms"
+        Me.Text = "UiHisAlarms"
         Me.bsSearchGroup.ResumeLayout(False)
         Me.bsHistoryGroup.ResumeLayout(False)
         CType(Me.xtraHistoryGrid, System.ComponentModel.ISupportInitialize).EndInit()

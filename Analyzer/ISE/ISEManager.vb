@@ -1,21 +1,25 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Global.GlobalEnumerates
+﻿Option Explicit On
+Option Strict On
+
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.InfoAnalyzer
 Imports Biosystems.Ax00.DAL
-Imports System.Globalization
+Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Globalization
+Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Public Class ISEAnalyzerEntity
-        Implements IISEAnalyzerEntity
+    Public Class ISEManager
+        Implements IISEManager
 
 #Region "Constructor"
 
-        Public Sub New(ByRef pAnalyzer As IAnalyzerEntity, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
+        Public Sub New(ByRef pAnalyzer As IAnalyzerManager, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
             Try
                 MyClass.IsAnalyzerDisconnectedAttr = pDisconnectedMode
                 MyClass.myAnalyzer = pAnalyzer
@@ -121,12 +125,13 @@ Namespace Biosystems.Ax00.Core.Entities
             LongTermDeactivated = 8
             ReagentsPack_DateInstall = 9
             Switch_Off = 10
+            Timeout = 11        ' XB 04/11/2014 - BA-1872
         End Enum
 
 #End Region
 
 #Region "Declarations"
-        Private myAnalyzer As IAnalyzerEntity 'Instance of Analyzer Manager class that creates ISE manager 'REFACTORING
+        Private myAnalyzer As IAnalyzerManager 'Instance of Analyzer Manager class that creates ISE manager 'REFACTORING
         Private myISEInfoDelegate As New ISEDelegate 'Delegate for accessing tinfoISE table
         Private myISECalibHistory As New ISECalibHistoryDelegate 'Delegate for calibration history 'JB 30/07/2012
         Private myISEInfoDS As ISEInformationDS 'Data obtained from tinfoISE table
@@ -134,6 +139,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private myISELimitsDS As FieldLimitsDS 'Data obtained from SwLimits
         ' XBC 26/03/2012
         Private myAlarms() As Boolean 'array of current ISE alarms
+
         ' XBC 02/07/2012
         Private SIPcycles As Single
         Private SIPIntervalConsumption As Single     ' interval of time that a SIP cycle is consumed (in minutes)
@@ -142,16 +148,18 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ForceConsumptionsInitialize As Boolean = False
         Private ISE_EXECUTION_TIME_SER As Single = 0
         Private ISE_EXECUTION_TIME_URI As Single = 0
+
+
 #End Region
 
 #Region "Public Events"
 
-        Public Event ISEMonitorDataChanged() Implements IISEAnalyzerEntity.ISEMonitorDataChanged 'occurs when some change happens in Monitor Data
-        Public Event ISEProcedureFinished() Implements IISEAnalyzerEntity.ISEProcedureFinished 'occurs when some ISE procedure has finished
-        Public Event ISEReadyChanged() Implements IISEAnalyzerEntity.ISEReadyChanged 'occurs when IsISEModuleReady property has changed
-        Public Event ISESwitchedOnChanged() Implements IISEAnalyzerEntity.ISESwitchedOnChanged 'occurs when IsISESwitchOn property has changed
-        Public Event ISEConnectionFinished(ByVal pOK As Boolean) Implements IISEAnalyzerEntity.ISEConnectionFinished 'occurs when Initialization has finished
-        Public Event ISEMaintenanceRequired(ByVal pOperation As MaintenanceOperations) Implements IISEAnalyzerEntity.ISEMaintenanceRequired 'occurs when maintenance (calibrations and cleaning) operations are required
+        Public Event ISEMonitorDataChanged() Implements IISEManager.ISEMonitorDataChanged 'occurs when some change happens in Monitor Data
+        Public Event ISEProcedureFinished() Implements IISEManager.ISEProcedureFinished 'occurs when some ISE procedure has finished
+        Public Event ISEReadyChanged() Implements IISEManager.ISEReadyChanged 'occurs when IsISEModuleReady property has changed
+        Public Event ISESwitchedOnChanged() Implements IISEManager.ISESwitchedOnChanged 'occurs when IsISESwitchOn property has changed
+        Public Event ISEConnectionFinished(ByVal pOK As Boolean) Implements IISEManager.ISEConnectionFinished 'occurs when Initialization has finished
+        Public Event ISEMaintenanceRequired(ByVal pOperation As MaintenanceOperations) Implements IISEManager.ISEMaintenanceRequired 'occurs when maintenance (calibrations and cleaning) operations are required
 #End Region
 
 #Region "Attributes"
@@ -317,12 +325,15 @@ Namespace Biosystems.Ax00.Core.Entities
         'SGM 01/08/2012
         Private ISEWSCancelErrorCounterAttr As Integer
 
+        ' XB 04/11/2014 - BA-1872
+        Private IsTimeoutAttr As Boolean
+        Private FirmwareErrDetectedAttr As Boolean
 #End Region
 
 #Region "Properties"
 
 #Region "Generic"
-        Public Property WorkSessionID() As String Implements IISEAnalyzerEntity.WorkSessionID
+        Public Property WorkSessionID() As String Implements IISEManager.WorkSessionID
             Get
                 Return MyClass.WorkSessionIDAttr
             End Get
@@ -331,7 +342,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property IsInUtilities() As Boolean Implements IISEAnalyzerEntity.IsInUtilities
+        Public Property IsInUtilities() As Boolean Implements IISEManager.IsInUtilities
             Get
                 Return IsInUtilitiesAttr
             End Get
@@ -343,7 +354,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'Counts the times that an ERC (A,B,S,F) error occured while WS
-        Public Property ISEWSCancelErrorCounter() As Integer Implements IISEAnalyzerEntity.ISEWSCancelErrorCounter
+        Public Property ISEWSCancelErrorCounter() As Integer Implements IISEManager.ISEWSCancelErrorCounter
             Get
                 Return ISEWSCancelErrorCounterAttr
             End Get
@@ -362,7 +373,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 28/06/2012</remarks>
-        Public ReadOnly Property IsBiosystemsValidationMode() As Boolean Implements IISEAnalyzerEntity.IsBiosystemsValidationMode
+        Public ReadOnly Property IsBiosystemsValidationMode() As Boolean Implements IISEManager.IsBiosystemsValidationMode
             Get
                 Dim IsBioMode As Boolean = False
                 Dim myGlobal As New GlobalDataTO
@@ -379,7 +390,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISEModuleInstalled() As Boolean Implements IISEAnalyzerEntity.IsISEModuleInstalled
+        Public Property IsISEModuleInstalled() As Boolean Implements IISEManager.IsISEModuleInstalled
             Get
                 'Dim myISEAdj As String = MyClass.myAnalyzerManager.ReadAdjustValue(Ax00Adjustsments.ISEINS)
                 'MyClass.IsISEModuleInstalledAttr = (IsNumeric(myISEAdj) AndAlso CInt(myISEAdj) > 0)
@@ -410,8 +421,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISESwitchON() As Boolean Implements IISEAnalyzerEntity.IsISESwitchON
+        ''' <remarks>
+        ''' Created by SGM 12/03/2012
+        ''' Modified by XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''             XB 12/12/2014 - When ISE is Off set IsISEInitiatedOKAttr attribute to FALSE because the correct inicialization is required again - BA-2178
+        ''' </remarks>
+        Public Property IsISESwitchON() As Boolean Implements IISEManager.IsISESwitchON
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -424,6 +439,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 ' XBC 03/10/2012 - Correction : When ISE is switch off set Ise as initialized
                 If Not value Then
                     MyClass.IsISEInitializationDoneAttr = True
+                    ' XB 12/12/2014 - BA-2178
+                    MyClass.IsISEInitiatedOKAttr = False
+                    MyClass.IsISEOnceInitiatedOKAttr = False
+                    ' XB 12/12/2014 - BA-2178
                 End If
                 ' XBC 03/10/2012
 
@@ -435,12 +454,15 @@ Namespace Biosystems.Ax00.Core.Entities
                     IsISESwitchONAttr = value
 
                     If Not value Then
-                        MyClass.IsISECommsOkAttr = False
-                        MyClass.IsISEInitiatedOKAttr = False
-                        'MyClass.IsISEInitializationDoneAttr = False
+                        ' XB 30/09/2014 - BA-1872
+                        'MyClass.IsISECommsOkAttr = False       
+                        'MyClass.IsISEInitiatedOKAttr = False
 
-                        'stop timeout timer
-                        MyClass.StopInstructionStartedTimer()
+                        ''MyClass.IsISEInitializationDoneAttr = False
+
+                        ''stop timeout timer
+                        'MyClass.StopInstructionStartedTimer()  
+                        ' XB 30/09/2014 - BA-1872
 
                         If MyClass.CurrentProcedure <> ISEProcedures.None Then
                             MyClass.AbortCurrentProcedureDueToException()
@@ -470,7 +492,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISECommsOk() As Boolean Implements IISEAnalyzerEntity.IsISECommsOk
+        Public Property IsISECommsOk() As Boolean Implements IISEManager.IsISECommsOk
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -495,7 +517,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by XBC 17/01/2013 - Delete 'Readonly' property to be available from AnalyzerManager.ProcessUSBCableDisconnection
         '''                              ISE Object to reset it after a disconnection communications (Bugs tracking #1109)
         ''' </remarks>
-        Public Property IsAnalyzerDisconnected() As Boolean Implements IISEAnalyzerEntity.IsAnalyzerDisconnected
+        Public Property IsAnalyzerDisconnected() As Boolean Implements IISEManager.IsAnalyzerDisconnected
             Get
                 Return IsAnalyzerDisconnectedAttr
             End Get
@@ -510,7 +532,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsAnalyzerWarmUp() As Boolean Implements IISEAnalyzerEntity.IsAnalyzerWarmUp
+        Public Property IsAnalyzerWarmUp() As Boolean Implements IISEManager.IsAnalyzerWarmUp
             Get
                 Return IsAnalyzerWarmUpAttr
             End Get
@@ -521,8 +543,25 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property IsCommErrorDetected() As Boolean = False Implements IISEAnalyzerEntity.IsCommErrorDetected
+        Public Property IsCommErrorDetected() As Boolean = False Implements IISEManager.IsCommErrorDetected
+        ' XB 04/11/2014 - BA-1872
+        Public Property IsTimeOut As Boolean Implements IISEManager.IsTimeOut
+            Get
+                Return IsTimeoutAttr
+            End Get
+            Set(value As Boolean)
+                If IsTimeoutAttr <> value Then
+                    IsTimeoutAttr = value
+                End If
+            End Set
+        End Property
 
+        ' XB 19/11/2014 - BA-1872
+        Public ReadOnly Property FirmwareErrDetected As Boolean Implements IISEManager.FirmwareErrDetected
+            Get
+                Return FirmwareErrDetectedAttr
+            End Get
+        End Property
 #End Region
 
 #Region "Initial Checkings"
@@ -534,7 +573,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitiating() As Boolean Implements IISEAnalyzerEntity.IsISEInitiating
+        Public ReadOnly Property IsISEInitiating() As Boolean Implements IISEManager.IsISEInitiating
             Get
                 'AG 02/04/2012 - add "OrElse isISEStatusUnknownAttr"
                 Return Not MyClass.IsAnalyzerDisconnected And _
@@ -551,7 +590,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitializationDone() As Boolean Implements IISEAnalyzerEntity.IsISEInitializationDone
+        Public ReadOnly Property IsISEInitializationDone() As Boolean Implements IISEManager.IsISEInitializationDone
             Get
                 Return IsISEInitializationDoneAttr
             End Get
@@ -564,7 +603,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitiatedOK() As Boolean Implements IISEAnalyzerEntity.IsISEInitiatedOK
+        Public ReadOnly Property IsISEInitiatedOK() As Boolean Implements IISEManager.IsISEInitiatedOK
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -581,7 +620,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property ConnectionTasksCanContinue() As Boolean Implements IISEAnalyzerEntity.ConnectionTasksCanContinue
+        Public ReadOnly Property ConnectionTasksCanContinue() As Boolean Implements IISEManager.ConnectionTasksCanContinue
             Get
                 ' XBC 03/10/2012 - Correction : some case didn't actives the menu
                 'Return ((IsISEModuleInstalled And (IsISEInitializationDone Or Not IsISESwitchON)) Or IsLongTermDeactivation Or Not IsISEModuleInstalled)
@@ -616,7 +655,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEOnceInitiatedOK() As Boolean Implements IISEAnalyzerEntity.IsISEOnceInitiatedOK
+        Public ReadOnly Property IsISEOnceInitiatedOK() As Boolean Implements IISEManager.IsISEOnceInitiatedOK
             Get
                 Return IsISEOnceInitiatedOKAttr
             End Get
@@ -628,14 +667,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Created by XBC 24/05/2012</remarks>
-        Public WriteOnly Property IsISEInitiatedDone() As Boolean Implements IISEAnalyzerEntity.IsISEInitiatedDone
+        Public WriteOnly Property IsISEInitiatedDone() As Boolean Implements IISEManager.IsISEInitiatedDone
             Set(ByVal value As Boolean)
                 MyClass.IsISEInitiatedOKAttr = value
                 MyClass.IsISEInitializationDoneAttr = value
             End Set
         End Property
 
-        Public Property IsPendingToInitializeAfterActivation() As Boolean = False Implements IISEAnalyzerEntity.IsPendingToInitializeAfterActivation
+        Public Property IsPendingToInitializeAfterActivation() As Boolean = False Implements IISEManager.IsPendingToInitializeAfterActivation
 
 #End Region
 
@@ -648,7 +687,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEModuleReady() As Boolean Implements IISEAnalyzerEntity.IsISEModuleReady
+        Public ReadOnly Property IsISEModuleReady() As Boolean Implements IISEManager.IsISEModuleReady
             Get
                 Dim myGlobal As GlobalDataTO = MyClass.UpdateISEModuleReady
                 If Not myGlobal.HasError Then
@@ -665,10 +704,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsLongTermDeactivation() As Boolean Implements IISEAnalyzerEntity.IsLongTermDeactivation
+        Public Property IsLongTermDeactivation() As Boolean Implements IISEManager.IsLongTermDeactivation
             Get
                 Dim myGlobal As New GlobalDataTO
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LONG_TERM_DEACTIVATED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LONG_TERM_DEACTIVATED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsLongTermDeactivationAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -708,7 +747,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsReagentsPackReady() As Boolean Implements IISEAnalyzerEntity.IsReagentsPackReady
+        Public ReadOnly Property IsReagentsPackReady() As Boolean Implements IISEManager.IsReagentsPackReady
             Get
                 Dim myReturn As Boolean = False
 
@@ -735,7 +774,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 02/07/2012 - NO V1
-        Public ReadOnly Property IsReagentsPackSerialNumberMatch() As Boolean Implements IISEAnalyzerEntity.IsReagentsPackSerialNumberMatch
+        Public ReadOnly Property IsReagentsPackSerialNumberMatch() As Boolean Implements IISEManager.IsReagentsPackSerialNumberMatch
             Get
                 Return MyClass.IsReagentsPackSerialNumberMatchAttr
             End Get
@@ -752,7 +791,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsElectrodesReady() As Boolean Implements IISEAnalyzerEntity.IsElectrodesReady
+        Public Property IsElectrodesReady() As Boolean Implements IISEManager.IsElectrodesReady
             Get
                 Dim myReturn As Boolean = False
                 Dim myGlobal As GlobalDataTO = MyClass.CheckElectrodesReady()
@@ -783,7 +822,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property MonitorDataTO() As ISEMonitorTO Implements IISEAnalyzerEntity.MonitorDataTO
+        Public ReadOnly Property MonitorDataTO() As ISEMonitorTO Implements IISEManager.MonitorDataTO
             Get
                 Return MonitorDataTOAttr
             End Get
@@ -799,7 +838,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property CurrentProcedure() As ISEProcedures Implements IISEAnalyzerEntity.CurrentProcedure
+        Public Property CurrentProcedure() As ISEProcedures Implements IISEManager.CurrentProcedure
             Get
                 Return CurrentProcedureAttr
             End Get
@@ -819,7 +858,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 27/08/2012 - Correction : Save consumptions after Current Procedure is finished
-        Public ReadOnly Property CurrentProcedureIsFinished() As Boolean Implements IISEAnalyzerEntity.CurrentProcedureIsFinished
+        Public ReadOnly Property CurrentProcedureIsFinished() As Boolean Implements IISEManager.CurrentProcedureIsFinished
             Get
                 Return CurrentProcedureIsFinishedAttr
             End Get
@@ -831,7 +870,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property CurrentCommandTO() As ISECommandTO Implements IISEAnalyzerEntity.CurrentCommandTO
+        Public Property CurrentCommandTO() As ISECommandTO Implements IISEManager.CurrentCommandTO
             Get
                 Return CurrentCommandTOAttr
             End Get
@@ -848,7 +887,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property LastISEResult() As ISEResultTO Implements IISEAnalyzerEntity.LastISEResult
+        Public Property LastISEResult() As ISEResultTO Implements IISEManager.LastISEResult
             Get
                 Return LastISEResultAttr
             End Get
@@ -871,7 +910,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property LastProcedureResult() As ISEProcedureResult Implements IISEAnalyzerEntity.LastProcedureResult
+        Public ReadOnly Property LastProcedureResult() As ISEProcedureResult Implements IISEManager.LastProcedureResult
             Get
                 Return LastProcedureResultAttr
             End Get
@@ -890,7 +929,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by XB 12/03/2012</remarks>
-        Public ReadOnly Property IsCalAUpdateRequired() As Boolean Implements IISEAnalyzerEntity.IsCalAUpdateRequired
+        Public ReadOnly Property IsCalAUpdateRequired() As Boolean Implements IISEManager.IsCalAUpdateRequired
             Get
                 Return IsCalAUpdateRequiredAttr
             End Get
@@ -902,14 +941,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by XB 12/03/2012</remarks>
-        Public ReadOnly Property IsCalBUpdateRequired() As Boolean Implements IISEAnalyzerEntity.IsCalBUpdateRequired
+        Public ReadOnly Property IsCalBUpdateRequired() As Boolean Implements IISEManager.IsCalBUpdateRequired
             Get
                 Return IsCalBUpdateRequiredAttr
             End Get
         End Property
 
         ' XBC 17/07/2012
-        Public Property PurgeAbyFirmware() As Integer Implements IISEAnalyzerEntity.PurgeAbyFirmware
+        Public Property PurgeAbyFirmware() As Integer Implements IISEManager.PurgeAbyFirmware
             Get
                 Return MyClass.PurgeAbyFirmwareAttr
             End Get
@@ -919,7 +958,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 17/07/2012
-        Public Property PurgeBbyFirmware() As Integer Implements IISEAnalyzerEntity.PurgeBbyFirmware
+        Public Property PurgeBbyFirmware() As Integer Implements IISEManager.PurgeBbyFirmware
             Get
                 Return MyClass.PurgeBbyFirmwareAttr
             End Get
@@ -929,7 +968,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 17/07/2012
-        Public Property WorkSessionOverallTime() As Single Implements IISEAnalyzerEntity.WorkSessionOverallTime
+        Public Property WorkSessionOverallTime() As Single Implements IISEManager.WorkSessionOverallTime
             Get
                 Return MyClass.WorkSessionOverallTimeAttr
             End Get
@@ -939,7 +978,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 17/07/2012
-        Public Property WorkSessionIsRunning() As Boolean Implements IISEAnalyzerEntity.WorkSessionIsRunning
+        Public Property WorkSessionIsRunning() As Boolean Implements IISEManager.WorkSessionIsRunning
             Get
                 Return MyClass.WorkSessionIsRunningAttr
             End Get
@@ -949,7 +988,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         ' XBC 23/07/2012
-        Public Property WorkSessionTestsByType() As String Implements IISEAnalyzerEntity.WorkSessionTestsByType
+        Public Property WorkSessionTestsByType() As String Implements IISEManager.WorkSessionTestsByType
             Get
                 Return MyClass.WorkSessionTestsByTypeAttr
             End Get
@@ -964,7 +1003,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #Region "Maintenance Needed"
 
         'This property is updated after validating that a Electrodes' Calibration is needed
-        Public Property IsCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsCalibrationNeeded
+        Public Property IsCalibrationNeeded() As Boolean Implements IISEManager.IsCalibrationNeeded
             Get
                 Return IsCalibrationNeededAttr
             End Get
@@ -985,7 +1024,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'This property is updated after validating that a Pumps' Calibration is needed
-        Public Property IsPumpCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsPumpCalibrationNeeded
+        Public Property IsPumpCalibrationNeeded() As Boolean Implements IISEManager.IsPumpCalibrationNeeded
             Get
                 Return IsPumpCalibrationNeededAttr
             End Get
@@ -1008,7 +1047,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'SGM 25/07/2012
         'This property is updated after validating that a Bubble detector Calibration is needed
-        Public Property IsBubbleCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsBubbleCalibrationNeeded
+        Public Property IsBubbleCalibrationNeeded() As Boolean Implements IISEManager.IsBubbleCalibrationNeeded
             Get
                 Return IsBubbleCalibrationNeededAttr
             End Get
@@ -1028,7 +1067,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property IsCleanNeeded() As Boolean Implements IISEAnalyzerEntity.IsCleanNeeded
+        Public Property IsCleanNeeded() As Boolean Implements IISEManager.IsCleanNeeded
             Get
                 Return IsCleanNeededAttr
             End Get
@@ -1062,40 +1101,40 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceNaRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceNaRecommended
+        Public ReadOnly Property IsReplaceNaRecommended() As Boolean Implements IISEManager.IsReplaceNaRecommended
             Get
                 Return (IsNaInstalled And (IsNaExpired Or IsNaOverUsed))
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceKRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceKRecommended
+        Public ReadOnly Property IsReplaceKRecommended() As Boolean Implements IISEManager.IsReplaceKRecommended
             Get
                 Return (IsKInstalled And (IsKExpired Or IsKOverUsed))
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceClRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceClRecommended
+        Public ReadOnly Property IsReplaceClRecommended() As Boolean Implements IISEManager.IsReplaceClRecommended
             Get
                 Return (IsClInstalled And (IsClExpired Or IsClOverUsed))
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplaceRefRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceRefRecommended
+        Public ReadOnly Property IsReplaceRefRecommended() As Boolean Implements IISEManager.IsReplaceRefRecommended
             Get
                 Return (IsRefInstalled And (IsRefExpired Or IsRefOverUsed))
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplaceFluidicTubingRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceFluidicTubingRecommended
+        Public ReadOnly Property IsReplaceFluidicTubingRecommended() As Boolean Implements IISEManager.IsReplaceFluidicTubingRecommended
             Get
                 Return ((FluidicTubingExpireDate <> Nothing) AndAlso FluidicTubingExpireDate > DateTime.Now)
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplacePumpTubingRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplacePumpTubingRecommended
+        Public ReadOnly Property IsReplacePumpTubingRecommended() As Boolean Implements IISEManager.IsReplacePumpTubingRecommended
             Get
                 Return ((PumpTubingExpireDate <> Nothing) AndAlso PumpTubingExpireDate > DateTime.Now)
             End Get
@@ -1105,10 +1144,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #Region "Last Calibrations and Cleans"
 
-        Public Property LastElectrodesCalibrationResult1() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationResult1
+        Public Property LastElectrodesCalibrationResult1() As String Implements IISEManager.LastElectrodesCalibrationResult1
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT1)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_RESULT1)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationResult1Attr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationResult1Attr
@@ -1124,10 +1163,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End Set
         End Property
-        Public Property LastElectrodesCalibrationResult2() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationResult2
+        Public Property LastElectrodesCalibrationResult2() As String Implements IISEManager.LastElectrodesCalibrationResult2
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT2)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_RESULT2)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationResult2Attr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationResult2Attr
@@ -1144,10 +1183,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastElectrodesCalibrationError() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationError
+        Public Property LastElectrodesCalibrationError() As String Implements IISEManager.LastElectrodesCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationErrorAttr
@@ -1164,10 +1203,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property LastPumpsCalibrationResult() As String Implements IISEAnalyzerEntity.LastPumpsCalibrationResult
+        Public Property LastPumpsCalibrationResult() As String Implements IISEManager.LastPumpsCalibrationResult
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_RESULT)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMPCAL_RESULT)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationResultAttr = CType(myGlobal.SetDatos, String)
                     Return LastPumpsCalibrationResultAttr
@@ -1184,10 +1223,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastPumpsCalibrationError() As String Implements IISEAnalyzerEntity.LastPumpsCalibrationError
+        Public Property LastPumpsCalibrationError() As String Implements IISEManager.LastPumpsCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMPCAL_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastPumpsCalibrationErrorAttr
@@ -1205,10 +1244,10 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
 
-        Public Property LastElectrodesCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastElectrodesCalibrationDate
+        Public Property LastElectrodesCalibrationDate() As DateTime Implements IISEManager.LastElectrodesCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1225,10 +1264,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property LastPumpsCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastPumpsCalibrationDate
+        Public Property LastPumpsCalibrationDate() As DateTime Implements IISEManager.LastPumpsCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMP_CAL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMP_CAL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1245,10 +1284,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'SGM 25/07/2012
-        Public Property LastBubbleCalibrationResult() As String Implements IISEAnalyzerEntity.LastBubbleCalibrationResult
+        Public Property LastBubbleCalibrationResult() As String Implements IISEManager.LastBubbleCalibrationResult
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_RESULT)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLECAL_RESULT)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationResultAttr = CType(myGlobal.SetDatos, String)
                     Return LastBubbleCalibrationResultAttr
@@ -1265,10 +1304,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastBubbleCalibrationError() As String Implements IISEAnalyzerEntity.LastBubbleCalibrationError
+        Public Property LastBubbleCalibrationError() As String Implements IISEManager.LastBubbleCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLECAL_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastBubbleCalibrationErrorAttr
@@ -1286,10 +1325,10 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'SGM 25/07/2012
-        Public Property LastBubbleCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastBubbleCalibrationDate
+        Public Property LastBubbleCalibrationDate() As DateTime Implements IISEManager.LastBubbleCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLE_CAL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLE_CAL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1306,10 +1345,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property LastCleanDate() As DateTime Implements IISEAnalyzerEntity.LastCleanDate
+        Public Property LastCleanDate() As DateTime Implements IISEManager.LastCleanDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastCleanDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1326,10 +1365,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastCleanError() As String Implements IISEAnalyzerEntity.LastCleanError
+        Public Property LastCleanError() As String Implements IISEManager.LastCleanError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastCleanErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastCleanErrorAttr
@@ -1389,7 +1428,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ReagentsPackExpirationDateAttr = MyClass.ISEDallasPage00Attr.ExpirationDate
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REAGENTS_EXPIRE_DATE, True)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REAGENTS_EXPIRE_DATE, True)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackExpirationDateAttr = CDate(myGlobal.SetDatos)
                     Else
@@ -1412,13 +1451,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
-        Public Property ReagentsPackInstallationDate() As DateTime Implements IISEAnalyzerEntity.ReagentsPackInstallationDate
+        Public Property ReagentsPackInstallationDate() As DateTime Implements IISEManager.ReagentsPackInstallationDate
             Get
                 If MyClass.ISEDallasPage01Attr IsNot Nothing Then
                     ReagentsPackInstallationDateAttr = MyClass.ISEDallasPage01Attr.InstallationDate
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REAGENTS_INSTALL_DATE, True)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REAGENTS_INSTALL_DATE, True)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInstallationDateAttr = CDate(myGlobal.SetDatos)
                     Else
@@ -1447,7 +1486,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     BiosystemsCodeAttr = MyClass.ISEDallasPage00Attr.DistributorCode
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.DISTRIBUTOR_CODE)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.DISTRIBUTOR_CODE)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         BiosystemsCodeAttr = CStr(myGlobal.SetDatos)
                     Else
@@ -1473,7 +1512,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ReagentsPackInitialVolCalAAttr = MyClass.ISEDallasPage00Attr.InitialCalibAVolume
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.INITIAL_VOL_CAL_A)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.INITIAL_VOL_CAL_A)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInitialVolCalAAttr = CSng(myGlobal.SetDatos)
                     Else
@@ -1500,7 +1539,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ReagentsPackInitialVolCalBAttr = MyClass.ISEDallasPage00Attr.InitialCalibBVolume
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.INITIAL_VOL_CAL_B)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.INITIAL_VOL_CAL_B)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInitialVolCalBAttr = CSng(myGlobal.SetDatos)
                     Else
@@ -1524,10 +1563,10 @@ Namespace Biosystems.Ax00.Core.Entities
             Get
                 'Return 5 'For Test Document
                 Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return myUtil.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
@@ -1537,20 +1576,20 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ReadOnly Property ReagentsPackRemainingVolCalB() As Single
             Get
                 Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return myUtil.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
             End Get
         End Property
 
-        Public Property IsCleanPackInstalled() As Boolean Implements IISEAnalyzerEntity.IsCleanPackInstalled
+        Public Property IsCleanPackInstalled() As Boolean Implements IISEManager.IsCleanPackInstalled
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CLEANING_PACK_INSTALLED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.CLEANING_PACK_INSTALLED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsCleanPackInstalledAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -1619,7 +1658,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     ISEDallasPage01Attr = value
 
-                    Dim myUtil As New Utilities
+                    'Dim Utilities As New Utilities
                     Dim myGlobal As New GlobalDataTO
 
                     'if the current consumption value in the Dallas > saved in DB then update the db, 
@@ -1632,7 +1671,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If ISEDallasPage00 IsNot Nothing Then 'SGM 13/06/2012
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibAVolumeSaved = myUtil.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibAVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
 
 
                             Dim myDallasCalibAVolume As Single
@@ -1654,7 +1693,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibBVolumeSaved = myUtil.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibBVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
 
                             Dim myDallasCalibBVolume As Single
 
@@ -1720,10 +1759,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #Region "Electrodes"
 
-        Public Property LiInstallDate() As DateTime Implements IISEAnalyzerEntity.LiInstallDate
+        Public Property LiInstallDate() As DateTime Implements IISEManager.LiInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LI_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LiInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1741,10 +1780,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property NaInstallDate() As DateTime Implements IISEAnalyzerEntity.NaInstallDate
+        Public Property NaInstallDate() As DateTime Implements IISEManager.NaInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.NA_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.NA_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     NaInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1762,10 +1801,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property KInstallDate() As DateTime Implements IISEAnalyzerEntity.KInstallDate
+        Public Property KInstallDate() As DateTime Implements IISEManager.KInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.K_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.K_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     KInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1783,10 +1822,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property ClInstallDate() As DateTime Implements IISEAnalyzerEntity.ClInstallDate
+        Public Property ClInstallDate() As DateTime Implements IISEManager.ClInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CL_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.CL_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     ClInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1804,10 +1843,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property RefInstallDate() As DateTime Implements IISEAnalyzerEntity.RefInstallDate
+        Public Property RefInstallDate() As DateTime Implements IISEManager.RefInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REF_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REF_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     RefInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1825,31 +1864,31 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property HasLiInstallDate() As Boolean Implements IISEAnalyzerEntity.HasLiInstallDate
+        Public ReadOnly Property HasLiInstallDate() As Boolean Implements IISEManager.HasLiInstallDate
             Get
                 Return (MyClass.LiInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasNaInstallDate() As Boolean Implements IISEAnalyzerEntity.HasNaInstallDate
+        Public ReadOnly Property HasNaInstallDate() As Boolean Implements IISEManager.HasNaInstallDate
             Get
                 Return (MyClass.NaInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasKInstallDate() As Boolean Implements IISEAnalyzerEntity.HasKInstallDate
+        Public ReadOnly Property HasKInstallDate() As Boolean Implements IISEManager.HasKInstallDate
             Get
                 Return (MyClass.KInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasClInstallDate() As Boolean Implements IISEAnalyzerEntity.HasClInstallDate
+        Public ReadOnly Property HasClInstallDate() As Boolean Implements IISEManager.HasClInstallDate
             Get
                 Return (MyClass.ClInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasRefInstallDate() As Boolean Implements IISEAnalyzerEntity.HasRefInstallDate
+        Public ReadOnly Property HasRefInstallDate() As Boolean Implements IISEManager.HasRefInstallDate
             Get
                 Return (MyClass.RefInstallDate <> Nothing)
             End Get
@@ -1914,10 +1953,10 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
         'defined by the user that the Lithium is usable
-        Public Property IsLiEnabledByUser() As Boolean Implements IISEAnalyzerEntity.IsLiEnabledByUser
+        Public Property IsLiEnabledByUser() As Boolean Implements IISEManager.IsLiEnabledByUser
             Get
                 Dim myGlobal As New GlobalDataTO
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_ENABLED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LI_ENABLED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsLiEnabledByUserAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -2202,10 +2241,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
-        Public Property PumpTubingInstallDate() As DateTime Implements IISEAnalyzerEntity.PumpTubingInstallDate
+        Public Property PumpTubingInstallDate() As DateTime Implements IISEManager.PumpTubingInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.PUMP_TUBING_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.PUMP_TUBING_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     PumpTubingInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -2232,10 +2271,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property FluidicTubingInstallDate() As DateTime Implements IISEAnalyzerEntity.FluidicTubingInstallDate
+        Public Property FluidicTubingInstallDate() As DateTime Implements IISEManager.FluidicTubingInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.FLUID_TUBING_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.FLUID_TUBING_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     FluidicTubingInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -2263,14 +2302,14 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
 
-        Public ReadOnly Property HasPumpTubingInstallDate() As Boolean Implements IISEAnalyzerEntity.HasPumpTubingInstallDate
+        Public ReadOnly Property HasPumpTubingInstallDate() As Boolean Implements IISEManager.HasPumpTubingInstallDate
             Get
                 Return (MyClass.PumpTubingInstallDate <> Nothing)
             End Get
         End Property
 
 
-        Public ReadOnly Property HasFluidicTubingInstallDate() As Boolean Implements IISEAnalyzerEntity.HasFluidicTubingInstallDate
+        Public ReadOnly Property HasFluidicTubingInstallDate() As Boolean Implements IISEManager.HasFluidicTubingInstallDate
             Get
                 Return (MyClass.FluidicTubingInstallDate <> Nothing)
             End Get
@@ -2302,9 +2341,9 @@ Namespace Biosystems.Ax00.Core.Entities
         'This property is updated every test completed
         Private Property TestsCountSinceLastClean() As Integer
             Get
-                Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
-                myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.SAMPLES_SINCE_LAST_CLEAN)
+                'Dim myglobal As New GlobalDataTO
+                ''Dim myUtil As New Utilities.
+                Dim myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.SAMPLES_SINCE_LAST_CLEAN)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
                     TestsCountSinceLastCleanAttr = CInt(myglobal.SetDatos)
                 Else
@@ -2345,38 +2384,42 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Modified by XBC 21/01/2013 - When a valid Reagent Pack is read, Page0 and Page1 must be refreshed with news values, and not set 
+        ''' Modified by XB 21/01/2013 - When a valid Reagent Pack is read, Page0 and Page1 must be refreshed with news values, and not set 
         '''                              to Nothing. Additionally, IsCleanPackInstalled change to FALSE (Bugs tracking #1108)
+        '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Private Function ManageLastISEResult() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If LastISEResult.ISEResultType <> ISEResultTO.ISEResultTypes.None Then
 
+                    ' XB 30/09/2014 - BA-1872
+                    'If MyClass.IsWaitingForInstructionStart Then
 
-                    If MyClass.IsWaitingForInstructionStart Then
+                    '    'START TIMEOUT 
 
-                        'START TIMEOUT 
+                    '    'there are communications errors
+                    '    MyClass.IsISECommsOk = False
 
-                        'there are communications errors
-                        MyClass.IsISECommsOk = False
+                    '    'stop timeout timer
+                    '    MyClass.StopInstructionStartedTimer()
 
-                        'stop timeout timer
-                        MyClass.StopInstructionStartedTimer()
+                    '    'abort procedure because of communucations error, timeout
+                    '    myGlobal = MyClass.AbortCurrentProcedureDueToException
 
-                        'abort procedure because of communucations error, timeout
-                        myGlobal = MyClass.AbortCurrentProcedureDueToException
+                    '    'force ISE START Timeout error
+                    '    RaiseEvent ISEProcedureFinished()
+                    '    'MyClass.myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED, False)
 
-                        'force ISE START Timeout error
-                        RaiseEvent ISEProcedureFinished()
-                        'MyClass.myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED, False)
+                    '    Exit Try
 
-                        Exit Try
+                    'Else
+                    ' XB 30/09/2014 - BA-1872
 
-                    ElseIf MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
+                    If MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
 
                         'RESULT TIMEOUT
-                        MyClass.IsISECommsOk = False 'there are communications
+                        'MyClass.IsISECommsOk = False 'there are communications  ' XB 30/09/2014 - BA-1872
                         'error because of communucations error, timeout
                         myGlobal = MyClass.AbortCurrentProcedureDueToException
                         Exit Try
@@ -2390,13 +2433,13 @@ Namespace Biosystems.Ax00.Core.Entities
                         If MyClass.myAnalyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
                             If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.R Or _
                                 MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                MyClass.IsISECommsOkAttr = False
+                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
                                 MyClass.IsISEInitiatedOKAttr = False
                                 MyClass.IsCommErrorDetected = True
                             End If
                         Else
                             If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                MyClass.IsISECommsOkAttr = False
+                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
                                 MyClass.IsISEInitiatedOKAttr = False
                                 MyClass.IsCommErrorDetected = True
                             End If
@@ -2440,8 +2483,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     ' Update date for the Last ISE operation
                                     MyClass.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_DATE, DateTime.Now.ToString, True)
                                 Else
-                                    'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                                    'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "ISEManager.Manage", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                    ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
+                                    'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "ISEManager.Manage", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                     ' Update date for the ISE test executed while running
                                     MyClass.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                                     ' Update date for the Last registered SIP cycles
@@ -2564,13 +2607,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 MyClass.AbortCurrentProcedureDueToException()
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ManageLastISEResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ManageLastISEResult", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2586,6 +2629,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''             XB  20/05/2014 - Add more protections against not expected answers from Firmware - Task #1614
         '''             XB  20/05/2014 - Fix Bug #1629
         '''             XB  12/06/2014 - Fix Bug caused by Task #1614 - ActivateReagentsPack
+        '''             XB  19/11/2014 - Emplace the kind of errors derived of BA-1614 inside the management of timeouts and automatic instructions repetitions - BA-1872
         ''' </remarks>
         Private Function ManageISEProcedureFinished(Optional ByVal pForcedResult As ISEProcedureResult = ISEProcedureResult.None) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2594,6 +2638,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim ToValidateCalB As Boolean = False
                 Dim ToValidatePumpCal As Boolean = False
                 Dim ToValidateBubbleCal As Boolean = False
+
+                FirmwareErrDetectedAttr = False     ' XB 19/11/2014 - BA-1872
 
                 'catch last command of the Procedure
                 Select Case MyClass.CurrentProcedure
@@ -2658,10 +2704,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                     ' XB 30/04/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
-                                    LastISEResult.IsCancelError = True
-                                    pForcedResult = ISEProcedureResult.Exception
-                                    MyClass.IsCalibrationNeeded = True
+
+                                    ' XB 19/11/2014 - BA-1872
+                                    FirmwareErrDetectedAttr = True
+
+                                    'LastISEResult.IsCancelError = True
+                                    'pForcedResult = ISEProcedureResult.Exception
+                                    'MyClass.IsCalibrationNeeded = True
                                     ' XB 30/04/2014 - Task #1614
+                                    ' XB 19/11/2014 - BA-1872
                                 End If
 
                             Case ISECommands.LAST_SLOPES
@@ -2694,10 +2745,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                                    LastISEResult.IsCancelError = True
-                                    pForcedResult = ISEProcedureResult.Exception
-                                    MyClass.IsPumpCalibrationNeeded = True
-                                    ' XB 20/05/2014 - Task #1614
+
+                                    ' XB 19/11/2014 - BA-1872
+                                    FirmwareErrDetectedAttr = True
+
+                                    'LastISEResult.IsCancelError = True
+                                    'pForcedResult = ISEProcedureResult.Exception
+                                    'MyClass.IsPumpCalibrationNeeded = True
+                                    '' XB 20/05/2014 - Task #1614
+                                    ' XB 19/11/2014 - BA-1872
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
@@ -2729,9 +2785,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                                    LastISEResult.IsCancelError = True
-                                    pForcedResult = ISEProcedureResult.Exception
+
+                                    ' XB 19/11/2014 - BA-1872
+                                    FirmwareErrDetectedAttr = True
+
+                                    'LastISEResult.IsCancelError = True
+                                    'pForcedResult = ISEProcedureResult.Exception
                                     ' XB 20/05/2014 - Task #1614
+                                    ' XB 19/11/2014 - BA-1872
                                 End If
 
                             Case ISECommands.READ_mV
@@ -2741,8 +2802,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not isFinished Then
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer AMV or BMV or an ERC, but no this instruction: <ISE!>
-                                        LastISEResult.IsCancelError = True
-                                        pForcedResult = ISEProcedureResult.Exception
+
+                                        ' XB 19/11/2014 - BA-1872
+                                        FirmwareErrDetectedAttr = True
+
+                                        'LastISEResult.IsCancelError = True
+                                        'pForcedResult = ISEProcedureResult.Exception
+                                        ' XB 19/11/2014 - BA-1872
+
                                     End If
                                 End If
                                 ' XB 20/05/2014 - Task #1614
@@ -2754,8 +2821,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not isFinished Then
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer DDT00 but no this instruction: <ISE!>
-                                        LastISEResult.IsCancelError = True
-                                        pForcedResult = ISEProcedureResult.Exception
+                                        ' XB 19/11/2014 - BA-1872
+                                        FirmwareErrDetectedAttr = True
+
+                                        'LastISEResult.IsCancelError = True
+                                        'pForcedResult = ISEProcedureResult.Exception
+                                        ' XB 19/11/2014 - BA-1872
+
                                     End If
                                 End If
                                 ' XB 20/05/2014 - Task #1614
@@ -2767,8 +2839,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not isFinished Then
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer DDT01 but no this instruction: <ISE!>
-                                        LastISEResult.IsCancelError = True
-                                        pForcedResult = ISEProcedureResult.Exception
+                                        ' XB 19/11/2014 - BA-1872
+                                        FirmwareErrDetectedAttr = True
+
+                                        'LastISEResult.IsCancelError = True
+                                        'pForcedResult = ISEProcedureResult.Exception
+                                        ' XB 19/11/2014 - BA-1872
                                     End If
                                 End If
                                 ' XB 20/05/2014 - Task #1614
@@ -2837,12 +2913,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' XB 20/05/2014 - Task #1614
                         ElseIf MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
-                            LastISEResult.IsCancelError = True
-                            pForcedResult = ISEProcedureResult.Exception
-                            MyClass.IsISEInitializationDoneAttr = True
-                            MyClass.IsISEInitiatedOKAttr = False
-                            RaiseEvent ISEConnectionFinished(False)
+                            ' XB 19/11/2014 - BA-1872
+                            FirmwareErrDetectedAttr = True
+
+                            'LastISEResult.IsCancelError = True
+                            'pForcedResult = ISEProcedureResult.Exception
+                            'MyClass.IsISEInitializationDoneAttr = True
+                            'MyClass.IsISEInitiatedOKAttr = False
+                            'RaiseEvent ISEConnectionFinished(False)
                             ' XB 20/05/2014 - Task #1614
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                     Case ISEProcedures.ActivateModule
@@ -2905,8 +2985,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not isFinished Then
                             If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                 ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
-                                LastISEResult.IsCancelError = True
-                                pForcedResult = ISEProcedureResult.Exception
+                                ' XB 19/11/2014 - BA-1872
+                                FirmwareErrDetectedAttr = True
+
+                                'LastISEResult.IsCancelError = True
+                                'pForcedResult = ISEProcedureResult.Exception
+                                ' XB 19/11/2014 - BA-1872
                             End If
                         End If
                         ' XB 20/05/2014 - Task #1614
@@ -2940,10 +3024,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' XB 30/04/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
-                            LastISEResult.IsCancelError = True
-                            pForcedResult = ISEProcedureResult.Exception
-                            MyClass.IsCalibrationNeeded = True
+                            ' XB 19/11/2014 - BA-1872
+                            FirmwareErrDetectedAttr = True
+
+                            'LastISEResult.IsCancelError = True
+                            'pForcedResult = ISEProcedureResult.Exception
+                            'MyClass.IsCalibrationNeeded = True
                             ' XB 30/04/2014 - Task #1614
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                     Case ISEProcedures.CalibratePumps
@@ -2969,10 +3057,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                            LastISEResult.IsCancelError = True
-                            pForcedResult = ISEProcedureResult.Exception
-                            MyClass.IsPumpCalibrationNeeded = True
+                            ' XB 19/11/2014 - BA-1872
+                            FirmwareErrDetectedAttr = True
+
+                            'LastISEResult.IsCancelError = True
+                            'pForcedResult = ISEProcedureResult.Exception
+                            'MyClass.IsPumpCalibrationNeeded = True
                             ' XB 20/05/2014 - Task #1614
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                         ' XBC 27/09/2012
@@ -2998,8 +3090,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                            LastISEResult.IsCancelError = True
-                            pForcedResult = ISEProcedureResult.Exception
+                            ' XB 19/11/2014 - BA-1872
+                            FirmwareErrDetectedAttr = True
+
+                            'LastISEResult.IsCancelError = True
+                            'pForcedResult = ISEProcedureResult.Exception
+                            ' XB 19/11/2014 - BA-1872
                             ' XB 20/05/2014 - Task #1614
                         End If
 
@@ -3286,13 +3382,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 MyClass.AbortCurrentProcedureDueToException()
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ManageISEProcedureFinished", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ManageISEProcedureFinished", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3301,19 +3397,25 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Cancel the current Procedure
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function AbortCurrentProcedureDueToException() As GlobalDataTO Implements IISEAnalyzerEntity.AbortCurrentProcedureDueToException
+        ''' <remarks>
+        ''' Modified by XB 30/09/2014 - Add parameter isTimeoutException - Remove too restrictive limitations because timeouts - BA-1872
+        ''' </remarks>
+        Public Function AbortCurrentProcedureDueToException(Optional ByVal isTimeoutException As Boolean = False) As GlobalDataTO Implements IISEManager.AbortCurrentProcedureDueToException
             Dim myGlobal As New GlobalDataTO
             Try
-                If MyClass.CurrentProcedure = ISEProcedures.GeneralCheckings Then
+                If Not isTimeoutException AndAlso MyClass.CurrentProcedure = ISEProcedures.GeneralCheckings Then
                     MyClass.IsISEInitializationDoneAttr = True
                     MyClass.IsISEInitiatedOKAttr = False
                     RaiseEvent ISEConnectionFinished(False)
                 End If
 
                 If MyClass.CurrentProcedure <> ISEProcedures.None Then
-                    MyClass.LastProcedureResultAttr = ISEProcedureResult.Exception
-                    RaiseEvent ISEProcedureFinished()
+
+                    If Not isTimeoutException Then
+                        MyClass.LastProcedureResultAttr = ISEProcedureResult.Exception
+
+                        RaiseEvent ISEProcedureFinished()
+                    End If
 
                     'MyClass.LastProcedureResultAttr = ISEProcedureResult.None
                 End If
@@ -3321,11 +3423,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.AbortCurrentProcedureDueToException", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.AbortCurrentProcedureDueToException", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3335,8 +3437,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Only invoked in constructor and after loading a Report SAT
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function RefreshAllDatabaseInformation() As GlobalDataTO Implements IISEAnalyzerEntity.RefreshAllDatabaseInformation
+        ''' <remarks>
+        ''' Modified by XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        ''' </remarks>
+        Public Function RefreshAllDatabaseInformation() As GlobalDataTO Implements IISEManager.RefreshAllDatabaseInformation
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = MyClass.LoadISEParameters()
@@ -3350,12 +3454,14 @@ Namespace Biosystems.Ax00.Core.Entities
                         ' XBC 22/03/2012
                     End If
 
-                    'SGM 02/07/2012
-                    myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CMD_TIMEOUT)
-                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                        MyClass.InstructionStartedTimeout = CInt(myGlobal.SetDatos)
-                    End If
-                    'SGM 02/07/2012
+                    ' XB 30/09/2014 - BA-1872
+                    ''SGM 02/07/2012
+                    'myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CMD_TIMEOUT)
+                    'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    '    MyClass.InstructionStartedTimeout = CInt(myGlobal.SetDatos)
+                    'End If
+                    ''SGM 02/07/2012
+                    ' XB 30/09/2014 - BA-1872
 
                     ' XBC 18/07/2012
                     'get parameters
@@ -3383,13 +3489,13 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim mySWParametersDelegate As New SwParametersDelegate
 
                     'Get time needed for each Analyzer Cycle
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.CYCLE_MACHINE.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then cycleMachineTime = Convert.ToSingle(myParametersDS.tfmwSwParameters.First.ValueNumeric)
                     End If
 
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.ISE_EXECUTION_TIME_SER.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.ISE_EXECUTION_TIME_SER.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
@@ -3399,7 +3505,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         ISE_EXECUTION_TIME_SER = (ISE_EXECUTION_TIME_SER * cycleMachineTime) ' seconds
                     End If
 
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.ISE_EXECUTION_TIME_URI.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.ISE_EXECUTION_TIME_URI.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
@@ -3413,7 +3519,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 ' XBC 26/03/2012
-                ReDim myAlarms(10)
+                ReDim myAlarms(11)
                 myAlarms(Alarms.ReagentsPack_Invalid) = False
                 myAlarms(Alarms.ReagentsPack_Depleted) = False
                 myAlarms(Alarms.ReagentsPack_Expired) = False
@@ -3425,17 +3531,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 myAlarms(Alarms.LongTermDeactivated) = False
                 myAlarms(Alarms.ReagentsPack_DateInstall) = False
                 myAlarms(Alarms.Switch_Off) = False 'SGM 18/06/2012
+                myAlarms(Alarms.Timeout) = False ' XB 04/11/2014 - BA-1872
                 ' XBC 26/03/2012
 
 
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.RefreshAllDatabaseInformation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.RefreshAllDatabaseInformation", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3447,7 +3554,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Modified by XB 23/05/2014 - BT #1639 - Display Calibrations Expired Data times
         ''' </remarks>
-        Public Function RefreshMonitorDataTO() As GlobalDataTO Implements IISEAnalyzerEntity.RefreshMonitorDataTO
+        Public Function RefreshMonitorDataTO() As GlobalDataTO Implements IISEManager.RefreshMonitorDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If Not MyClass.IsISEModuleInstalled Or MyClass.IsLongTermDeactivation Then
@@ -3654,11 +3761,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.RefreshMonitorDataTO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.RefreshMonitorDataTO", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3667,8 +3774,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Gets the current alarms for showing in ISE Utilities
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>SGM 26/10/2012</remarks>
-        Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO Implements IISEAnalyzerEntity.GetISEAlarmsForUtilities
+        ''' <remarks>
+        ''' Created by SGM 26/10/2012
+        ''' Modified by XB 31/10/2014 - Add ISE timeout alarm - BA-1872
+        ''' </remarks>
+        Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO Implements IISEManager.GetISEAlarmsForUtilities
             Dim myGlobal As New GlobalDataTO
             Try
                 If Not MyClass.IsISEModuleInstalled Then
@@ -3698,6 +3808,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             If MyClass.myAlarms(Alarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
                             If MyClass.myAlarms(Alarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
 
+                            ' XB 04/11/2014 - BA-1872
+                            If MyClass.myAlarms(Alarms.Timeout) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+
                             pPendingCalibrations = New List(Of MaintenanceOperations)
                             If MyClass.IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
                             If MyClass.IsPumpCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.PumpsCalibration)
@@ -3712,11 +3825,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetISEAlarmsForUtilities", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetISEAlarmsForUtilities", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3733,8 +3846,8 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function LoadISEParameters() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
-            Dim myAllParametersDS As New ParametersDS
-            Dim myGlobalbase As New GlobalBase
+            'Dim myAllParametersDS As New ParametersDS
+            ''Dim myGlobalbase As New GlobalBase
             Try
                 If MyClass.AnalyzerModelAttr.Length > 0 Then
                     myGlobal = myParams.GetAllISEList(Nothing)
@@ -3747,11 +3860,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.LoadISEParameters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.LoadISEParameters", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3807,11 +3920,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.LoadISELimits", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.LoadISELimits", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3825,7 +3938,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  SG 16/02/2012
         ''' Modified by XB 04/02/2013 - Upper conversions must use Invariant Culture Info (Bugs tracking #1112)
         ''' </remarks>
-        Private Function GetISEParameterValue(ByVal pISEParameterName As GlobalEnumerates.SwParameters, Optional ByVal pIsTextValue As Boolean = False) As GlobalDataTO
+        Private Function GetISEParameterValue(ByVal pISEParameterName As SwParameters, Optional ByVal pIsTextValue As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.myISESwParametersDS IsNot Nothing Then
@@ -3858,11 +3971,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetISEParameterValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetISEParameterValue", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3875,7 +3988,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pLimitEnum"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function GetISELimitValues(ByVal pLimitEnum As GlobalEnumerates.FieldLimitsEnum) As GlobalDataTO
+        Private Function GetISELimitValues(ByVal pLimitEnum As FieldLimitsEnum) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
 
@@ -3891,11 +4004,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetISELimitValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetISELimitValues", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3921,8 +4034,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ReadISEInformationTable", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ReadISEInformationTable", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3945,8 +4058,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateISEInformationTable", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateISEInformationTable", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3963,7 +4076,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Add parameter pIsDatetime. Datetime Format must be controled due ISE info may be loaded into systems with different culture info
         ''' Modified by SGM 29/01/2013 - DateTime to Invariant Format - Bug #1121
         ''' </remarks>
-        Public Function UpdateISEInfoSetting(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.UpdateISEInfoSetting
+        Public Function UpdateISEInfoSetting(ByVal pISESettingID As ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO Implements IISEManager.UpdateISEInfoSetting
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.AnalyzerIDAttr.Length > 0 AndAlso MyClass.myISEInfoDS IsNot Nothing Then
@@ -3996,11 +4109,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateISEInfoSetting", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateISEInfoSetting", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4017,7 +4130,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Add parameter pIsDatetime. Datetime Format must be controled due ISE info may be loaded into systems with different culture info
         ''' Modified by SGM 29/01/2013 - DateTime to Invariant Format - Bug #1121
         ''' </remarks>
-        Private Function GetISEInfoSettingValue(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
+        Private Function GetISEInfoSettingValue(ByVal pISESettingID As ISEModuleSettings, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.AnalyzerIDAttr.Length > 0 AndAlso MyClass.myISEInfoDS IsNot Nothing Then
@@ -4054,11 +4167,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetISEInfoSettingValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetISEInfoSettingValue", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4069,11 +4182,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function GetElectrodeTestCount(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function GetElectrodeTestCount(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myConsumption As Integer = -1
-                Dim myISESetting As GlobalEnumerates.ISEModuleSettings = ISEModuleSettings.NONE
+                Dim myISESetting As ISEModuleSettings = ISEModuleSettings.NONE
 
                 Select Case pElectrode
                     Case ISE_Electrodes.Ref : myISESetting = ISEModuleSettings.REF_CONSUMPTION
@@ -4092,11 +4205,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetElectrodeTestCount", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetElectrodeTestCount", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4110,7 +4223,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function CheckElectrodeExpired(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function CheckElectrodeExpired(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsExpired As Boolean = False
@@ -4141,11 +4254,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodeExpired", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodeExpired", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4156,7 +4269,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function CheckElectrodeOverUsed(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function CheckElectrodeOverUsed(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsOverUsed As Boolean = False
@@ -4182,11 +4295,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodeOverUsed", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodeOverUsed", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4205,7 +4318,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' CREATED BY:  SGM 06/03/2012
         ''' MODIFIED BY: JBL 20/09/2012 - Added parameter pForcedLiEnabledValue set Public Function
         ''' </remarks>
-        Public Function ValidateElectrodesCalibration(ByVal pResultStr As String, Optional ByVal pForcedLiEnabledValue As TriState = TriState.UseDefault) As GlobalDataTO Implements IISEAnalyzerEntity.ValidateElectrodesCalibration
+        Public Function ValidateElectrodesCalibration(ByVal pResultStr As String, Optional ByVal pForcedLiEnabledValue As TriState = TriState.UseDefault) As GlobalDataTO Implements IISEManager.ValidateElectrodesCalibration
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim isError As Boolean = False
@@ -4215,7 +4328,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim isClOK As Boolean = False
                 Dim myCalibrationOK As Boolean = False
 
-                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
+                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetLiNaKClValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.LiNaKCl = CType(myGlobal.SetDatos, ISEResultTO.LiNaKCl)
@@ -4226,7 +4339,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (pForcedLiEnabledValue = TriState.UseDefault And MyClass.IsLiEnabledByUser) Or (pForcedLiEnabledValue = TriState.True) Then
                         'If MyClass.IsLiEnabledByUser Then
                         'Lithium
-                        myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_LI)
+                        myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_LI)
                         If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                             myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                             isLiOK = (myValues.Li > myLimits.MinValue And myValues.Li < myLimits.MaxValue)
@@ -4236,7 +4349,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Sodium
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_NA)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_NA)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isNaOK = (myValues.Na > myLimits.MinValue And myValues.Na < myLimits.MaxValue)
@@ -4245,7 +4358,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Potassium
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_K)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_K)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isKOK = (myValues.K > myLimits.MinValue And myValues.K < myLimits.MaxValue)
@@ -4254,7 +4367,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Chlorine
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_CL)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_CL)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isClOK = (myValues.Cl > myLimits.MinValue And myValues.Cl < myLimits.MaxValue)
@@ -4296,11 +4409,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidateElectrodesCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidateElectrodesCalibration", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4316,7 +4429,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myCalibrationOK As Boolean = False
-                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
+                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetPumpCalibrationValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.PumpCalibrationValues = CType(myGlobal.SetDatos, ISEResultTO.PumpCalibrationValues)
@@ -4324,7 +4437,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim myLimitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
 
                     myLimitList = (From a In MyClass.myISELimitsDS.tfmwFieldLimits _
-                                 Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.ISE_PUMPS_CALIBR_OK.ToString _
+                                 Where a.LimitID = FieldLimitsEnum.ISE_PUMPS_CALIBR_OK.ToString _
                                  Select a).ToList
 
                     If myLimitList.Count > 0 Then
@@ -4337,11 +4450,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidatePumpsCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidatePumpsCalibration", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4357,7 +4470,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myCalibrationOK As Boolean = False
-                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
+                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetBubbleDetectorCalibrationValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.BubbleCalibrationValues = CType(myGlobal.SetDatos, ISEResultTO.BubbleCalibrationValues)
@@ -4375,11 +4488,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidateBubbleCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidateBubbleCalibration", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4392,7 +4505,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pValue"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/02/2012</remarks>
-        Private Function ValidateDataLimits(ByVal pLimitsID As GlobalEnumerates.FieldLimitsEnum, ByVal pValue As Single) As GlobalDataTO
+        Private Function ValidateDataLimits(ByVal pLimitsID As FieldLimitsEnum, ByVal pValue As Single) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myResult As Boolean = False
@@ -4415,11 +4528,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetValidationLimits", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetValidationLimits", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4485,11 +4598,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesMounted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesMounted", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4539,15 +4652,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesReady", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesReady", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
-
 
         Private Function UpdateISEModuleReady() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -4573,11 +4685,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateISEModuleReady", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateISEModuleReady", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4602,11 +4714,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsPackReady", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsPackReady", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4623,11 +4735,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsPackVolumeEnough", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsPackVolumeEnough", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4659,11 +4771,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsSerialNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckReagentsSerialNumber", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4673,7 +4785,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 07/09/2012</remarks>
-        Public Function CheckAnyCalibrationIsNeeded(ByRef pAffectedElectrodes As List(Of String)) As GlobalDataTO Implements IISEAnalyzerEntity.CheckAnyCalibrationIsNeeded
+        Public Function CheckAnyCalibrationIsNeeded(ByRef pAffectedElectrodes As List(Of String)) As GlobalDataTO Implements IISEManager.CheckAnyCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4690,7 +4802,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If IsNeeded Then 'check if it is result error
                                 'affected electrodes will be locked in current ws
                                 'pAffectedElectrodes = New List(Of String)
-                                Dim myISEReception As New ISEReceptionEntity(MyClass.myAnalyzer)
+                                Dim myISEReception As New ISEReception(MyClass.myAnalyzer)
 
                                 Dim myResultTO_1 As New ISEResultTO
                                 myISEReception.FillISEResultValues(myResultTO_1, ISEResultTO.ISEResultItemTypes.Calibration1, MyClass.LastElectrodesCalibrationResult1)
@@ -4732,11 +4844,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckAnyCalibrationIsNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckAnyCalibrationIsNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4749,7 +4861,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by SGM 12/03/2012
         ''' Modified by XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
         ''' </remarks>
-        Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckElectrodesCalibrationIsNeeded
+        Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO Implements IISEManager.CheckElectrodesCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4788,11 +4900,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesCalibrationIsNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckElectrodesCalibrationIsNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4802,7 +4914,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 25/07/2012</remarks>
-        Public Function CheckBubbleCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckBubbleCalibrationIsNeeded
+        Public Function CheckBubbleCalibrationIsNeeded() As GlobalDataTO Implements IISEManager.CheckBubbleCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4824,11 +4936,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckBubbleCalibrationIsNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckBubbleCalibrationIsNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4841,7 +4953,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by SGM 12/03/2012
         ''' Modified by XB 07/04/2014 - Refresh MonitorTO when change - task #1485
         ''' </remarks>
-        Public Function CheckPumpsCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckPumpsCalibrationIsNeeded
+        Public Function CheckPumpsCalibrationIsNeeded() As GlobalDataTO Implements IISEManager.CheckPumpsCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4874,11 +4986,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckPumpsCalibrationIsNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckPumpsCalibrationIsNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4888,7 +5000,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/02/2012</remarks>
-        Public Function CheckCleanIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckCleanIsNeeded
+        Public Function CheckCleanIsNeeded() As GlobalDataTO Implements IISEManager.CheckCleanIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4901,7 +5013,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'get Lst Clean flag
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_DATE, True)
                 If Not myGlobal.HasError Then
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myLastCleanDate = CDate(myGlobal.SetDatos)
@@ -4915,7 +5027,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         Else
                             'get Maximum Test for requiring Sample
-                            myGlobal = MyClass.GetISEParameterValue(GlobalEnumerates.SwParameters.ISE_CLEAN_REQUIRED_SAMPLES)
+                            myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CLEAN_REQUIRED_SAMPLES)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 myMaximumTestsWithoutClean = CInt(myGlobal.SetDatos)
                                 If MyClass.TestsCountSinceLastClean >= myMaximumTestsWithoutClean Then
@@ -4958,11 +5070,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckCleanIsNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckCleanIsNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4974,8 +5086,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Created by SGM 05/06/2012</remarks>
         Private Function ValidateBiosystemsPack() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
-            Dim myLogAcciones As New ApplicationLogManager()
+            ''Dim myUtil As New Utilities.
+            'Dim myLogAcciones As New ApplicationLogManager()
             Try
 
                 '**********BIOSYSTEMS ALGORITHM SPECIFICATION*********************
@@ -5016,128 +5128,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Not MyClass.ISEDallasPage01.ValidationError Then
 
                                 'SGM 22/01/2013 - separate the algorithm
-                                myGlobal = ISEAnalyzerEntity.BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
+                                myGlobal = BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     result = CBool(myGlobal.SetDatos)
                                 End If
-
-
-
-                                ''Obtain SerialID 64 bits integer
-                                ''Serial ID[8] = (ID7,ID6,ID5,ID4,ID3,ID2,ID1,ID0)
-                                'Dim mySerialID_0 As String = MyClass.ISEDallasSN.SerialNumber.Substring(0, 2)
-                                'Dim mySerialID_1 As String = MyClass.ISEDallasSN.SerialNumber.Substring(2, 2)
-                                'Dim mySerialID_2 As String = MyClass.ISEDallasSN.SerialNumber.Substring(4, 2)
-                                'Dim mySerialID_3 As String = MyClass.ISEDallasSN.SerialNumber.Substring(6, 2)
-                                'Dim mySerialID_4 As String = MyClass.ISEDallasSN.SerialNumber.Substring(8, 2)
-                                'Dim mySerialID_5 As String = MyClass.ISEDallasSN.SerialNumber.Substring(10, 2)
-                                'Dim mySerialID_6 As String = MyClass.ISEDallasSN.SerialNumber.Substring(12, 2)
-                                'Dim mySerialID_7 As String = MyClass.ISEDallasSN.SerialNumber.Substring(14, 2)
-
-                                'Dim mySerialID As String = mySerialID_7 & mySerialID_6 & mySerialID_5 & mySerialID_4 & _
-                                '            mySerialID_3 & mySerialID_2 & mySerialID_1 & mySerialID_0
-
-                                ''X = ([ID4][ID3][ID2][ID1]) 4 Bytes
-                                'Dim strX As String = mySerialID.Substring(6, 8)
-                                'myGlobal = myUtil.ConvertHexToUInt32(strX)
-                                'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '    Dim X As UInt32 = Convert.ToUInt32(myGlobal.SetDatos)
-
-                                '    'SGM 31/08/2012 - This does not work!!!
-                                '    'Dim X2old As UInt64 = Convert.ToUInt64(Math.Pow(X, 2))
-
-                                '    'new way for power to 2 SGM 31/08/2012
-                                '    Dim X2 As UInt64
-                                '    myGlobal = myUtil.PowUint64To2(X)
-                                '    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '        X2 = Convert.ToUInt64(myGlobal.SetDatos)
-                                '        'X2 = Convert.ToUInt64((Convert.ToUInt64(X)) * (Convert.ToUInt64(X)))
-                                '        Dim MMask As UInt64 = 4294901760 ' &HFFFF0000
-                                '        Dim LMask As UInt64 = 65535 '&HFFFF
-                                '        Dim High As UInt32 = CType(((X2 And MMask) >> 16), UInt32)
-                                '        Dim Low As UInt32 = CType((X2 And LMask), UInt32)
-
-                                '        Dim strHigh As String = ""
-                                '        myGlobal = myUtil.ConvertUint32ToHex(High)
-                                '        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '            strHigh = CStr(myGlobal.SetDatos)
-
-                                '            'SGM 14/12/2012, V1.0.0 - prevent that result's length is minor than 4 bytes. add as many "0" up to 4
-                                '            If strHigh.Length < 4 Then
-                                '                For c As Integer = 1 To 4 - strHigh.Length Step 1
-                                '                    strHigh = "0" & strHigh
-                                '                Next
-                                '            ElseIf strHigh.Length > 4 Then
-                                '                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
-                                '            End If
-                                '            'end SGM 14/12/2012
-
-                                '        End If
-
-                                '        Dim strLow As String = ""
-                                '        myGlobal = myUtil.ConvertUint32ToHex(Low)
-                                '        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '            strLow = CStr(myGlobal.SetDatos)
-
-                                '            'SGM 14/12/2012, V1.0.0 - prevent that result's length is minor than 4 bytes. add as many "0" up to 4
-                                '            If strLow.Length < 4 Then
-                                '                For c As Integer = 1 To 4 - strLow.Length Step 1
-                                '                    strLow = "0" & strLow
-                                '                Next
-                                '            ElseIf strLow.Length > 4 Then
-                                '                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
-                                '            End If
-                                '            'end SGM 14/12/2012
-
-                                '        End If
-
-
-                                '        'MSB =(16 bits of Odd bits of X) -> [31][29][27][25]....[1]
-                                '        'LSB =(16 bits of Even bits of X) -> [30][28][26][24]....[0]
-                                '        If strHigh.Length = 4 And strLow.Length = 4 Then
-
-                                '            Dim strHighLow As String = strHigh & strLow
-                                '            Dim difTo8 As Integer = 8 - strHighLow.Length
-                                '            For c As Integer = 1 To difTo8 Step 1
-                                '                strHighLow = "0" & strHighLow
-                                '            Next
-                                '            myGlobal = myUtil.ConvertHexToBinaryString(strHighLow)
-                                '            If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '                Dim myBinary As String = CStr(myGlobal.SetDatos)
-                                '                If myBinary.Length = 32 Then
-                                '                    Dim strbMSB As String = ""
-                                '                    Dim strbLSB As String = ""
-                                '                    For B As Integer = 1 To myBinary.Length - 1 Step 2
-                                '                        strbMSB &= myBinary.Substring(B - 1, 1)
-                                '                        strbLSB &= myBinary.Substring(B, 1)
-                                '                    Next
-
-                                '                    'Y = 0x[MSB][LSB]
-                                '                    Dim strMSBLSB As String = strbMSB & strbLSB
-                                '                    myGlobal = myUtil.ConvertBinaryStringToDecimal(strMSBLSB)
-                                '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '                        Dim intY As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
-                                '                        myGlobal = myUtil.ConvertDecimalToHex(Convert.ToInt64(intY))
-                                '                        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-
-                                '                            'Security Key Validation:
-                                '                            'these bytes must match the readed Security code from Dallas Page 00
-                                '                            Dim myResultantCode As String = CStr(myGlobal.SetDatos)
-                                '                            Dim dif8 As Integer = 8 - myResultantCode.Length
-                                '                            'bug fixed: dif8 used
-                                '                            For c As Integer = 1 To dif8 Step 1
-                                '                                myResultantCode = "0" & myResultantCode
-                                '                            Next
-                                '                            result = (myResultantCode = MyClass.ISEDallasPage00.SecurityCode)
-
-                                '                        End If
-                                '                    End If
-                                '                End If
-                                '            End If
-                                '        End If
-                                '    End If
-                                'End If
-
 
                             End If
                         Else
@@ -5151,11 +5145,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -5177,11 +5171,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidateBiosystemsCode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidateBiosystemsCode", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5196,8 +5190,8 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Shared Function BiosystemsValidationAlgorithm(ByVal pISEDallasSN As ISEDallasSNTO, ByVal pDallas00 As ISEDallasPage00TO) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
-            Dim myUtil As New Utilities
+            'Dim myLogAcciones As New ApplicationLogManager()
+            'Dim Utilities As New Utilities
 
             Try
                 Dim result As Boolean = False
@@ -5218,7 +5212,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'X = ([ID4][ID3][ID2][ID1]) 4 Bytes
                 Dim strX As String = mySerialID.Substring(6, 8)
-                myGlobal = myUtil.ConvertHexToUInt32(strX)
+                myGlobal = Utilities.ConvertHexToUInt32(strX)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     Dim X As UInt32 = Convert.ToUInt32(myGlobal.SetDatos)
 
@@ -5227,7 +5221,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'new way for power to 2 SGM 31/08/2012
                     Dim X2 As UInt64
-                    myGlobal = myUtil.PowUint64To2(X)
+                    myGlobal = Utilities.PowUint64To2(X)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         X2 = Convert.ToUInt64(myGlobal.SetDatos)
                         'X2 = Convert.ToUInt64((Convert.ToUInt64(X)) * (Convert.ToUInt64(X)))
@@ -5237,7 +5231,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim Low As UInt32 = CType((X2 And LMask), UInt32)
 
                         Dim strHigh As String = ""
-                        myGlobal = myUtil.ConvertUint32ToHex(High)
+                        myGlobal = Utilities.ConvertUint32ToHex(High)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strHigh = CStr(myGlobal.SetDatos)
 
@@ -5247,14 +5241,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                     strHigh = "0" & strHigh
                                 Next
                             ElseIf strHigh.Length > 4 Then
-                                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
                             End If
                             'end SGM 14/12/2012
 
                         End If
 
                         Dim strLow As String = ""
-                        myGlobal = myUtil.ConvertUint32ToHex(Low)
+                        myGlobal = Utilities.ConvertUint32ToHex(Low)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strLow = CStr(myGlobal.SetDatos)
 
@@ -5264,7 +5258,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     strLow = "0" & strLow
                                 Next
                             ElseIf strLow.Length > 4 Then
-                                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
                             End If
                             'end SGM 14/12/2012
 
@@ -5280,7 +5274,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             For c As Integer = 1 To difTo8 Step 1
                                 strHighLow = "0" & strHighLow
                             Next
-                            myGlobal = myUtil.ConvertHexToBinaryString(strHighLow)
+                            myGlobal = Utilities.ConvertHexToBinaryString(strHighLow)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 Dim myBinary As String = CStr(myGlobal.SetDatos)
                                 If myBinary.Length = 32 Then
@@ -5293,10 +5287,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Y = 0x[MSB][LSB]
                                     Dim strMSBLSB As String = strbMSB & strbLSB
-                                    myGlobal = myUtil.ConvertBinaryStringToDecimal(strMSBLSB)
+                                    myGlobal = Utilities.ConvertBinaryStringToDecimal(strMSBLSB)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         Dim intY As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
-                                        myGlobal = myUtil.ConvertDecimalToHex(Convert.ToInt64(intY))
+                                        myGlobal = Utilities.ConvertDecimalToHex(Convert.ToInt64(intY))
                                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
                                             'Security Key Validation:
@@ -5309,7 +5303,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Next
 
                                             If myResultantCode.Length <> 8 Then
-                                                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
+                                                GlobalBase.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
                                             Else
                                                 result = (myResultantCode = pDallas00.SecurityCode)
                                             End If
@@ -5326,11 +5320,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.BiosystemsValidationAlgorithm", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5372,11 +5366,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidateReagentsPackVolumes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidateReagentsPackVolumes", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5437,8 +5431,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         '        returnValue = False
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ValidatePreparatiosAllowed", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ValidatePreparatiosAllowed", EventLogEntryType.Error, False)
         '    End Try
         '    Return myglobal
         'End Function
@@ -5462,8 +5456,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     MyClass.SIPcycles = MyClass.EstimatedSIPCycles()
                 Else
                     ' XBC 17/07/2012
-                    'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                    'myLogAcciones.CreateLogActivity("Update Consumptions - Work Session Running ! ", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                    ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
+                    'GlobalBase.CreateLogActivity("Update Consumptions - Work Session Running ! ", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                     ' Into Work session running, Sips are avoid
                     Dim myLastOperationDate As DateTime
@@ -5474,22 +5468,22 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     If myLastOperationDate <> Nothing Then
-                        'myLogAcciones.CreateLogActivity("Update Consumptions - Last Date " & myLastOperationDate.ToString, "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                        'GlobalBase.CreateLogActivity("Update Consumptions - Last Date " & myLastOperationDate.ToString, "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                         Dim TimeOperation As Single
                         If MyClass.LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.SER Then
                             TimeOperation = ISE_EXECUTION_TIME_SER
-                            'myLogAcciones.CreateLogActivity("Update Consumptions - SERUM [" & ISE_EXECUTION_TIME_SER.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                            'GlobalBase.CreateLogActivity("Update Consumptions - SERUM [" & ISE_EXECUTION_TIME_SER.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         ElseIf MyClass.LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.URN Then
                             TimeOperation = ISE_EXECUTION_TIME_URI
-                            'myLogAcciones.CreateLogActivity("Update Consumptions - URINE [" & ISE_EXECUTION_TIME_URI.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                            'GlobalBase.CreateLogActivity("Update Consumptions - URINE [" & ISE_EXECUTION_TIME_URI.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         End If
 
                         ' variable times depending on interval Firmware time duration
                         If Interval2forPurgeACompletedbyFW > 0 AndAlso myLastOperationDate < DateAdd(DateInterval.Second, -(Interval2forPurgeACompletedbyFW + TimeOperation), DateTime.Now) Then
                             ' If last ISE operation completed > ISE_PUGAbyFW_TIME2 the corresponding flag is increased
                             MyClass.PurgeAbyFirmwareAttr += 1
-                            'myLogAcciones.CreateLogActivity("Update Consumptions - PurgeA [" & MyClass.PurgeAbyFirmwareAttr.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                            'GlobalBase.CreateLogActivity("Update Consumptions - PurgeA [" & MyClass.PurgeAbyFirmwareAttr.ToString & "]", "ISEManager.UpdateConsumptions", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         End If
                     End If
                 End If
@@ -5534,11 +5528,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateConsumptions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateConsumptions", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -5548,13 +5542,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>GlobalDataTO containing a Typed Dataset AnalyzerLedPositionsDS with the list of WaveLength items</returns>
         ''' <remarks>Created by XBC 08/03/2012</remarks>
-        Public Function GetConsumptionParameters() As GlobalDataTO Implements IISEAnalyzerEntity.GetConsumptionParameters
+        Public Function GetConsumptionParameters() As GlobalDataTO Implements IISEManager.GetConsumptionParameters
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             Dim myParametersDS As New ParametersDS
             Try
                 ' Consumption of calibrator A by Serum Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SERUM_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SERUM_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbySerumAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5563,7 +5557,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Serum Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SERUM_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SERUM_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbySerumAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5572,7 +5566,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Urine (1st phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE1_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE1_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyUrine1Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5581,7 +5575,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Urine (1st phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE1_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE1_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyUrine1Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5590,7 +5584,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Urine (2nd phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE2_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE2_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyUrine2Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5599,7 +5593,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Urine (2nd phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE2_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE2_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyUrine2Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5608,7 +5602,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Electrodes calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CALB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CALB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyElectrodesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5617,7 +5611,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Electrodes calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CALB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CALB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyElectrodesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5626,7 +5620,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Pumps calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PMCL_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PMCL_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPumpsCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5635,7 +5629,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Pumps calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PMCL_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PMCL_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPumpsCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5644,7 +5638,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Bubbles detector calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_BBCL_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_BBCL_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyBubblesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5653,7 +5647,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Bubbles detector calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_BBCL_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_BBCL_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyBubblesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5662,7 +5656,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Clean cycle Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CLEN_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CLEN_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyCleanCycleAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5671,7 +5665,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Clean cycle Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CLEN_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CLEN_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyCleanCycleAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5680,7 +5674,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PurgeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGA_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGA_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPurgeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5689,7 +5683,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PurgeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGA_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGA_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPurgeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5698,7 +5692,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PurgeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPurgeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5707,7 +5701,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PurgeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPurgeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5716,7 +5710,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PrimeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMA_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMA_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPrimeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5725,7 +5719,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PrimeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMA_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMA_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPrimeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5734,7 +5728,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PrimeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPrimeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5743,7 +5737,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PrimeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPrimeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5752,7 +5746,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Sipping Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SIPPING_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SIPPING_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbySippingAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5761,7 +5755,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Sipping Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SIPPING_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SIPPING_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbySippingAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5773,11 +5767,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetConsumptionParameters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetConsumptionParameters", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5879,7 +5873,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Debug.Print("CONSUME CAL A : " & MyClass.CountConsumptionToSaveDallasData_CalA.ToString & " (-" & myAdditionValue.ToString & ")")
 
                         If MyClass.CountConsumptionToSaveDallasData_CalA >= MyClass.MinConsumptionVolToSaveDallasData_CalA Then
-                            'Debug.Print("SAVE Consume ISE PENDING !")
+                            Debug.Print("SAVE Consume ISE PENDING (A) !")
                             MyClass.IsCalAUpdateRequiredAttr = True
                         End If
 
@@ -5890,11 +5884,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateReagentsCalAConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateReagentsCalAConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6009,11 +6003,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateReagentsCalBConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateReagentsCalBConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6055,11 +6049,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeRefConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeRefConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6101,11 +6095,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeLiConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeLiConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6147,11 +6141,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeNaConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeNaConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6193,11 +6187,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeKConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeKConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6239,11 +6233,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeClConsumption", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateElectrodeClConsumption", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6275,11 +6269,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.InitializeReagentsConsumptions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.InitializeReagentsConsumptions", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6289,7 +6283,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 08/03/2012</remarks>
-        Public Function SaveConsumptionCalToDallasData(ByVal pCalibrator As String) As GlobalDataTO Implements IISEAnalyzerEntity.SaveConsumptionCalToDallasData
+        Public Function SaveConsumptionCalToDallasData(ByVal pCalibrator As String) As GlobalDataTO Implements IISEManager.SaveConsumptionCalToDallasData
             Dim myglobal As New GlobalDataTO
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -6308,7 +6302,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ' XBC 15/03/2012
                     ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
                     'If IsNumeric(myPosition) Then
-                    '    myglobal = myUtility.ConvertDecimalToHex(CLng(myPosition))
+                    '    myglobal = Utilities.ConvertDecimalToHex(CLng(myPosition))
                     '    If Not myglobal.HasError AndAlso Not myglobal.SetDatos Is Nothing Then
                     '        myPosition = CType(myglobal.SetDatos, String)
                     '    Else
@@ -6319,7 +6313,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'End If
 
                     'If IsNumeric(myInfo) Then
-                    '    myglobal = myUtility.ConvertDecimalToHex(CLng(myInfo))
+                    '    myglobal = Utilities.ConvertDecimalToHex(CLng(myInfo))
                     '    If Not myglobal.HasError AndAlso Not myglobal.SetDatos Is Nothing Then
                     '        myInfo = CType(myglobal.SetDatos, String)
                     '    Else
@@ -6344,11 +6338,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SaveConsumptionCalAToDallasData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SaveConsumptionCalAToDallasData", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -6435,8 +6429,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.SetDatos = returnValue
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetNextPositionToSaveConsumptionCalA", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetNextPositionToSaveConsumptionCalA", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -6470,11 +6464,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.EstimatedSIPCycles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.EstimatedSIPCycles", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -6485,7 +6479,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 17/07/2012</remarks>
-        Public Function EstimatedFWConsumptionWS() As Long Implements IISEAnalyzerEntity.EstimatedFWConsumptionWS
+        Public Function EstimatedFWConsumptionWS() As Long Implements IISEManager.EstimatedFWConsumptionWS
             Dim myglobal As New GlobalDataTO
             Dim returnValue As Long = 0
             Try
@@ -6585,11 +6579,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.EstimatedFWConsumptionWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.EstimatedFWConsumptionWS", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -6608,7 +6602,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by SGM 08/02/2012
         ''' Modified by XB 23/10/2013 - ISECMDs instructions are allowed to send while Analyzer is in Running during Pause mode - BT #1343
         ''' </remarks>
-        Public Function SendISECommand() As GlobalDataTO Implements IISEAnalyzerEntity.SendISECommand
+        Public Function SendISECommand() As GlobalDataTO Implements IISEManager.SendISECommand
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.CurrentCommandTO IsNot Nothing Then
@@ -6624,7 +6618,7 @@ Namespace Biosystems.Ax00.Core.Entities
                            (MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And MyClass.myAnalyzer.AllowScanInRunning) Then
                             ' XB 23/10/2013
 
-                            myGlobal = MyClass.myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
+                            myGlobal = myAnalyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
                             If Not myGlobal.HasError Then
 
                                 ' XBC 05/09/2012 - Start Timeout must emplaced inside ManageAnalyzer
@@ -6642,11 +6636,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SendISECommand", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SendISECommand", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -6656,7 +6650,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 05/07/2012</remarks>
-        Public Function MoveR2ArmAway() As GlobalDataTO Implements IISEAnalyzerEntity.MoveR2ArmAway
+        Public Function MoveR2ArmAway() As GlobalDataTO Implements IISEManager.MoveR2ArmAway
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6670,8 +6664,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.MoveR2ArmAway", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.MoveR2ArmAway", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6681,7 +6675,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 05/07/2012</remarks>
-        Public Function MoveR2ArmBack() As GlobalDataTO Implements IISEAnalyzerEntity.MoveR2ArmBack
+        Public Function MoveR2ArmBack() As GlobalDataTO Implements IISEManager.MoveR2ArmBack
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6695,15 +6689,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.MoveR2ArmBack", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.MoveR2ArmBack", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         Public Function SetElectrodesInstallDates(ByVal pRef As DateTime, ByVal pNa As DateTime, _
                                                   ByVal pK As DateTime, ByVal pCl As DateTime, _
-                                                  ByVal pLi As DateTime, Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.SetElectrodesInstallDates
+                                                  ByVal pLi As DateTime, Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IISEManager.SetElectrodesInstallDates
 
             Dim resultData As New GlobalDataTO
             Try
@@ -6728,13 +6722,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SetElectrodesInstallDates", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SetElectrodesInstallDates", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
-        Public Function SetReagentsPackInstallDate(ByVal pdate As DateTime, Optional ByVal pResetConsumptions As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.SetReagentsPackInstallDate
+        Public Function SetReagentsPackInstallDate(ByVal pdate As DateTime, Optional ByVal pResetConsumptions As Boolean = False) As GlobalDataTO Implements IISEManager.SetReagentsPackInstallDate
 
             Dim resultData As New GlobalDataTO
             Try
@@ -6762,8 +6756,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SetReagentsPackInstallDate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SetReagentsPackInstallDate", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6774,7 +6768,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDate"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function SetPumpTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEAnalyzerEntity.SetPumpTubingInstallDate
+        Public Function SetPumpTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEManager.SetPumpTubingInstallDate
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.PumpTubingInstallDate = pDate
@@ -6784,8 +6778,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SetPumpTubingInstallDate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SetPumpTubingInstallDate", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6797,7 +6791,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDate"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function SetFluidicTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEAnalyzerEntity.SetFluidicTubingInstallDate
+        Public Function SetFluidicTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEManager.SetFluidicTubingInstallDate
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.FluidicTubingInstallDate = pDate
@@ -6807,8 +6801,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SetFluidicTubingInstallDate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SetFluidicTubingInstallDate", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6818,7 +6812,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function InstallISEModule() As GlobalDataTO Implements IISEAnalyzerEntity.InstallISEModule
+        Public Function InstallISEModule() As GlobalDataTO Implements IISEManager.InstallISEModule
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6832,8 +6826,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.InstallISEModule", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.InstallISEModule", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6846,7 +6840,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DeactivateISEModule(ByVal pDeactivationMode As Boolean) As GlobalDataTO Implements IISEAnalyzerEntity.DeactivateISEModule
+        Public Function DeactivateISEModule(ByVal pDeactivationMode As Boolean) As GlobalDataTO Implements IISEManager.DeactivateISEModule
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.IsLongTermDeactivation = pDeactivationMode
@@ -6857,8 +6851,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DeactivateISEModule", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DeactivateISEModule", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6872,7 +6866,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by SGM 07/03/2012
         ''' Modified by SGM 16/01/2013 - Bug #1108
         ''' </remarks>
-        Public Function ActivateReagentsPack() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateReagentsPack
+        Public Function ActivateReagentsPack() As GlobalDataTO Implements IISEManager.ActivateReagentsPack
             Dim resultData As New GlobalDataTO
             Try
                 ' XBC 18/07/2012 - Initialize database consumptions counters
@@ -6919,8 +6913,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ActivateReagentsPack", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ActivateReagentsPack", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6930,7 +6924,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function ActivateElectrodes() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateElectrodes
+        Public Function ActivateElectrodes() As GlobalDataTO Implements IISEManager.ActivateElectrodes
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6944,8 +6938,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ActivateElectrodes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ActivateElectrodes", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6955,7 +6949,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function ActivateISEPreparations() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateISEPreparations
+        Public Function ActivateISEPreparations() As GlobalDataTO Implements IISEManager.ActivateISEPreparations
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6970,8 +6964,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ActivateISEpreparations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ActivateISEpreparations", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -6981,7 +6975,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 11/06/2012</remarks>
-        Public Function DoPrimeAndCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPrimeAndCalibration
+        Public Function DoPrimeAndCalibration() As GlobalDataTO Implements IISEManager.DoPrimeAndCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6995,8 +6989,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoPrimeAndCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoPrimeAndCalibration", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7006,7 +7000,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 11/06/2012</remarks>
-        Public Function DoPrimeX2AndCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPrimeX2AndCalibration
+        Public Function DoPrimeX2AndCalibration() As GlobalDataTO Implements IISEManager.DoPrimeX2AndCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7020,8 +7014,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoPrimeX2AndCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoPrimeX2AndCalibration", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7032,7 +7026,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DoGeneralCheckings(Optional ByVal pIsRPAlreadyRead As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.DoGeneralCheckings
+        Public Function DoGeneralCheckings(Optional ByVal pIsRPAlreadyRead As Boolean = False) As GlobalDataTO Implements IISEManager.DoGeneralCheckings
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7051,8 +7045,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoGeneralCheckings", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoGeneralCheckings", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7065,7 +7059,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by SGM 07/03/2012
         ''' </remarks>
-        Public Function DoCleaning(ByVal pTubePos As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.DoCleaning
+        Public Function DoCleaning(ByVal pTubePos As Integer) As GlobalDataTO Implements IISEManager.DoCleaning
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.Clean
@@ -7078,8 +7072,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoCleaning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoCleaning", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7089,7 +7083,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DoMaintenanceExit() As GlobalDataTO Implements IISEAnalyzerEntity.DoMaintenanceExit
+        Public Function DoMaintenanceExit() As GlobalDataTO Implements IISEManager.DoMaintenanceExit
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7103,8 +7097,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoMaintenanceExit", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoMaintenanceExit", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7115,7 +7109,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pType">"A" or "B"</param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587</remarks>
-        Public Function DoPurge(ByVal pType As String) As GlobalDataTO Implements IISEAnalyzerEntity.DoPurge
+        Public Function DoPurge(ByVal pType As String) As GlobalDataTO Implements IISEManager.DoPurge
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.SingleCommand
@@ -7133,8 +7127,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoPurge" & pType, EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoPurge" & pType, EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7179,8 +7173,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoWriteConsumption", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoWriteConsumption", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -7190,7 +7184,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function CheckCleanPackInstalled() As GlobalDataTO Implements IISEAnalyzerEntity.CheckCleanPackInstalled
+        Public Function CheckCleanPackInstalled() As GlobalDataTO Implements IISEManager.CheckCleanPackInstalled
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7204,8 +7198,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckCleanPackInstalled", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckCleanPackInstalled", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7216,8 +7210,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Check ISE module Alarms
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by XBC 26/03/2012</remarks>
-        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEAnalyzerEntity.CheckAlarms
+        ''' <remarks>
+        ''' Created by XBC 26/03/2012
+        ''' Modified by XB 04/11/2014 - Add ISE Timeout Alarm - BA-1872
+        ''' </remarks>
+        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEManager.CheckAlarms
             Dim resultData As New GlobalDataTO
             Try
                 Dim treat As Boolean = True
@@ -7316,6 +7313,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
                         'SGM 14/06/2012
+
+                        'Timeout    XB 04/11/2014 - BA-1872
+                        myAlarms(Alarms.Timeout) = False
+                        alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                        pAlarmList.Add(alarmID)
+                        pAlarmStatusList.Add(alarmStatus)
 
                     Else
                         If myAlarms(Alarms.LongTermDeactivated) Then
@@ -7584,7 +7587,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             ' Ise Clean Pack wrong installed           
-                            If MyClass.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.CheckCleanPackInstalled Then
+                            If MyClass.CurrentProcedure = ISEProcedures.CheckCleanPackInstalled Then
                                 Dim isFinished As Boolean = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                                 If isFinished And Not MyClass.IsCleanPackInstalled Then
 
@@ -7607,6 +7610,28 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                             End If
+
+                            ' XB 04/11/2014 - BA-1872
+                            ' Ise Timeout   
+                            If MyClass.IsTimeOut Then
+
+                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmStatus = True
+                                pAlarmList.Add(alarmID)
+                                pAlarmStatusList.Add(alarmStatus)
+
+                                myAlarms(Alarms.Timeout) = True
+                            Else
+                                If myAlarms(Alarms.Timeout) Then
+                                    myAlarms(Alarms.Timeout) = False
+                                    ' solved
+                                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                    alarmStatus = False
+                                    pAlarmList.Add(alarmID)
+                                    pAlarmStatusList.Add(alarmStatus)
+                                End If
+                            End If
+
                         End If
 
                         ' Ise Electrodes Expired by consumption
@@ -7678,8 +7703,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.CheckAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.CheckAlarms", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7691,9 +7716,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 04/04/2012
-        ''' AG + XBC 28/09/2012 - Returns GlobalDataTo (SetDatos as boolean, TRUE any instruction sent, FALSE no instructin sent)
+        ''' Modified by AG + XBC 28/09/2012 - Returns GlobalDataTo (SetDatos as boolean, TRUE any instruction sent, FALSE no instructin sent)
+        '''                   XB 07/01/2015 - Do not save consumptions when Start Session or Shutdown operations are processing - BA-1178
         ''' </remarks>
-        Public Function SaveConsumptions() As GlobalDataTO Implements IISEAnalyzerEntity.SaveConsumptions
+        Public Function SaveConsumptions() As GlobalDataTO Implements IISEManager.SaveConsumptions
             Dim resultData As New GlobalDataTO
             Try
                 Dim instructionSentFlag As Boolean = False 'AG + XBC 28/09/2012
@@ -7702,52 +7728,56 @@ Namespace Biosystems.Ax00.Core.Entities
                 ' And Reagents Pack Ready (Has Distributor Code Ok and Installed)
                 If MyClass.IsISEInitiatedOKAttr And MyClass.IsReagentsPackReady Then
 
-                    If MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    '  XB 07/01/2015 - BA-1178
+                    If Not myAnalyzer.ShutDownisPending And Not myAnalyzer.StartSessionisPending Then
 
-                        If MyClass.IsCalAUpdateRequired Then 'update cal A consumption
+                        If MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
 
-                            MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
+                            If MyClass.IsCalAUpdateRequired Then 'update cal A consumption
 
-                            ' Save it into Dallas Xip
-                            resultData = SaveConsumptionCalToDallasData("A")
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
-                                Debug.Print("Guardant Consum Cal A ...")
+                                MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
 
-                                resultData = MyClass.SendISECommand()
-                                If Not resultData.HasError Then
-                                    instructionSentFlag = True  'AG + XBC 28/09/2012
-                                    MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION
-                                    Debug.Print("Canvi d'estat a WRITE_CALA_CONSUMPTION ...")
-                                Else
-                                    Debug.Print("Cal A ... No entra !")
+                                ' Save it into Dallas Xip
+                                resultData = SaveConsumptionCalToDallasData("A")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
+                                    Debug.Print("Guardant Consum Cal A ...")
+
+                                    resultData = MyClass.SendISECommand()
+                                    If Not resultData.HasError Then
+                                        instructionSentFlag = True  'AG + XBC 28/09/2012
+                                        MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION
+                                        Debug.Print("Canvi d'estat a WRITE_CALA_CONSUMPTION ...")
+                                    Else
+                                        Debug.Print("Cal A ... No entra !")
+                                    End If
+
+                                End If
+
+                            ElseIf MyClass.IsCalBUpdateRequired Then 'update calB consumption
+
+                                MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
+
+                                ' Save it into Dallas Xip
+                                resultData = SaveConsumptionCalToDallasData("B")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
+                                    Debug.Print("Guardant Consum Cal B ...")
+
+                                    resultData = MyClass.SendISECommand()
+                                    If Not resultData.HasError Then
+                                        instructionSentFlag = True  'AG + XBC 28/09/2012
+                                        MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
+                                        Debug.Print("Canvi d'estat a WRITE_CALB_CONSUMPTION ...")
+                                    Else
+                                        Debug.Print("Cal B ... No entra !")
+                                    End If
                                 End If
 
                             End If
-
-                        ElseIf MyClass.IsCalBUpdateRequired Then 'update calB consumption
-
-                            MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
-
-                            ' Save it into Dallas Xip
-                            resultData = SaveConsumptionCalToDallasData("B")
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
-                                Debug.Print("Guardant Consum Cal B ...")
-
-                                resultData = MyClass.SendISECommand()
-                                If Not resultData.HasError Then
-                                    instructionSentFlag = True  'AG + XBC 28/09/2012
-                                    MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
-                                    Debug.Print("Canvi d'estat a WRITE_CALB_CONSUMPTION ...")
-                                Else
-                                    Debug.Print("Cal B ... No entra !")
-                                End If
-                            End If
-
                         End If
-                    End If
 
+                    End If
                 End If
                 resultData.SetDatos = instructionSentFlag 'AG + XBC 28/09/2012
 
@@ -7757,8 +7787,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SaveConsumptions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SaveConsumptions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7768,7 +7798,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 26/06/2012</remarks>
-        Public Function DoElectrodesCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoElectrodesCalibration
+        Public Function DoElectrodesCalibration() As GlobalDataTO Implements IISEManager.DoElectrodesCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7782,8 +7812,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoElectrodesCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoElectrodesCalibration", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7793,7 +7823,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 26/06/2012</remarks>
-        Public Function DoPumpsCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPumpsCalibration
+        Public Function DoPumpsCalibration() As GlobalDataTO Implements IISEManager.DoPumpsCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7807,8 +7837,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoPumpsCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoPumpsCalibration", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7818,7 +7848,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 25/07/2012</remarks>
-        Public Function DoBubblesCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoBubblesCalibration
+        Public Function DoBubblesCalibration() As GlobalDataTO Implements IISEManager.DoBubblesCalibration
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.CalibrateBubbles
@@ -7831,13 +7861,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.DoBubblesCalibration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.DoBubblesCalibration", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
-        Public Function GetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As String Implements IISEAnalyzerEntity.GetISEErrorDescription
+        Public Function GetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As String Implements IISEManager.GetISEErrorDescription
             Dim myDesc As String = ""
             Try
                 Dim myDescID As String = ""
@@ -7917,8 +7947,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myDesc = ""
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetISEErrorDescription", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetISEErrorDescription", EventLogEntryType.Error, False)
             End Try
             Return myDesc
         End Function
@@ -7930,7 +7960,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAnalyzerModel"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 03/12/2013 - protection : Ensure that connected Analyzer is fine registered on ISE table DB - task #1410</remarks>
-        Public Function UpdateAnalyzerInformation(ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO Implements IISEAnalyzerEntity.UpdateAnalyzerInformation
+        Public Function UpdateAnalyzerInformation(ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO Implements IISEManager.UpdateAnalyzerInformation
             Dim resultData As New GlobalDataTO
             Try
                 AnalyzerIDAttr = pAnalyzerID
@@ -7938,8 +7968,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 resultData = MyClass.RefreshAllDatabaseInformation
 
-                Dim myLogAccionesAux As New ApplicationLogManager()
-                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Update Analyzer ID on ISE Manager [ " & pAnalyzerID & " ] ", "ISEManager.UpdateAnalyzerInformation", EventLogEntryType.Information, False)
+                'Dim myLogAccionesAux As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("(Analyzer Change) Update Analyzer ID on ISE Manager [ " & pAnalyzerID & " ] ", "ISEManager.UpdateAnalyzerInformation", EventLogEntryType.Information, False)
 
             Catch ex As Exception
                 resultData = New GlobalDataTO()
@@ -7947,8 +7977,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.UpdateAnalyzerInformation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.UpdateAnalyzerInformation", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -7957,7 +7987,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Initialize() Implements IISEAnalyzerEntity.Initialize
+        Public Sub Initialize() Implements IISEManager.Initialize
             Try
                 MyClass.IsAnalyzerDisconnectedAttr = False
 
@@ -8112,7 +8142,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 ConsumptionCalAbySippingAttr = 0
                 ConsumptionCalBbySippingAttr = 0
 
-                Const CteVolumeToSaveDallasData = 1
                 MinConsumptionVolToSaveDallasData_CalA = 0
                 MinConsumptionVolToSaveDallasData_CalB = 0
                 CountConsumptionToSaveDallasData_CalA = 0
@@ -8132,6 +8161,38 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
+     ''' <summary>
+        ''' Returns an formated string displaying the results with the corresponding ISE test names
+        ''' </summary>
+        ''' <param name="pAffected"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by: XB 08/09/2014 - Use ISE Test Name field instead of fixed texts - BA-1902
+        ''' </remarks>
+        Public Shared Function FormatAffected(ByVal pAffected As String) As String
+            Dim res As String = ""
+            Try
+                'Cl-, K+, Na+, Li+
+                Dim ISETestList As New ISETestsDelegate
+
+                Dim Li As String = ISETestList.GetName(Nothing, ISE_Tests.Li)
+                Dim Na As String = ISETestList.GetName(Nothing, ISE_Tests.Na)
+                Dim K As String = ISETestList.GetName(Nothing, ISE_Tests.K)
+                Dim Cl As String = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+
+                If pAffected.Contains("Cl") Then res &= Cl & ", "
+                If pAffected.Contains("K") Then res &= K & ", "
+                If pAffected.Contains("Na") Then res &= Na & ", "
+                If pAffected.Contains("Li") Then res &= Li & ", "
+
+                If res.EndsWith(", ") Then res = res.Substring(0, res.Length - 2)
+
+            Catch ex As Exception
+                res = ""
+            End Try
+            Return res
+        End Function
+
 #End Region
 
 #Region "ISE Sendings"
@@ -8140,110 +8201,112 @@ Namespace Biosystems.Ax00.Core.Entities
         'this functionality is implemented in order to manage timeouts 
         'when no Status Start notification is received after sending an ISE Command
 
-        Private InstructionStartedTimeout As Integer = 2000 '1000 miliseconds
+        ' XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        'Private InstructionStartedTimeout As Integer = 2000 '1000 miliseconds
 
-        Private InstructionStartedTimerCallBack As System.Threading.TimerCallback
-        Private WithEvents InstructionStartedTimer As System.Threading.Timer
+        'Private InstructionStartedTimerCallBack As System.Threading.TimerCallback
+        'Private WithEvents InstructionStartedTimer As System.Threading.Timer
 
-        ''' <summary>
-        ''' flag for knowing if it is waiting for the 1st instruction start after sending ISECMD
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public ReadOnly Property IsWaitingForInstructionStart() As Boolean Implements IISEAnalyzerEntity.IsWaitingForInstructionStart
-            Get
-                Return (MyClass.InstructionStartedTimer IsNot Nothing)
-            End Get
-        End Property
+        ' ''' <summary>
+        ' ''' flag for knowing if it is waiting for the 1st instruction start after sending ISECMD
+        ' ''' </summary>
+        ' ''' <value></value>
+        ' ''' <returns></returns>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Public ReadOnly Property IsWaitingForInstructionStart() As Boolean
+        '    Get
+        '        Return (MyClass.InstructionStartedTimer IsNot Nothing)
+        '    End Get
+        'End Property
 
-        ''' <summary>
-        ''' Start Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <param name="pTime"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by SGM 20/06/2012
-        ''' Modified by XBC 04/09/2012 - change to Public to allow calls from ManageAnalyzer
-        ''' </remarks>
-        Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO Implements IISEAnalyzerEntity.StartInstructionStartedTimer
-            Dim myGlobal As New GlobalDataTO
-            Try
-                Dim myTime As Integer
+        ' ''' <summary>
+        ' ''' Start Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <param name="pTime"></param>
+        ' ''' <returns></returns>
+        ' ''' <remarks>
+        ' ''' Created by SGM 20/06/2012
+        ' ''' Modified by XBC 04/09/2012 - change to Public to allow calls from ManageAnalyzer
+        ' ''' </remarks>
+        'Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO
+        '    Dim myGlobal As New GlobalDataTO
+        '    Try
+        '        Dim myTime As Integer
 
-                If pTime > 0 Then
-                    myTime = pTime
-                Else
-                    myTime = MyClass.InstructionStartedTimeout
-                End If
+        '        If pTime > 0 Then
+        '            myTime = pTime
+        '        Else
+        '            myTime = MyClass.InstructionStartedTimeout
+        '        End If
 
-                MyClass.StopInstructionStartedTimer()
+        '        MyClass.StopInstructionStartedTimer()
 
-                MyClass.InstructionStartedTimerCallBack = New System.Threading.TimerCallback(AddressOf OnInstructionStartedTimerTick)
+        '        MyClass.InstructionStartedTimerCallBack = New System.Threading.TimerCallback(AddressOf OnInstructionStartedTimerTick)
 
-                MyClass.InstructionStartedTimer = New System.Threading.Timer(MyClass.InstructionStartedTimerCallBack, New Object, myTime, 0)
+        '        MyClass.InstructionStartedTimer = New System.Threading.Timer(MyClass.InstructionStartedTimerCallBack, New Object, myTime, 0)
 
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer activated")
+        '        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer activated")
 
-            Catch ex As Exception
-                myGlobal = New GlobalDataTO()
-                myGlobal.HasError = True
-                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                myGlobal.ErrorMessage = ex.Message
+        '    Catch ex As Exception
+        '        myGlobal = New GlobalDataTO()
+        '        myGlobal.HasError = True
+        '        myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
+        '        myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StartInstructionStartedTimer", EventLogEntryType.Error, False)
-            End Try
-            Return myGlobal
-        End Function
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.StartInstructionStartedTimer", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return myGlobal
+        'End Function
 
-        ''' <summary>
-        ''' Stop Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public Sub StopInstructionStartedTimer() Implements IISEAnalyzerEntity.StopInstructionStartedTimer
-            Try
-                If MyClass.InstructionStartedTimer IsNot Nothing Then
-                    MyClass.InstructionStartedTimer.Dispose()
-                    MyClass.InstructionStartedTimer = Nothing
-                    MyClass.InstructionStartedTimerCallBack = Nothing
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer killed")
-                Else
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer es nothing")
-                End If
+        ' ''' <summary>
+        ' ''' Stop Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Public Sub StopInstructionStartedTimer()
+        '    Try
+        '        If MyClass.InstructionStartedTimer IsNot Nothing Then
+        '            MyClass.InstructionStartedTimer.Dispose()
+        '            MyClass.InstructionStartedTimer = Nothing
+        '            MyClass.InstructionStartedTimerCallBack = Nothing
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer killed")
+        '        Else
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer es nothing")
+        '        End If
 
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StopInstructionStartedTimer", EventLogEntryType.Error, False)
-            End Try
-        End Sub
+        '    Catch ex As Exception
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.StopInstructionStartedTimer", EventLogEntryType.Error, False)
+        '    End Try
+        'End Sub
 
-        ''' <summary>
-        ''' Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Private Sub OnInstructionStartedTimerTick(ByVal stateInfo As Object)
-            Try
+        ' ''' <summary>
+        ' ''' Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Private Sub OnInstructionStartedTimerTick(ByVal stateInfo As Object)
+        '    Try
 
-                If MyClass.InstructionStartedTimer IsNot Nothing AndAlso MyClass.InstructionStartedTimerCallBack IsNot Nothing Then
-                    'MyClass.StopInstructionStartedTimer()
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timeout!!!")
+        '        If MyClass.InstructionStartedTimer IsNot Nothing AndAlso MyClass.InstructionStartedTimerCallBack IsNot Nothing Then
+        '            'MyClass.StopInstructionStartedTimer()
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timeout!!!")
 
-                    Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
-                    myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                    MyClass.LastISEResult = myISEResultWithComErrors
+        '            Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
+        '            myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
+        '            MyClass.LastISEResult = myISEResultWithComErrors
 
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("ISE timeout after waiting for Status instruction from Analyzer", "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
+        '            'Dim myLogAcciones As New ApplicationLogManager()
+        '            GlobalBase.CreateLogActivity("ISE timeout after waiting for Status instruction from Analyzer", "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
 
-                    MyClass.StopInstructionStartedTimer()
-                End If
+        '            MyClass.StopInstructionStartedTimer()
+        '        End If
 
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
-            End Try
-        End Sub
+        '    Catch ex As Exception
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
+        '    End Try
+        'End Sub
+        ' XB 30/09/2014 - BA-1872
 
 #End Region
 
@@ -8263,22 +8326,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by AG 11/01/2012
         ''' Updated by XBC 12/01/2012 - Add ISEModes Low_Level_Control functionalities
         ''' </remarks>
-        Public Function PrepareDataToSend(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pApplicationName As String, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function PrepareDataToSend(ByVal pDBConnection As SqlConnection, ByVal pApplicationName As String, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                           ByVal pISEMode As ISEModes, ByVal pCmd As ISECommands, _
                                           Optional ByVal pParameter1 As String = "0", _
                                           Optional ByVal pParameter2 As String = "0", _
                                           Optional ByVal pParameter3 As String = "0", _
-                                          Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend
+                                          Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO Implements IISEManager.PrepareDataToSend
 
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
 
                 'SGM 16/07/2012 Protection in case of null enter
                 If pISEMode = ISEModes.None Or pCmd = ISECommands.NONE Then
                     resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                    resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                     Exit Try
                 End If
 
@@ -8287,7 +8350,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myISECommand As New ISECommandTO
 
@@ -8318,11 +8381,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         If .SampleVolume = -1 Then
                                             resultData.HasError = True
-                                            resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                            resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                             Exit Try
                                         End If
                                     Else
-                                        resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                        resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                         Exit Try
                                     End If
 
@@ -8390,11 +8453,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         If .SampleVolume = -1 Then
                                             resultData.HasError = True
-                                            resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                            resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                             Exit Try
                                         End If
                                     Else
-                                        resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                        resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                         Exit Try
                                     End If
 
@@ -8464,7 +8527,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             Case Else
                                 resultData.HasError = True
-                                resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                 Exit Try
                                 'With myISECommand
                                 '    .ISEMode = pISEMode
@@ -8489,11 +8552,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 MyClass.CurrentCommandTO = Nothing
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -8510,7 +8573,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_POLL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_POLL
+        Public Function PrepareDataToSend_POLL() As GlobalDataTO Implements IISEManager.PrepareDataToSend_POLL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8525,8 +8588,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_POLL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_POLL", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8538,7 +8601,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_CALB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_CALB
+        Public Function PrepareDataToSend_CALB() As GlobalDataTO Implements IISEManager.PrepareDataToSend_CALB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8553,8 +8616,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_CALB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_CALB", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8566,7 +8629,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_CLEAN(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_CLEAN
+        Public Function PrepareDataToSend_CLEAN(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEManager.PrepareDataToSend_CLEAN
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8581,8 +8644,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_CLEAN", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_CLEAN", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8595,7 +8658,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PUMP_CAL(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PUMP_CAL
+        Public Function PrepareDataToSend_PUMP_CAL(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEManager.PrepareDataToSend_PUMP_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8610,8 +8673,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PUMP_CAL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PUMP_CAL", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8623,7 +8686,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_START() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_START
+        Public Function PrepareDataToSend_START() As GlobalDataTO Implements IISEManager.PrepareDataToSend_START
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8638,8 +8701,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_START", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_START", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8651,7 +8714,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PURGEA() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PURGEA
+        Public Function PrepareDataToSend_PURGEA() As GlobalDataTO Implements IISEManager.PrepareDataToSend_PURGEA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8666,8 +8729,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PURGEA", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PURGEA", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8679,7 +8742,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PURGEB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PURGEB
+        Public Function PrepareDataToSend_PURGEB() As GlobalDataTO Implements IISEManager.PrepareDataToSend_PURGEB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8694,8 +8757,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PURGEB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PURGEB", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8707,7 +8770,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_BUBBLE_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_BUBBLE_CAL
+        Public Function PrepareDataToSend_BUBBLE_CAL() As GlobalDataTO Implements IISEManager.PrepareDataToSend_BUBBLE_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8722,8 +8785,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_BUBBLE_CAL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_BUBBLE_CAL", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8735,7 +8798,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_SHOW_BUBBLE_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_SHOW_BUBBLE_CAL
+        Public Function PrepareDataToSend_SHOW_BUBBLE_CAL() As GlobalDataTO Implements IISEManager.PrepareDataToSend_SHOW_BUBBLE_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8750,8 +8813,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_SHOW_BUBBLE_CAL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_SHOW_BUBBLE_CAL", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8763,7 +8826,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_SHOW_PUMP_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_SHOW_PUMP_CAL
+        Public Function PrepareDataToSend_SHOW_PUMP_CAL() As GlobalDataTO Implements IISEManager.PrepareDataToSend_SHOW_PUMP_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8778,8 +8841,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_SHOW_PUMP_CAL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_SHOW_PUMP_CAL", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8792,7 +8855,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DSPA(ByVal pVolume As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DSPA
+        Public Function PrepareDataToSend_DSPA(ByVal pVolume As String) As GlobalDataTO Implements IISEManager.PrepareDataToSend_DSPA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8807,8 +8870,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DSPA", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DSPA", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8821,7 +8884,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DSPB(ByVal pVolume As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DSPB
+        Public Function PrepareDataToSend_DSPB(ByVal pVolume As String) As GlobalDataTO Implements IISEManager.PrepareDataToSend_DSPB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8836,8 +8899,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DSPB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DSPB", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8849,7 +8912,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_VERSION_CHECKSUM() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_VERSION_CHECKSUM
+        Public Function PrepareDataToSend_VERSION_CHECKSUM() As GlobalDataTO Implements IISEManager.PrepareDataToSend_VERSION_CHECKSUM
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8864,8 +8927,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_VERSION_CHECKSUM", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_VERSION_CHECKSUM", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8877,7 +8940,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_READ_mV() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_READ_mV
+        Public Function PrepareDataToSend_READ_mV() As GlobalDataTO Implements IISEManager.PrepareDataToSend_READ_mV
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8892,8 +8955,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_READ_mV", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_READ_mV", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8905,7 +8968,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_LAST_SLOPES() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_LAST_SLOPES
+        Public Function PrepareDataToSend_LAST_SLOPES() As GlobalDataTO Implements IISEManager.PrepareDataToSend_LAST_SLOPES
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8920,8 +8983,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_LAST_SLOPES", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_LAST_SLOPES", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8933,7 +8996,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DEBUG_mV(ByVal pDebugMode As ISECommands) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DEBUG_mV
+        Public Function PrepareDataToSend_DEBUG_mV(ByVal pDebugMode As ISECommands) As GlobalDataTO Implements IISEManager.PrepareDataToSend_DEBUG_mV
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8948,8 +9011,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DEBUG_mV", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_DEBUG_mV", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8961,7 +9024,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_MAINTENANCE() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_MAINTENANCE
+        Public Function PrepareDataToSend_MAINTENANCE() As GlobalDataTO Implements IISEManager.PrepareDataToSend_MAINTENANCE
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8976,8 +9039,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_MAINTENANCE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_MAINTENANCE", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -8989,7 +9052,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PRIME_CALA() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PRIME_CALA
+        Public Function PrepareDataToSend_PRIME_CALA() As GlobalDataTO Implements IISEManager.PrepareDataToSend_PRIME_CALA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9004,8 +9067,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PRIME_CALA", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PRIME_CALA", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9017,7 +9080,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PRIME_CALB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PRIME_CALB
+        Public Function PrepareDataToSend_PRIME_CALB() As GlobalDataTO Implements IISEManager.PrepareDataToSend_PRIME_CALB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9032,8 +9095,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PRIME_CALB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_PRIME_CALB", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9046,7 +9109,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_READ_PAGE_DALLAS(ByVal pPage As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_READ_PAGE_DALLAS
+        Public Function PrepareDataToSend_READ_PAGE_DALLAS(ByVal pPage As Integer) As GlobalDataTO Implements IISEManager.PrepareDataToSend_READ_PAGE_DALLAS
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9066,8 +9129,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_READ_PAGE_DALLAS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_READ_PAGE_DALLAS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9083,7 +9146,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC 12/01/2012
         ''' </remarks>
         Public Function PrepareDataToSend_WRITE_DALLAS(ByVal pPosition As String, _
-                                                       ByVal pInfo As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_DALLAS
+                                                       ByVal pInfo As String) As GlobalDataTO Implements IISEManager.PrepareDataToSend_WRITE_DALLAS
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9103,8 +9166,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_DALLAS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_DALLAS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9126,14 +9189,14 @@ Namespace Biosystems.Ax00.Core.Entities
         '        Dim myReason As String
         '        Dim myPosition As String
 
-        '        resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.NoGoodByte))
+        '        resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.NoGoodByte))
         '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
         '            myPosition = CType(resultData.SetDatos, String)
         '        Else
         '            Exit Try
         '        End If
         '        If IsNumeric(pReason) Then
-        '            resultData = myUtility.ConvertDecimalToHex(CLng(pReason))
+        '            resultData = Utilities.ConvertDecimalToHex(CLng(pReason))
         '            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
         '                myReason = CType(resultData.SetDatos, String)
         '            Else
@@ -9155,8 +9218,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_REAGENTPACK_WRONG", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_REAGENTPACK_WRONG", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -9169,7 +9232,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_DAY(ByVal pDay As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_DAY
+        Public Function PrepareDataToSend_WRITE_INSTALL_DAY(ByVal pDay As Integer) As GlobalDataTO Implements IISEManager.PrepareDataToSend_WRITE_INSTALL_DAY
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9179,14 +9242,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallDay))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallDay))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pDay) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pDay))
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pDay))
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myDay = CType(resultData.SetDatos, String)
                 '    Else
@@ -9213,8 +9276,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_DAY", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_DAY", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9227,7 +9290,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_MONTH(ByVal pMonth As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_MONTH
+        Public Function PrepareDataToSend_WRITE_INSTALL_MONTH(ByVal pMonth As Integer) As GlobalDataTO Implements IISEManager.PrepareDataToSend_WRITE_INSTALL_MONTH
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9237,14 +9300,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallMonth))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallMonth))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pMonth) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pMonth))
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pMonth))
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myMonth = CType(resultData.SetDatos, String)
                 '    Else
@@ -9271,8 +9334,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_MONTH", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_MONTH", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9285,7 +9348,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_YEAR(ByVal pYear As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_YEAR
+        Public Function PrepareDataToSend_WRITE_INSTALL_YEAR(ByVal pYear As Integer) As GlobalDataTO Implements IISEManager.PrepareDataToSend_WRITE_INSTALL_YEAR
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9295,14 +9358,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallYear))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallYear))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pYear) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pYear) - 2000)
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pYear) - 2000)
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myYear = CType(resultData.SetDatos, String)
                 '    Else
@@ -9329,8 +9392,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_YEAR", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_WRITE_INSTALL_YEAR", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9342,7 +9405,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by SGM 03/07/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_R2_TO_WASH() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_R2_TO_WASH
+        Public Function PrepareDataToSend_R2_TO_WASH() As GlobalDataTO Implements IISEManager.PrepareDataToSend_R2_TO_WASH
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9357,8 +9420,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_R2_To_WASH", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_R2_To_WASH", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9370,7 +9433,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by SGM 03/07/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_R2_TO_PARK() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_R2_TO_PARK
+        Public Function PrepareDataToSend_R2_TO_PARK() As GlobalDataTO Implements IISEManager.PrepareDataToSend_R2_TO_PARK
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9385,8 +9448,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_R2_TO_PARK", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.PrepareDataToSend_R2_TO_PARK", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -9409,17 +9472,17 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pTubeType">ByRef</param>
         ''' <returns>Globaldata to with error or not</returns>
         ''' <remarks>AG 11/01/2012</remarks>
-        Private Function GetRequiredTubePositon(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Private Function GetRequiredTubePositon(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                      ByVal pTubeContent As String, ByVal pSolutionCode As String, _
                                      ByRef pFoundFlag As Boolean, ByRef pCellNumber As Integer, ByRef pTubeType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim rcpDel As New WSRotorContentByPositionDelegate
                         Dim myRcpDS As New WSRotorContentByPositionDS
@@ -9481,7 +9544,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim paramsDlg As New SwParametersDelegate
                             Dim paramsDS As New ParametersDS
 
-                            resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.ISE_UTIL_WASHSOL_POSITION.ToString, True)
+                            resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.ISE_UTIL_WASHSOL_POSITION.ToString, True)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 paramsDS = CType(resultData.SetDatos, ParametersDS)
                                 If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
@@ -9499,11 +9562,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetRequiredTubePositon", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetRequiredTubePositon", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -9521,27 +9584,27 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAnalyzerID"></param>
         ''' <returns>GlobalDataTo (integer)</returns>
         ''' <remarks>AG 11/01/2012</remarks>
-        Private Function GetRequiredTubeVolume(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Private Function GetRequiredTubeVolume(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         Dim paramsDlg As New SwParametersDelegate
                         Dim paramsDS As New ParametersDS
 
-                        resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.ISE_UTIL_VOLUME.ToString, True)
+                        resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.ISE_UTIL_VOLUME.ToString, True)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             paramsDS = CType(resultData.SetDatos, ParametersDS)
                             If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
                                 Dim volume As Single = paramsDS.tfmwSwParameters(0).ValueNumeric
 
-                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString, False)
+                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.SAMPLE_STEPS_UL.ToString, False)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     paramsDS = CType(resultData.SetDatos, ParametersDS)
                                     If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
@@ -9560,11 +9623,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.GetRequiredTubeVolume", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.GetRequiredTubeVolume", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

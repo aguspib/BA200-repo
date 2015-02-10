@@ -3,15 +3,6 @@ Option Explicit On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
-
-Imports PerpetuumSoft.Instrumentation
-Imports PerpetuumSoft.Instrumentation.Windows.Forms
-Imports PerpetuumSoft.Instrumentation.Model
-Imports PerpetuumSoft.Framework.Drawing
 
 Namespace Biosystems.Ax00.Controls.UserControls
 
@@ -29,7 +20,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            MyBase.InstrumentPanel = MyClass.InstrumentPanel
+            'InstrumentPanel = InstrumentPanel
 
         End Sub
 
@@ -47,30 +38,30 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                             Select Case CurrentStatusAttr
                                 Case Status._ON
-                                    MyClass.DigitForeColor = Color.LightGreen
+                                    DigitForeColor = Color.LightGreen
                                 Case Status._OFF
-                                    MyClass.DigitForeColor = Color.LightCoral
+                                    DigitForeColor = Color.LightCoral
                                 Case Else
                                     Me.DigitLabel.Enabled = False
-                                    MyClass.DigitForeColor = Color.LightGray
+                                    DigitForeColor = Color.LightGray
                             End Select
 
 
                         Case Status._ON
                             Me.DigitLabel.Enabled = True
-                            MyClass.DigitForeColor = Color.LimeGreen
+                            DigitForeColor = Color.LimeGreen
 
                         Case Status._OFF
                             Me.DigitLabel.Enabled = True
-                            MyClass.DigitForeColor = Color.Red
+                            DigitForeColor = Color.Red
 
                         Case Status.TIMEOUT
                             Me.DigitLabel.Enabled = True
-                            MyClass.DigitForeColor = Color.LightGray
+                            DigitForeColor = Color.LightGray
 
                         Case Status.DISABLED
                             Me.DigitLabel.Enabled = False
-                            MyClass.DigitForeColor = Color.LightGray
+                            DigitForeColor = Color.LightGray
 
                     End Select
 
@@ -88,7 +79,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As Single)
 
-                MyClass.SetDigitSize(value)
+                SetDigitSize(value)
 
                 DigitSizeAttr = value
             End Set
@@ -102,7 +93,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As Font)
 
-                MyClass.SetDigitUnitsFont(value)
+                SetDigitUnitsFont(value)
 
                 DigitUnitsFontAttr = value
             End Set
@@ -114,7 +105,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As Double)
 
-                MyClass.SetDigitText(value.ToString(DigitFormat))
+                SetDigitText(value.ToString(DigitFormat))
 
                 DigitValueAttr = value
             End Set
@@ -126,7 +117,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As String)
                 DigitFormatAttr = value
-                MyClass.SetDigitText(DigitValue.ToString(value))
+                SetDigitText(DigitValue.ToString(value))
             End Set
         End Property
 
@@ -136,7 +127,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As Color)
                 DigitForeColorAttr = value
-                MyClass.SetDigitForeColor(value)
+                SetDigitForeColor(value)
             End Set
         End Property
 
@@ -146,7 +137,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As Color)
                 DigitUnitsForeColorAttr = value
-                MyClass.SetDigitUnitsForeColor(value)
+                SetDigitUnitsForeColor(value)
             End Set
         End Property
 
@@ -155,7 +146,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return DigitAlignmentAttr
             End Get
             Set(ByVal value As ContentAlignment)
-                MyClass.DigitLabel.TextAlign = value
+                DigitLabel.TextAlign = value
                 DigitAlignmentAttr = value
             End Set
         End Property
@@ -165,7 +156,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return DigitBorderStyleAttr
             End Get
             Set(ByVal value As BorderStyle)
-                MyClass.DigitLabel.BorderStyle = value
+                DigitLabel.BorderStyle = value
                 DigitBorderStyleAttr = value
             End Set
         End Property
@@ -178,14 +169,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 DigitUnitsAttr = value
                 Me.UnitsLabel.Text = value
                 Me.UnitsLabel.Visible = (value.Length > 0)
-                MyClass.SetDigitText(DigitValue.ToString(value))
+                SetDigitText(DigitValue.ToString(value))
 
             End Set
         End Property
 #End Region
 
 #Region "Attributes"
-        Private CurrentStatusAttr As Status = Status.DISABLED
+        Private CurrentStatusAttr As Status = Status.DISABLED   'Inconsistent data, as this has been already declared in base class. Design can be improved.
         Private DigitValueAttr As Double = 99.9
         Private DigitForeColorAttr As Color = Color.LimeGreen
         Private DigitUnitsForeColorAttr As Color = Color.LimeGreen
@@ -218,7 +209,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         Private Sub SetDigitText(ByVal pText As String)
             Try
-                MyClass.DigitLabel.Text = pText.Replace(",", ".")
+                Me.DigitLabel.Text = pText.Replace(",", ".")
 
             Catch ex As Exception
                 Throw ex

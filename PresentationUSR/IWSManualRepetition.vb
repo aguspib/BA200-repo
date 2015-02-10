@@ -1,14 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
-Imports System.Configuration
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.BL.Framework
 
-Public Class IWSManualRepetition
+Public Class UiWSManualRepetition
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"
@@ -122,7 +121,7 @@ Public Class IWSManualRepetition
                 ShowMessage(Me.Name, result.ErrorCode, result.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistsRepetitionToAdd ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistsRepetitionToAdd ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
             RepetitionToAddExists = False
@@ -151,7 +150,7 @@ Public Class IWSManualRepetition
                 CurrentPostDilutionType = PostDilutionTypes.UNDEFINED    'AG 28/07/2010 PostDilutionTypes.WITHOUT
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetNewPostDilutionType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetNewPostDilutionType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -178,7 +177,7 @@ Public Class IWSManualRepetition
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -194,13 +193,13 @@ Public Class IWSManualRepetition
 
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -234,7 +233,7 @@ Public Class IWSManualRepetition
 
             result.HasError = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareQueryForWSRepetitionToAdd ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareQueryForWSRepetitionToAdd ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
             RepetitionToAddExists = False
@@ -299,7 +298,7 @@ Public Class IWSManualRepetition
                 ShowMessage(Me.Name, result.ErrorCode, result.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -383,7 +382,7 @@ Public Class IWSManualRepetition
 
             ManualRepetitionCriteriaAttribute = InitialPostDilutionType 'AG 28/07/2010 - Inform the attribute
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetUpPostDilutionTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetUpPostDilutionTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -394,15 +393,15 @@ Public Class IWSManualRepetition
         Try
             If (e.KeyCode = Keys.Escape) Then bsCancelButton.PerformClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSManualRepetition_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSManualRepetition_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IWSManualRepetition_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub IWSManualRepetition_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -419,7 +418,7 @@ Public Class IWSManualRepetition
                 SetUpPostDilutionTypes() 'SG 16/07/2010
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSManualRepetition_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSManualRepetition_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -429,7 +428,7 @@ Public Class IWSManualRepetition
             ManualRepetitionCriteriaAttribute = PostDilutionTypes.UNDEFINED
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -439,7 +438,7 @@ Public Class IWSManualRepetition
             SaveChanges()
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -473,7 +472,7 @@ Public Class IWSManualRepetition
     '            Return ""
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetPostDilutionDefinition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetPostDilutionDefinition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name, GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '        Return ""
     '    End Try

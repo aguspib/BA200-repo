@@ -11,23 +11,24 @@
       </DataSource>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="ReportsTestsSortingDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="ReportsTestsSortingDS" msprop:Generator_DataSetName="ReportsTestsSortingDS" msprop:EnableTableAdapterManager="true">
+  <xs:element name="ReportsTestsSortingDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ReportsTestsSortingDS" msprop:Generator_UserDSName="ReportsTestsSortingDS">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="tcfgReportsTestsSorting" msprop:Generator_UserTableName="tcfgReportsTestsSorting" msprop:Generator_RowDeletedName="tcfgReportsTestsSortingRowDeleted" msprop:Generator_RowChangedName="tcfgReportsTestsSortingRowChanged" msprop:Generator_RowClassName="tcfgReportsTestsSortingRow" msprop:Generator_RowChangingName="tcfgReportsTestsSortingRowChanging" msprop:Generator_RowEvArgName="tcfgReportsTestsSortingRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgReportsTestsSortingRowChangeEventHandler" msprop:Generator_TableClassName="tcfgReportsTestsSortingDataTable" msprop:Generator_TableVarName="tabletcfgReportsTestsSorting" msprop:Generator_RowDeletingName="tcfgReportsTestsSortingRowDeleting" msprop:Generator_TablePropName="tcfgReportsTestsSorting">
+        <xs:element name="tcfgReportsTestsSorting" msprop:Generator_UserTableName="tcfgReportsTestsSorting" msprop:Generator_RowEvArgName="tcfgReportsTestsSortingRowChangeEvent" msprop:Generator_TableVarName="tabletcfgReportsTestsSorting" msprop:Generator_TablePropName="tcfgReportsTestsSorting" msprop:Generator_RowDeletingName="tcfgReportsTestsSortingRowDeleting" msprop:Generator_RowChangingName="tcfgReportsTestsSortingRowChanging" msprop:Generator_RowDeletedName="tcfgReportsTestsSortingRowDeleted" msprop:Generator_RowEvHandlerName="tcfgReportsTestsSortingRowChangeEventHandler" msprop:Generator_TableClassName="tcfgReportsTestsSortingDataTable" msprop:Generator_RowChangedName="tcfgReportsTestsSortingRowChanged" msprop:Generator_RowClassName="tcfgReportsTestsSortingRow">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="TestType" msprop:Generator_UserColumnName="TestType" msprop:Generator_ColumnVarNameInTable="columnTestType" msprop:Generator_ColumnPropNameInRow="TestType" msprop:Generator_ColumnPropNameInTable="TestTypeColumn" minOccurs="0">
+              <xs:element name="TestType" msprop:Generator_ColumnVarNameInTable="columnTestType" msprop:Generator_ColumnPropNameInRow="TestType" msprop:Generator_ColumnPropNameInTable="TestTypeColumn" msprop:Generator_UserColumnName="TestType" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="15" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="TestID" msprop:Generator_UserColumnName="TestID" msprop:Generator_ColumnVarNameInTable="columnTestID" msprop:Generator_ColumnPropNameInRow="TestID" msprop:Generator_ColumnPropNameInTable="TestIDColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="TestPosition" msprop:Generator_UserColumnName="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="TestName" msprop:Generator_UserColumnName="TestName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTestName" msprop:Generator_ColumnPropNameInTable="TestNameColumn" msprop:Generator_ColumnPropNameInRow="TestName" type="xs:string" default="" minOccurs="0" />
-              <xs:element name="PreloadedTest" msprop:Generator_UserColumnName="PreloadedTest" msprop:Generator_ColumnVarNameInTable="columnPreloadedTest" msprop:Generator_ColumnPropNameInRow="PreloadedTest" msprop:Generator_ColumnPropNameInTable="PreloadedTestColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TestID" msprop:Generator_ColumnVarNameInTable="columnTestID" msprop:Generator_ColumnPropNameInRow="TestID" msprop:Generator_ColumnPropNameInTable="TestIDColumn" msprop:Generator_UserColumnName="TestID" type="xs:int" minOccurs="0" />
+              <xs:element name="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" msprop:Generator_UserColumnName="TestPosition" type="xs:int" minOccurs="0" />
+              <xs:element name="TestName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestName" msprop:Generator_ColumnVarNameInTable="columnTestName" msprop:Generator_ColumnPropNameInTable="TestNameColumn" msprop:Generator_UserColumnName="TestName" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="PreloadedTest" msprop:Generator_ColumnVarNameInTable="columnPreloadedTest" msprop:Generator_ColumnPropNameInRow="PreloadedTest" msprop:Generator_ColumnPropNameInTable="PreloadedTestColumn" msprop:Generator_UserColumnName="PreloadedTest" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Available" msprop:Generator_ColumnVarNameInTable="columnAvailable" msprop:Generator_ColumnPropNameInRow="Available" msprop:Generator_ColumnPropNameInTable="AvailableColumn" msprop:Generator_UserColumnName="Available" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

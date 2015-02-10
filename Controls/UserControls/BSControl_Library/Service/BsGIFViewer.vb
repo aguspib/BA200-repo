@@ -3,6 +3,7 @@ Option Strict On
 
 Imports System.Drawing
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.Global
 
 Public Class BsGIFViewer
 
@@ -42,7 +43,7 @@ Public Class BsGIFViewer
     Public Sub OpenGIFFile(ByVal pPath As String)
         Try
             If System.IO.File.Exists(pPath) Then
-                Dim myImage As Image = Image.FromFile(pPath)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(pPath)
 
                 myImage = ResizeImage(myImage, New Size(CInt(myImage.Width * ZoomAttr / 100), CInt(myImage.Height * ZoomAttr / 100)))
                 Me.myPicBox.Size = New Size(myImage.Size.Width + HorizontalMarginWidthAttr, myImage.Size.Height + VerticalMarginWidthAttr)

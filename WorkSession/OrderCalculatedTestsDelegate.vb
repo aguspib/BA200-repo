@@ -55,8 +55,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -102,8 +102,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.DeleteByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.DeleteByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -148,8 +148,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.DeleteByCalOrderTestId", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.DeleteByCalOrderTestId", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -213,8 +213,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetByCalcOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetByCalcOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -248,8 +248,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -284,8 +284,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetOTInfoByCalcOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.GetOTInfoByCalcOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -321,8 +321,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.ReadByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OrderCalculatedTestsDelegate.ReadByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -330,13 +330,14 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get all ordertests that form part of a CALCULATED TEST and has to be excluded from in the final patients / and compact patients reports
+        ''' Get all ordertests that form part of a CALCULATED TEST and has to be excluded for the final patients / and compact patients reports
         ''' (apply only in current WS results)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <returns>GlobalDataTo as list of integer with the OrderTestID that have to be excluded from patients final reports</returns>
         ''' <remarks>
         ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' AG 13/10/2014 - BA-2006 In a CalcultedTest the Print Partial Tests (printExpTests) apply only 1 level, not in cascade when the calctest forms part of another calctest formula
         ''' </remarks>
         Public Function GetOrderTestsToExcludeInPatientsReport(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -357,6 +358,31 @@ Namespace Biosystems.Ax00.BL
                             Dim myAuxDS As New OrderCalculatedTestsDS
                             myAuxDS = DirectCast(resultData.SetDatos, OrderCalculatedTestsDS)
 
+                            ''AG 13/10/2014 - BA-2006 - Cancelled, but leave the code in prevision of future changes
+                            ''UPDATE those tests that form part of a calculated tests inside the formula of another calculated test. They won't be printed
+                            ''BUN/CREATININE with printPartialTest as True
+                            ''(BUN/CREATININE) = ((UREA-UV/2.14)/CREATININE)) -> sw will print BUN/CREATININE, BUN and CREATININE but no UREA because it isnt partial test of the BUN/CREAT
+
+                            'Dim RowsToPrint As List(Of OrderCalculatedTestsDS.twksOrderCalculatedTestsRow)
+                            'Dim secondLevel As List(Of OrderCalculatedTestsDS.twksOrderCalculatedTestsRow)
+                            'RowsToPrint = (From a As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In myAuxDS.twksOrderCalculatedTests _
+                            '               Where a.PrintExpTests = True Select a).ToList
+                            'If RowsToPrint.Count > 0 Then
+                            '    For Each row As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In RowsToPrint
+                            '        secondLevel = (From a As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In myAuxDS.twksOrderCalculatedTests _
+                            '                                  Where a.OrderTestID = row.CalcOrderTestID Select a).ToList
+                            '        If secondLevel.Count > 0 Then
+                            '            row.BeginEdit()
+                            '            row.PrintExpTests = False
+                            '            row.EndEdit()
+                            '            myAuxDS.twksOrderCalculatedTests.AcceptChanges()
+                            '        End If
+                            '    Next
+                            'End If
+                            'RowsToPrint = Nothing
+                            'secondLevel = Nothing
+                            ''AG 13/10/2014 - BA-2006
+
                             Dim FinalToExcludeList As New List(Of Integer)
                             'Get ordertests that form part of a calculated test that exclude print their experimental tests
                             FinalToExcludeList = (From a As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In myAuxDS.twksOrderCalculatedTests _
@@ -369,11 +395,11 @@ Namespace Biosystems.Ax00.BL
 
                             'If the same ordertestID exists in toExclude and toPrint list we have to remove it from toExclude list
                             If toPrint.Count > 0 Then
-                                Dim positionToDelete As Integer = 0
+                                Dim positionToDeleteFromFinalToExcludeList As Integer = 0
                                 For Each item As Integer In toPrint
                                     If FinalToExcludeList.Contains(item) Then
-                                        positionToDelete = FinalToExcludeList.IndexOf(item)
-                                        FinalToExcludeList.RemoveAt(positionToDelete)
+                                        positionToDeleteFromFinalToExcludeList = FinalToExcludeList.IndexOf(item)
+                                        FinalToExcludeList.RemoveAt(positionToDeleteFromFinalToExcludeList)
                                     End If
                                 Next
                             End If
@@ -396,8 +422,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsToExcludeInPatientsReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsToExcludeInPatientsReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -434,8 +460,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

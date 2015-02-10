@@ -1,15 +1,12 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcfgCustomDemographicsDAO
-        Inherits DAOBase
+
 
 #Region "Other Methods"
 
@@ -73,8 +70,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadNyDemographicID", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadNyDemographicID", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -130,8 +127,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -190,8 +187,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''        resultData.ErrorCode = "SYSTEM_ERROR"
         ''        resultData.ErrorMessage = ex.Message
 
-        ''        Dim myLogAcciones As New ApplicationLogManager()
-        ''        myLogAcciones.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
+        ''        'Dim myLogAcciones As New ApplicationLogManager()
+        ''        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
 
         ''    Finally
         ''        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -243,8 +240,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.MiddleNameStatus", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.MiddleNameStatus", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

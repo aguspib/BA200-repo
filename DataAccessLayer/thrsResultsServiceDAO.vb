@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class thrsResultsServiceDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -62,8 +62,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.ReadAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -108,8 +108,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.ReadByAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.ReadByAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -148,8 +148,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
-                    cmdText &= " N'" & currentSession.GetSessionInfo().UserName.ToString.Replace("'", "''") & "', "
+                    'Dim currentSession As New GlobalBase
+                    cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName.ToString.Replace("'", "''") & "', "
 
 
                     cmdText &= " '" & CType(Now, DateTime).ToString("yyyyMMdd HH:mm:ss") & "') "
@@ -184,8 +184,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -243,8 +243,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.UpdateComments", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.UpdateComments", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -287,8 +287,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsResultsServiceDAO.Delete", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO

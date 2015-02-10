@@ -6,8 +6,6 @@ Imports System.Windows.Forms
 Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.BL
 
 Namespace Biosystems.Ax00.BL.UpdateVersion
 
@@ -55,12 +53,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''                                            ** When CreateSATReport is called from ServiceSW, inform the new parameter as TRUE
         '''                                           To known if the RSAT has been launched from UserSW or from ServiceSW, inform the optional parameter with value of 
         '''                                           the GlobalBase property IsServiceAssembly
+        '''              SA 20/10/2014 - BA-1944 ==> Include in the RSAT the last XML File generated for the Update Version process
         ''' </remarks>
         Public Function CreateSATReport(ByVal pAction As GlobalEnumerates.SATReportActions, Optional ByVal pAuto As Boolean = False, _
                                         Optional ByVal ExcelPath As String = "", Optional ByVal pAdjFilePath As String = "", _
                                         Optional ByVal pFilePath As String = "", Optional ByVal pFileName As String = "", _
                                         Optional ByVal pUserVersion As String = "", Optional ByVal pIncludeZIP As Boolean = True) As GlobalDataTO
-            Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             Dim ReportFolderPath As String = String.Empty
@@ -278,13 +277,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myDatabaseAdmin As New DataBaseManagerDelegate()
                 If (Not myDatabaseAdmin.BackUpDataBaseAndMoveBkFile(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, ReportFolderPath)) Then
                     'Error creating the DB Backup
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     Dim Message As String = "Unable to create a backup copy of the data base"
-                    myLogAcciones.CreateLogActivity(Message, "Utilities.CreateSATReport", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity(Message, "Utilities.CreateSATReport", EventLogEntryType.Error, False)
 
                     Dim myDataBaseManager As New DataBaseManagerDelegate
                     Dim IsSQLServer2005 As Boolean = myDataBaseManager.IsSQLServer2005(DAOBase.DBServer, DAOBase.DBLogin, DAOBase.DBPassword)
-                    myLogAcciones.CreateLogActivity("IsSQLServer2005 = " & IsSQLServer2005.ToString(), "Utilities.CreateSATReport", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("IsSQLServer2005 = " & IsSQLServer2005.ToString(), "Utilities.CreateSATReport", EventLogEntryType.Error, False)
                 End If
 
                 '2.3 - Add the file with PC and OS Info 
@@ -298,7 +297,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
                 '2.4 - Add the Synapse Event Log
-                If (pUserVersion <> "1.0.0") Then myGlobal = myUtil.SaveSynapseEventLog(GlobalBase.SynapseLogFileName, ReportFolderPath)
+                If (pUserVersion <> "1.0.0") Then myGlobal = Utilities.SaveSynapseEventLog(GlobalBase.SynapseLogFileName, ReportFolderPath)
 
                 '2.5 - Add the Application Log files 
                 If (Directory.Exists(Application.StartupPath & GlobalBase.XmlLogFilePath)) Then ' XB 28/05/2013 - Correction : condition must done by Directory instead of File
@@ -328,6 +327,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             End If
                         Next
                     End If
+
+                    'BA-1944: Add the XML of the last Update Version process executed
+                    Dim diar3 As IO.FileInfo() = di.GetFiles(GlobalBase.UpdateVersionProcessLogFileName)
+                    For Each dra In diar3
+                        logFileName = ReportFolderPath & "\" & dra.ToString
+                        If (File.Exists(SATLogFolder & dra.ToString)) Then
+                            If (Not Directory.Exists(ReportFolderPath)) Then Directory.CreateDirectory(ReportFolderPath)
+                            If (Not File.Exists(logFileName)) Then File.Copy(SATLogFolder & dra.ToString, logFileName)
+                        End If
+                    Next
                 End If
 
                 '2.6 - Add the FW Adjustments file
@@ -338,12 +347,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (File.Exists(FwAdjustmentsFileNamePath)) Then File.Copy(FwAdjustmentsFileNamePath, FwAdjustmentsFileName)
 
                 'NOT USED, ExcelPath is never informed
-                'If (ExcelPath <> String.Empty) Then myUtil.CopyFiles(ExcelPath, ReportFolderPath & "\", "*.xls")
+                'If (ExcelPath <> String.Empty) Then Utilities.CopyFiles(ExcelPath, ReportFolderPath & "\", "*.xls")
 
                 '2.7 - Add the Log file of the Application Update process if it finished with Error
                 If (pAction = GlobalEnumerates.SATReportActions.SAT_UPDATE_ERR) Then
                     If (File.Exists(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile)) Then
-                        myUtil.CopyFiles(Application.StartupPath & GlobalBase.PreviousFolder, ReportFolderPath & "\", GlobalBase.UpdateLogFile)
+                        Utilities.CopyFiles(Application.StartupPath & GlobalBase.PreviousFolder, ReportFolderPath & "\", GlobalBase.UpdateLogFile)
                     End If
                 End If
 
@@ -394,10 +403,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 '2.9 - Add the plain text with the Application Version
                 Dim myVersionFileName As String = GlobalBase.VersionFileName
-                myGlobal = myUtil.CreateVersionFile(ReportFolderPath & "\" & myVersionFileName, pAction, pUserVersion, GlobalBase.IsServiceAssembly)
+                myGlobal = Utilities.CreateVersionFile(ReportFolderPath & "\" & myVersionFileName, pAction, pUserVersion, GlobalBase.IsServiceAssembly)
 
                 '2.10 - Compress and delete the temporal folder
-                myGlobal = myUtil.CompressToZip(ReportFolderPath, ReportFolderPath & GlobalBase.ZIPExtension)
+                myGlobal = Utilities.CompressToZip(ReportFolderPath, ReportFolderPath & GlobalBase.ZIPExtension)
                 If (Not myGlobal Is Nothing AndAlso Not myGlobal.HasError) Then
                     If (Directory.Exists(ReportFolderPath)) Then Directory.Delete(ReportFolderPath, True)
                     myGlobal.SetDatos = True
@@ -410,8 +419,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CreateSATReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CreateSATReport", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -455,8 +464,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.GetLastWrittenFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetLastWrittenFile", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -472,11 +481,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         Public Function GetSATReportVersion(ByVal pSATReportFilePath As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Try
                 'extract temporaly
                 Dim tempFolder As String = Directory.GetParent(pSATReportFilePath).FullName & "\temp"
-                myGlobal = myUtil.ExtractFromZip(pSATReportFilePath, tempFolder)
+                myGlobal = Utilities.ExtractFromZip(pSATReportFilePath, tempFolder)
                 Dim VersionData As String = String.Empty
 
                 'RH 12/11/2010 Introduce the Using statement
@@ -504,8 +513,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.GetSATReportVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetSATReportVersion", EventLogEntryType.Error, False)
 
             End Try
 
@@ -571,8 +580,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -604,8 +613,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
 
             End Try
 

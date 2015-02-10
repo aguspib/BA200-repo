@@ -11,7 +11,7 @@ Imports Biosystems.Ax00.App
 
 'Imports System.Runtime.InteropServices 'WIN32
 
-Public Class ITankLevelsAdjustments
+Public Class UiTankLevelsAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 
@@ -65,7 +65,7 @@ Public Class ITankLevelsAdjustments
     'Screen's business delegate
     Private WithEvents myScreenDelegate As TankLevelsAdjustmentDelegate
 
-    Private SelectedPage As ITankLevelsAdjustments.ADJUSTMENT_PAGES = ADJUSTMENT_PAGES.SCALES
+    Private SelectedPage As UiTankLevelsAdjustments.ADJUSTMENT_PAGES = ADJUSTMENT_PAGES.SCALES
 
     Private SelectedAdjustmentsDS As New SRVAdjustmentsDS
     Private TemporalAdjustmentsDS As New SRVAdjustmentsDS
@@ -643,7 +643,7 @@ Public Class ITankLevelsAdjustments
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
@@ -681,7 +681,7 @@ Public Class ITankLevelsAdjustments
     '        Catch ex As Exception
     '            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '            myGlobal.ErrorMessage = ex.Message
-    '            mybase.CreateLogActivity(ex.Message, Me.Name & " InitializeSensors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeSensors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '            mybase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '        End Try
     '        Return myGlobal
@@ -750,7 +750,7 @@ Public Class ITankLevelsAdjustments
     '        Catch ex As Exception
     '            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '            myGlobal.ErrorMessage = ex.Message
-    '            mybase.CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '            mybase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '        End Try
     '        Return myGlobal
@@ -769,7 +769,7 @@ Public Class ITankLevelsAdjustments
 
     '            MyBase.CurrentSensorsMode = SENSORS_MODES.OFF
 
-    '            mybase.CreateLogActivity(ex.Message, Me.Name & ".DisplaySensorsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisplaySensorsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '            mybase.ShowMessage(Me.Name & ".DisplaySensorsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '        End Try
     '    End Sub
@@ -823,7 +823,7 @@ Public Class ITankLevelsAdjustments
             MyClass.GetScreenTooltip(pLanguageID)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -840,15 +840,15 @@ Public Class ITankLevelsAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            bsScreenToolTips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
 
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -873,7 +873,7 @@ Public Class ITankLevelsAdjustments
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
             'Write error SYSTEM_ERROR in the Application Log
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " GetControlsLimits ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetControlsLimits ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             MyBase.ShowMessage(Me.Name & " GetControlsLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
@@ -887,7 +887,7 @@ Public Class ITankLevelsAdjustments
     ''' <remarks>Created by XBC 05/01/2011</remarks>
     Private Function GetLimitValues() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ' Get Value limit ranges
             Dim myFieldLimitsDS As New FieldLimitsDS
@@ -929,14 +929,14 @@ Public Class ITankLevelsAdjustments
             End If
 
             ' Another Initializations
-            Me.SCALESDINAMICRANGE = myGlobalbase.ScalesDinamicRange
+            Me.SCALESDINAMICRANGE = GlobalBase.ScalesDinamicRange
 
         Catch ex As Exception
             myGlobalDataTO.HasError = True
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -953,7 +953,7 @@ Public Class ITankLevelsAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myutil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -973,7 +973,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsAdjustButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -982,7 +982,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -991,7 +991,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsCancelButton.Image = myImage
             '    BsCancelButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1000,7 +1000,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1011,7 +1011,7 @@ Public Class ITankLevelsAdjustments
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
 
             '    WSFullAdjustButton.Image = myImage
             '    WSFullAdjustButton.ImageAlign = ContentAlignment.MiddleLeft
@@ -1031,17 +1031,17 @@ Public Class ITankLevelsAdjustments
             auxIconName = GetIconName("ACCEPTF")
             If System.IO.File.Exists(iconPath & auxIconName) Then
 
-                WSFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                WSEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                WSFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                WSEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             End If
 
             'Info Button
             auxIconName = GetIconName("RIGHT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
@@ -1049,7 +1049,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStartTestButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1058,13 +1058,13 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsStopTestButton.Image = myImage
             '    BsStopTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1091,7 +1091,7 @@ Public Class ITankLevelsAdjustments
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtonsVisiblility ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtonsVisiblility ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtonsVisiblility ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1199,7 +1199,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1220,7 +1220,7 @@ Public Class ITankLevelsAdjustments
             Me.BsStopTestButton.Visible = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesPreparingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesPreparingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareHomesPreparingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1261,7 +1261,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareHomesFinishedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1309,7 +1309,7 @@ Public Class ITankLevelsAdjustments
                 PrepareErrorMode()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSimulationAdjustmentsReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSimulationAdjustmentsReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSimulationAdjustmentsReadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1391,7 +1391,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -1429,7 +1429,7 @@ Public Class ITankLevelsAdjustments
             Me.ManageTabPages = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustPreparedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1445,7 +1445,7 @@ Public Class ITankLevelsAdjustments
             MyClass.DisableAll()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSavingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1535,7 +1535,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSavedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -1562,7 +1562,7 @@ Public Class ITankLevelsAdjustments
             UpdateTestProcess()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestEmptyLCMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1592,7 +1592,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestEmptyLCRequestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1623,7 +1623,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCEndedMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestEmptyLCEndedMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestEmptyLCEndedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1643,7 +1643,7 @@ Public Class ITankLevelsAdjustments
             Me.BsStopTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestFillDWMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1663,7 +1663,7 @@ Public Class ITankLevelsAdjustments
             Me.BsStopTestButton.Visible = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestFillDWRequestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1694,7 +1694,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWEndedMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFillDWEndedMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestFillDWEndedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1714,7 +1714,7 @@ Public Class ITankLevelsAdjustments
             Me.BsStopTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestTransferDWLCMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestTransferDWLCMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestEmptyLCMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1737,7 +1737,7 @@ Public Class ITankLevelsAdjustments
             UpdateTestProcess()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestTransferDWLCRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestTransferDWLCRequestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestTransferDWLCRequestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1774,7 +1774,7 @@ Public Class ITankLevelsAdjustments
             MyBase.ActivateMDIMenusButtons(True)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestFinishedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1795,7 +1795,7 @@ Public Class ITankLevelsAdjustments
             'TestSimulatorTimer.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestExitingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1846,7 +1846,7 @@ Public Class ITankLevelsAdjustments
             'If Not MyBase.CurrentSensorsMode = SENSORS_MODES.OFF Then MyBase.SensorsTimer.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestExitedMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2005,7 +2005,7 @@ Public Class ITankLevelsAdjustments
             MyClass.myScreenDelegate.ManageHistoryResults()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2031,7 +2031,7 @@ Public Class ITankLevelsAdjustments
             MyClass.IsIntermediateTesting = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistoryError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2062,7 +2062,7 @@ Public Class ITankLevelsAdjustments
 
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2087,7 +2087,7 @@ Public Class ITankLevelsAdjustments
     '        'DisableAll() 'SGM 24/01/11
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareLoadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2115,7 +2115,7 @@ Public Class ITankLevelsAdjustments
     '        MyBase.myScreenLayout.ButtonsPanel.ExitButton.Focus()
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareAdjustPreparingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2143,7 +2143,7 @@ Public Class ITankLevelsAdjustments
     '        DisableButtons()
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareAdjustingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2185,7 +2185,7 @@ Public Class ITankLevelsAdjustments
     '        ManageTabPages = False
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareAdjustedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2207,7 +2207,7 @@ Public Class ITankLevelsAdjustments
 
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareAdjustExitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2241,7 +2241,7 @@ Public Class ITankLevelsAdjustments
     '        MyBase.myScreenLayout.ButtonsPanel.CancelButton.Enabled = False
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2275,7 +2275,7 @@ Public Class ITankLevelsAdjustments
     '        ManageTabPages = False
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareTestExitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2297,7 +2297,7 @@ Public Class ITankLevelsAdjustments
     '        ManageTabPages = True
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".PrepareTestExitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2331,7 +2331,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         MyClass.SelectedAdjustmentsDS.AcceptChanges()
@@ -2358,7 +2358,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Me.TemporalAdjustmentsDS.AcceptChanges()
@@ -2382,7 +2382,7 @@ Public Class ITankLevelsAdjustments
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2429,7 +2429,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadGlobalAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2487,7 +2487,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2522,7 +2522,7 @@ Public Class ITankLevelsAdjustments
 
         Catch ex As Exception
             Me.WSSelectedAdjustmentsDS = CopyOfSelectedWSAdjustmentsDS
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2542,7 +2542,7 @@ Public Class ITankLevelsAdjustments
             resultData.HasError = True
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2609,7 +2609,7 @@ Public Class ITankLevelsAdjustments
 
         Catch ex As Exception
             MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".MergeSelectedAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MergeSelectedAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".MergeSelectedAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2633,7 +2633,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2686,7 +2686,7 @@ Public Class ITankLevelsAdjustments
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeMonitorTanks ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeMonitorTanks ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeMonitorTanks ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2742,7 +2742,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeEditedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeEditedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeEditedValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2769,7 +2769,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeSystemInput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeSystemInput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeSystemInput ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2782,7 +2782,7 @@ Public Class ITankLevelsAdjustments
         Try
             MyClass.TanksLevelsStatus = New LevelsStatus(True)
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeTestProcessStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeTestProcessStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeTestProcessStatus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2812,13 +2812,13 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & NG_IconName) Then
 
-                Dim myNGImage As Image = Image.FromFile(iconPath & NG_IconName)
+                Dim myNGImage As Image = ImageUtilities.ImageFromFile(iconPath & NG_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewNGImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -2873,7 +2873,7 @@ Public Class ITankLevelsAdjustments
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareIntermediateTestGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareIntermediateTestGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareIntermediateTestGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.ProcessDataGridView.Visible = True
@@ -2947,7 +2947,7 @@ Public Class ITankLevelsAdjustments
             UpdateTestGrid()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTestProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTestProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTestProcess", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
         End Try
@@ -3000,7 +3000,7 @@ Public Class ITankLevelsAdjustments
             myglobal.HasError = True
             myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myglobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckStepNotUndefined", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckStepNotUndefined", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckStepNotUndefined", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myglobal
@@ -3024,21 +3024,21 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & RUN_IconName) And System.IO.File.Exists(iconPath & OK_IconName) Then
 
-                Dim myRunImage As Image = Image.FromFile(iconPath & RUN_IconName)
-                Dim myOKImage As Image = Image.FromFile(iconPath & OK_IconName)
+                Dim myRunImage As Image = ImageUtilities.ImageFromFile(iconPath & RUN_IconName)
+                Dim myOKImage As Image = ImageUtilities.ImageFromFile(iconPath & OK_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myRunImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myRunImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewRunImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
                     myNewRunImage = CType(myRunImage, Bitmap)
                 End If
 
-                myGlobal = myUtil.ResizeImage(myOKImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myOKImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewOKImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -3090,7 +3090,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateIntermediateTestGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateIntermediateTestGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateIntermediateTestGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3130,7 +3130,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ResetEditedNewValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ResetEditedNewValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ResetEditedNewValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3161,7 +3161,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetEditedNewValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetEditedNewValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetEditedNewValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3190,7 +3190,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetEditedCurrentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetEditedCurrentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetEditedCurrentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3226,7 +3226,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetEditedCurrentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetEditedCurrentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SetEditedCurrentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3265,14 +3265,14 @@ Public Class ITankLevelsAdjustments
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             Else
 
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3323,7 +3323,7 @@ Public Class ITankLevelsAdjustments
 
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3400,7 +3400,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveLocal ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveLocal ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveLocal ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3464,7 +3464,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateLevel ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3538,7 +3538,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateLevel ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3672,7 +3672,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3717,7 +3717,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CancelAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CancelAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3862,7 +3862,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestTanksTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestTanksTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestTanksTest ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3914,7 +3914,7 @@ Public Class ITankLevelsAdjustments
                 ManageTabPages = True
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CancelTanksTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelTanksTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CancelTanksTest ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3987,7 +3987,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FillAdjustmentValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillAdjustmentValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FillAdjustmentValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -4036,7 +4036,7 @@ Public Class ITankLevelsAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FillNewAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillNewAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FillNewAdjustmentValue  ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -4077,7 +4077,7 @@ Public Class ITankLevelsAdjustments
             'Me.BsStopTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableButtons ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4095,7 +4095,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DeactivateAll ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4139,15 +4139,15 @@ Public Class ITankLevelsAdjustments
                 max = CSng(myGlobal.SetDatos)
             End If
 
-            Dim myUtil As New Utilities
-            myGlobal = myUtil.CalculatePercent(pValue, min, max)
+            ''Dim myUtil As New Utilities.
+            myGlobal = Utilities.CalculatePercent(pValue, min, max)
 
         Catch ex As Exception
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetPercentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetPercentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetPercentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4212,7 +4212,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExitScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4255,7 +4255,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4277,7 +4277,7 @@ Public Class ITankLevelsAdjustments
             Me.Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4436,7 +4436,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -4461,7 +4461,7 @@ Public Class ITankLevelsAdjustments
             myValue = CDbl(pValue).ToString(myFormat).Replace(",", ".")
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myValue
@@ -4501,7 +4501,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4513,13 +4513,13 @@ Public Class ITankLevelsAdjustments
     '        MyClass.ExitScreen()
 
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
     Private Sub TankLevelsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ''sensors
             'With MyBase.SensorsTimer
@@ -4529,7 +4529,7 @@ Public Class ITankLevelsAdjustments
             'End With
 
             'Get the current Language from the current Application Session
-            MyClass.LanguageId = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            MyClass.LanguageId = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             MyClass.GetScreenLabels(MyClass.LanguageId)
 
@@ -4632,7 +4632,7 @@ Public Class ITankLevelsAdjustments
             Me.BsTabPagesControl.TabPages.Remove(Me.BsIntermediateTabPage)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4650,7 +4650,7 @@ Public Class ITankLevelsAdjustments
             Me.BsInfoScalesXPSViewer.RefreshPage()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4672,7 +4672,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Deselecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Deselecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_Deselecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.PrepareErrorMode()
         End Try
@@ -4703,7 +4703,7 @@ Public Class ITankLevelsAdjustments
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_Selected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.PrepareErrorMode()
         End Try
@@ -4757,7 +4757,7 @@ Public Class ITankLevelsAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl1_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl1_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabControl1_Selecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.PrepareErrorMode()
         End Try
@@ -4844,7 +4844,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".AdjustButtons_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AdjustButtons_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AdjustButtons_Click", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4854,7 +4854,7 @@ Public Class ITankLevelsAdjustments
             MyClass.ExitScreen()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4876,7 +4876,7 @@ Public Class ITankLevelsAdjustments
                 BsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4905,7 +4905,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StartTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StartTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StartTestButton_Click", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4928,7 +4928,7 @@ Public Class ITankLevelsAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CancelTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CancelTestButton_Click", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4938,7 +4938,7 @@ Public Class ITankLevelsAdjustments
             MyClass.SaveAdjustment()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4980,7 +4980,7 @@ Public Class ITankLevelsAdjustments
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5010,12 +5010,12 @@ Public Class ITankLevelsAdjustments
             'TestProcessTimer.Enabled = False
             'RaiseEvent ProcessTimeOut(MyClass.TestProcessStep)
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TestProcessTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestProcessTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TestProcessTimer_Tick", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelChanged
+    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelChanged
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER
@@ -5033,12 +5033,12 @@ Public Class ITankLevelsAdjustments
             UpdateTestProcess()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnTankLevelChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnTankLevelChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".OnTankLevelChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelUndefined
+    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelUndefined
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER
@@ -5055,7 +5055,7 @@ Public Class ITankLevelsAdjustments
             Me.LCMonitorTank.Refresh()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnTankLevelUndefined ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnTankLevelUndefined ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".OnTankLevelUndefined ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5141,7 +5141,7 @@ Public Class ITankLevelsAdjustments
     '        TestProcessTimer.Enabled = False
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".OnTestProcessTimeOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnTestProcessTimeOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".OnTestProcessTimeOut ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -5157,7 +5157,7 @@ Public Class ITankLevelsAdjustments
     '        PrepareErrorMode()
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".OnTestProcessTimeOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnTestProcessTimeOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".OnTestProcessTimeOut ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -5178,7 +5178,7 @@ Public Class ITankLevelsAdjustments
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

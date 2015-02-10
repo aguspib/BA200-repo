@@ -64,8 +64,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -119,8 +119,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -174,8 +174,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByCalibratorID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByCalibratorID", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -214,8 +214,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.ExistVRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.ExistVRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -257,8 +257,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.GetVRotorsByRotorType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.GetVRotorsByRotorType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -282,7 +282,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 10/03/2010 - Changed the way of opening the DB Transaction to fulfill the new template
         '''              SA 19/04/2011 - When field VirtualRotorID in the DS is informed but its value is -1 it means the Virtual
         '''                              Rotor has to be created (same as when the field has a Null value)
-        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
+        '''              AG 07/10/2014 - BA-1979 ==> Added a call to new auxiliary function CheckForInvalidPosition to check if there are NOT IN USE Rotor 
+        '''                                          Positions with incomplete data (TubeContent without ID of the corresponding element). 
+        '''              SA 15/12/2014 - BA-1972 ==> Function CheckForInvalidPosition has to be called also when the Virtual Rotor exists and will be 
+        '''                                          updated. 
         ''' </remarks>
         Public Function Save(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pVirtualRotorPositionsDS As VirtualRotorPosititionsDS, _
                              ByVal pVirtualRotorName As String, Optional ByVal pInternalRotor As Boolean = False) As GlobalDataTO
@@ -295,44 +298,36 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         If (pVirtualRotorPositionsDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
-                            Dim virtualRotorPosToAdd As New tparVirtualRotorsPositionsDAO
+                            'BA-1979: Check if there are Positions in the Rotor with incomplete data (TubeContent without ID of the element) and
+                            '         mark InvalidPosition for them in the DataSet to exclude them from the INSERT
+                            Dim myVirtualPositionDlg As New VirtualRotorsPositionsDelegate
+                            resultData = myVirtualPositionDlg.CheckForInvalidPosition(dbConnection, pRotorType, pVirtualRotorPositionsDS, pInternalRotor)
 
-                            If (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).IsVirtualRotorIDNull) OrElse _
-                               (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).VirtualRotorID = -1) Then
-                                'AG 07/10/2014 BA-1979
-                                Dim myVirtualPositionDlg As New VirtualRotorsPositionsDelegate
-                                resultData = myVirtualPositionDlg.CheckForInvalidPosition(dbConnection, pRotorType, pVirtualRotorPositionsDS, pInternalRotor)
+                            If (Not resultData.HasError) Then
+                                Dim virtualRotorPosToAdd As New tparVirtualRotorsPositionsDAO
 
-                                If Not resultData.HasError Then
-                                    'AG 07/10/2014 BA-1979
-
-                                    'Saving a new Virtual Rotor
+                                If (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).IsVirtualRotorIDNull) OrElse _
+                                   (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).VirtualRotorID = -1) Then
+                                    'SAVE the new Virtual Rotor
                                     Dim rotorToAdd As New tparVirtualRotorsDAO
                                     resultData = rotorToAdd.Create(dbConnection, pRotorType, pVirtualRotorName, pInternalRotor)
 
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        'Successfully addition; get the automatically generated ID
+                                        'Get the automatically generated VirtualRotorID
                                         Dim vRotorID As Integer = DirectCast(resultData.SetDatos, Integer)
 
                                         'Inform the generated ID for each one of the Rotor Positions before adding them
                                         For i As Integer = 0 To pVirtualRotorPositionsDS.tparVirtualRotorPosititions.Rows.Count - 1
                                             pVirtualRotorPositionsDS.tparVirtualRotorPosititions(i).VirtualRotorID = vRotorID
                                         Next
-
-                                        'Create also the Rotor Positions
-                                        resultData = virtualRotorPosToAdd.Create(dbConnection, pVirtualRotorPositionsDS)
                                     End If
-                                End If 'AG 07/10/2014 BA-1979
-
-
-                            Else
-                                'Updating an exiting Virtual Rotor
-                                'First delete all currently filled positions...
-                                resultData = virtualRotorPosToAdd.DeleteAll(dbConnection, pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).VirtualRotorID)
-                                If (Not resultData.HasError) Then
-                                    'Finally add the new informed positions
-                                    resultData = virtualRotorPosToAdd.Create(dbConnection, pVirtualRotorPositionsDS)
+                                Else
+                                    'DELETE all Positions in the existing Virtual Rotor
+                                    resultData = virtualRotorPosToAdd.DeleteAll(dbConnection, pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).VirtualRotorID)
                                 End If
+
+                                'Finally, add all Positions to the Virtual Rotor
+                                If (Not resultData.HasError) Then resultData = virtualRotorPosToAdd.Create(dbConnection, pVirtualRotorPositionsDS)
                             End If
                         End If
 
@@ -354,8 +349,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Save", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Save", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -5,8 +5,6 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 
 Imports System.IO
@@ -71,7 +69,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIdAttr As String = ""
 
         'HISTORY
         '***************************
@@ -84,14 +81,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Properties"
 
-        Public Property AnalyzerId() As String
-            Get
-                Return AnalyzerIdAttr
-            End Get
-            Set(ByVal value As String)
-                AnalyzerIdAttr = value
-            End Set
-        End Property
 
         '**************HISTORY********************ç
 
@@ -156,8 +145,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESET_ANALYZER", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESET_ANALYZER", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -269,8 +258,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -295,7 +284,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -492,7 +481,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         myLines.Add(myLine)
 
                         For Each Line As List(Of String) In myLines
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, False)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, False)
                         Next
 
                         myGlobal.SetDatos = FinalText
@@ -506,8 +495,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
                 If Not dbConnection IsNot Nothing Then dbConnection.Close()
@@ -537,8 +526,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GenerateResultData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
             Return myData
@@ -563,8 +552,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -597,8 +586,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
             Return myResult
@@ -643,8 +632,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryNOKReasons", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryNOKReasons", EventLogEntryType.Error, False)
             End Try
 
             Return myReasonText
@@ -681,8 +670,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -710,8 +699,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -758,8 +747,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -796,8 +785,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_ADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             MyClass.RestoringAdjustmentsTextAttr = ""
             Return myGlobal
@@ -822,8 +811,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_FACTORY_ADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_FACTORY_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -844,6 +833,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #Region "Constants"
 
         Private Const FirmwareTag As String = " v"
+        Private Const ReleaseTag As String = "Release="     ' Tag to identify the Release info in the Firmware file (BA-1871).
         Private Const ChecksumTag As String = "CHECKSUM="
         Private Const SizeTag As String = "SIZE="
         Private Const StartTag As String = "START"
@@ -965,8 +955,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.StartUPDATE_FIRMWARE", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.StartUPDATE_FIRMWARE", EventLogEntryType.Error, False)
         '    End Try
         '    MyClass.RestoringAdjustmentsTextAttr = ""
         '    Return myGlobal
@@ -1030,8 +1020,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendFWUTIL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendFWUTIL", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1049,13 +1039,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myTempFilePath As String = ""
 
             Try
-                Dim myUtil As New Utilities
-                Dim myFileBytes As Byte()
+                'Dim utilities As New Utilities
+                Dim myFileBytes As Byte() = Nothing
 
                 '0- Decrypt if needed
                 If pDecrypt Then
                     myTempFilePath = Directory.GetDirectoryRoot(pFilePath)
-                    myGlobal = myUtil.DecryptFile(pFilePath, myTempFilePath)
+                    myGlobal = Utilities.DecryptFile(pFilePath, myTempFilePath)
 
                     If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                         myFileBytes = (File.ReadAllBytes(myTempFilePath))
@@ -1116,8 +1106,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.OpenFwFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.OpenFwFile", EventLogEntryType.Error, False)
             Finally
                 If File.Exists(myTempFilePath) Then
                     File.Delete(myTempFilePath)
@@ -1161,8 +1151,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SplitFwFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SplitFwFile", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1174,11 +1164,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>
         ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        '''             WE 21/01/2015 - BA-1871: extended with the ability to read the Release number in addition to the existing Version number.
         ''' </remarks>
         Private Function GetFWFileHeaderInfo(ByVal pStringData As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myVersion As String = ""
+                Dim myRelease As String = ""
                 Dim myCRC32Hex As String = ""
                 Dim mySize As Integer = -1
 
@@ -1187,13 +1179,18 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Dim myLine As String = myLines(L)
                     If myLine.Length > 0 Then
-                        If myLine.Contains(MyClass.FirmwareTag) Then
-                            myVersion = myLine.Substring(myLine.IndexOf(MyClass.FirmwareTag) + 2).Trim
+                        If myLine.Contains(InstrumentUpdateUtilDelegate.FirmwareTag) Then
+                            ' Extract the Firmware version number (entire string directly after the Firmware tag).
+                            myVersion = myLine.Substring(myLine.IndexOf(InstrumentUpdateUtilDelegate.FirmwareTag) + 2).Trim
 
-                        ElseIf myLine.Contains(MyClass.ChecksumTag) Then
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.ReleaseTag) Then
+                            ' Extract the Firmware release number (entire string directly after the Release tag).
+                            myRelease = myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim
+
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.ChecksumTag) Then
                             myCRC32Hex = myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim    '.ToUpper
 
-                        ElseIf myLine.Contains(MyClass.SizeTag) Then
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.SizeTag) Then
                             mySize = CInt(myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim)
                             'If mySize Mod 4 > 0 Then
                             '    myGlobal.HasError = True
@@ -1206,7 +1203,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Next
 
                 If Not myGlobal.HasError Then
-                    MyClass.FWFileHeaderVersionAttr = myVersion
+                    'MyClass.FWFileHeaderVersionAttr = myVersion
+                    MyClass.FWFileHeaderVersionAttr = myVersion & "." & myRelease
                     MyClass.FWFileHeaderCRC32HexAttr = myCRC32Hex
                     MyClass.FWFileHeaderSizeAttr = mySize
                 End If
@@ -1215,8 +1213,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetFWFileHeaderInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetFWFileHeaderInfo", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1231,8 +1229,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim iscompatible As Boolean = False
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                'Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
                     myGlobal = AnalyzerController.Instance.Analyzer.ValidateFwSwCompatibility(pFWFileVersion, SwVersion) '#REFACTORING
@@ -1247,8 +1245,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ValidateFwFileVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ValidateFwFileVersion", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function

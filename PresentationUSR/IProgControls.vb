@@ -1,5 +1,6 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -7,8 +8,9 @@ Imports Biosystems.Ax00.Types
 'Imports System.Configuration
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IProgControls
+Public Class UiProgControls
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -95,7 +97,7 @@ Public Class IProgControls
                 AddModeScreenStatus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AddControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -108,6 +110,7 @@ Public Class IProgControls
     ''' Modified by: SA 11/05/2011 - Min allowed ExpirationDate will be ActivationDate + 1 day. ActivationDate
     '''                              has to be shown with the date/time format currently active in the OS
     '''              TR 24/07/2013 - Disabel button Add new control lot (bsNewLotButton) to avoid error (bug #1130)
+    '''              XB 01/09/2014 - add Level field - BA #1868
     ''' </remarks>
     Private Sub AddModeScreenStatus()
         Try
@@ -151,6 +154,10 @@ Public Class IProgControls
             bsExpDatePickUpCombo.MinDate = CDate(bsActivationTextBox.Text).AddDays(1)
             bsExpDatePickUpCombo.Value = Now.AddMonths(3)
 
+            bsLevelUpDown.Enabled = True
+            bsLevelUpDown.Value = 1
+            bsLevelUpDown.BackColor = Color.White
+
             'Initialize global variables
             bsScreenErrorProvider.Clear()
             CleanGlobalValues()
@@ -173,7 +180,7 @@ Public Class IProgControls
             'Put Focus in the first enabled field
             bsControlNameTextbox.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AddModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -250,7 +257,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalculatedTarget ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalculatedTarget ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalculatedTarget ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -300,7 +307,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelControlEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelControlEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CancelControlEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -323,7 +330,7 @@ Public Class IProgControls
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myPreviousControlLotDS As ControlsDS = DirectCast(resultData.SetDatos, ControlsDS)
 
-                Using myForm As New ILotChangeAuxScreen
+                Using myForm As New UiLotChangeAuxScreen
                     myForm.CurrentLot = bsLotNumberTextBox.Text.Trim
                     myForm.OriginalLot = bsControlsListView.SelectedItems(0).SubItems(4).Text
                     myForm.PreviusLotDataDS = myPreviousControlLotDS
@@ -406,7 +413,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeLot", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeLot", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ChangeLot", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -448,7 +455,7 @@ Public Class IProgControls
                 ChangesMade = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CheckNumericCell ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -466,7 +473,7 @@ Public Class IProgControls
             selectedControlID = -1
             originalSelectedIndex = -1
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CleanGlobalValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -486,7 +493,7 @@ Public Class IProgControls
             If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 'Get the current User from the Application Session
                 Dim currentSession As New ApplicationSessionManager
-                Dim loggedUser As String = currentSession.GetSessionInfo().UserName
+                Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Load all selected Controls in a typed DataSet controlDS
                 Dim myControlsDS As New ControlsDS
@@ -527,7 +534,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -590,7 +597,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -615,7 +622,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditSelectedControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditSelectedControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditSelectedControl ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -625,6 +632,7 @@ Public Class IProgControls
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by  XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub EditModeScreenStatus()
         Try
@@ -672,10 +680,13 @@ Public Class IProgControls
 
             bsDelTest.Enabled = False
 
+            bsLevelUpDown.Enabled = True
+            bsLevelUpDown.BackColor = Color.White
+
             UnselectTestsSampleTypes()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -704,11 +715,11 @@ Public Class IProgControls
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -719,6 +730,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL
     ''' Modified by: SA 11/05/2011 - Set ToolTip for New Lot button, it was missing
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -746,8 +758,11 @@ Public Class IProgControls
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+
+            ' XB 01/09/2014 - BA #1868
+            bsLevelLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_UserLevel", currentLanguage) + ":"
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -758,6 +773,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed columns for Previous Control Lot information
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub InitializeControlsList()
         Try
@@ -783,14 +799,73 @@ Public Class IProgControls
             bsControlsListView.Columns.Add("ActivationDate", 0, HorizontalAlignment.Left)
             bsControlsListView.Columns.Add("ExpirationDate", 0, HorizontalAlignment.Left)
             bsControlsListView.Columns.Add("InUse", 0, HorizontalAlignment.Left)
+            ' XB 01/09/2014 - BA #1868
+            bsControlsListView.Columns.Add("Level", 0, HorizontalAlignment.Left)
 
             'Fill ListView with the list of existing Control.
             LoadControlsList()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeControlsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeControlsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeControlsList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Setup the limits and step increment of all Numeric UpDown controls 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Sub SetUpControlsLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.CONTROLS_NUMBER)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsLevelUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsLevelUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsLevelUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                bsLevelUpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetUpControlsLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SetUpControlsLimits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Method in charge to get the controls limits value. 
+    ''' </summary>
+    ''' <param name="pLimitsID">Limit to get</param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Function GetControlsLimits(ByVal pLimitsID As FieldLimitsEnum, Optional ByVal pAnalyzerModel As String = "") As FieldLimitsDS
+        Dim myFieldLimitsDS As New FieldLimitsDS
+        Try
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
+            'Load the time Cycles control
+            myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID, pAnalyzerModel)
+
+            If Not myGlobalDataTO.HasError Then
+                myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
+            Else
+                ShowMessage("Error", myGlobalDataTO.ErrorCode)
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+
+        Return myFieldLimitsDS
+
+    End Function
 
     ''' <summary>
     ''' Set the screen controls to INITIAL MODE
@@ -800,6 +875,7 @@ Public Class IProgControls
     ''' Modified by: SA 11/05/2011 - Min allowed ExpirationDate will be ActivationDate + 1 day
     '''                              ActivationDate should be shown with the format defined in the OSCultureInfo
     '''                              Use function Now instead of Today, due to the formated hour returns always 
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks> 
     Private Sub InitialModeScreenStatus(Optional ByVal pInitializeListView As Boolean = True)
         Try
@@ -841,6 +917,9 @@ Public Class IProgControls
             bsExpDatePickUpCombo.Value = Now.AddMonths(3)
             bsExpDatePickUpCombo.BackColor = SystemColors.MenuBar
 
+            bsLevelUpDown.Enabled = False
+            bsLevelUpDown.BackColor = SystemColors.MenuBar
+
             DeletedTestsListDS = New SelectedTestsDS
             TestControlsListDS = New TestControlsDS
             bsTestListGrid.DataSource = TestControlsListDS.tparTestControls
@@ -858,7 +937,7 @@ Public Class IProgControls
             'Focus to button Add
             If (pInitializeListView) Then bsNewButton.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitialModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -869,6 +948,7 @@ Public Class IProgControls
     ''' <returns>A typed DataSet ControlsDS containing all data of the Controls</returns>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by: XB 01/09/2014 - inform field ControlLevel with the value of the added NumericUpDown - BA #1868
     ''' </remarks>
     Private Function LoadControlsDS() As ControlsDS
         Dim controlRow As ControlsDS.tparControlsRow
@@ -883,15 +963,17 @@ Public Class IProgControls
             controlRow.LotNumber = bsLotNumberTextBox.Text.Trim
             controlRow.ActivationDate = CDate(bsActivationTextBox.Text)
             controlRow.ExpirationDate = CDate(bsExpDatePickUpCombo.Value)
+            ' XB 01/09/2014 - BA #1868
+            controlRow.ControlLevel = CType(bsLevelUpDown.Value, Integer)
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
-            controlRow.TS_User = currentSession.GetSessionInfo().UserName
+            controlRow.TS_User = GlobalBase.GetSessionInfo().UserName
             controlRow.TS_DateTime = Now
 
             controlData.tparControls.Rows.Add(controlRow)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadControlsDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadControlsDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadControlsDS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return controlData
@@ -903,6 +985,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed columns for Previous Control Lot information
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub LoadControlsList()
         Try
@@ -911,13 +994,13 @@ Public Class IProgControls
             'Get the Icon defined for controls that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("CTRL")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("CTRL", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("CTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for Controls that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSECTRL")
             If (inUseIcon <> "") Then
-                myIcons.Images.Add("INUSECTRL", Image.FromFile(MyBase.IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSECTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the Controls
@@ -965,6 +1048,8 @@ Public Class IProgControls
                     bsControlsListView.Items(i).SubItems.Add(controlRow.ActivationDate.ToString)
                     bsControlsListView.Items(i).SubItems.Add(controlRow.ExpirationDate.ToString)
                     bsControlsListView.Items(i).SubItems.Add(controlRow.InUse.ToString)
+                    ' XB 01/09/2014 - BA #1868
+                    bsControlsListView.Items(i).SubItems.Add(controlRow.ControlLevel.ToString)
 
                     'If there is a selected control and it is still in the list, its position is stored to re-select 
                     'the same control once the list is loaded
@@ -993,7 +1078,7 @@ Public Class IProgControls
                 CleanGlobalValues()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadControlsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadControlsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadControlsList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1005,6 +1090,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed load of Previous Control Lot values
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Function LoadDataOfControl() As Boolean
         Dim inUse As Boolean = False
@@ -1028,10 +1114,13 @@ Public Class IProgControls
             bsExpDatePickUpCombo.Value = CDate(bsControlsListView.SelectedItems(0).SubItems(6).Text)
             inUse = Convert.ToBoolean(bsControlsListView.SelectedItems(0).SubItems(7).Text)
 
+            ' XB 01/09/2014 - BA #1868
+            bsLevelUpDown.Value = CInt(bsControlsListView.SelectedItems(0).SubItems(8).Text)
+
             'Load the list of Tests/SampleTypes linked to the selected Control
             LoadTestControlsGrid()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadDataOfControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadDataOfControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadDataOfControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return inUse
@@ -1072,7 +1161,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTestControlsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTestControlsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadTestControlsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1106,7 +1195,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSampleTypesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1118,6 +1207,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Implementation changed; removed verification of changes in Tests/SampleTypes grid
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks> 
     Public Function ExistPendingChanges() As Boolean
         Try
@@ -1147,14 +1237,15 @@ Public Class IProgControls
                     If (bsControlNameTextbox.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).Text) OrElse _
                        (selectedSample <> bsControlsListView.Items(originalSelectedIndex).SubItems(3).Text.Trim) OrElse _
                        (bsLotNumberTextBox.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).SubItems(4).Text.Trim) OrElse _
-                       (bsExpDatePickUpCombo.Value.ToString("yyyyMMdd") <> Convert.ToDateTime(bsControlsListView.Items(originalSelectedIndex).SubItems(6).Text).ToString("yyyyMMdd")) Then
+                       (bsExpDatePickUpCombo.Value.ToString("yyyyMMdd") <> Convert.ToDateTime(bsControlsListView.Items(originalSelectedIndex).SubItems(6).Text).ToString("yyyyMMdd")) OrElse _
+                       (bsLevelUpDown.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).SubItems(8).Text.Trim) Then
                         ChangesMade = True
                     End If
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistPendingChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistPendingChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExistPendingChanges ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1177,27 +1268,27 @@ Public Class IProgControls
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsNewLotButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsNewLotButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelTest.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelTest.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1206,22 +1297,22 @@ Public Class IProgControls
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1384,7 +1475,7 @@ Public Class IProgControls
             bsTestListGrid.Columns("TargetSD").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestsSamplesGrid " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestsSamplesGrid " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestsSamplesGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1430,7 +1521,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1446,7 +1537,7 @@ Public Class IProgControls
         Try
             QueryControl()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryControlByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryControlByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryControlByMoveUpDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1456,6 +1547,7 @@ Public Class IProgControls
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by: XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub QueryModeScreenStatus()
         Try
@@ -1495,12 +1587,15 @@ Public Class IProgControls
             bsExpDatePickUpCombo.Enabled = False
             bsExpDatePickUpCombo.BackColor = SystemColors.MenuBar
 
+            bsLevelUpDown.Enabled = False
+            bsLevelUpDown.BackColor = SystemColors.MenuBar
+
             'Tests/SampleTypes grid is disabled
             bsTestControlPanel.Visible = True
             bsTestListGrid.Enabled = False
             UnselectTestsSampleTypes()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1520,7 +1615,7 @@ Public Class IProgControls
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReadOnlyModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReadOnlyModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1550,7 +1645,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1595,7 +1690,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             savingExecuted = False
         End Try
@@ -1610,19 +1705,20 @@ Public Class IProgControls
     ''' Created by:  DL 30/03/2011 
     ''' Modified by: SA 18/05/2011 - Get limits (min and max allowed values) for Min/Max Concentration fields 
     '''              DL 28/07/2011 - Set the screen location when it is opened
+    '''              XB 01/09/2014 - Call SetUpControlsLimits funcion - BA #1868
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
             If (String.Compare(SourceScreenAttribute, GlbSourceScreen.TEST_QCTAB.ToString, False) = 0) Then
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -1653,6 +1749,8 @@ Public Class IProgControls
                 'Configure and load the list of existing Controls
                 InitializeControlsList()
 
+                SetUpControlsLimits()   ' XB 01/09/2014 - BA #1868
+
                 'Configure the grid for Tests/SampleTypes
                 PrepareTestsSamplesGrid()
                 bsTestControlPanel.Visible = True
@@ -1674,7 +1772,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1703,7 +1801,7 @@ Public Class IProgControls
                     Exit Select
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1733,7 +1831,7 @@ Public Class IProgControls
             Next
 
             'Inform Properties and open the auxiliary screen of Tests selection
-            Using myForm As New IWSTestSelectionAuxScreen
+            Using myForm As New UiWSTestSelectionAuxScreen
                 myForm.WorkingModel = GlbSourceScreen.MODEL2.ToString()
                 myForm.ControlID = selectedControlID
                 myForm.ListOfSelectedTests = myTests
@@ -1832,7 +1930,7 @@ Public Class IProgControls
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SearchTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SearchTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SearchTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1892,7 +1990,7 @@ Public Class IProgControls
                 bsTestListGrid.Rows(pRow).Cells(pCol).ErrorText = GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetLimitValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetLimitValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetLimitValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1931,7 +2029,7 @@ Public Class IProgControls
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UnselectTestsSampleTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UnselectTestsSampleTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UnselectTestsSampleTypes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1961,7 +2059,7 @@ Public Class IProgControls
                 Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                 If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using AffectedElement As New IWarningAfectedElements
+                    Using AffectedElement As New UiWarningAfectedElements
                         AffectedElement.AffectedElements = myDependeciesElementsDS
 
                         AffectedElement.ShowDialog()
@@ -1976,7 +2074,7 @@ Public Class IProgControls
                 ShowMessage(Me.Name & ".ValidateDependenciesOnDeletedElements", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnDeletedElements", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnDeletedElements", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateDependenciesOnDeletedElements", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2003,7 +2101,7 @@ Public Class IProgControls
                 Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                 If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using AffectedElement As New IWarningAfectedElements
+                    Using AffectedElement As New UiWarningAfectedElements
                         AffectedElement.AffectedElements = myDependeciesElementsDS
                         AffectedElement.ShowDialog()
 
@@ -2018,7 +2116,7 @@ Public Class IProgControls
                 ShowMessage(Me.Name & ".ValidateDependenciesOnLotChange", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnLotChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnLotChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateDependenciesOnLotChange", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2056,7 +2154,7 @@ Public Class IProgControls
                         Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(resultData.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
 
                                 AffectedElement.ShowDialog()
@@ -2073,7 +2171,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnUpdate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependenciesOnUpdate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateDependenciesOnUpdate", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2096,7 +2194,7 @@ Public Class IProgControls
                 If errorFound Then Exit For
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateErrorOnTestsValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateErrorOnTestsValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateErrorOnTestsValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return errorFound
@@ -2112,6 +2210,7 @@ Public Class IProgControls
     '''                              message: the message should exist in tfmwMessage, the resource should exist
     '''                              in tfmwMultiLanguageResources, the enumerate for the message should exist in
     '''                              GlobalEnumerates.Messages, and then, the GetMessageText function should be called
+    '''              XB 01/09/2014 - add Level field - BA #1868
     ''' </remarks>
     Private Function ValidateSavingConditions() As Boolean
         Dim fieldsOK As Boolean = True
@@ -2143,6 +2242,14 @@ Public Class IProgControls
                 If (setFocusTo = -1) Then setFocusTo = 4
             End If
 
+            ' XB 01/09/2014 - BA #1868
+            If bsLevelUpDown.Text = "" Then
+                bsScreenErrorProvider.SetError(bsLevelUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                If (setFocusTo = -1) Then setFocusTo = 5
+            End If
+
+
+
             'Select the proper field to put the focus
             If (setFocusTo >= 0) Then
                 fieldsOK = False
@@ -2157,6 +2264,8 @@ Public Class IProgControls
                     bsExpDatePickUpCombo.Focus()
                 ElseIf (setFocusTo = 4) Then
                     bsTestListGrid.Focus()
+                ElseIf (setFocusTo = 5) Then
+                    bsLevelUpDown.Focus()   ' XB 01/09/2014 - BA #1868
                 End If
             Else
                 'All mandatory fields are informed, verify the informed Name is unique
@@ -2175,7 +2284,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateSavingConditions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return fieldsOK
@@ -2244,7 +2353,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateTestGridRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateTestGridRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateTestGridRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return rowWithErrors
@@ -2261,8 +2370,8 @@ Public Class IProgControls
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If (SourceScreenAttribute = GlbSourceScreen.TEST_QCTAB.ToString) Then
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top
@@ -2271,7 +2380,7 @@ Public Class IProgControls
             End If
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2301,7 +2410,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgControls_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2315,13 +2424,13 @@ Public Class IProgControls
     Private Sub ProgControls_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
 
             ScreenLoad()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgControls_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2344,7 +2453,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgControls_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2393,7 +2502,7 @@ Public Class IProgControls
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2421,7 +2530,7 @@ Public Class IProgControls
             End Select
             bsControlsListView.Sort()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_ColumnClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2438,7 +2547,7 @@ Public Class IProgControls
                 e.NewWidth = 0
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2459,7 +2568,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_DoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2493,7 +2602,7 @@ Public Class IProgControls
             End If
             ScreenStatusByUserLevel() 'TR 23/04/2012
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2512,7 +2621,7 @@ Public Class IProgControls
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsControlsListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsControlsListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2540,7 +2649,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSampleTypeComboBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2563,7 +2672,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTextbox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2578,7 +2687,7 @@ Public Class IProgControls
         Try
             bsDelTest.Enabled = (bsTestListGrid.SelectedRows.Count > 0)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_CellClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2597,7 +2706,7 @@ Public Class IProgControls
                 CalculatedTarget(e.RowIndex, e.ColumnIndex)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_CellLeave", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2623,7 +2732,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsTestListGrid_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsTestListGrid_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_CellFormatting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2643,7 +2752,7 @@ Public Class IProgControls
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_CellValidating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2667,7 +2776,7 @@ Public Class IProgControls
                 RemoveHandler e.Control.KeyPress, AddressOf CheckNumericCell
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_EditingControlShowing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2681,7 +2790,7 @@ Public Class IProgControls
                 DeleteTests()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2696,7 +2805,7 @@ Public Class IProgControls
         Try
             ValidateTestGridRow(e.RowIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_RowValidating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListGrid_RowValidating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListGrid_RowValidating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2714,7 +2823,7 @@ Public Class IProgControls
         Try
             AddControl()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsNewButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2731,7 +2840,7 @@ Public Class IProgControls
             EditSelectedControl()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2746,7 +2855,7 @@ Public Class IProgControls
         Try
             DeleteControls()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsDeleteButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2763,7 +2872,7 @@ Public Class IProgControls
             ChangeLot()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewLotButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewLotButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsNewLotButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2779,7 +2888,7 @@ Public Class IProgControls
         Try
             SearchTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSearchTestsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSearchTestsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSearchTestsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2795,7 +2904,7 @@ Public Class IProgControls
         Try
             DeleteTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDelTest_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDelTest_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsDelTest_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2810,7 +2919,7 @@ Public Class IProgControls
         Try
             SaveChanges()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2825,7 +2934,7 @@ Public Class IProgControls
         Try
             CancelControlEdition()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2837,8 +2946,100 @@ Public Class IProgControls
         Try
             ExitScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Activate the Change made variable when some value of the corresponding numericupdown control is change by text (not only by arrows)
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by:  XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Sub TextChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLevelUpDown.TextChanged
+        Try
+            If EditionMode Then
+                Dim myNewValue As String = DirectCast(sender, BSNumericUpDown).Text
+                Dim myMaxValue As Single = DirectCast(sender, BSNumericUpDown).Maximum
+                Dim myMinValue As Single = DirectCast(sender, BSNumericUpDown).Minimum
+
+                If myNewValue.Length > 0 AndAlso myNewValue.Length > myMaxValue.ToString.Length Then
+                    If CSng(myNewValue) > CSng(myMaxValue) Then
+                        DirectCast(sender, Biosystems.Ax00.Controls.UserControls.BSNumericUpDown).Text = myMaxValue.ToString
+                    ElseIf CSng(myNewValue) < myMinValue Then
+                        If IsNumeric(Microsoft.VisualBasic.Left(myNewValue, 1)) Then
+                            DirectCast(sender, Biosystems.Ax00.Controls.UserControls.BSNumericUpDown).Text = myMinValue.ToString
+                        End If
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".TextChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".TextChange", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    'Private Sub SlopeAUpDown_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles SlopeAUpDown.Validating
+
+    '    Try
+    '        BsErrorProvider1.Clear()
+    '        ValidationError = False
+    '        If Not SlopeAUpDown.Text = "" AndAlso SlopeAUpDown.Value = 0 Then
+    '            BsErrorProvider1.SetError(SlopeAUpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+    '            ValidationError = True
+    '            SlopeAUpDown.Select()
+    '        ElseIf Not SlopeAUpDown.Text = "" AndAlso SlopeBUpDown.Text = "" Then
+    '            BsErrorProvider1.SetError(SlopeBUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+    '            ValidationError = True
+    '        End If
+
+    '    Catch ex As Exception
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeAUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".SlopeAUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
+
+
+    ''' <summary>
+    ''' generic event handler to capture the NumericUpDown content deletion
+    ''' </summary>
+    ''' <remarks>Created by:  XB 01/09/2014 - BA #1868</remarks>
+    Private Sub NumericUpDown_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsLevelUpDown.KeyUp
+        Try
+            Dim miNumericUpDown As NumericUpDown = CType(sender, NumericUpDown)
+
+            If miNumericUpDown.Text <> "" Then
+
+            Else
+                miNumericUpDown.Value = miNumericUpDown.Minimum
+                miNumericUpDown.ResetText()
+            End If
+
+            If EditionMode Then
+                ChangesMade = True
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "NumericUpDown_KeyUp " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".NumericUpDown_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Handle for NumericUpDown controls allowing numbers with decimals. Only numbers and the decimal separator are allowed
+    ''' </summary>
+    ''' <remarks>Created by:  XB 01/09/2014 - BA #1868</remarks>
+    Private Sub IntegerNumericUpDown_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles bsLevelUpDown.KeyPress
+        Try
+            If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".IntegerNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 

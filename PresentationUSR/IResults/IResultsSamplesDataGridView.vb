@@ -1,6 +1,6 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
@@ -11,25 +11,15 @@ Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
 'Imports Biosystems.Ax00.CommunicationsSwFw
 
-Imports System.Text
-Imports System.ComponentModel
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraPrintingLinks
-Imports DevExpress.XtraEditors
 Imports DevExpress.XtraGrid
 Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
 Imports DevExpress.XtraGrid.Views.Grid
 Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
 Imports DevExpress.XtraEditors.Controls
 Imports DevExpress.Utils
-Imports DevExpress.XtraGrid.Drawing
 
 
-
-Partial Class IResults
+Partial Class UiResults
 
 #Region "SamplesXtraGrid Methods"
     ''' <summary>
@@ -352,7 +342,7 @@ Partial Class IResults
             RemarksColumn.ColumnEdit = largeTextEdit
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeSamplesXtraGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeSamplesXtraGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -375,7 +365,7 @@ Partial Class IResults
             'SamplesXtraGridView.CanSortColumn(SamplesXtraGridView.Columns("ResultDate"))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineSamplesSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineSamplesSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -449,7 +439,7 @@ Partial Class IResults
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateAverageList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateAverageList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -461,12 +451,13 @@ Partial Class IResults
     ''' <remarks>
     ''' Created RH - v1.0.0
     ''' Modified AG + DL 14/06/2013 (show barcode when informed in v2.0.0)
-    ''' Modified AG 28/06/2013 - fix issue #1199 (show barcode if informed also for calculated and offsystem tests)
+    '''          AG 28/06/2013 - fix issue #1199 (show barcode if informed also for calculated and offsystem tests)
+    '''          XB 16/01/2015 - Change on displaying CONC errors values derived from ISE error - BA-1064
     ''' </remarks>
     Private Sub UpdateSamplesXtraGrid()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
@@ -640,6 +631,16 @@ Partial Class IResults
                     End If
                     'END AG 15/09/2010
 
+                    ' XB 16/01/2015 - BA-1064 
+                    If Not resultRow.IsCONC_ErrorNull Then
+                        If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                            If resultRow.TestType = "ISE" Then
+                                CurrentRow.Concentration = GlobalConstants.CONC_ISE_ERROR
+                            End If
+                        End If
+                    End If
+                    ' XB 16/01/2015 - BA-1064 
+
                     Remark = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, _
                                                                             resultRow.MultiPointNumber)
                     CurrentRow.Remarks = Remark
@@ -670,7 +671,7 @@ Partial Class IResults
                                                  resultRow.ResultDateTime.ToString(SystemInfoManager.OSLongTimeFormat)
 
                     CurrentRow.PatientName = resultRow.PatientName
-                    CurrentRow.PatientID = IIf(resultRow.RerunNumber = 1, resultRow.PatientID, String.Format("{0} ({1})", resultRow.PatientID, resultRow.RerunNumber))
+                    CurrentRow.PatientID = TryCast(IIf(resultRow.RerunNumber = 1, resultRow.PatientID, String.Format("{0} ({1})", resultRow.PatientID, resultRow.RerunNumber)), String)
                     CurrentRow.TestType = resultRow.TestType 'RH 23/03/2012
 
                     'AG + DL 14/06/2013 - show specimen id in the Group 
@@ -789,6 +790,16 @@ Partial Class IResults
                             End If
                             'END AG 15/09/2010
 
+                            ' XB 16/01/2015 - BA-1064 
+                            If Not resultRow.IsCONC_ErrorNull Then
+                                If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                                    If resultRow.TestType = "ISE" Then
+                                        CurrentRow.Concentration = GlobalConstants.CONC_ISE_ERROR
+                                    End If
+                                End If
+                            End If
+                            ' XB 16/01/2015 - BA-1064 
+
                             'RH 01/02/2011 Get alarms for OffSystem tests and the others. OffSystem test do not have valid ExecutionID
                             If Not String.Equals(resultRow.TestType, "OFFS") Then
                                 Remark = GetExecutionAlarmDescription(SampleList(j).ExecutionID)
@@ -814,7 +825,7 @@ Partial Class IResults
                                 'TR(07/06 /2012)
 
                             Else
-                                CurrentRow.ReplicateNumber = SampleList(j).ReplicateNumber
+                                CurrentRow.ReplicateNumber = CStr(SampleList(j).ReplicateNumber)
                             End If
                             'dgv("No", k).ToolTipText = Remark
                             'RH 03/08/2011
@@ -873,12 +884,12 @@ Partial Class IResults
             'MessageBox.Show("UpdateXtraSamplesDataGrid Elapsed Time: " & ElapsedTime.ToStringWithDecimals(0))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateSamplesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateSamplesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.UpdateSamplesXtraGrid", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -898,7 +909,7 @@ Partial Class IResults
     ''' </remarks>
     Private Sub SamplesXtraGridView_RowStyle(ByVal sender As System.Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs) Handles SamplesXtraGridView.RowStyle
         Try
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             If (e.RowHandle >= 0) Then
                 'This is how to get the DataRow behind the GridViewRow
@@ -922,7 +933,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -935,7 +946,7 @@ Partial Class IResults
     ''' </remarks>
     Private Sub SamplesXtraGridView_CellMerge(ByVal sender As System.Object, ByVal e As DevExpress.XtraGrid.Views.Grid.CellMergeEventArgs) Handles SamplesXtraGridView.CellMerge
         Try
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             Dim CurrentRow1 As ResultsDS.XtraSamplesRow = CType(View.GetDataRow(e.RowHandle1), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle1)
             Dim CurrentRow2 As ResultsDS.XtraSamplesRow = CType(View.GetDataRow(e.RowHandle2), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle2)
@@ -946,7 +957,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CellMerge ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CellMerge ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -967,7 +978,7 @@ Partial Class IResults
 
             If info Is Nothing Then Return
 
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             Dim ChildHandle As Integer = View.GetChildRowHandle(e.RowHandle, 0)
 
@@ -1034,7 +1045,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CustomDrawGroupRow ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CustomDrawGroupRow ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1078,7 +1089,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1102,7 +1113,7 @@ Partial Class IResults
 
             If sender Is Nothing Then Return
 
-            Dim dgv As GridView = sender
+            Dim dgv = TryCast(sender, GridView)
 
             'This is how to get the DataRow behind the GridViewRow
             Dim CurrentRow As ResultsDS.XtraSamplesRow = CType(dgv.GetDataRow(e.RowHandle), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle)
@@ -1209,7 +1220,7 @@ Partial Class IResults
 
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SamplesXtraGridView_RowCellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SamplesXtraGridView_RowCellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             Cursor = Cursors.Default
@@ -1227,7 +1238,7 @@ Partial Class IResults
             Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_MouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_MouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1246,7 +1257,7 @@ Partial Class IResults
             If Not e.SelectedControl Is SamplesXtraGrid Then Return
 
             'Get the view at the current mouse position
-            Dim view As GridView = SamplesXtraGrid.GetViewAt(e.ControlMousePosition)
+            Dim view = TryCast(SamplesXtraGrid.GetViewAt(e.ControlMousePosition), GridView)
             If view Is Nothing Then Return
 
             'Get the view's element information that resides at the current position
@@ -1351,7 +1362,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ToolTipController1_GetActiveObjectInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ToolTipController1_GetActiveObjectInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1388,7 +1399,7 @@ Partial Class IResults
             e.Handled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CustomDrawColumnHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesXtraGridView_CustomDrawColumnHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1479,7 +1490,7 @@ Partial Class IResults
             dgv.EndSort()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SortXtraGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SortXtraGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub

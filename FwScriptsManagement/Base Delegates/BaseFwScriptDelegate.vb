@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
-Imports System.Configuration
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.App
 
@@ -29,7 +28,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         End Sub
         Public Sub New(ByVal pAnalyzerID As String) 'SGM 20/01/2012
-            MyClass.AnalyzerIdAttr = pAnalyzerID
+            AnalyzerId = pAnalyzerID
         End Sub
 #End Region
 
@@ -50,7 +49,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Private pValueSensorsAttr As String
 
-        Protected Friend AnalyzerIdAttr As String = "" 'SGM 20/01/2012
+        'Protected Friend AnalyzerIdAttr As String = "" 'SGM 20/01/2012     'MANEL
 #End Region
 
 #Region "Properties"
@@ -66,13 +65,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         'SGM 20/01/2012
         Public Property AnalyzerId() As String
-            Get
-                Return AnalyzerIdAttr
-            End Get
-            Set(ByVal value As String)
-                AnalyzerIdAttr = value
-            End Set
-        End Property
 #End Region
 
 #Region "Communication Events"
@@ -101,8 +93,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 RaiseEvent ReceivedLastFwScriptEvent(pResponse, pData)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.OnReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.OnReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -120,8 +112,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 RaiseEvent ReceivedLastFwScriptEvent(pResponse, pData)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.OnDataReceivedFromAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.OnDataReceivedFromAnalyzer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -149,8 +141,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "SendMonitorFwScriptsQueueList.SendQueueForREADINGADJUSTMENTS", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "SendMonitorFwScriptsQueueList.SendQueueForREADINGADJUSTMENTS", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -204,8 +196,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForREADINGADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForREADINGADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -248,8 +240,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForSAVING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForSAVING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -266,15 +258,15 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim resultData As New GlobalDataTO
             Try
                 Dim myPreliminaryDAO As New tadjPreliminaryHomesDAO
-                resultData = myPreliminaryDAO.InsertAnalyzerPreliminaryHomes(pDBConnection, MyClass.AnalyzerIdAttr)
+                resultData = myPreliminaryDAO.InsertAnalyzerPreliminaryHomes(pDBConnection, MyClass.AnalyzerId)
 
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.InsertNewAnalyzerPreliminaryHomes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.InsertNewAnalyzerPreliminaryHomes", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -296,8 +288,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultdata.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "GetPreliminaryHomes", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "GetPreliminaryHomes", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultdata
         'End Function
@@ -311,15 +303,15 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim resultdata As New GlobalDataTO
             Try
                 Dim myHomesDAO As New tadjPreliminaryHomesDAO
-                resultdata = myHomesDAO.GetAllPreliminaryHomes(pDBConnection, MyClass.AnalyzerIdAttr)
+                resultdata = myHomesDAO.GetAllPreliminaryHomes(pDBConnection, MyClass.AnalyzerId)
 
             Catch ex As Exception
                 resultdata.HasError = True
                 resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "GetAllPreliminaryHomes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "GetAllPreliminaryHomes", EventLogEntryType.Error, False)
             End Try
             Return resultdata
         End Function
@@ -341,8 +333,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultdata.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "SetPreliminaryHomeAsDone", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "SetPreliminaryHomeAsDone", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultdata
         'End Function
@@ -365,8 +357,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ResetPreliminaryHomes", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ResetPreliminaryHomes", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -387,8 +379,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ResetPreliminaryHomes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ResetPreliminaryHomes", EventLogEntryType.Error, False)
             End Try
             Return resultdata
         End Function
@@ -406,12 +398,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Dim myHomesDS As SRVPreliminaryHomesDS
                 Dim myPendingHomesList As New List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow)
 
-                myGlobal = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
+                myGlobal = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerId, pAdjustment.ToString)
                 If myGlobal IsNot Nothing AndAlso Not myGlobal.HasError Then
                     myHomesDS = CType(myGlobal.SetDatos, SRVPreliminaryHomesDS)
 
                     myPendingHomesList = (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where a.AnalyzerID = MyClass.AnalyzerIdAttr And a.AdjustmentGroupID = pAdjustment.ToString And a.Done = False Select a).ToList
+                                    Where a.AnalyzerID = MyClass.AnalyzerId And a.AdjustmentGroupID = pAdjustment.ToString And a.Done = False Select a).ToList
 
                 End If
 
@@ -422,8 +414,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "GetPendingPreliminaryHomes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "GetPendingPreliminaryHomes", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -436,13 +428,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
 
 
-                Dim myHomeScriptList As New List(Of FwScriptQueueItem)
+                'Dim myHomeScriptList As New List(Of FwScriptQueueItem)
 
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
 
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjGroup.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerId, pAdjGroup.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -502,8 +494,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GetPendingPreliminaryHomeScripts", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GetPendingPreliminaryHomeScripts", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -524,7 +516,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
 
-                        myGlobal = myHomes.SetPreliminaryHomeAsDone(Nothing, MyClass.AnalyzerIdAttr, H.RequiredHomeID)
+                        myGlobal = myHomes.SetPreliminaryHomeAsDone(Nothing, AnalyzerId, H.RequiredHomeID)
                         If Not myGlobal.HasError Then
 
                         Else
@@ -537,8 +529,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SetPreliminaryHomesAsDone", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SetPreliminaryHomesAsDone", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -547,20 +539,31 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Reset an specified Prelimimnary Home
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>XBC 12/11/2012</remarks>
-        Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pRequiredHomeID As String) As GlobalDataTO
+        ''' <remarks>XBC 12/11/2012
+        ''' AG 01/10/2014 BA-1953 adapt method in order to receive a list of required homes not only 1</remarks>
+        Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pListRequiredHomeID As List(Of String)) As GlobalDataTO
+            'Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pRequiredHomeID As String) As GlobalDataTO
             Dim resultdata As New GlobalDataTO
             Try
                 Dim myHomesDAO As New tadjPreliminaryHomesDAO
-                resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, pRequiredHomeID)
+                'AG 01/10/2014 BA-1953
+                'resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, pRequiredHomeID)
+                For Each item As String In pListRequiredHomeID
+                    If Not resultdata.HasError Then
+                        resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, item)
+                    Else
+                        Exit For
+                    End If
+                Next
+                'AG 01/10/2014 BA-1953
 
             Catch ex As Exception
                 resultdata.HasError = True
                 resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.ResetSpecifiedPreliminaryHomes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.ResetSpecifiedPreliminaryHomes", EventLogEntryType.Error, False)
             End Try
             Return resultdata
         End Function
@@ -578,78 +581,78 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendREAD_ADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendREAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
 
-        ''' <summary>
-        ''' Creates the Script List for Homing operation
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>Created by SG 10/03/11</remarks>
-        Protected Friend Function SendQueueForHOMING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
-            Dim myResultData As New GlobalDataTO
-            Dim myListFwScript As New List(Of FwScriptQueueItem)
-            Dim myFwScript1 As New FwScriptQueueItem
-            Try
+        ' ''' <summary>
+        ' ''' Creates the Script List for Homing operation
+        ' ''' </summary>
+        ' ''' <returns></returns>
+        ' ''' <remarks>Created by SG 10/03/11</remarks>
+        'Protected Friend Function SendQueueForHOMING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
+        '    Dim myResultData As New GlobalDataTO
+        '    Dim myListFwScript As New List(Of FwScriptQueueItem)
+        '    Dim myFwScript1 As New FwScriptQueueItem
+        '    Try
 
-                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
-                End If
+        '        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '        End If
 
-                'get the pending Homes
-                Dim myHomes As New tadjPreliminaryHomesDAO
-                Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
+        '        'get the pending Homes
+        '        Dim myHomes As New tadjPreliminaryHomesDAO
+        '        Dim myHomesDS As SRVPreliminaryHomesDS
+        '        myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
 
-                If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
+        '        If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
 
-                    myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
+        '            myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
-                    Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
-                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where a.Done = False Select a).ToList
+        '            Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
+        '                            (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
+        '                            Where a.Done = False Select a).ToList
 
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
-                        Dim myFwScript As New FwScriptQueueItem
-                        myListFwScript.Add(myFwScript)
-                    Next
-
-
-                    With myFwScript1
-                        .FwScriptID = FwSCRIPTS_IDS.HOME_ALL_ARMS.ToString
-                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        .EvaluateValue = 1
-                        .NextOnResultOK = Nothing
-                        .NextOnResultNG = Nothing
-                        .NextOnTimeOut = Nothing
-                        .NextOnError = Nothing
-                        .ParamList = Nothing
-                    End With
+        '            For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+        '                Dim myFwScript As New FwScriptQueueItem
+        '                myListFwScript.Add(myFwScript)
+        '            Next
 
 
-                End If
+        '            With myFwScript1
+        '                .FwScriptID = FwSCRIPTS_IDS.HOME_ALL_ARMS.ToString
+        '                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+        '                .EvaluateValue = 1
+        '                .NextOnResultOK = Nothing
+        '                .NextOnResultNG = Nothing
+        '                .NextOnTimeOut = Nothing
+        '                .NextOnError = Nothing
+        '                .ParamList = Nothing
+        '            End With
 
-                'add to the queue list
-                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+        '        End If
+
+        '        'add to the queue list
+        '        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
 
 
-            Catch ex As Exception
-                myResultData.HasError = True
-                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myResultData.ErrorMessage = ex.Message
+        '    Catch ex As Exception
+        '        myResultData.HasError = True
+        '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        myResultData.ErrorMessage = ex.Message
 
-                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
-                End If
+        '        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '        End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForHOMING", EventLogEntryType.Error, False)
-            End Try
-            Return myResultData
-        End Function
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForHOMING", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return myResultData
+        'End Function
 
         ''' <summary>
         ''' Request for Fw Information values
@@ -668,8 +671,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendPOLLFW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendPOLLFW", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -689,8 +692,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendINFO_START", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendINFO_START", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -710,8 +713,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendINFO_STOP", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendINFO_STOP", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -732,8 +735,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendPOLLHW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendPOLLHW", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -753,8 +756,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendENABLE_EVENTS", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendENABLE_EVENTS", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -774,8 +777,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendDISABLE_EVENTS", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendDISABLE_EVENTS", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -790,8 +793,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendSOUND", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -806,8 +809,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendENDSOUND", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendENDSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -830,8 +833,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendUTIL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendUTIL", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -872,8 +875,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.GetInformationDocument", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.GetInformationDocument", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -924,8 +927,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.onResponse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.onResponse", EventLogEntryType.Error, False)
             End Try
         End Sub
 

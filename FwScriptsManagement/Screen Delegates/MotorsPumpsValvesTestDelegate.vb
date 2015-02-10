@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.App
 
@@ -700,8 +699,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -745,8 +744,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -780,8 +779,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.REQUEST_ANALYZER_INFO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.REQUEST_ANALYZER_INFO", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -808,11 +807,37 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
+
+        ''' <summary>
+        ''' NRotor High Level Instruction
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004</remarks>
+        Public Function SendNEW_ROTOR() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myParams As New List(Of String)
+            Try
+
+                CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
+
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
 
 #End Region
 
@@ -828,7 +853,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             Dim myParametersDS As New ParametersDS
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Try
                 ' Offet Washing Station for Z aproximation
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WASHING_STATION_OFFSET.ToString, pAnalyzerModel)
@@ -868,8 +893,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.GetParameters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -931,8 +956,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSTOPARKING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSTOPARKING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -952,7 +977,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyBase.AnalyzerIdAttr, pAdjustment.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -1021,8 +1046,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSHOMING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSHOMING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1085,8 +1110,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSTOWASHING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSTOWASHING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1145,8 +1170,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForSWITCHINGOFF", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForSWITCHINGOFF", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1234,8 +1259,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForSWITCHINGOFF", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForSWITCHINGOFF", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1286,8 +1311,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_DOWN", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_DOWN", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1338,8 +1363,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_UP", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_UP", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1532,8 +1557,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForManifoldTESTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForManifoldTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1757,8 +1782,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForFluidicsTESTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForFluidicsTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1853,8 +1878,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForPhotometricsTESTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForPhotometricsTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1915,8 +1940,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForMOTORTESTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForMOTORTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1982,8 +2007,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendENCODER_TEST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendENCODER_TEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2049,8 +2074,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 MyClass.CurrentOperation = OPERATIONS.NONE
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2215,8 +2240,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.HasError = True
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
             Return myResultData
@@ -2239,7 +2264,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -2511,7 +2536,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         Next
 
                         If myAllLines.Count > 0 Then
-                            FinalText = myUtility.FormatLineHistorics(myAreaLine, myColWidth, True)
+                            FinalText = Utilities.FormatLineHistorics(myAreaLine, myColWidth, True)
                         End If
 
                         For Each LL As List(Of List(Of String)) In myAllLines
@@ -2537,7 +2562,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     End If
                                 Next
 
-                                If hasText Then FinalText &= myUtility.FormatLineHistorics(L, myColWidth, newLine)
+                                If hasText Then FinalText &= Utilities.FormatLineHistorics(L, myColWidth, newLine)
 
                             Next L
 
@@ -2599,7 +2624,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     t.PadRight(myColWidth)
                                 End If
                             Next
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, True)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, True)
                         Next
 
                         myResultData.SetDatos = FinalText
@@ -2644,7 +2669,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     t.PadRight(myColWidth)
                                 End If
                             Next
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, True)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, True)
                         Next
 
                         myResultData.SetDatos = FinalText
@@ -2660,8 +2685,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
                 If Not dbConnection IsNot Nothing Then dbConnection.Close()
@@ -2809,8 +2834,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.HisCollisions.Add(HISTORY_COLLISIONS.REAGENT2, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.InitializeHistoryElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.InitializeHistoryElements", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2985,8 +3010,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
             Return myData
@@ -3011,8 +3036,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3035,8 +3060,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
                 res = "xxxxx"
             End Try
 
@@ -3071,8 +3096,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
             Return myResult
@@ -3108,8 +3133,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
                 res = "xxxxx"
             End Try
 
@@ -3142,8 +3167,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryArea", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryArea", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3173,8 +3198,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistorySubsystem", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistorySubsystem", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3198,8 +3223,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 res = MLRD.GetResourceText(pDBConnection, "LBL_SRV_" & pElement.ToString, pLanguageId)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryId", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryId", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3232,8 +3257,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryType", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3280,8 +3305,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryCollision", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.DecodeHistoryCollision", EventLogEntryType.Error, False)
             End Try
 
             Return myResultText
@@ -3321,8 +3346,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -3350,8 +3375,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsPumpsValvesTestDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
 

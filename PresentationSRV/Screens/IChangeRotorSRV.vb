@@ -4,14 +4,13 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.App
 
 
 
-Public Class IChangeRotorSRV
+Public Class UiChangeRotorSRV
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Constructor"
@@ -50,19 +49,19 @@ Public Class IChangeRotorSRV
             'New rotor button
             auxIconName = GetIconName("ADJUSTMENT") 'CONTINUESEB")
             If (auxIconName <> "") Then
-                bsNewRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHANGE ROTOR Button
             auxIconName = GetIconName("CHANGEROTORB")
             If (auxIconName <> "") Then
-                bsWSUpDownButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsWSUpDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'icons for result
@@ -77,7 +76,7 @@ Public Class IChangeRotorSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -90,23 +89,23 @@ Public Class IChangeRotorSRV
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ChangeRotor", currentLanguage)
             bsChangeRotorLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RISINGUP", currentLanguage)
             bsNewAdjLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NEW_ROTOR", currentLanguage) 'LBL_SRV_NEW_ROTOR
 
             'For Tooltips...
-            bsScreenToolTips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            ScreenTooltips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
+            ScreenTooltips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
+            ScreenTooltips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             'RH 14/02/2012
             MSG_StartInstrument = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_StartInstrument", currentLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -148,7 +147,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -186,7 +185,7 @@ Public Class IChangeRotorSRV
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, ".ExitScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, ".ExitScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -219,7 +218,7 @@ Public Class IChangeRotorSRV
             Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -239,7 +238,7 @@ Public Class IChangeRotorSRV
                 End If
                 ScreenWorkingProcess = False
                 MyBase.ActivateMDIMenusButtons(True)
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                 Me.bsStatusImage.Visible = True
 
                 Me.BsNewRotorProcessTimer.Stop()
@@ -254,7 +253,7 @@ Public Class IChangeRotorSRV
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -280,7 +279,7 @@ Public Class IChangeRotorSRV
             PrepareArea()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -326,7 +325,7 @@ Public Class IChangeRotorSRV
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendWASH_STATION_CTRL", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -376,7 +375,7 @@ Public Class IChangeRotorSRV
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -390,7 +389,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -406,7 +405,7 @@ Public Class IChangeRotorSRV
             Me.Refresh()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWSMovingUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWSMovingUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWSMovingUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -426,7 +425,7 @@ Public Class IChangeRotorSRV
             Me.Refresh()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWSUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWSUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWSUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -441,7 +440,7 @@ Public Class IChangeRotorSRV
             Me.Refresh()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWSMovingDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWSMovingDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWSMovingDownMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -470,7 +469,7 @@ Public Class IChangeRotorSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWSDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWSDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWSDownMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -483,7 +482,7 @@ Public Class IChangeRotorSRV
             MyClass.DisableAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareNewRotorProcessMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareNewRotorProcessMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareNewRotorProcessMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -497,9 +496,9 @@ Public Class IChangeRotorSRV
             MyBase.ActivateMDIMenusButtons(True)
 
             If AnalyzerController.Instance.Analyzer.ErrorCodes.Contains("550") Then 'Reactions rotor missing '#REFACTORING
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
             Else
-                Me.bsStatusImage.Image = Image.FromFile(OKIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(OKIconName)
             End If
             Me.BsProgressBar.Value = Me.BsProgressBar.Maximum
             Me.BsNewRotorProcessTimer.Stop()
@@ -510,7 +509,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareNewRotorFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareNewRotorFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareNewRotorFinishedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -524,7 +523,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableAll ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -556,7 +555,7 @@ Public Class IChangeRotorSRV
 
             InitializeScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IChangeRotor_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -584,7 +583,7 @@ Public Class IChangeRotorSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsChangeRotortButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Cursor = Cursors.Default
@@ -625,7 +624,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsContinueButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -702,7 +701,7 @@ Public Class IChangeRotorSRV
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
@@ -725,7 +724,7 @@ Public Class IChangeRotorSRV
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsNewRotorProcessTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsNewRotorProcessTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsNewRotorProcessTimer_Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

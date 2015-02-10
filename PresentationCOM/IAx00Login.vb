@@ -4,7 +4,6 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
@@ -12,12 +11,12 @@ Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 Imports Biosystems.Ax00.Types
 
-Public Class IAx00Login
+Public Class UiAx00Login
 
 #Region "Declarations"
     'Private CountDownValue As Long = 0
     Private CurrentAppLanguage As String = "ENG"
-    Protected Ax00StartUp As IAx00StartUp
+    Protected Ax00StartUp As UiAx00StartUp
     Private RunningPreload As Boolean = False
     Private DBServerError As Boolean
     Private IsService As Boolean = False
@@ -94,7 +93,7 @@ Public Class IAx00Login
         Catch ex As Exception
             boolValidation = True
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckDataBaseAvailability ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckDataBaseAvailability ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckDataBaseAvailability ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return boolValidation
@@ -113,7 +112,7 @@ Public Class IAx00Login
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckInitialValidation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckInitialValidation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckInitialValidation ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return returnvalue
@@ -277,7 +276,7 @@ Public Class IAx00Login
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckDataBaseAvailability ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckDataBaseAvailability ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckDataBaseAvailability ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -292,12 +291,12 @@ Public Class IAx00Login
     Private Function CallRestorePointScreen() As DialogResult
         Dim myResult As DialogResult
         Try
-            Dim myIRestPointUpdateProc As New IRestPointUpdateProc
+            Dim myIRestPointUpdateProc As New UiRestPointUpdateProc
             myIRestPointUpdateProc.AllowDrop = False 'TR 08/07/2013 -Set the allow Drop to false to avoid exception (bugTracking 1232)
             myIRestPointUpdateProc.RestorePointMode = True
             myResult = myIRestPointUpdateProc.ShowDialog()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CallRestorePointScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CallRestorePointScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CallRestorePointScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -320,22 +319,22 @@ Public Class IAx00Login
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsLoginButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLoginButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHANGE PASSWORD Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsChangePwdButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsChangePwdButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -384,7 +383,7 @@ Public Class IAx00Login
                 fieldsOK = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Validation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Validation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Validation", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return fieldsOK
@@ -416,7 +415,7 @@ Public Class IAx00Login
                 InitializeApplicationInfoSession(pUserID, pUserLevel, CurrentAppLanguage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetApplicationSessionInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetApplicationSessionInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetApplicationSessionInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -443,7 +442,7 @@ Public Class IAx00Login
                 bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangDelegate.GetResourceText(Nothing, "BTN_CancelSelection", CurrentAppLanguage))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -469,7 +468,7 @@ Public Class IAx00Login
                         'Informed User/Pwd is correct
                         SetApplicationSessionInfo(bsUserIDTextBox.Text.Trim, returnData.SetUserLevel.ToString)
 
-                        Using objChangePwd As New IPassword() ' dl 08/06/2011
+                        Using objChangePwd As New UiPassword() ' dl 08/06/2011
                             objChangePwd.IsUserChange = IsUserChange 'TR 28/11/2011
                             objChangePwd.ShowDialog()
                             If (objChangePwd.DialogResult = DialogResult.OK) Then
@@ -489,7 +488,7 @@ Public Class IAx00Login
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeUserPassword ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeUserPassword ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeUserPassword", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -523,7 +522,7 @@ Public Class IAx00Login
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginApplication", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginApplication", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoginApplication", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -549,7 +548,7 @@ Public Class IAx00Login
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateAdminPass", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateAdminPass", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateAdminPass", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -595,9 +594,9 @@ Public Class IAx00Login
                     '                .WaitText = "Please wait...", _
                     '                .Background = myBackground}
 
-                    Dim myStartUp As WaitScreen
+                    Dim myStartUp As UiWaitScreen
                     Me.Enabled = False
-                    myStartUp = New WaitScreen(Me) With { _
+                    myStartUp = New UiWaitScreen(Me) With { _
                                     .Title = "Waiting ongoing processes completion...", _
                                     .WaitText = "Please wait..."}
 
@@ -636,8 +635,8 @@ Public Class IAx00Login
                     Me.DialogResult = DialogResult.Cancel
 
                     'SGM 07/11/2012 - log app ends
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
 
                     Close()
                 End If
@@ -648,7 +647,7 @@ Public Class IAx00Login
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitApplication", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitApplication", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitApplication", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -668,7 +667,7 @@ Public Class IAx00Login
                 bsChangePwdButton.Enabled = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePasswordButtonStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePasswordButtonStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePasswordButtonStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -686,7 +685,7 @@ Public Class IAx00Login
                 bsLoginButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginButtonStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginButtonStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoginButtonStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -707,7 +706,7 @@ Public Class IAx00Login
     '            Hide()
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginTimerTick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoginTimerTick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".LoginTimerTick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub
@@ -728,7 +727,7 @@ Public Class IAx00Login
             bsExitButton.Visible = pValue
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateAccessControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateAccessControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ActivateAccessControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -745,7 +744,7 @@ Public Class IAx00Login
     '    Try
     '        If bsPasswordTextBox.Enabled And bsPasswordTextBox.Visible Then bsPasswordTextBox.Select()
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Login_Activated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Login_Activated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".Login_Activated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub
@@ -763,7 +762,7 @@ Public Class IAx00Login
                 ExitApplication()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IAx00Login_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -787,7 +786,7 @@ Public Class IAx00Login
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetFileLogSize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetFileLogSize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetFileLogSize", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -839,7 +838,7 @@ Public Class IAx00Login
                     myBackground &= "Embedded\UserSplash.png"
                 End If
 
-                Ax00StartUp = New IAx00StartUp(Me) With { _
+                Ax00StartUp = New UiAx00StartUp(Me) With { _
                                 .Title = "Starting system required services...", _
                                 .WaitText = "Please wait...", _
                                 .Background = myBackground}
@@ -895,9 +894,9 @@ Public Class IAx00Login
                 ' END DL
 
                 'TR 07/02/2012 -Get the version information from the assembly information.
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
                 Dim myGlobalDataTO As GlobalDataTO
-                myGlobalDataTO = myUtil.GetSoftwareVersion()
+                myGlobalDataTO = Utilities.GetSoftwareVersion()
                 If Not myGlobalDataTO.HasError Then
                     bsVersionLabel.Text = "Version: " & myGlobalDataTO.SetDatos.ToString()
                 Else
@@ -919,7 +918,7 @@ Public Class IAx00Login
                     Dim myVersionFileName As String = GlobalBase.VersionFileName
 
                     If Not File.Exists(myFolder & myVersionFileName) Then
-                        myUtil.CreateVersionFile(myFolder & myVersionFileName)
+                        Utilities.CreateVersionFile(myFolder & myVersionFileName)
                     End If
 
                 End If
@@ -1016,7 +1015,7 @@ Public Class IAx00Login
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Login_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Login_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Login_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -1033,7 +1032,7 @@ Public Class IAx00Login
         Try
             ChangeUserPassword()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsChangePwdButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsChangePwdButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsChangePwdButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1049,7 +1048,7 @@ Public Class IAx00Login
         Try
             LoginApplication()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoginButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoginButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsLoginButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1065,7 +1064,7 @@ Public Class IAx00Login
     '    Try
     '        LoginTimerTick()
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoginTimer_Tick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoginTimer_Tick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".BsLoginTimer_Tick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub
@@ -1083,7 +1082,7 @@ Public Class IAx00Login
             ExitApplication()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1116,8 +1115,8 @@ Public Class IAx00Login
         Try
             'RH 14/10/2010
             If (Not e.Error Is Nothing) Then
-                CreateLogActivity(e.Error.Message, Name & ".Ax00MDBackGround_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-                ShowMessage(Name & ".Ax00MDBackGround_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), e.Error.Message)
+                GlobalBase.CreateLogActivity(e.Error.Message, Name & ".Ax00MDBackGround_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                ShowMessage(Name & ".Ax00MDBackGround_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), e.Error.Message)
             End If
 
             'RH 14/10/2010
@@ -1129,7 +1128,7 @@ Public Class IAx00Login
             'Ax00MDBackGround.Dispose()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MDBackGround_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MDBackGround_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Ax00MDBackGround_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1149,7 +1148,7 @@ Public Class IAx00Login
             CheckDataBaseAvailability()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bwPreload_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bwPreload_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bwPreload_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1169,12 +1168,12 @@ Public Class IAx00Login
     ''' </summary>
     Private Shared Function InstallUpdateProcess() As GlobalDataTO
         'Private Shared Sub InstallUpdateProcess()
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         Dim myGlobalDataTO As New GlobalDataTO
         Try
             Dim mydbmngDelegate As New DataBaseManagerDelegate()
 
-            'myLogAcciones.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
             myGlobalDataTO = mydbmngDelegate.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword)
 
         Catch ex As Exception
@@ -1198,36 +1197,36 @@ Public Class IAx00Login
         Try
             ChangePasswordButtonStatus()
 
-            If (e.KeyCode = Keys.Enter) Then
-                bsPasswordTextBox.Focus()
-                bsPasswordTextBox.SelectAll()
-                e.Handled = True
-            End If
+            '    If (e.KeyCode = Keys.Enter) Then
+            '        bsPasswordTextBox.Focus()
+            '        bsPasswordTextBox.SelectAll()
+            '        e.Handled = True
+            '    End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsUserIDTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsUserIDTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsUserIDTextBox_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Move focus to bsLoginButton when rhe user presses Enter User TextBox has the focus
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  RH 09/03/2012
-    ''' </remarks>
-    Private Sub bsPasswordTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsPasswordTextBox.KeyUp
-        Try
-            If (e.KeyCode = Keys.Enter) Then
-                bsLoginButton.Focus()
-                e.Handled = True
-            End If
+    ' ''' <summary>
+    ' ''' Move focus to bsLoginButton when rhe user presses Enter User TextBox has the focus
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  RH 09/03/2012
+    ' ''' </remarks>
+    'Private Sub bsPasswordTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsPasswordTextBox.KeyUp
+    'Try
+    '    If (e.KeyCode = Keys.Enter) Then
+    '        bsLoginButton.Focus()
+    '        e.Handled = True
+    '    End If
 
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPasswordTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsPasswordTextBox_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
+    'Catch ex As Exception
+    '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPasswordTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '    ShowMessage(Name & ".bsPasswordTextBox_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    'End Try
+    'End Sub
 
     Private Sub bsUserIDTextBox_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsUserIDTextBox.Enter
         BsErrorProvider1.Clear()
@@ -1257,7 +1256,7 @@ Public Class IAx00Login
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".IAx00Login_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
     '    End Try
@@ -1273,7 +1272,7 @@ Public Class IAx00Login
     '        If IsUserChange Then Me.Location = myNewLocation
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_Move", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IAx00Login_Move", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".IAx00Login_Move", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
 
@@ -1300,5 +1299,13 @@ Public Class IAx00Login
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub bsUserIDTextBox_TextChanged(sender As Object, e As EventArgs) Handles bsUserIDTextBox.TextChanged
+
+    End Sub
+
+    Private Sub bsLoginTimer_Tick(sender As Object, e As EventArgs) Handles bsLoginTimer.Tick
+
     End Sub
 End Class

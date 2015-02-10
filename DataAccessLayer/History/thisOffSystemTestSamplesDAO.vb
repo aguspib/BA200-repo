@@ -3,13 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports System.Text
-Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisOffSystemTestSamplesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -61,8 +59,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -97,8 +95,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.CloseOFFSTestSample", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.CloseOFFSTestSample", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -119,10 +117,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM thisOffSystemTestSamples " & vbCrLf & _
+                    '                        " WHERE  ClosedOffSystemTest  = 1 " & vbCrLf & _
+                    '                        " AND    HistOffSystemTestID  NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                    '                                                            " WHERE  TestType = 'OFFS') " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM thisOffSystemTestSamples " & vbCrLf & _
                                             " WHERE  ClosedOffSystemTest  = 1 " & vbCrLf & _
-                                            " AND    HistOffSystemTestID  NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
-                                                                                " WHERE  TestType = 'OFFS') " & vbCrLf
+                                            " AND NOT EXISTS (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                                                              " WHERE  TestType = 'OFFS' AND thisOffSystemTestSamples.HistOffSystemTestID = HistTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -134,14 +138,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Verify if the informed OFFSTestID already exists in Historics Module and in this case, get its data
+        ''' Verify if the informed OFFSTestID already exists in Historics Module and it's not a closed Test, and in this case get its data.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOFFSTestID">Identifier of the OFF-SYSTEM Test in Parameters Programming Module</param>
@@ -179,8 +183,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.ReadByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.ReadByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -228,8 +232,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.ReadByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.ReadByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -268,8 +272,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisOffSystemTestSamplesDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

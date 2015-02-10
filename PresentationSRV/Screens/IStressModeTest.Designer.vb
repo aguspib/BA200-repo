@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IStressModeTest
+Partial Class UiStressModeTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -918,7 +918,7 @@ Partial Class IStressModeTest
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IStressModeTest"
+        Me.Name = "UiStressModeTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "StressModeTest"
         Me.BsMessagesPanel.ResumeLayout(False)

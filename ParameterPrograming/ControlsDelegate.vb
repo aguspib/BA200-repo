@@ -77,8 +77,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.AddControl", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.AddControl", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -175,8 +175,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.ModifyControl", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.ModifyControl", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -250,8 +250,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.AddControl", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.AddControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -384,8 +383,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.DeleteControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.DeleteControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -426,8 +425,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.ExistsControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.ExistsControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -473,8 +472,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.GetAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.GetAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -509,8 +508,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.GetControlData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.GetControlData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -547,8 +546,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -647,8 +646,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.ModifyControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.ModifyControl", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -705,8 +704,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -741,11 +740,11 @@ Namespace Biosystems.Ax00.BL
 
                 'Get the Warning Message of QC Results Accumulation in the current Language 
                 Dim myWarningMSG As String = String.Empty
-                Dim currentLanguageGlobal As New GlobalBase
+                'Dim currentLanguageGlobal As New GlobalBase
                 Dim myMessageDelegate As New MessageDelegate()
 
                 myGlobalDataTO = myMessageDelegate.GetMessageDescription(Nothing, GlobalEnumerates.Messages.CUMULATE_QCRESULTS.ToString, _
-                                                                         currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString)
+                                                                         GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     Dim myMessagesDS As MessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
                     If (myMessagesDS.tfmwMessages.Rows.Count > 0) Then myWarningMSG = myMessagesDS.tfmwMessages(0).MessageText
@@ -796,8 +795,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.ValidatedDependenciesOnUpdate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.ValidatedDependenciesOnUpdate", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -825,11 +824,11 @@ Namespace Biosystems.Ax00.BL
 
                 'Get the Warning Message of QC Results Accumulation in the current Language 
                 Dim myWarningMSG As String = String.Empty
-                Dim currentLanguageGlobal As New GlobalBase
+                'Dim currentLanguageGlobal As New GlobalBase
                 Dim myMessageDelegate As New MessageDelegate()
 
                 myGlobalDataTO = myMessageDelegate.GetMessageDescription(Nothing, GlobalEnumerates.Messages.CUMULATE_QCRESULTS.ToString, _
-                                                                         currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString)
+                                                                         GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     Dim myMessagesDS As MessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
                     If (myMessagesDS.tfmwMessages.Rows.Count > 0) Then myWarningMSG = myMessagesDS.tfmwMessages(0).MessageText
@@ -933,8 +932,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.ValidatedDependenciesOnDelete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.ValidatedDependenciesOnDelete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -998,8 +997,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ControlsDelegate.CumulateQCResultsByControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ControlsDelegate.CumulateQCResultsByControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

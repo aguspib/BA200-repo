@@ -1,12 +1,16 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
+Imports DevExpress.Utils
 Imports DevExpress.XtraCharts
 
-Public Class IQCCumulatedReview
+Public Class UiQCCumulatedReview
 
 #Region "Declarations"
     Private currentLanguage As String = ""
@@ -74,7 +78,7 @@ Public Class IQCCumulatedReview
             constantLine.LineStyle.DashStyle = pDashStyle
             constantLine.LineStyle.Thickness = 1
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateConstantLine", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateConstantLine", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CreateConstantLine", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -92,7 +96,7 @@ Public Class IQCCumulatedReview
             CType(e.SeriesDrawOptions, PointDrawOptions).Marker.FillStyle.FillMode = FillMode.Solid
             CType(e.SeriesDrawOptions, PointDrawOptions).Marker.Kind = MarkerKind.Cross
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CustomDrawSeriesPoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CustomDrawSeriesPoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CustomDrawSeriesPoint ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -112,7 +116,7 @@ Public Class IQCCumulatedReview
                     Dim myCumulateResultsRow As CumulatedResultsDS.tqcCumulatedResultsRow
 
                     For Each SelQCResult As DataGridViewRow In bsResultsDetailsGridView.SelectedRows
-                        myCumulateResultsRow = myCumulateResultsDS.tqcCumulatedResults.NewRow
+                        myCumulateResultsRow = CType(myCumulateResultsDS.tqcCumulatedResults.NewRow, CumulatedResultsDS.tqcCumulatedResultsRow)
 
                         myCumulateResultsRow.QCTestSampleID = CInt(SelQCResult.Cells("QCTestSampleID").Value)
                         myCumulateResultsRow.QCControlLotID = CInt(SelQCResult.Cells("QCControlLotID").Value)
@@ -137,7 +141,7 @@ Public Class IQCCumulatedReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelectedResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelectedResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteSelectedResult ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -158,7 +162,6 @@ Public Class IQCCumulatedReview
             Dim myQCHistoryTestSampleDelegate As New HistoryTestSamplesDelegate
 
             'Get all Tests/Sample Types in tqcHistoryTestSample table
-            'myGlobalDataTO = myQCHistoryTestSampleDelegate.ReadAll(Nothing, False)
             myGlobalDataTO = myQCHistoryTestSampleDelegate.ReadAllNEW(Nothing, AnalyzerIDAttribute, False)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myQCHistoryTestSampleDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
@@ -201,10 +204,10 @@ Public Class IQCCumulatedReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample.ToString)
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -214,7 +217,7 @@ Public Class IQCCumulatedReview
                 ShowMessage(Name & ".FillTestSampleListView", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestSampleListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestSampleListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillTestSampleListView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -268,7 +271,7 @@ Public Class IQCCumulatedReview
             End If
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FilterCumulatedSeries ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FilterCumulatedSeries ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FilterCumulatedSeries ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -295,7 +298,6 @@ Public Class IQCCumulatedReview
             Dim myCumulateResultsDelegate As New CumulatedResultsDelegate
 
             'Before getting all the cumulated series, get the date and time of the oldest Cumulated Serie for the Test/SampleType
-            'myGlobalDataTO = myCumulateResultsDelegate.GetMinCumDateTime(Nothing, pQCTestSampleID)
             myGlobalDataTO = myCumulateResultsDelegate.GetMinCumDateTimeNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute)
             If (Not myGlobalDataTO.HasError) Then
                 If (Not pSearchButton AndAlso Not myGlobalDataTO.SetDatos Is DBNull.Value) Then
@@ -303,7 +305,7 @@ Public Class IQCCumulatedReview
                     bsDateFromDateTimePick.Value = DirectCast(myGlobalDataTO.SetDatos, DateTime)
                 End If
 
-                'TR 02/07/2012 -Set the max cum date time 
+                'TR 02/07/2012 - Set the maximum value for DateTo DateTimePicker
                 myGlobalDataTO = myCumulateResultsDelegate.GetMaxCumDateTime(Nothing, pQCTestSampleID, AnalyzerIDAttribute)
                 If (Not myGlobalDataTO.HasError) Then
                     If (Not pSearchButton AndAlso Not myGlobalDataTO.SetDatos Is DBNull.Value) Then
@@ -316,10 +318,7 @@ Public Class IQCCumulatedReview
                 bsDateFromDateTimePick.MaxDate = bsDateToDateTimePick.Value
                 bsDateToDateTimePick.MinDate = bsDateFromDateTimePick.Value
 
-                'TR 02/07/2012 -END
-
                 'Get all Cumulated Series for all Controls/Lots linked to the selected Test/SampleType in the specified range of dates
-                'myGlobalDataTO = myCumulateResultsDelegate.GetCumulatedSeries(Nothing, pQCTestSampleID, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
                 myGlobalDataTO = myCumulateResultsDelegate.GetCumulatedSeriesNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute, _
                                                                                  bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -335,8 +334,6 @@ Public Class IQCCumulatedReview
                     Next
 
                     'Get statistics values for all Controls/Lots having Cumulated Series for the selected Test/SampleType in the specified range of dates
-                    'myGlobalDataTO = myCumulateResultsDelegate.GetControlsLotsWithCumulatedSeries(Nothing, pQCTestSampleID, bsDateFromDateTimePick.Value, _
-                    '                                                                              bsDateToDateTimePick.Value, LocalCumulateResultsDS)
                     myGlobalDataTO = myCumulateResultsDelegate.GetControlsLotsWithCumulatedSeriesNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute, _
                                                                                                      bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
                                                                                                      LocalCumulateResultsDS)
@@ -365,10 +362,10 @@ Public Class IQCCumulatedReview
                             bsResultControlLotGridView.DataSource = LocalQCCumulateResultsDS.QCCumulatedSummaryTable.DefaultView
 
                             'Get the current Language from the current Application Session and get the text for the Button in the DataGridView
-                            Dim currentLanguageGlobal As New GlobalBase
+                            'Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+                            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
                             Dim myButtonText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CumReview_SaveAsTarget", currentLanguage)
 
                             'For each Control/Lot, verify if Button for Save values as Target has to be enabled or disabled
@@ -383,12 +380,10 @@ Public Class IQCCumulatedReview
 
                                 If (Not myButtonDisabled) Then
                                     'Verify if the link between the Test/SampleType and the Control still exists in the application (table tparTestControls)
-                                    'myGlobalDataTO = myTestControlsDelegate.VerifyLinkByQCModuleIDs(Nothing, pQCTestSampleID, _
-                                    '                                                                Convert.ToInt32(bsResultControlLotGridView.Rows(i).Cells("QCControlLotID").Value))
                                     myGlobalDataTO = myTestControlsDelegate.VerifyLinkByQCModuleIDsNEW(Nothing, pQCTestSampleID, _
                                                                                                        Convert.ToInt32(bsResultControlLotGridView.Rows(i).Cells("QCControlLotID").Value))
                                     If (myGlobalDataTO.HasError) Then Exit For
-                                    'If (CurrentUserLevel.ToUpper() <> "OPERATOR") Then
+
                                     If (CurrentUserLevel <> "OPERATOR") Then
                                         myButtonDisabled = Not DirectCast(myGlobalDataTO.SetDatos, Boolean)
                                     Else
@@ -432,7 +427,7 @@ Public Class IQCCumulatedReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetControlsLotsWithCumulatedSeries ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetControlsLotsWithCumulatedSeries ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetControlsLotsWithCumulatedSeries ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -465,7 +460,7 @@ Public Class IQCCumulatedReview
                            Select a.CV).Max
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetCVValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetCVValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetCVValue ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myCVValue
@@ -494,7 +489,7 @@ Public Class IQCCumulatedReview
             bsThirdCtrlLotLabel.Enabled = False
             bsThirdCtrlLotPictureBox.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetLegendsLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetLegendsLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetLegendsLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -522,7 +517,7 @@ Public Class IQCCumulatedReview
             LabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", pLanguageID)
             LabelMEAN = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -536,8 +531,8 @@ Public Class IQCCumulatedReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             GetLegendsLabels(currentLanguage)
@@ -547,7 +542,7 @@ Public Class IQCCumulatedReview
             PrepareResultControlLotGrid(currentLanguage)
             PrepareResultDetailsGrid(currentLanguage)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -566,9 +561,13 @@ Public Class IQCCumulatedReview
 
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            bsMeanChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            bsMeanChartControl.RuntimeHitTesting = True
 
             Dim myDiagram As New XYDiagram
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
@@ -578,8 +577,10 @@ Public Class IQCCumulatedReview
                     'Set up the series
                     bsMeanChartControl.Series.Add(qcCumResultRow.QCControlLotID.ToString(), ViewType.Line)
                     bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ShowInLegend = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Label.Visible = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).PointOptions.PointView = PointView.ArgumentAndValues
+                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+
+                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ArgumentScaleType = ScaleType.Qualitative
+                    CType(bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).View, LineSeriesView).MarkerVisibility = DefaultBoolean.True
 
                     'Set Serie Color
                     If (bsMeanChartControl.Series.Count = 1) Then
@@ -589,8 +590,9 @@ Public Class IQCCumulatedReview
                         bsFirstCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsFirstCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber.ToString
+
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 2) Then
@@ -600,8 +602,8 @@ Public Class IQCCumulatedReview
                         bsSecondCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsSecondCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 3) Then
@@ -611,8 +613,8 @@ Public Class IQCCumulatedReview
                         bsThirdCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsThirdCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
                     End If
 
@@ -653,11 +655,13 @@ Public Class IQCCumulatedReview
                 myDiagram.AxisY.GridLines.Visible = False
                 myDiagram.AxisX.GridLines.Visible = True
 
+                myDiagram.AxisY.VisualRange.SideMarginsValue = 0
+
                 'Remove all Constant lines
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                 'Create constans lines depending the number of selected controls
                 If ((From a In LocalQCCumulateResultsDS.QCCumulatedSummaryTable _
@@ -678,14 +682,17 @@ Public Class IQCCumulatedReview
                     CreateConstantLine("-1 " & LabelSD, myDiagram, myMean - (1 * mySD), Color.Black, DashStyle.Dash)
 
                     'Set limits for Axis Y
-                    myDiagram.AxisY.Range.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                                                          myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
                                                           myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
                 Else
                     'More than one control selected
                     CreateConstantLine("+1 " & LabelSD, myDiagram, 1, Color.Black, DashStyle.Dash)
                     CreateConstantLine(LabelMEAN, myDiagram, 0, Color.Black, DashStyle.Solid)
                     CreateConstantLine("-1 " & LabelSD, myDiagram, -1, Color.Black, DashStyle.Dash)
-                    myDiagram.AxisY.Range.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(-1.5, 1.5)
 
                     'Get the max value for X Axis
                     Dim MaxValue As Integer = (From a In LocalCumulateResultsDS.tqcCumulatedResults _
@@ -694,7 +701,8 @@ Public Class IQCCumulatedReview
                                             AndAlso b.Selected _
                                              Select a.CumResultsNum).Max
 
-                    myDiagram.AxisX.Range.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.WholeRange.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.VisualRange.SetMinMaxValues(0, MaxValue)
                 End If
             End If
 
@@ -704,7 +712,7 @@ Public Class IQCCumulatedReview
             RemoveHandler bsMeanChartControl.ObjectHotTracked, AddressOf ObjectHotTracked
             AddHandler bsMeanChartControl.ObjectHotTracked, AddressOf ObjectHotTracked
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadMeanGraphic", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadMeanGraphic", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadMeanGraphic", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -749,7 +757,7 @@ Public Class IQCCumulatedReview
                 bsScreenToolTips.HideHint()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ObjectHotTracked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ObjectHotTracked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ObjectHotTracked ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -765,48 +773,48 @@ Public Class IQCCumulatedReview
         Try
             Dim auxIconName As String = ""
             Dim iconPath As String = MyBase.IconsPath
-            Dim myToolTipsControl As New ToolTip
+            Dim myToolTipsControl As New Windows.Forms.ToolTip
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'SEARCH Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsSearchButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Search", pLanguageID))
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteCumulateSeries.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteCumulateSeries.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsDeleteCumulateSeries, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'ICONS for the Graph Legend GroupBox
             auxIconName = GetIconName("GREEN_CIRCLE")
-            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_CIRCLE")
-            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VIOLET_CIRCLE")
-            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -950,7 +958,7 @@ Public Class IQCCumulatedReview
             bsResultControlLotGridView.Columns("DeletedControlLot").DataPropertyName = "DeletedControlLot"
             bsResultControlLotGridView.Columns("DeletedControlLot").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultControlLotGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultControlLotGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareResultControlLotGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1089,7 +1097,7 @@ Public Class IQCCumulatedReview
             bsResultsDetailsGridView.Columns("XMLFileName").DataPropertyName = "XMLFileName"
             bsResultsDetailsGridView.Columns("XMLFileName").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultDetailsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultDetailsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareResultDetailsGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1110,12 +1118,12 @@ Public Class IQCCumulatedReview
             Dim myTestIconList As New ImageList
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            myTestIconList.Images.Add("TESTICON", Image.FromFile(MyBase.IconsPath & GetIconName("TESTICON")))
-            myTestIconList.Images.Add("USERTEST", Image.FromFile(MyBase.IconsPath & GetIconName("USERTEST")))
-            myTestIconList.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
-            myTestIconList.Images.Add("INUSETEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
-            myTestIconList.Images.Add("INUSUSTEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
-            myTestIconList.Images.Add("INUSETISE", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
+            myTestIconList.Images.Add("TESTICON", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TESTICON")))
+            myTestIconList.Images.Add("USERTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("USERTEST")))
+            myTestIconList.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
+            myTestIconList.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
+            myTestIconList.Images.Add("INUSUSTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
+            myTestIconList.Images.Add("INUSETISE", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
 
             'Initialization of Tests/Sample Types list
             bsTestSampleListView.Items.Clear()
@@ -1131,87 +1139,17 @@ Public Class IQCCumulatedReview
             bsTestSampleListView.Columns.Add(myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TestNames", pLanguageID), 168, HorizontalAlignment.Left)
             bsTestSampleListView.Columns.Add("", 50, HorizontalAlignment.Center)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestListView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
     ''' <summary>
-    ''' Update Min/Max Concentration values for the specified QCTestSampleID and QCControlLotID in table tqcHistoryTestControlLots
-    ''' in QC Module, and for the correspondent TestID/SampleType in table tparTestControls
+    ''' Set elements to Nothing to release memory when the screen is closed
     ''' </summary>
-    ''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC</param>
-    ''' <param name="pQCControlLotID">Identifier of Control/Lot in QC</param>
-    ''' <param name="pMinValue">Min concentration value</param>
-    ''' <param name="pMaxValue">Max concentration value</param>
-    ''' <remarks>
-    ''' Created by:  SA 02/01/2012
-    ''' </remarks>
-    Private Sub SaveCumValuesAsTarget(ByVal pQCTestSampleID As Integer, ByVal pQCControlLotID As Integer, ByVal pMinValue As Single, ByVal pMaxValue As Single)
-        Try
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim myHistTestControlsDelegate As New HistoryTestControlLotsDelegate
-
-            'myGlobalDataTO = myHistTestControlsDelegate.SaveLastCumulatedAsTarget(Nothing, pQCTestSampleID, pQCControlLotID, pMinValue, pMaxValue)
-            myGlobalDataTO = myHistTestControlsDelegate.SaveLastCumulatedAsTargetNEW(Nothing, pQCTestSampleID, pQCControlLotID, AnalyzerIDAttribute, pMinValue, pMaxValue)
-            If (myGlobalDataTO.HasError) Then
-                'Error updating the Target Min/Max values for the Test/SampleType and Control/Lot; show it
-                ShowMessage(Me.Name & ".SaveCumValuesAsTarget", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCumValuesAsTarget ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".SaveCumValuesAsTarget ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Enable/disable availability of button for deleting Cumulated Series according the Level of the connected User
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: TR 20/04/2012
-    ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
-    ''' </remarks>
-    Private Sub ScreenStatusByUserLevel()
-        Try
-            Select Case CurrentUserLevel    '.ToUpper()
-                Case "SUPERVISOR"
-                    Exit Select
-                Case "OPERATOR"
-                    bsDeleteCumulateSeries.Enabled = False
-                    Exit Select
-            End Select
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Validate the number of active (selected) Controls
-    ''' </summary>
-    ''' <returns>Return true if the number of controls selected is lower than 3</returns>
-    ''' <remarks>
-    ''' Created by:  TR 05/07/2011
-    ''' </remarks>
-    Private Function ValidateActiveControls() As Boolean
-        Dim myResult As Boolean = False
-
-        Try
-            'Validate if there are more than two controls selected
-            myResult = ((From a In LocalQCCumulateResultsDS.QCCumulatedSummaryTable _
-                    Where Not a.IsSelectedNull AndAlso a.Selected _
-                       Select a).Count < 4)
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateActiveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ValidateActiveControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-        Return myResult
-    End Function
-
+    ''' <remarks></remarks>
     Private Sub ReleaseElements()
-
         Try
-            '--- Detach variable defined using WithEvents ---
             bsTestSampleListView = Nothing
             bsTestSampleGroupBox = Nothing
             bsTestSampleTypeLabel = Nothing
@@ -1241,14 +1179,82 @@ Public Class IQCCumulatedReview
             bsThirdCtrlLotLabel = Nothing
             bsThirdCtrlLotPictureBox = Nothing
             bsScreenToolTips = Nothing
-            '-----------------------------------------------
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-
     End Sub
 
+    ''' <summary>
+    ''' Update Min/Max Concentration values for the specified QCTestSampleID and QCControlLotID in table tqcHistoryTestControlLots
+    ''' in QC Module, and for the correspondent TestID/SampleType in table tparTestControls
+    ''' </summary>
+    ''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC</param>
+    ''' <param name="pQCControlLotID">Identifier of Control/Lot in QC</param>
+    ''' <param name="pMinValue">Min concentration value</param>
+    ''' <param name="pMaxValue">Max concentration value</param>
+    ''' <remarks>
+    ''' Created by:  SA 02/01/2012
+    ''' </remarks>
+    Private Sub SaveCumValuesAsTarget(ByVal pQCTestSampleID As Integer, ByVal pQCControlLotID As Integer, ByVal pMinValue As Single, ByVal pMaxValue As Single)
+        Try
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myHistTestControlsDelegate As New HistoryTestControlLotsDelegate
+
+            myGlobalDataTO = myHistTestControlsDelegate.SaveLastCumulatedAsTargetNEW(Nothing, pQCTestSampleID, pQCControlLotID, AnalyzerIDAttribute, pMinValue, pMaxValue)
+            If (myGlobalDataTO.HasError) Then
+                'Error updating the Target Min/Max values for the Test/SampleType and Control/Lot; show it
+                ShowMessage(Me.Name & ".SaveCumValuesAsTarget", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCumValuesAsTarget ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SaveCumValuesAsTarget ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Enable/disable availability of button for deleting Cumulated Series according the Level of the connected User
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: TR 20/04/2012
+    ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+    ''' </remarks>
+    Private Sub ScreenStatusByUserLevel()
+        Try
+            Select Case CurrentUserLevel    '.ToUpper()
+                Case "SUPERVISOR"
+                    Exit Select
+                Case "OPERATOR"
+                    bsDeleteCumulateSeries.Enabled = False
+                    Exit Select
+            End Select
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Validate the number of active (selected) Controls
+    ''' </summary>
+    ''' <returns>Return true if the number of controls selected is lower than 3</returns>
+    ''' <remarks>
+    ''' Created by:  TR 05/07/2011
+    ''' </remarks>
+    Private Function ValidateActiveControls() As Boolean
+        Dim myResult As Boolean = False
+
+        Try
+            'Validate if there are more than two controls selected
+            myResult = ((From a In LocalQCCumulateResultsDS.QCCumulatedSummaryTable _
+                    Where Not a.IsSelectedNull AndAlso a.Selected _
+                       Select a).Count < 4)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateActiveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ValidateActiveControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myResult
+    End Function
 #End Region
 
 #Region "Events"
@@ -1259,7 +1265,7 @@ Public Class IQCCumulatedReview
         Try
             If (e.KeyCode = Keys.Escape) Then bsExitButton.PerformClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IQCCumulatedReview_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1273,8 +1279,8 @@ Public Class IQCCumulatedReview
     ''' </remarks>
     Private Sub IQCCumulatedReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             InitializeScreen()
             FillTestSampleListView()
@@ -1282,7 +1288,7 @@ Public Class IQCCumulatedReview
             ResetBorder()
             Application.DoEvents()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IQCCumulatedReview_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1299,7 +1305,7 @@ Public Class IQCCumulatedReview
             End If
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCCumulatedReview_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IQCCumulatedReview_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1311,7 +1317,7 @@ Public Class IQCCumulatedReview
         Try
             DeleteSelectedResult()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteCumulateSeries_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteCumulateSeries_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDeleteCumulateSeries_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1323,7 +1329,7 @@ Public Class IQCCumulatedReview
                 GetControlsLotsWithCumulatedSeries(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), True)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSearchButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1335,27 +1341,29 @@ Public Class IQCCumulatedReview
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
         Try
-            If bsTestSampleListView.SelectedItems.Count = 1 AndAlso _
-               bsResultControlLotGridView.DataSource IsNot Nothing AndAlso _
-               bsResultsDetailsGridView.DataSource IsNot Nothing Then
+            If (bsTestSampleListView.SelectedItems.Count = 1) AndAlso (Not bsResultControlLotGridView.DataSource Is Nothing) AndAlso _
+               (Not bsResultsDetailsGridView.DataSource Is Nothing) Then
                 Dim testSampleId As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
                 Dim decAllow As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
 
+                Cursor = Cursors.WaitCursor
                 XRManager.ShowQCAccumulatedResultsByTestReport(testSampleId, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
                                                                LocalQCCumulateResultsDS, LocalCumulateResultsDS, decAllow)
+                Cursor = Cursors.Default
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            Cursor = Cursors.Default
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1372,7 +1380,7 @@ Public Class IQCCumulatedReview
                 e.NewWidth = 50
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestSampleListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestSampleListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestSampleListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1390,7 +1398,7 @@ Public Class IQCCumulatedReview
                 bsResultControlLotGridView.Columns("SaveAsTarget").Visible = Convert.ToBoolean(bsTestSampleListView.SelectedItems(0).SubItems(5).Text)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestSampleListView_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestSampleListView_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestSampleListView_SelectedIndexChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1414,7 +1422,7 @@ Public Class IQCCumulatedReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultControlLotGridView_CellClick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1441,7 +1449,7 @@ Public Class IQCCumulatedReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultControlLotGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1474,7 +1482,7 @@ Public Class IQCCumulatedReview
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CellValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultControlLotGridView_CellValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1485,7 +1493,7 @@ Public Class IQCCumulatedReview
                 bsResultControlLotGridView.CommitEdit(DataGridViewDataErrorContexts.Commit)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultControlLotGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultControlLotGridView_CurrentCellDirtyStateChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1513,10 +1521,10 @@ Public Class IQCCumulatedReview
             End If
 
         Catch ex As DataException
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultsDetailsGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultsDetailsGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1525,7 +1533,7 @@ Public Class IQCCumulatedReview
         Try
             If (e.KeyCode = Keys.Delete) Then DeleteSelectedResult()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsDetailsGridView_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsResultsDetailsGridView_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1549,11 +1557,11 @@ Public Class IQCCumulatedReview
             'Clear Graphics controls
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DateFromDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DateFromDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DateFromDateTimePick_ValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1568,7 +1576,7 @@ Public Class IQCCumulatedReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CumulatedXtraTab_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CumulatedXtraTab_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CumulatedXtraTab_Selecting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1577,13 +1585,10 @@ Public Class IQCCumulatedReview
         Try
             LocalPoint = bsMeanChartControl.PointToScreen(New Point(e.X, e.Y))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MeanChartControl_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MeanChartControl_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".MeanChartControl_MouseMove ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 #End Region
-
-
-
 End Class
 

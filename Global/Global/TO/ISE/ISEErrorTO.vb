@@ -188,27 +188,28 @@ Namespace Biosystems.Ax00.Global
             Return ErrorDataStringAttr
         End Function
 
-        Public Shared Function FormatAffected(ByVal pAffected As String) As String
-            Dim res As String = ""
-            Try
-                'Cl-, K+, Na+, Li+
+        ' Commented by: XB 08/09/2014 - Use FormatAffected method recently created on ISE Maneger layer instead this one - BA-1902
+        'Public Shared Function FormatAffected(ByVal pAffected As String) As String
+        '    Dim res As String = ""
+        '    Try
+        '        'Cl-, K+, Na+, Li+
 
-                Dim Li As String = "Li+"
-                Dim Na As String = "Na+"
-                Dim K As String = "K+"
-                Dim Cl As String = "Cl-"
+        '        Dim Li As String = "Li+"
+        '        Dim Na As String = "Na+"
+        '        Dim K As String = "K+"
+        '        Dim Cl As String = "Cl-"
 
-                If pAffected.Contains("Cl") Then res &= Cl & ", "
-                If pAffected.Contains("K") Then res &= K & ", "
-                If pAffected.Contains("Na") Then res &= Na & ", "
-                If pAffected.Contains("Li") Then res &= Li & ", "
+        '        If pAffected.Contains("Cl") Then res &= Cl & ", "
+        '        If pAffected.Contains("K") Then res &= K & ", "
+        '        If pAffected.Contains("Na") Then res &= Na & ", "
+        '        If pAffected.Contains("Li") Then res &= Li & ", "
 
-                If res.EndsWith(", ") Then res = res.Substring(0, res.Length - 2)
+        '        If res.EndsWith(", ") Then res = res.Substring(0, res.Length - 2)
 
-            Catch ex As Exception
-                res = ""
-            End Try
-            Return res
-        End Function
+        '    Catch ex As Exception
+        '        res = ""
+        '    End Try
+        '    Return res
+        'End Function
     End Class
 End Namespace

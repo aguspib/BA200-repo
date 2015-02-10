@@ -55,6 +55,7 @@ Namespace Biosystems.Ax00.Global
         Public Const ABSORBANCE_ERROR As String = "--"
         Public Const EXPORTED_RESULT As String = "Exp"
         Public Const ABSORBANCE_INVALID_VALUE As String = "Error" 'AG 15/10/2012 - Used when the abs can not be calculated (abs(t) graph in table, results excel document)
+        Public Const CONC_ISE_ERROR As String = "--"    ' XB 16/01/2015 - BA-1064
 
         'Temporal constant
         Public Const TO_DO As String = "Pending"

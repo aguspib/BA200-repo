@@ -5,13 +5,9 @@ Option Strict On
 Option Explicit On
 
 Imports System.Xml
-Imports System.Xml.XPath
-Imports System.IO
-Imports System.Xml.Schema
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
@@ -213,11 +209,11 @@ Namespace Biosystems.Ax00.LISCommunications
                         Dim pHostProvider As String
                         Dim pInstrumentID As String
                         Dim pInstrumentProvider As String
-                        Dim pFieldSeparator As String
-                        Dim pComponentSeparator As String
-                        Dim pRepeatSeparator As String
-                        Dim pSpecialSeparator As String
-                        Dim pSubComponentSeparator As String
+                        Dim pFieldSeparator As String = Nothing
+                        Dim pComponentSeparator As String = Nothing
+                        Dim pRepeatSeparator As String = Nothing
+                        Dim pSpecialSeparator As String = Nothing
+                        Dim pSubComponentSeparator As String = Nothing
 
                         resultData = settingsDelg.GetCurrentValueBySettingID(Nothing, UserSettingsEnum.LIS_PROTOCOL_NAME.ToString())
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -757,8 +753,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannel", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -874,8 +870,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMessageStorage", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMessageStorage", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -946,8 +942,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetPendingMessages", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetPendingMessages", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1034,8 +1030,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteMessage", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteMessage", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1117,8 +1113,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteAllMessages", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteAllMessages", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1153,8 +1149,8 @@ Namespace Biosystems.Ax00.LISCommunications
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteIncomingMessages", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetDeleteIncomingMessages", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1249,8 +1245,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetQueryAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetQueryAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1352,8 +1348,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetHostQuery", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetHostQuery", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1457,8 +1453,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosAccept", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosAccept", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1557,8 +1553,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosReject", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosReject", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1724,8 +1720,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosRejectDelayed", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetAwosRejectDelayed", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1940,7 +1936,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                     Next
                                 End If
 
-                                 '4) Build the XML foot (or source)
+                                '4) Build the XML foot (or source)
                                 '<ci:source>
                                 '<ci:companyName>Company name</ci:companyName>				
                                 '<ci:model>Analyzer mode</ci:model>
@@ -1952,7 +1948,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 If (Not resultData.HasError) Then
                                     Dim myAnalyzerID As String = String.Empty
                                     If (pHistoricFlag) Then myAnalyzerID = pHistDataDS.vhisWSResults(0).AnalyzerID
-                                    
+
                                     resultData = MyClass.CreateSourceNode(myXMLDoc, myAnalyzerID)
                                     If (Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing) Then
                                         Dim Source As XmlNode = CType(resultData.SetDatos, XmlNode)
@@ -1980,8 +1976,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetOrdersResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetOrdersResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2012,6 +2008,7 @@ Namespace Biosystems.Ax00.LISCommunications
         '''                              LIS_UPLOAD_UNSOLICITED_QC_RES.
         '''              SG 25/04/2013 - Assigned current Mapping names to history data in case of Manual orders
         '''              SA 09/01/2014 - BT #1407 ==> Added to code to avoid export twice results of Calculated Tests (patch copied from function GetUploadLISOrdersResults)
+        '''              AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetUploadManualOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pManualResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                       ByVal pHistoricalFlag As Boolean, ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, _
@@ -2020,7 +2017,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                                       ByRef pCiPatientIdTags As List(Of XmlNode)) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
@@ -2156,7 +2153,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                 resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, TestSampleClass.patient, myResulDataTime, _
                                                                        myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, myPatientID, _
-                                                                       myOrderID, True, Nothing, "") 'AG 24/04/2013 - Add AwosID as an empty string
+                                                                       myOrderID, True, Nothing, "", exeRow.LISMappingError) 'AG 24/04/2013 - Add AwosID as an empty string
 
                                 If (resultData.HasError) Then
                                     Exit Try
@@ -2239,7 +2236,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             'Create Service Node
                             resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, TestSampleClass.QC, myResulDataTime, _
                                                                    myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, myPatientID, _
-                                                                   myOrderID, True, myControlsDS, "") 'AG 24/04/2013 - Add AwosID as an empty string
+                                                                   myOrderID, True, myControlsDS, "", exeRow.LISMappingError) 'AG 24/04/2013 - Add AwosID as an empty string
 
                             If (resultData.HasError) Then
                                 Exit Try
@@ -2261,7 +2258,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetUploadManualOrdersResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetUploadManualOrdersResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2293,6 +2290,7 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Modified by SG 25/04/2013 - Assign saved Mapping names to history data in case of LIS orders. Obtain data from 'thisWSOrderTests'
         ''' Modified by SG 27/06/2013 - In case of Calc Tests, upload unique result for OrderTEstID
         ''' Modified by SG 25/07/2013 - In case of the executions have not AwosID, they are discarded
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetUploadLISOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                    ByVal pHistoricalFlag As Boolean, ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, _
@@ -2480,7 +2478,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                                    myESPatientID, _
                                                                                    myESOrderID, _
                                                                                    False, _
-                                                                                   Nothing, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID) 'AG 24/04/2013 - add awosid
+                                                                                   Nothing, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID, item.LISMappingError) 'AG 24/04/2013 - add awosid
 
                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                 Dim myServiceNode As XmlNode = CType(resultData.SetDatos, XmlNode)
@@ -2609,7 +2607,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                                myPatientID, _
                                                                                myOrderID, _
                                                                                False, _
-                                                                               myControlsDS, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID) 'AG 24/04/2013 - add awosid)
+                                                                               myControlsDS, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID, item.LISMappingError) 'AG 24/04/2013 - add awosid)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                             Dim myServiceNode As XmlNode = CType(resultData.SetDatos, XmlNode)
@@ -2665,8 +2663,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetUploadLISOrdersResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetUploadLISOrdersResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2690,7 +2688,8 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' <param name="pCiPatientList">ByRef parameter: List of Patient XML Nodes</param>
         ''' <returns>All ByRef parameters plus a GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 14/01/2014 
+        ''' Created by:  SA 14/01/2014
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetMIXEDOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, ByVal pResultsDS As ResultsDS, _
@@ -2853,7 +2852,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                         'Create XML node 'SERVICE'
                                         resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, myRole, myResulDataTime, _
                                                                                myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, _
-                                                                               myESPatientID, myESOrderID, False, Nothing, myAwosID)
+                                                                               myESPatientID, myESOrderID, False, Nothing, myAwosID, item.LISMappingError)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                             myServiceNode = CType(resultData.SetDatos, XmlNode)
@@ -2891,8 +2890,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMIXEDOrdersResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMIXEDOrdersResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2998,8 +2997,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMIXEDOrdersResultsHIST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetMIXEDOrdersResultsHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3201,8 +3200,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetRequiredDataForResultsUpload", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetRequiredDataForResultsUpload", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3245,8 +3244,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLMessage", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLMessage", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3520,8 +3519,8 @@ Namespace Biosystems.Ax00.LISCommunications
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLServiceTag", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLServiceTag", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3798,8 +3797,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLServiceTag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLServiceTag", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -3958,8 +3957,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLPatientTag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLPatientTag", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -4039,8 +4038,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLOrderTag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLOrderTag", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -4233,8 +4232,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLNotification", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLNotification", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -4297,7 +4296,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
 
                     Dim myXmlNode As XmlNode = TryCast(myXmlDoc.DocumentElement, XmlNode)
-                    Dim myXmlHelper As New xmlHelper(myXmlNode.GetPrefixOfNamespace(myXmlNode.NamespaceURI), MyClass.TraceSchema, Nothing, Nothing)
+                    Dim myXmlHelper As New xmlHelper(myXmlNode.GetPrefixOfNamespace(myXmlNode.NamespaceURI), TraceSchema, Nothing, Nothing)
                     Dim myXmlNodeList As XmlNodeList = myXmlNode.ChildNodes
                     If myXmlNodeList IsNot Nothing Then
                         For Each E As XmlNode In myXmlNodeList
@@ -4361,8 +4360,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLExceptions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.DecodeXMLExceptions", EventLogEntryType.Error, False)
 
 
             End Try
@@ -4405,8 +4404,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateRootElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateRootElement", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -4508,8 +4507,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateHeaderNode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateHeaderNode", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -4527,7 +4526,13 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' <param name="pResultsRow">Results data row</param>
         ''' <param name="pHisResultsRow">History Results data row</param>
         ''' <param name="pRefRanges">Related reference ranges</param>
+        ''' <param name="pSpecimenID"></param>
+        ''' <param name="pPatientID"></param>
+        ''' <param name="pOrderID"></param>
         ''' <param name="pIsManual">Automatic(false) or Manual(true)</param>
+        ''' <param name="pControlsDS"></param>
+        ''' <param name="pAwosID"></param>
+        ''' <param name="pLISMappingError"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by  SG 06/03/2013
@@ -4535,7 +4540,9 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Modified by AG 24/04/2013 - Add parameter AwosID and inform it in Service id tag when different than ""
         ''' Modified by AG 03/05/2013 - Historical results could contain CONCValue = NULL
         ''' Modified by DL 16/05/2013 - Modify system decimal separator by "."
-        '''             AG 27/05/2013 - RefRanges father is Result instead of QualifyingElement
+        ''' AG 27/05/2013 - RefRanges father is Result instead of QualifyingElement
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the new byref parameter pLISMappingError
+        ''' AG 30/09/2014 - All CreateLogActivity as EventLogEntryType.Information but the exception one
         ''' </remarks>
         Private Function CreateServiceNode(ByRef XmlDoc As XmlDocument, _
                                            ByVal pTestMappingDS As AllTestsByTypeDS, _
@@ -4551,15 +4558,15 @@ Namespace Biosystems.Ax00.LISCommunications
                                            ByVal pOrderID As String, _
                                            ByVal pIsManual As Boolean, _
                                            ByVal pControlsDS As ControlsDS, _
-                                           ByVal pAwosID As String) As GlobalDataTO
+                                           ByVal pAwosID As String, ByRef pLISMappingError As Boolean) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
             Dim myResultRow As ResultsDS.vwksResultsRow = Nothing
             Dim IsHistorical As Boolean = (pHisResultsRow IsNot Nothing)
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
-
+                pLISMappingError = False 'AG 29/09/2014 - BA-1440 initial value, not mapping errors
                 If pResultsRow IsNot Nothing Then
                     'ws
                     myResultRow = pResultsRow
@@ -4654,7 +4661,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         'Sample Type 
                         resultData = myLISMappingDelegate.GetLISSampleType(pConfigMappingDS, myResultRow.SampleType)
                         If resultData.HasError Then
-                            myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
+                            GlobalBase.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Information, False)
                             itMustSetToNotSent = True
                         Else
                             myMappedSampleType = CStr(resultData.SetDatos)
@@ -4664,7 +4671,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             'Test Id 
                             resultData = myAllTestMappingDelegate.GetLISTestID(pTestMappingDS, myResultRow.TestID, myResultRow.TestType)
                             If resultData.HasError Then
-                                myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Information, False)
                                 itMustSetToNotSent = True
                             Else
                                 myMappedTestId = CStr(resultData.SetDatos)
@@ -4679,6 +4686,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                     'in case of mapping is missing, set to 'NOTSENT'
                     If itMustSetToNotSent Then
+                        pLISMappingError = True 'AG 29/09/2014 - BA-1440 inform LISMapping error!!!
                         Dim myNotSentHisResultsDS As New ResultsDS
                         Dim myRow As ResultsDS.vwksResultsRow = myNotSentHisResultsDS.vwksResults.NewvwksResultsRow()
                         With myRow
@@ -4776,14 +4784,14 @@ Namespace Biosystems.Ax00.LISCommunications
                     'For historical pHistDataDS do the same with equivalent fields
                     Dim ResultQElement As XmlNode = XmlDoc.CreateElement("ci", "qualifyingElement", ClinicalInfoSchema)
                     Dim QElementValue As XmlNode = XmlDoc.CreateElement("ci", "value", ClinicalInfoSchema)
-                    Dim myDAO As New DAOBase 'DL 16/05/2013
+                    'Dim myDAO As New DAOBase 'DL 16/05/2013
 
                     'Use pResultsDS, if ManualResultFlag = False use CONC_Value, else 
                     'use ManualResult or ManualResultText.(For historical pHistDataDS same fields)
                     If Not myResultRow.ManualResultFlag Then
                         'DL 16/05/2013
                         'QElementValue.InnerText = myResultRow.CONC_Value.ToString(InvariantCulture)
-                        QElementValue.InnerText = myDAO.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
+                        QElementValue.InnerText = DAOBase.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
                         'DL 16/05/2013
                     Else
                         If myResultRow.IsManualResultNull AndAlso Not myResultRow.IsManualResultTextNull Then
@@ -4794,7 +4802,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         ElseIf Not myResultRow.IsCONC_ValueNull Then
                             'DL 16/05/2013
                             'QElementValue.InnerText = myResultRow.CONC_Value.ToString(InvariantCulture)
-                            QElementValue.InnerText = myDAO.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
+                            QElementValue.InnerText = DAOBase.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
                             'DL 16/05/2013
                         End If
                     End If
@@ -4829,7 +4837,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 If Not pHisResultsRow.IsMaxRefRangeNull Then
                                     'DL 16/05/2013
                                     'HiRefValue.InnerText = pHisResultsRow.MaxRefRange.ToString(InvariantCulture)
-                                    HiRefValue.InnerText = myDAO.ReplaceNumericString(pHisResultsRow.MaxRefRange).ToString(InvariantCulture)
+                                    HiRefValue.InnerText = DAOBase.ReplaceNumericString(pHisResultsRow.MaxRefRange).ToString(InvariantCulture)
                                     'DL 16/05/2013
                                 Else
                                     HiRefValue.InnerText = String.Empty
@@ -4838,7 +4846,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 'DL 16/05/2013
                                 'HiRefValue.InnerText = myRefRangesRow.NormalUpperLimit.ToString(InvariantCulture)
                                 If myRefRangesRow.NormalUpperLimit > -1 Then
-                                    HiRefValue.InnerText = myDAO.ReplaceNumericString(myRefRangesRow.NormalUpperLimit).ToString(InvariantCulture)
+                                    HiRefValue.InnerText = DAOBase.ReplaceNumericString(myRefRangesRow.NormalUpperLimit).ToString(InvariantCulture)
                                 End If
                                 'DL 16/05/2013
                             End If
@@ -4857,7 +4865,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 If Not pHisResultsRow.IsMinRefRangeNull Then
                                     'DL 16/05/2013
                                     'LoRefValue.InnerText = pHisResultsRow.MinRefRange.ToString(InvariantCulture)
-                                    LoRefValue.InnerText = myDAO.ReplaceNumericString(pHisResultsRow.MinRefRange).ToString(InvariantCulture)
+                                    LoRefValue.InnerText = DAOBase.ReplaceNumericString(pHisResultsRow.MinRefRange).ToString(InvariantCulture)
                                     'DL 16/05/2013
                                 Else
                                     LoRefValue.InnerText = String.Empty
@@ -4866,7 +4874,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 'DL 16/05/2013
                                 'LoRefValue.InnerText = myRefRangesRow.NormalLowerLimit.ToString(InvariantCulture)
                                 If myRefRangesRow.NormalLowerLimit > -1 Then
-                                    LoRefValue.InnerText = myDAO.ReplaceNumericString(myRefRangesRow.NormalLowerLimit).ToString(InvariantCulture)
+                                    LoRefValue.InnerText = DAOBase.ReplaceNumericString(myRefRangesRow.NormalLowerLimit).ToString(InvariantCulture)
                                 End If
                                 'DL 16/05/2013
                             End If
@@ -4944,8 +4952,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     'OPERATOR
                     Dim OperatorNode As XmlNode = XmlDoc.CreateElement("ci", "operator", ClinicalInfoSchema)
                     Dim OperatorId As XmlNode = XmlDoc.CreateElement("ci", "id", ClinicalInfoSchema)
-                    Dim myGlobalbase As New GlobalBase
-                    OperatorId.InnerText = myGlobalbase.GetSessionInfo.UserName
+                    'Dim myGlobalbase As New GlobalBase
+                    OperatorId.InnerText = GlobalBase.GetSessionInfo.UserName
                     OperatorNode.AppendChild(OperatorId)
                     Service.AppendChild(OperatorNode)
 
@@ -4976,8 +4984,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -5016,8 +5024,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateFlagsNode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateFlagsNode", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5072,7 +5080,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 For Each item As String In distinctPatientList
                     qPatientsList = (From o In pOrderTestsLISInfoDS.twksOrderTestsLISInfo Where o.ESPatientID = item Select o Distinct Order By o.ESPatientID).ToList()
                     Dim counter As Integer = 0
-                    Dim myPatientNode As XmlNode
+                    Dim myPatientNode As XmlNode = Nothing
                     For Each p As OrderTestsLISInfoDS.twksOrderTestsLISInfoRow In qPatientsList
                         If counter = 0 Then
                             counter += 1
@@ -5102,8 +5110,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreatePatientNodes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreatePatientNodes", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -5138,8 +5146,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreatePatientNode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreatePatientNode", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -5149,7 +5157,6 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' </summary>
         ''' <param name="XmlDoc">Xml document in which the node and subnodes will be added</param>
         ''' <param name="pESOrderID"></param>
-        ''' <param name="pLISOrderID"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by SGM 08/02/2013
@@ -5176,8 +5183,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateOrderNode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateOrderNode", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -5244,8 +5251,8 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateSourceNode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.CreateSourceNode", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

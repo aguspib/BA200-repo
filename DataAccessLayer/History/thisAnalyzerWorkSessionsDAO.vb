@@ -3,13 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports System.Text
-Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisAnalyzerWorkSessionsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -52,8 +50,57 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.Create", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get data of the specified WorkSession 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DS WorkSessionsDS with all WorkSession definition data</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * " & vbCrLf & _
+                                                " FROM   thisAnalyzerWorkSessions " & vbCrLf & _
+                                                " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                "   AND  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf
+
+                        Dim myWorkSessionDS As New WorkSessionsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myWorkSessionDS.twksWorkSessions)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myWorkSessionDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -110,12 +157,57 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.GenerateNextSequenceNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.GenerateNextSequenceNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get all different Analyzers having Results in Historic Module
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet AnalyzersDS with the list of different Analyzers having Historical Results</returns>
+        ''' <remarks>
+        ''' Created by:  SA 01/09/2014 - BA-1910
+        ''' </remarks>
+        Public Function ReadAllDistinctAnalyzers(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim dataToReturn As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT AnalyzerID " & vbCrLf & _
+                                                " FROM   thisAnalyzerWorkSessions " & vbCrLf
+
+                        Dim myDs As New AnalyzersDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDs.tcfgAnalyzers)
+                            End Using
+                        End Using
+
+                        dataToReturn.SetDatos = myDs
+                        dataToReturn.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                dataToReturn = New GlobalDataTO()
+                dataToReturn.HasError = True
+                dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                dataToReturn.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.ReadAllDistinctAnalyzers", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return dataToReturn
         End Function
 #End Region
 
@@ -152,8 +244,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.Delete", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.Delete", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

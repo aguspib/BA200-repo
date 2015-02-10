@@ -3,10 +3,8 @@ Option Explicit On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 
 Namespace Biosystems.Ax00.Calculations
     Partial Public Class RecalculateResultsDelegate
@@ -177,6 +175,8 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO containing succes/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 12/06/2014 - BT #1660
+        ''' Modified by: AG 30/07/2014 #1887 (recalculate the ExportStatus after manual recalculations)
+        ''' AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
         ''' </remarks>
         Public Function RecalculateISEAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                    ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
@@ -225,10 +225,26 @@ Namespace Biosystems.Ax00.Calculations
                                             res_DS.twksResults(0).AnalyzerID = pAnalyzerID
                                             res_DS.twksResults(0).WorkSessionID = pWorkSessionID
                                             res_DS.twksResults(0).SampleClass = mySampleClass
+
+                                            'AG 30/07/2014 #1887 - Update ExportStatus after recalculations and set OrderToExport = TRUE after manual recalculations
+                                            resultData = myResultsDelegate.RecalculateExportStatusValue(dbConnection, myOT, myRerun)
+                                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                                res_DS.twksResults(0).ExportStatus = CType(resultData.SetDatos, String)
+                                            End If
+                                            'AG 30/07/2014 #1887
+
                                             res_DS.twksResults(0).AcceptChanges()
 
                                             'Update the Result Value
                                             resultData = myResultsDelegate.SaveResults(dbConnection, res_DS)
+
+                                            'AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
+                                            If Not resultData.HasError AndAlso res_DS.twksResults(0).AcceptedResultFlag Then
+                                                Dim orders_dlg As New OrdersDelegate
+                                                resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , myOT)
+                                            End If
+                                            'AG 15/10/2014 BA-2011
+
                                             If (Not resultData.HasError) Then
                                                 'Delete all Alarms saved previously for the Average Result
                                                 resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, myOT, myRerun, res_DS.twksResults(0).MultiPointNumber)
@@ -308,8 +324,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateISEAverageValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateISEAverageValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -364,8 +380,8 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -472,665 +488,10 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ValidateISERefRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ValidateISERefRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-#End Region
-
-#Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES"
-        ''' <summary>
-        ''' Change the accepted result when there are several reruns
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzer"></param>
-        ''' <param name="pWorkSession"></param>
-        ''' <param name="pOrderTestID"></param>
-        ''' <param name="pRerunNumber"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pTestType" ></param>
-        ''' <param name="pSampleClass" ></param>
-        ''' <returns>GlobalDataTo (set data as boolean)</returns>
-        ''' <remarks>Created by AG 04/08/2010
-        ''' Modified by AG 02/12/2010 - adapt for accept rerun different than STD tests (executionID)
-        ''' AG 18/03/2011 - add pSampleClass due controls can accept more than one result
-        ''' AG 03/07/2012 - Running Cycles lost - Improvements!
-        ''' </remarks>
-        Public Function ChangeAcceptedResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
-                                         ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer, _
-                                         ByVal pExecutionID As Integer, ByVal pTestType As String, _
-                                         ByVal pSampleClass As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-                Dim myResult As Boolean = True
-                Dim myResDelegate As New ResultsDelegate
-                resultData = myResDelegate.UpdateAcceptedResult(dbConnection, pOrderTestID, pRerunNumber, True)
-
-                If Not resultData.HasError Then
-                    'resultData = myResDelegate.ResetAcceptedResultFlag(dbConnection, pOrderTestID, pRerunNumber)
-                    If pSampleClass <> "CTRL" Then
-                        resultData = myResDelegate.ResetAcceptedResultFlag(dbConnection, pOrderTestID, pRerunNumber)
-                    End If
-
-                    If Not resultData.HasError And pTestType = "STD" Then
-                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True)
-                    End If
-                End If
-
-                resultData.SetDatos = False
-                If (Not resultData.HasError) Then
-                    '            'When the Database Connection was opened locally, then the Commit is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                    resultData.SetDatos = myResult  'True or False
-                Else
-                    '            'When the Database Connection was opened locally, then the Rollback is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing) And _
-                '   (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeAcceptedResult", EventLogEntryType.Error, False)
-
-            Finally
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get the OrderTestID - RerunNumber owners of the pExecutionID
-        ''' If NewInUse flag = False (discard replicate)
-        ''' .......Count the excutions INUSE closed for the OrderTestID - RerunNumber
-        ''' .......If count > 1 allow discard replicate, update INUSE flag (FALSE) and call recalculations
-        ''' .......Else count dont allow change inuse status (discard replicate not allowed!!!)
-        ''' ElseIf NewInUse flag = True ... allow change status, update INUSE flag (TRUE) and call recalculations
-        ''' Finally return: Allowed or not internal flag
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzer"></param>
-        ''' <param name="pWorkSession"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pNewInUseValue"></param>
-        ''' <returns>GlobalDataTo (set data as boolean)</returns>
-        ''' <remarks>
-        ''' Created by AG 21/07/2010
-        ''' Modified by AG 15/09/2010: InUseReplicates count do not count replicates with Absorbance error
-        ''' AG 03/07/2012 - Running Cycles lost - Improvements!
-        ''' </remarks>
-        Public Function ChangeInUseFlagReplicate(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
-                                                 ByVal pExecutionID As Integer, ByVal pNewInUseValue As Boolean) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                Dim myResult As Boolean = True
-                Dim myEx_Delegate As New ExecutionsDelegate
-
-                Dim myExecutionItemNumber As Integer = 1 'AG 10/11/2010
-                Dim myExecOrderTestID As Integer = 1 'AG 10/11/2010
-                Dim myExecRerunNumber As Integer = 1 'AG 10/11/2010
-                Dim myExecSampleClass As String = "" 'AG 10/11/2010
-                Dim myExecType As String = String.Empty 'AG 13/01/2011
-
-                'Get closed executions belongs the same OrderTestId-RerunNumber
-                resultData = myEx_Delegate.GetClosedExecutionsRelated(dbConnection, pAnalyzer, pWorkSession, pExecutionID)
-
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    Dim myEx_DataSet As New ExecutionsDS
-                    myEx_DataSet = CType(resultData.SetDatos, ExecutionsDS)
-
-                    'Dim myExecutionItemNumber As Integer = 1
-                    myExecutionItemNumber = (From a In myEx_DataSet.vwksWSExecutionsResults Where a.ExecutionID = pExecutionID Select a.MultiItemNumber).First
-
-                    'AG 10/11/2010
-                    myExecOrderTestID = (From a In myEx_DataSet.vwksWSExecutionsResults Where a.ExecutionID = pExecutionID Select a.OrderTestID).First
-                    myExecRerunNumber = (From a In myEx_DataSet.vwksWSExecutionsResults Where a.ExecutionID = pExecutionID Select a.RerunNumber).First
-                    myExecSampleClass = (From a In myEx_DataSet.vwksWSExecutionsResults Where a.ExecutionID = pExecutionID Select a.SampleClass).First
-                    myExecType = (From a In myEx_DataSet.vwksWSExecutionsResults Where a.ExecutionID = pExecutionID Select a.ExecutionType).First 'AG 13/01/2011
-
-
-                    Dim inUseReplicates As Integer = 0
-                    'AG 15/09/2010
-                    'inUseReplicates = (From a In myEx_DataSet.vwksWSExecutionsResults _
-                    '   Where a.InUse = True And a.MultiItemNumber = myExecutionItemNumber Select a).Count
-                    inUseReplicates = (From a In myEx_DataSet.vwksWSExecutionsResults _
-                                       Where a.InUse = True And a.MultiItemNumber = myExecutionItemNumber _
-                                       And a.IsABS_ErrorNull Select a).Count
-                    'END AG 15/09/2010
-
-                    If inUseReplicates > 1 Then
-                        myResult = True
-                    Else
-                        myResult = False
-                    End If
-                End If
-
-                If pNewInUseValue Then  'User wants DISCARD replicate (InUse flag to FALSE)
-                    myResult = True
-                End If 'If Not pNewInUseValue Then
-
-                If myResult And Not resultData.HasError Then
-                    'Update InUse flag
-                    resultData = myEx_Delegate.UpdateInUse(dbConnection, pAnalyzer, pWorkSession, pExecutionID, pNewInUseValue)
-
-                    'AG 10/11/2010
-                    'If SampleClass = Calibrator ... on change inuse replicates Recover experimental calibration results 
-                    If Not resultData.HasError Then
-                        If myExecType = "PREP_STD" And myExecSampleClass = "CALIB" Then
-                            Dim resultsDelegate As New ResultsDelegate
-                            resultData = resultsDelegate.UpdateManualResult(dbConnection, False, "QUANTIVE", 1, "", myExecOrderTestID, myExecutionItemNumber, myExecRerunNumber)
-                        End If
-                    End If
-                    'END AG 10/11/2010
-
-                    If Not resultData.HasError Then
-                        'Last parameter = TRUE due the change in use replicate flag is an user action!!
-                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True)
-                    End If
-                End If
-
-                resultData.SetDatos = False
-                If (Not resultData.HasError) Then
-                    '            'When the Database Connection was opened locally, then the Commit is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                    resultData.SetDatos = myResult  'True or False
-                Else
-                    '            'When the Database Connection was opened locally, then the Rollback is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing) And _
-                '  (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeInUseFlagReplicate", EventLogEntryType.Error, False)
-
-            Finally
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Implements the re calculations business process
-        ''' Recalculate all results affected for the new pExecution result
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzer"></param>
-        ''' <param name="pWorkSession"></param>
-        ''' <param name="pExecution"></param>
-        ''' <param name="pManualRecalculationFlag"> Re-calculations due to an user action (TRUE) or not (FALSE) (receive new Ax00 results and calculate them)</param>
-        ''' <param name="pManualFactorEvent"></param> Optional parameter. When TRUE means the recalculations are called from ManualFactor functionality
-        ''' <returns>GlobalDataTO indicate if an error has succeed or not</returns>
-        ''' <remarks>
-        ''' Created AG 21/07/21010
-        ''' Modified AG 10/11/2010 - add optinal parameter pManualFactorEvent (when true the CalculationsDelegate.CalculateExecution method is not necessary)
-        ''' AG 03/07/2012 - Running Cycles lost - Improvements!
-        ''' </remarks>
-        Public Function RecalculateResults(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                           ByVal pAnalyzer As String, ByVal pWorkSession As String, _
-                                           ByVal pExecution As Integer, ByVal pManualRecalculationFlag As Boolean, _
-                                           Optional ByVal pManualFactorEvent As Boolean = False) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                If Not myRecalData.Initialized Then
-                    resultData = Me.Init(dbConnection, pAnalyzer, pWorkSession, pExecution)
-                End If
-
-                'AG 26/11/2010 - This recalculate results only applies for PREP_STD
-                If myRecalData.ExecutionType = "PREP_STD" And myRecalData.ExecutionStatus = "CLOSED" Then
-
-                    If Not resultData.HasError Then '1
-                        'AG 29/11/2010 - If ExecutionID = -1 (ManualFlag from WS Preparation screen) do not call SearchLastClosedOrderTestIdExecution
-                        'resultData = Me.SearchLastClosedOrderTestIdExecution(dbConnection)
-                        If pExecution > 0 Then resultData = Me.SearchLastClosedOrderTestIdExecution(dbConnection)
-
-                        If Not resultData.HasError Then '2
-                            'Recalculate & Update Average results
-                            'Dim myCalcDelegate As New CalculationsDelegate() 'AG 14/05/2012 - Declare the variable just before to be used!!!
-
-                            If Not resultData.HasError Then '3
-                                'If pManualRecalculationFlag Then 'AG 10/11/2010 - Comment this line
-                                If pManualRecalculationFlag And Not pManualFactorEvent Then
-                                    'AG 10/09/2010 - add optional parameter pManualRecalculationFlag
-                                    Dim myCalcDelegate As New CalculationsDelegate() 'AG 14/05/2012 - Declare variable here. Otherwise some structures keep information of previous executions calculated
-                                    myCalcDelegate.AnalyzerModel = myAnalyzerModel
-                                    resultData = myCalcDelegate.CalculateExecution(dbConnection, myRecalData.Execution, myRecalData.AnalyzerID, myRecalData.WorkSessionID, _
-                                                                                   True, myRecalData.SampleClass, pManualRecalculationFlag)
-
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Recalcul selected result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "RecalculateResultsDelegate.RecalculateResults", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                End If
-
-                                If Not resultData.HasError Then '4
-                                    If (myRecalData.SampleClass = "BLANK" Or myRecalData.SampleClass = "CALIB") And myRecalData.AcceptedResult Then
-                                        'Search affected results
-                                        Dim ex_deleg As New ExecutionsDelegate
-                                        resultData = ex_deleg.ReadAffectedExecutions(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, _
-                                                                                      myRecalData.SampleClass, myRecalData.TestID, myRecalData.SampleType)
-
-                                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                            Dim executionsList As New ExecutionsDS
-                                            executionsList = CType(resultData.SetDatos, ExecutionsDS)
-
-                                            'AG 10/08/2010 - Get the proper MaxItemsNumber for the calibrator
-                                            If myRecalData.MaxItemsNumber <= 1 Then
-                                                Dim maxItems As List(Of Integer)
-                                                maxItems = (From a In executionsList.vwksWSExecutionsResults _
-                                                            Where a.SampleClass = "CALIB" _
-                                                            Select a.MultiItemNumber Distinct _
-                                                            Order By MultiItemNumber Descending).ToList
-
-                                                If maxItems.Count > 0 Then
-                                                    If maxItems(0) > 1 Then
-                                                        myRecalData.MaxItemsNumber = maxItems(0)
-                                                    End If
-                                                End If
-                                                maxItems = Nothing 'AG 25/02/2014 - #1521
-                                            End If
-                                            'END AG 10/08/2010
-
-                                            'For each affected result ... calculated it
-                                            For Each ex_row As ExecutionsDS.vwksWSExecutionsResultsRow In executionsList.vwksWSExecutionsResults
-
-                                                'CalculateExecution
-                                                Dim callCalculationsFlag As Boolean = True
-                                                If ex_row.SampleClass = "CALIB" Then
-
-                                                    'AG 11/08/2010
-                                                    ''Call calculations ONLY when executions belongs to (maximum multiitemnumber)
-                                                    ''We need call for each replicate
-                                                    'If ex_row.MultiItemNumber < myRecalData.MaxItemsNumber Then
-                                                    '    callCalculationsFlag = False
-                                                    '
-                                                    '    'For calibrators 1 point: call CalculateExecution only for the highest CALIB closed replicatenumber
-                                                    '    'Only 1 call is needed
-                                                    'ElseIf myRecalData.MaxItemsNumber = 1 Then
-                                                    '    Dim maxCalibReplicates As Integer = 0
-                                                    '    maxCalibReplicates = (From a In executionsList.vwksWSExecutionsResults _
-                                                    '                      Where a.OrderTestID = ex_row.OrderTestID _
-                                                    '                      And a.RerunNumber = ex_row.RerunNumber Select a.ReplicateNumber).Max
-
-                                                    '    If ex_row.ReplicateNumber < maxCalibReplicates Then
-                                                    '        callCalculationsFlag = False
-                                                    '    End If
-                                                    'End If
-
-                                                    'Call calculations ONLY when executions belongs to (maximum multiitemnumber)
-                                                    'We need call for only when the current replicate is the maximum replicate
-                                                    If ex_row.MultiItemNumber < myRecalData.MaxItemsNumber Then
-                                                        callCalculationsFlag = False
-                                                    End If
-
-                                                    If callCalculationsFlag Then
-                                                        Dim maxCalibReplicates As Integer = 0
-                                                        maxCalibReplicates = (From a In executionsList.vwksWSExecutionsResults _
-                                                                          Where a.OrderTestID = ex_row.OrderTestID _
-                                                                          And a.RerunNumber = ex_row.RerunNumber Select a.ReplicateNumber).Max
-
-                                                        If ex_row.ReplicateNumber < maxCalibReplicates Then
-                                                            callCalculationsFlag = False
-                                                        End If
-                                                    End If
-                                                    'END AG 11/08/2010
-
-                                                End If
-
-                                                If callCalculationsFlag Then
-                                                    'AG 10/09/2010 - add optional parameter pManualRecalculationFlag
-                                                    Dim myCalcDelegate As New CalculationsDelegate() 'AG 14/05/2012 - Declare variable here. Otherwise some structures keep information of previous executions calculated
-                                                    myCalcDelegate.AnalyzerModel = myAnalyzerModel
-                                                    resultData = myCalcDelegate.CalculateExecution(dbConnection, ex_row.ExecutionID, myRecalData.AnalyzerID, myRecalData.WorkSessionID, _
-                                                                                                    True, myRecalData.SampleClass, pManualRecalculationFlag)
-                                                    If resultData.HasError Then Exit For
-                                                    'If patient the CalculateExecution already has marked the average result as pending the LIS export and final print flags
-                                                End If
-
-                                            Next
-
-                                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                            myLogAcciones.CreateLogActivity("Recalculate rest of affected Executions: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                            "RecalculateResultsDelegate.RecalculateResults", EventLogEntryType.Information, False)
-                                            StartTime = Now
-                                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                        End If 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-
-                                        'If patient the CalculateExecution already has marked the average result as pending the LIS export and final print flags
-                                    End If
-
-                                End If '(4) If Not resultData.HasError Then
-                            End If '(3) If Not resultData.HasError Then
-                        End If '(2) If Not resultData.HasError Then
-                    End If '(1) If Not resultData.HasError Then 
-
-                    'AG 13/01/2011
-                ElseIf myRecalData.ExecutionType = "PREP_ISE" And myRecalData.ExecutionStatus = "CLOSED" Then
-                    'XBC 20/01/2012
-                    'Dim myISECalcDelegate As New ISEResultsDelegate
-                    'resultData = myISECalcDelegate.RecalculateAverageValue(dbConnection, pAnalyzer, pWorkSession, pExecution)
-                    resultData = MyClass.RecalculateAverageValue(dbConnection, pAnalyzer, pWorkSession, pExecution)
-                    'XBC 20/01/2012
-                    'AG 13/01/2011
-                End If 'If myRecalData.ExecutionType = "PREP_STD" Then
-
-                'AG 19/03/2013 - Comment these lines, the exportation will be perform in any case after calculations done
-                ''AG 21/05/2012 - If no manual recalculations call method to export results
-                'If Not resultData.HasError AndAlso Not pManualRecalculationFlag AndAlso myRecalData.OrderTestStatus = "CLOSED" Then
-                '    Dim myExport As New ExportDelegate
-                '    resultData = myExport.ManageLISExportation(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.OrderTestID, False)
-                'End If
-                'AG 19/03/2013
-
-                '        If (Not resultData.HasError) Then
-                '            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                '        Else
-                '            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                '        End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateResults", EventLogEntryType.Error, False)
-
-            Finally
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Change experimental calibration for manual theoretical calibration factor
-        ''' Change manual theoretical calibration factor for the experimental calibration result
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzer"></param>
-        ''' <param name="pWorkSession"></param>
-        ''' <param name="pManualFactorFlag"></param>
-        ''' <param name="pFactorValue"></param>
-        ''' <param name="pExecutionID"> = -1 if called from WS Preparation screen</param>
-        ''' <param name="pOrderTestID"></param>
-        ''' <param name="pItemNumber"></param>
-        ''' <param name="pRerunNumber"> = -1 if called from WS Preparation screen</param>
-        ''' <returns>GlobalDataTo indicates if error or not</returns>
-        ''' <remarks>AG 09/11/2010
-        ''' AG 03/07/2012 - Running Cycles lost - Improvements!</remarks>
-        Public Function UpdateManualCalibrationFactor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
-                                                      ByVal pManualFactorFlag As Boolean, ByVal pFactorValue As Single, ByVal pExecutionID As Integer, _
-                                                      ByVal pOrderTestID As Integer, ByVal pItemNumber As Integer, ByVal pRerunNumber As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Try
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                '1st update the result (mark as ManualResultFlag = TRUE and the entered ManualFactorValue
-                Dim myResults As New ResultsDelegate
-                resultData = myResults.UpdateManualResult(dbConnection, pManualFactorFlag, "QUANTIVE", pFactorValue, "", pOrderTestID, pItemNumber, pRerunNumber)
-
-                If Not resultData.HasError Then
-                    If pExecutionID = -1 Then 'Special code for ManualFactor recalculations from WS Preparation screen
-                        With myRecalData
-                            .AnalyzerID = pAnalyzer
-                            .WorkSessionID = pWorkSession
-                            .Execution = pExecutionID
-                            .OrderTestID = pOrderTestID
-                            .RerunNumber = pRerunNumber
-                            .SampleClass = "CALIB"
-
-                            'Get TestID, SampleType from OrderTestID
-                            .TestID = 0
-                            .SampleType = ""
-                            Dim otDelegate As New OrderTestsDelegate
-                            resultData = otDelegate.GetOrderTest(dbConnection, pOrderTestID)
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myOtDS As New OrderTestsDS
-                                myOtDS = CType(resultData.SetDatos, OrderTestsDS)
-                                If myOtDS.twksOrderTests.Rows.Count > 0 Then
-                                    .TestID = myOtDS.twksOrderTests(0).TestID
-                                    .SampleType = myOtDS.twksOrderTests(0).SampleType
-                                End If
-                            End If
-
-                            'Add protection case
-                            If .TestID = 0 Or .SampleType = "" Then resultData.HasError = True
-
-                            .ExecutionType = "PREP_STD"
-                            .MaxItemsNumber = 1
-                            .MaxReplicates = 1
-                            .AcceptedResult = True
-                            .Initialized = True
-                        End With
-                    End If
-
-                    If Not resultData.HasError Then
-                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True, True)
-                    End If
-
-                End If
-
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                If (Not resultData.HasError) Then
-                    '            'When the Database Connection was opened locally, then the Commit is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                    resultData.SetDatos = True
-                Else
-                    '            'When the Database Connection was opened locally, then the Rollback is executed
-                    '            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                    '            resultData.SetDatos = False
-                End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)'AG 03/07/2012 - Running Cycles lost - Solution!
-
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.UpdateManualCalibrationFactor", EventLogEntryType.Error, False)
-            Finally
-                'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 03/07/2012 - Running Cycles lost - Solution!
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Starting with the informed recalculated execution (myRecalData.Execution) search his OrderTestID - RerunNumber
-        ''' Using these values (OrderTestID - RerunNumber) get the CLOSED executions belongs with the MAX(ReplicateNumber) and MAX(MultiItemNumber)
-        ''' Finally update myRecalData.Execution with this value
-        ''' 
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <returns>Error or not in a globaldatato</returns>
-        ''' <remarks>
-        ''' Created by AG 23/07/2010
-        ''' </remarks>
-        Private Function SearchLastClosedOrderTestIdExecution(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    Dim myOriginExecution = myRecalData.Execution
-                    Dim exe_delegate As New ExecutionsDelegate
-
-                    resultData = exe_delegate.GetClosedExecutionsRelated(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myOriginExecution, True)
-                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                        Dim myFinalExecution As Integer = 0
-                        Dim ex_DS As New ExecutionsDS
-                        ex_DS = CType(resultData.SetDatos, ExecutionsDS)
-                        If ex_DS.vwksWSExecutionsResults.Rows.Count > 0 Then
-                            myFinalExecution = ex_DS.vwksWSExecutionsResults(0).ExecutionID
-                        End If
-                        myRecalData.Execution = myFinalExecution
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.SearchLastClosedOrderTestIdExecution", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Initializes the re-calculation structures (global variable class myRecalData)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzer"></param>
-        ''' <param name="pWorkSession"></param>
-        ''' <param name="pExecution"></param>
-        ''' <returns>GlobalDataTo with error or not</returns>
-        ''' <remarks>
-        ''' Created by: AG 22/07/2010
-        ''' </remarks>
-        Private Function Init(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
-                              ByVal pExecution As Integer) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim exe_delegate As New ExecutionsDelegate
-
-                        resultData = exe_delegate.GetExecution(dbConnection, pExecution, pAnalyzer, pWorkSession)
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim ex_DS As New ExecutionsDS
-                            ex_DS = CType(resultData.SetDatos, ExecutionsDS)
-                            Dim ex_Status As String = ""
-                            If ex_DS.twksWSExecutions.Rows.Count > 0 Then
-                                If Not ex_DS.twksWSExecutions(0).IsExecutionStatusNull Then
-                                    ex_Status = ex_DS.twksWSExecutions(0).ExecutionStatus
-                                End If
-                            End If
-
-                            resultData = exe_delegate.GetClosedExecutionsRelated(dbConnection, pAnalyzer, pWorkSession, pExecution)
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myFinalExecution As Integer = 0
-                                ex_DS = CType(resultData.SetDatos, ExecutionsDS)
-                                If ex_DS.vwksWSExecutionsResults.Rows.Count > 0 Then
-                                    With myRecalData
-                                        .AnalyzerID = pAnalyzer
-                                        .WorkSessionID = pWorkSession
-                                        .Execution = pExecution
-                                        .OrderTestID = ex_DS.vwksWSExecutionsResults(0).OrderTestID
-                                        If Not ex_DS.vwksWSExecutionsResults(0).IsOrderTestStatusNull Then .OrderTestStatus = ex_DS.vwksWSExecutionsResults(0).OrderTestStatus 'AG 21/05/2012
-                                        .RerunNumber = ex_DS.vwksWSExecutionsResults(0).RerunNumber
-                                        .SampleClass = ex_DS.vwksWSExecutionsResults(0).SampleClass
-                                        .TestID = ex_DS.vwksWSExecutionsResults(0).TestID
-                                        .SampleType = ex_DS.vwksWSExecutionsResults(0).SampleType
-                                        .ExecutionType = ex_DS.vwksWSExecutionsResults(0).ExecutionType 'AG 26/11/2010
-
-                                        .MaxItemsNumber = (From a In ex_DS.vwksWSExecutionsResults Select a.MultiItemNumber).Max
-                                        .MaxReplicates = (From a In ex_DS.vwksWSExecutionsResults Select a.ReplicateNumber).Max
-                                        .AcceptedResult = True
-                                        .ExecutionStatus = ex_Status
-                                        .Initialized = True
-                                    End With
-
-                                    'Accepted result flag (only recalculate affected results if the changes blank or calibrator is the accepted one)
-                                    Dim res_delegate As New ResultsDelegate
-                                    resultData = res_delegate.GetResults(dbConnection, myRecalData.OrderTestID)
-                                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                        Dim res_DS As New ResultsDS
-                                        res_DS = CType(resultData.SetDatos, ResultsDS)
-                                        If res_DS.vwksResults.Rows.Count > 1 Then
-                                            myRecalData.AcceptedResult = (From a In res_DS.vwksResults _
-                                                                         Where a.RerunNumber = myRecalData.RerunNumber _
-                                                                         Select a.AcceptedResultFlag).First
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.Init", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -1141,11 +502,17 @@ Namespace Biosystems.Ax00.Calculations
         ''' Change the accepted result when there are several reruns. Apply to all Sample Classes excepting CONTROLS (for Controls it is 
         ''' possible to accept several Reruns)
         ''' </summary>
+        ''' <param name="pSelectedExecRow"></param>
+        ''' <param name="pExportStatus"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: SA 16/07/2012 - Based in ChangeAcceptedResult
+        ''' AG 16/10/2014 BA-2011
+        '''     Inform new required parameters + add pExportStatus parameter
+        '''     #1 Change Accepted result for a PATIENT or CONTROL do not launch RecalculateResultsNEW (but in case of PATIENTs recalculate affected calculated tests ExecuteCalculatedTest)
+        '''     #2 Set OrderToExport = TRUE when the new accepted result belongs a patient or a control and his export status is different than SENT
         ''' </remarks>
-        Public Function ChangeAcceptedResultNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow) As GlobalDataTO
+        Public Function ChangeAcceptedResultNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1165,11 +532,33 @@ Namespace Biosystems.Ax00.Calculations
 
                 If (Not resultData.HasError) Then
                     'For Results of STANDARD Tests, recalculate all Results affected for the new accepted Rerun
-                    If (pSelectedExecRow.TestType = "STD") Then
+                    'AG 16/10/2014 BA-2011 #2 Recalculate only for blank and calib
+                    'If (pSelectedExecRow.TestType = "STD") Then
+                    If (pSelectedExecRow.TestType = "STD") AndAlso (pSelectedExecRow.SampleClass = "BLANK" OrElse pSelectedExecRow.SampleClass = "CALIB") Then
                         'Recalculate all the affected Results - The row with all data of the Execution to recalculate is sent as selected 
                         'Execution and also as Execution to recalculate
+
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
                         resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, pSelectedExecRow, True, False)
                     End If
+
+
+                    'AG 16/10/2014 BA-2011 
+                    '#1 recalculate calculated tests
+                    If (pSelectedExecRow.SampleClass = "PATIENT") Then
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        myCalcTestsDelegate.AnalyzerID = pSelectedExecRow.AnalyzerID
+                        myCalcTestsDelegate.WorkSessionID = pSelectedExecRow.WorkSessionID
+                        resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, pSelectedExecRow.OrderTestID, True)
+                    End If
+
+                    '#2 set OrderToExport = TRUE (except if the test is not mapped)
+                    If (pSelectedExecRow.SampleClass = "CTRL" OrElse pSelectedExecRow.SampleClass = "PATIENT") AndAlso (pExportStatus <> "SENT") Then
+                        Dim orders_dlg As New OrdersDelegate
+                        resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , pSelectedExecRow.OrderTestID)
+                    End If
+                    'AG 16/10/2014 BA-2011
+
                 End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
@@ -1177,8 +566,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeAcceptedResultNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeAcceptedResultNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1197,6 +586,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO </returns>
         ''' <remarks>
         ''' Created by: SA 09/07/2012 - Based in ChangeInUseFlagReplicate
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
         ''' </remarks>
         Public Function ChangeInUseFlagReplicateNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                                     ByVal pNewInUseValue As Boolean) As GlobalDataTO
@@ -1236,14 +626,16 @@ Namespace Biosystems.Ax00.Calculations
                                 'Only for Calibrators, the experimental results are recovered
                                 If (pSelectedExecRow.SampleClass = "CALIB" AndAlso pSelectedExecRow.ExecutionType = "PREP_STD") Then
                                     Dim resultsDelegate As New ResultsDelegate
+                                    'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                                     resultData = resultsDelegate.UpdateManualResult(Nothing, False, "QUANTIVE", 1, "", pSelectedExecRow.OrderTestID, maxMultiItemNumber, _
-                                                                                    pSelectedExecRow.RerunNumber)
+                                                                                    pSelectedExecRow.RerunNumber, "NOTSENT")
                                 End If
                             End If
 
                             If (Not resultData.HasError) Then
                                 'Execute recalculations excluding the annuled Replicate
-                                resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, myExecutionsDS.vwksWSExecutionsResults.First, True)
+                                'AG 15/10/2014 BA-2011 inform the new required parameters
+                                resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, myExecutionsDS.vwksWSExecutionsResults.First, True, False)
                             End If
                         End If
 
@@ -1257,8 +649,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeInUseFlagReplicateNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeInUseFlagReplicateNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1279,17 +671,19 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by:  SA 09/07/2012 - Based in RecalculateResults
         ''' Modified by: SA 12/06/2014 - BT# 1660 ==> When the Result to recalculate is for an  ISETest/SampleType, new function RecalculateISEAverageValue is
         '''                                           called instead of the previous version function (RecalculateAverageValue)
+        '''              AG 15/10/2014 BA-2011 do not use optional parameters
+        '''              XB 28/11/2014 - recalculates calculated tests also for ISE tests - BA-1867
         ''' </remarks>
         Public Function RecalculateResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                               ByVal pExecToRecalculateRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pManualRecalculationFlag As Boolean, _
-                                              Optional ByVal pManualFactorEvent As Boolean = False) As GlobalDataTO
+                                              ByVal pManualFactorEvent As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Dim maxMultiItemNumber As Integer = pExecToRecalculateRow.MultiItemNumber
@@ -1309,13 +703,12 @@ Namespace Biosystems.Ax00.Calculations
                         If (pManualRecalculationFlag AndAlso Not pManualFactorEvent) Then
                             Dim myCalcDelegate As New CalculationsDelegate()
                             myCalcDelegate.AnalyzerModel = myAnalyzerModel
-
                             resultData = myCalcDelegate.CalculateExecutionNEW(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution, _
-                                                                              True, myRecalData.SampleClass, pManualRecalculationFlag)
+                                                                              True, myRecalData.SampleClass, pManualRecalculationFlag, Nothing)
                         End If
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Recalculate selected result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Recalculate selected result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                         StartTime = Now
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1337,14 +730,13 @@ Namespace Biosystems.Ax00.Calculations
                                     For Each ex_row As ExecutionsDS.twksWSExecutionsRow In executionsList.twksWSExecutions
                                         'Dim myCalcDelegate As New CalculationsDelegate()
                                         myCalcDelegate.AnalyzerModel = myAnalyzerModel
-
                                         resultData = myCalcDelegate.CalculateExecutionNEW(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, ex_row.ExecutionID, _
                                                                                           True, myRecalData.SampleClass, pManualRecalculationFlag, ex_row)
                                         If (resultData.HasError) Then Exit For
                                     Next
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Recalculate affected CALIBs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Recalculate affected CALIBs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1371,7 +763,7 @@ Namespace Biosystems.Ax00.Calculations
                                         Next
 
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        myLogAcciones.CreateLogActivity("Recalculate affected CTRLs and PATIENTs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                        GlobalBase.CreateLogActivity("Recalculate affected CTRLs and PATIENTs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                         "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                                         StartTime = Now
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1384,8 +776,18 @@ Namespace Biosystems.Ax00.Calculations
                 ElseIf (myRecalData.ExecutionType = "PREP_ISE" AndAlso myRecalData.ExecutionStatus = "CLOSED") Then
                     resultData = RecalculateISEAverageValue(Nothing, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution)
 
+                    ' XB 28/11/2014 - BA-1867
+                    ' recalculate calculated tests
+                    If (pSelectedExecRow.SampleClass = "PATIENT") Then
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        myCalcTestsDelegate.AnalyzerID = pSelectedExecRow.AnalyzerID
+                        myCalcTestsDelegate.WorkSessionID = pSelectedExecRow.WorkSessionID
+                        resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, pSelectedExecRow.OrderTestID, True)
+                    End If
+                    ' XB 28/11/2014 - BA-1867
+
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 End If
@@ -1395,8 +797,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateResultsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateResultsNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1413,6 +815,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 16/07/2012
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
         ''' </remarks>
         Public Function UpdateManualCalibrationFactorNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                                          ByVal pManualFactorFlag As Boolean, ByVal pFactorValue As Single) As GlobalDataTO
@@ -1422,9 +825,10 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 'Update the result setting ManualResultFlag = TRUE and ManualResult = the entered Factor value
                 Dim myResults As New ResultsDelegate
+                'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                 resultData = myResults.UpdateManualResult(Nothing, pManualFactorFlag, "QUANTIVE", pFactorValue, String.Empty, _
-                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber)
-                
+                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber, "NOTSENT")
+
                 If (Not resultData.HasError) Then
                     'Special code for ManualFactor recalculations from WS Preparation screen
                     If (pSelectedExecRow.ExecutionID = -1) Then
@@ -1446,6 +850,7 @@ Namespace Biosystems.Ax00.Calculations
                         End With
                     End If
 
+                    'AG 15/10/2014 BA-2011 inform the new required parameters
                     resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, pSelectedExecRow, True, True)
                 End If
                 resultData.SetDatos = (Not resultData.HasError)
@@ -1456,8 +861,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.UpdateManualCalibrationFactorNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.UpdateManualCalibrationFactorNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1518,347 +923,13 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.InitNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.InitNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
-#End Region
-
-#Region "NOT USED"
-        ''' <summary>
-        '''  IT IS REPLACED FOR NEW FUNCTION RecalculateISEAverageValue (BT #1660)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created By:AG 13/01/2011
-        ''' Modified By: TR 17/10/2011 -Correct the Exit Try.
-        '''              TR 23/01/2012 -Implement to show alarms on media value.    
-        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
-        ''' AG 25/06/2012 resultsDS inform also AnalyzerID, WorkSessionID
-        ''' AG 03/07/2012 - use the proper template (INSERT / UPDATE / DELETE)
-        '''              TR 19/07/2012 -Inform the sample class in to ResultsDS.
-        ''' </remarks>
-        Public Function RecalculateAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'Get the orderTest & rerun number
-                        Dim exec_delg As New ExecutionsDelegate
-                        resultData = exec_delg.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
-
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myDS As New ExecutionsDS
-                            myDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                            If myDS.twksWSExecutions.Rows.Count > 0 Then
-                                Dim myOT As Integer = myDS.twksWSExecutions(0).OrderTestID
-                                Dim myRerun As Integer = myDS.twksWSExecutions(0).RerunNumber
-                                'TR 19/07/2012 -Declare variable and set the sample class value.
-                                Dim mySampleClass As String = myDS.twksWSExecutions(0).SampleClass
-
-                                'Get the current Results row (OrderTestID - RerunNumber
-                                Dim results_del As New ResultsDelegate
-                                Dim res_DS As New ResultsDS
-                                resultData = results_del.ReadByOrderTestIDandRerunNumber(dbConnection, myOT, myRerun)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    res_DS = CType(resultData.SetDatos, ResultsDS)
-                                    'Else
-                                    '    Exit Try
-                                End If
-                                'TR 17/10/2011 -Implemented to avoid Exit Try
-                                If Not resultData.HasError Then
-                                    'Calculate OrderTestID - Rerun new average
-                                    resultData = GetAverageConcentrationValue(dbConnection, myOT, myRerun)
-                                    Dim myAverage As Single = 0
-                                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                        'Get the concentration value to calculate the the average.
-                                        myAverage = CType(resultData.SetDatos, Single)
-                                        'Else
-                                        '  Exit Try
-                                    End If
-                                    'AG 13/01/2011
-
-                                    'TR 17/10/2011 -Implemented to avoid Exit Try
-                                    If Not resultData.HasError Then
-                                        'update result into DS
-                                        If res_DS.twksResults.Rows.Count > 0 Then
-                                            res_DS.twksResults(0).BeginEdit()
-                                            res_DS.twksResults(0).CONC_Value = myAverage
-                                            res_DS.twksResults(0).AnalyzerID = pAnalyzerID
-                                            res_DS.twksResults(0).WorkSessionID = pWorkSessionID
-                                            res_DS.twksResults(0).SampleClass = mySampleClass 'TR 19/07/2012 -inform the sampleclass value.
-                                            res_DS.twksResults(0).AcceptChanges()
-
-                                            'Save results on result table.
-                                            resultData = results_del.SaveResults(dbConnection, res_DS)
-                                            If resultData.HasError Then Exit Try
-
-                                            'TR 12/12/2011 -Delete all related alarms before entering.
-                                            Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
-                                            resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, res_DS.twksResults(0).OrderTestID, _
-                                                                                          res_DS.twksResults(0).RerunNumber, res_DS.twksResults(0).MultiPointNumber)
-
-                                            'Proccess the Ref Ranges Alarm and insert into Ranges alarm.
-                                            resultData = IsValidISERefRanges(dbConnection, res_DS.twksResults(0).OrderTestID, myDS.twksWSExecutions(0).TestID, _
-                                                                             myDS.twksWSExecutions(0).SampleType, myAverage)
-
-                                            'TR 23/01/2012 -Move here
-                                            Dim myResultAlarmsDS As New ResultAlarmsDS
-                                            Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-                                            'TR 23/01/2012 -END.
-                                            If Not resultData.HasError Then
-                                                If Not CBool(resultData.SetDatos) Then
-                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
-                                                    'Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-
-                                                    myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                    myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
-                                                    myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
-                                                    myResultAlarmRow.MultiPointNumber = 1
-                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
-                                                    myResultAlarmRow.AlarmDateTime = Now
-                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-
-                                                End If
-                                                'TR 24/01/2012 -Search if there're any alarm for the current resutl to show.
-                                                If Not resultData.HasError Then
-                                                    Dim myResultExecutionsAlarmsDS As New WSExecutionAlarmsDS 'TR 24/01/2012
-                                                    Dim myTemExecutionDS As New ExecutionsDS
-                                                    Dim myExecutionDelegate As New ExecutionsDelegate
-                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
-                                                    Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
-
-                                                    resultData = myExecutionDelegate.GetByOrderTest(dbConnection, pWorkSessionID, pAnalyzerID, _
-                                                                                                    res_DS.twksResults(0).OrderTestID, res_DS.twksResults(0).MultiPointNumber)
-                                                    If Not resultData.HasError Then
-                                                        myTemExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                                        For Each execRow As ExecutionsDS.twksWSExecutionsRow In myTemExecutionDS.twksWSExecutions.Rows
-                                                            'Validate execution is in Use 
-                                                            If Not execRow.IsInUseNull AndAlso execRow.InUse Then
-                                                                'Get the execution alarm by the execution ID 
-                                                                resultData = myExecutionAlarmsDelegate.Read(dbConnection, execRow.ExecutionID)
-                                                                If Not resultData.HasError Then
-                                                                    myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
-                                                                    'myResultExecutionsAlarmsDS
-                                                                    For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString Then
-                                                                            'Before adding the row validate if not exist in curren Dataset
-                                                                            If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
-                                                                                                                               AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _
-                                                                                                                               AndAlso a.MultiPointNumber = res_DS.twksResults(0).MultiPointNumber _
-                                                                                                                               AndAlso a.AlarmID = ResultExeAlarmRow.AlarmID).Count > 0 Then
-
-                                                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                                                myResultAlarmRow.OrderTestID = myOT
-                                                                                myResultAlarmRow.RerunNumber = myRerun
-                                                                                myResultAlarmRow.MultiPointNumber = 1
-                                                                                myResultAlarmRow.AlarmID = ResultExeAlarmRow.AlarmID
-                                                                                myResultAlarmRow.AlarmDateTime = Now
-                                                                                myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-                                                                            End If
-
-                                                                        End If
-                                                                    Next
-                                                                End If
-                                                            End If
-
-                                                        Next
-                                                    End If
-                                                End If
-                                                'TR 24/01/2012 -END
-
-                                                If Not resultData.HasError Then
-                                                    'Insert. The Result alarms
-                                                    resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
-                                                End If
-                                            End If
-                                            'TR 12/12/2011 -END
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Validate if the concentration value is Between the Ref Ranges if APPLY.
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pOrderTestID"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <param name="pCONC_Value"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' CREATED BY: TR 05/12/2011
-        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
-        ''' AG 03/07/2012 - use the proper template (GET)
-        ''' </remarks>
-        Public Function IsValidISERefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
-                                             ByVal pTestID As Integer, ByVal pSampleType As String, ByVal pCONC_Value As Single) As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                Dim myResult As Boolean = True
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'Get the ISE TEST INFO 
-                        Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-                        Dim myISETestSampleDS As New ISETestSamplesDS
-                        resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
-
-                        If Not resultData.HasError Then
-                            myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
-
-                            If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-                                Dim myOrderTestsDelegate As New OrderTestsDelegate
-                                'Get the Reference Range Interval defined for the Test.
-                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
-                                                                                                pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-                                If Not resultData.HasError Then
-                                    'Validate the range
-                                    Dim myTestRefRangesDS As New TestRefRangesDS
-                                    myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                        If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
-                                           (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
-                                            If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
-                                               (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
-
-                                                myResult = False
-
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-                resultData.SetDatos = myResult
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-
-            Return resultData
-
-
-            'OLD CODE 03/07/2012
-            'Dim myGlobalDataTO As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
-            'Try
-            '    Dim myResult As Boolean = True
-            '    myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-            '    If (Not myGlobalDataTO.HasError) Then
-            '        dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-            '        If (Not dbConnection Is Nothing) Then
-            '            'Get the ISE TEST INFO 
-            '            Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-            '            Dim myISETestSampleDS As New ISETestSamplesDS
-            '            myGlobalDataTO = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
-
-            '            If Not myGlobalDataTO.HasError Then
-            '                myISETestSampleDS = DirectCast(myGlobalDataTO.SetDatos, ISETestSamplesDS)
-
-            '                If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-            '                    Dim myOrderTestsDelegate As New OrderTestsDelegate
-            '                    'Get the Reference Range Interval defined for the Test.
-            '                    myGlobalDataTO = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
-            '                                                                                    pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-            '                    If Not myGlobalDataTO.HasError Then
-            '                        'Validate the range
-            '                        Dim myTestRefRangesDS As New TestRefRangesDS
-            '                        myTestRefRangesDS = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
-
-            '                        If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-            '                            If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
-            '                               (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
-            '                                If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
-            '                                   (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
-
-            '                                    myResult = False
-
-            '                                End If
-            '                            End If
-            '                        End If
-            '                    End If
-            '                End If
-            '            End If
-            '        End If
-            '    End If
-            '    myGlobalDataTO.SetDatos = myResult
-
-            'Catch ex As Exception
-            '    myGlobalDataTO.HasError = True
-            '    myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-            '    myGlobalDataTO.ErrorMessage = ex.Message
-
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
-            'End Try
-            'Return myGlobalDataTO
-        End Function
-
 #End Region
     End Class
 End Namespace

@@ -1,11 +1,15 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IQCResultsReview
+Public Class UiQCResultsReview
 
 #Region "Declaration"
     Private currentLanguage As String = ""
@@ -40,7 +44,25 @@ Public Class IQCResultsReview
     End Property
 #End Region
 
-#Region "Methods"
+#Region "Public Methods"
+    ''' <summary>
+    ''' Reload the screen when auxiliary screen IQCCumulateControlsResults is closed
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  TR 02/07/2012
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Replaced current code by a call to function LoadScreen
+    ''' </remarks>
+    Public Sub ReloadScreen()
+        Try
+            LoadScreen(False)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReloadScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ReloadScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+#End Region
+
+#Region "Private Methods"
     ''' <summary>
     ''' Open the auxiliary screen that allow adding of new manual QC Results
     ''' </summary>
@@ -81,7 +103,7 @@ Public Class IQCResultsReview
                 Next
 
                 'Open the auxiliary screen to add new results
-                Using myManualQCResultForm As New IQCAddManualResultsAux
+                Using myManualQCResultForm As New UiQCAddManualResultsAux
                     myManualQCResultForm.LanguageID = currentLanguage
                     myManualQCResultForm.MaxRunNumber = myRunNumber + 1
                     myManualQCResultForm.DecimalAllowed = LocalDecimalAllow
@@ -160,8 +182,46 @@ Public Class IQCResultsReview
             ''Recalculate Results By Control/Lot after add the new Results 
             'BindResultsControlLot(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddResultValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' For the selected Test/SampleType, load QC data applying the specified criteria
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from Click event of SearchButton
+    ''' </remarks>
+    Private Sub ApplySearchCriteria()
+        Try
+            Me.Enabled = False
+            Cursor = Cursors.WaitCursor
+
+            If (bsTestSampleListView.SelectedItems.Count > 0) Then
+                If (Not ValidateErrorRequiredValues()) Then
+                    If (ChangeMade) Then
+                        SaveUpdatedValues(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), _
+                                          bsTestSampleListView.SelectedItems(0).SubItems(5).Text, _
+                                          CInt(bsTestSampleListView.SelectedItems(0).SubItems(3).Text), _
+                                          bsTestSampleListView.SelectedItems(0).SubItems(1).Text)
+                        ChangeMade = False
+                    End If
+
+                    'Clear previous filters
+                    PrevSelectedControlName.Clear()
+                    BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), False)
+                End If
+            End If
+
+            Cursor = Cursors.Default
+            Me.Enabled = True
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            Me.Enabled = True
+
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplySearchCriteria ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ApplySearchCriteria ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -197,12 +257,12 @@ Public Class IQCResultsReview
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     '** Bind Calculation Mode, Number of Series and Rejection Criteria...
                     bsCalculationModeCombo.SelectedValue = myHistoryTestSampleDS.tqcHistoryTestSamples(0).CalculationMode
-                    If (bsCalculationModeCombo.SelectedValue = "MANUAL") Then
+                    If (CStr(bsCalculationModeCombo.SelectedValue) = "MANUAL") Then
                         bsNumberOfSeriesNumeric.ResetText()
                     Else
-                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries
+                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries.ToString
                     End If
-                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria
+                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria.ToString
 
                     'Bind Multirules...
                     BindMultirulesControls(pQCTestSampleID)
@@ -351,7 +411,7 @@ Public Class IQCResultsReview
             'After binding all controls, set ChangeMade to false
             ChangeMade = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindCalculationCriteria ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindCalculationCriteria ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BindCalculationCriteria ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -415,7 +475,7 @@ Public Class IQCResultsReview
                 ShowMessage(Name & ".BindMultirulesControls ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindMultirulesControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindMultirulesControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BindMultirulesControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -531,7 +591,7 @@ Public Class IQCResultsReview
                 ShowMessage(Name & ".BindResultsControlLot ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindResultsControlLot ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindResultsControlLot ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BindResultsControlLot ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -553,7 +613,7 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlLotSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlLotSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlLotSelectedState", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -578,7 +638,7 @@ Public Class IQCResultsReview
             bsNumberOfSeriesNumeric.ResetText()
             bsRejectionNumeric.ResetText()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ClearControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ClearControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ClearControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -634,7 +694,7 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelecteQCResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelecteQCResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteSelecteQCResultValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -649,7 +709,7 @@ Public Class IQCResultsReview
     Private Sub EditResultValues()
         Try
             If (bsResultsDetailsGridView.SelectedRows.Count = 1) Then
-                Using myQCResultEdition As New IQCResultsEditionAux()
+                Using myQCResultEdition As New UiQCResultsEditionAux()
                     Dim myResultInformationDS As New ResultInformationDS
                     Dim myResultInformationRow As ResultInformationDS.tResultInformationRow
 
@@ -667,11 +727,11 @@ Public Class IQCResultsReview
                     myResultInformationRow.RunsGroupNumber = CInt(bsResultControlLotGridView.SelectedRows(0).Cells("RunsGroupNumber").Value)
                     myResultInformationRow.NumberOfSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("RunNumber").Value)
                     myResultInformationRow.CalNumberSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("CalcRunNumber").Value)
-                    myResultInformationRow.ResultValue = CDbl(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
+                    myResultInformationRow.ResultValue = CSng(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
                     myResultInformationRow.Excluded = CBool(bsResultsDetailsGridView.SelectedRows(0).Cells("Excluded").Value)
 
                     If (Not bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value Is DBNull.Value) Then
-                        myResultInformationRow.ResultComment = bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value
+                        myResultInformationRow.ResultComment = CStr(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value)
                     End If
                     myResultInformationRow.ManualResultValue = 0
                     myResultInformationDS.tResultInformation.AddtResultInformationRow(myResultInformationRow)
@@ -685,7 +745,7 @@ Public Class IQCResultsReview
                 BindResultsControlLot(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditResultValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -727,7 +787,7 @@ Public Class IQCResultsReview
 
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EnableDisableControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -761,7 +821,7 @@ Public Class IQCResultsReview
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillCalculationModeCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillCalculationModeCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillCalculationModeCombo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -806,9 +866,9 @@ Public Class IQCResultsReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.TestID))
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.DecimalsAllowed))
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -819,7 +879,7 @@ Public Class IQCResultsReview
                 ShowMessage(Name & ".FillTestSampleListView ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestSampleListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestSampleListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillTestSampleListView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -892,7 +952,7 @@ Public Class IQCResultsReview
                 bsDeleteButtom.Enabled = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FilterQCResultsBySelectedControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FilterQCResultsBySelectedControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FilterQCResultsBySelectedControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -922,7 +982,7 @@ Public Class IQCResultsReview
                 ShowMessage(Name & ".GetMaxRunNumber ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMaxRunNumber ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMaxRunNumber ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetMaxRunNumber ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myMaxRunNumber
@@ -957,7 +1017,7 @@ Public Class IQCResultsReview
                 ShowMessage(Name & ".GetNonCumulateResultForAllControls ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetNonCumulateResultForAllControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetNonCumulateResultForAllControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetNonCumulateResultForAllControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -987,7 +1047,7 @@ Public Class IQCResultsReview
             bsControlLotResultsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Results", pLanguageID)
             bsIndividualResultDetLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Individual_Results", pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1001,8 +1061,8 @@ Public Class IQCResultsReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             PrepareButtons(currentLanguage)
@@ -1012,7 +1072,7 @@ Public Class IQCResultsReview
             FillCalculationModeCombo()
             SetQCLimits()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1035,8 +1095,111 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsMultirulesApplicationEqual ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsMultirulesApplicationEqual ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IsMultirulesApplicationEqual ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' When a new Test/SampleType is selected, get and load all non-cumulated QC Results for all linked Control/Lots
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from SelectedIndexChanged event of the ListView containing the Tests/SampleTypes.
+    '''                                          Disable the screen and show the hourglass cursor while details areas are beign loaded 
+    ''' </remarks>
+    Private Sub LoadDataOfSelectedTestSample()
+        Try
+            If (bsTestSampleListView.SelectedItems.Count = 1) Then
+                Me.Enabled = False
+                Cursor = Cursors.WaitCursor
+
+                LoadingData = True
+
+                'Clean previous filter control; clean the Error Provider control
+                PrevSelectedControlName.Clear()
+                bsResultErrorProv.Clear()
+
+                'Set the decimals allowed to my local variable to format numeric values
+                LocalDecimalAllow = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
+                BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), True)
+                LoadingData = False
+
+                Me.Enabled = True
+                Cursor = Cursors.Default
+            Else
+                'TR 23/07/2012 - If there is not a Test/SampleType selected in the list, then all Controls are cleared
+                ClearControls()
+            End If
+        Catch ex As Exception
+            Me.Enabled = True
+            Cursor = Cursors.Default
+
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfSelectedTestSample ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".LoadDataOfSelectedTestSample ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Initialize and configure all Screen controls and load data for the first Test/Sample Type in the list when the 
+    ''' screen is opened
+    ''' </summary>
+    ''' <param name="pInitialScreenLoad">True if the method is called for initial screen loading; False if the method is 
+    '''                                  called to refresh the screen after closing the auxiliary screen of Cumulate Control Results</param>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from the Screen Load Event
+    ''' </remarks>
+    Private Sub LoadScreen(ByVal pInitialScreenLoad As Boolean)
+        Try
+            InitializeScreen()
+            FillTestSampleListView()
+
+            If (pInitialScreenLoad) Then
+                'TR 20/04/2012 - Get level of the connected User
+                'Dim myGlobalbase As New GlobalBase
+                CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
+            End If
+
+            If (bsTestSampleListView.Items.Count = 0) Then
+                'Disable screen controls
+                EnableDisableControls(False)
+
+                bsAddButtom.Enabled = False
+                bsEditButtom.Enabled = False
+                bsDeleteButtom.Enabled = False
+                bsGraphsButton.Enabled = False
+            Else
+                If (pInitialScreenLoad) Then
+                    If (QCTestSampleIDAttribute > 0) Then
+                        'Select the Test/SampleType on the ListView
+                        SelectQCTestSampleID(QCTestSampleIDAttribute)
+                    Else
+                        'Select the first Test/SampleType on the ListView
+                        bsTestSampleListView.Items(0).Selected = True
+                    End If
+                Else
+                    'Select the first Test/SampleType on the ListView
+                    bsTestSampleListView.Items(0).Selected = True
+                End If
+
+                'Enable screen controls
+                EnableDisableControls(True)
+
+                bsAddButtom.Enabled = True
+                bsEditButtom.Enabled = True
+                bsDeleteButtom.Enabled = True
+                bsGraphsButton.Enabled = True
+
+                'TR 20/04/2012 - Validate the user level to activate/desactivate functionalities
+                If (pInitialScreenLoad) Then ScreenStatusByUserLevel()
+            End If
+
+            If (pInitialScreenLoad) Then
+                ResetBorder()
+                Application.DoEvents()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".LoadScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1057,60 +1220,60 @@ Public Class IQCResultsReview
             'SEARCH Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsSearchButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Search", pLanguageID))
             End If
 
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsAddButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsAddButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsAddButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsEditButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_EDIT", pLanguageID))
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsDeleteButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'LJ & YOUDEN GRAPHS Button
             auxIconName = GetIconName("ABS_GRAPH")
             If (auxIconName <> "") Then
-                bsGraphsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsGraphsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsGraphsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Graph", pLanguageID))
             End If
 
             'CUMULATE RESULTS Button
             auxIconName = GetIconName("QCCUM")
             If (auxIconName <> "") Then
-                bsCumulateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCumulateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsCumulateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Cumulate_Results", pLanguageID))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1124,7 +1287,10 @@ Public Class IQCResultsReview
     ''' Modified by: SA 30/11/2011 - Added three new visible columns for Calculated values of Mean, SD and CV. Added
     '''                              a dummy column to separate the assigned values and the result values     
     '''              SA 25/01/2012 - Column LotNumber is deleted due to column ControlName will shown ControlName (LotNumber)     
-    '''                              Changed labels used for columns containing calculated Mean, SD and CV                  
+    '''                              Changed labels used for columns containing calculated Mean, SD and CV         
+    '''              JC 12/11/2012 - Added columns Mean, CV and CalcCV     
+    '''              SA 12/11/2014 - BA-1885 ==> Extend the width of column "n" to allow show numbers of three digits. Reduce width
+    '''                                          of columns CalcMean and CalcSD proportionally
     ''' </remarks>
     Private Sub PrepareResultControlLotGrid(ByVal pLanguageID As String)
         Try
@@ -1154,7 +1320,6 @@ Public Class IQCResultsReview
             bsResultControlLotGridView.Columns("ControlName").ReadOnly = True
 
             'Assigned Mean for the Test/SampleType and Control/Lot
-            ' JC 12/11/2012
             bsResultControlLotGridView.Columns.Add("Mean", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pLanguageID))
             bsResultControlLotGridView.Columns("Mean").Width = 50
             bsResultControlLotGridView.Columns("Mean").DataPropertyName = "Mean"
@@ -1186,7 +1351,6 @@ Public Class IQCResultsReview
             bsResultControlLotGridView.Columns("SD").ReadOnly = True
 
             'Assigned Coefficient of Variation for the Test/SampleType and Control/Lot
-            ' JC 12/11/2012
             bsResultControlLotGridView.Columns.Add("CV", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CV", pLanguageID))
             bsResultControlLotGridView.Columns("CV").Width = 45
             bsResultControlLotGridView.Columns("CV").DataPropertyName = "CV"
@@ -1213,7 +1377,7 @@ Public Class IQCResultsReview
 
             'Number of open QC Results (not included in the statistical calculation of the Mean) for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("n", "n")
-            bsResultControlLotGridView.Columns("n").Width = 25
+            bsResultControlLotGridView.Columns("n").Width = 35
             bsResultControlLotGridView.Columns("n").DataPropertyName = "n"
             bsResultControlLotGridView.Columns("n").HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
             bsResultControlLotGridView.Columns("n").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
@@ -1223,7 +1387,7 @@ Public Class IQCResultsReview
             'Additional columns to show Mean, SD and CV calculated from all obtained open QC Results
             'Calculated Mean of open QC Results for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("CalcMean", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pLanguageID))
-            bsResultControlLotGridView.Columns("CalcMean").Width = 50
+            bsResultControlLotGridView.Columns("CalcMean").Width = 45
             bsResultControlLotGridView.Columns("CalcMean").DataPropertyName = "CalcMean"
             bsResultControlLotGridView.Columns("CalcMean").DefaultCellStyle.NullValue = Nothing
             bsResultControlLotGridView.Columns("CalcMean").SortMode = DataGridViewColumnSortMode.NotSortable
@@ -1234,7 +1398,7 @@ Public Class IQCResultsReview
 
             'Assigned Standard Deviation for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("CalcSD", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", pLanguageID))
-            bsResultControlLotGridView.Columns("CalcSD").Width = 55
+            bsResultControlLotGridView.Columns("CalcSD").Width = 50
             bsResultControlLotGridView.Columns("CalcSD").DataPropertyName = "CalcSD"
             bsResultControlLotGridView.Columns("CalcSD").DefaultCellStyle.NullValue = Nothing
             bsResultControlLotGridView.Columns("CalcSD").SortMode = DataGridViewColumnSortMode.NotSortable
@@ -1244,7 +1408,6 @@ Public Class IQCResultsReview
             bsResultControlLotGridView.Columns("CalcSD").ReadOnly = True
 
             'Assigned Coefficient of Variation for the Test/SampleType and Control/Lot
-            ' JC 12/11/2012
             bsResultControlLotGridView.Columns.Add("CalcCV", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CV", pLanguageID))
             bsResultControlLotGridView.Columns("CalcCV").Width = 50
             bsResultControlLotGridView.Columns("CalcCV").DataPropertyName = "CalcCV"
@@ -1271,7 +1434,7 @@ Public Class IQCResultsReview
             bsResultControlLotGridView.Columns("LastMeanRunNumber").DataPropertyName = "LastMeanRunNumber"
             bsResultControlLotGridView.Columns("LastMeanRunNumber").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultControlLotGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultControlLotGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareResultControlLotGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1412,7 +1575,7 @@ Public Class IQCResultsReview
             bsResultsDetailsGridView.Columns("RELError").DataPropertyName = "RELError"
             bsResultsDetailsGridView.Columns("RELError").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultDetailsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareResultDetailsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareResultDetailsGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1430,9 +1593,9 @@ Public Class IQCResultsReview
             Dim myTestIconList As New ImageList
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            myTestIconList.Images.Add("TESTICON", Image.FromFile(MyBase.IconsPath & GetIconName("TESTICON")))
-            myTestIconList.Images.Add("USERTEST", Image.FromFile(MyBase.IconsPath & GetIconName("USERTEST")))
-            myTestIconList.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
+            myTestIconList.Images.Add("TESTICON", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TESTICON")))
+            myTestIconList.Images.Add("USERTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("USERTEST")))
+            myTestIconList.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
 
             bsTestSampleListView.Items.Clear()
             bsTestSampleListView.Scrollable = True
@@ -1449,8 +1612,60 @@ Public Class IQCResultsReview
             bsTestSampleListView.Columns.Add(myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TestNames", pLanguageID), 168, HorizontalAlignment.Left)
             bsTestSampleListView.Columns.Add("", 50, HorizontalAlignment.Center)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestListView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Set elements to Nothing to release memory when the screen is closed
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub ReleaseElements()
+        Try
+            bsTestSampleListView = Nothing
+            bsTestSampleGroupBox = Nothing
+            bsTestSampleTypeLabel = Nothing
+            bsCalculationCriteriaGroupBox = Nothing
+            bsDateFromDateTimePick = Nothing
+            bsDateFromLabel = Nothing
+            bsCalculationCriteriaLabel = Nothing
+            bsMultirulesApplication2Combo = Nothing
+            bsMultirulesApplication1Combo = Nothing
+            bsMultirulesApplicationLabel = Nothing
+            bsDateToDateTimePick = Nothing
+            bsDateToLabel = Nothing
+            bsNumberOfSeriesNumeric = Nothing
+            bsSearchButton = Nothing
+            bsCalculationModeCombo = Nothing
+            bsCalculationModeLabel = Nothing
+            bsRejectionNumeric = Nothing
+            bsRejectionLabel = Nothing
+            bsRulesGroupbox = Nothing
+            bs22SCheckBox = Nothing
+            bs13SCheckBox = Nothing
+            bs12SCheckBox = Nothing
+            bsSDLabel = Nothing
+            bs10XmCheckBox = Nothing
+            bsR4SCheckBox = Nothing
+            bsExitButton = Nothing
+            bs41SCheckBox = Nothing
+            bsResultsByCtrlGroupBox = Nothing
+            bsControlLotLabel = Nothing
+            bsResultControlLotGridView = Nothing
+            bsResultsDetailsGridView = Nothing
+            bsIndividualResultDetLabel = Nothing
+            bsResultErrorProv = Nothing
+            bsDeleteButtom = Nothing
+            bsAddButtom = Nothing
+            bsEditButtom = Nothing
+            bsCumulateButton = Nothing
+            bsPrintButton = Nothing
+            bsGraphsButton = Nothing
+            bsControlLotResultsLabel = Nothing
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1490,13 +1705,10 @@ Public Class IQCResultsReview
                 If (bsMultirulesApplication2Combo.Enabled) Then myQCControlLotIDForWESG2 = bsMultirulesApplication2Combo.SelectedValue.ToString()
 
                 '** Used to update the Parameters Programming table
-                'myTestSampleMultirulesDS = UpdateTestSampleMultiRules(pTestID, pSampleType)
                 myTestSampleMultirulesDS = UpdateTestSampleMultiRules(pTestType, pTestID, pSampleType)
             End If
 
             'Finally execute the updates
-            'myGlobalDataTO = myQCResultsDelegate.UpdateChangedValues(Nothing, pQCTestSampleID, mycalcMode, myNumSeries, myRejecNumeric, _
-            '                                                         myQCControlLotIDForWESG1, myQCControlLotIDForWESG2, myTestSampleMultirulesDS)
             myGlobalDataTO = myQCResultsDelegate.UpdateChangedValuesNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute, mycalcMode, myNumSeries, myRejecNumeric, _
                                                                         myQCControlLotIDForWESG1, myQCControlLotIDForWESG2, myTestSampleMultirulesDS)
             If (myGlobalDataTO.HasError) Then
@@ -1505,7 +1717,7 @@ Public Class IQCResultsReview
             End If
         Catch ex As Exception
             myResult = False
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveUpdatedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveUpdatedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveUpdatedValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -1528,7 +1740,7 @@ Public Class IQCResultsReview
                     Exit Select
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1551,7 +1763,7 @@ Public Class IQCResultsReview
             End If
             myItemList = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SelectTestSampleID ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SelectTestSampleID ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SelectTestSampleID ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1607,7 +1819,7 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetQCLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetQCLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetQCLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1632,7 +1844,6 @@ Public Class IQCResultsReview
             Dim myTestSampleMultiDelegate As New TestSamplesMultirulesDelegate
 
             'Get the status of the Westgard Multirules for the selected Test/SampleType in DB
-            'myGlobalDataTO = myTestSampleMultiDelegate.GetByTestIDAndSampleType(Nothing, pTestID, pSampleType)
             myGlobalDataTO = myTestSampleMultiDelegate.GetByTestIDAndSampleTypeNEW(Nothing, pTestType, pTestID, pSampleType)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 myTestSampleMultirulesDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesMultirulesDS)
@@ -1677,7 +1888,7 @@ Public Class IQCResultsReview
                 ShowMessage(Me.Name & ".UpdateTestSampleMultiRules ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTestSampleMultiRules " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTestSampleMultiRules " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateTestSampleMultiRules ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myTestSampleMultirulesDS
@@ -1697,7 +1908,7 @@ Public Class IQCResultsReview
                     Where Not a.IsSelectedNull AndAlso a.Selected _
                        Select a).Count <= 3)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateActiveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateActiveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateActiveControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -1735,7 +1946,7 @@ Public Class IQCResultsReview
                 ValidationError = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateErrorRequiredValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateErrorRequiredValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateErrorRequiredValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return ValidationError
@@ -1767,61 +1978,9 @@ Public Class IQCResultsReview
                 ChangeMade = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValuesChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValuesChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValuesChanges ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-    End Sub
-
-    Private Sub ReleaseElements()
-
-        Try
-            '--- Detach variable defined using WithEvents ---
-            bsTestSampleListView = Nothing
-            bsTestSampleGroupBox = Nothing
-            bsTestSampleTypeLabel = Nothing
-            bsCalculationCriteriaGroupBox = Nothing
-            bsDateFromDateTimePick = Nothing
-            bsDateFromLabel = Nothing
-            bsCalculationCriteriaLabel = Nothing
-            bsMultirulesApplication2Combo = Nothing
-            bsMultirulesApplication1Combo = Nothing
-            bsMultirulesApplicationLabel = Nothing
-            bsDateToDateTimePick = Nothing
-            bsDateToLabel = Nothing
-            bsNumberOfSeriesNumeric = Nothing
-            bsSearchButton = Nothing
-            bsCalculationModeCombo = Nothing
-            bsCalculationModeLabel = Nothing
-            bsRejectionNumeric = Nothing
-            bsRejectionLabel = Nothing
-            bsRulesGroupbox = Nothing
-            bs22SCheckBox = Nothing
-            bs13SCheckBox = Nothing
-            bs12SCheckBox = Nothing
-            bsSDLabel = Nothing
-            bs10XmCheckBox = Nothing
-            bsR4SCheckBox = Nothing
-            bsExitButton = Nothing
-            bs41SCheckBox = Nothing
-            bsResultsByCtrlGroupBox = Nothing
-            bsControlLotLabel = Nothing
-            bsResultControlLotGridView = Nothing
-            bsResultsDetailsGridView = Nothing
-            bsIndividualResultDetLabel = Nothing
-            bsResultErrorProv = Nothing
-            bsDeleteButtom = Nothing
-            bsAddButtom = Nothing
-            bsEditButtom = Nothing
-            bsCumulateButton = Nothing
-            bsPrintButton = Nothing
-            bsGraphsButton = Nothing
-            bsControlLotResultsLabel = Nothing
-            '-----------------------------------------------
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-
     End Sub
 
 #End Region
@@ -1848,63 +2007,27 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCResultsReview_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IQCResultsReview_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IQCResultsReview_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Load screen event
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  TR
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Code for the event Shown has been moved to this event to avoid show the screen while it is 
+    '''                                          still loading (the time needed for loading can be larger now due to until 300 results by Control/Lot
+    '''                                          are allowed). Additionally, new function LoadScreen has been created and the final code has been
+    '''                                          moved to it. 
+    ''' </remarks>
     Private Sub QCResultsReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            InitializeScreen()
-            FillTestSampleListView()
-
-            'TR 20/04/2012 - Get level of the connected User
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-
-            If (bsTestSampleListView.Items.Count = 0) Then
-                'Disable screen controls
-                EnableDisableControls(False)
-
-                bsAddButtom.Enabled = False
-                bsEditButtom.Enabled = False
-                bsDeleteButtom.Enabled = False
-                bsGraphsButton.Enabled = False
-            Else
-                'Enable screen controls
-                EnableDisableControls(True)
-
-                bsAddButtom.Enabled = True
-                bsEditButtom.Enabled = True
-                bsDeleteButtom.Enabled = True
-                bsGraphsButton.Enabled = True
-            End If
-
-            ResetBorder()
-            Application.DoEvents()
+            LoadScreen(True)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultsReview_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultsReview_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QCResultsReview_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    Private Sub QCResultsReview_Shown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Shown
-        Try
-            If (bsTestSampleListView.Items.Count > 0) Then
-                If (QCTestSampleIDAttribute > 0) Then
-                    'Select the Test/SampleType on the ListView
-                    SelectQCTestSampleID(QCTestSampleIDAttribute)
-                Else
-                    'Select the first Test/SampleType on the ListView
-                    bsTestSampleListView.Items(0).Selected = True
-                End If
-
-                'TR 20/04/2012 - Validate the user level to activate/desactivate functionalities
-                ScreenStatusByUserLevel()
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultsReview_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".QCResultsReview_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1918,7 +2041,7 @@ Public Class IQCResultsReview
                 ChangeMade = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddButtom_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1927,7 +2050,7 @@ Public Class IQCResultsReview
         Try
             EditResultValues()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditButtom_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1936,14 +2059,14 @@ Public Class IQCResultsReview
         Try
             DeleteSelecteQCResultValues()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteButtom_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteButtom_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub CumulateButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCumulateButton.Click
         Try
-            Dim myCumulateForm As New IQCCumulateControlResults
+            Dim myCumulateForm As New UiQCCumulateControlResults
             myCumulateForm.MdiParent = Me.MdiParent
             myCumulateForm.AnalyzerID = AnalyzerIDAttribute
             myCumulateForm.IQCResultReviewGone = True
@@ -1952,7 +2075,7 @@ Public Class IQCResultsReview
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CumulateButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CumulateButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CumulateButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1964,40 +2087,34 @@ Public Class IQCResultsReview
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
+    ''' <summary>
+    ''' For the selected Test/SampleType, load QC data applying the specified criteria
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Disable the screen and show the hourglass cursor while details areas are beign loaded
+    '''                                          Code moved to a new method ApplySearchCriteria
+    ''' </remarks>
     Private Sub SearchButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSearchButton.Click
         Try
-            If (bsTestSampleListView.SelectedItems.Count > 0) Then
-                If (Not ValidateErrorRequiredValues()) Then
-                    If (ChangeMade) Then
-                        SaveUpdatedValues(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), _
-                                          bsTestSampleListView.SelectedItems(0).SubItems(5).Text, _
-                                          CInt(bsTestSampleListView.SelectedItems(0).SubItems(3).Text), _
-                                          bsTestSampleListView.SelectedItems(0).SubItems(1).Text)
-                        ChangeMade = False
-                    End If
-
-                    'Clear prev. filter Control.
-                    PrevSelectedControlName.Clear()
-                    BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), False)
-                End If
-            End If
+            ApplySearchCriteria()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub GraphsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsGraphsButton.Click
         Try
-            Using myIQCGraph As New IQCGraphs
+            Using myIQCGraph As New UiQCGraphs
                 myIQCGraph.DateTo = bsDateToDateTimePick.Value
                 myIQCGraph.DateFrom = bsDateFromDateTimePick.Value
                 myIQCGraph.TestSampleID = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
@@ -2006,7 +2123,7 @@ Public Class IQCResultsReview
                 myIQCGraph.DecimalAllowed = LocalDecimalAllow
                 myIQCGraph.TestName = bsTestSampleListView.SelectedItems(0).SubItems(0).Text
                 myIQCGraph.SampleType = bsTestSampleListView.SelectedItems(0).SubItems(1).Text
-                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value.ToString()
+                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value
 
                 myIQCGraph.ShowDialog()
 
@@ -2014,8 +2131,27 @@ Public Class IQCResultsReview
                 FilterQCResultsBySelectedControls(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text))
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GraphsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GraphsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GraphsButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
+        Try
+            If (bsTestSampleListView.SelectedItems.Count = 1) AndAlso (Not bsResultControlLotGridView.DataSource Is Nothing) AndAlso _
+               (Not bsResultsDetailsGridView.DataSource Is Nothing) Then
+                Dim testSampleId As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
+                Dim decAllow As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
+
+                Cursor = Cursors.WaitCursor
+                XRManager.ShowQCIndividualResultsByTestReport(testSampleId, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
+                                                              LocalOpenQCResultsDS, LocalQCResultsDS, decAllow, REPORT_QC_GRAPH_TYPE.NO_GRAPH)
+                Cursor = Cursors.Default
+            End If
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -2031,30 +2167,24 @@ Public Class IQCResultsReview
                 e.NewWidth = 50
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestSampleListView_ColumnWidthChanging ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestSampleListView_ColumnWidthChanging ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestSampleListView_ColumnWidthChanging ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
+    ''' <summary>
+    ''' When a new Test/SampleType is selected in the ListView, load its QC data
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Disable the screen and show the hourglass cursor while details areas are beign loaded
+    '''                                          Code moved to a new method LoadDataOfSelectedTestSample
+    ''' </remarks>
     Private Sub TestSampleListView_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTestSampleListView.SelectedIndexChanged
         Try
-            If (bsTestSampleListView.SelectedItems.Count = 1) Then
-                LoadingData = True
-
-                'Clean previous filter control; clean the Error Provider control
-                PrevSelectedControlName.Clear()
-                bsResultErrorProv.Clear()
-
-                'Set the decimals allowed to my local variable to format numeric values
-                LocalDecimalAllow = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
-                BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), True)
-                LoadingData = False
-            Else
-                'TR 23/07/2012 -If not selected element on the list the clear controls
-                ClearControls()
-            End If
+            LoadDataOfSelectedTestSample()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestSampleListView_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestSampleListView_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestSampleListView_SelectedIndexChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2071,7 +2201,7 @@ Public Class IQCResultsReview
             End If
             ValuesChanges()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DateFromDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DateFromDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DateFromDateTimePick_ValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2083,7 +2213,7 @@ Public Class IQCResultsReview
                 IsMultirulesApplicationEqual(DirectCast(sender, BSComboBox).Name)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultirulesApplicationCombo_SelectedValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultirulesApplicationCombo_SelectedValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".MultirulesApplicationCombo_SelectedValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2102,7 +2232,7 @@ Public Class IQCResultsReview
         Try
             ValuesChanges()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Controls_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Controls_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Controls_ValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2121,7 +2251,7 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculationModeCombo_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculationModeCombo_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalculationModeCombo_SelectedIndexChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2134,7 +2264,7 @@ Public Class IQCResultsReview
                 bsNumberOfSeriesNumeric.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".NumberOfSeriesNumeric_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".NumberOfSeriesNumeric_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".NumberOfSeriesNumeric_Validating ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2147,7 +2277,7 @@ Public Class IQCResultsReview
                 bsRejectionNumeric.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RejectionNumeric_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RejectionNumeric_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RejectionNumeric_Validating ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2178,7 +2308,7 @@ Public Class IQCResultsReview
                 e.CellStyle.BackColor = SystemColors.MenuBar
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultControlLotGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultControlLotGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultControlLotGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2194,14 +2324,19 @@ Public Class IQCResultsReview
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultControlLotGridView_CellValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultControlLotGridView_CellValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultControlLotGridView_CellValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub ResultControlLotGridView_CurrentCellDirtyStateChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
                                                                       Handles bsResultControlLotGridView.CurrentCellDirtyStateChanged
-        ChangeControlLotSelectedState()
+        Try
+            ChangeControlLotSelectedState()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultControlLotGridView_CurrentCellDirtyStateChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ResultControlLotGridView_CurrentCellDirtyStateChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
     End Sub
 
     '*********************************************
@@ -2216,7 +2351,7 @@ Public Class IQCResultsReview
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_CellDoubleClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_CellDoubleClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultsDetailsGridView_CellDoubleClick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2228,7 +2363,7 @@ Public Class IQCResultsReview
                 Dim file As String = e.Value.ToString()
 
                 If (System.IO.File.Exists(file)) Then
-                    e.Value = Image.FromFile(file)
+                    e.Value = ImageUtilities.ImageFromFile(file)
                 Else
                     e.Value = Nothing
                 End If
@@ -2269,7 +2404,7 @@ Public Class IQCResultsReview
                           DirectCast(e.Value, DateTime).ToString(SystemInfoManager.OSLongTimeFormat).ToString()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultsDetailsGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2278,7 +2413,7 @@ Public Class IQCResultsReview
         Try
             If (e.KeyCode = Keys.Delete) Then DeleteSelecteQCResultValues()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultsDetailsGridView_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2294,62 +2429,10 @@ Public Class IQCResultsReview
                 bsEditButtom.Enabled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsDetailsGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResultsDetailsGridView_RowEnter ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 #End Region
-
-    ''' <summary>
-    ''' Reload the scree when closign IQCCumulateControlsResults.
-    ''' </summary>
-    ''' <remarks>CREATED BY: TR 02/07/2012</remarks>
-    Public Sub ReloadScreen()
-        Try
-            InitializeScreen()
-            FillTestSampleListView()
-
-            If (bsTestSampleListView.Items.Count = 0) Then
-                'Disable screen controls
-                EnableDisableControls(False)
-
-                bsAddButtom.Enabled = False
-                bsEditButtom.Enabled = False
-                bsDeleteButtom.Enabled = False
-                bsGraphsButton.Enabled = False
-            Else
-                'Enable screen controls
-                EnableDisableControls(True)
-
-                bsAddButtom.Enabled = True
-                bsEditButtom.Enabled = True
-                bsDeleteButtom.Enabled = True
-                bsGraphsButton.Enabled = True
-                'Select the first element on the listview.
-                bsTestSampleListView.Items(0).Selected = True
-
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReloadScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ReloadScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
-        Try
-            If bsTestSampleListView.SelectedItems.Count = 1 AndAlso _
-               bsResultControlLotGridView.DataSource IsNot Nothing AndAlso _
-               bsResultsDetailsGridView.DataSource IsNot Nothing Then
-                Dim testSampleId As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
-                Dim decAllow As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
-
-                XRManager.ShowQCIndividualResultsByTestReport(testSampleId, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
-                                                              LocalOpenQCResultsDS, LocalQCResultsDS, decAllow, REPORT_QC_GRAPH_TYPE.NO_GRAPH)
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
 End Class
 

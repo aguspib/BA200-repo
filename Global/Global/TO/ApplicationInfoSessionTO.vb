@@ -4,6 +4,8 @@ Option Strict On
 
 #Region "Libraries Used by this Class"
 Imports System
+Imports Biosystems.Ax00.Global.GlobalEnumerates
+
 #End Region
 
 Namespace Biosystems.Ax00.Global.TO
@@ -24,6 +26,7 @@ Namespace Biosystems.Ax00.Global.TO
         Private activateSystemLogAttribute As Boolean
         Private applicationIconPathAttribute As String
         Private maxTestsNumberAttribute As Integer 'TR 29/03/2012
+        Private userLevelEnumAttribute As USER_LEVEL 'IT 18/09/2014 #BA-1946
 #End Region
 
 #Region "Properties"
@@ -81,6 +84,19 @@ Namespace Biosystems.Ax00.Global.TO
             End Set
 
         End Property
+
+        'IT 18/09/2014 #BA-1946 - INI
+        Public Property UserLevelEnum() As USER_LEVEL
+            Get
+                Return userLevelEnumAttribute
+            End Get
+
+            Set(ByVal Value As USER_LEVEL)
+                userLevelEnumAttribute = Value
+            End Set
+
+        End Property
+        'IT 18/09/2014 #BA-1946 - FIN
 
         Public Property ApplicationVersion() As String
             Get

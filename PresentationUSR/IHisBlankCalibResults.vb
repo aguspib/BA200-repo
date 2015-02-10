@@ -2,22 +2,17 @@
 
 Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.IO
-Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
-Imports Biosystems.Ax00.InfoAnalyzer
+Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IHisBlankCalibResults
+Public Class UiHisBlankCalibResults
 
 #Region "Events definitions"
 
@@ -48,7 +43,10 @@ Public Class IHisBlankCalibResults
     Private mSampleTypes As Dictionary(Of String, String)   ' The Sample Types: {SampleType, Multilanguage Text}
     Private mImageGridDict As Dictionary(Of String, Byte())   ' The images inside the grid
 
-    Private mAnalyzers As List(Of String)
+    'SA 01/09/2014
+    'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+    Private mAnalyzers As New AnalyzersDS
+
     Private alarmsDefiniton As New AlarmsDS 'AG 22/10/2012
     Dim myHisWSResultsDelegate As New HisWSResultsDelegate 'AG 22/10/2012
 
@@ -76,6 +74,7 @@ Public Class IHisBlankCalibResults
 #End Region
 
 #Region "Private Methods"
+
 #Region " Multilanguage Support "
     ''' <summary>
     ''' Gets the image by its key
@@ -105,9 +104,9 @@ Public Class IHisBlankCalibResults
         auxIconName = GetIconName(pKey)
         If Not String.IsNullOrEmpty(auxIconName) Then
             If mImageDict.ContainsKey(pKey) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
 
@@ -194,7 +193,7 @@ Public Class IHisBlankCalibResults
             BsCalibsGridLabel1.Text = GetText("LBL_Calibrators")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -216,8 +215,12 @@ Public Class IHisBlankCalibResults
             searchButton.Image = GetImage("FIND")
             myToolTipsControl.SetToolTip(searchButton, GetText("BTN_Search"))
 
+            'PRINT Button
+            printButton.Image = GetImage("PRINT")
+            myToolTipsControl.SetToolTip(printButton, GetText("BTN_Print"))
+
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -226,77 +229,64 @@ Public Class IHisBlankCalibResults
     ''' Load all the Analyzers
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 28/09/2012
+    ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 (adapted to screen AG 19/10/2012)
+    '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox
     ''' </remarks>
     Private Sub GetAnalyzerList()
-        Dim myAnalyzerDelegate As New AnalyzersDelegate
-        Dim myGlobalDataTO As New GlobalDataTO
-        'Dim myAnalyzerData As AnalyzersDS
-        Dim myAnalyzerData As List(Of String)
         Try
-            'Begin IR 04/10/2012 Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
-            'myGlobalDataTO = myAnalyzerDelegate.GetAllAnalyzers(Nothing)
-            myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myHisAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
+
+            myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                'myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
-                myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
-                'mAnalyzers = (From a In myAnalyzerData.tcfgAnalyzers _
-                '              Where Not a.Generic _
-                '              Order By a.Active Descending _
-                '              Select a.AnalyzerID).ToList
+                mAnalyzers = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
 
-                Dim o As String
-                For Each o In myAnalyzerData
-                    mAnalyzers.Add(o.ToString)
-                Next
-
-                'mAnalyzers = myGlobalDataTO.SetDatos
+                'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
+                If ((mAnalyzers.tcfgAnalyzers.ToList.Where(Function(a) a.AnalyzerID = AnalyzerIDAttribute)).Count = 0) Then
+                    Dim myRow As AnalyzersDS.tcfgAnalyzersRow = mAnalyzers.tcfgAnalyzers.NewtcfgAnalyzersRow()
+                    myRow.AnalyzerID = AnalyzerIDAttribute
+                    mAnalyzers.tcfgAnalyzers.AddtcfgAnalyzersRow(myRow)
+                    mAnalyzers.AcceptChanges()
+                End If
             End If
-            'End IR 04/10/2012
 
+            myGlobalDataTO = Nothing
+            myHisAnalyzerWSDelegate = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-
-    ' ''' <summary>
-    ' ''' Load all the Sample Type availables (with its multilanguage text)
-    ' ''' </summary>
-    ' ''' <remarks>
-    ' ''' Created by: JB 18/10/2012
-    ' '''             AG 27/05/2013 - Add new samples types LIQ and SER
-    ' '''             TR 27/05/2013 -  This method is not in use (DELETE)
-    ' '''             XB 04/06/2013 - Commented
-    ' ''' </remarks>
-    'Private Sub GetSampleTypes()
-    '    With mSampleTypes
-    '        .Clear()
-    '        .Add("SER", "SER-" & GetText("MAD_SAMPLE_TYPES_SER"))
-    '        .Add("URI", "URI-" & GetText("MAD_SAMPLE_TYPES_URI"))
-    '        .Add("PLM", "PLM-" & GetText("MAD_SAMPLE_TYPES_PLM"))
-    '        .Add("WBL", "WBL-" & GetText("MAD_SAMPLE_TYPES_WBL"))
-    '        .Add("CSF", "CSF-" & GetText("MAD_SAMPLE_TYPES_CSF"))
-    '        .Add("LIQ", "LIQ-" & GetText("MAD_SAMPLE_TYPES_LIQ"))
-    '        .Add("SEM", "SEM-" & GetText("MAD_SAMPLE_TYPES_SEM"))
-    '    End With
-    'End Sub
 
     ''' <summary>
     '''  Fills the DropDownLists
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012
+    ''' Created by:  JB 18/10/2012
+    ''' Modified by: SA 01/08/2014 - Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
     ''' </remarks>
     Private Sub FillDropDownLists()
+        Try
+            'Get the list of Analyzers and load the ComboBox
+            GetAnalyzerList()
+            analyzerIDComboBox.DataSource = mAnalyzers.tcfgAnalyzers.DefaultView
 
-        GetAnalyzerList()
-        analyzerIDComboBox.DataSource = mAnalyzers
+            'BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
+            analyzerIDComboBox.DisplayMember = "AnalyzerID"
+            analyzerIDComboBox.ValueMember = "AnalyzerID"
 
-        analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-        analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
-        analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+            'The label and the ComboBox are visible and enabled only when there are several Analyzers loaded in the ComboBox
+            analyzerIDComboBox.Enabled = (mAnalyzers.tcfgAnalyzers.Rows.Count > 1)
+            analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
+            analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
     End Sub
 
     ''' <summary>
@@ -322,7 +312,7 @@ Public Class IHisBlankCalibResults
             End With
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeGridNavigator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeGridNavigator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeGridNavigator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -345,7 +335,7 @@ Public Class IHisBlankCalibResults
             InitializeCalibResultsGrid()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeResultHistoryGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeResultHistoryGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeResultHistoryGrids", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -446,7 +436,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = False
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Absorbance
@@ -599,7 +589,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.AllowSize = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
             'Additional Info
@@ -615,17 +605,14 @@ Public Class IHisBlankCalibResults
 
             GraphColumn.ColumnEdit = pictureEdit
 
-
             'For wrapping text
             Dim largeTextEdit As DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit
             largeTextEdit = TryCast(xtraBlanksGrid.RepositoryItems.Add("MemoEdit"),  _
                                     DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit)
 
             RemarksColumn.ColumnEdit = largeTextEdit
-
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeBlankResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeBlankResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeBlankResultsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -634,9 +621,13 @@ Public Class IHisBlankCalibResults
     ''' <summary>
     ''' Initialize calibrator grid
     ''' </summary>
-    ''' <remarks>AG 22/10/2012
-    ''' AG 29/10/2012 (AG + EF meeting): Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert
-    '''                                  Date - Test - Type - Calib Name - Lot - ...</remarks>
+    ''' <remarks>
+    ''' Created by:  AG 22/10/2012
+    ''' Modified by: AG 29/10/2012 - Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert, Test, Type, Calib Name, Lot... (AG + EF meeting)
+    '''              XB 25/09/2014 - BA-1863 ==> Added TestVersion column to allow filter by it when select the Calibrator chart result from Historics
+    '''              SA 09/12/2014 - BA-1011 ==> Added new hidden column ManualResultFlag to allow change the font of ABSValue column to StrikeOut when 
+    '''                                          ManualResultFlag is True (which mean the CalibratorFactor shown was entered manually)
+    ''' </remarks>
     Private Sub InitializeCalibResultsGrid()
         Try
             'Prepare calibrator Grid
@@ -655,14 +646,15 @@ Public Class IHisBlankCalibResults
             Dim GraphColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim RemarksColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim AnalyzerIDColumn As New DevExpress.XtraGrid.Columns.GridColumn()
-
+            Dim TestVersionColumn As New DevExpress.XtraGrid.Columns.GridColumn()       'BA-1863 - XB 25/09/2014
+            Dim ManualResultFlagColumn As New DevExpress.XtraGrid.Columns.GridColumn()  'BA-1011
 
             With CalibratorGridView
                 .Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() _
                                   {DateColumn, CalibratorNameColumn, LotNumberColumn, NumberOfCalibratorsColumn, _
                                    TestNameColumn, SampleTypeColumn, RemarksAlertColumn, AbsColumn, _
                                    TheoricalConcColumn, UnitColumn, CalibratorFactorColumn, CalibratorLimitsColumn, _
-                                   GraphColumn, RemarksColumn, AnalyzerIDColumn})
+                                   GraphColumn, RemarksColumn, AnalyzerIDColumn, TestVersionColumn, ManualResultFlagColumn})
 
                 .OptionsView.AllowCellMerge = True 'AG 29/10/2012
                 .OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Default
@@ -688,7 +680,7 @@ Public Class IHisBlankCalibResults
                 .GroupCount = 0
                 .OptionsMenu.EnableColumnMenu = False
                 .ColumnPanelRowHeight = 30
-                .ColumnPanelRowHeight += CInt(.ColumnPanelRowHeight / 4) 'add additional height for Wrap header columns
+                .ColumnPanelRowHeight += CInt(.ColumnPanelRowHeight / 4) 'Add additional height for Wrap header columns
             End With
 
             'Date Column
@@ -732,7 +724,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Calibrator Name column
@@ -790,7 +782,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = False
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Absorbance
@@ -910,7 +902,28 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.AllowSize = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+            End With
+
+            'XB 25/09/2014 - BA-1863
+            'Test Version column
+            With TestVersionColumn
+                .Caption = String.Empty
+                .FieldName = "TestVersionNumber"
+                .DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric
+                .Name = "TestVersionNumber"
+                .Visible = False
+                .Width = 0
+            End With
+            'XB 25/09/2014 - BA-1863
+
+            'BA-1011: ManualResultFlag (hidden column)  
+            With ManualResultFlagColumn
+                .Caption = String.Empty
+                .FieldName = "ManualResultFlag"
+                .Name = "ManualResultFlag"
+                .Visible = False
+                .Width = 0
             End With
 
             'Additional Info
@@ -935,7 +948,7 @@ Public Class IHisBlankCalibResults
             RemarksColumn.ColumnEdit = largeTextEdit
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeCalibResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeCalibResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeCalibResultsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -945,7 +958,9 @@ Public Class IHisBlankCalibResults
     ''' Initializes the filter search
     ''' </summary>
     ''' <remarks>
-    ''' Created by JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one  
     ''' </remarks>
     Private Sub InitializeFilterSearch()
         Try
@@ -955,13 +970,16 @@ Public Class IHisBlankCalibResults
             dateToDateTimePick.Checked = True
             dateToDateTimePick.Value = Today
 
-            If analyzerIDComboBox.Items.Count > 0 Then
+            If (analyzerIDComboBox.Items.Count > 0) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                analyzerIDComboBox.SelectedValue = AnalyzerIDAttribute
+            Else
+                'Select the unique element in the list
                 analyzerIDComboBox.SelectedIndex = 0
             End If
 
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeFilterSearch", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -971,24 +989,25 @@ Public Class IHisBlankCalibResults
     ''' Initialize all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties 
+    '''                                          DisplayMember and ValueMember in the ComboBox
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
             mImageDict = New Dictionary(Of String, Image)()
             mTextDict = New Dictionary(Of String, String)()
             mSampleTypes = New Dictionary(Of String, String)
-            mAnalyzers = New List(Of String)
             mImageGridDict = New Dictionary(Of String, Byte())()
 
-            'GetSampleTypes()   ' XB 04/06/2013 - Commented
+            'BA-1910 - Changed from list of Strings to a typed DataSet AnalyzersDS 
+            mAnalyzers = New AnalyzersDS
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()
-            'InitializeAlarmTexts()
             PrepareButtons()
             FillDropDownLists()
 
@@ -1006,7 +1025,7 @@ Public Class IHisBlankCalibResults
             FindHistoricalResults()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1014,16 +1033,18 @@ Public Class IHisBlankCalibResults
 
 #Region " Search "
     ''' <summary>
-    ''' Returns the selected search filter
+    ''' Fill a SearchFilter structure with filters selected in Search Area
     ''' </summary>
-    ''' <returns></returns>
+    ''' <returns>SearchFilter structure filled with filters selected in Search Area</returns>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> To get the selected Analyzer, used SelectedValue instead of SelectedItem, due to the ComboBox is loaded
+    '''                                          in a different way
     ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
-            .analyzerId = analyzerIDComboBox.SelectedItem.ToString
+            .analyzerId = analyzerIDComboBox.SelectedValue.ToString
 
             If dateFromDateTimePick.Checked Then
                 .dateFrom = dateFromDateTimePick.Value
@@ -1071,7 +1092,7 @@ Public Class IHisBlankCalibResults
             End If
             UpdateFormBehavior(True) 'Enable controls
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindHistoricalResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindHistoricalResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FindHistoricalResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1093,7 +1114,7 @@ Public Class IHisBlankCalibResults
 
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FormatRowNumeric ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FormatRowNumeric ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FormatRowNumeric ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobalDataTO
@@ -1124,7 +1145,7 @@ Public Class IHisBlankCalibResults
 
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeRowImages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeRowImages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DecodeRowImages ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1190,7 +1211,7 @@ Public Class IHisBlankCalibResults
 
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeRowTexts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeRowTexts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DecodeRowTexts ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobalDataTO
@@ -1272,7 +1293,7 @@ Public Class IHisBlankCalibResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareAndSetDataToGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareAndSetDataToGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareAndSetDataToGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1295,7 +1316,7 @@ Public Class IHisBlankCalibResults
             'exportButton.Enabled = historyGridView.SelectedRowsCount > 0
             'searchGroup.Enabled = analyzerIDComboBox.Items.Count > 0
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateFormBehavior ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateFormBehavior ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UpdateFormBehavior ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1309,7 +1330,10 @@ Public Class IHisBlankCalibResults
     ''' Opens the auxliary screen (IResultsCalibCurve)
     ''' </summary>
     ''' <param name="pRow"></param>
-    ''' <remarks>AG 23/10/2012</remarks>
+    ''' <remarks>
+    ''' Created by:  AG 23/10/2012
+    ''' Modified by: XB 30/07/2014 - Remove call to function HisWSExecutionsDelegate.GetExecutionResultsForCalibCurve. Instead, add required rows to the local ExecutionsDS - BA-1863
+    ''' </remarks>
     Private Sub OpenCalibCurveScreen(ByVal pRow As HisWSResultsDS.vhisWSResultsRow)
         Try
             If pRow.IsAnalyzerIDNull OrElse pRow.IsWorkSessionIDNull OrElse pRow.IsHistOrderTestIDNull _
@@ -1318,7 +1342,7 @@ Public Class IHisBlankCalibResults
                 'Some required column is missing. The aux screen can not be opened
                 'Do nothing
 
-            Else 'All required columns are informed. The aux screen can be opened
+            Else 'All required columns are informed. The aux screen can be opened 
 
                 Dim analyzerID As String = pRow.AnalyzerID
                 Dim worksessionID As String = pRow.WorkSessionID
@@ -1343,13 +1367,41 @@ Public Class IHisBlankCalibResults
                 'Get Replic Results
                 Dim exeResults As New ExecutionsDS
                 If Not resultData.HasError Then
-                    Dim dlgate2 As New HisWSExecutionsDelegate
-                    resultData = dlgate2.GetExecutionResultsForCalibCurve(Nothing, histOrderTestID, analyzerID, worksessionID)
-                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                        exeResults = CType(resultData.SetDatos, ExecutionsDS)
-                    Else
-                        ShowMessage(Me.Name & ".OpenCalibCurveScreen", resultData.ErrorCode, resultData.ErrorMessage, Me)
-                    End If
+
+                    ' XB 30/07/2014 - BA-1863
+                    'Dim dlgate2 As New HisWSExecutionsDelegate
+                    'resultData = dlgate2.GetExecutionResultsForCalibCurve(Nothing, histOrderTestID, analyzerID, worksessionID)
+
+                    'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    '    exeResults = CType(resultData.SetDatos, ExecutionsDS)
+                    'Else
+                    '    ShowMessage(Me.Name & ".OpenCalibCurveScreen", resultData.ErrorCode, resultData.ErrorMessage, Me)
+                    'End If
+
+                    Dim myExecutionRow As ExecutionsDS.vwksWSExecutionsResultsRow
+                    myExecutionRow = exeResults.vwksWSExecutionsResults.NewvwksWSExecutionsResultsRow()
+                    myExecutionRow.OrderTestID = avgResults.vwksResults.First.OrderTestID
+                    myExecutionRow.AnalyzerID = avgResults.vwksResults.First.AnalyzerID
+                    myExecutionRow.WorkSessionID = avgResults.vwksResults.First.WorkSessionID
+                    myExecutionRow.SampleClass = avgResults.vwksResults.First.SampleClass
+                    myExecutionRow.MultiItemNumber = avgResults.vwksResults.First.MultiPointNumber
+                    myExecutionRow.RerunNumber = 1
+                    myExecutionRow.ReplicateNumber = 1
+                    myExecutionRow.ExecutionType = "CALIB"
+                    myExecutionRow.ABS_Value = avgResults.vwksResults.First.ABSValue
+                    If (Not avgResults.vwksResults.First.IsABS_InitialNull) Then myExecutionRow.ABS_Initial = avgResults.vwksResults.First.ABS_Initial
+                    If (Not avgResults.vwksResults.First.IsABS_MainFilterNull) Then myExecutionRow.ABS_MainFilter = avgResults.vwksResults.First.ABS_MainFilter
+                    If (Not avgResults.vwksResults.First.IsAbs_WorkReagentNull) Then myExecutionRow.Abs_WorkReagent = avgResults.vwksResults.First.Abs_WorkReagent
+                    myExecutionRow.CONC_Value = avgResults.vwksResults.First.TheoricalConcentration
+                    myExecutionRow.ResultDate = avgResults.vwksResults.First.ResultDateTime
+                    myExecutionRow.SampleType = avgResults.vwksResults.First.SampleType
+                    myExecutionRow.TestName = avgResults.vwksResults.First.TestName
+                    If (Not avgResults.vwksResults.First.IsKineticBlankLimitNull) Then myExecutionRow.KineticBlankLimit = avgResults.vwksResults.First.KineticBlankLimit
+                    myExecutionRow.TestType = "STD"
+                    myExecutionRow.AlarmList = avgResults.vwksResults.First.AlarmList
+                    myExecutionRow.InUse = True
+                    exeResults.vwksWSExecutionsResults.AddvwksWSExecutionsResultsRow(myExecutionRow)
+                    ' XB 30/07/2014 - BA-1863
                 End If
 
                 'Open the calib curve screen
@@ -1373,7 +1425,7 @@ Public Class IHisBlankCalibResults
                         End If
 
                         'Open the aux screen
-                        Using myCurveForm As New IResultsCalibCurve
+                        Using myCurveForm As New UiResultsCalibCurve
                             With myCurveForm
                                 .ActiveAnalyzer = analyzerID
                                 .ActiveWorkSession = worksessionID
@@ -1383,6 +1435,8 @@ Public Class IHisBlankCalibResults
                                 .SelectedTestName = TestList(0).TestName
                                 .SelectedSampleType = TestList(0).SampleType
                                 .SelectedFullTestName = TestList(0).TestName
+                                .SelectedOrderTestID = TestList(0).OrderTestID  ' XB 30/07/2014 - BA-1863 
+                                .SelectedTestVersionNumber = pRow.TestVersionNumber  ' XB 25/09/2014 - BA-1863
 
                                 'Add the analyzsis mode
                                 Dim analysisMode As String = String.Empty
@@ -1408,7 +1462,7 @@ Public Class IHisBlankCalibResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenCalibCurveScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenCalibCurveScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenCalibCurveScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1423,7 +1477,7 @@ Public Class IHisBlankCalibResults
         Try
             'TODO
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenAbsorbanceTimeCurveScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenAbsorbanceTimeCurveScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenAbsorbanceTimeCurveScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1441,7 +1495,7 @@ Public Class IHisBlankCalibResults
                 exitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IHisAlarms_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1456,7 +1510,7 @@ Public Class IHisBlankCalibResults
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IHisAlarms_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1465,7 +1519,7 @@ Public Class IHisBlankCalibResults
         Try
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IHisAlarms_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1479,16 +1533,40 @@ Public Class IHisBlankCalibResults
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub bsSearchButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles searchButton.Click
         FindHistoricalResults()
+    End Sub
+
+    Private Sub PrintBlanksAndCalibratorsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles printButton.Click
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            'Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Dim filter As SearchFilter = GetSearchFilter()
+            With filter
+                XRManager.ShowBlanksAndCalibratorsReport(.analyzerId, .dateFrom, .dateTo, .testNameContains) 'IT 06/10/2014 - BT #1883
+            End With
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Blanks and Calibrator Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "IHisBlankCalibResults.PrintBlanksAndCalibratorsButton_Click", EventLogEntryType.Information, False)
+            StartTime = Now
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintBlanksAndCalibratorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 
 #End Region
@@ -1512,22 +1590,41 @@ Public Class IHisBlankCalibResults
 #End Region
 
 #Region " Grid Events "
-
     ''' <summary>
-    ''' 
+    ''' When in the grid row value of field ManualResultFlag is TRUE, all row cells excepting TestName, SampleType, CalibratorFactor and GraphImage) 
+    ''' are  shown striked-out, which means that value shown in cell CalibratorFactor was informed manually by the final User
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks></remarks>
-    Private Sub BlankGridView_SelectionChanged(ByVal sender As System.Object, ByVal e As DevExpress.Data.SelectionChangedEventArgs) Handles BlankGridView.SelectionChanged, CalibratorGridView.SelectionChanged
+    ''' <remarks>
+    ''' Created by:  SA 09/12/2014 - BA-1011
+    ''' </remarks>
+    Private Sub CalibratorGridView_RowCellStyle(sender As Object, e As DevExpress.XtraGrid.Views.Grid.RowCellStyleEventArgs) Handles CalibratorGridView.RowCellStyle
+        Try
+            Dim View As DevExpress.XtraGrid.Views.Grid.GridView = TryCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
 
+            If (Not IsDBNull(View.GetRowCellValue(e.RowHandle, View.Columns("ManualResultFlag")))) Then
+                Dim manualResultFlag As Boolean = Convert.ToBoolean(View.GetRowCellValue(e.RowHandle, View.Columns("ManualResultFlag")))
+                If (manualResultFlag) Then
+                    If (e.Column.FieldName <> "TestName" AndAlso e.Column.FieldName <> "SampleType" AndAlso _
+                        e.Column.FieldName <> "CalibratorFactor" AndAlso e.Column.FieldName <> "GraphImage") Then
+                        Dim myFontName As String = xtraCalibratorsGrid.Font.Name
+                        Dim myFontSize As Single = xtraCalibratorsGrid.Font.Size
+
+                        e.Appearance.Font = New Font(myFontName, myFontSize, FontStyle.Strikeout)
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CalibratorGridView_RowCellStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".CalibratorGridView_RowCellStyle", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
+        Finally
+            Cursor = Cursors.Default
+        End Try
     End Sub
 
     ''' <summary>
     ''' Processes the mouse click event over the cells (calibrator grid)
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
     ''' Created by: AG 23/10/2012
     ''' </remarks>
@@ -1559,20 +1656,17 @@ Public Class IHisBlankCalibResults
 
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorGridView_RowCellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorGridView_RowCellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             Cursor = Cursors.Default
         End Try
     End Sub
 
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>JB 23/10/2012 (copied and adapted to screen AG 23/10/2012)</remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: AG 23/10/2012
+    ''' </remarks>
     Private Sub BlankGridView_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles BlankGridView.MouseMove, CalibratorGridView.MouseMove
         Try
             If sender Is Nothing Then Return
@@ -1606,16 +1700,13 @@ Public Class IHisBlankCalibResults
 
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BlankGridView_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BlankGridView_MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
     End Sub
-
-
 #End Region
 
 #End Region
-
 
 End Class

@@ -1,21 +1,15 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
-Imports System.Configuration
-Imports System.Deployment
-Imports System.Deployment.Application
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports System.Windows.Forms
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Xml
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Microsoft.Win32
-Imports System.IO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class InstallerForm
@@ -23,7 +17,7 @@ Public Class InstallerForm
 
     'Public WithEvents MDIAnalyzerManager As AnalyzerManager
 
-    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.IAx00StartUp
+    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.UiAx00StartUp
 
 
     Private Sub InstallerForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -33,8 +27,8 @@ Public Class InstallerForm
         'dbVerNumberlbl.Text = GlobalBase.DataBaseVersion
         'testLims()
 
-        Dim MyGlobalBase As New GlobalBase
-        CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+        'Dim myGlobalbase As New GlobalBase
+        CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
         ScreenAccessControl()
     End Sub
 
@@ -226,7 +220,7 @@ Public Class InstallerForm
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim myILISUtilities As New ILISUtilities
+        Dim myILISUtilities As New UiLISUtilities
         myILISUtilities.ShowDialog()
         'SaveLISValue()
     End Sub
@@ -237,7 +231,7 @@ Public Class InstallerForm
             If CurrentUserLevel = "OPERATOR" Then
                 EditButton.Enabled = False
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
 
             ElseIf CurrentUserLevel = "SUPERVISOR" Then
 
@@ -245,7 +239,7 @@ Public Class InstallerForm
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message, Me.Name & " ScreenAccessControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ScreenAccessControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -290,20 +284,20 @@ Public Class InstallerForm
 #Region "OLD"
 
     'Private Sub Updateprocess()
-    '    Dim myLogAcciones As New ApplicationLogManager()
+    '    'Dim myLogAcciones As New ApplicationLogManager()
 
     '    Try
     '        Dim mydbmngDelegate As New DataBaseManagerDelegate()
-    '        myLogAcciones.CreateLogActivity("ANTES DE VALIDAR SI EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '        GlobalBase.CreateLogActivity("ANTES DE VALIDAR SI EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
 
     '        If mydbmngDelegate.DataBaseExist(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then
-    '            myLogAcciones.CreateLogActivity("EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '            GlobalBase.CreateLogActivity("EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
     '            Dim myDBUpdateManager As New DataBaseUpdateManagerDelegate
     '            'If myDBUpdateManager.UpdateDatabase(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then
     '            '    MessageBox.Show("Actalizacion de base de datos correcta")
     '            'End If
     '        Else
-    '            myLogAcciones.CreateLogActivity("ANTES DE INSTALAR LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '            GlobalBase.CreateLogActivity("ANTES DE INSTALAR LA BD", "InstallerForm", EventLogEntryType.Information, False)
     '            Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
     '            'If myDBInstallerDelegate.InstallApplicationDataBase(DAOBase.DBServer, DAOBase.CurrentDB, _
     '            '                                                    DAOBase.DBLogin, DAOBase.DBPassword) Then
@@ -450,9 +444,9 @@ Public Class InstallerForm
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Dim myUtility As New Utilities
+        'Dim Utilities As New Utilities
         Dim myGlobalData As New GlobalDataTO
-        'myGlobalData = myUtility.SaveSynapseEventLog("MyEventLog", "C:\Temp\")
+        'myGlobalData = Utilities.SaveSynapseEventLog("MyEventLog", "C:\Temp\")
 
         If myGlobalData.HasError Then
             MessageBox.Show(myGlobalData.ErrorMessage)

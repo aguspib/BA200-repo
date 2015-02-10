@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSTestSelectionAuxScreen
+Partial Class UiWSTestSelectionAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -62,7 +62,7 @@ Partial Class IWSTestSelectionAuxScreen
         Dim DataGridViewCellStyle34 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle35 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle36 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSTestSelectionAuxScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSTestSelectionAuxScreen))
         Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsAdviceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsWarningIconPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
@@ -1300,7 +1300,7 @@ Partial Class IWSTestSelectionAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSTestSelectionAuxScreen"
+        Me.Name = "UiWSTestSelectionAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsAdviceGroupBox.ResumeLayout(False)

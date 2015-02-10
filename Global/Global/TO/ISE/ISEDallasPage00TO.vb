@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.Global
                     ExpirationDayAttr = value
                 Else
                     ExpirationDayAttr = -1
-                    MyClass.ValidationError = True
+                    Me.ValidationError = True
                 End If
             End Set
         End Property
@@ -63,7 +63,7 @@ Namespace Biosystems.Ax00.Global
                     ExpirationMonthAttr = value
                 Else
                     ExpirationMonthAttr = -1
-                    MyClass.ValidationError = True
+                    Me.ValidationError = True
                 End If
             End Set
         End Property
@@ -77,15 +77,15 @@ Namespace Biosystems.Ax00.Global
                     ExpirationYearAttr = value
                 Else
                     ExpirationYearAttr = -1
-                    MyClass.ValidationError = True
+                    Me.ValidationError = True
                 End If
             End Set
         End Property
 
         Public ReadOnly Property ExpirationDate() As DateTime
             Get
-                If MyClass.ExpirationYearAttr >= 0 And MyClass.ExpirationMonthAttr >= 1 And MyClass.ExpirationDayAttr >= 1 Then
-                    Dim myDate As New DateTime(MyClass.ExpirationYear, MyClass.ExpirationMonthAttr, MyClass.ExpirationDayAttr)
+                If Me.ExpirationYearAttr >= 0 And Me.ExpirationMonthAttr >= 1 And Me.ExpirationDayAttr >= 1 Then
+                    Dim myDate As New DateTime(Me.ExpirationYear, Me.ExpirationMonthAttr, Me.ExpirationDayAttr)
                     Return myDate 'new DateTime(2011,05,30) for testing
                 Else
                     Return Nothing
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.Global
 #End Region
 
         Public Overrides Function ToString() As String
-            Return MyClass.Page00DataStringAttr
+            Return Me.Page00DataStringAttr
         End Function
 
     End Class

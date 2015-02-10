@@ -1,7 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -9,7 +8,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tfmwPreloadedMasterDataDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -32,11 +31,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT  MLR.ResourceText AS [Description], PMD.ResourceID AS [Group], PMD.FixedItemDesc AS FileName, PMD.Position" & vbCrLf
                         cmdText &= "FROM tfmwPreloadedMasterData PMD LEFT JOIN tfmwMultiLanguageResources MLR ON PMD.ITEMID = MLR.RESOURCEID" & vbCrLf
-                        cmdText &= "WHERE PMD.SubTableID = '" & pSubTableID & "' AND MLR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
+                        cmdText &= "WHERE PMD.SubTableID = '" & pSubTableID & "' AND MLR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
                         cmdText &= "ORDER BY PMD.Position"
 
                         Dim myLegendDS As New LegendDS
@@ -60,8 +59,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadLegendBySubTableID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadLegendBySubTableID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -90,7 +89,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT PMD.SubTableID, PMD.ItemID, MR.ResourceText AS FixedItemDesc, PMD.Position, PMD.Status " & vbCrLf
                         cmdText &= "FROM   tfmwPreloadedMasterData PMD INNER JOIN tfmwMultiLanguageResources MR " & vbCrLf
@@ -98,7 +97,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "WHERE  PMD.SubTableID = '" & pSubTableID.ToString() & "'" & vbCrLf
                         cmdText &= "  AND  PMD.MultiLanguageFlag = 1" & vbCrLf
                         cmdText &= "  AND  PMD.Status = 1 " & vbCrLf
-                        cmdText &= "  AND  MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
+                        cmdText &= "  AND  MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
                         cmdText &= "SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & vbCrLf
                         cmdText &= " FROM  tfmwPreloadedMasterData " & vbCrLf
@@ -127,8 +126,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadBySubTableID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadBySubTableID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -160,7 +159,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim mylocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText = " SELECT PMD.SubTableID, PMD.ItemID, MR.ResourceText AS FixedItemDesc, PMD.Position, PMD.Status " & _
                                   " FROM   tfmwPreloadedMasterData PMD WITH (NOLOCK) INNER JOIN " & _
@@ -168,7 +167,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " WHERE  PMD.SubTableID = '" & pSubTableID.ToString & "' " & _
                                   " AND    PMD.ItemID = '" & pItemID & "' " & _
                                   " AND    PMD.MultiLanguageFlag = 1 " & _
-                                  " AND    MR.LanguageID = '" & mylocalBase.GetSessionInfo.ApplicationLanguage & "' " & _
+                                  " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & _
                                   " UNION " & _
                                   " SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & _
                                   " FROM tfmwPreloadedMasterData WITH (NOLOCK) " & _
@@ -197,8 +196,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -227,7 +226,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim mylocalBase As New GlobalBase
+                        ''Dim myLocalBase As New GlobalBase
 
                         cmdText = " SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & _
                                   " FROM tfmwPreloadedMasterData WITH (NOLOCK) " & _
@@ -256,8 +255,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemIDWithOutLanguages", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemIDWithOutLanguages", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -285,7 +284,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        ''Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & vbCrLf
                         cmdText &= " FROM  tfmwPreloadedMasterData " & vbCrLf
@@ -314,8 +313,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadBySubTableIDWithOutLanguages", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadBySubTableIDWithOutLanguages", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -339,7 +338,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Dim cmdText As String = ""
             Dim resultData As New PreloadedMasterDataDS
             Dim dbConnection As New SqlClient.SqlConnection
-            Dim myLocalBase As New GlobalBase
+            'Dim myLocalBase As New GlobalBase
 
             Try
                 'Open the DB Connection
@@ -357,7 +356,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                           " WHERE  PMD.SubTableID = '" & pSubTableID.ToString & "' " & _
                           " AND    PMD.ItemID = '" & pItemID & "' " & _
                           " AND    PMD.MultiLanguageFlag = 1 " & _
-                          " AND    MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & _
+                          " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & _
                           " UNION SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & _
                           " FROM tfmwPreloadedMasterData" & _
                           " WHERE  SubTableID = '" & pSubTableID.ToString & "' " & _
@@ -374,8 +373,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dbDataAdapter.Fill(resultData.tfmwPreloadedMasterData)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwPreloadedMasterDataDAO.ReadByItemID", EventLogEntryType.Error, False)
                 Throw ex
 
             Finally

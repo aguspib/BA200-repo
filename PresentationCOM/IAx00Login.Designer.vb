@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IAx00Login
+Partial Class UiAx00Login
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -19,27 +19,27 @@ Partial Class IAx00Login
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IAx00Login))
-        Me.bsLoginTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bwPreload = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker
-        Me.Ax00MDBackGround = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker
-        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsLoginButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsChangePwdButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsPasswordTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsUserIDTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsPasswordLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsUserIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSoftwareLabel = New DevExpress.XtraEditors.LabelControl
-        Me.TestSortingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.TestSortingGB = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.LoginErrorLabel = New System.Windows.Forms.Label
-        Me.bsVersionLabel = New DevExpress.XtraEditors.LabelControl
-        Me.LogoBAServicePicture = New DevExpress.XtraEditors.PictureEdit
-        Me.LogoBAUserPicture = New DevExpress.XtraEditors.PictureEdit
-        Me.BsBorderedPanel1 = New bsBorderedPanel
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiAx00Login))
+        Me.bsLoginTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bwPreload = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker()
+        Me.Ax00MDBackGround = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker()
+        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsLoginButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsChangePwdButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsPasswordTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsUserIDTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsPasswordLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsUserIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSoftwareLabel = New DevExpress.XtraEditors.LabelControl()
+        Me.TestSortingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.TestSortingGB = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.LoginErrorLabel = New System.Windows.Forms.Label()
+        Me.bsVersionLabel = New DevExpress.XtraEditors.LabelControl()
+        Me.LogoBAServicePicture = New DevExpress.XtraEditors.PictureEdit()
+        Me.LogoBAUserPicture = New DevExpress.XtraEditors.PictureEdit()
+        Me.BsBorderedPanel1 = New bsBorderedPanel()
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TestSortingGB.SuspendLayout()
         CType(Me.LogoBAServicePicture.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -87,6 +87,7 @@ Partial Class IAx00Login
         Me.bsChangePwdButton.Name = "bsChangePwdButton"
         Me.bsChangePwdButton.Size = New System.Drawing.Size(32, 32)
         Me.bsChangePwdButton.TabIndex = 8
+        Me.bsChangePwdButton.TabStop = False
         Me.bsChangePwdButton.UseVisualStyleBackColor = True
         '
         'bsPasswordTextBox
@@ -251,11 +252,11 @@ Partial Class IAx00Login
         Me.BsBorderedPanel1.Name = "BsBorderedPanel1"
         Me.BsBorderedPanel1.Size = New System.Drawing.Size(508, 310)
         Me.BsBorderedPanel1.TabIndex = 20
+        Me.BsBorderedPanel1.TabStop = False
         '
-        'IAx00Login
+        'UiAx00Login
         '
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
@@ -272,7 +273,7 @@ Partial Class IAx00Login
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IAx00Login"
+        Me.Name = "UiAx00Login"
         Me.Text = ""
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TestSortingGB.ResumeLayout(False)

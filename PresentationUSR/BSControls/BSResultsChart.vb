@@ -1,11 +1,11 @@
-﻿Option Strict On
-Option Explicit On
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
 
 Imports System.Drawing
 Imports System.Windows.Forms
-Imports Biosystems.Ax00
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.AbsorbanceDS
 Imports Biosystems.Ax00.Global
 
 Public Class bsResultsChart

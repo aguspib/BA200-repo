@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCCumulatedReview
+Partial Class UiQCCumulatedReview
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -35,7 +35,7 @@ Partial Class IQCCumulatedReview
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCCumulatedReview))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCCumulatedReview))
         Me.bsTestSampleListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
         Me.bsTestSampleGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsTestSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -540,7 +540,7 @@ Partial Class IQCCumulatedReview
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCCumulatedReview"
+        Me.Name = "UiQCCumulatedReview"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestSampleGroupBox.ResumeLayout(False)

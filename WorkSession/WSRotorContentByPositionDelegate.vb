@@ -19,7 +19,9 @@ Namespace Biosystems.Ax00.BL
         ''' This enumerate informs the process who is saving the information about the rotors positions
         ''' By now it is only use for UPDATE items, not for delete
         ''' </summary>
-        ''' <remarks>AG 07/10/2014 BA-1979</remarks>
+        ''' <remarks>
+        ''' Created by: AG 07/10/2014 BA-1979
+        ''' </remarks>
         Public Enum ClassCalledFrom
             NotInitiated
             ChangeElementPosition1
@@ -46,7 +48,6 @@ Namespace Biosystems.Ax00.BL
             UpdateMultiTubeNumber
             UpdateBarcodeFields
         End Enum
-
 #End Region
 
 #Region "Public methods"
@@ -74,8 +75,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 12/01/2012 - This function has to open a DB Transaction instead of a DB Connection. Code improved
         '''              SA 10/02/2012 - Get also Additional Solutions marked as INCOMPLETE an positioning a bottle for each one of them in
         '''                              the internal Reagents Rotor Ring
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function AdditionalSolutionsAutoPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                            ByVal pAnalyzerID As String, ByVal pRotorType As String) As GlobalDataTO
@@ -146,8 +149,8 @@ Namespace Biosystems.Ax00.BL
                                             myRotorContentByPositionDS = ProcessAdditionalSolutions(myAdditionalSolutionDS, pWorkSessionID, pAnalyzerID, _
                                                                                                     pRotorType, maxRing, bottleCode, maxBottleSize)
                                             'Get the logged User
-                                            Dim myGlobalBase As New GlobalBase
-                                            Dim myLoggedUser As String = myGlobalBase.GetSessionInfo().UserName
+                                            'Dim myGlobalbase As New GlobalBase
+                                            Dim myLoggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                                             Dim myRotorContentPosTMP As New WSRotorContentByPositionDS
                                             For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow _
@@ -212,8 +215,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalSolutionsAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalSolutionsAutoPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -240,8 +243,10 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: AG 08/09/2011 - Calculate Sample Position Status (PENDING, INPROCESS,....)
         '''              SA 11/01/2012 - Implementation improved; use value of field ElementFinished to set Cell Status = Finished. 
         '''                              Call function GetSamplePositionStatus only when ElementFinished is False
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field 
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function AdditionalTubeSolutionPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                                           ByVal pMaxRotorRingNumber As Integer, ByVal pAutoPositioning As Boolean) As GlobalDataTO
@@ -342,8 +347,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalTubeSolutionPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalTubeSolutionPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -384,8 +389,16 @@ Namespace Biosystems.Ax00.BL
         '''              SA 15/02/2012 - Management of "death volume" bottle is removed; changes when a bottle in Reagents Rotor is moved from the internal
         '''                              ring to the external one, bottle is refilled only when the bottle size changes
         '''              SA 02/03/2012 - Changed the calling to function GetReagentBottles due it was modified by removing the parameter for the residual volume
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
+        '''              SA 22/12/2014 - BA-1999 ==> Before update field in the DS of Not In Use Rotor Positions, verify the DS has a row to avoid errors when
+        '''                                          a position with BarcodeStatus = UNKNOWN is moved to another position in Reagents Rotor (in this case, the 
+        '''                                          position Status is NO_INUSE but there is not a row in table twksWSNotInUseRotorPositions)
+        '''              SA 08/01/2015 - BA-1999 ==> When it is verified is the Element to move is NOT IN USE in the active Work Session, if Position Status is 
+        '''                                          different of NO_INUSE, but field ElementID is not informed, it means the Position is NOT IN USE, but it contains
+        '''                                          a bottle that is DEPLETED, FEW or LOCKED; then, both conditions have to be checked
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -435,7 +448,9 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             'The moved TUBE/BOTTLE is NOT IN USE in the current WorkSession
-                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 'Get the information of the NOT IN USE Position to move
                                 dataToReturn = myNotInUsePositionsDelegate.GetPositionContent(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
                                                                                               pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
@@ -446,12 +461,17 @@ Namespace Biosystems.Ax00.BL
                                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                                     myNotInUsePositionDS = DirectCast(dataToReturn.SetDatos, VirtualRotorPosititionsDS)
 
-                                    'Update the Ring/Cell fields with values of the target position
-                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.RingNumber = pToRingNumber
-                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.CellNumber = pToCellNumber
+                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
+                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
+                                    '         to move them to another position) 
+                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                        'Update the Ring/Cell fields with values of the target position
+                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.RingNumber = pToRingNumber
+                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.CellNumber = pToCellNumber
 
-                                    'Delete the position from table of NOT IN USE Rotor Positions for the active WorkSession
-                                    dataToReturn = myNotInUsePositionsDelegate.Delete(dbConnection, pWSRotorContentByPositionDS)
+                                        'Delete the position from table of NOT IN USE Rotor Positions for the active WorkSession
+                                        dataToReturn = myNotInUsePositionsDelegate.Delete(dbConnection, pWSRotorContentByPositionDS)
+                                    End If
                                 End If
                             End If
                         End If
@@ -488,11 +508,11 @@ Namespace Biosystems.Ax00.BL
                                                 pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType = myReagentTubeTypesDS.ReagentTubeTypes(0).TubeCode
                                                 pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume = myReagentTubeTypesDS.ReagentTubeTypes(0).TubeVolume
 
-                                                If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) <> 0) Then
+                                                If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status <> "NO_INUSE") Then
                                                     'Update also the position Status to IN_USE, due to the new bottle is full
                                                     pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "INUSE"
 
-                                                    If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeContent, "REAGENT", False) = 0) Then
+                                                    If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeContent = "REAGENT") Then
                                                         'Calculate the number of remaining Tests that can be executed with the volume of the new positioned Bottle, and also if the 
                                                         'total volume of all positioned Reagent Bottles is enough for the Work Session. Update the Rotor Position and also the Element Status
                                                         Dim myWSRotorContentByPosDelegate As New WSRotorContentByPositionDelegate
@@ -515,13 +535,18 @@ Namespace Biosystems.Ax00.BL
                                                         End If
                                                     End If
                                                 Else
-                                                    'Set to NULL the position Status, and update also the TubeType for the new one
-                                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.SetStatusNull()
-                                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.TubeType = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
+                                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
+                                                    '         to move them to another position) 
+                                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                                        'Set to NULL the position Status, and update also the TubeType for the new one
+                                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.SetStatusNull()
+                                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.TubeType = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
 
-                                                    'Update the Rotor Cell / Position 
-                                                    'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
-                                                    dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition5) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+                                                        'Update the Rotor Cell / Position 
+                                                        'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
+                                                        dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition5) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+                                                    End If
                                                 End If
                                             Else
                                                 'The bottle size is the same, update the Rotor Cell / Position informing the Element positioned in it
@@ -535,7 +560,9 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         If (Not dataToReturn.HasError) Then
-                            If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) = 0) Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 If (pToBarCodeStatus = "UNKNOWN") Then
                                     'When the destination position has BarcodeStatus = UNKNOWN, the target position already exists in the table of Not In Use Elements
                                     'and it should be updated; however, due to update function does not exist, the target position has to be deleted before continuing
@@ -543,12 +570,16 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 If (Not dataToReturn.HasError) Then
-                                    'AG 07/10/2014 BA-1979 add classCalledFrom parameter
-                                    'Add the new NOT IN USE Position in with the same information of the previous one
-                                    dataToReturn = myNotInUsePositionsDelegate.Add(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
-                                                                                   pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
-                                                                                   pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
-                                                                                   myNotInUsePositionDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.ChangeElementPosition)
+                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
+                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions) 
+                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                        'BA-1979: Added classCalledFrom parameter
+                                        'Add the new NOT IN USE Position in with the same information of the previous one
+                                        dataToReturn = myNotInUsePositionsDelegate.Add(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
+                                                                                       pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
+                                                                                       pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
+                                                                                       myNotInUsePositionDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.ChangeElementPosition)
+                                    End If
                                 End If
                             End If
                         End If
@@ -577,8 +608,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -615,8 +646,10 @@ Namespace Biosystems.Ax00.BL
         '''                              the previous state. Implementation changed.
         '''              SA 06/03/2012 - Change "IN_USE" for "INUSE", which is the correct code in PreloadedMasterData
         '''              JV 04/12/2013 - #1384 new optional parameter to assure we have not active session and the user wants to fill the cell.
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function ChangeVolumeByPosition(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pSelectedPositionsDS As WSRotorContentByPositionDS, _
                                                Optional ByVal pOnlyRefill As Boolean = False, Optional ByVal pEmptyWS As Boolean = False) As GlobalDataTO
@@ -885,8 +918,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorMessage = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 returnedData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1045,8 +1078,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CompleteDeletePositionSeleted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CompleteDeletePositionSeleted", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1158,8 +1191,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CreateWSRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CreateWSRotorPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1195,7 +1228,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 15/02/2012 - When a deleted position in REAGENTS Rotor contains a Reagent, the Element Status is calculated by getting the total volume
         '''                              of Reagent currently placed in the Rotor and verifying if it is enough to execute all pending tests for it (new function
         '''                              CalculateReagentStatus is called to do that)
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function DeletePositions(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pRotorPositionsDS As WSRotorContentByPositionDS, _
                                         ByVal pOnlyCalculateElementStatus As Boolean) _
@@ -1424,8 +1459,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.DeletePositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.DeletePositions", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1463,8 +1498,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRotorContentByPositionDAO.ExistBarcodeInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRotorContentByPositionDAO.ExistBarcodeInfo", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1503,8 +1538,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ExistOtherPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ExistOtherPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1596,8 +1631,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetAllPatientTubesForHQ", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetAllPatientTubesForHQ", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1688,8 +1723,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetAllTubeSizes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetAllTubeSizes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1728,8 +1763,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetElementPositionInRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetElementPositionInRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1770,8 +1805,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPlacedTubesByElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPlacedTubesByElement", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1814,8 +1849,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionedElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionedElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1887,8 +1922,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionedReagentVolume", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionedReagentVolume", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1924,10 +1959,12 @@ Namespace Biosystems.Ax00.BL
         '''              SA 29/09/2011 - Search of multilanguage description of a not in use position containing Tube Special Solutions was bad done;
         '''                              it has to be searched by SolutionCode in subtable SPECIAL_SOLUTIONS in table of Preloaded Master Data
         '''              SA 07/10/2011 - For each NOT INUSE Reagent, get the name of all Tests that can use it and fill field TestList in the DS
-        '''              TR 14/11/213  - BT #1383 CAlculate the remaining test number for reagents with status NOT INUSE.
+        '''              TR 14/11/213  - BA-1383 ==> Calculate the remaining test number for reagents with status NOT INUSE
+        '''              SA 07/01/2015 - BA-1999 ==> Code for IN USE Positions moved to a new function GetINUSEPositionInfo; code for NOT IN USE Positions
+        '''                                          moved to a new function GetNOT_INUSEPositionInfo; calculation of number or remaining tests for NOT IN 
+        '''                                          USE Positions moved to the new function GetNOT_INUSEPositionInfo 
         ''' </remarks>
-        Public Function GetPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                        ByVal pRotorPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
+        Public Function GetPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
             Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1938,474 +1975,478 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         If (Not pRotorPositionDS Is Nothing) Then
                             If (pRotorPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                                Dim myGlobalDataTo As GlobalDataTO
                                 Dim myCellPosInfoDS As New CellPositionInformationDS
 
                                 'Get all data of the specified Rotor Position
                                 Dim myRotorContentPosition As New twksWSRotorContentByPositionDAO
-                                myGlobalDataTo = myRotorContentPosition.Read(dbConnection, _
-                                                                             pRotorPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
-                                                                             pRotorPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
-                                                                             pRotorPositionDS.twksWSRotorContentByPosition(0).RotorType, _
-                                                                             pRotorPositionDS.twksWSRotorContentByPosition(0).CellNumber, _
-                                                                             pRotorPositionDS.twksWSRotorContentByPosition(0).RingNumber)
+                                resultData = myRotorContentPosition.Read(dbConnection, pRotorPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
+                                                                         pRotorPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
+                                                                         pRotorPositionDS.twksWSRotorContentByPosition(0).RotorType, _
+                                                                         pRotorPositionDS.twksWSRotorContentByPosition(0).CellNumber, _
+                                                                         pRotorPositionDS.twksWSRotorContentByPosition(0).RingNumber)
 
-                                If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                    Dim myRotorContentByPositionDS As WSRotorContentByPositionDS
-                                    myRotorContentByPositionDS = DirectCast(myGlobalDataTo.SetDatos, WSRotorContentByPositionDS)
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    Dim myRotorContentByPositionDS As WSRotorContentByPositionDS = DirectCast(resultData.SetDatos, WSRotorContentByPositionDS)
 
                                     If (myRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
+                                        Dim myRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow = myRotorContentByPositionDS.twksWSRotorContentByPosition.First
 
-                                        'TR 14/11/2013 -BT #1383 Get all the Reagents not in use and complete the remaining test.
-                                        If Not myGlobalDataTo.HasError Then
-                                            Dim myWSRotorContentByPositionDS As New WSRotorContentByPositionDS
-                                            Dim myListNotInUse As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-                                            myWSRotorContentByPositionDS = DirectCast(myGlobalDataTo.SetDatos, WSRotorContentByPositionDS)
-                                            'Get all the elements with status  NOT_INUSE
-                                            myListNotInUse = (From a In myWSRotorContentByPositionDS.twksWSRotorContentByPosition
-                                                              Where a.Status = "NO_INUSE" Select a).ToList()
-                                            For Each NotInUseElement As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myListNotInUse
-                                                'Validate the Reagent id and the real volume are not null values to avoid exception error.
-                                                If Not pRotorPositionDS.twksWSRotorContentByPosition(0).IsReagentIDNull AndAlso _
-                                                    Not pRotorPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull Then
+                                        ''TR 14/11/2013 -BT #1383 Get all the Reagents not in use and complete the remaining test.
+                                        'If Not myGlobalDataTo.HasError Then
+                                        '    Dim myWSRotorContentByPositionDS As New WSRotorContentByPositionDS
+                                        '    Dim myListNotInUse As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+                                        '    myWSRotorContentByPositionDS = DirectCast(myGlobalDataTo.SetDatos, WSRotorContentByPositionDS)
+                                        '    'Get all the elements with status  NOT_INUSE
+                                        '    myListNotInUse = (From a In myWSRotorContentByPositionDS.twksWSRotorContentByPosition
+                                        '                      Where a.Status = "NO_INUSE" Select a).ToList()
+                                        '    For Each NotInUseElement As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myListNotInUse
+                                        '        'Validate the Reagent id and the real volume are not null values to avoid exception error.
+                                        '        If Not pRotorPositionDS.twksWSRotorContentByPosition(0).IsReagentIDNull AndAlso _
+                                        '            Not pRotorPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull Then
 
-                                                    'calculate the remaining test number.
-                                                    myGlobalDataTo = CalculateRemainingTestNotInUseReagent(dbConnection, NotInUseElement.WorkSessionID, _
-                                                                                          pRotorPositionDS.twksWSRotorContentByPosition(0).ReagentID, _
-                                                                                          NotInUseElement.MultiTubeNumber, pRotorPositionDS.twksWSRotorContentByPosition(0).RealVolume, _
-                                                                                          NotInUseElement.TubeType)
+                                        '            'calculate the remaining test number.
+                                        '            myGlobalDataTo = CalculateRemainingTestNotInUseReagent(dbConnection, NotInUseElement.WorkSessionID, _
+                                        '                                                  pRotorPositionDS.twksWSRotorContentByPosition(0).ReagentID, _
+                                        '                                                  NotInUseElement.MultiTubeNumber, pRotorPositionDS.twksWSRotorContentByPosition(0).RealVolume, _
+                                        '                                                  NotInUseElement.TubeType)
 
-                                                    If Not myGlobalDataTo.HasError Then
-                                                        NotInUseElement.RemainingTestsNumber = CInt(myGlobalDataTo.SetDatos)
-                                                    End If
-                                                End If
-                                            Next
-                                        End If
-                                        'TR 14/11/2013 -END.
+                                        '            If Not myGlobalDataTo.HasError Then
+                                        '                NotInUseElement.RemainingTestsNumber = CInt(myGlobalDataTo.SetDatos)
+                                        '            End If
+                                        '        End If
+                                        '    Next
+                                        'End If
+                                        ''TR 14/11/2013 -END.
 
                                         'Fill fields in table PositionInformation 
                                         Dim myCellPosInfoRow As CellPositionInformationDS.PositionInformationRow
                                         myCellPosInfoRow = myCellPosInfoDS.PositionInformation.NewPositionInformationRow()
 
-                                        myCellPosInfoRow.RingNumber = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RingNumber
-                                        myCellPosInfoRow.CellNumber = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).CellNumber
-                                        myCellPosInfoRow.Status = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status.ToString
-                                        myCellPosInfoRow.BarcodeInfo = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).BarCodeInfo.ToString
-                                        myCellPosInfoRow.BarcodeStatus = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).BarcodeStatus.ToString
-                                        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull) Then
-                                            myCellPosInfoRow.ElementID = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).ElementID
+                                        myCellPosInfoRow.RingNumber = myRow.RingNumber
+                                        myCellPosInfoRow.CellNumber = myRow.CellNumber
+                                        myCellPosInfoRow.Status = myRow.Status.ToString
+                                        myCellPosInfoRow.BarcodeInfo = myRow.BarCodeInfo.ToString
+                                        myCellPosInfoRow.BarcodeStatus = myRow.BarcodeStatus.ToString
+                                        If (Not myRow.IsElementIDNull) Then
+                                            myCellPosInfoRow.ElementID = myRow.ElementID
                                         End If
-
                                         myCellPosInfoDS.PositionInformation.Rows.Add(myCellPosInfoRow)
-                                    End If
 
-                                    If (myRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull) Then
-                                        'Get data of the specified Required Work Session Element 
-                                        'myGlobalDataTo = New GlobalDataTO
-                                        Dim myRequiredElements As New WSRequiredElementsDelegate
-                                        myGlobalDataTo = myRequiredElements.GetRequiredElementInfo(dbConnection, _
-                                                                                                   myRotorContentByPositionDS.twksWSRotorContentByPosition(0).ElementID)
-
-                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                            Dim resultDataDS As WSRequiredElementsTreeDS
-                                            resultDataDS = DirectCast(myGlobalDataTo.SetDatos, WSRequiredElementsTreeDS)
-
-                                            Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow
-                                            Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow
-
-                                            'By checking which of the tables in the DataSet has rows, the data is obtained from the proper
-                                            'table in the returned DataSet and inserted in the proper table in the final DataSet to return
-                                            If (resultDataDS.Controls.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = "CTRL"
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from Controls table in WSRequiredElementsTreeDS and 
-                                                'inserted in Samples Table in CellPositionInformationDS.  Value of field 
-                                                'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                myCellSamplesPosInfoRow.ElementID = resultDataDS.Controls(0).ElementID
-                                                myCellSamplesPosInfoRow.SampleID = resultDataDS.Controls(0).ControlName
-                                                myCellSamplesPosInfoRow.LotNumber = resultDataDS.Controls(0).LotNumber
-                                                myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Controls(0).ExpirationDate)
-                                                myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-
-                                            ElseIf (resultDataDS.Calibrators.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = "CALIB"
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from Calibrators table in WSRequiredElementsTreeDS and 
-                                                'inserted in Samples Table in CellPositionInformationDS.  Value of field 
-                                                'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                myCellSamplesPosInfoRow.ElementID = resultDataDS.Calibrators(0).ElementID
-                                                myCellSamplesPosInfoRow.SampleID = resultDataDS.Calibrators(0).CalibratorName
-                                                myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.Calibrators(0).CalibratorNumber
-                                                myCellSamplesPosInfoRow.LotNumber = resultDataDS.Calibrators(0).LotNumber
-                                                myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Calibrators(0).ExpirationDate)
-                                                myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-
-                                            ElseIf (resultDataDS.PatientSamples.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from Patients table in WSRequiredElementsTreeDS and 
-                                                'inserted in Samples Table in CellPositionInformationDS.  Value of field 
-                                                'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                myCellSamplesPosInfoRow.ElementID = resultDataDS.PatientSamples(0).ElementID
-
-                                                If (Not resultDataDS.PatientSamples(0).IsPatientIDNull) Then
-                                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).PatientID
-                                                ElseIf Not resultDataDS.PatientSamples(0).IsSampleIDNull Then
-                                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).SampleID
-                                                ElseIf Not resultDataDS.PatientSamples(0).IsOrderIDNull Then
-                                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).OrderID
-                                                End If
-
-                                                myCellSamplesPosInfoRow.SampleType = resultDataDS.PatientSamples(0).SampleType
-
-                                                If (Not resultDataDS.PatientSamples(0).IsPredilutionFactorNull) Then
-                                                    myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.PatientSamples(0).PredilutionFactor
-                                                    myCellSamplesPosInfoRow.Diluted = (resultDataDS.PatientSamples(0).PredilutionFactor > 0)
-                                                End If
-
-                                                myCellSamplesPosInfoRow.Stat = resultDataDS.PatientSamples(0).StatFlag
-                                                myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-
-                                            ElseIf (resultDataDS.Reagents.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from Reagents table in WSRequiredElementsTreeDS and 
-                                                'inserted in Reagents Table in CellPositionInformationDS.  Value of field 
-                                                'BottleCode is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
-                                                myCellReagentPosInfoRow.ElementID = resultDataDS.Reagents(0).ElementID
-                                                myCellReagentPosInfoRow.ReagentName = resultDataDS.Reagents(0).ReagentName
-                                                myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.Reagents(0).ReagentNumber
-                                                myCellReagentPosInfoRow.TestList = resultDataDS.Reagents(0).TestName
-                                                myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-
-                                                If (Not resultDataDS.Reagents(0).IsLotNumberNull) Then
-                                                    myCellReagentPosInfoRow.LotNumber = resultDataDS.Reagents(0).LotNumber.ToString
-                                                End If
-
-                                                If (Not resultDataDS.Reagents(0).IsExpirationDateNull) Then
-                                                    myCellReagentPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Reagents(0).ExpirationDate)
-                                                End If
-
-                                                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
-                                                    myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
-                                                End If
-                                                'TR 14/11/2013 -BT #1383
-                                                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                    myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                End If
-                                                'TR 14/11/2013 -BT #1383 -END.
-                                                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                    myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                End If
-                                                myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
-
-                                            ElseIf (resultDataDS.AdditionalSolutions.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = resultDataDS.AdditionalSolutions(0).TubeContent
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                If (Not resultDataDS.AdditionalSolutions(0).IsSolutionCodeNull) Then
-                                                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.AdditionalSolutions(0).SolutionCode
-                                                End If
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and 
-                                                'inserted in Reagents Table in CellPositionInformationDS.  Value of field 
-                                                'BottleCode is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
-                                                myCellReagentPosInfoRow.ElementID = resultDataDS.AdditionalSolutions(0).ElementID
-                                                myCellReagentPosInfoRow.ReagentName = resultDataDS.AdditionalSolutions(0).SolutionName
-                                                myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-
-                                                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
-                                                    myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
-                                                End If
-                                                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                    myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                End If
-                                                myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
-
-                                            ElseIf (resultDataDS.TubeAdditionalSolutions.Rows.Count > 0) Then
-                                                'The TubeContent is informed in table PositionInfo in the DataSet to return
-                                                myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                myCellPosInfoDS.PositionInformation(0).Content = resultDataDS.TubeAdditionalSolutions(0).TubeContent
-                                                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                If (Not resultDataDS.TubeAdditionalSolutions(0).IsSolutionCodeNull) Then
-                                                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.TubeAdditionalSolutions(0).SolutionCode
-                                                End If
-                                                myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and 
-                                                'inserted in Samples Table in CellPositionInformationDS.  Value of field 
-                                                'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
-                                                myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                myCellSamplesPosInfoRow.ElementID = resultDataDS.TubeAdditionalSolutions(0).ElementID
-                                                myCellSamplesPosInfoRow.SampleID = resultDataDS.TubeAdditionalSolutions(0).SolutionName
-                                                myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                'Else
-                                                'TODO: pending process for other Solutions: ISE, etc
-                                            End If
-                                        End If
-
-                                    ElseIf (myRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso _
-                                           (myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull) AndAlso _
-                                           (String.Compare(myRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) = 0) Then
-                                        'Process for NOT IN USE positions
-                                        Dim myNoInUsePositions As New WSNotInUseRotorPositionsDelegate
-                                        myGlobalDataTo = myNoInUsePositions.GetPositionContent(dbConnection, pRotorPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
-                                                                                               pRotorPositionDS.twksWSRotorContentByPosition(0).RotorType, _
-                                                                                               pRotorPositionDS.twksWSRotorContentByPosition(0).RingNumber, _
-                                                                                               pRotorPositionDS.twksWSRotorContentByPosition(0).CellNumber, _
-                                                                                               pRotorPositionDS.twksWSRotorContentByPosition(0).WorkSessionID)
-
-                                        Dim resultDataDS As New VirtualRotorPosititionsDS
-                                        Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow
-                                        Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow
-
-                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                            resultDataDS = DirectCast(myGlobalDataTo.SetDatos, VirtualRotorPosititionsDS)
-
-                                            If (resultDataDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
-                                                Select Case (resultDataDS.tparVirtualRotorPosititions(0).TubeContent())
-                                                    Case "WASH_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "WASH_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
-                                                            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
-                                                        End If
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
-                                                        myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
-                                                                                                                       resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
-                                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
-
-                                                            myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
-                                                            myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
-                                                            If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
-                                                                myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
-                                                            End If
-                                                            If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                                myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                            End If
-                                                            myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
-                                                        End If
-
-                                                    Case "SPEC_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "SPEC_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
-                                                            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
-                                                        End If
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
-                                                        myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
-                                                                                                                       resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
-
-                                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
-
-                                                            myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
-                                                            myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
-                                                            If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
-                                                                myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
-                                                            End If
-                                                            If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                                myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                            End If
-
-                                                            myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
-                                                        End If
-
-                                                    Case "TUBE_WASH_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "TUBE_WASH_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
-                                                            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
-                                                        End If
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
-                                                        myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
-                                                                                                                       resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
-                                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS
-                                                            myPreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
-
-                                                            myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                            myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
-                                                            myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                        End If
-
-                                                    Case "TUBE_SPEC_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "TUBE_SPEC_SOL"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
-                                                            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
-                                                        End If
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
-                                                        myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
-                                                                                                                       resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
-                                                        If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
-                                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
-
-                                                            myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                            myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
-                                                            myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                        End If
-
-                                                    Case "CTRL"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "CTRL"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myControlsDelegate As New ControlsDelegate
-                                                        resultData = myControlsDelegate.GetControlData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ControlID)
-
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            Dim myControlDataTo As ControlsDS = DirectCast(resultData.SetDatos, ControlsDS)
-
-                                                            myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                            myCellSamplesPosInfoRow.LotNumber = myControlDataTo.tparControls(0).LotNumber
-                                                            myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myControlDataTo.tparControls(0).ExpirationDate)
-                                                            myCellSamplesPosInfoRow.SampleID = myControlDataTo.tparControls(0).ControlName
-                                                            myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                        End If
-
-                                                    Case "CALIB"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "CALIB"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        Dim myCalibratorDelegate As New CalibratorsDelegate
-                                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
-
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
-
-                                                            myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                            myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
-                                                            myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
-                                                            myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myCalibratorDataTo.tparCalibrators(0).ExpirationDate)
-                                                            myCellSamplesPosInfoRow.SampleID = myCalibratorDataTo.tparCalibrators(0).CalibratorName
-                                                            myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-                                                            myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                        End If
-
-                                                    Case "REAGENT"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
-                                                        myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
-                                                        myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-
-                                                        Dim myReagentsDelegate As New ReagentsDelegate
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsReagentIDNull) Then
-                                                            resultData = myReagentsDelegate.GetReagentsData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
-                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                Dim myReagentDataTo As ReagentsDS = DirectCast(resultData.SetDatos, ReagentsDS)
-
-                                                                If myReagentDataTo.tparReagents.Count > 0 Then 'DL 07/02/2012
-
-                                                                    myCellReagentPosInfoRow.ReagentName = myReagentDataTo.tparReagents(0).ReagentName
-
-                                                                    'Get the list of Tests that use the Reagent
-                                                                    Dim myTestReagentDelegate As New TestReagentsDelegate
-                                                                    resultData = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
-
-                                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                        Dim myTestReagentsDS As TestReagentsDS = DirectCast(resultData.SetDatos, TestReagentsDS)
-
-                                                                        For i As Integer = 0 To myTestReagentsDS.tparTestReagents.Rows.Count - 1
-                                                                            If (i > 0) Then myCellReagentPosInfoRow.TestList &= ","
-                                                                            myCellReagentPosInfoRow.TestList &= myTestReagentsDS.tparTestReagents(0).TestName
-                                                                        Next
-                                                                    End If
-                                                                End If 'DL 02/07/2012
-                                                            End If
-                                                        End If
-
-                                                        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
-                                                            myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
-                                                        End If
-                                                        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
-                                                            myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
-                                                        End If
-                                                        myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
-
-                                                    Case "PATIENT"
-                                                        myCellPosInfoDS.PositionInformation(0).BeginEdit()
-                                                        myCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
-                                                        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
-                                                        myCellPosInfoDS.PositionInformation(0).EndEdit()
-
-                                                        myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
-                                                        myCellSamplesPosInfoRow.SampleType = resultDataDS.tparVirtualRotorPosititions(0).SampleType
-                                                        myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
-
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPatientIDNull) Then
-                                                            myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).PatientID
-                                                        ElseIf Not resultDataDS.tparVirtualRotorPosititions(0).IsOrderIDNull Then
-                                                            myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).OrderID
-                                                        End If
-
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPredilutionFactorNull) Then
-                                                            myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor
-                                                            myCellSamplesPosInfoRow.Diluted = (resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor > 0)
-                                                        End If
-
-                                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsOnlyForISENull) Then
-                                                            If (resultDataDS.tparVirtualRotorPosititions(0).OnlyForISE) Then
-                                                                myCellSamplesPosInfoRow.SampleType &= " (ISE)"
-                                                            End If
-                                                        End If
-                                                        myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
-                                                End Select
-                                            End If
+                                        If (Not myRow.IsElementIDNull) Then
+                                            'Get information of an INUSE Rotor Position
+                                            resultData = GetINUSEPositionInfo(dbConnection, myRow, myCellPosInfoDS)
+                                        ElseIf (myRow.Status <> "FREE") Then
+                                            'Get information of a NOT INUSE Rotor Position
+                                            resultData = GetNOT_INUSEPositionInfo(dbConnection, myRow, myCellPosInfoDS)
                                         End If
                                     End If
+
+                                    'If (myRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull) Then
+                                    ''Get data of the specified Required Work Session Element 
+                                    'Dim myGlobalDataTo As GlobalDataTO
+                                    'Dim myRequiredElements As New WSRequiredElementsDelegate
+                                    'myGlobalDataTo = myRequiredElements.GetRequiredElementInfo(dbConnection, myRotorContentByPositionDS.twksWSRotorContentByPosition(0).ElementID)
+
+                                    'If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '    Dim resultDataDS As WSRequiredElementsTreeDS
+                                    '    resultDataDS = DirectCast(myGlobalDataTo.SetDatos, WSRequiredElementsTreeDS)
+
+                                    '    Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow
+                                    '    Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow
+
+                                    '    'By checking which of the tables in the DataSet has rows, the data is obtained from the proper
+                                    '    'table in the returned DataSet and inserted in the proper table in the final DataSet to return
+                                    '    If (resultDataDS.Controls.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = "CTRL"
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from Controls table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Samples Table in CellPositionInformationDS.  Value of field 
+                                    '        'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '        myCellSamplesPosInfoRow.ElementID = resultDataDS.Controls(0).ElementID
+                                    '        myCellSamplesPosInfoRow.SampleID = resultDataDS.Controls(0).ControlName
+                                    '        myCellSamplesPosInfoRow.LotNumber = resultDataDS.Controls(0).LotNumber
+                                    '        myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Controls(0).ExpirationDate)
+                                    '        myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '        myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                                    '    ElseIf (resultDataDS.Calibrators.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = "CALIB"
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from Calibrators table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Samples Table in CellPositionInformationDS.  Value of field 
+                                    '        'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '        myCellSamplesPosInfoRow.ElementID = resultDataDS.Calibrators(0).ElementID
+                                    '        myCellSamplesPosInfoRow.SampleID = resultDataDS.Calibrators(0).CalibratorName
+                                    '        myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.Calibrators(0).CalibratorNumber
+                                    '        myCellSamplesPosInfoRow.LotNumber = resultDataDS.Calibrators(0).LotNumber
+                                    '        myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Calibrators(0).ExpirationDate)
+                                    '        myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '        myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                                    '    ElseIf (resultDataDS.PatientSamples.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from Patients table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Samples Table in CellPositionInformationDS.  Value of field 
+                                    '        'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '        myCellSamplesPosInfoRow.ElementID = resultDataDS.PatientSamples(0).ElementID
+
+                                    '        If (Not resultDataDS.PatientSamples(0).IsPatientIDNull) Then
+                                    '            myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).PatientID
+                                    '        ElseIf Not resultDataDS.PatientSamples(0).IsSampleIDNull Then
+                                    '            myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).SampleID
+                                    '        ElseIf Not resultDataDS.PatientSamples(0).IsOrderIDNull Then
+                                    '            myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).OrderID
+                                    '        End If
+
+                                    '        myCellSamplesPosInfoRow.SampleType = resultDataDS.PatientSamples(0).SampleType
+
+                                    '        If (Not resultDataDS.PatientSamples(0).IsPredilutionFactorNull) Then
+                                    '            myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.PatientSamples(0).PredilutionFactor
+                                    '            myCellSamplesPosInfoRow.Diluted = (resultDataDS.PatientSamples(0).PredilutionFactor > 0)
+                                    '        End If
+
+                                    '        myCellSamplesPosInfoRow.Stat = resultDataDS.PatientSamples(0).StatFlag
+                                    '        myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '        myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                                    '    ElseIf (resultDataDS.Reagents.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull() 'AG 11/01/2012
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from Reagents table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Reagents Table in CellPositionInformationDS.  Value of field 
+                                    '        'BottleCode is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
+                                    '        myCellReagentPosInfoRow.ElementID = resultDataDS.Reagents(0).ElementID
+                                    '        myCellReagentPosInfoRow.ReagentName = resultDataDS.Reagents(0).ReagentName
+                                    '        myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.Reagents(0).ReagentNumber
+                                    '        myCellReagentPosInfoRow.TestList = resultDataDS.Reagents(0).TestName
+                                    '        myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+
+                                    '        If (Not resultDataDS.Reagents(0).IsLotNumberNull) Then
+                                    '            myCellReagentPosInfoRow.LotNumber = resultDataDS.Reagents(0).LotNumber.ToString
+                                    '        End If
+
+                                    '        If (Not resultDataDS.Reagents(0).IsExpirationDateNull) Then
+                                    '            myCellReagentPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Reagents(0).ExpirationDate)
+                                    '        End If
+
+                                    '        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
+                                    '            myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
+                                    '        End If
+                                    '        'TR 14/11/2013 -BT #1383
+                                    '        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '            myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '        End If
+                                    '        'TR 14/11/2013 -BT #1383 -END.
+                                    '        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '            myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '        End If
+                                    '        myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                                    '    ElseIf (resultDataDS.AdditionalSolutions.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = resultDataDS.AdditionalSolutions(0).TubeContent
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '        If (Not resultDataDS.AdditionalSolutions(0).IsSolutionCodeNull) Then
+                                    '            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.AdditionalSolutions(0).SolutionCode
+                                    '        End If
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Reagents Table in CellPositionInformationDS.  Value of field 
+                                    '        'BottleCode is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
+                                    '        myCellReagentPosInfoRow.ElementID = resultDataDS.AdditionalSolutions(0).ElementID
+                                    '        myCellReagentPosInfoRow.ReagentName = resultDataDS.AdditionalSolutions(0).SolutionName
+                                    '        myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+
+                                    '        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
+                                    '            myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
+                                    '        End If
+                                    '        If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '            myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '        End If
+                                    '        myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                                    '    ElseIf (resultDataDS.TubeAdditionalSolutions.Rows.Count > 0) Then
+                                    '        'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                    '        myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '        myCellPosInfoDS.PositionInformation(0).Content = resultDataDS.TubeAdditionalSolutions(0).TubeContent
+                                    '        myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '        If (Not resultDataDS.TubeAdditionalSolutions(0).IsSolutionCodeNull) Then
+                                    '            myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.TubeAdditionalSolutions(0).SolutionCode
+                                    '        End If
+                                    '        myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '        'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and 
+                                    '        'inserted in Samples Table in CellPositionInformationDS.  Value of field 
+                                    '        'TubeType is in the DataSet with position information (myRotorContentByPositionDS)
+                                    '        myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '        myCellSamplesPosInfoRow.ElementID = resultDataDS.TubeAdditionalSolutions(0).ElementID
+                                    '        myCellSamplesPosInfoRow.SampleID = resultDataDS.TubeAdditionalSolutions(0).SolutionName
+                                    '        myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '        myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '        'Else
+                                    '        'TODO: pending process for other Solutions: ISE, etc
+                                    '    End If
+                                    'End If
+
+                                    'ElseIf (myRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso _
+                                    '       (myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull) AndAlso _
+                                    '       (String.Compare(myRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) = 0) Then
+                                    ''Process for NOT IN USE positions
+                                    'Dim myNoInUsePositions As New WSNotInUseRotorPositionsDelegate
+                                    'myGlobalDataTo = myNoInUsePositions.GetPositionContent(dbConnection, pRotorPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
+                                    '                                                       pRotorPositionDS.twksWSRotorContentByPosition(0).RotorType, _
+                                    '                                                       pRotorPositionDS.twksWSRotorContentByPosition(0).RingNumber, _
+                                    '                                                       pRotorPositionDS.twksWSRotorContentByPosition(0).CellNumber, _
+                                    '                                                       pRotorPositionDS.twksWSRotorContentByPosition(0).WorkSessionID)
+
+                                    'Dim resultDataDS As New VirtualRotorPosititionsDS
+                                    'Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow
+                                    'Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow
+
+                                    'If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '    resultDataDS = DirectCast(myGlobalDataTo.SetDatos, VirtualRotorPosititionsDS)
+
+                                    '    If (resultDataDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                    '        Select Case (resultDataDS.tparVirtualRotorPosititions(0).TubeContent())
+                                    '            Case "WASH_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "WASH_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                    '                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                    '                End If
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                    '                myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
+                                    '                                                                               resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                    '                If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '                    Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
+
+                                    '                    myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
+                                    '                    myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    '                    If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
+                                    '                        myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
+                                    '                    End If
+                                    '                    If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '                        myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '                    End If
+                                    '                    myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+                                    '                End If
+
+                                    '            Case "SPEC_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "SPEC_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                    '                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                    '                End If
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                    '                myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
+                                    '                                                                               resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+
+                                    '                If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '                    Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
+
+                                    '                    myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
+                                    '                    myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    '                    If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
+                                    '                        myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
+                                    '                    End If
+                                    '                    If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '                        myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '                    End If
+
+                                    '                    myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+                                    '                End If
+
+                                    '            Case "TUBE_WASH_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "TUBE_WASH_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                    '                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                    '                End If
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                    '                myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
+                                    '                                                                               resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                    '                If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '                    Dim myPreloadedMasterDataDS As PreloadedMasterDataDS
+                                    '                    myPreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
+
+                                    '                    myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '                    myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    '                    myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '                End If
+
+                                    '            Case "TUBE_SPEC_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "TUBE_SPEC_SOL"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                    '                    myCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                    '                End If
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                    '                myGlobalDataTo = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
+                                    '                                                                               resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                    '                If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
+                                    '                    Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTo.SetDatos, PreloadedMasterDataDS)
+
+                                    '                    myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '                    myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    '                    myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '                End If
+
+                                    '            Case "CTRL"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "CTRL"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myControlsDelegate As New ControlsDelegate
+                                    '                resultData = myControlsDelegate.GetControlData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ControlID)
+
+                                    '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '                    Dim myControlDataTo As ControlsDS = DirectCast(resultData.SetDatos, ControlsDS)
+
+                                    '                    myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '                    myCellSamplesPosInfoRow.LotNumber = myControlDataTo.tparControls(0).LotNumber
+                                    '                    myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myControlDataTo.tparControls(0).ExpirationDate)
+                                    '                    myCellSamplesPosInfoRow.SampleID = myControlDataTo.tparControls(0).ControlName
+                                    '                    myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '                End If
+
+                                    '            Case "CALIB"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "CALIB"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                Dim myCalibratorDelegate As New CalibratorsDelegate
+                                    '                resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
+
+                                    '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '                    Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
+                                    '                    myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '                    myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
+                                    '                    myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
+                                    '                    myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myCalibratorDataTo.tparCalibrators(0).ExpirationDate)
+                                    '                    myCellSamplesPosInfoRow.SampleID = myCalibratorDataTo.tparCalibrators(0).CalibratorName
+                                    '                    myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                    '                    myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '                End If
+
+                                    '            Case "REAGENT"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                myCellReagentPosInfoRow = myCellPosInfoDS.Reagents.NewReagentsRow()
+                                    '                myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
+                                    '                myCellReagentPosInfoRow.BottleCode = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+
+                                    '                Dim myReagentsDelegate As New ReagentsDelegate
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsReagentIDNull) Then
+                                    '                    resultData = myReagentsDelegate.GetReagentsData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
+                                    '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '                        Dim myReagentDataTo As ReagentsDS = DirectCast(resultData.SetDatos, ReagentsDS)
+
+                                    '                        If myReagentDataTo.tparReagents.Count > 0 Then 'DL 07/02/2012
+
+                                    '                            myCellReagentPosInfoRow.ReagentName = myReagentDataTo.tparReagents(0).ReagentName
+
+                                    '                            'Get the list of Tests that use the Reagent
+                                    '                            Dim myTestReagentDelegate As New TestReagentsDelegate
+                                    '                            resultData = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
+
+                                    '                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '                                Dim myTestReagentsDS As TestReagentsDS = DirectCast(resultData.SetDatos, TestReagentsDS)
+
+                                    '                                For i As Integer = 0 To myTestReagentsDS.tparTestReagents.Rows.Count - 1
+                                    '                                    If (i > 0) Then myCellReagentPosInfoRow.TestList &= ","
+                                    '                                    myCellReagentPosInfoRow.TestList &= myTestReagentsDS.tparTestReagents(0).TestName
+                                    '                                Next
+                                    '                            End If
+                                    '                        End If 'DL 02/07/2012
+                                    '                    End If
+                                    '                End If
+
+                                    '                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRealVolumeNull) Then
+                                    '                    myCellReagentPosInfoRow.RealVolume = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume
+                                    '                End If
+                                    '                If (Not myRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsRemainingTestsNumberNull) Then
+                                    '                    myCellReagentPosInfoRow.RemainingTests = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).RemainingTestsNumber
+                                    '                End If
+                                    '                myCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                                    '            Case "PATIENT"
+                                    '                myCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                    '                myCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
+                                    '                myCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                    '                myCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                    '                myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
+                                    '                myCellSamplesPosInfoRow.SampleType = resultDataDS.tparVirtualRotorPosititions(0).SampleType
+                                    '                myCellSamplesPosInfoRow.TubeType = myRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPatientIDNull) Then
+                                    '                    myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).PatientID
+                                    '                ElseIf Not resultDataDS.tparVirtualRotorPosititions(0).IsOrderIDNull Then
+                                    '                    myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).OrderID
+                                    '                End If
+
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPredilutionFactorNull) Then
+                                    '                    myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor
+                                    '                    myCellSamplesPosInfoRow.Diluted = (resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor > 0)
+                                    '                End If
+
+                                    '                If (Not resultDataDS.tparVirtualRotorPosititions(0).IsOnlyForISENull) Then
+                                    '                    If (resultDataDS.tparVirtualRotorPosititions(0).OnlyForISE) Then
+                                    '                        myCellSamplesPosInfoRow.SampleType &= " (ISE)"
+                                    '                    End If
+                                    '                End If
+                                    '                myCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                    '        End Select
+                                    '    End If
+                                    'End If
+                                    'End If
 
                                     'The information is returned
                                     resultData.HasError = False
@@ -2422,8 +2463,464 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionInfo", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get all details of an IN USE Rotor Position (all information to show in Position Info area in Rotor Positions Screen and/or in Monitor Screen) 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pPositionRow">Row of typed DataSet WSRotorContentByPositionDS containing data saved in DB for an specific Rotor Position</param>
+        ''' <param name="pCellPosInfoDS">Typed DataSet CellPositionInformationDS to return detailed information about the content of the specified 
+        '''                              IN USE Rotor Position</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
+        ''' </remarks>
+        Private Function GetINUSEPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPositionRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
+                                              ByRef pCellPosInfoDS As CellPositionInformationDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Get data of the specified Required Work Session Element 
+                        Dim myRequiredElements As New WSRequiredElementsDelegate
+
+                        resultData = myRequiredElements.GetRequiredElementInfo(dbConnection, pPositionRow.ElementID)
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim resultDataDS As WSRequiredElementsTreeDS = DirectCast(resultData.SetDatos, WSRequiredElementsTreeDS)
+
+                            Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow
+                            Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow
+
+                            'By checking which of the tables in the DataSet has rows, the data is obtained from the proper table in the returned 
+                            'DataSet and inserted in the proper table in the final DataSet to return
+                            If (resultDataDS.Controls.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = "CTRL"
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from Controls table in WSRequiredElementsTreeDS and inserted in Samples Table in CellPositionInformationDS  
+                                myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                myCellSamplesPosInfoRow.ElementID = resultDataDS.Controls(0).ElementID
+                                myCellSamplesPosInfoRow.SampleID = resultDataDS.Controls(0).ControlName
+                                myCellSamplesPosInfoRow.LotNumber = resultDataDS.Controls(0).LotNumber
+                                myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Controls(0).ExpirationDate)
+                                myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                            ElseIf (resultDataDS.Calibrators.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = "CALIB"
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from Calibrators table in WSRequiredElementsTreeDS and inserted in Samples Table in CellPositionInformationDS
+                                myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                myCellSamplesPosInfoRow.ElementID = resultDataDS.Calibrators(0).ElementID
+                                myCellSamplesPosInfoRow.SampleID = resultDataDS.Calibrators(0).CalibratorName
+                                myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.Calibrators(0).CalibratorNumber
+                                myCellSamplesPosInfoRow.LotNumber = resultDataDS.Calibrators(0).LotNumber
+                                myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Calibrators(0).ExpirationDate)
+                                myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                            ElseIf (resultDataDS.PatientSamples.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from Patients table in WSRequiredElementsTreeDS and inserted in Samples Table in CellPositionInformationDS.  
+                                myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                myCellSamplesPosInfoRow.ElementID = resultDataDS.PatientSamples(0).ElementID
+
+                                If (Not resultDataDS.PatientSamples(0).IsPatientIDNull) Then
+                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).PatientID
+                                ElseIf Not resultDataDS.PatientSamples(0).IsSampleIDNull Then
+                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).SampleID
+                                ElseIf Not resultDataDS.PatientSamples(0).IsOrderIDNull Then
+                                    myCellSamplesPosInfoRow.SampleID = resultDataDS.PatientSamples(0).OrderID
+                                End If
+
+                                myCellSamplesPosInfoRow.SampleType = resultDataDS.PatientSamples(0).SampleType
+
+                                If (Not resultDataDS.PatientSamples(0).IsPredilutionFactorNull) Then
+                                    myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.PatientSamples(0).PredilutionFactor
+                                    myCellSamplesPosInfoRow.Diluted = (resultDataDS.PatientSamples(0).PredilutionFactor > 0)
+                                End If
+
+                                myCellSamplesPosInfoRow.Stat = resultDataDS.PatientSamples(0).StatFlag
+                                myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+
+                            ElseIf (resultDataDS.Reagents.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from Reagents table in WSRequiredElementsTreeDS and inserted in Reagents Table in CellPositionInformationDS
+                                myCellReagentPosInfoRow = pCellPosInfoDS.Reagents.NewReagentsRow()
+                                myCellReagentPosInfoRow.ElementID = resultDataDS.Reagents(0).ElementID
+                                myCellReagentPosInfoRow.ReagentName = resultDataDS.Reagents(0).ReagentName
+                                myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.Reagents(0).ReagentNumber
+                                myCellReagentPosInfoRow.TestList = resultDataDS.Reagents(0).TestName
+                                myCellReagentPosInfoRow.BottleCode = pPositionRow.TubeType
+
+                                If (Not resultDataDS.Reagents(0).IsLotNumberNull) Then
+                                    myCellReagentPosInfoRow.LotNumber = resultDataDS.Reagents(0).LotNumber.ToString
+                                End If
+
+                                If (Not resultDataDS.Reagents(0).IsExpirationDateNull) Then
+                                    myCellReagentPosInfoRow.ExpirationDate = Convert.ToDateTime(resultDataDS.Reagents(0).ExpirationDate)
+                                End If
+
+                                If (Not pPositionRow.IsRealVolumeNull) Then
+                                    myCellReagentPosInfoRow.RealVolume = pPositionRow.RealVolume
+                                End If
+
+                                If (Not pPositionRow.IsRemainingTestsNumberNull) Then
+                                    myCellReagentPosInfoRow.RemainingTests = pPositionRow.RemainingTestsNumber
+                                End If
+                                pCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                            ElseIf (resultDataDS.AdditionalSolutions.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = resultDataDS.AdditionalSolutions(0).TubeContent
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                If (Not resultDataDS.AdditionalSolutions(0).IsSolutionCodeNull) Then
+                                    pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.AdditionalSolutions(0).SolutionCode
+                                End If
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and inserted in Reagents Table in CellPositionInformationDS
+                                myCellReagentPosInfoRow = pCellPosInfoDS.Reagents.NewReagentsRow()
+                                myCellReagentPosInfoRow.ElementID = resultDataDS.AdditionalSolutions(0).ElementID
+                                myCellReagentPosInfoRow.ReagentName = resultDataDS.AdditionalSolutions(0).SolutionName
+                                myCellReagentPosInfoRow.BottleCode = pPositionRow.TubeType
+
+                                If (Not pPositionRow.IsRealVolumeNull) Then
+                                    myCellReagentPosInfoRow.RealVolume = pPositionRow.RealVolume
+                                End If
+                                myCellReagentPosInfoRow.RemainingTests = 0
+                                pCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                            ElseIf (resultDataDS.TubeAdditionalSolutions.Rows.Count > 0) Then
+                                'The TubeContent is informed in table PositionInfo in the DataSet to return
+                                pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                pCellPosInfoDS.PositionInformation(0).Content = resultDataDS.TubeAdditionalSolutions(0).TubeContent
+                                pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                If (Not resultDataDS.TubeAdditionalSolutions(0).IsSolutionCodeNull) Then
+                                    pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.TubeAdditionalSolutions(0).SolutionCode
+                                End If
+                                pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                'Information is get from AdditionalSolutions table in WSRequiredElementsTreeDS and inserted in Samples Table in CellPositionInformationDS
+                                myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                myCellSamplesPosInfoRow.ElementID = resultDataDS.TubeAdditionalSolutions(0).ElementID
+                                myCellSamplesPosInfoRow.SampleID = resultDataDS.TubeAdditionalSolutions(0).SolutionName
+                                myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                            End If
+                            pCellPosInfoDS.AcceptChanges()
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetINUSEPositionInfo", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get all details of a NOT IN USE Rotor Position (all information to show in Position Info area in Rotor Positions Screen and/or in Monitor Screen) 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pPositionRow">Row of typed DataSet WSRotorContentByPositionDS containing data saved in DB for an specific Rotor Position</param>
+        ''' <param name="pCellPosInfoDS">Typed DataSet CellPositionInformationDS to return detailed information about the content of the specified 
+        '''                              NOT IN USE Rotor Position</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
+        ''' </remarks>
+        Private Function GetNOT_INUSEPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPositionRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
+                                                  ByRef pCellPosInfoDS As CellPositionInformationDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myNoInUsePositions As New WSNotInUseRotorPositionsDelegate
+                        resultData = myNoInUsePositions.GetPositionContent(dbConnection, pPositionRow.AnalyzerID, pPositionRow.RotorType, pPositionRow.RingNumber, _
+                                                                           pPositionRow.CellNumber, pPositionRow.WorkSessionID)
+
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim resultDataDS As VirtualRotorPosititionsDS = DirectCast(resultData.SetDatos, VirtualRotorPosititionsDS)
+                            If (resultDataDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                Dim myCellSamplesPosInfoRow As CellPositionInformationDS.SamplesRow = Nothing
+                                Dim myCellReagentPosInfoRow As CellPositionInformationDS.ReagentsRow = Nothing
+
+                                Select Case (resultDataDS.tparVirtualRotorPosititions.First.TubeContent())
+                                    Case "WASH_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "WASH_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                            pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                        End If
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                        resultData = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
+                                                                                                   resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+                                            myCellReagentPosInfoRow = pCellPosInfoDS.Reagents.NewReagentsRow()
+                                            myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                            If (Not pPositionRow.IsRealVolumeNull) Then
+                                                myCellReagentPosInfoRow.RealVolume = pPositionRow.RealVolume
+                                            End If
+                                            If (Not pPositionRow.IsRemainingTestsNumberNull) Then
+                                                myCellReagentPosInfoRow.RemainingTests = pPositionRow.RemainingTestsNumber
+                                            End If
+                                            myCellReagentPosInfoRow.BottleCode = pPositionRow.TubeType
+                                            pCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+                                        End If
+
+                                    Case "SPEC_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "SPEC_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                            pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                        End If
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                        resultData = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
+                                                                                                   resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+                                            myCellReagentPosInfoRow = pCellPosInfoDS.Reagents.NewReagentsRow()
+                                            myCellReagentPosInfoRow.ReagentName = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                            If (Not pPositionRow.IsRealVolumeNull) Then
+                                                myCellReagentPosInfoRow.RealVolume = pPositionRow.RealVolume
+                                            End If
+                                            If (Not pPositionRow.IsRemainingTestsNumberNull) Then
+                                                myCellReagentPosInfoRow.RemainingTests = pPositionRow.RemainingTestsNumber
+                                            End If
+
+                                            myCellReagentPosInfoRow.BottleCode = pPositionRow.TubeType
+                                            pCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+                                        End If
+
+                                    Case "TUBE_WASH_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "TUBE_WASH_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                            pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                        End If
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                        resultData = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
+                                                                                                   resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS
+                                            myPreloadedMasterDataDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+                                            myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                            myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                            myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                            pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                        End If
+
+                                    Case "TUBE_SPEC_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "TUBE_SPEC_SOL"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsSolutionCodeNull) Then
+                                            pCellPosInfoDS.PositionInformation(0).SolutionCode = resultDataDS.tparVirtualRotorPosititions(0).SolutionCode
+                                        End If
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+                                        resultData = myPreloadedMasterDataDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS, _
+                                                                                                   resultDataDS.tparVirtualRotorPosititions(0).SolutionCode)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myPreloadedMasterDataDS As PreloadedMasterDataDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+                                            myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                            myCellSamplesPosInfoRow.SampleID = myPreloadedMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                            myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                            pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                        End If
+
+                                    Case "CTRL"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "CTRL"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myControlsDelegate As New ControlsDelegate
+                                        resultData = myControlsDelegate.GetControlData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ControlID)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myControlDataTo As ControlsDS = DirectCast(resultData.SetDatos, ControlsDS)
+
+                                            myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                            myCellSamplesPosInfoRow.LotNumber = myControlDataTo.tparControls(0).LotNumber
+                                            myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myControlDataTo.tparControls(0).ExpirationDate)
+                                            myCellSamplesPosInfoRow.SampleID = myControlDataTo.tparControls(0).ControlName
+                                            myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                            pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                        End If
+
+                                    Case "CALIB"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "CALIB"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        Dim myCalibratorDelegate As New CalibratorsDelegate
+                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
+                                            myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                            myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
+                                            myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
+                                            myCellSamplesPosInfoRow.ExpirationDate = Convert.ToDateTime(myCalibratorDataTo.tparCalibrators(0).ExpirationDate)
+                                            myCellSamplesPosInfoRow.SampleID = myCalibratorDataTo.tparCalibrators(0).CalibratorName
+                                            myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+                                            pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                        End If
+
+                                    Case "REAGENT"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "REAGENT"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        myCellReagentPosInfoRow = pCellPosInfoDS.Reagents.NewReagentsRow()
+                                        myCellReagentPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
+                                        myCellReagentPosInfoRow.BottleCode = pPositionRow.TubeType
+
+                                        Dim myReagentsDelegate As New ReagentsDelegate
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsReagentIDNull) Then
+                                            resultData = myReagentsDelegate.GetReagentsData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                Dim myReagentDataTo As ReagentsDS = DirectCast(resultData.SetDatos, ReagentsDS)
+
+                                                If (myReagentDataTo.tparReagents.Rows.Count > 0) Then
+                                                    myCellReagentPosInfoRow.ReagentName = myReagentDataTo.tparReagents(0).ReagentName
+
+                                                    'Get the list of Tests that use the Reagent
+                                                    Dim myTestReagentDelegate As New TestReagentsDelegate
+                                                    resultData = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, resultDataDS.tparVirtualRotorPosititions(0).ReagentID)
+
+                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                        Dim myTestReagentsDS As TestReagentsDS = DirectCast(resultData.SetDatos, TestReagentsDS)
+
+                                                        For i As Integer = 0 To myTestReagentsDS.tparTestReagents.Rows.Count - 1
+                                                            If (i > 0) Then myCellReagentPosInfoRow.TestList &= ","
+                                                            myCellReagentPosInfoRow.TestList &= myTestReagentsDS.tparTestReagents(0).TestName
+                                                        Next
+                                                    End If
+                                                End If
+                                            End If
+                                        End If
+
+                                        If (Not pPositionRow.IsRealVolumeNull) Then
+                                            myCellReagentPosInfoRow.RealVolume = pPositionRow.RealVolume
+
+                                            If (Not pPositionRow.IsRemainingTestsNumberNull) Then
+                                                myCellReagentPosInfoRow.RemainingTests = pPositionRow.RemainingTestsNumber
+                                            Else
+                                                'Calculate the Number of Tests that can be executed with the available volume 
+                                                resultData = CalculateRemainingTestNotInUseReagent(dbConnection, pPositionRow.WorkSessionID, resultDataDS.tparVirtualRotorPosititions(0).ReagentID, _
+                                                                                                   pPositionRow.MultiTubeNumber, pPositionRow.RealVolume, pPositionRow.TubeType)
+
+                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                    myCellReagentPosInfoRow.RemainingTests = CInt(resultData.SetDatos)
+                                                End If
+                                            End If
+                                        End If
+                                        pCellPosInfoDS.Reagents.Rows.Add(myCellReagentPosInfoRow)
+
+                                    Case "PATIENT"
+                                        pCellPosInfoDS.PositionInformation(0).BeginEdit()
+                                        pCellPosInfoDS.PositionInformation(0).Content = "PATIENT"
+                                        pCellPosInfoDS.PositionInformation(0).SetSolutionCodeNull()
+                                        pCellPosInfoDS.PositionInformation(0).EndEdit()
+
+                                        myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
+                                        myCellSamplesPosInfoRow.SampleType = resultDataDS.tparVirtualRotorPosititions(0).SampleType
+                                        myCellSamplesPosInfoRow.TubeType = pPositionRow.TubeType
+
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPatientIDNull) Then
+                                            myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).PatientID
+                                        ElseIf Not resultDataDS.tparVirtualRotorPosititions(0).IsOrderIDNull Then
+                                            myCellSamplesPosInfoRow.SampleID = resultDataDS.tparVirtualRotorPosititions(0).OrderID
+                                        End If
+
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsPredilutionFactorNull) Then
+                                            myCellSamplesPosInfoRow.PredilutionFactor = resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor
+                                            myCellSamplesPosInfoRow.Diluted = (resultDataDS.tparVirtualRotorPosititions(0).PredilutionFactor > 0)
+                                        End If
+
+                                        If (Not resultDataDS.tparVirtualRotorPosititions(0).IsOnlyForISENull) Then
+                                            If (resultDataDS.tparVirtualRotorPosititions(0).OnlyForISE) Then
+                                                myCellSamplesPosInfoRow.SampleType &= " (ISE)"
+                                            End If
+                                        End If
+                                        pCellPosInfoDS.Samples.Rows.Add(myCellSamplesPosInfoRow)
+                                End Select
+                                pCellPosInfoDS.AcceptChanges()
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetNOT_INUSEPositionInfo", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2436,9 +2933,10 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by:  TR 15/11/2013 - BT #1383
+        ''' Created by:  TR 15/11/2013 - BA-1383
+        ''' Modified by: SA 22/12/2014 - BA-1999 ==> Function changed from Private to Public to allow call it when the Reagents Rotor is scanned. 
         ''' </remarks>
-        Private Function CalculateRemainingTestNotInUseReagent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSession As String, _
+        Public Function CalculateRemainingTestNotInUseReagent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSession As String, _
                                                                ByVal pReagentID As Integer, pReagentNumber As Integer, ByVal pRealBottleVolume As Single, _
                                                                ByVal pBottleType As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -2448,7 +2946,6 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         Dim myTestID As Integer = 0
                         Dim numRemainingTests As Integer = 0
                         Dim myTestReagentVolume As Single = 0
@@ -2460,61 +2957,60 @@ Namespace Biosystems.Ax00.BL
                         Dim myTestReagentsDS As New TestReagentsDS
                         Dim mytestReagentsVolumeDS As New TestReagentsVolumesDS
 
+                        'Get the Test that use the Reagent and if it is used as first or second Reagent to set the Volume
+                        myGlobalDataTO = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, pReagentID)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            'Get the Test that use the Reagent and if it is used as first or second Reagent to set the Volume
-                            myGlobalDataTO = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, pReagentID)
+                            myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                            If (myTestReagentsDS.tparTestReagents.Count > 0) Then
+                                'Get TestID and ReagentNumber 
+                                myTestID = myTestReagentsDS.tparTestReagents(0).TestID
+                                pReagentNumber = myTestReagentsDS.tparTestReagents(0).ReagentNumber
+                            End If
+                        End If
+
+                        ''Get the required volume for this Test
+                        If (myTestID > 0) Then
+                            myGlobalDataTO = myTestReagentVolumeDelegate.GetReagentsVolumesByTestID(dbConnection, myTestID)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
-                                If (myTestReagentsDS.tparTestReagents.Count > 0) Then
-                                    'Get TestID and ReagentNumber 
-                                    myTestID = myTestReagentsDS.tparTestReagents(0).TestID
-                                    pReagentNumber = myTestReagentsDS.tparTestReagents(0).ReagentNumber
+                                'Get the required volume depending on if the Test uses the Reagent as first or second
+                                mytestReagentsVolumeDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsVolumesDS)
+
+                                If (mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).Count > 0) Then
+                                    myTestReagentVolume = mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).First().ReagentVolume
                                 End If
                             End If
+                        End If
 
-                            'Get the required volume for this Test
-                            If (myTestID > 0) Then
-                                myGlobalDataTO = myTestReagentVolumeDelegate.GetReagentsVolumesByTestID(dbConnection, myTestID)
+                        'Get the Section defined for the Bottle according its size 
+                        Dim reagentBottles As New ReagentTubeTypesDelegate
+                        myGlobalDataTO = reagentBottles.GetVolumeByTubeType(dbConnection, pBottleType)
+
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            Dim reagentBottlesDS As ReagentTubeTypesDS = DirectCast(myGlobalDataTO.SetDatos, ReagentTubeTypesDS)
+
+                            If (reagentBottlesDS.ReagentTubeTypes.Rows.Count = 1) Then
+                                'Calculate the death volume for the bottle according its size
+                                myGlobalDataTO = reagentBottles.CalculateDeathVolByBottleType(dbConnection, pBottleType, reagentBottlesDS.ReagentTubeTypes.First.Section)
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                    'Get the required volume depending on if the Test uses the Reagent as first or second
-                                    mytestReagentsVolumeDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsVolumesDS)
-                                    If (mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).Count > 0) Then
-                                        myTestReagentVolume = mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).First().ReagentVolume
-                                    End If
-                                End If
-                            End If
+                                    Dim deathBottleVol As Single = CType(myGlobalDataTO.SetDatos, Single)
 
-                            'Get the Section defined for the Bottle according its size 
-                            Dim reagentBottles As New ReagentTubeTypesDelegate
-                            myGlobalDataTO = reagentBottles.GetVolumeByTubeType(dbConnection, pBottleType)
-
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                Dim reagentBottlesDS As ReagentTubeTypesDS = DirectCast(myGlobalDataTO.SetDatos, ReagentTubeTypesDS)
-
-                                If (reagentBottlesDS.ReagentTubeTypes.Rows.Count = 1) Then
-                                    'Calculate the death volume for the bottle according its size
-                                    myGlobalDataTO = reagentBottles.CalculateDeathVolByBottleType(dbConnection, pBottleType, reagentBottlesDS.ReagentTubeTypes.First.Section)
-
-                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                        Dim deathBottleVol As Single = CType(myGlobalDataTO.SetDatos, Single)
-
-                                        'Finally, calculate the number of Tests that can be executed with the remaining volume (excluding the death volume)
-                                        If ((pRealBottleVolume - deathBottleVol) < 0) Then
-                                            numRemainingTests = 0
-                                        Else
-                                            Dim preparationVolume As Single = CType((myTestReagentVolume) / 1000, Single)
-                                            If (preparationVolume > 0) Then
-                                                numRemainingTests = CType(Math.Truncate((pRealBottleVolume - deathBottleVol) / preparationVolume), Integer)
-                                            End If
+                                    'Finally, calculate the number of Tests that can be executed with the remaining volume (excluding the death volume)
+                                    If ((pRealBottleVolume - deathBottleVol) < 0) Then
+                                        numRemainingTests = 0
+                                    Else
+                                        Dim preparationVolume As Single = CType((myTestReagentVolume) / 1000, Single)
+                                        If (preparationVolume > 0) Then
+                                            numRemainingTests = CType(Math.Truncate((pRealBottleVolume - deathBottleVol) / preparationVolume), Integer)
                                         End If
                                     End If
                                 End If
                             End If
-
-                            'Set the result value to the GlobalDataTO 
-                            myGlobalDataTO.SetDatos = numRemainingTests
-                            myGlobalDataTO.HasError = False
                         End If
+
+                        'Set the result value to the GlobalDataTO 
+                        myGlobalDataTO.SetDatos = numRemainingTests
+                        myGlobalDataTO.HasError = False
                     End If
                 End If
             Catch ex As Exception
@@ -2523,8 +3019,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRequiredElementsDelegate.CalculateRemainingTestNotInUseReagent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRequiredElementsDelegate.CalculateRemainingTestNotInUseReagent", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -3044,8 +3540,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionInfoForReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionInfoForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3086,8 +3582,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetReagentsRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetReagentsRotorPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3125,8 +3621,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorContentPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorContentPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3164,8 +3660,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorContentPositionsResetDone", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorContentPositionsResetDone", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3209,8 +3705,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorCurrentContentForBarcodeManagement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorCurrentContentForBarcodeManagement", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3251,8 +3747,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorPositionsByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorPositionsByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3293,8 +3789,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetSamplesRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetSamplesRotorPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3328,8 +3824,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetWashingSolutionPosInfoBySolutionCode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetWashingSolutionPosInfoBySolutionCode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3366,8 +3862,13 @@ Namespace Biosystems.Ax00.BL
         '''                              needed to search in DB the Position Status, all information about the cell is contained in DS myVirtualRotorPosDS
         '''              DL 30/04/2013 - 
         '''              XB+JC 09/10/2013 - Correction on Load Virtual Rotors #1274 Bugs tracking
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
+        '''              SA 12/01/2015 - BA-1999 ==> When calling function CalculateReagentStatus, update the ElementStatus field also when the returned Status 
+        '''                                          is NOPOS (currently, it is updated only when the returned Status is incomplete, and if all positioned Reagent
+        '''                                          bottles are DEPLETED, the element is shown positioned in the TreeView of required Elements in Rotor Positioning Screen)
         ''' </remarks>
         Public Function LoadRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                   ByVal pRotorType As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -3398,33 +3899,34 @@ Namespace Biosystems.Ax00.BL
                                     resultDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
 
                                     'Update positions in the physical Rotor
-                                    'Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
-                                    'myGlobalDataTO = myRotorContentByPositionDAO.Update(dbConnection, resultDS)
                                     myGlobalDataTO = Update(dbConnection, pRotorType, resultDS, ClassCalledFrom.LoadRotor) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
 
                                     If (Not myGlobalDataTO.HasError) Then
                                         If (pRotorType = "REAGENTS") Then
-
                                             'Get Rotor Positions containing required Reagents to calculate its status (POS or INCOMPLETE)
                                             'Use TubeContent = REAGENT and ElementID NOT NULL, and sort data by ElementID; for each Reagent, calculate the Reagent Status just once
                                             '(due to it is possible to have several bottles of the same Reagent placed in the Rotor)
                                             Dim myReagentTubes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                             myReagentTubes = (From e As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In resultDS.twksWSRotorContentByPosition _
                                                              Where e.RotorType = "REAGENTS" _
-                                                           AndAlso String.Compare(e.TubeContent, "REAGENT", False) = 0 _
+                                                           AndAlso e.TubeContent = "REAGENT" _
                                                        AndAlso Not e.IsElementIDNull _
                                                             Select e Order By e.ElementID).Distinct.ToList
 
                                             Dim immPreviousRow As Integer = 0
-                                            Dim previousEleStatus As String = ""
+                                            Dim myReagentStatus As String = String.Empty
+                                            Dim previousEleStatus As String = String.Empty
                                             Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow = Nothing
+
                                             For Each myReagentContentROW As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myReagentTubes
                                                 If (myReagentContentROW.ElementID <> immPreviousRow) Then
                                                     myGlobalDataTO = myRequiredElementsDelegate.CalculateReagentStatus(dbConnection, pAnalyzerID, pRotorType, myReagentContentROW.ElementID, True)
-
                                                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                        If (DirectCast(myGlobalDataTO.SetDatos, String) = "INCOMPLETE") Then
-                                                            myReagentContentROW.ElementStatus = "INCOMPLETE"
+                                                        myReagentStatus = DirectCast(myGlobalDataTO.SetDatos, String)
+
+                                                        'BA-1999: If the returned Reagent Status is NOPOS (all positioned bottles are DEPLETED), ElementStatus field is also updated
+                                                        If (myReagentStatus = "INCOMPLETE" OrElse myReagentStatus = "NOPOS") Then
+                                                            myReagentContentROW.ElementStatus = myReagentStatus
                                                             previousEleStatus = myReagentContentROW.ElementStatus
                                                         End If
 
@@ -3452,7 +3954,7 @@ Namespace Biosystems.Ax00.BL
                                             Dim myTubes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                             myTubes = (From e As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In resultDS.twksWSRotorContentByPosition _
                                                       Where e.RotorType = pRotorType _
-                                                    AndAlso String.Compare(e.TubeContent, "REAGENT", False) <> 0 _
+                                                    AndAlso e.TubeContent <> "REAGENT" _
                                                 AndAlso Not e.IsElementIDNull _
                                                      Select e Order By e.ElementID).Distinct.ToList
 
@@ -3480,9 +3982,6 @@ Namespace Biosystems.Ax00.BL
 
                                         Dim noInUseDelegate As New WSNotInUseRotorPositionsDelegate
                                         Dim myNoInUseVirtualPosition As New VirtualRotorPosititionsDS
-
-                                        'Dim vRotorDS As New VirtualRotorPosititionsDS
-                                        'Dim vRotorDelegate As New VirtualRotorsPositionsDelegate
                                         Dim virtualRotorPosition As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow)
 
                                         For Each noInUseRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myNotInUseCells
@@ -3529,31 +4028,27 @@ Namespace Biosystems.Ax00.BL
                                             ' JC 20/09/2013 - Fix Bug #1274
                                             ' Check if there was any error and the 
                                             ' LoadRotor is necessary continue
-                                            If myGlobalDataTO.HasError Then
-
+                                            If (myGlobalDataTO.HasError) Then
                                                 ' if error was decodifing sample type
                                                 ' set the sample with Error and paint the sample at Rotor Position with a cross 
                                                 ' continue with next sample from virtual rotor 
-                                                If myGlobalDataTO.ErrorMessage = "Barcode Sample Type Error" Then
+                                                If (myGlobalDataTO.ErrorMessage = "Barcode Sample Type Error") Then
                                                     RowRotorContentByPos.BarcodeStatus = "ERROR"
                                                     myGlobalDataTO.HasError = False
                                                     Continue For
                                                 End If
-
                                             End If ' END JC 20/09/2013 - Fix Bug #1274
 
-                                            If Not myGlobalDataTO.HasError Then
-
+                                            If (Not myGlobalDataTO.HasError) Then
                                                 ' JC 20-09-2013 
                                                 'if there wasnot any error on decode, and BarcodeStatus has Error value, set as Ok.
                                                 ' special case: Rotor was saved with sample barcode status = error and restored when
                                                 ' barcode configuration has changed and now, the sample may be is correct
-                                                If RowRotorContentByPos.BarcodeStatus = "ERROR" Then
+                                                If (RowRotorContentByPos.BarcodeStatus = "ERROR") Then
                                                     RowRotorContentByPos.BarcodeStatus = "OK"
                                                 End If ' END JC 20/09/2013 - Fix Bug #1274
                                                 ' XB+JC 09/10/2013 
 
-                                                'If Not myGlobalDataTO.HasError Then
                                                 Dim decodedDataDS As BarCodesDS = DirectCast(myGlobalDataTO.SetDatos, BarCodesDS)
 
                                                 'new incorpore sample type
@@ -3564,7 +4059,7 @@ Namespace Biosystems.Ax00.BL
                                                                          AndAlso a.CellNumber = RowRotorContentByPos.CellNumber _
                                                                           Select a).ToList
 
-                                                    If virtualRotorPosition.Count > 0 Then
+                                                    If (virtualRotorPosition.Count > 0) Then
                                                         row.BeginEdit()
                                                         row.SampleType = virtualRotorPosition.First.SampleType
                                                         row.EndEdit()
@@ -3581,14 +4076,10 @@ Namespace Biosystems.Ax00.BL
                                                                          AndAlso Not row.IsBarCodeInfoNull _
                                                                           Select row).ToList
 
-
                                                 Dim noTestRequestDlg As New BarcodePositionsWithNoRequestsDelegate
                                                 myGlobalDataTO = noTestRequestDlg.AddPosition(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, RowRotorContentByPos.CellNumber, decodedDataDS)
-
                                             End If
                                         Next
-
-                                        'DL 30/04/2013. End Changes v2.0.0
                                     End If
                                 End If
                             End If
@@ -3614,8 +4105,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.LoadRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.LoadRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3740,8 +4231,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ManualElementPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ManualElementPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3781,8 +4272,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReadByCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReadByCellNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3819,8 +4310,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReadByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReadByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3862,8 +4353,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 02/03/2012 - Informed parameter for the BottleType with calling function CalculateRemainingTests
         '''              SA 06/03/2012 - Call to function for automatic positioning of Additional Solutions have to be done although
         '''                              there are not Reagents pending to positioning
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function ReagentsAutoPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                 ByVal pAnalyzerID As String, ByVal pRotorType As String) As GlobalDataTO
@@ -4451,8 +4944,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReagentsAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReagentsAutoPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4470,7 +4963,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  BK 08/12/2009 - Tested: OK
         ''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
-        '''              AG 21/01/2010 - Reset the noinuse rotor postiions table (Tested OK)
+        '''              AG 21/01/2010 - Reset the not in use rotor positions table (Tested OK)
         ''' </remarks>
         Public Function ResetRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                    ByVal pRotorType As String, ByVal pWorkSessionID As String) As GlobalDataTO
@@ -4517,8 +5010,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ResetRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ResetRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4565,8 +5058,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4751,8 +5244,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SamplesAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SamplesAutoPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4771,7 +5264,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentByPositionDS</returns>
         ''' <remarks>
         ''' Created by:  AG 30/03/2011 - Based on ExistOtherPosition
-        ''' AG 13/06/2014 #1662 - Protection against change positions in pause when S / R2 arm still have not been finished with this position
+        ''' Modified by: AG 13/06/2014 - BT #1662 ==> Protection against change positions in pause when S / R2 arm still have not been finished with this position
         ''' </remarks>
         Public Function SearchOtherPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
                                             ByVal pRotorType As String, ByVal pCellNumber As Integer) As GlobalDataTO
@@ -4805,8 +5298,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SearchOtherPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SearchOtherPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4851,14 +5344,13 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SetScannedPositionToFREE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SetScannedPositionToFREE", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Update ScannedPosition and the rest of Barcode fields of a Rotor position with the data read from Analyzer (BarCodeInfo and BarCodeStatus)
@@ -4874,11 +5366,10 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 26/06/2011 
-        ''' AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        ''' Modified by: AG 07/10/2014 - BA-1979 ==>  Added a call to new auxiliary function CheckForInvalidPosition to check if there are FREE or NOT IN USE Rotor 
+        '''                                           Positions with incomplete data (TubeContent without ID of the corresponding element)
         ''' </remarks>
-        Public Function UpdateBarCodeFields(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                            ByVal pRotorType As String, _
-                                            ByVal pBarcodeDS As WSRotorContentByPositionDS, _
+        Public Function UpdateBarCodeFields(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pBarcodeDS As WSRotorContentByPositionDS, _
                                             ByVal pAdditionalFieldsFlag As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -4887,11 +5378,10 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'AG 07/10/2014 - BA-1979
+                        'BA-1979: Check if there are FREE or NOT IN USE Rotor Positions with incomplete data (TubeContent without ID of the element) 
                         resultData = CheckForInvalidPosition(dbConnection, pRotorType, pBarcodeDS, ClassCalledFrom.UpdateBarcodeFields)
-                        If Not resultData.HasError Then
-                            'AG 07/10/2014 - BA-1979
 
+                        If (Not resultData.HasError) Then
                             Dim myDAO As New twksWSRotorContentByPositionDAO
                             resultData = myDAO.UpdateBarCodeFields(dbConnection, pBarcodeDS, pAdditionalFieldsFlag)
                         End If
@@ -4914,8 +5404,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateBarCodeFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateBarCodeFields", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5016,8 +5506,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5039,8 +5529,10 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR 20/11/2009 - Tested: OK
         ''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        ''' AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function UpdateMultitubeNumber(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalizerID As String, _
                                               ByVal pRotorType As String, ByVal pElementID As Integer) As GlobalDataTO
@@ -5093,8 +5585,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateMultitubeNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateMultitubeNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5120,9 +5612,9 @@ Namespace Biosystems.Ax00.BL
             Try
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        If Not (pNotInUsePositionDS Is Nothing) Then
+                        If (Not pNotInUsePositionDS Is Nothing) Then
                             'Update values of ElementID and Status in the Rotor Position. 
                             Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
                             myGlobalDataTO = myRotorContentByPositionDAO.UpdateNotInUseRotorPosition(dbConnection, pNotInUsePositionDS)
@@ -5151,8 +5643,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateNotInUseRotorPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateNotInUseRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5179,8 +5671,10 @@ Namespace Biosystems.Ax00.BL
         '''              RH 31/08/2011 - Code optimization. short-circuit evaluation. Remove unneeded and memory wasting "New" instructions.
         '''              SA 15/02/2012 - Function updated due to changes in function CalculateReagentStatus
         '''              SA 02/03/2012 - Informed parameter for the BottleType with calling function CalculateRemainingTests
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Public Function UpdateReagentPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) _
                                               As GlobalDataTO
@@ -5201,12 +5695,12 @@ Namespace Biosystems.Ax00.BL
                                                                                                 rotorContenPositionRow.RealVolume, rotorContenPositionRow.TubeType)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 If (String.Compare(myGlobalDataTO.SetDatos.ToString(), "", False) <> 0) Then
-                                    Dim myGlobalBase As New GlobalBase
+                                    'Dim myGlobalbase As New GlobalBase
 
                                     'Set value of field RemainingTests in DataSet 
                                     rotorContenPositionRow.BeginEdit()
                                     rotorContenPositionRow.RemainingTestsNumber = CType(myGlobalDataTO.SetDatos, Integer)
-                                    rotorContenPositionRow.TS_User = myGlobalBase.GetSessionInfo.UserName
+                                    rotorContenPositionRow.TS_User = GlobalBase.GetSessionInfo.UserName
                                     rotorContenPositionRow.TS_DateTime = DateTime.Now
                                     rotorContenPositionRow.EndEdit()
                                 End If
@@ -5259,8 +5753,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateReagentPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateReagentPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5588,8 +6082,8 @@ Namespace Biosystems.Ax00.BL
 
 
                 '' XBC 03/07/2012 - time estimation
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity("Update Sample Position : Id [" & pExecutionID.ToString & "] " & _
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity("Update Sample Position : Id [" & pExecutionID.ToString & "] " & _
                 '                                "New Position Status [" & pNewPositionStatus.ToString & "] " & _
                 '                                Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "WSRotorContentByPositionDelegate.UpdateSamplePositionStatus", EventLogEntryType.Information, False)
 
@@ -5602,8 +6096,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateSamplePositionStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateSamplePositionStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5646,8 +6140,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.VerifyTubesByElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.VerifyTubesByElement", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -5671,7 +6165,7 @@ Namespace Biosystems.Ax00.BL
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSRotorContentByPositionDAO
                         resultData = myDAO.UpdateWSAnalyzerID(dbConnection, pAnalyzerID, pWorkSessionID)
@@ -5694,24 +6188,26 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
 
-
         ''' <summary>
-        ''' Replace callings to DAO.Update by this method who implements traces for determine who is the responsible of leave invalid values into database
+        ''' All calls to Update function in the DAO Class have been replaced for a call to this funcion, which add traces to the Application Log when
+        ''' there are positions with invalid values (TubeContent informed but not information about the corresponding Element ID). 
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pRotorType"></param>
-        ''' <param name="pRotorContentsDS"></param>
-        ''' <param name="pProcessWhoCalls"></param>
-        ''' <returns></returns>
-        ''' <remarks>AG 07/10/2014 - BA-1979</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pRotorType">Rotor Type: SAMPLES or REAGENTS</param>
+        ''' <param name="pRotorContentsDS">Typed DataSet WSRotorContentByPositionDS containing data of the Rotor Positions to update</param>
+        ''' <param name="pProcessWhoCalls">Enumerate that informs the process who calls the delegate instance</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  AG 07/10/2014 - BA-1979
+        ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pRotorContentsDS As WSRotorContentByPositionDS, Optional ByVal pProcessWhoCalls As ClassCalledFrom = ClassCalledFrom.NotInitiated) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -5719,14 +6215,14 @@ Namespace Biosystems.Ax00.BL
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
-                        If pProcessWhoCalls <> ClassCalledFrom.NotInitiated Then
+                        'BA-1979: Check if there are FREE and NOT IN USE Rotor Positions with incomplete data (TubeContent without ID of the element) 
+                        If (pProcessWhoCalls <> ClassCalledFrom.NotInitiated) Then
                             resultData = CheckForInvalidPosition(dbConnection, pRotorType, pRotorContentsDS, pProcessWhoCalls)
                         End If
 
-                        If Not resultData.HasError Then
+                        If (Not resultData.HasError) Then
                             Dim myDAO As New twksWSRotorContentByPositionDAO
                             resultData = myDAO.Update(dbConnection, pRotorContentsDS)
                         End If
@@ -5734,25 +6230,23 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
                     End If
                 End If
-
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.Update", EventLogEntryType.Error, False)
-
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5775,11 +6269,13 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  TR 30/11/2009 - Tested: OK
         ''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
         '''              SA 11/01/2012 - Code improved
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Private Function AdditionalSolutionPositioning(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                      ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
+                                                       ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -5869,8 +6365,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalSolutionPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AdditionalSolutionPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5919,8 +6415,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AddRotorRingCell", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.AddRotorRingCell", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5956,8 +6452,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 27/09/2011 - Set values of Barcode fields for all positions of a Multipoint Calibrator (currently they are updated only for the first point)
         '''              SA 10/01/2012 - Use value of field ElementFinished to set Cell Status = Finished. Call function GetSamplePositionStatus only when 
         '''                              ElementFinished is False. Implementation improved 
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Private Function CalibratorPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                                ByVal pMaxRotorRingNumber As Integer, ByVal pAutoPositioning As Boolean) As GlobalDataTO
@@ -5973,8 +6471,8 @@ Namespace Biosystems.Ax00.BL
                         rotorContentRow = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0)
 
                         'Get Username of the logged User                                       
-                        Dim myGlobalBase As New GlobalBase
-                        Dim loggedUser As String = myGlobalBase.GetSessionInfo().UserName
+                        'Dim myGlobalbase As New GlobalBase
+                        Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                         'Search details of the Required Element needed to be positioned (Calibrator Identifier, TubeType and indicator of Element Finished)
                         Dim myRequiredElementsDelegate As New WSRequiredElementsDelegate
@@ -6183,8 +6681,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CalibratorPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CalibratorPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6244,8 +6742,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CheckAvailablePositionsByRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CheckAvailablePositionsByRotor", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -6275,8 +6773,10 @@ Namespace Biosystems.Ax00.BL
         '''              AG 08/09/2011 - Calculate sample position status (PENDING, INPROCESS, ...)
         '''              TR 17/10/2011 - Removed Exit Try in code and changed the implementation
         '''              SA 10/01/2012 - Implementation improved
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Private Function ControlPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                             ByVal pMaxRotorRingNumber As Integer, ByVal pAutoPositioning As Boolean) As GlobalDataTO
@@ -6375,8 +6875,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ControlPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ControlPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6416,8 +6916,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = ""
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountPositionedReagentsBottlesByElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountPositionedReagentsBottlesByElementID", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -6467,8 +6967,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountPositionsByStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountPositionsByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6583,8 +7083,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetNextRotorPositionForSample", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetNextRotorPositionForSample", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6664,36 +7164,36 @@ Namespace Biosystems.Ax00.BL
                                     Do While ((Not freeCell) AndAlso (ringNumber <= pMaxRotorRingNumber))
                                         myGlobalDataTO = myRotorContentbyPositionDAO.GetMinFreeCellByRing(dbConnection, pAnalyzerID, pRotorType, pWorkSessionID, ringNumber)
 
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                If (Not String.IsNullOrEmpty(myGlobalDataTO.SetDatos.ToString)) Then
-                                    freeCell = True
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            If (Not String.IsNullOrEmpty(myGlobalDataTO.SetDatos.ToString)) Then
+                                                freeCell = True
 
-                                    'Inform the Ring and Cell found in the DS to return
-                                    myRingCellRow.RingNumber = ringNumber
-                                    myRingCellRow.CellNumber = CType(myGlobalDataTO.SetDatos, Integer)
-                                    myRingCellNumberDS.RingCellTable.AddRingCellTableRow(myRingCellRow)
-                                Else
-                                    ringNumber += 1
-                                End If
-                            Else
-                                'Error getting the MinFreeCell in the informed Ring; stop the searching by forcing the EXIT WHILE
-                                ringNumber = (pMaxRotorRingNumber + 1)
-                            End If
+                                                'Inform the Ring and Cell found in the DS to return
+                                                myRingCellRow.RingNumber = ringNumber
+                                                myRingCellRow.CellNumber = CType(myGlobalDataTO.SetDatos, Integer)
+                                                myRingCellNumberDS.RingCellTable.AddRingCellTableRow(myRingCellRow)
+                                            Else
+                                                ringNumber += 1
+                                            End If
+                                        Else
+                                            'Error getting the MinFreeCell in the informed Ring; stop the searching by forcing the EXIT WHILE
+                                            ringNumber = (pMaxRotorRingNumber + 1)
+                                        End If
                                     Loop
-                    End If
+                                End If
 
-                    If (Not myGlobalDataTO.HasError) Then
-                        If (freeCell) Then
-                            'Return the found Ring/Cell in the GlobalDataTO
-                            myGlobalDataTO.SetDatos = myRingCellNumberDS
-                        Else
-                            'A Free Cell was not found, the Rotor is full
-                            myGlobalDataTO.ErrorCode = "ROTOR_FULL"
-                        End If
-                    End If
-                End If
-                'Else
-                'TODO: PENDING: Process for A200 Rotor for Samples and Reagents
+                                If (Not myGlobalDataTO.HasError) Then
+                                    If (freeCell) Then
+                                        'Return the found Ring/Cell in the GlobalDataTO
+                                        myGlobalDataTO.SetDatos = myRingCellNumberDS
+                                    Else
+                                        'A Free Cell was not found, the Rotor is full
+                                        myGlobalDataTO.ErrorCode = "ROTOR_FULL"
+                                    End If
+                                End If
+                            End If
+                            'Else
+                            'TODO: PENDING: Process for A200 Rotor for Samples and Reagents
                         End If
                     End If
                 End If
@@ -6704,8 +7204,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorPositionForSample", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorPositionForSample", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6892,8 +7392,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetSamplePositionStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetSamplePositionStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6930,8 +7430,10 @@ Namespace Biosystems.Ax00.BL
         '''                              ** If field SpecimenIDList is informed for the required Patient Sample, fill BarcodeInfo with the first SpecimenID in the list
         '''                                 and set BarcodeStatus = OK
         '''                              ** Otherwise, both Barcode fields remain with NULL value
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
-        '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
+        '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
+        '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
+        '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
         ''' </remarks>
         Private Function PatientSamplePositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                                  ByVal pMaxRotorRingNumber As Integer, ByVal pAutoPositioning As Boolean) As GlobalDataTO
@@ -7071,8 +7573,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.PatientSamplePositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.PatientSamplePositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -7120,8 +7622,8 @@ Namespace Biosystems.Ax00.BL
                     Dim cellNumber As Integer = pRotorContentPosRow.CellNumber
 
                     'Get the logged User
-                    Dim myGlobalBase As New GlobalBase
-                    Dim loggedUser As String = myGlobalBase.GetSessionInfo().UserName
+                    'Dim myGlobalbase As New GlobalBase
+                    Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                     'Declare a RotorContentByPosition row to add to it the positions for the Patient Sample Dilutions
                     Dim rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
@@ -7183,8 +7685,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.PrepareSampleForDilution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.PrepareSampleForDilution", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -7231,8 +7733,8 @@ Namespace Biosystems.Ax00.BL
                     myWSRotorContentByPositionDS.twksWSRotorContentByPosition.AddtwksWSRotorContentByPositionRow(myRotorContentByPositionRow)
                 Next
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcesseAdditionalSolutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcesseAdditionalSolutions", EventLogEntryType.Error, False)
             End Try
             Return myWSRotorContentByPositionDS
         End Function
@@ -7339,8 +7841,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessCalibratorsForAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessCalibratorsForAutoPositioning", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -7435,8 +7937,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = ""
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessControlsForAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessControlsForAutoPositioning", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -7539,8 +8041,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = ""
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessPatientsForAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessPatientsForAutoPositioning", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -7624,8 +8126,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = ""
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessReagentPositionedBottle", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessReagentPositionedBottle", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -7648,7 +8150,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  RH 16/06/2011
         ''' Modified by: RH 14/09/2011 - Initialize Barcode fields for each position in the DS to return
         '''              SA 11/01/2012 - Code improved
-        '''              TR 13/03/2012 -Excluded the ISE Washing solution from the autopositioning on sample rotor
+        '''              TR 13/03/2012 - Excluded the ISE Washing solution from the autopositioning on sample rotor
         ''' </remarks>
         Private Function ProcessTubeAdditionalSolutionsForAutoPositioning(ByRef pDBConnection As SqlClient.SqlConnection, ByVal pRequiredSamples As WSRequiredElementsTreeDS, _
                                                                           ByVal pAnalyzerID As String, ByVal pRotorType As String, ByVal pWorkSessionID As String, _
@@ -7722,8 +8224,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = String.Empty
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessTubeAdditionalSolutionsForAutoPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ProcessTubeAdditionalSolutionsForAutoPositioning", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -7814,8 +8316,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReagentPositioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.ReagentPositioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -7823,503 +8325,70 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Evaluate if data in paramaters contains invalid values. In this case do nothing but inform into internal LOG
+        ''' Evaluate if data in parameters contains invalid values. In this case do nothing but inform into internal LOG
         ''' -	Status not “FREE” And Status not “NO_INUSE” And ElementID = vbNULL
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pRotorType"></param>
-        ''' <param name="pRotorPositionsDS"></param>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pRotorType">Rotor Type: SAMPLES or REAGENTS</param>
+        ''' <param name="pRotorPositionsDS">Typed DataSet WSRotorContentByPositionDS containing data of the Rotor Positions to update</param>
         ''' <param name="pProcessWhoCalls">Enumerate that informs the process who calls the delegate instance</param>
-        ''' <returns></returns>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by  AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
-        ''' Modified by XB 08/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
+        ''' Created by:  AG 07/10/2014 - BA-1979 ==> Add log traces to catch NULL values in field ElementID for Rotor Positions with Status 
+        '''                                          different of FREE and/or NO_INUSE
+        ''' Modified by: XB 08/10/2014 - BA-1978 ==> Add log traces to catch NULL wrong assignment on RealVolume field
         ''' </remarks>
-        Private Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pRotorPositionsDS As WSRotorContentByPositionDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
+        Private Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pRotorPositionsDS As WSRotorContentByPositionDS, _
+                                                 ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim textDetails As String = "(" & pProcessWhoCalls.ToString & ")"
                         textDetails &= " - (" & pRotorType & " rotor)"
 
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         Dim linqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+
                         linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In pRotorPositionsDS.twksWSRotorContentByPosition _
-                                  Where Not a.IsStatusNull AndAlso a.Status <> "FREE" AndAlso a.Status <> "NO_INUSE" AndAlso a.IsElementIDNull Select a).ToList
-                        If linqRes.Count > 0 Then
-                            myLogAcciones.CreateLogActivity("Invalid values: Position with status <> FREE and <> NO_INUSE with ElementID = vbNULL " & textDetails, "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                  Where Not a.IsStatusNull AndAlso a.Status <> "FREE" AndAlso a.Status <> "NO_INUSE" AndAlso a.IsElementIDNull _
+                                 Select a).ToList
+
+                        If (linqRes.Count > 0) Then
+                            GlobalBase.CreateLogActivity("Invalid values: Position with status <> FREE and <> NO_INUSE with ElementID = vbNULL " & textDetails, "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                         End If
-                        If pRotorType = "REAGENTS" Then
+
+                        If (pRotorType = "REAGENTS") Then
                             linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In pRotorPositionsDS.twksWSRotorContentByPosition _
-                                       Where Not a.IsStatusNull AndAlso a.Status <> "FREE" AndAlso a.IsRealVolumeNull Select a).ToList
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: REAGENTS rotor Position with status <> FREE with RealVolume = vbNULL " & textDetails, "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                      Where Not a.IsStatusNull AndAlso a.Status <> "FREE" AndAlso a.IsRealVolumeNull _
+                                     Select a).ToList
+
+                            If (linqRes.Count > 0) Then
+                                GlobalBase.CreateLogActivity("Invalid values: REAGENTS rotor Position with status <> FREE with RealVolume = vbNULL " & textDetails, "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
                         End If
                         linqRes = Nothing
                     End If
                 End If
-
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
-
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
             resultData.HasError = False 'Not inform error flag in this method!!
             Return resultData
         End Function
 #End Region
-
-#Region "TO REVIEW - DELETE?"
-        'AG 07/12/2011 - comment this method and move into ReactionsRotorDelegate
-        ''''<summary>
-        '''' Get the information of the content in an specific Rotor Position. If the Rotor Position
-        '''' contains a Required Element, then the specific information of it is obtained and returned
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pRotorPositionDS">Typed DataSet containing information of the Rotor Position for 
-        ''''                                which detailed information is consulted</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet CellPositionInformationDS with the detailed 
-        ''''          information of the content of a Rotor Position</returns>
-        '''' <remarks>
-        '''' Created by:  DL 02/06/2011
-        '''' </remarks>
-        'Public Function GetPositionReactionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                ByVal pRotorPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                If (Not pRotorPositionDS Is Nothing) Then
-        '                    If (pRotorPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
-        '                        Dim myGlobalDataTo As New GlobalDataTO
-        '                        'Dim myCellPosInfoDS As New CellPositionInformationDS
-
-        '                        'Get all data of the specified Rotor Position
-        '                        Dim myRotorContentPosition As New twksWSRotorContentByPositionDAO
-        '                        myGlobalDataTo = myRotorContentPosition.ReadReactions(dbConnection, _
-        '                                                                     pRotorPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
-        '                                                                     pRotorPositionDS.twksWSRotorContentByPosition(0).RingNumber, _
-        '                                                                     pRotorPositionDS.twksWSRotorContentByPosition(0).CellNumber, _
-        '                                                                     pRotorPositionDS.twksWSRotorContentByPosition(0).WorkSessionID)
-
-        '                        If (Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing) Then
-
-        '                            Dim myReactionRotorDetails As New ReactionRotorDetailsDS
-        '                            myReactionRotorDetails = DirectCast(myGlobalDataTo.SetDatos, ReactionRotorDetailsDS)
-
-        '                            'The information is returned
-        '                            resultData.HasError = False
-        '                            resultData.SetDatos = myReactionRotorDetails
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetPositionReactionsInfo", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-        'AG 07/12/2011
-
-        '''' <summary>
-        '''' DON T USE THIS METHOD ... IS OLD AND HAS NOT THE FINAL BUSINESS!!!!!!
-        '''' 
-        '''' Save results sent by the Analyzer after execution of a BarCode Scanning for one or more Rotor Positions
-        '''' (on receiving Scan results frame SW updates the rotor content by position table with BarCode sent by Firmware)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pRotorType">Rotor Type</param>
-        '''' <param name="pScannedResults">Typed DataSet containing one or more Rotor Positions with the scanned BarCode 
-        ''''                               sent by the Analyzer Firmware</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentByPositionDS with containing the same entry 
-        ''''          information but with some fields updated</returns>
-        '''' <remarks>
-        '''' Created by:  AG 01/12/2009 
-        ''''              BASIC Testing: OK 15/12/2009
-        ''''              FINAL Testing: Pending Barcode Definition
-        '''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template.
-        ''''                              Fixed error when validating if Commit or Rollback has to be executed
-        '''' </remarks>
-        'Public Function SaveScannedBarCode(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-        '                                   ByVal pWorkSessionID As String, ByVal pRotorType As String, ByVal pScannedResults As ScannedCellsDS) _
-        '                                   As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        ' DON T USE THIS METHOD ... IS OLD AND HAS NOT THE FINAL BUSINESS!!!!!!
-
-        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim scannedRow As ScannedCellsDS.ScannedCellsRow
-        '                Dim commandDAO As New twksWSRotorContentByPositionDAO
-        '                Dim requiredElem As New WSRequiredElementsDelegate
-        '                Dim returnDS As New WSRotorContentByPositionDS
-        '                Dim tmpRotorContentDS As New WSRotorContentByPositionDS
-        '                Dim rowDS As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-        '                Dim temp As New GlobalDataTO
-
-        '                For Each scannedRow In pScannedResults.ScannedCells
-
-        '                    '// Create new row in the DS to return                        
-        '                    returnDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
-
-        '                    '// Read information about ring-cell position and update DS to return (RowDS)
-
-        '                    temp = commandDAO.Read(dbConnection, pAnalyzerID, pRotorType, scannedRow.RingNumber, scannedRow.CellNumber, pWorkSessionID)
-        '                    If temp.HasError Then Exit For
-        '                    tmpRotorContentDS = CType(temp.SetDatos, WSRotorContentByPositionDS)
-
-        '                    'TODO: Decode barcode information sent by Firmware (PENDING DEFINITION)
-        '                    '       and update fields in RowDS: BarCodeInfo, ScannedPosition, BarCodeStatus, TubeContent,....
-        '                    'Temp = DecodeBarCode(ScannedRow.BarCodeRead, RotorContentDS.twksWSRotorContentByPosition(0).RotorType)
-
-        '                    'TODO: Relate ElementID with barcode information received (PENDING DEFINITION)
-        '                    '       and update fields in RowDS: ElementID
-        '                    'Temp = Me.FindElementIDRelatedWithBarCode(dbConnection, pAnalyzerID, pRotorType, ScannedRow.RingNumber, ScannedRow.CellNumber, ScannedRow.BarCodeRead, RotorContentDS.twksWSRotorContentByPosition(0).BarcodeStatus)
-
-        '                    'Find TubeContent
-        '                    If Not tmpRotorContentDS.twksWSRotorContentByPosition(0).IsElementIDNull Then
-        '                        Dim ReqElemDS As New WSRequiredElementsDS
-        '                        temp = requiredElem.GetRequiredElementData(dbConnection, tmpRotorContentDS.twksWSRotorContentByPosition(0).ElementID)
-        '                        'If temp.HasError Then Exit Try
-        '                        'TR 17/10/2011 -Cahnge Exit Try by Exit For.
-        '                        If temp.HasError Then Exit For
-
-        '                        ReqElemDS = CType(temp.SetDatos, WSRequiredElementsDS)
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).BeginEdit()
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).TubeContent = ReqElemDS.twksWSRequiredElements(0).TubeContent
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).ScannedPosition = True
-
-        '                        '// TEMPORALLY
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).BarCodeInfo = "ABCDE"
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).BarcodeStatus = "OK"
-
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).EndEdit()
-        '                    End If
-
-        '                    rowDS = tmpRotorContentDS.twksWSRotorContentByPosition(0)
-
-
-        '                    'Update ring-cell depending on TubeContent
-        '                    If Not rowDS.IsTubeContentNull Then
-        '                        If rowDS.TubeContent = "REAGENT" Then
-        '                            temp = Me.UpdateReagentPosition(dbConnection, tmpRotorContentDS)
-        '                            If temp.HasError Then Exit For
-
-        '                        ElseIf rowDS.TubeContent = "SPEC_SOL" Or _
-        '                               rowDS.TubeContent = "WASH_SOL" Then
-
-        '                            temp = commandDAO.Update(dbConnection, tmpRotorContentDS)
-        '                            If Not temp.HasError Then
-        '                                '// Calculate MultiTubeNumber
-        '                                temp = Me.UpdateMultitubeNumber(dbConnection, pAnalyzerID, pRotorType, rowDS.ElementID)
-
-        '                                If Not temp.HasError Then
-        '                                    '// Update ElementStatus to "POS"
-        '                                    temp = requiredElem.UpdateStatus(dbConnection, rowDS.ElementID, "POS")
-        '                                End If
-        '                            End If
-
-        '                        Else    'TubeContent is sample: CALIB, CTRL, PATIENT, TUBE_SPEC_SOL or TUBE_WASH_SOL
-        '                            'TODO: PENDING DEFINITION
-        '                        End If
-
-        '                        '// Add row into the DS to return (read updated register + add row)
-        '                        If Not temp.HasError Then
-        '                            'TEMPORALLY while UpdateReagentPosition is not tested because returns SetDatos empty instead of WSRotorContentByPositionDS
-        '                            temp = commandDAO.Read(dbConnection, pAnalyzerID, pRotorType, scannedRow.RingNumber, scannedRow.CellNumber, pWorkSessionID)
-        '                            If temp.HasError Then Exit For
-        '                            tmpRotorContentDS = CType(temp.SetDatos, WSRotorContentByPositionDS)
-
-        '                            rowDS = tmpRotorContentDS.twksWSRotorContentByPosition(0)
-        '                            returnDS.twksWSRotorContentByPosition.ImportRow(rowDS)
-        '                        End If
-        '                    End If
-
-        '                Next
-
-        '                If (Not temp.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                    resultData.SetDatos = returnDS
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                    resultData = temp
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Rollback is executed
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SaveScannedBarCode", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' DON T USE THIS METHOD ... IS OLD AND HAS NOT THE FINAL BUSINESS!!!!!!
-        '''' 
-        '''' Save results sent by the Analyzer after execution of a checked Real Volume for one of more Rotor Positions
-        '''' (on receiving Check volume results frame SW updates the RealVolume, Status, ElementStatus...)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param> 
-        '''' <param name="pRotorType">Rotor Type</param>
-        '''' <param name="pRealVolumeResults">Typed DataSet containing one or more Rotor Positions with the measurement of the 
-        ''''                                  Real Volume of the tube/bottle placed in it sent by the Analyzer Firmware</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentByPositionDS with the same entry information but 
-        ''''          with some fields updated</returns>
-        '''' <remarks>
-        '''' Created by:  AG 01/12/2009
-        ''''              BASIC TESTING: OK 15/12/2009 but PD test 'UpdateReagentPosition'
-        ''''              FINAL Testing: Pending FRAME DEFINITION
-        '''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
-        ''''                              Fixed error when validating if Commit or Rollback has to be executed
-        '''' </remarks>
-        'Public Function SaveCheckedVolume(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-        '                                  ByVal pWorkSessionID As String, ByVal pRotorType As String, ByVal pRealVolumeResults As RealVolumeDS) _
-        '                                  As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        'DON T USE THIS METHOD ... IS OLD AND HAS NOT THE FINAL BUSINESS!!!!!!
-        '        ' 
-        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim checkedVolumeRow As RealVolumeDS.VolumeDetectedRow
-        '                Dim commandDAO As New twksWSRotorContentByPositionDAO
-        '                Dim returnDS As New WSRotorContentByPositionDS
-        '                Dim temp As New GlobalDataTO
-        '                Dim requiredElem As New WSRequiredElementsDelegate
-        '                Dim tmpRotorContentDS As New WSRotorContentByPositionDS
-        '                Dim rowDS As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-
-        '                For Each checkedVolumeRow In pRealVolumeResults.VolumeDetected
-        '                    '// Create new row in the DS to return                        
-        '                    returnDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
-
-        '                    temp = commandDAO.Read(dbConnection, pAnalyzerID, pRotorType, checkedVolumeRow.RingNumber, checkedVolumeRow.CellNumber, pWorkSessionID)
-        '                    If temp.HasError Then Exit For
-
-        '                    tmpRotorContentDS = CType(temp.SetDatos, WSRotorContentByPositionDS)
-
-        '                    'Find TubeContent
-        '                    If Not tmpRotorContentDS.twksWSRotorContentByPosition(0).IsElementIDNull Then
-        '                        Dim ReqElemDS As New WSRequiredElementsDS
-        '                        temp = requiredElem.GetRequiredElementData(dbConnection, tmpRotorContentDS.twksWSRotorContentByPosition(0).ElementID)
-        '                        If temp.HasError Then Exit Try
-
-        '                        ReqElemDS = CType(temp.SetDatos, WSRequiredElementsDS)
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).BeginEdit()
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).TubeContent = ReqElemDS.twksWSRequiredElements(0).TubeContent
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).RealVolume = CType(checkedVolumeRow.CheckedVolume, Single)
-        '                        tmpRotorContentDS.twksWSRotorContentByPosition(0).EndEdit()
-        '                    End If
-
-        '                    rowDS = tmpRotorContentDS.twksWSRotorContentByPosition(0)
-
-        '                    'TODO: Pending DEFINITION
-        '                    'TODO: TUBE_SPEC_SOL and TUBE_WASH_SOL
-        '                    'ConvertRealVolumeFwToSw(FwVolumeReceived, TubeType)
-
-        '                    'Update ring-cell depending on TubeContent
-        '                    If Not rowDS.IsElementIDNull Then
-        '                        If rowDS.TubeContent = "REAGENT" Then
-        '                            temp = Me.UpdateReagentPosition(dbConnection, tmpRotorContentDS)
-        '                            If temp.HasError Then Exit For
-
-        '                        ElseIf rowDS.TubeContent = "SPEC_SOL" Or _
-        '                               rowDS.TubeContent = "WASH_SOL" Then
-
-        '                            temp = commandDAO.Update(dbConnection, tmpRotorContentDS)
-        '                            If Not temp.HasError Then
-        '                                '// Update ElementStatus to "POS"
-        '                                temp = requiredElem.UpdateStatus(dbConnection, rowDS.ElementID, "POS")
-        '                            End If
-        '                        End If
-
-        '                        '// Add row into the DS to return (read updated register + add row)
-        '                        If Not temp.HasError Then
-        '                            'TEMPORALLY testing while UpdateReagentPosition is not tested because returns SetDatos empty instead of WSRotorContentByPositionDS
-        '                            temp = commandDAO.Read(dbConnection, pAnalyzerID, pRotorType, checkedVolumeRow.RingNumber, checkedVolumeRow.CellNumber, pWorkSessionID)
-        '                            If temp.HasError Then Exit For
-        '                            tmpRotorContentDS = CType(temp.SetDatos, WSRotorContentByPositionDS)
-
-        '                            rowDS = tmpRotorContentDS.twksWSRotorContentByPosition(0)
-        '                            returnDS.twksWSRotorContentByPosition.ImportRow(rowDS)
-        '                        End If
-        '                    End If
-        '                Next
-
-        '                If (Not temp.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                    resultData.SetDatos = returnDS
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                    resultData = temp
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Rollback is executed
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.SaveCheckedVolume", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-
-        '''' <summary>
-        '''' After load a virtual rotor updates element status in wsRequiredElements
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pRotorContents"></param>
-        '''' <returns>Globaldatato with information about correct execution or not</returns>
-        '''' <remarks>
-        '''' Created by: AG 25/01/2010 (Tested pending)
-        '''' </remarks>
-        'Private Function UpdateRequiredElementStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorContents As WSRotorContentByPositionDS) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myReqElementsDel As New WSRequiredElementsDelegate
-
-        '                If Not pRotorContents Is Nothing And pRotorContents.twksWSRotorContentByPosition.Rows.Count > 0 Then
-        '                    For Each Row In pRotorContents.twksWSRotorContentByPosition
-        '                        Dim elementId As Integer = 0
-        '                        Dim elementStatus As String = ""
-        '                        If Not Row.IsElementStatusNull Then elementStatus = Row.ElementStatus
-
-        '                        If Not Row.IsElementIDNull Then
-        '                            elementId = Row.ElementID
-        '                            myGlobalDataTO = myReqElementsDel.UpdateStatus(dbConnection, elementId, elementStatus)
-        '                        End If
-        '                    Next
-        '                End If
-
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.UpdateRequiredElementStatus", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-
-        'End Function
-
-        '''' <summary>
-        '''' Get the rotor content by Analyzer, WorkSession and RotorType
-        '''' (Based in GetRotorContentPositions)
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pWorkSessionID"></param>
-        '''' <param name="pAnalyzerID"></param>
-        '''' <param name="pRotorType"></param>
-        '''' <returns>GlobalDataTO with Data as rotorcontentDS</returns>
-        '''' <remarks>
-        '''' Created by: AG 25/01/2010 (Tested OK)
-        '''' </remarks>
-        'Public Function GetRotorTypeContentPositions(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                 ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, ByVal pRotorType As String) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myRotorContentByPosDAO As New twksWSRotorContentByPositionDAO
-        '                myGlobalDataTO = myRotorContentByPosDAO.GetRotorTypeContentPositions(pDBConnection, pAnalyzerID, pWorkSessionID, pRotorType)
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.GetRotorTypeContentPositions", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
-#End Region
-
     End Class
-
 End Namespace
 

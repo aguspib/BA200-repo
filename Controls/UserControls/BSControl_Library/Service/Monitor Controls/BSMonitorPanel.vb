@@ -2,17 +2,8 @@
 Option Explicit On
 
 Imports System.Windows.Forms
-Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-
-Imports PerpetuumSoft.Instrumentation
-Imports PerpetuumSoft.Instrumentation.Windows.Forms
-Imports PerpetuumSoft.Instrumentation.Model
-Imports PerpetuumSoft.Framework.Drawing
 
 
 ''' <summary>
@@ -231,7 +222,7 @@ Public Class BSMonitorPanel
                             Next
                             If isAdded Then
                                 Dim myControlStruct As New ControlStruct(pControl, pSensorId, pColIndex, pRowIndex, pMin, pMax)
-                                MyClass.ControlList.Add(myControlStruct)
+                                ControlList.Add(myControlStruct)
                                 pControl.RefreshControl()
                                 pControl.Focus()
                                 Exit For
@@ -275,7 +266,7 @@ Public Class BSMonitorPanel
         Dim myGlobal As New GlobalDataTO
 
         Try
-            For Each C As ControlStruct In MyClass.ControlList
+            For Each C As ControlStruct In ControlList
                 'If C.SensorId.ToUpper.Trim = pSensorId.ToUpper.Trim Then
                 If C.SensorId.Trim = pSensorId.Trim Then
                     If TypeOf (C.MonitorControl) Is BSMonitorLED Then
@@ -357,7 +348,7 @@ Public Class BSMonitorPanel
         Dim myGlobal As New GlobalDataTO
 
         Try
-            For Each C As ControlStruct In MyClass.ControlList
+            For Each C As ControlStruct In ControlList
                 'If C.SensorId.ToUpper.Trim = pSensorId.ToUpper.Trim Then
                 If C.SensorId.Trim = pSensorId.Trim Then
                     C.MonitorControl.TitleText = pText

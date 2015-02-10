@@ -2,14 +2,13 @@
 Option Strict On
 
 Imports System.Text
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisTestSamplesDAO
-        Inherits DAOBase
+          
 #Region "CRUD Methods"
 
         ''' <summary>
@@ -48,8 +47,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestSampleAndTestVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestSampleAndTestVersion", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -94,8 +93,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestVersion", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -133,8 +132,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestVersionByHistCalibratorID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.CloseTestVersionByHistCalibratorID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -360,8 +359,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -401,8 +400,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -455,8 +454,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -509,8 +508,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.ReadByCalibratorID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.ReadByCalibratorID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -616,8 +615,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -639,6 +638,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 27/09/2012 - Changed the SQL to remove from the update all fields that generate a new TestVersion when they are changed
         '''              SA 18/10/2012 - Changed the SQL to remove from the update fields KineticBlankLimit and BlankAbsorbanceLimit
         '''              SA 22/10/2012 - Changed the filter: it should be by HistTestID = row.HistTestID instead of by HistTestID = row.TestID 
+        '''              SA 04/09/2014 - BA-1919 ==> Add N prefix when update field TestLongName to allow save correctly texts with tw-bytes characters
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisTestSamplesDS As HisTestSamplesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -651,14 +651,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     For Each row As HisTestSamplesDS.thisTestSamplesRow In pHisTestSamplesDS.thisTestSamples.Rows
                         cmdText &= " UPDATE thisTestSamples " & vbCrLf & _
-                                                " SET    TestName            = N'" & row.TestName.Replace("'", "''").Trim & "', " & vbCrLf & _
-                                                       " MeasureUnit         = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
-                                                       " DecimalsAllowed     = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
+                                   " SET    TestName        = N'" & row.TestName.Replace("'", "''").Trim & "', " & vbCrLf & _
+                                          " MeasureUnit     = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
+                                          " DecimalsAllowed = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
 
                         If (row.IsTestLongNameNull) Then
                             cmdText &= " TestLongName = NULL, " & vbCrLf
                         Else
-                            cmdText &= " TestLongName = '" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
+                            cmdText &= " TestLongName = N'" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
                         End If
                         If (row.IsProzoneRatioNull) Then
                             cmdText &= " ProzoneRatio = NULL, " & vbCrLf
@@ -716,8 +716,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -763,8 +763,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.GetClosedSTDTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.GetClosedSTDTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -814,10 +814,50 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.GetNextHistTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.GetNextHistTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update field TestName for all records in thisTestSamples for the informed TestID and having ClosedTestSample = False and ClosedTestVersion = False
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier in Parameters Programming Module</param>
+        ''' <param name="pTestName">Test Name to update</param>
+        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1980)
+        ''' </remarks>
+        Public Function UpdateNameByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pTestName As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE thisTestSamples " & vbCrLf & _
+                                            " SET    TestName = N'" & pTestName.Replace("'", "''").Trim & "' " & vbCrLf & _
+                                            " WHERE  TestID   = " & pTestID.ToString & vbCrLf & _
+                                            " AND    ClosedTestSample = 0 " & vbCrLf & _
+                                            " AND    ClosedTestVersion = 0 " & vbCrLf
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.SetDatos = dbCmd.ExecuteScalar()
+                        resultData.HasError = False
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.UpdateNameByTestID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -862,8 +902,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.VerifyReagentInUse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisTestSamplesDAO.VerifyReagentInUse", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

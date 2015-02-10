@@ -25,7 +25,7 @@ Namespace Biosystems.Ax00.App
 
 #Region "Properties"
 
-        Public Property Analyzer As IAnalyzerEntity Implements IAnalyzerController.Analyzer
+        Public Property Analyzer As IAnalyzerManager Implements IAnalyzerController.Analyzer
 
         ''' <summary>
         ''' 
@@ -69,7 +69,7 @@ Namespace Biosystems.Ax00.App
         ''' <remarks>
         ''' AG 10/11/2014 BA-2082 remove parameter model and use analyzerModel that are read from database
         ''' </remarks>
-        Public Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity Implements IAnalyzerController.CreateAnalyzer
+        Public Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerManager Implements IAnalyzerController.CreateAnalyzer
             Select Case analyzerModel
                 Case AnalyzerModelEnum.A200.ToString 'BA200
                     _factory = New BA200AnalyzerFactory()

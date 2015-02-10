@@ -1,26 +1,19 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Globalization
-Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communications
-Imports System.Xml 'AG 25/02/2013 - for LIS communications
-Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
-Imports System.Timers
-Imports Biosystems.Ax00.Core.Entities
-Imports Biosystems.Ax00.App
+
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Action Buttons managenement business"
 
@@ -140,7 +133,7 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateActionButtonBarOrSendNewAction ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateActionButtonBarOrSendNewAction ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " ActivateActionButtonBarOrSendNewAction, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -236,7 +229,7 @@ Partial Public Class IAx00MainMDI
 
             'AG 14/05/2012 - When ISE utilities screen is active the only vertical buttons that can be enabled are: ChangeBottle confirm, Recover & Sound Off
             Dim iSEUtilitiesActiveFlag As Boolean = False
-            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IISEUtilities Then
+            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiISEUtilities Then
                 iSEUtilitiesActiveFlag = True
             End If
             'AG 14/05/2012
@@ -506,7 +499,7 @@ Partial Public Class IAx00MainMDI
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateButtonWithAlarms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateButtonWithAlarms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " ActivateButtonWithAlarms, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myStatus
@@ -581,7 +574,7 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeStatusImageMultipleSessionButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeStatusImageMultipleSessionButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeStatusImageMultipleSessionButton ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -617,8 +610,8 @@ Partial Public Class IAx00MainMDI
 
                                 ' XBC 04/07/2012
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
                                         ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
                                         ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.ALIGHT_REQUIRED.ToString)
@@ -632,7 +625,7 @@ Partial Public Class IAx00MainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesStandByWithOutALIGHT ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesStandByWithOutALIGHT ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplyRulesStandByWithOutALIGHT ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -966,8 +959,8 @@ Partial Public Class IAx00MainMDI
                     ElseIf myAx00Ready AndAlso Not WarmUpFinishedAttribute Then
                         bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag 'AG 23/07/2012
 
-                        If ActiveMdiChild Is IMonitor Then
-                            Dim myMonitor As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If ActiveMdiChild Is UiMonitor Then
+                            Dim myMonitor As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             If myMonitor.IsEndWarmUpButtonVisible Then
                                 bsTSShutdownButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.SHUT_DOWN) 'AG 14/05/2012 True 
                                 WithShutToolStripMenuItem.Enabled = bsTSShutdownButton.Enabled  'DL 04/06/2012
@@ -997,8 +990,8 @@ Partial Public Class IAx00MainMDI
                         Dim analyzerSettings As New AnalyzerSettingsDelegate
                         Dim resultData As New GlobalDataTO
 
-                        If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                            Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                        If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                            Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                             If Not CurrentMdiChild.bsScanningButton Is Nothing AndAlso CurrentMdiChild.bsScanningButton.Enabled <> bcButtonStatus Then
                                 'CurrentMdiChild.bsScanningButton.Enabled = buttonStatus
                                 If bcButtonStatus Then
@@ -1039,8 +1032,8 @@ Partial Public Class IAx00MainMDI
                             End If
                             'AG 28/03/2012
 
-                        ElseIf (TypeOf ActiveMdiChild Is IWSSampleRequest) Then
-                            Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                        ElseIf (TypeOf ActiveMdiChild Is UiWSSampleRequest) Then
+                            Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                             If Not CurrentMdiChild.bsScanningButton Is Nothing AndAlso CurrentMdiChild.bsScanningButton.Enabled <> bcButtonStatus Then
                                 If bcButtonStatus Then
                                     'A part from Analyzer status check if barcode reader is enabled
@@ -1058,8 +1051,8 @@ Partial Public Class IAx00MainMDI
                             End If
 
                             'AG 22/02/2012 - Update button in change rotor utility
-                        ElseIf (TypeOf ActiveMdiChild Is IChangeRotor) Then
-                            Dim CurrentMdiChild As IChangeRotor = CType(ActiveMdiChild, IChangeRotor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                            Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
                             If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
                                 bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
                                 'AG 28/03/2012
@@ -1089,7 +1082,7 @@ Partial Public Class IAx00MainMDI
             End If 'AG 23/03/2012 - ISE initialitation not finished (connection in StandBy)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForStandBy ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForStandBy ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplyRulesForStandBy ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1331,7 +1324,7 @@ Partial Public Class IAx00MainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForRunning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForRunning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplyRulesForRunning ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1417,7 +1410,7 @@ Partial Public Class IAx00MainMDI
             'AG 24/01/2014
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForFreeze ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRulesForFreeze ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplyRulesForFreeze ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 

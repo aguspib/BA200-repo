@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports System.Data.SqlClient
 
 Partial Public Class tparReagentsDAO
-    Inherits DAOBase
+      
 
     ''' <summary>
     ''' Add new Reagents
@@ -76,8 +76,8 @@ Partial Public Class tparReagentsDAO
                     End If
 
                     If (reagentRow.IsTS_UserNull) Then
-                        Dim myGlobalBase As New GlobalBase
-                        values &= " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim myGlobalbase As New GlobalBase
+                        values &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         values &= " N'" & reagentRow.TS_User & "', "
                     End If
@@ -111,8 +111,8 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Create", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -160,8 +160,8 @@ Partial Public Class tparReagentsDAO
             resultData.ErrorCode = "SYSTEM_ERROR"
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Read", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -213,8 +213,8 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.ReadByReagentName", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.ReadByReagentName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -269,8 +269,8 @@ Partial Public Class tparReagentsDAO
 
                     values &= " TS_User = "
                     If (reagentRow.IsTS_UserNull) Then
-                        Dim myGlobalBase As New GlobalBase
-                        values &= " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim myGlobalbase As New GlobalBase
+                        values &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         values &= " N'" & reagentRow.TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -301,8 +301,8 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Update", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -327,7 +327,7 @@ Partial Public Class tparReagentsDAO
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
-                Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
 
                 Dim cmdText As String = ""
                 cmdText = " DELETE FROM tparReagents  "
@@ -348,8 +348,8 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Delete", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -383,25 +383,47 @@ Partial Public Class tparReagentsDAO
             Else
                 Dim cmdText As String
                 If (Not pUpdateForExcluded) Then
+                    'AJG
+                    'cmdText = " UPDATE tparReagents " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  ReagentID IN (SELECT TR.ReagentID " & _
+                    '                               " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                    '                                                          " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                          " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                    '                               " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                               " AND    O.SampleClass = 'BLANK') "
                     cmdText = " UPDATE tparReagents " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  ReagentID IN (SELECT TR.ReagentID " & _
-                                                   " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
-                                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
-                                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                   " AND    O.SampleClass = 'BLANK') "
+                              " WHERE  EXISTS (SELECT TR.ReagentID " & _
+                                              " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                                                                         " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                              " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                                              " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                              " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentID = TR.ReagentID) "
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparReagents " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  ReagentID NOT IN (SELECT TR.ReagentID " & _
+                    '                                   " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                    '                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                    '                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                   " AND    O.SampleClass = 'BLANK') " & _
+                    '          " AND    InUse = 1 "
+
                     cmdText = " UPDATE tparReagents " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  ReagentID NOT IN (SELECT TR.ReagentID " & _
-                                                       " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
-                                                                                  " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                  " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
-                                                       " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                       " AND    O.SampleClass = 'BLANK') " & _
+                              " WHERE  NOT EXISTS (SELECT TR.ReagentID " & _
+                                                  " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                                                                             " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                  " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentID = TR.ReagentID) " & _
                               " AND    InUse = 1 "
                 End If
 
@@ -424,8 +446,8 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -476,8 +498,8 @@ Partial Public Class tparReagentsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetByCodeTest", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.GetByCodeTest", EventLogEntryType.Error, False)
 
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -487,5 +509,44 @@ Partial Public Class tparReagentsDAO
         Return resultData
     End Function
 
+    ''' <summary>
+    ''' Get the maximum value of field ReagentID in table tparReagents. Used in the Update Version process to assign a suitable temporary ReagentID
+    ''' to new Reagents (because function PrepareTestToSave needs it)
+    ''' </summary>
+    ''' <param name="pDBConnection">Open DB Connection</param>
+    ''' <returns>GlobalDataTO containing an integer value with the maximum value of field ReagentID </returns>
+    ''' <remarks>
+    ''' Created by:  SA 09/10/20014 - BA-1944 
+    ''' </remarks>
+    Public Function GetMaxReagentID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Dim resultData As GlobalDataTO = Nothing
+        Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+        Try
+            resultData = GetOpenDBConnection(pDBConnection)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                If (Not dbConnection Is Nothing) Then
+                    Dim cmdText As String = " SELECT MAX(ReagentID) AS MaxReagentID " & vbCrLf & _
+                                            " FROM   tparReagents  " & vbCrLf 
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                        resultData.SetDatos = dbCmd.ExecuteScalar()
+                        resultData.HasError = False
+                    End Using
+                End If
+            End If
+        Catch ex As Exception
+            resultData = New GlobalDataTO()
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            resultData.ErrorMessage = ex.Message
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.GetMaxReagentID", EventLogEntryType.Error, False)
+        Finally
+            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        End Try
+        Return resultData
+    End Function
 End Class

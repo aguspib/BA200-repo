@@ -12,7 +12,7 @@ Imports DevExpress.XtraPrinting
 Imports System.Drawing.Design
 Imports System.Drawing.Imaging
 
-Public Class IBandTemplateReport
+Public Class UiBandTemplateReport
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"
@@ -92,7 +92,7 @@ Public Class IBandTemplateReport
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditTemplate", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -198,7 +198,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTemplatesListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -217,7 +217,7 @@ Public Class IBandTemplateReport
     ''' Created by: DL 23/11/2011
     ''' AG 12/06/2014 - #1661
     ''' </remarks>
-    Private Function AddTemplate(ByVal pFileReport) As GlobalDataTO
+    Private Function AddTemplate(ByVal pFileReport As String) As GlobalDataTO
 
         Dim resultData As New GlobalDataTO
 
@@ -276,17 +276,17 @@ Public Class IBandTemplateReport
                         resultData.SetDatos = myTemplateDS 'AG 12/06/2014 - #1661
 
                         bsTemplatesListView.Items.Add(bsTemplateTextBox.Text)
-                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False)
+                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False.ToString)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(myCurrentOrientation) 'UCase(bsOrientationComboBox.Text.Trim))
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(pFileReport)
-                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(bsDefaultCheckbox.Checked)
+                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(bsDefaultCheckbox.Checked.ToString)
                     End If
                 End If
 
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AddTemplate", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -309,7 +309,7 @@ Public Class IBandTemplateReport
             OpenReport()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditReport_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditReport_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsEditReport_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -335,7 +335,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -524,7 +524,7 @@ Public Class IBandTemplateReport
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -546,7 +546,7 @@ Public Class IBandTemplateReport
             SaveReport()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -565,7 +565,7 @@ Public Class IBandTemplateReport
             DeleteTemplate()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsDeleteButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -612,7 +612,7 @@ Public Class IBandTemplateReport
         oImageFormat.ExportMode = ImageExportMode.SingleFilePageByPage
         oImageFormat.Format = ImageFormat.Gif
         oImageFormat.Resolution = nResolution
-        oImageFormat.PageRange = 1
+        oImageFormat.PageRange = 1.ToString
         oImageFormat.PageBorderWidth = 1
         oImageFormat.PageBorderColor = Color.Black
 
@@ -691,7 +691,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IBandTemplateReport_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IBandTemplateReport_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IBandTemplateReport_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -730,7 +730,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DesignForm_Closing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -750,7 +750,7 @@ Public Class IBandTemplateReport
             Cursor = Cursors.WaitCursor
             DesignForm.Dispose()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DesignForm_Closed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             Cursor = Cursors.Default
@@ -835,7 +835,7 @@ Public Class IBandTemplateReport
             Next item
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DesignForm_Closing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -853,7 +853,7 @@ Public Class IBandTemplateReport
     '        End Using
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".OpenReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
     '    End Try
@@ -1014,23 +1014,23 @@ Public Class IBandTemplateReport
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.Closing, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.PropertiesWindow, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.Zoom, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Customize, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.File, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Open, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageOrientation, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Parameters, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Pointer, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PrintDirect, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ViewWholePage, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Save, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Find, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Magnifier, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageSetup, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Watermark, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportCsv, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.SendFile, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Customize, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.File, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Open, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageOrientation, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Parameters, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Pointer, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PrintDirect, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ViewWholePage, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Save, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Find, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Magnifier, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageSetup, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Watermark, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportCsv, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.SendFile, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.EditPageHF, DevExpress.XtraPrinting.CommandVisibility.None)
@@ -1097,7 +1097,7 @@ Public Class IBandTemplateReport
             DesignForm.ShowDialog()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OpenReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1151,7 +1151,7 @@ Public Class IBandTemplateReport
             bsPicturePanel.Refresh()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OpenReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OpenReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1219,7 +1219,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsNewButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1241,7 +1241,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsDefaultCheckbox_CheckedChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsDefaultCheckbox_CheckedChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "bsDefaultCheckbox_CheckedChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1277,7 +1277,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsTemplateTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsTemplateTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "bsTemplateTextBox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1340,7 +1340,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsOrientationComboBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsOrientationComboBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "bsOrientationComboBox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1392,7 +1392,7 @@ Public Class IBandTemplateReport
             bsNewButton.Select()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1410,7 +1410,7 @@ Public Class IBandTemplateReport
             EditTemplate()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1485,7 +1485,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTemplatesListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1513,7 +1513,7 @@ Public Class IBandTemplateReport
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IBandTemplateReport_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IBandTemplateReport_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IBandTemplateReport_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1531,7 +1531,7 @@ Public Class IBandTemplateReport
             bsNewButton.Select()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgControls_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1554,7 +1554,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTemplatesListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1569,7 +1569,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTemplatesListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1590,8 +1590,8 @@ Public Class IBandTemplateReport
             Cursor = Cursors.WaitCursor 'RH 15/12/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -1618,7 +1618,7 @@ Public Class IBandTemplateReport
             ResetBorder() 'RH 30/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1657,7 +1657,7 @@ Public Class IBandTemplateReport
             LoadTemplatesList()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeTemplateList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeTemplateList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeTemplateList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1686,7 +1686,7 @@ Public Class IBandTemplateReport
 
 
                 For Each fi In aryFi
-                    myfilewithoutextension = fi.Name.Split(".")(0).ToString '& ".repx"
+                    myfilewithoutextension = fi.Name.Split("."c)(0).ToString '& ".repx"
                     'myLength = Len(myfilewithoutextension)
 
                     If Not String.Equals(myfilewithoutextension, "MASTERTEMPLATE") AndAlso _
@@ -1708,7 +1708,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteResidualFiles ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteResidualFiles ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteResidualFiles", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1785,7 +1785,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTemplatesList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTemplatesList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadTemplatesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1808,7 +1808,7 @@ Public Class IBandTemplateReport
             'bsControlDefLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Controls_Definition", currentLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1844,7 +1844,7 @@ Public Class IBandTemplateReport
             myLandscapePlug = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LANDSCAPE", currentLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1864,34 +1864,34 @@ Public Class IBandTemplateReport
 
             'NEW Button
             auxIconName = GetIconName("ADD")
-            If Not String.Equals(auxIconName, String.Empty) Then bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EDIT REPORT Button
             auxIconName = GetIconName("EDITREPORT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditReport.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditReport.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
-            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1916,7 +1916,7 @@ Public Class IBandTemplateReport
                     'AG 12/06/2014 - #1661 check if user wants delete the defaulttemplate .. in this case mark the mastertemplate as new default before delete
                     'resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
                     Dim newDefault As Boolean = False
-                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text Then
+                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text <> "" Then
                         'Get the current orientation
                         Dim myOrientation As String = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text
                         resultData = templateList.SetDefaultTemplateStatus(Nothing, True, True, myOrientation)
@@ -1928,8 +1928,8 @@ Public Class IBandTemplateReport
                     If (Not resultData.HasError) Then
                         Dim fileImage As String = PathTemplates & "\" & bsTemplatesListView.Items(iRow).SubItems(3).Text
 
-                        File.Delete(fileImage.Split(".")(0) & ".REPX")
-                        File.Delete(fileImage.Split(".")(0) & ".GIF")
+                        File.Delete(fileImage.Split("."c)(0) & ".REPX")
+                        File.Delete(fileImage.Split("."c)(0) & ".GIF")
 
                         bsTemplatesListView.Items.Remove(bsTemplatesListView.Items(iRow))
 
@@ -1952,7 +1952,7 @@ Public Class IBandTemplateReport
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteTemplate", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1963,7 +1963,7 @@ Public Class IBandTemplateReport
     ''' <remarks>
     ''' IT 13/06/2014 #1661 
     ''' </remarks>
-    Private Function IsValidTemplate(ByVal templateName) As Boolean
+    Private Function IsValidTemplate(ByVal templateName As String) As Boolean
 
         Dim isDuplicated As Boolean = False
         bsScreenErrorProvider.Clear()

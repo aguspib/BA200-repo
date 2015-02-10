@@ -23,43 +23,43 @@ Namespace Biosystems.Ax00.Controls.UserControls
         'No lo modifique con el editor de código.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
-            Me.components = New System.ComponentModel.Container
+            Me.components = New System.ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(BSFormula))
-            Me.OneButton = New System.Windows.Forms.Button
-            Me.ThreeButton = New System.Windows.Forms.Button
-            Me.SevenButton = New System.Windows.Forms.Button
-            Me.FourButton = New System.Windows.Forms.Button
-            Me.EightButton = New System.Windows.Forms.Button
-            Me.NineButton = New System.Windows.Forms.Button
-            Me.ZeroButton = New System.Windows.Forms.Button
-            Me.FiveButton = New System.Windows.Forms.Button
-            Me.SixButton = New System.Windows.Forms.Button
-            Me.TwoButton = New System.Windows.Forms.Button
-            Me.DotButton = New System.Windows.Forms.Button
-            Me.NumbersPanel = New System.Windows.Forms.Panel
-            Me.MultButton = New System.Windows.Forms.Button
-            Me.ClearButton = New System.Windows.Forms.Button
-            Me.CloseParenthesisButton = New System.Windows.Forms.Button
-            Me.BackButton = New System.Windows.Forms.Button
-            Me.OpenParenthesisButton = New System.Windows.Forms.Button
-            Me.DivisionButton = New System.Windows.Forms.Button
-            Me.AddButton = New System.Windows.Forms.Button
-            Me.MinusButton = New System.Windows.Forms.Button
-            Me.FormulaTextBox = New System.Windows.Forms.TextBox
-            Me.FormulaLabel = New System.Windows.Forms.Label
-            Me.Panel1 = New System.Windows.Forms.Panel
-            Me.bsCalculatedLabel = New System.Windows.Forms.Label
-            Me.bsStandardLabel = New System.Windows.Forms.Label
-            Me.bsCalculatedTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-            Me.bsStandardTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-            Me.SampleTypeListComboBox = New System.Windows.Forms.ComboBox
-            Me.SampleTypeLabel = New System.Windows.Forms.Label
-            Me.AddSelectTestButton = New System.Windows.Forms.Button
+            Me.OneButton = New System.Windows.Forms.Button()
+            Me.ThreeButton = New System.Windows.Forms.Button()
+            Me.SevenButton = New System.Windows.Forms.Button()
+            Me.FourButton = New System.Windows.Forms.Button()
+            Me.EightButton = New System.Windows.Forms.Button()
+            Me.NineButton = New System.Windows.Forms.Button()
+            Me.ZeroButton = New System.Windows.Forms.Button()
+            Me.FiveButton = New System.Windows.Forms.Button()
+            Me.SixButton = New System.Windows.Forms.Button()
+            Me.TwoButton = New System.Windows.Forms.Button()
+            Me.DotButton = New System.Windows.Forms.Button()
+            Me.NumbersPanel = New System.Windows.Forms.Panel()
+            Me.MultButton = New System.Windows.Forms.Button()
+            Me.ClearButton = New System.Windows.Forms.Button()
+            Me.CloseParenthesisButton = New System.Windows.Forms.Button()
+            Me.BackButton = New System.Windows.Forms.Button()
+            Me.OpenParenthesisButton = New System.Windows.Forms.Button()
+            Me.DivisionButton = New System.Windows.Forms.Button()
+            Me.AddButton = New System.Windows.Forms.Button()
+            Me.MinusButton = New System.Windows.Forms.Button()
+            Me.FormulaTextBox = New System.Windows.Forms.TextBox()
+            Me.FormulaLabel = New System.Windows.Forms.Label()
+            Me.Panel1 = New System.Windows.Forms.Panel()
+            Me.bsCalculatedLabel = New System.Windows.Forms.Label()
+            Me.bsTestLabel = New System.Windows.Forms.Label()
+            Me.bsCalculatedTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+            Me.bsTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+            Me.SampleTypeListComboBox = New System.Windows.Forms.ComboBox()
+            Me.SampleTypeLabel = New System.Windows.Forms.Label()
+            Me.AddSelectTestButton = New System.Windows.Forms.Button()
             Me.FormulaStatusImageList = New System.Windows.Forms.ImageList(Me.components)
-            Me.FormulaStatusImage = New System.Windows.Forms.PictureBox
-            Me.bsAuxForErrorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-            Me.bsFormulaToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-            Me.bsFormulaErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
+            Me.FormulaStatusImage = New System.Windows.Forms.PictureBox()
+            Me.bsAuxForErrorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+            Me.bsFormulaToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+            Me.bsFormulaErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
             Me.NumbersPanel.SuspendLayout()
             Me.Panel1.SuspendLayout()
             CType(Me.FormulaStatusImage, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -332,9 +332,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
             '
             Me.Panel1.BackColor = System.Drawing.Color.Transparent
             Me.Panel1.Controls.Add(Me.bsCalculatedLabel)
-            Me.Panel1.Controls.Add(Me.bsStandardLabel)
+            Me.Panel1.Controls.Add(Me.bsTestLabel)
             Me.Panel1.Controls.Add(Me.bsCalculatedTestListView)
-            Me.Panel1.Controls.Add(Me.bsStandardTestListView)
+            Me.Panel1.Controls.Add(Me.bsTestListView)
             Me.Panel1.Controls.Add(Me.SampleTypeListComboBox)
             Me.Panel1.Controls.Add(Me.SampleTypeLabel)
             Me.Panel1.Controls.Add(Me.AddSelectTestButton)
@@ -353,15 +353,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Me.bsCalculatedLabel.TabIndex = 34
             Me.bsCalculatedLabel.Text = "Calculated"
             '
-            'bsStandardLabel
+            'bsTestLabel
             '
-            Me.bsStandardLabel.AutoSize = True
-            Me.bsStandardLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.bsStandardLabel.Location = New System.Drawing.Point(4, 48)
-            Me.bsStandardLabel.Name = "bsStandardLabel"
-            Me.bsStandardLabel.Size = New System.Drawing.Size(59, 13)
-            Me.bsStandardLabel.TabIndex = 33
-            Me.bsStandardLabel.Text = "Standard"
+            Me.bsTestLabel.AutoSize = True
+            Me.bsTestLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            Me.bsTestLabel.Location = New System.Drawing.Point(4, 48)
+            Me.bsTestLabel.Name = "bsTestLabel"
+            Me.bsTestLabel.Size = New System.Drawing.Size(31, 13)
+            Me.bsTestLabel.TabIndex = 33
+            Me.bsTestLabel.Text = "Test"
             '
             'bsCalculatedTestListView
             '
@@ -375,15 +375,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Me.bsCalculatedTestListView.UseCompatibleStateImageBehavior = False
             Me.bsCalculatedTestListView.View = System.Windows.Forms.View.Details
             '
-            'bsStandardTestListView
+            'bsTestListView
             '
-            Me.bsStandardTestListView.BackColor = System.Drawing.Color.White
-            Me.bsStandardTestListView.ForeColor = System.Drawing.Color.Black
-            Me.bsStandardTestListView.Location = New System.Drawing.Point(4, 66)
-            Me.bsStandardTestListView.Name = "bsStandardTestListView"
-            Me.bsStandardTestListView.Size = New System.Drawing.Size(208, 154)
-            Me.bsStandardTestListView.TabIndex = 3
-            Me.bsStandardTestListView.UseCompatibleStateImageBehavior = False
+            Me.bsTestListView.BackColor = System.Drawing.Color.White
+            Me.bsTestListView.ForeColor = System.Drawing.Color.Black
+            Me.bsTestListView.Location = New System.Drawing.Point(4, 66)
+            Me.bsTestListView.Name = "bsTestListView"
+            Me.bsTestListView.Size = New System.Drawing.Size(208, 154)
+            Me.bsTestListView.TabIndex = 3
+            Me.bsTestListView.UseCompatibleStateImageBehavior = False
             '
             'SampleTypeListComboBox
             '
@@ -507,9 +507,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
         Friend WithEvents DivisionButton As System.Windows.Forms.Button
         Friend WithEvents AddButton As System.Windows.Forms.Button
         Friend WithEvents MinusButton As System.Windows.Forms.Button
-        Friend WithEvents bsStandardTestListView As Biosystems.Ax00.Controls.UserControls.BSListView
+        Friend WithEvents bsTestListView As Biosystems.Ax00.Controls.UserControls.BSListView
         Friend WithEvents bsCalculatedTestListView As Biosystems.Ax00.Controls.UserControls.BSListView
-        Friend WithEvents bsStandardLabel As System.Windows.Forms.Label
+        Friend WithEvents bsTestLabel As System.Windows.Forms.Label
         Friend WithEvents bsCalculatedLabel As System.Windows.Forms.Label
         Friend WithEvents bsFormulaToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
         Friend WithEvents bsFormulaErrorProvider As Biosystems.Ax00.Controls.UserControls.BSErrorProvider

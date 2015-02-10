@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.App
 
-Public Class ISATReportSRV
+Public Class UiSATReportSRV
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declaration"
@@ -46,7 +46,7 @@ Public Class ISATReportSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SATReportData_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -62,8 +62,8 @@ Public Class ISATReportSRV
     Private Sub SATReportData_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -93,7 +93,7 @@ Public Class ISATReportSRV
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message, Me.Name & " SATReportData_Load ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SATReportData_Load ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
@@ -152,7 +152,7 @@ Public Class ISATReportSRV
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message, Me.Name & " bsCloseButton_Click ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsCloseButton_Click ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
@@ -183,7 +183,7 @@ Public Class ISATReportSRV
                     'Dim workingThread As New Threading.Thread(AddressOf CreateReportSAT)
 
                     'TR 09/01/2012 - Indicate RSAT Start on Application LOG
-                    CreateLogActivity("RSAT START  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", _
+                    GlobalBase.CreateLogActivity("RSAT START  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", _
                                       EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
                     processing = True
@@ -246,7 +246,7 @@ Public Class ISATReportSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " bsSaveSATRepButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsSaveSATRepButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
 
         Finally
@@ -256,7 +256,7 @@ Public Class ISATReportSRV
             bsSATDirListBox.Enabled = True
 
             'TR 09/01/2012 - Indicate RSAT END on Application LOG.
-            CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -282,7 +282,7 @@ Public Class ISATReportSRV
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message, Me.Name & " bsDeleteButton_Click ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsDeleteButton_Click ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
@@ -359,26 +359,26 @@ Public Class ISATReportSRV
 
             auxIconName = GetIconName("OPEN")
             If auxIconName <> "" Then
-                FolderButton.Image = Image.FromFile(iconPath & auxIconName)
+                FolderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CREATE_REP_SAT")
             If auxIconName <> "" Then
-                bsSaveSATRepButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveSATRepButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("REMOVE")
             If auxIconName <> "" Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If auxIconName <> "" Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -411,7 +411,7 @@ Public Class ISATReportSRV
             bsScreenToolTips.SetToolTip(FolderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NEW_FILE_PATH", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -471,7 +471,7 @@ Public Class ISATReportSRV
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " CreateReportSAT_NEW", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " CreateReportSAT_NEW", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Me.UIThread(Function() ShowMessage(Name & ".CreateReportSAT_NEW", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message))
         Finally
             processing = False
@@ -498,7 +498,7 @@ Public Class ISATReportSRV
             Dim errorMessage As String = GetMessageText(GlobalEnumerates.Messages.EMAIL_ERROR.ToString(), currentLanguage) '"*Unable to send e-mail to SAT.*"
 
             If Not ma.Logon(IntPtr.Zero) Then
-                CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("Information", GlobalEnumerates.Messages.EMAIL_ERROR.ToString())
                 Return
             End If
@@ -507,16 +507,16 @@ Public Class ISATReportSRV
 
             ma.AddRecip(pTo, Nothing, False)
             If Not ma.Send(pSubject, pBody) Then
-                CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("Information", GlobalEnumerates.Messages.EMAIL_ERROR.ToString())
                 Return
             End If
             ma.Logoff()
 
-            CreateLogActivity(GetMessageText(GlobalEnumerates.Messages.EMAIL_ERROR.ToString(), currentLanguage), Me.Name & " SendMail ", _
+            GlobalBase.CreateLogActivity(GetMessageText(GlobalEnumerates.Messages.EMAIL_ERROR.ToString(), currentLanguage), Me.Name & " SendMail ", _
                               EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SendMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -553,7 +553,7 @@ Public Class ISATReportSRV
             myResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResult.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & " EncodeMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " EncodeMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
         Return myResult
@@ -579,7 +579,7 @@ Public Class ISATReportSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetSatReportPrefix ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetSatReportPrefix ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
         Return myReportSatPrefix
@@ -609,7 +609,7 @@ Public Class ISATReportSRV
                 bsSelectAllDirCheckbox.Checked = bsSelectAllDirCheckbox.Checked And bsSelectAllDirCheckbox.Enabled
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetFilesInSatDirectory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetFilesInSatDirectory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -638,7 +638,7 @@ Public Class ISATReportSRV
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SetFolderLocation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SetFolderLocation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -658,7 +658,7 @@ Public Class ISATReportSRV
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " FileNameExist ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " FileNameExist ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
         Return ExistFileName
@@ -781,7 +781,7 @@ Public Class ISATReportSRV
     '        'TR-AG 05/01/2012 -END
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & " CreateReportSAT", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " CreateReportSAT", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        'DL 15/05/2013
     '        'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
     '        Me.UIThread(Function() ShowMessage(Name & ".CreateReportSAT", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message))
@@ -837,7 +837,7 @@ Public Class ISATReportSRV
 
     '    Catch ex As Exception
     '        'Write error SYSTEM_ERROR in the Application Log
-    '        CreateLogActivity(ex.Message, Me.Name & " SendMail ", EventLogEntryType.Error, _
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SendMail ", EventLogEntryType.Error, _
     '                                                        GetApplicationInfoSession().ActivateSystemLog)
     '        'Show error message
     '        ShowMessage("Error", "SYSTEM_ERROR", ex.Message)

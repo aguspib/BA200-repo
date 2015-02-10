@@ -1,4 +1,6 @@
-Public Class WaitScreen
+Imports Biosystems.Ax00.Global
+
+Public Class UiWaitScreen
     Inherits Windows.Forms.Form
 
 #Region "Declaration"
@@ -33,7 +35,7 @@ Public Class WaitScreen
     Public WriteOnly Property Background() As String
         Set(ByVal value As String)
             If Not value Is String.Empty Then
-                Me.BackgroundImage = System.Drawing.Image.FromFile(value)
+                Me.BackgroundImage = ImageUtilities.ImageFromFile(value)
             End If
 
         End Set
@@ -63,7 +65,7 @@ Public Class WaitScreen
 #Region "Inicializadores de Componentes"
 
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(WaitScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWaitScreen))
         Me.lbTextoPreload = New System.Windows.Forms.Label
         Me.lbTitle = New System.Windows.Forms.Label
         Me.BsTimer1 = New Biosystems.Ax00.Controls.UserControls.BSTimer
@@ -157,8 +159,8 @@ Public Class WaitScreen
         lbTitle.Width = Size.Width
 
         'Get the factor with this code 
-        Dim factorEscalaX As Integer = (_form.Size.Width - mSizeInicialPreload.Width) / 2
-        Dim factorEscalaY As Integer = (_form.Size.Height - mSizeInicialPreload.Height) / 2
+        Dim factorEscalaX As Integer = CInt((_form.Size.Width - mSizeInicialPreload.Width) / 2)
+        Dim factorEscalaY As Integer = CInt((_form.Size.Height - mSizeInicialPreload.Height) / 2)
 
         picAjax.Left = picAjax.Left + factorEscalaX
         picAjax.Top = picAjax.Top + factorEscalaY

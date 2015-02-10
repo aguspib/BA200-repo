@@ -1,13 +1,12 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class tparVirtualRotorsPositionsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -20,49 +19,50 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  VR 18/11/2009 - Tested: OK
         ''' Modified by: VR 22/12/2009 - Tested: OK
-        '''              SA 22/12/2009 - For fields PredilutionFactor and RequireVolume the Replace have to be of
-        '''                              commas by dots because they are REAL values
-        '''              VR 05/01/2010 (Tested : OK)
-        '''              AG 08/01/2010 - The only fields that can not be NULL are the PK fields (VirtualRotorID, ring, cell) (Tested OK)
+        '''              SA 22/12/2009 - For fields PredilutionFactor and RequireVolume the Replace has to be of commas by dots because they are REAL values
+        '''              VR 05/01/2010 - Tested : OK
+        '''              AG 08/01/2010 - The only fields that can not be NULL are the PK fields (VirtualRotorID, Ring, Cell)
         '''              SA 25/10/2010 - Added new field OnlyForISE to the SQL; use N when set value of field TS_User 
         '''              RH 14/02/2011 - Code optimization and Using statement 
-        '''              RH 15/09/2011 - New field: ScannedPosition
-        '''              AG 03/02/2012 - New field: Status
+        '''              RH 15/09/2011 - Added new field to the INSERT: ScannedPosition
+        '''              AG 03/02/2012 - Added new field to the INSERT: Status
+        '''              SA 15/12/2014 - BA-1972 ==> Do not insert positions in the entry DataSet that are marked with InvalidPosition = True, which
+        '''                                          means the ID of the element is missing (due to an error which cause is unkown and that cannot be
+        '''                                          reproduced)
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pVirtualRotorPositionsDS As VirtualRotorPosititionsDS) _
                                As GlobalDataTO
-            Dim dataToReturn As New GlobalDataTO
+            Dim resultData As New GlobalDataTO
 
             Try
                 If (pDBConnection Is Nothing) Then
-                    dataToReturn.HasError = True
-                    dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    'Dim objGlobal As New GlobalBase
+                    Dim cmdText As String = String.Empty
 
-                ElseIf (Not pVirtualRotorPositionsDS Is Nothing) Then
+                    For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pVirtualRotorPositionsDS.tparVirtualRotorPosititions
+                        If (Not row.InvalidPosition) Then
+                            cmdText = " INSERT INTO tparVirtualRotorPositions (VirtualRotorID, RingNumber, CellNumber, TubeContent, " & vbCrLf & _
+                                                                             " TubeType, MultiTubeNumber, ReagentID, SolutionCode, CalibratorID, " & vbCrLf & _
+                                                                             " ControlID, MultiItemNumber, SampleType, OrderID, PatientID, " & vbCrLf & _
+                                                                             " PredilutionFactor, OnlyForISE, RealVolume, ScannedPosition, BarcodeInfo, " & vbCrLf & _
+                                                                             " BarcodeStatus, Status, TS_User, TS_DateTime) " & vbCrLf & _
+                                      " VALUES (" & row.VirtualRotorID & ", " & vbCrLf & _
+                                                    row.RingNumber & ", " & vbCrLf & _
+                                                    row.CellNumber & ", " & vbCrLf
 
-                    Using dbCmd As New SqlClient.SqlCommand()
-                        dbCmd.Connection = pDBConnection
-
-                        Dim cmdText As String
-                        Dim objGlobal As New GlobalBase
-                        For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pVirtualRotorPositionsDS.tparVirtualRotorPosititions.Rows
-                            cmdText = String.Format(" INSERT INTO tparVirtualRotorPositions (VirtualRotorID, RingNumber, CellNumber, TubeContent, " & _
-                                                    " TubeType, MultiTubeNumber, ReagentID, SolutionCode, CalibratorID, ControlID, " & _
-                                                    " MultiItemNumber, SampleType, OrderID, PatientID, PredilutionFactor, " & _
-                                                    " OnlyForISE, RealVolume, ScannedPosition, BarcodeInfo, BarcodeStatus, Status, TS_User, TS_DateTime) " & _
-                                                    " VALUES ({0}, {1}, {2}, ", row.VirtualRotorID, row.RingNumber, row.CellNumber)
-
-                            'Control of values of non required fields
                             If (row.IsTubeContentNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= "'" & row.TubeContent & "', "
+                                cmdText &= " '" & row.TubeContent.Trim & "', "
                             End If
 
                             If (row.IsTubeTypeNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= "'" & row.TubeType & "', "
+                                cmdText &= " '" & row.TubeType & "', "
                             End If
 
                             If (row.IsMultiTubeNumberNull) Then
@@ -80,7 +80,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                             If (row.IsSolutionCodeNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= " '" & row.SolutionCode.Trim.Replace("'", "''") & "', "
+                                cmdText &= " '" & row.SolutionCode.Trim & "', "
                             End If
 
                             If (row.IsCalibratorIDNull) Then
@@ -104,13 +104,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                             If (row.IsSampleTypeNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= " '" & row.SampleType.Trim.Replace("'", "''") & "', "
+                                cmdText &= " '" & row.SampleType.Trim & "', "
                             End If
 
                             If (row.IsOrderIDNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= " '" & row.OrderID.Trim.Replace("'", "''") & "', "
+                                cmdText &= " N'" & row.OrderID.Trim.Replace("'", "''") & "', "
                             End If
 
                             If (row.IsPatientIDNull) Then
@@ -155,16 +155,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 cmdText &= " '" & row.BarcodeStatus.Trim.Replace("'", "''") & "', "
                             End If
 
-                            'AG 03/02/2012 - Save also (Position) Status
                             If (row.IsStatusNull) Then
                                 cmdText &= " NULL, "
                             Else
-                                cmdText &= " '" & row.Status.Trim.Replace("'", "''") & "', "
+                                cmdText &= " '" & row.Status.Trim & "', "
                             End If
-                            'AG 03/02/2012
 
                             If (row.IsTS_UserNull) Then
-                                cmdText &= " N'" & objGlobal.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                                cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                             Else
                                 cmdText &= " N'" & row.TS_User.Trim.Replace("'", "''") & "', "
                             End If
@@ -176,26 +174,21 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End If
 
                             'Execute the SQL sentence 
-                            dbCmd.CommandText = cmdText
-                            dataToReturn.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                            If (Not dataToReturn.AffectedRecords > 0) Then
-                                dataToReturn.HasError = True
-                                Exit For
-                            End If
-                        Next
-
-                    End Using
+                            Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                                resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            End Using
+                        End If
+                    Next
                 End If
             Catch ex As Exception
-                dataToReturn.HasError = True
-                dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                dataToReturn.ErrorMessage = ex.Message
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.Create", EventLogEntryType.Error, False)
             End Try
-            Return dataToReturn
+            Return resultData
         End Function
 
         ''' <summary>
@@ -230,8 +223,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -271,8 +264,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeletePostion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeletePostion", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -315,8 +308,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeleteControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeleteControl", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -359,8 +352,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeleteVirtualRotorByCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.DeleteVirtualRotorByCalibrator", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -407,13 +400,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSNotInUseRotorPositionsDAO.DeleteControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSNotInUseRotorPositionsDAO.DeleteControl", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
 
-       
+
 
         ''' <summary>
         ''' Delete twksWSNotInUseRotorPositions by control identifier 
@@ -457,8 +450,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSNotInUseRotorPositionsDAO.DeleteNotInUseByRotorCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSNotInUseRotorPositionsDAO.DeleteNotInUseByRotorCalibrator", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -503,8 +496,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByReagentID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByReagentID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -557,8 +550,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByControlID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -610,8 +603,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByCalibrationID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByCalibrationID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -655,9 +648,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " WHERE  VirtualRotorID = " & pVirtualRotorID
                         ElseIf (String.Compare(pRotorType, String.Empty, False) <> 0) Then
                             'Get content of the Internal Rotor of the informed type
-                            cmdText &= " WHERE VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
-                                                                " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
-                                                                " AND    InternalRotor = 1) "
+                            'AJG
+                            'cmdText &= " WHERE VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                            '                                    " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                            '                                    " AND    InternalRotor = 1) "
+                            cmdText &= " WHERE EXISTS (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                                                      " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                                                      " AND    InternalRotor = 1 AND tparVirtualRotorPositions.VirtualRotorID = VirtualRotorID) "
                         End If
 
                         Dim myVRotorPosDataDS As New VirtualRotorPosititionsDS
@@ -677,8 +674,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByVirtualRotorID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsPositionsDAO.ReadByVirtualRotorID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -723,12 +720,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                                       " AND    RingNumber     = " & pRingNumber & vbCrLf & _
                                       " AND    CellNumber     = " & pCellNumber & vbCrLf
                         Else
+                            'AJG
+                            'cmdText = " SELECT * FROM tparVirtualRotorPositions " & vbCrLf & _
+                            '          " WHERE  RingNumber = " & pRingNumber & vbCrLf & _
+                            '          " AND    CellNumber = " & pCellNumber & vbCrLf & _
+                            '          " AND    VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                            '                                    " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                            '                                    " AND    InternalRotor = 1) "
+
                             cmdText = " SELECT * FROM tparVirtualRotorPositions " & vbCrLf & _
                                       " WHERE  RingNumber = " & pRingNumber & vbCrLf & _
                                       " AND    CellNumber = " & pCellNumber & vbCrLf & _
-                                      " AND    VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                                      " AND    EXISTS (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
                                                                 " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
-                                                                " AND    InternalRotor = 1) "
+                                                                " AND    InternalRotor = 1 AND tparVirtualRotorPositions.VirtualRotorID = VirtualRotorID) "
                         End If
 
                         Dim queryResults As New VirtualRotorPosititionsDS
@@ -748,8 +753,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorPositionsDelegate.ReadPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorPositionsDelegate.ReadPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

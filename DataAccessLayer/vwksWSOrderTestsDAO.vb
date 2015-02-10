@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Types
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksWSOrderTestsDAO
-        Inherits DAOBase
+          
 
 #Region "Public Methods"
         ''' <summary>
@@ -48,8 +48,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.CountWSOffSystemTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.CountWSOffSystemTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -82,8 +82,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "FROM vwksWSOrderTests " & vbCrLf
                         cmdText &= "WHERE TestType = 'ISE' " & vbCrLf
                         cmdText &= "AND   ToSendFlag = 1 " & vbCrLf
-                        cmdText &= "AND   OrderTestID IN (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
+                        'AJG
+                        'cmdText &= "AND   OrderTestID IN (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
+                        cmdText &= "AND   EXISTS (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
                         cmdText &= "                      WHERE WorkSessionID = '" & pWorkSessionID & "'" & vbCrLf
+                        'AJG
+                        cmdText &= "                      AND   vwksWSOrderTests.OrderTestID = OrderTestID " & vbCrLf
                         cmdText &= "                      AND   AnalyzerID = '" & pAnalyzerID & "'" & vbCrLf
                         cmdText &= "                      AND   ExecutionType = 'PREP_ISE' " & vbCrLf
                         cmdText &= "                      AND  (ExecutionStatus = 'PENDING'  " & vbCrLf
@@ -96,9 +100,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "FROM vwksWSOrderTests " & vbCrLf
                         cmdText &= "WHERE TestType = 'ISE' " & vbCrLf
                         cmdText &= "AND   ToSendFlag = 1 " & vbCrLf
-                        cmdText &= "AND   OrderTestID IN (SELECT EX.OrderTestID  " & vbCrLf
+                        'AJG
+                        'cmdText &= "AND   OrderTestID IN (SELECT EX.OrderTestID  " & vbCrLf
+                        cmdText &= "AND   EXISTS (SELECT EX.OrderTestID  " & vbCrLf
                         cmdText &= "                      FROM   twksWSExecutions EX LEFT JOIN twksWSPreparations P ON EX.PreparationID = P.PreparationID  " & vbCrLf
                         cmdText &= "                      WHERE  EX.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
+                        'AJG
+                        cmdText &= "                      AND    vwksWSOrderTests.OrderTestID = EX.OrderTestID " & vbCrLf
                         cmdText &= "                      AND    EX.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
                         cmdText &= "                      AND    EX.ExecutionType = 'PREP_ISE' " & vbCrLf
                         cmdText &= "                      AND    EX.ExecutionStatus ='INPROCESS' " & vbCrLf
@@ -123,8 +131,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetNotSendISEPreparations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetNotSendISEPreparations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -185,8 +193,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetCalibratorsWithAlternative", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetCalibratorsWithAlternative", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -256,8 +264,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetPreviousBlkCalibUsed", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetPreviousBlkCalibUsed", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -327,8 +335,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetWSOffSystemTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.GetWSOffSystemTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -379,8 +387,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadAllAlternativeOTs", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadAllAlternativeOTs", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -434,8 +442,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadByWorkSessionAndSampleClass", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadByWorkSessionAndSampleClass", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -495,8 +503,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadByWorkSessionAndTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadByWorkSessionAndTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -552,8 +560,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadPatientsAndCtrlsByTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadPatientsAndCtrlsByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -602,8 +610,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadSpecialTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksWSOrderTestsDAO.ReadSpecialTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

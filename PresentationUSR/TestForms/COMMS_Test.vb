@@ -1,23 +1,24 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
+Imports System.Xml
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Calculations
-Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Xml
-Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
+Imports LIS.Biosystems.Ax00.LISCommunications
 
 Public Class bsReception
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Definitions"
 
-    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
+    Private WithEvents analyzer As IAnalyzerManager = AnalyzerController.Instance.Analyzer '#REFACTORING
     Private mdiESWrapperCopy As ESWrapper = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 15/03/2013
 
 #End Region
@@ -41,7 +42,7 @@ Public Class bsReception
             'Execute calculations test
             Dim myCalc As New CalculationsDelegate()
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, "SN0000099999_Ax400", "2010010501", False, "")
-            myGlobal = myCalc.CalculateExecutionNEW(Nothing, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, myExec, False, "")
+            myGlobal = myCalc.CalculateExecutionNEW(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.ActiveWorkSession, myExec, False, "")
             If myGlobal.HasError Then
                 Exit Sub
             End If
@@ -79,7 +80,7 @@ Public Class bsReception
         Dim turnToPendingFlag As Boolean = False
 
         'Volume missing over the reagent or sample rotors
-        resultData = myExecutions.ProcessVolumeMissing(Nothing, myPrepID, myRotorName, myCellNumber, myOKPerformedFlag, IAx00MainMDI.ActiveWorkSession, IAx00MainMDI.ActiveAnalyzer, turnToPendingFlag)
+        resultData = myExecutions.ProcessVolumeMissing(Nothing, myPrepID, myRotorName, myCellNumber, myOKPerformedFlag, UiAx00MainMDI.ActiveWorkSession, UiAx00MainMDI.ActiveAnalyzer, turnToPendingFlag)
 
         ''SPECIAL CASE ONLY FOR Volume missing over the reactions rotor (dilutions)
         ''These code must be the same as used in method ProcessArmStatusRecived marked as ('Level detection fails (no diluted sample) in reactions rotors)
@@ -121,7 +122,7 @@ Public Class bsReception
             Dim myInstruction As New Instructions
             Dim myInstrucList As New List(Of InstructionParameterTO)
             'obtener los valores para los parametros para las preparaciones
-            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer), IAx00MainMDI.AnalyzerModel) 'Llamada standard.
+            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer), UiAx00MainMDI.AnalyzerModel) 'Llamada standard.
             'myglobalto = myInstruction.GenerateISEPreparation(CType(BsTextBoxToSend.Text.Trim(), Integer)) 'Llamada ISE.
             If Not myglobalto.HasError Then
                 Dim myLA00Inter As New LAX00Interpreter
@@ -213,8 +214,8 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -223,8 +224,8 @@ Public Class bsReception
             BsReceivedTextBox.Text += pInstructionSent & vbCrLf
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -268,8 +269,8 @@ Public Class bsReception
                         myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
 
                     Case "RUNNING"
-                        AnalyzerController.Instance.Analyzer.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                        AnalyzerController.Instance.Analyzer.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
+                        AnalyzerController.Instance.Analyzer.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                        AnalyzerController.Instance.Analyzer.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
 
                         myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
 
@@ -320,7 +321,7 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsCommTestings_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
@@ -335,7 +336,7 @@ Public Class bsReception
             BsReceivedTextBox.Clear()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsClearReception_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         End Try
@@ -357,7 +358,7 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsSendNext_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSendNext_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsSendNext_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -384,7 +385,7 @@ Public Class bsReception
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, "SN0000099999_Ax400", "2010010501", False, "")
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, False, "")
 
-            myGlobal = myCalc.CalculateExecutionNEW(Nothing, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, myExec, False, "", False, Nothing)
+            myGlobal = myCalc.CalculateExecutionNEW(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.ActiveWorkSession, myExec, False, "", False, Nothing)
             If myGlobal.HasError Then
                 Exit Sub
             End If
@@ -406,18 +407,24 @@ Public Class bsReception
     End Sub
 
     Private Sub bsDecodeEnBase2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsDecodeEnBase2.Click
-        'Try
-        Const errorValue As Integer = 5 'En base2 el 5 (0x101) está formado por 1 + 4 (0x001 or 0x100)
-        'Dim errorValue As Integer = 11 'En base2 el 11 (0x1011) está formado por 1 + 2 + 8 (0x001 or 0x010 or 0x1000)
+        Try
+            'Decodificar en base 2
+            'Const errorValue As Integer = 5 'En base2 el 5 (0x101) está formado por 1 + 4 (0x001 or 0x100)
+            'Dim errorValue As Integer = 11 'En base2 el 11 (0x1011) está formado por 1 + 2 + 8 (0x001 or 0x010 or 0x1000)
 
-        If (errorValue And 1) = 1 Then MessageBox.Show("Contiene el 1")
-        If (errorValue And 2) = 2 Then MessageBox.Show("Contiene el 2")
-        If (errorValue And 4) = 4 Then MessageBox.Show("Contiene el 4")
-        If (errorValue And 8) = 8 Then MessageBox.Show("Contiene el 8")
+            'If (errorValue And 1) = 1 Then MessageBox.Show("Contiene el 1")
+            'If (errorValue And 2) = 2 Then MessageBox.Show("Contiene el 2")
+            'If (errorValue And 4) = 4 Then MessageBox.Show("Contiene el 4")
+            'If (errorValue And 8) = 8 Then MessageBox.Show("Contiene el 8")
 
-        'Catch ex As Exception
+            'Pruebas BA-2006
+            Dim myDlgate As New OrderCalculatedTestsDelegate
+            Dim resultData As New GlobalDataTO
+            resultData = myDlgate.GetOrderTestsToExcludeInPatientsReport(Nothing)
 
-        'End Try
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub BsHistoricCalibCurve_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsHistoricCalibCurve.Click
@@ -466,7 +473,7 @@ Public Class bsReception
               Select row).ToList()
             If TestList.Count > 0 Then
                 'RH 19/10/2010 Introduce the Using statement
-                Using myCurveForm As New IResultsCalibCurve
+                Using myCurveForm As New UiResultsCalibCurve
                     With myCurveForm
                         .ActiveAnalyzer = analyzerID
                         .ActiveWorkSession = worksessionID
@@ -495,9 +502,9 @@ Public Class bsReception
     End Sub
 
     Private Sub bsNewGUID_Click(sender As Object, e As EventArgs) Handles bsNewGUID.Click
-        Dim myUtils As New Utilities
+        'Dim myUtils As New Utilities
         Dim myGlobal As New GlobalDataTO
-        myGlobal = myUtils.GetNewGUID
+        myGlobal = Utilities.GetNewGUID
         If Not myGlobal.HasError Then
             MessageBox.Show(CType(myGlobal.SetDatos, String))
         Else
@@ -506,103 +513,120 @@ Public Class bsReception
 
     End Sub
 
-    Private Sub BsImport_Click(sender As Object, e As EventArgs) Handles BsImport.Click
 
 
-    End Sub
 
-    Private Sub bsXmlButton_Click(sender As Object, e As EventArgs) Handles bsXmlButton.Click
+
+    'Private Sub bsXmlButton_Click(sender As Object, e As EventArgs) Handles bsXmlButton.Click
+    '    Try
+    '        Dim xmlDelg As New xmlMessagesDelegate
+    '        Dim resultData As New GlobalDataTO
+
+    '        Dim xmlDoc As XmlDocument = New XmlDocument()
+    '        xmlDoc.LoadXml(TextBox5.Text)
+
+    '        ''LIS Patient process
+    '        Dim myPatientsDS As New PatientsDS
+    '        resultData = xmlDelg.ProcessLISPatients(xmlDoc, "1", "BA400", "9999")
+    '        myPatientsDS = TryCast(resultData.SetDatos, PatientsDS)
+
+    '        ''LIS Order process
+    '        Dim myOrdersDS As New OrdersDS
+    '        resultData = xmlDelg.ProcessLISOrders(xmlDoc, myPatientsDS, "1", "BA400", "9999")
+    '        myOrdersDS = TryCast(resultData.SetDatos, OrdersDS)
+
+    '        'LIS OrderTest process
+
+
+    '        Dim myTestMappDS As New AllTestsByTypeDS
+    '        Dim myConfMappDS As New LISMappingsDS
+
+    '        Dim testmapDlg As New AllTestByTypeDelegate
+    '        resultData = testmapDlg.ReadAll(Nothing)
+    '        myTestMappDS = CType(resultData.SetDatos, AllTestsByTypeDS)
+
+    '        Dim mappDlg As New LISMappingsDelegate
+    '        resultData = mappDlg.ReadAll(Nothing)
+    '        myConfMappDS = CType(resultData.SetDatos, LISMappingsDS)
+
+    '        Dim myRejectedOTLISInfoDS As New OrderTestsLISInfoDS
+    '        resultData = xmlDelg.ProcessLISOrderTests(xmlDoc, myPatientsDS, myOrdersDS, myRejectedOTLISInfoDS, myTestMappDS, myConfMappDS, "PED", "PED", _
+    '                                                  UiAx00MainMDI.channelIDForLIS, "A400", "AnalyzerSN", "WorkSessionID", Now)
+
+    '    Catch ex As Exception
+
+    '    End Try
+
+    'End Sub
+
+    'Private Sub BsShortAction_Click(sender As Object, e As EventArgs) Handles BsShortAction.Click
+
+    '    Try
+    '        Dim resultData As New GlobalDataTO
+
+    '        'Test new table twksWSRotorPositionsInProcess
+    '        'Dim myDelegate As New WSRotorPositionsInProcessDelegate
+
+    '        'resultData = myDelegate.IncrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SS;TT;QQ;RR")
+    '        ''resultData = myDelegate.DecrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SAMPLES", 2)
+
+    '        'Dim temp As New List(Of Integer)
+    '        'temp.Add(1)
+    '        'temp.Add(2)
+    '        'temp.Add(3)
+    '        'resultData = myDelegate.Read(Nothing, "SN0000099999_Ax400", "REAGENTS", temp)
+
+    '        ''resultData = myDelegate.ResetWS(Nothing, "SN0000099999_Ax400")
+
+
+    '        'Insert readings
+    '        'Dim myDS As New twksWSReadingsDS
+    '        'Dim readRow As twksWSReadingsDS.twksWSReadingsRow
+    '        'For i As Integer = 3 To 33
+    '        '    readRow = myDS.twksWSReadings.NewtwksWSReadingsRow
+    '        '    With readRow
+    '        '        .AnalyzerID = "SN0000099999_Ax400"
+    '        '        .WorkSessionID = "2013112501"
+    '        '        .ExecutionID = 1
+    '        '        .ReactionComplete = True
+    '        '        .ReadingNumber = i
+    '        '        .LedPosition = 1
+    '        '        .MainCounts = 700000
+    '        '        .RefCounts = 123000
+    '        '        .DateTime = Now
+    '        '        .Pause = False
+    '        '    End With
+    '        '    myDS.twksWSReadings.AddtwksWSReadingsRow(readRow)
+    '        'Next
+    '        'myDS.twksWSReadings.AcceptChanges()
+    '        'Dim readingsDlg As New WSReadingsDelegate
+    '        'resultData = readingsDlg.SaveReadings(Nothing, myDS)
+
+    '        'Test new functionality warn if critical tests in pause
+    '        Dim myExDlg As New ExecutionsDelegate
+    '        resultData = myExDlg.ExistCriticalPauseTests(Nothing, "SN0000099999_Ax400", "A400", "2013112501")
+
+    '        'AG Temporal create whole rotor inprocess
+    '        'Dim inProcDelg As New WSRotorPositionsInProcessDelegate
+    '        'resultData = inProcDelg.AUXCreateWholeRotorInProcess(Nothing, "SN0000099999_Ax400", "REAGENTS")
+
+    '    Catch ex As Exception
+
+    '    End Try
+    'End Sub
+
+    Private Sub bsCustomSelection_Click(sender As Object, e As EventArgs) Handles bsCustomSelection.Click
+
         Try
-            Dim xmlDelg As New xmlMessagesDelegate
             Dim resultData As New GlobalDataTO
 
-            Dim xmlDoc As XmlDocument = New XmlDocument()
-            xmlDoc.LoadXml(TextBox5.Text)
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New UiSortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "STD"
+                AuxMe.ShowDialog()
+            End Using
 
-            ''LIS Patient process
-            Dim myPatientsDS As New PatientsDS
-            resultData = xmlDelg.ProcessLISPatients(xmlDoc, "1", "BA400", "9999")
-            myPatientsDS = TryCast(resultData.SetDatos, PatientsDS)
-
-            ''LIS Order process
-            Dim myOrdersDS As New OrdersDS
-            resultData = xmlDelg.ProcessLISOrders(xmlDoc, myPatientsDS, "1", "BA400", "9999")
-            myOrdersDS = TryCast(resultData.SetDatos, OrdersDS)
-
-            'LIS OrderTest process
-
-
-            Dim myTestMappDS As New AllTestsByTypeDS
-            Dim myConfMappDS As New LISMappingsDS
-
-            Dim testmapDlg As New AllTestByTypeDelegate
-            resultData = testmapDlg.ReadAll(Nothing)
-            myTestMappDS = CType(resultData.SetDatos, AllTestsByTypeDS)
-
-            Dim mappDlg As New LISMappingsDelegate
-            resultData = mappDlg.ReadAll(Nothing)
-            myConfMappDS = CType(resultData.SetDatos, LISMappingsDS)
-
-            Dim myRejectedOTLISInfoDS As New OrderTestsLISInfoDS
-            resultData = xmlDelg.ProcessLISOrderTests(xmlDoc, myPatientsDS, myOrdersDS, myRejectedOTLISInfoDS, myTestMappDS, myConfMappDS, "PED", "PED", _
-                                                      IAx00MainMDI.channelIDForLIS, "A400", "AnalyzerSN", "WorkSessionID", Now)
-
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
-
-    Private Sub BsShortAction_Click(sender As Object, e As EventArgs) Handles BsShortAction.Click
-
-        Try
-            Dim resultData As New GlobalDataTO
-
-            'Test new table twksWSRotorPositionsInProcess
-            'Dim myDelegate As New WSRotorPositionsInProcessDelegate
-
-            'resultData = myDelegate.IncrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SS;TT;QQ;RR")
-            ''resultData = myDelegate.DecrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SAMPLES", 2)
-
-            'Dim temp As New List(Of Integer)
-            'temp.Add(1)
-            'temp.Add(2)
-            'temp.Add(3)
-            'resultData = myDelegate.Read(Nothing, "SN0000099999_Ax400", "REAGENTS", temp)
-
-            ''resultData = myDelegate.ResetWS(Nothing, "SN0000099999_Ax400")
-
-
-            'Insert readings
-            'Dim myDS As New twksWSReadingsDS
-            'Dim readRow As twksWSReadingsDS.twksWSReadingsRow
-            'For i As Integer = 3 To 33
-            '    readRow = myDS.twksWSReadings.NewtwksWSReadingsRow
-            '    With readRow
-            '        .AnalyzerID = "SN0000099999_Ax400"
-            '        .WorkSessionID = "2013112501"
-            '        .ExecutionID = 1
-            '        .ReactionComplete = True
-            '        .ReadingNumber = i
-            '        .LedPosition = 1
-            '        .MainCounts = 700000
-            '        .RefCounts = 123000
-            '        .DateTime = Now
-            '        .Pause = False
-            '    End With
-            '    myDS.twksWSReadings.AddtwksWSReadingsRow(readRow)
-            'Next
-            'myDS.twksWSReadings.AcceptChanges()
-            'Dim readingsDlg As New WSReadingsDelegate
-            'resultData = readingsDlg.SaveReadings(Nothing, myDS)
-
-            'Test new functionality warn if critical tests in pause
-            Dim myExDlg As New ExecutionsDelegate
-            resultData = myExDlg.ExistCriticalPauseTests(Nothing, "SN0000099999_Ax400", "A400", "2013112501")
-
-            'AG Temporal create whole rotor inprocess
-            'Dim inProcDelg As New WSRotorPositionsInProcessDelegate
-            'resultData = inProcDelg.AUXCreateWholeRotorInProcess(Nothing, "SN0000099999_Ax400", "REAGENTS")
 
         Catch ex As Exception
 

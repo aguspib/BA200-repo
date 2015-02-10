@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ISettings
+Partial Class UiSettings
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -29,7 +29,7 @@ Partial Class ISettings
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ISettings))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiSettings))
         Me.bsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
         Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.LastButton = New Biosystems.Ax00.Controls.UserControls.BSButton
@@ -44,7 +44,7 @@ Partial Class ISettings
         Me.bsSettingsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.LimitsDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.EditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -132,7 +132,7 @@ Partial Class ISettings
         Me.bsLoadSaveGroupBox.Controls.Add(Me.bsSettingsLabel)
         Me.bsLoadSaveGroupBox.Controls.Add(Me.LimitsDataGridView)
         Me.bsLoadSaveGroupBox.Controls.Add(Me.SaveButton)
-        Me.bsLoadSaveGroupBox.Controls.Add(Me.CancelButton)
+        Me.bsLoadSaveGroupBox.Controls.Add(Me.ButtonCancel)
         Me.bsLoadSaveGroupBox.Controls.Add(Me.EditButton)
         Me.bsLoadSaveGroupBox.Controls.Add(Me.FilterComboBox)
         Me.bsLoadSaveGroupBox.Controls.Add(Me.BsShowLabel)
@@ -320,13 +320,13 @@ Partial Class ISettings
         '
         'CancelButton
         '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CancelButton.Location = New System.Drawing.Point(910, 552)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 174
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCancel.Location = New System.Drawing.Point(910, 552)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 174
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'EditButton
         '
@@ -407,7 +407,7 @@ Partial Class ISettings
     Friend WithEvents BsButton1 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsLoadSaveGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
     Friend WithEvents SaveButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents EditButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsSettingsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip

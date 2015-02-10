@@ -1,14 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
-
     Public Class tqcHistoryTestSamplesRulesDAO
-        Inherits DAOBase
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -42,8 +39,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -89,8 +86,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.InsertFromISETestSampleMultiRules", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.InsertFromISETestSampleMultiRules", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -134,61 +131,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.ReadByQCTestSampleID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.ReadByQCTestSampleID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
-#End Region
-
-#Region "TO DELETE - OLD FUNCTIONS"
-        '''' <summary>
-        '''' When the selected Multirules are changed for a Test/SampleType in Tests Programming Screen, they are also inserted in 
-        '''' the correspondent table in QC Module
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pTestID">Test Identifier</param>
-        '''' <param name="pSampleType">Sample Type Code</param>
-        '''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC Module</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by: TR 10/05/2011
-        '''' </remarks>
-        'Public Function InsertFromTestSampleMultiRulesOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
-        '                                                  ByVal pQCTestSampleID As Integer) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-
-        '    Try
-        '        If (pDBConnection Is Nothing) Then
-        '            resultData.HasError = True
-        '            resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-        '        Else
-        '            Dim cmdText As String = " INSERT INTO tqcHistoryTestSamplesRules(QCTestSampleID, RuleID) "
-        '            cmdText &= " SELECT " & pQCTestSampleID.ToString() & ", RuleID "
-        '            cmdText &= " FROM   tparTestSamplesMultirules "
-        '            cmdText &= " WHERE  TestID = " & pTestID.ToString()
-        '            cmdText &= " AND    SampleType = '" & pSampleType & "'"
-        '            cmdText &= " AND    SelectedRule = 1 "
-
-        '            Dim cmd As SqlClient.SqlCommand
-        '            cmd = pDBConnection.CreateCommand
-        '            cmd.CommandText = cmdText
-
-        '            resultData.AffectedRecords = cmd.ExecuteNonQuery()
-        '            resultData.HasError = False
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tqcHistoryTestSamplesRulesDAO.InsertFromTestSampleMultiRules", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return resultData
-        'End Function
 #End Region
 
     End Class

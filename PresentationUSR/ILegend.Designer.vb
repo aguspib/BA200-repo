@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ILegend
+Partial Class UiLegend
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -21,7 +21,7 @@ Partial Class ILegend
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim GridView1 As DevExpress.XtraGrid.Views.Grid.GridView
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ILegend))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiLegend))
         Me.Cycle = New DevExpress.XtraGrid.Columns.GridColumn
         Me.Abs1 = New DevExpress.XtraGrid.Columns.GridColumn
         Me.Abs2 = New DevExpress.XtraGrid.Columns.GridColumn
@@ -74,7 +74,7 @@ Partial Class ILegend
         GridView1.OptionsFind.AllowFindPanel = False
         GridView1.OptionsSelection.EnableAppearanceFocusedCell = False
         GridView1.OptionsView.EnableAppearanceEvenRow = True
-        GridView1.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
+        GridView1.OptionsView.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
         '
         'Cycle
         '
@@ -209,7 +209,7 @@ Partial Class ILegend
         Me.LegendGridView.Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() {Me.IconColumn, Me.Description, Me.Position, Me.Group})
         Me.LegendGridView.GridControl = Me.bsSamplesListDataGridView
         Me.LegendGridView.GroupCount = 1
-        Me.LegendGridView.GroupFooterShowMode = DevExpress.XtraGrid.Views.Grid.GroupFooterShowMode.Hidden
+        Me.LegendGridView.OptionsView.GroupFooterShowMode = DevExpress.XtraGrid.Views.Grid.GroupFooterShowMode.Hidden
         Me.LegendGridView.GroupFormat = "[#image]{1} {2}"
         Me.LegendGridView.GroupPanelText = "Legend"
         Me.LegendGridView.HorzScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Never
@@ -242,11 +242,11 @@ Partial Class ILegend
         Me.LegendGridView.OptionsView.ShowGroupExpandCollapseButtons = False
         Me.LegendGridView.OptionsView.ShowGroupPanel = False
         Me.LegendGridView.OptionsView.ShowIndicator = False
-        Me.LegendGridView.OptionsView.ShowPreviewLines = False
-        Me.LegendGridView.OptionsView.ShowVertLines = False
+        Me.LegendGridView.OptionsView.ShowPreviewRowLines = DevExpress.Utils.DefaultBoolean.False
+        Me.LegendGridView.OptionsView.ShowVerticalLines = DevExpress.Utils.DefaultBoolean.False
         Me.LegendGridView.PaintStyleName = "Web"
         Me.LegendGridView.ScrollStyle = DevExpress.XtraGrid.Views.Grid.ScrollStyleFlags.LiveVertScroll
-        Me.LegendGridView.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.[Default]
+        Me.LegendGridView.OptionsView.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.[Default]
         Me.LegendGridView.SortInfo.AddRange(New DevExpress.XtraGrid.Columns.GridColumnSortInfo() {New DevExpress.XtraGrid.Columns.GridColumnSortInfo(Me.Group, DevExpress.Data.ColumnSortOrder.Ascending), New DevExpress.XtraGrid.Columns.GridColumnSortInfo(Me.Position, DevExpress.Data.ColumnSortOrder.Ascending)})
         Me.LegendGridView.VertScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Always
         '
@@ -394,7 +394,7 @@ Partial Class ILegend
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "ILegend"
+        Me.Name = "UiLegend"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

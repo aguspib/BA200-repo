@@ -38,8 +38,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.GetFormulaValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.GetFormulaValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -113,8 +113,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.GetTestsInFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.GetTestsInFormula", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -122,21 +122,22 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Verify if the specified Test is included in the formula of a Calculated Test, filtering data by
-        ''' Sample Type if this value has been informed
+        ''' Verify if the specified Test (Standard, ISE, Off-System or Calculated Test) is included in the formula of a Calculated Test,
+        ''' filtering data by Sample Type if this value has been informed.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType">Sample Type Code. Optional parameter</param>
-        ''' <param name="pTestType">Type of Test. Optional parameter</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter.</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC). Optional parameter.</param>
         ''' <param name="pExcludeSampleTypes">When True, it indicates the Test will be searched in Formulas but using a
-        '''                                   SampleType different of the specified ones. Optional parameter</param>
+        '''                                   SampleType different of the specified ones. Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet FormulasDS with the Identifier and Name of the Calculated
-        '''          Test in which formula the specified Test is included</returns>
+        '''          Test(s) in which formula the specified Test is included.</returns>
         ''' <remarks>
         ''' Created by:  TR 17/05/2010
         ''' Modified by: SA 14/01/2010 - Added new optional parameter to allow search a Test in a Formula but using a SampleType 
         '''                              different of the specified ones
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadFormulaByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, Optional ByVal pSampleType As String = "", _
                                             Optional ByVal pTestType As String = "STD", Optional ByVal pExcludeSampleTypes As Boolean = False) As GlobalDataTO
@@ -158,8 +159,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.ReadFormulaByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.ReadFormulaByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -202,8 +203,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -258,8 +259,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.AddFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.AddFormula", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -302,8 +303,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.UpdateCalcTestValueAfterDBUpdate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.UpdateCalcTestValueAfterDBUpdate", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -339,8 +340,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FormulasDelegate.GetCalculatedTestIntoFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FormulasDelegate.GetCalculatedTestIntoFormula", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

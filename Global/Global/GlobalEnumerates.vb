@@ -124,18 +124,23 @@ Namespace Biosystems.Ax00.Global
         ''' Define the Enumeration for General Settings
         ''' </summary>
         ''' <remarks>
-        ''' Created by: VR 29/12/2009 
+        ''' Created by:  VR 29/12/2009 
+        ''' Modified by: SA 11/11/2014 - BA-1885 ==> Item MAX_QCRESULTS_TO_ACCUMULATE removed from the enumerated 
         ''' </remarks>
         Public Enum GeneralSettingsEnum
             ACCESS_CONTROL_ACTIVATION
             BIG_BOTTLE_MIN_VOLUME
             CAL_EXPIR_DATE_DAYNUMBER
+            EXT_SAMPLEID_MAXSIZE 'AG 03/09/2014 - complete enum
+            EXT_SAMPLETYPE_MAXSIZE 'AG 03/09/2014 - complete enum
             INITIAL_KEY
             INTERVAL_ABS_T
+            LAST_TEST_REPORT_POS 'AG 03/09/2014 - complete enum
             MAX_CUMULATED_QCSERIES
             MAX_DAYS_PREVIOUS_BLK_CALIB
             MAX_NEW_TESTS_ALLOWED
             MAX_PATIENT_ORDER_TESTS
+            SUPERVISOR_CREATED_TEST_COUNT 'AG 03/09/2014 - complete enum
             MAX_QCRESULTS_TO_ACCUMULATE
         End Enum
 
@@ -301,6 +306,8 @@ Namespace Biosystems.Ax00.Global
             SAMPLES_VOLUME
             SLOPE_FACTOR_A
             SLOPE_FACTOR_B
+            SLOPE_FACTOR_A2
+            SLOPE_FACTOR_B2
             SUBSTRATE_DEPLETION
             TEST_NUM_DECIMALS
             TEST_NUM_REPLICATES
@@ -439,7 +446,14 @@ Namespace Biosystems.Ax00.Global
             CRITICAL_PAUSEMODE 'AG 22/11/2013 - Task #1391
         End Enum
 
+        ''' <summary>
+        ''' Enumeration for DB SOFTWARE Parameters
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by: SA 11/11/2014 - BA-1885 ==> Added new item MAX_QCRESULTS_TO_ACCUMULATE to the enumerated 
+        ''' </remarks>
         Public Enum SwParameters
+
             MAX_FILE_LOG_SIZE
             LIMIT_ABS
             PATH_LENGHT
@@ -453,6 +467,7 @@ Namespace Biosystems.Ax00.Global
             FIRST_USER_TESTID
             CYCLE_MACHINE
             TOTAL_READINGS
+            SECOND_REAGENT
             PREDILUTION_CYCLES
             ISETEST_CYCLES_SERPLM
             ISETEST_CYCLES_URI
@@ -683,6 +698,8 @@ Namespace Biosystems.Ax00.Global
             ISE_INTERCEPT_SER_K
             ISE_SLOPE_SER_Cl
             ISE_INTERCEPT_SER_Cl
+            ISE_SLOPE_URI_Li 'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for URI
+            ISE_INTERCEPT_URI_Li 'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for URI
             ISE_SLOPE_URI_Na
             ISE_INTERCEPT_URI_Na
             ISE_SLOPE_URI_K
@@ -690,6 +707,15 @@ Namespace Biosystems.Ax00.Global
             ISE_SLOPE_URI_Cl
             ISE_INTERCEPT_URI_Cl
             'TR 14/03/2012 -END.
+
+            'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for PLM
+            ISE_SLOPE_PLM_Na
+            ISE_INTERCEPT_PLM_Na
+            ISE_SLOPE_PLM_K
+            ISE_INTERCEPT_PLM_K
+            ISE_SLOPE_PLM_Cl
+            ISE_INTERCEPT_PLM_Cl
+            'AG 15/09/2014 - BA-1918
 
             ISE_SECURITY_MODE 'SG 28/06/2012 Determines which kind of validation has to be performed 
             ISE_CMD_TIMEOUT 'SGM 02/07/2012 Time for wait Action 34 (ISE Instruction Start)
@@ -752,6 +778,15 @@ Namespace Biosystems.Ax00.Global
             BL_TYPE_FOR_CALCULATIONS
             BL_TYPE_FOR_WELLREJECT
 
+            MAX_QCRESULTS_TO_ACCUMULATE 'BA-1885
+
+            ' XB 09/12/2014 - BA-1872
+            WAITING_TIME_OFF
+            SYSTEM_TIME_OFFSET
+            WAITING_TIME_DEFAULT
+            WAITING_TIME_FAST
+            WAITING_TIME_ISE_FAST
+            WAITING_TIME_ISE_OFFSET
             BL_DYNAMIC_SD 'AG 26/11/2014 BA-2081
             FLIGHT_INIT_FAILURES 'Number of failures of baseline initializations (FLIGHT)
             RDI_CUMULATE_ALL_BASELINES 'AG 15/01/2015 BA-2212
@@ -951,6 +986,10 @@ Namespace Biosystems.Ax00.Global
             ISE_ACTIVATED 'WARNING! Sw generates this warning when ISE module is Activated (Software business)
             ISE_RP_NO_INST_ERR ' ERROR! Sw generates this error when Reagents Pack is wrong installed (Software business)
 
+            ISE_CALB_PDT_WARN   ' CALIBS WARNING! Sw generates this warning when ISE Electrodes calibration is not performed or is expired - BA-1873
+            ISE_PUMP_PDT_WARN   ' CALIBS WARNING! Sw generates this warning when ISE Pumps calibration is not performed or is expired - BA-1873
+            ISE_CLEAN_PDT_WARN  ' CALIBS WARNING! Sw generates this warning when ISE Clean is not performed or is expired - BA-1873
+
             'Software business alarms
             '========================
             BASELINE_INIT_ERR 'ERROR! Sw generates this error when the base line calculations determine a Baseline error (initialization)
@@ -999,6 +1038,10 @@ Namespace Biosystems.Ax00.Global
             INST_COMMAND_WARN           'Error with Command script                  | FW ERROR CODE:  43 | DL 27/07/2012 
             INST_LOADADJ_WARN           'Error Loading Adjustments                  | FW ERROR CODE:  45 | DL 27/07/2012 
 
+            COMMS_TIMEOUT_ERR           'XB 06/11/2014 - BA-1872
+            ''''''''''''''''
+            'IMPORTANT NOTE: Every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
+            ''''''''''''''''
 
 
             '***********************
@@ -1337,6 +1380,7 @@ Namespace Biosystems.Ax00.Global
             MANUAL_DELETE_FOR_STATS
             MASTER_DATA_MISSING
             MAX_PATIENT_ORDERTESTS
+            MAX_RESULTS_FOR_LISEXPORT
             MIN_MUST_BE_LOWER_THAN_MAX
             MINEQUALSMAX
             MINGREATHERMAX
@@ -1780,6 +1824,7 @@ Namespace Biosystems.Ax00.Global
             RES_RECOVER_INPAUSE 'AG 28/11/2013 - #1397
 
             READING_NOT_SAVED 'AG 21/05/2014 activate code: TR 06/05/2014 BT #1612, #1634 Indicate there was an error saving a received reading.-**UNCOMMENT Version 3.0.1**-
+            RESULTS_CANNOT_BE_SENT 'AG 30/09/2014 BA-1440 new message to inform the user when some result cannot be sent to LIS
 
         End Enum
 
@@ -2979,6 +3024,16 @@ Namespace Biosystems.Ax00.Global
 
 #End Region
 
+#Region "Tests"
+        ' XB 05/09/2014 - BA-1902
+        Public Enum ISE_Tests
+            Na = 1
+            K = 2
+            Cl = 3
+            Li = 4
+        End Enum
+#End Region
+
 #End Region
 
 #Region "SERVICE SOFTWARE"
@@ -3116,6 +3171,8 @@ Namespace Biosystems.Ax00.Global
             MBEV_ALL_ARMS_TO_WASHING
             MBEV_ALL_ARMS_IN_WASHING
 
+            MBEV_WASHING_STATION_TO_NROTOR              ' XB 15/10/2014 - BA-2004
+            MBEV_WASHING_STATION_IS_NROTOR_PERFORMED    ' XB 15/10/2014 - BA-2004
             MBEV_WASHING_STATION_TO_DOWN
             MBEV_WASHING_STATION_IS_DOWN
 
@@ -3173,6 +3230,10 @@ Namespace Biosystems.Ax00.Global
 
             NEW_ROTOR_START
             NEW_ROTOR_END
+
+            ' XB 15/10/2014 - BA-2004
+            FINE_OPTICAL_CENTERING_PERFORMING
+            FINE_OPTICAL_CENTERING_DONE
 
         End Enum
 
@@ -3477,6 +3538,7 @@ Namespace Biosystems.Ax00.Global
             REAGENTS_HOME_ROTOR
             REACTIONS_HOME_ROTOR
             REACTIONS_ROTOR_HOME_WELL1
+            REACTIONS_ROTOR_AUTO_CENTERING
             ' Absolute Movements
             WASHING_STATION_ABS_Z
             WASHING_STATION_PARK

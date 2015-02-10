@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tparTestReagentsVolumeDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -94,8 +94,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -105,12 +105,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Used as filter only when it has a value different of empty string</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents Volume required for the informed Test</returns>
         ''' <remarks>
         ''' Created by:  DL 22/02/2010
         ''' Modified by: SA 28/10/2010 - Changed the query, the join is not needed, field TestID exists in tparTestReagentsVolumes
         '''              SA 29/02/2012 - Changed the function template; changed the query to get all table fields
-        ''' AG 03/07/2012 - add parameter pSampleType
+        '''              AG 03/07/2012 - Added parameter pSampleType and use it to filter data when it is informed
         ''' </remarks>
         Public Function ReadByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -123,9 +124,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT * FROM tparTestReagentsVolumes " & vbCrLf & _
                                                 " WHERE  TestID = " & pTestID.ToString & vbCrLf
-                        If pSampleType <> "" Then
-                            cmdText &= " AND SampleType = '" & pSampleType.ToString & "' "
-                        End If
+
+                        If (pSampleType <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.ToString & "' "
 
                         Dim resultData As New TestReagentsVolumesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -144,8 +144,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsDAO.ReadByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsDAO.ReadByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -233,8 +233,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -273,8 +273,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.DeleteByTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.DeleteByTestIDAndSampleType", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -314,8 +314,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.DeleteByTestIDReagNumberReagID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsVolumeDAO.DeleteByTestIDReagNumberReagID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

@@ -2,11 +2,8 @@
 Option Strict On
 
 Imports Microsoft.Win32
-Imports System.Windows.Forms
-Imports System.Configuration
 Imports System.Globalization
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global
 
 ''' <summary>
@@ -74,7 +71,7 @@ Public Class SystemInfoManager
     '        MySystemInfoTO.GetComputerInfo() ' dl 15/09/2010
 
     '    Catch ex As EvaluateException
-    '        CreateLogActivity(ex.Message, "SystemInfo.LoadApplicationInfoSessionTO", EventLogEntryType.Error, GetSessionInfo().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, "SystemInfo.LoadApplicationInfoSessionTO", EventLogEntryType.Error, GetSessionInfo().ActivateSystemLog)
     '    End Try
     '    Return MySystemInfoTO
     'End Function

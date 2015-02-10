@@ -1,33 +1,15 @@
 ﻿Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
-
-Imports System.Text
-Imports System.ComponentModel
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraPrintingLinks
-Imports DevExpress.XtraEditors
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
-Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
-Imports DevExpress.XtraEditors.Controls
-Imports DevExpress.Utils
+'AG 26/07/2010
 
 
-Partial Class IResults
+Partial Class UiResults
 
 #Region "TestsListDataGridView Methods"
     ''' <summary>
@@ -60,7 +42,7 @@ Partial Class IResults
             bsTestsListDataGridView.Columns("OrderID").Visible = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeTestsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeTestsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -73,6 +55,9 @@ Partial Class IResults
     ''' Modified by: AG 01/12/2010 - Adapted for ISE and OFFS tests
     '''              SA 26/01/2011 - Besides the TestType Icon, inform also the Code in the correspondent hidden column
     '''              RH 02/02/2011 - Removed the hidden column for storing the code of the TestType
+    '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
+    '''              WE 13/01/2015 - BA-2153: Note that the sequence of elements of array 'TestType' must always be in-sync
+    '''                                       with the ImageList 'TestTypeIconList' in Sub PrepareButtons (Class IResults).
     ''' </remarks>
     Private Sub UpdateTestsListDataGrid()
         Try
@@ -82,7 +67,11 @@ Partial Class IResults
             Dim dgv As BSDataGridView = bsTestsListDataGridView
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim RowIndex As Integer = -1
-            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+
+            ' XB 28/11/2014 - BA-1867
+            'Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+            Dim TestType() As String = {"STD", "ISE", "OFFS", "CALC"}
+            ' XB 28/11/2014 - BA-1867
 
             ProcessEvent = False
             'TR 11/07/2012 -Declare Outside the for 
@@ -133,7 +122,7 @@ Partial Class IResults
             bsTestsListDataGridView_SelectionChanged(Nothing, Nothing)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateTestsListDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateTestsListDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub

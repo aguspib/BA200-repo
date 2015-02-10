@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Global
 'Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.BL
 
@@ -38,8 +37,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pVirtualRotorPos">Typed DataSet containing the information to add for a Rotor Position with Status = NOT IN USE</param>        
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
-        ''' Created by:  AG 21/01/2010 (Tested OK)
-        ''' AG 07/10/2014 - BA-1979 add traces into log when NO inuse rotor is saved with invalid values in order to find the origin
+        ''' Created by:  AG 21/01/2010 
+        ''' Modified by: AG 07/10/2014 - BA-1979 ==> Added a call to new auxiliary function CheckForInvalidPosition to check if there are NOT IN USE Rotor 
+        '''                                          Positions with incomplete data (TubeContent without ID of the corresponding element). 
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                             ByVal pWorkSessionID As String, ByVal pVirtualRotorPos As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
@@ -51,16 +51,15 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'AG 07/10/2014 BA-1979
+                        'BA-1979: Check if there are NOT IN USE Rotor Positions with incomplete data (TubeContent without ID of the element) and
+                        '         mark InvalidPosition for them in the DataSet to exclude them from the INSERT
                         resultData = CheckForInvalidPosition(dbConnection, pRotorType, pVirtualRotorPos, pProcessWhoCalls)
-                        If Not resultData.HasError Then
-                            'AG 07/10/2014 BA-1979
 
+                        If (Not resultData.HasError) Then
+                            'Save the NOT IN USE Rotor Positions in table twksWSNotInUseRotorPositions
                             Dim myDAO As New twksWSNotInUseRotorPositionsDAO
                             resultData = myDAO.Create(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, pVirtualRotorPos)
-
-                        End If 'AG 07/10/2014 BA-1979
-
+                        End If
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -80,8 +79,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Add", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -212,8 +211,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.CompleteSelection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.CompleteSelection", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -263,8 +262,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -310,8 +309,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -351,8 +350,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetPlacedTubesByPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetPlacedTubesByPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -393,8 +392,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetPositionContent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetPositionContent", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -552,8 +551,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetRotorPositionsByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.GetRotorPositionsByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -602,8 +601,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Reset", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.Reset", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -650,8 +649,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -703,8 +702,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.SetStatusToNull", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.SetStatusToNull", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -755,8 +754,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.UpdateSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.UpdateSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -802,8 +801,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -850,8 +849,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -862,7 +861,7 @@ Namespace Biosystems.Ax00.BL
 
 #Region "Private methods"
         ''' <summary>
-        ''' Evaluate if data in paramaters contains invalid values. In this case do nothing but inform into internal LOG
+        ''' Evaluate if data in parameters contains invalid values. In this case do nothing but inform into internal LOG:
         ''' -	TubeContent = “CALIB” + CalibratorID = vbNULL
         ''' -	TubeContent = “CTRL” + CalibratorID = vbNULL
         ''' -	TubeContent = “TUBE_SPEC_SOL” + SolutionCode = vbNULL
@@ -873,105 +872,162 @@ Namespace Biosystems.Ax00.BL
         ''' -	TubeContent = “WASH_SOL” + SolutionCode = vbNULL
         ''' -	TubeContent = “SALINESOL” + SolutionCode = vbNULL
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pRotorType"></param>
-        ''' <param name="pNotInUseRotorPositionsDS"></param>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pRotorType">Rotor Type: SAMPLES or REAGENT</param>
+        ''' <param name="pNotInUseRotorPositionsDS">Typed DataSet VirtualRotorPosititionsDS containing all NOT IN USE positions to save in table
+        '''                                         twksNotInUseRotorPositions for the specified Rotor</param>
         ''' <param name="pProcessWhoCalls">Enumerate that informs the process who calls the delegate instance</param>
-        ''' <returns></returns>
-        ''' <remarks>AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin</remarks>
-        Private Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pNotInUseRotorPositionsDS As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  AG 07/10/2014 - BA-1979 ==> Add traces into log for positions with invalid values in order to find the origin
+        ''' Modified by: SA 15/12/2014 - BA-1972 ==> Mark as invalid all positions with field TubeContent informed but without ID of the corresponding Element
+        '''                                          to avoid save it with incomplete data (due to the error cannot be reproduced, the wrong positions are not
+        '''                                          saved). If an error is raised during function execution, return it.
+        ''' </remarks>
+        Private Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, _
+                                                 ByVal pNotInUseRotorPositionsDS As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim textDetails As String = String.Empty
+
                         Select Case pProcessWhoCalls
                             Case ClassCalledFrom.BarcodeResultsManagement
-                                textDetails = "(called during barcode results management)"
+                                textDetails = "(called during Barcode results management)"
                             Case ClassCalledFrom.ChangeElementPosition
                                 textDetails = "(called during change NO INUSE element position)"
                             Case ClassCalledFrom.LoadVirtualRotor
                                 textDetails = "(called during load virtual rotor (NO INUSE elements))"
                         End Select
 
-
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         Dim linqRes As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow)
-                        If pRotorType = "REAGENTS" Then
-                            'REAGENTS without reagentID
+
+                        If (pRotorType = "REAGENTS") Then
+                            'REAGENTS without ReagentID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                      Where a.TubeContent = "REAGENT" AndAlso a.IsReagentIDNull Select a).ToList
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: REAGENT with ReagentID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                      Where a.TubeContent = "REAGENT" AndAlso a.IsReagentIDNull _
+                                     Select a).ToList
+
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = REAGENT but not ReagentID as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: REAGENT with ReagentID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
-                            'SPECIAL or WASH or SALINE solution without solutioncode
+                            'SPECIAL SOLUTION, WASH SOLUTION or SALINE SOLUTION without SolutionCode
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                       Where (a.TubeContent = "SPEC_SOL" OrElse a.TubeContent = "WASH_SOL" OrElse a.TubeContent = "SALINESOL") AndAlso a.IsSolutionCodeNull Select a).ToList
+                                      Where (a.TubeContent = "SPEC_SOL" OrElse a.TubeContent = "WASH_SOL" OrElse a.TubeContent = "SALINESOL") AndAlso a.IsSolutionCodeNull _
+                                     Select a).ToList
 
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: Bottle solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = SPEC_SOL/WASH_SOL/SALINESOL but not SolutionCode as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: Bottle solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
-
-
                         Else
                             'CALIBRATOR without CalibratorID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                      Where a.TubeContent = "CALIB" AndAlso a.IsCalibratorIDNull Select a).ToList
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: CALIBRATOR with CalibratorID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                      Where a.TubeContent = "CALIB" AndAlso a.IsCalibratorIDNull _
+                                     Select a).ToList
+
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = CALIB but not CalibratorID as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: CALIBRATOR with CalibratorID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'CONTROL without ControlID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                      Where a.TubeContent = "CTRL" AndAlso a.IsControlIDNull Select a).ToList
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: CONTROL with ControlID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                      Where a.TubeContent = "CTRL" AndAlso a.IsControlIDNull _
+                                     Select a).ToList
+
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = CTRL but not ControlID as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: CONTROL with ControlID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'PATIENT without PatientID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                      Where a.TubeContent = "PATIENT" AndAlso a.IsPatientIDNull Select a).ToList
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: PATIENT with PatientID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                                      Where a.TubeContent = "PATIENT" AndAlso a.IsPatientIDNull _
+                                     Select a).ToList
+
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = PATIENT but not PatientID as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: PATIENT with PatientID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
-                            'Tube SPECIAL or WASH solution without solutioncode
+                            'SPECIAL SOLUTION or WASH SOLUTION in Tube without SolutionCode
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
-                                       Where (a.TubeContent = "TUBE_SPEC_SOL" OrElse a.TubeContent = "TUBE_WASH_SOL") AndAlso a.IsSolutionCodeNull Select a).ToList
+                                      Where (a.TubeContent = "TUBE_SPEC_SOL" OrElse a.TubeContent = "TUBE_WASH_SOL") AndAlso a.IsSolutionCodeNull _
+                                     Select a).ToList
 
-                            If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: Tube solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
+                            If (linqRes.Count > 0) Then
+                                'Mark all positions with TubeContent = TUBE_SPEC_SOL/TUBE_WASH_SOL but not SolutionCode as invalid 
+                                For Each row As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
+                                    row.BeginEdit()
+                                    row.InvalidPosition = True
+                                    row.EndEdit()
+                                Next
+
+                                'Write the error in the LOG
+                                GlobalBase.CreateLogActivity("Invalid values: Tube solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
-
                         End If
+                        pNotInUseRotorPositionsDS.AcceptChanges()
                         linqRes = Nothing
-
                     End If
                 End If
-
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
-
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-            resultData.HasError = False 'Not inform error flag in this method!!
             Return resultData
         End Function
-
 #End Region
 
     End Class

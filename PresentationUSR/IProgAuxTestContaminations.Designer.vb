@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgAuxTestContaminations
+Partial Class UiProgAuxTestContaminations
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -30,7 +30,7 @@ Partial Class IProgAuxTestContaminations
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgAuxTestContaminations))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgAuxTestContaminations))
         Me.bsTestListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsContaminationsDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
         Me.bsContaminationsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -248,7 +248,7 @@ Partial Class IProgAuxTestContaminations
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgAuxTestContaminations"
+        Me.Name = "UiProgAuxTestContaminations"
         Me.Text = " "
         Me.bsTestListGroupBox.ResumeLayout(False)
         CType(Me.bsContaminationsDataGridView, System.ComponentModel.ISupportInitialize).EndInit()

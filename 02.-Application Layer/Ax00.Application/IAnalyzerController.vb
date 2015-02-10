@@ -6,13 +6,13 @@ Namespace Biosystems.Ax00.App
 
 #Region "Properties"
 
-        Property Analyzer As IAnalyzerEntity
+        Property Analyzer As IAnalyzerManager
 
 #End Region
 
 #Region "Public Methods"
         ''' AG 10/11/2014 BA-2082 remove parameter model and use analyzerModel that are read from database
-        Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity
+        Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerManager
 
 #End Region
 

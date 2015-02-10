@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IConfigUsers
+Partial Class UiConfigUsers
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class IConfigUsers
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IConfigUsers))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiConfigUsers))
         Me.bsUserDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
         Me.bsUserListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.bsUserDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox

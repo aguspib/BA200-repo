@@ -4,8 +4,6 @@
 'AG 13/03/2013 Moved to Global project because the WorkSession project also requires this class
 
 Imports System.Xml
-Imports System.Xml.XPath
-Imports System.IO
 Imports System.Xml.Schema
 
 
@@ -204,9 +202,9 @@ Namespace Biosystems.Ax00.Global
                 Dim myChars() As Char = pString.ToCharArray
                 For c As Integer = 0 To myChars.Length - 1 Step 1
                     Select Case myChars(c)
-                        Case "&" : res &= "&#x26;"
-                        Case "<" : res &= "&#x60;"
-                        Case ">" : res &= "&#x62;"
+                        Case "&"c : res &= "&#x26;"
+                        Case "<"c : res &= "&#x60;"
+                        Case ">"c : res &= "&#x62;"
                         Case Else : res &= myChars(c)
                     End Select
                 Next

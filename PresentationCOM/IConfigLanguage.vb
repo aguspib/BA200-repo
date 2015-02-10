@@ -10,7 +10,7 @@ Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 
 
-Public Class IConfigLanguage
+Public Class UiConfigLanguage
 
 #Region "Declarations"
     Private OriginalLanguage As String = ""
@@ -48,8 +48,8 @@ Public Class IConfigLanguage
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -58,7 +58,7 @@ Public Class IConfigLanguage
             GetCurrentLanguage()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -134,7 +134,7 @@ Public Class IConfigLanguage
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLanguages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLanguages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetLanguages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -170,7 +170,7 @@ Public Class IConfigLanguage
                 ShowMessage(Me.Name & ".SaveCurrentLanguage", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetCurrentLanguage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetCurrentLanguage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetCurrentLanguage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -189,16 +189,16 @@ Public Class IConfigLanguage
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1") 'AG 16/06/2010 auxIconName = GetIconName("ACCEPT")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -261,7 +261,7 @@ Public Class IConfigLanguage
 
         Catch ex As Exception
             Me.Cursor = Cursors.Default  'AG 13/10/2010
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCurrentLanguage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCurrentLanguage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveCurrentLanguage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -281,9 +281,9 @@ Public Class IConfigLanguage
     Private Sub SetApplicationSessionInfo(ByVal pNewLanguageID As String)
         Try
             'Get current Session Values before reset the Session
-            Dim currentSession As New GlobalBase
-            Dim currentUserID As String = currentSession.GetSessionInfo().UserName.Trim.ToString
-            Dim currentUserLevel As String = currentSession.GetSessionInfo().UserLevel.Trim.ToString
+            'Dim currentSession As New GlobalBase
+            Dim currentUserID As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
+            Dim currentUserLevel As String = GlobalBase.GetSessionInfo().UserLevel.Trim.ToString
 
             Dim resetStatus As Boolean = False
             Dim myApplicationSessionManager As New ApplicationSessionManager
@@ -299,7 +299,7 @@ Public Class IConfigLanguage
                 InitializeApplicationInfoSession(currentUserID, currentUserLevel, pNewLanguageID)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetApplicationSessionInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetApplicationSessionInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetApplicationSessionInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -322,7 +322,7 @@ Public Class IConfigLanguage
             bsScreenToolTips.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -335,18 +335,18 @@ Public Class IConfigLanguage
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             ScreenLoad()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Config Language LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Config Language LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IConfigLanguage.LanguageConfig_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LanguageConfig_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LanguageConfig_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LanguageConfig_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -365,7 +365,7 @@ Public Class IConfigLanguage
                 bsCancelButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LanguageConfig_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LanguageConfig_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LanguageConfig_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -374,7 +374,7 @@ Public Class IConfigLanguage
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Save the selected Language as the current one and refresh opened screens
@@ -386,12 +386,12 @@ Public Class IConfigLanguage
 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity(" Change Lang and Close Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity(" Change Lang and Close Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IConfigLanguage.bsAcceptButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsAcceptButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsAcceptButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsAcceptButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -410,7 +410,7 @@ Public Class IConfigLanguage
             Me.Enabled = False 'RH 13/04/2012 Disable the form to avoid pressing buttons on closing
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub

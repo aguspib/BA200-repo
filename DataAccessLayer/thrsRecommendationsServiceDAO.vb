@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class thrsRecommendationsServiceDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -64,8 +64,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT MR.ResourceText AS FixedItemDesc " & vbCrLf
                         cmdText &= "FROM srv_thrsRecommendationsService RS " & vbCrLf
@@ -95,7 +95,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "INNER JOIN tfmwMultiLanguageResources MR " & vbCrLf
                         cmdText &= "       ON R.ResourceID = MR.ResourceID " & vbCrLf
                         cmdText &= "WHERE  RS.ResultServiceID = " & pResultServiceID.ToString() & vbCrLf
-                        cmdText &= "  AND  MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
+                        cmdText &= "  AND  MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
 
                         Dim myDataSet As New SRVRecommendationsServiceDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -114,8 +114,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.ReadByResultServiceID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.ReadByResultServiceID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -154,8 +154,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Delete", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO

@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksWorkSessionsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -44,8 +44,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'Value for field TS_User
                     If (pWorkSession.twksWorkSessions(0).IsTS_UserNull) Then
-                        Dim myGlobalBase As New GlobalBase
-                        cmdText &= " N'" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "') " & vbCrLf
+                        'Dim myGlobalbase As New GlobalBase
+                        cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "') " & vbCrLf
                     Else
                         cmdText &= " N'" & pWorkSession.twksWorkSessions(0).TS_User.Replace("'", "''") & "') " & vbCrLf
                     End If
@@ -61,8 +61,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -96,8 +96,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.UpdateStartDateTime", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.UpdateStartDateTime", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -151,8 +151,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.GenerateWorkSessionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.GenerateWorkSessionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -200,8 +200,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.GetByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.GetByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -238,8 +238,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWorkSessionsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

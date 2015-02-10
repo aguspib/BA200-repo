@@ -27,13 +27,13 @@ Namespace Biosystems.Ax00.Core.Services
     ''' </remarks>
     Public Class RotorChangeServices
 
-        Public Sub New(analyzer As IAnalyzerEntity)
+        Public Sub New(analyzer As IAnalyzerManager)
             _analyzer = analyzer
         End Sub
 
 #Region "Attributes"
 
-        Private WithEvents _analyzer As IAnalyzerEntity
+        Private WithEvents _analyzer As IAnalyzerManager
         Private _currentStep As RotorChangeStepsEnum
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
@@ -195,8 +195,8 @@ Namespace Biosystems.Ax00.Core.Services
                 Return True
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RotorChangeServices.RecoverProcess", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RotorChangeServices.RecoverProcess", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function

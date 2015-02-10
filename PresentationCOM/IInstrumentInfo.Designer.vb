@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IInstrumentInfo
+Partial Class UiInstrumentInfo
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class IInstrumentInfo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IInstrumentInfo))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiInstrumentInfo))
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.BsBorderedPanel1 = New bsBorderedPanel
         Me.OKButton = New System.Windows.Forms.Button

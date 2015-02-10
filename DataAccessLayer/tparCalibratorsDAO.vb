@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Partial Public Class tparCalibratorsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
     ''' <summary>
@@ -64,8 +64,8 @@ Partial Public Class tparCalibratorsDAO
                 End If
 
                 If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                    Dim myGlobalBase As New GlobalBase
-                    cmdText &= "           ,N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
+                    'Dim myGlobalbase As New GlobalBase
+                    cmdText &= "           ,N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
                 Else
                     cmdText &= "           ,N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "'" & vbCrLf
                 End If
@@ -92,8 +92,8 @@ Partial Public Class tparCalibratorsDAO
                 'End If
 
                 'If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                '    Dim myGlobalBase As New GlobalBase
-                '    cmdText &= " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                '    'Dim myGlobalbase As New GlobalBase
+                '    cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                 'Else
                 '    cmdText &= " N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
                 'End If
@@ -124,8 +124,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Create", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -162,8 +162,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Delete", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -224,8 +224,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Read", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -269,8 +269,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadAll", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadAll", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -334,8 +334,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadByCalibratorName", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadByCalibratorName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -378,8 +378,8 @@ Partial Public Class tparCalibratorsDAO
                 End If
 
                 If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                    Dim myGlobalBase As New GlobalBase
-                    cmdText &= " TS_User = N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                    'Dim myGlobalbase As New GlobalBase
+                    cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                 Else
                     cmdText &= " TS_User = N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
                 End If
@@ -404,8 +404,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Update", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -503,8 +503,8 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.GetCalibratorsForReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.GetCalibratorsForReport", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -540,25 +540,47 @@ Partial Public Class tparCalibratorsDAO
                 Dim cmdText As String
 
                 If (Not pUpdateForExcluded) Then
+                    'AJG
+                    'cmdText = " UPDATE tparCalibrators " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  CalibratorID IN (SELECT DISTINCT TC.CalibratorID " & _
+                    '                                  " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                    '                                                                " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                                " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                    '                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                  " AND    O.SampleClass = 'CALIB') "
                     cmdText = " UPDATE tparCalibrators " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  CalibratorID IN (SELECT DISTINCT TC.CalibratorID " & _
-                                                      " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
-                                                                                    " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                    " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                      " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                      " AND    O.SampleClass = 'CALIB') "
+                              " WHERE EXISTS (SELECT TC.CalibratorID " & _
+                                             " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                                                                           " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                           " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                             " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                             " AND    O.SampleClass = 'CALIB' AND tparCalibrators.CalibratorID = TC.CalibratorID) "
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparCalibrators " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  CalibratorID NOT IN (SELECT DISTINCT TC.CalibratorID " & _
+                    '                                      " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                    '                                                                    " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                                    " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                    '                                      " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                      " AND    O.SampleClass = 'CALIB') " & _
+                    '          " AND    InUse = 1 "
+
                     cmdText = " UPDATE tparCalibrators " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  CalibratorID NOT IN (SELECT DISTINCT TC.CalibratorID " & _
-                                                          " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
-                                                                                        " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                        " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                          " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                          " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                          " AND    O.SampleClass = 'CALIB') " & _
+                              " WHERE NOT EXISTS (SELECT TC.CalibratorID " & _
+                                                 " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                                                                               " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                               " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                                 " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                 " AND    O.SampleClass = 'CALIB' AND tparCalibrators.CalibratorID = TC.CalibratorID) " & _
                               " AND    InUse = 1 "
                 End If
 
@@ -572,8 +594,8 @@ Partial Public Class tparCalibratorsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function

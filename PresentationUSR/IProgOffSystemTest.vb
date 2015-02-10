@@ -1,5 +1,6 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -7,7 +8,7 @@ Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Public Class IProgOffSystemTest
+Public Class UiProgOffSystemTest
 
 #Region "Declarations"
     Private EditionMode As Boolean = False                 'To control when the selected Calculated Test is in Edition Mode
@@ -41,6 +42,7 @@ Public Class IProgOffSystemTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
             '            bsPrintButton.Enabled = False DL 11/05/2012
 
             'Area of Calculated Test Definition
@@ -104,7 +106,7 @@ Public Class IProgOffSystemTest
             'Put Focus in the first enabled field
             bsFullNameTextbox.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AddModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -139,7 +141,7 @@ Public Class IProgOffSystemTest
                 bsTestRefRanges.ChangesMade = False 'TR 13/10/2011 -Set the change made = false on the RefRanges.
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AddOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AddOffSystemTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -214,7 +216,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelOffSystemTestEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelOffSystemTestEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CancelOffSystemTestEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -233,13 +235,13 @@ Public Class IProgOffSystemTest
             OriginalSelectedIndex = -1
             OriginalOffSystemTestName = ""
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CleanGlobalValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
     ''' <summary>
-    ''' Delete the selected OffSystem Tests
+    ''' Delete the selected OffSystem Test(s).
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 01/12/2010
@@ -274,7 +276,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -313,7 +315,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteOffSystemTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -334,7 +336,8 @@ Public Class IProgOffSystemTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
-            '            bsPrintButton.Enabled = False DL 11/05/2012
+            BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
+            'bsPrintButton.Enabled = False DL 11/05/2012
 
             bsFullNameTextbox.Enabled = True
             bsFullNameTextbox.BackColor = Color.White
@@ -379,7 +382,7 @@ Public Class IProgOffSystemTest
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -399,7 +402,7 @@ Public Class IProgOffSystemTest
                 EditModeScreenStatus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditOffSystemTestByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditOffSystemTestByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditOffSystemTestByButtonClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -459,7 +462,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditOffSystemTestByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditOffSystemTestByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditOffSystemTestByDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -488,13 +491,13 @@ Public Class IProgOffSystemTest
                     Close()
                 Else
                     'Normal button click - open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 bsFullNameTextbox.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -522,7 +525,7 @@ Public Class IProgOffSystemTest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAgeUnits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAgeUnits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAgeUnits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -551,7 +554,7 @@ Public Class IProgOffSystemTest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDetailedRangesSubTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDetailedRangesSubTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetDetailedRangesSubTypes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -580,7 +583,7 @@ Public Class IProgOffSystemTest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetGenders ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetGenders ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetGenders", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -607,7 +610,7 @@ Public Class IProgOffSystemTest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myFieldLimitsDS
@@ -636,7 +639,7 @@ Public Class IProgOffSystemTest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetMessages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -661,7 +664,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Name & ".GetOffSystemTestSamples", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetOffSystemTestSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetOffSystemTestSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetOffSystemTestSamples", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -686,7 +689,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Me.Name & ".GetRefRanges", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetRefRanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -698,6 +701,12 @@ Public Class IProgOffSystemTest
     ''' <remarks>
     ''' Created by:  SG 20/10/2010
     ''' Modified by: SA 24/12/2010 - Changes due to new implementation of Reference Ranges Control 
+    '''              AG 05/09/2014 - BA-1869 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of OFFS Tests (Custom Order Button)
+    '''              SA 17/11/2014 - BA-2125 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of OFFS Tests (Custom Order Button) - previous change was not really done; code 
+    '''                                          was commented and the label was not the correct one. Commented code to get ToolTip for Print 
+    '''                                          Button due to it is not visible.
     ''' </remarks>
     Private Sub GetScreenLabels(ByVal pLanguageID As String)
         Try
@@ -716,18 +725,9 @@ Public Class IProgOffSystemTest
             bsResultTypeLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ResultType", pLanguageID) + ":"
             'bsDefaultValueLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "????", pLanguageID) + ":"
 
+            'For bsTestRefRanges
             RefRangesTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", pLanguageID)
 
-            'For Tooltips
-            bsScreenToolTips.SetToolTip(bsNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsDeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
-            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
-
-            'For bsTestRefRanges
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", pLanguageID)
             bsTestRefRanges.TextForNormalityLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Normality", pLanguageID) & ":"
             bsTestRefRanges.TextForMinValueLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MinValue", pLanguageID)
@@ -740,8 +740,19 @@ Public Class IProgOffSystemTest
             bsTestRefRanges.TextForToColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_To", pLanguageID)
 
             bsTestRefRanges.ToolTipForDetailDeleteButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DelReferenceRange", pLanguageID)
+
+            'For Tooltips
+            bsScreenToolTips.SetToolTip(bsNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
+            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
+            bsScreenToolTips.SetToolTip(bsDeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
+            bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TEST_SORTING_SELECTION", pLanguageID))
+            'bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
+
+            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -779,7 +790,7 @@ Public Class IProgOffSystemTest
             'Fill ListView with the list of existing Off-System Tests
             LoadOffSystemTestList()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeOffSystemTestList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeOffSystemTestList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeOffSystemTestList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -806,7 +817,7 @@ Public Class IProgOffSystemTest
             bsTestRefRanges.LoadFrameworkData(myAllFieldLimitsDS, myGendersMasterDataDS, myAgeUnitsMasterDataDS, _
                                               myDetailedRangeSubTypesDS, myAllMessagesDS, SystemInfoManager.OSDecimalSeparator)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeReferenceRangesControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeReferenceRangesControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeReferenceRangesControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -829,7 +840,8 @@ Public Class IProgOffSystemTest
                 bsNewButton.Enabled = True
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = False
-                '                bsPrintButton.Enabled = False DL 11/05/2012
+                BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
+                'bsPrintButton.Enabled = False DL 11/05/2012
             End If
 
             'Area of OFF-SYSTEM Test Definition
@@ -882,7 +894,7 @@ Public Class IProgOffSystemTest
             'Focus to button Add
             If (pInitializeListView) Then bsNewButton.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitialModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -912,7 +924,7 @@ Public Class IProgOffSystemTest
 
             inUse = Convert.ToBoolean(bsOffSystemTestListView.SelectedItems(0).SubItems(6).Text)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadDataOfOffSystemTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return inUse
@@ -946,7 +958,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Name & ".LoadDecimalsLimit", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDecimalsLimit", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDecimalsLimit", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadDecimalsLimit", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -966,13 +978,13 @@ Public Class IProgOffSystemTest
             'Get the Icon defined for OFF-SYSTEM Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TOFF_SYS")
             If (String.Compare(notInUseIcon, "", False) <> 0) Then
-                myIcons.Images.Add("TOFF_SYS", Image.FromFile(IconsPath & notInUseIcon))
+                myIcons.Images.Add("TOFF_SYS", ImageUtilities.ImageFromFile(IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for OFF-SYSTEM Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSEOFFS")
             If (String.Compare(inUseIcon, "", False) <> 0) Then
-                myIcons.Images.Add("INUSEOFFS", Image.FromFile(IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSEOFFS", ImageUtilities.ImageFromFile(IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the OFF-SYSTEM Tests List View
@@ -1063,7 +1075,7 @@ Public Class IProgOffSystemTest
                 bsOffSystemTestListView.Enabled = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadOffSystemTestList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadOffSystemTestList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadOffSystemTestList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1093,7 +1105,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Me.Name & ".LoadMeasureUnits", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadMeasureUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadMeasureUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadMeasureUnits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1134,7 +1146,7 @@ Public Class IProgOffSystemTest
                 bsTestRefRanges.ClearData()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadRefRangesData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadRefRangesData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadRefRangesData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1168,7 +1180,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Name & ".LoadResultTypeCombo", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadResultTypeCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadResultTypeCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadResultTypeCombo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1201,7 +1213,7 @@ Public Class IProgOffSystemTest
                 ShowMessage(Name & ".LoadSampleTypesList", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSampleTypesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1276,7 +1288,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PendingChangesVerification", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return pendingToSaveChanges
@@ -1297,50 +1309,55 @@ Public Class IProgOffSystemTest
             'NEW Button
             auxIconName = GetIconName("ADD")
             If auxIconName <> "" Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If auxIconName <> "" Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
 
+            'CUSTOM SORT Button AG 04/09/2014 - BA-1869
+            auxIconName = GetIconName("ORDER_TESTS")
+            If (auxIconName <> "") Then
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+            End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1357,6 +1374,7 @@ Public Class IProgOffSystemTest
             bsEditButton.Enabled = True
             '            bsPrintButton.Enabled = True DL 11/05/2012
             bsDeleteButton.Enabled = True
+            BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
 
             bsFullNameTextbox.Enabled = False
             bsFullNameTextbox.BackColor = SystemColors.MenuBar
@@ -1387,7 +1405,7 @@ Public Class IProgOffSystemTest
 
             bsTestRefRanges.isEditing = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QueryModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1446,7 +1464,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QueryOffSystemTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1469,7 +1487,7 @@ Public Class IProgOffSystemTest
             'End Select
             'TR 13/10/2011 end Commented.
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryOffSystemTestByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryOffSystemTestByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryOffSystemTestByMoveUpDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1489,8 +1507,9 @@ Public Class IProgOffSystemTest
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1527,7 +1546,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -1557,7 +1576,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1568,6 +1587,7 @@ Public Class IProgOffSystemTest
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 17/10/2012
+    ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): beside Profiles extend with Calculated Tests as possible affected elements.
     ''' </remarks>
     Private Sub SaveChanges_NEW()
         Try
@@ -1577,7 +1597,7 @@ Public Class IProgOffSystemTest
 
             'Verify if the OFF-SYSTEM Test can be saved
             If (ValidateSavingConditions()) Then
-                'If the SampleType has been changed, verify if there are affected Profiles
+                ' If the SampleType has been changed, verify if there are affected Profiles and Calculated Tests to delete.
                 If (SelectedOffSystemTestID > 0 AndAlso bsSampleTypeComboBox.SelectedValue.ToString <> SelectedTestSampleTypesDS.tparOffSystemTestSamples(0).SampleType) Then
                     'Load the selected OFF-SYSTEM Test in a typed DataSet OffSystemTestsDS
                     Dim offSytemTestDataDS As New OffSystemTestsDS
@@ -1593,7 +1613,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -1620,7 +1640,7 @@ Public Class IProgOffSystemTest
                 'Get from the User Control of Reference Ranges the defined ones
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                'Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 ''Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 'Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1631,7 +1651,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1646,7 +1666,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1674,7 +1694,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1699,7 +1719,7 @@ Public Class IProgOffSystemTest
         Try
             'Gets from the Session the Username of the connected User
             Dim currentSession As New ApplicationSessionManager
-            Dim currentUser As String = currentSession.GetSessionInfo().UserName
+            Dim currentUser As String = GlobalBase.GetSessionInfo().UserName
 
             'Fill OffSystem Test basic data
             Dim offSystemTestData As New OffSystemTestsDS
@@ -1779,7 +1799,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveOffSystemTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveOffSystemTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return savingOK
@@ -1796,8 +1816,8 @@ Public Class IProgOffSystemTest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -1827,7 +1847,7 @@ Public Class IProgOffSystemTest
             'To avoid flickering when opening
             ResetBorder()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1849,24 +1869,27 @@ Public Class IProgOffSystemTest
                     bsNewButton.Enabled = False
                     bsEditButton.Enabled = False
                     bsDeleteButton.Enabled = False
+                    BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
                     'bsPrintButton.Enabled = False DL 11/05/2012
                     Exit Select
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     ''' <summary>
-    ''' Validate if there are affected elements (Profiles) that have to be changed/deleted due to deletion of 
-    ''' the selected OFF-SYSTEM Tests or due to the change of the SampleType of an updated OFF-SYSTEM Test 
+    ''' Validate if there are affected elements - Profiles that have to be changed and/or Calculated Tests that
+    ''' have to be deleted due to the deletion of the selected OFF-SYSTEM Test(s) or change of the SampleType
+    ''' of an updated OFF-SYSTEM Test.
     ''' </summary>
-    ''' <param name="pOffSystemTestDataDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM 
-    '''                                    Tests selected to be deleted</param>
+    ''' <param name="pOffSystemTestDataDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM Test(s)
+    '''                                    selected to be deleted, or containing the OFF-SYSTEM Test to be updated.</param>
     ''' <returns>GlobalDataTO containing a typed DataSet DependenciesElementsDS with the list of affected elements</returns>
     ''' <remarks>
     ''' Created by:  SA 04/01/2011
+    ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameter description (added Calculated Tests as possible cause).
     ''' </remarks>
     Private Function ValidateDependencies(ByVal pOffSystemTestDataDS As OffSystemTestsDS) As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1876,7 +1899,7 @@ Public Class IProgOffSystemTest
             myGlobalDataTO = myOffSystemTestDelegate.ValidatedDependencies(pOffSystemTestDataDS)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependencies", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateDependencies", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateDependencies", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myGlobalDataTO
@@ -1899,7 +1922,7 @@ Public Class IProgOffSystemTest
             End If
             Return True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateRefRanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -2014,7 +2037,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateSavingConditions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return fieldsOK
@@ -2041,7 +2064,7 @@ Public Class IProgOffSystemTest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgOffSystemTest_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgOffSystemTest_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgOffSystemTest_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2052,12 +2075,12 @@ Public Class IProgOffSystemTest
     Private Sub ProgOffSystemTest_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'TR 20/04/2012 - Get the Level of the Current User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgOffSystemTest_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgOffSystemTest_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgOffSystemTest_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2072,7 +2095,7 @@ Public Class IProgOffSystemTest
         Try
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IProgOffSystemTest_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IProgOffSystemTest_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IProgOffSystemTest_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2102,12 +2125,13 @@ Public Class IProgOffSystemTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsOffSystemTestListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2132,7 +2156,7 @@ Public Class IProgOffSystemTest
             End Select
             bsOffSystemTestListView.Sort()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsOffSystemTestListView_ColumnClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2149,7 +2173,7 @@ Public Class IProgOffSystemTest
                 e.NewWidth = 0
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsOffSystemTestListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2163,7 +2187,7 @@ Public Class IProgOffSystemTest
                 EditOffSystemTestByDoubleClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsOffSystemTestListView_DoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2187,12 +2211,13 @@ Public Class IProgOffSystemTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsOffSystemTestListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2213,7 +2238,7 @@ Public Class IProgOffSystemTest
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemTestListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsOffSystemTestListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2247,7 +2272,7 @@ Public Class IProgOffSystemTest
             '                flag UpdateHistoryRequired is set to TRUE
             If (EditionMode) Then UpdateHistoryRequired = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsComboBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsComboBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsComboBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2333,7 +2358,7 @@ Public Class IProgOffSystemTest
                 End Select
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2352,7 +2377,7 @@ Public Class IProgOffSystemTest
 
             bsTestRefRanges.RefNumDecimals = decimalsNumber
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDecimalsUpDown_Validated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDecimalsUpDown_Validated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDecimalsUpDown_Validated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2367,7 +2392,7 @@ Public Class IProgOffSystemTest
         Try
             If (EditionMode) Then UpdateHistoryRequired = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDecimalsUpDown_ValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDecimalsUpDown_ValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDecimalsUpDown_ValueChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2380,7 +2405,7 @@ Public Class IProgOffSystemTest
         Try
             If (ValidateSpecialCharacters(e.KeyChar, "[@#~$%&/()-+><_.:,;!¿?=·ªº'¡|}^{]")) Then e.Handled = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTextbox_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2404,7 +2429,7 @@ Public Class IProgOffSystemTest
             '                flag UpdateHistoryRequired is set to TRUE
             If (EditionMode AndAlso String.Compare(myTextBox.Name, bsFullNameTextbox.Name, False) = 0) Then UpdateHistoryRequired = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTextbox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2419,7 +2444,7 @@ Public Class IProgOffSystemTest
         Try
             AddOffSystemTest()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNewButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNewButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsNewButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2433,7 +2458,7 @@ Public Class IProgOffSystemTest
             EditOffSystemTestByDoubleClick()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2445,7 +2470,7 @@ Public Class IProgOffSystemTest
         Try
             DeleteOffSystemTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDeleteButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2457,7 +2482,7 @@ Public Class IProgOffSystemTest
         Try
             SaveChanges_NEW()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2469,7 +2494,7 @@ Public Class IProgOffSystemTest
         Try
             CancelOffSystemTestEdition()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2481,10 +2506,34 @@ Public Class IProgOffSystemTest
         Try
             ExitScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New UiSortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "OFFS"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
+
+
 End Class

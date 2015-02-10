@@ -1,18 +1,13 @@
 ﻿Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
+'AG 26/07/2010
 
-Imports System.Text
-Imports System.ComponentModel
 'Imports DevExpress.XtraReports.UI
 'Imports DevExpress.XtraPrinting
 'Imports DevExpress.XtraPrintingLinks
@@ -27,7 +22,7 @@ Imports System.ComponentModel
 'Imports DevExpress.Utils
 
 
-Partial Class IResults
+Partial Class UiResults
 
     Dim CollapseColumnExperimentals As New bsDataGridViewCollapseColumn
 
@@ -195,7 +190,7 @@ Partial Class IResults
             'DL 23/09/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeExperimentalsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeExperimentalsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -224,7 +219,7 @@ Partial Class IResults
             Next Col
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineExperimentalsSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineExperimentalsSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -239,13 +234,17 @@ Partial Class IResults
     '''                              Now the the method runs 8 - 10 times faster
     '''              SA 21/01/2011 - For OFF-SYSTEM Tests with qualitative results, shown value of field ManualResultText
     '''                              in the grid column for the result (CONC Value)
+    '''              AG 22/09/2014 - BA-1940 show specimen in the grid (test name column ... specimen (TEST NAME) )
+    '''                              Same format as in the results by test (patients)
+    '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
+    '''              XB 16/01/2015 - Change on displaying CONC errors values derived from ISE error - BA-1064
     ''' </remarks>
     Private Sub UpdateExperimentalsDataGrid()
         Dim dgv As BSDataGridView = bsExperimentalsDataGridView
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Try
@@ -277,7 +276,12 @@ Partial Class IResults
             Dim sentRepetitionCriteria As String = String.Empty
 
             'AG 25/06/2012 - implement a loop for test type
-            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+
+            ' XB 28/11/2014 - BA-1867
+            ' Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+            Dim TestType() As String = {"STD", "ISE", "OFFS", "CALC"}
+            ' XB 28/11/2014 - BA-1867
+
             For Each itemType As String In TestType
                 'AG 21/06/2012 - improve speed, search current patient results using LINQ and then apply loop only the linq results
                 Dim currentPatientAvgResultsList As List(Of ResultsDS.vwksResultsRow)
@@ -397,13 +401,17 @@ Partial Class IResults
                         SetRepPostDilutionImage(dgv, "NewRep", MaxRows, sentRepetitionCriteria, False)
                     End If
 
-                    'AG 03/03/2011
-                    'dgv("TestName", i).Value = resultRow.TestName
-                    'dgv("TestName", i).Value = IIf(resultRow.RerunNumber = 1, resultRow.TestName, resultRow.TestName & " (" & resultRow.RerunNumber.ToString & ")")
                     'RH 20/10/2011 String.Format() is a method optimized for Strings concatenations
                     dgv("TestName", MaxRows).Value = IIf(resultRow.RerunNumber = 1, resultRow.TestName, String.Format("{0} ({1})", resultRow.TestName, resultRow.RerunNumber))
                     dgv("Rerun", MaxRows).Value = resultRow.RerunNumber
-                    'dgv("ExportStatus", i).Value = resultRow.ExportStatus
+
+                    'AG 22/09/2014 - BA-1940 show specimen in the grid (sample type column)
+                    dgv("TestName", MaxRows).ToolTipText = String.Empty
+                    If Not resultRow.IsSpecimenIDListNull Then
+                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value.ToString & ")"
+                    End If
+                    'AG 22/09/2014
+
 
                     'DL 30/09/2011
                     If Not resultRow.IsExportStatusNull Then
@@ -473,6 +481,16 @@ Partial Class IResults
                         End If
                     End If
                     'END AG 15/09/2010
+
+                    ' XB 16/01/2015 - BA-1064 
+                    If Not resultRow.IsCONC_ErrorNull Then
+                        If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                            If resultRow.TestType = "ISE" Then
+                                dgv("Concentration", MaxRows).Value = GlobalConstants.CONC_ISE_ERROR
+                            End If
+                        End If
+                    End If
+                    ' XB 16/01/2015 - BA-1064 
 
                     Remark = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
                     ' dl 27/06/2011
@@ -655,6 +673,16 @@ Partial Class IResults
                             End If
                             'END AG 15/09/2010
 
+                            ' XB 16/01/2015 - BA-1064 
+                            If Not resultRow.IsCONC_ErrorNull Then
+                                If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                                    If resultRow.TestType = "ISE" Then
+                                        dgv("Concentration", k).Value = GlobalConstants.CONC_ISE_ERROR
+                                    End If
+                                End If
+                            End If
+                            ' XB 16/01/2015 - BA-1064 
+
                             'RH 01/02/2011 Get alarms for OffSystem tests and the others. OffSystem test do not have valid ExecutionID
                             If Not String.Equals(resultRow.TestType, "OFFS") Then
                                 Remark = GetExecutionAlarmDescription(SampleList(j).ExecutionID)
@@ -700,6 +728,7 @@ Partial Class IResults
                             dgv.Rows(k).Tag = SampleList(j)
 
                             dgv("TestName", k).Value = dgv("TestName", MaxRows).Value
+                            dgv("TestName", k).ToolTipText = dgv("TestName", MaxRows).ToolTipText 'AG 22/09/2014 - BA-1940 show specimen in the grid (testname column)
                             dgv("Rerun", k).Value = dgv("Rerun", MaxRows).Value
                             dgv("SampleType", k).Value = dgv("SampleType", MaxRows).Value
                             dgv("Unit", k).Value = dgv("Unit", MaxRows).Value
@@ -753,7 +782,7 @@ Partial Class IResults
             'MessageBox.Show("UpdateExperimentalsDataGrid Elapsed Time: " & ElapsedTime.ToStringWithDecimals(0))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateExperimentalsDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateExperimentalsDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -761,7 +790,7 @@ Partial Class IResults
             dgv.Enabled = True
             Cursor = Cursors.Default
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults UpdateExperimentalDataGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+            GlobalBase.CreateLogActivity("IResults UpdateExperimentalDataGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                             " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                             "IResults.UpdateExperimentalDataGrid", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

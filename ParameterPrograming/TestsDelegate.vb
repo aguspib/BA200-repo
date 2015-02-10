@@ -23,6 +23,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by: TR 02/03/2010
+        ''' AG 01/09/2014 - BA-1869 when new STD test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestDS As TestsDS, Optional pIsPreloadedTest As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -44,8 +45,18 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                     pTestDS.tparTests(0).TestPosition = CType(myGlobalDataTO.SetDatos, Integer)
 
-                                    'Finally, create the new Test
-                                    myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    'AG 01/09/2014 - BA-1869 Get the next Custom Position
+                                    ''Finally, create the new Test
+                                    'myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    myGlobalDataTO = GetNextCustomPosition(dbConnection)
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                        pTestDS.tparTests(0).CustomPosition = CType(myGlobalDataTO.SetDatos, Integer)
+
+                                        'Finally, create the new Test
+                                        myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    End If
+                                    'AG 01/09/2014 - BA-1869
+
                                 End If
                             End If
                         End If
@@ -66,8 +77,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -105,8 +116,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.Read", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -146,8 +157,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -155,26 +166,29 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' ???
+        ''' Get information of the specified Test and the list of Sample Types linked to it. Used in the Update Version process
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code (optional parameter)</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with Test data for all Sample Types defined for the informed Test or, if parameter 
+        '''          pSampleType is informed, only for the specific Sample Type</returns>
         ''' <remarks>
         ''' Created by:  TR 09/12/2010
+        ''' Modified by: SA 08/10/2014 - BA-1944 (SubTask BA-1983) ==> Parameter pSampleType changed to optional  
         ''' </remarks>
-        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                               Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytparTestsDAO As New tparTestsDAO
-                        resultData = mytparTestsDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
+                        Dim myDAO As New tparTestsDAO
+                        resultData = myDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
                     End If
                 End If
             Catch ex As Exception
@@ -182,8 +196,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ReadByTestIDSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ReadByTestIDSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -218,8 +232,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ReadByPreloadedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ReadByPreloadedTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -255,8 +269,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -292,8 +306,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ExistsTestName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ExistsTestName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -338,8 +352,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -384,8 +398,8 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.Delete", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.Delete", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -431,8 +445,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateTestPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateTestPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -485,8 +499,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -531,8 +545,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -543,11 +557,13 @@ Namespace Biosystems.Ax00.BL
         ''' Get all Standard Tests
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing data of all Standard Tests</returns>
         ''' <remarks>
         ''' Created by: TR 08/02/2010
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pCustomizedTestSelection As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -557,7 +573,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myTestsDAO As New tparTestsDAO()
-                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection)
+                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pForTestSelectionScreen
                     End If
                 End If
 
@@ -567,8 +583,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetList", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -604,8 +620,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ReadAllContaminatorsList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ReadAllContaminatorsList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -646,8 +662,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetTestReadingNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetTestReadingNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -723,8 +739,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetNextTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetNextTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -765,8 +781,50 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetNextTestPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetNextTestPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the next custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an Integer value with the next Custom Position</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetNextCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myTestsDAO As New tparTestsDAO()
+
+                        myGlobalDataTO = myTestsDAO.GetLastCustomPosition(dbConnection)
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (myGlobalDataTO.SetDatos Is Nothing OrElse myGlobalDataTO.SetDatos Is DBNull.Value) Then
+                                myGlobalDataTO.SetDatos = 1
+                            Else
+                                myGlobalDataTO.SetDatos = CType(myGlobalDataTO.SetDatos, Integer) + 1
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetNextCustomPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -781,6 +839,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSampleTypeCode">Sample Type to filter the Tests</param>
         ''' <param name="pSampleClass">Optional parameter. When informed, get only Test/SampleType for which Controls or Calibrators
         '''                            have been defined</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing basic data of the obtained Standard Tests</returns>
         ''' <remarks>
         ''' Modified by: SA 27/06/2010 - Changed the way of getting the Icon Path for System and User Tests
@@ -790,9 +849,10 @@ Namespace Biosystems.Ax00.BL
         '''                              filtered by SampleType for the informed SampleClass. Removed also optional parameter for TestProfileID
         '''                              due to this function is not called from the screen of Programming Test Profiles anymore. Name changed 
         '''                              to GetBySampleType. Removed the getting of the ICON according the TestType
+        '''              AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen (define 2 last parameters as required)
         ''' </remarks>
         Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleTypeCode As String, _
-                                        Optional ByVal pSampleClass As String = "") As GlobalDataTO
+                                         ByVal pSampleClass As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -802,7 +862,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testsDAO As New tparTestsDAO
-                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass)
+                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pCustomizedTestSelection
                     End If
                 End If
             Catch ex As Exception
@@ -810,8 +870,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -864,7 +924,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myTestRefRangesDelegate As New TestRefRangesDelegate() 'SG 17/06/2010
                         Dim qTestReagent As New List(Of TestReagentsDS.tparTestReagentsRow)
                         Dim qReagentsVolume As New List(Of TestReagentsVolumesDS.tparTestReagentsVolumesRow)
-                        Dim MyGlobalBase As New GlobalBase 'TR 30/03/202
+                        'Dim myGlobalbase As New GlobalBase 'TR 30/03/202
 
                         For Each testRow As TestsDS.tparTestsRow In pTestDS.tparTests.Rows
                             Dim myTestID As Integer = testRow.TestID
@@ -1179,8 +1239,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.SaveTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.SaveTest", EventLogEntryType.Error, False)
             End Try
 
             If (Not myGlobalDataTO.HasError) Then
@@ -1206,13 +1266,20 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTestReagentesDS"></param>
         ''' <param name="pDelTestReagentsVolumeList"></param>
         ''' <param name="pDeletedTestProgramingList"></param>
+        ''' <param name="pApplyDeleteCascade"></param>
         ''' <returns></returns>
-        ''' <remarks>Modified by AG 22/03/2010: Delete curve results when needed
-        ''' MODIFIED BY: TR 14/06/2010 -add calibrators parammeters (pTestReagentesDS,
-        ''' pTestCalibratorDS, pTestCalibratorValuesDS)
-        ''' MODIFIED BY: SG 17/06/2010 add test ref ranges (pTestRefRangesDS)
-        '''            : TR Add parammeters  pTestSamplesMultiRulesDS, pTestControlsDS, 
-        '''              Optional pUpdateSampleType 
+        ''' <remarks>
+        ''' Created by:
+        ''' Modified by: AG 22/03/2010 - Delete curve results when needed
+        '''              TR 14/06/2010 - Add calibrators parammeters (pTestReagentesDS, pTestCalibratorDS, pTestCalibratorValuesDS)
+        '''              SG 17/06/2010 - Add test reference ranges (pTestRefRangesDS)
+        '''              TR            - Add parameters pTestSamplesMultiRulesDS, pTestControlsDS, and pUpdateSampleType (optional)
+        '''              SA 27/08/2014 - Inform field TestLongName when preparing the HistoryTestSamplesDS that is passed to function UpdateByQCTestIDAndSampleTypeNEW
+        '''                              in HistoryTestSamplesDelegate (added as part of BT #1865, in which field TestLongName is also exported to QC Module for ISE Tests; 
+        '''                              this change is to export the field also for Standard Tests)  
+        '''              SA 10/10/2014 - BA-1944 (SubTask BA-1981) ==> Added new optional parameter ApplyDeleteCascade (DefaultValue = TRUE) to avoid remove 
+        '''                                                            elements that are not in the DataSets when a new SampleType is added for the Test or when data 
+        '''                                                            of an existing Sample Type is updated
         ''' </remarks>
         Public Function PrepareTestToSave(ByVal pDBConnection As SqlClient.SqlConnection, _
                                           ByVal pAnalyzerID As String, _
@@ -1232,7 +1299,8 @@ Namespace Biosystems.Ax00.BL
                                           ByVal pTestSamplesMultiRulesDS As TestSamplesMultirulesDS, _
                                           ByVal pTestsControlsDS As TestControlsDS, _
                                           ByVal pDeleteControlTOList As List(Of DeletedControlTO), _
-                                          Optional ByVal pUpdateSampleType As String = "") As GlobalDataTO
+                                          Optional ByVal pUpdateSampleType As String = "", _
+                                          Optional ByVal pApplyDeleteCascade As Boolean = True) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO()
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1305,32 +1373,34 @@ Namespace Biosystems.Ax00.BL
                                            Where a.TestID = myTestID _
                                            Select a).ToList()
 
-                            'SG 07/09/2010
-                            Dim myDBSavedTestSample As New TestSamplesDS
-                            myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
-                            If Not myGlobalDataTO.HasError Then
-                                myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
-                                For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
-                                    Dim NotToDelete As Boolean = True
-                                    For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
-                                        NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
-                                        If NotToDelete Then
-                                            Exit For
+                            'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, data of SampleTypes different of the informed one are not deleted
+                            If (pApplyDeleteCascade) Then
+                                'SG 07/09/2010
+                                Dim myDBSavedTestSample As New TestSamplesDS
+                                myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
+                                If Not myGlobalDataTO.HasError Then
+                                    myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
+                                    For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
+                                        Dim NotToDelete As Boolean = True
+                                        For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
+                                            NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
+                                            If NotToDelete Then
+                                                Exit For
+                                            End If
+                                        Next
+                                        'Delete the testsample
+                                        If Not NotToDelete Then
+                                            myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
+                                            If myGlobalDataTO.HasError Then
+                                                Exit For
+                                            End If
                                         End If
                                     Next
-                                    'Delete the testsample
-                                    If Not NotToDelete Then
-                                        myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
-                                        If myGlobalDataTO.HasError Then
-                                            Exit For
-                                        End If
-                                    End If
-                                Next
 
-                            Else
-                                Exit For
+                                Else
+                                    Exit For
+                                End If
                             End If
-                            'END 07/09/2010
 
                             For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
                                 tempTestSampleDS.tparTestSamples.ImportRow(tempTestSampleRow)
@@ -1467,9 +1537,12 @@ Namespace Biosystems.Ax00.BL
                                         'Call the delegate to save TestControls
                                         myGlobalDataTO = myTestControlsDelegate.SaveTestControlsNEW(dbConnection, pTestsControlsDS, Nothing, False)
                                     Else
-                                        'If there are not linked Controls, then delete all the existing ones in the DataSet
-                                        myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
-                                                                                                                         "STD", pUpdateSampleType)
+                                        'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, Controls are not deleted when TestControlsDS is empty
+                                        If (pApplyDeleteCascade) Then
+                                            'If there are not linked Controls, then delete all the existing ones in the DataSet
+                                            myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
+                                                                                                                             "STD", pUpdateSampleType)
+                                        End If
                                     End If
                                 Else
                                     Exit For
@@ -1508,10 +1581,13 @@ Namespace Biosystems.Ax00.BL
                                     If (myHistoryTestSamplesDS.tqcHistoryTestSamples.Count > 0) Then myQCTestSampleID = myHistoryTestSamplesDS.tqcHistoryTestSamples(0).QCTestSampleID
 
                                     If (Not myQCTestSampleID = 0) Then
-                                        'Update fileds of QC Calculation Criteria
+                                        'Update fields of QC Calculation Criteria
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria = TestSampleRow.RejectionCriteria
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode = TestSampleRow.CalculationMode
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries = TestSampleRow.NumberOfSeries
+
+                                        'Update field TestLongName (Report Name) 
+                                        myHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName = TestSampleRow.TestLongName
 
                                         myGlobalDataTO = myHistoryTestSamplesDelegate.UpdateByQCTestIdAndSampleTypeNEW(dbConnection, myHistoryTestSamplesDS)
                                         If (myGlobalDataTO.HasError) Then Exit For
@@ -1621,7 +1697,7 @@ Namespace Biosystems.Ax00.BL
                                                 myGlobalDataTO = myTestSampleMultirulesDelegate.DeleMultiRulesByTestIDNEW(dbConnection, "STD", DelTestSampRow.TestID)
                                             End If
 
-                                            'TR 11/05/2011 -Mark Test as delete on the history tables.
+                                            'TR 11/05/2011 -Mark Test as deleted on the QC history tables.
                                             If Not myGlobalDataTO.HasError Then
                                                 myGlobalDataTO = myHistoryTestSamplesDelegate.MarkTestValuesAsDeleteNEW(dbConnection, "STD", DelTestSampRow.TestID)
                                             End If
@@ -1653,7 +1729,7 @@ Namespace Biosystems.Ax00.BL
                                             End If
                                             'TR 25/01/2012 -END
 
-                                            'TR 11/05/2011 -Mark Test Sample as delete on the history tables.
+                                            'TR 11/05/2011 -Mark Test Sample as delete on the QC history tables.
                                             If Not myGlobalDataTO.HasError Then
                                                 myGlobalDataTO = myHistoryTestSamplesDelegate.MarkSampleTypeValuesAsDeleteNEW(dbConnection, "STD", DelTestSampRow.TestID, _
                                                                                                                               DelTestSampRow.SampleType)
@@ -1743,8 +1819,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.PrepareTestToSave", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.PrepareTestToSave", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 
@@ -1819,8 +1895,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.CreateNewTestSample", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.CreateNewTestSample", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobalDataTO
@@ -2038,8 +2114,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.DeleteTestCascade", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.DeleteTestCascade", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2109,8 +2185,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestDelegate.GetCurveResultID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestDelegate.GetCurveResultID", EventLogEntryType.Error, False)
 
                 curveIDToReturn = -1    'If error dont delete curve results
             Finally
@@ -2148,8 +2224,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetTestToSetCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetTestToSetCalibrator", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2187,8 +2263,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetCalibratorTestSampleList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetCalibratorTestSampleList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2239,11 +2315,11 @@ Namespace Biosystems.Ax00.BL
 
                 'Get text of Warning Message for QC Results cumulation in the current language
                 Dim myWarningQCMSG As String = String.Empty
-                Dim currentLanguageGlobal As New GlobalBase
+                'Dim currentLanguageGlobal As New GlobalBase
                 Dim myMessageDelegate As New MessageDelegate()
 
                 myGlobalDataTO = myMessageDelegate.GetMessageDescription(Nothing, GlobalEnumerates.Messages.CUMULATE_QCRESULTS.ToString, _
-                                                                         currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString)
+                                                                         GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     Dim myMessagesDS As MessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
                     If (myMessagesDS.tfmwMessages.Rows.Count > 0) Then myWarningQCMSG = myMessagesDS.tfmwMessages(0).MessageText
@@ -2390,8 +2466,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2466,8 +2542,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetForControlsProgramming", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.GetForControlsProgramming", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2517,8 +2593,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.CalculateQCCumulate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.CalculateQCCumulate", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2562,8 +2638,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateLISValueByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateLISValueByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2608,8 +2684,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdatePreloadedTestSortByTestName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdatePreloadedTestSortByTestName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2665,13 +2741,118 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateUserTestPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateUserTestPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
+
+
+        ''' <summary>
+        ''' Gets all STD tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "TestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for STD tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) _
+                                           As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparTestsDAO
+                        myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Update CALCTEST available in cascade depending their components (all components available -> CalcTest available // else CalcTest NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            myGlobalDataTO = myCalcTestDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
+
+                        'Update PROFILE available in cascade depending their components (all components available -> Profile available // else Profile NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myTestProfileDlg As New TestProfilesDelegate
+                            myGlobalDataTO = myTestProfileDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
+
+                    End If
+                End If
+
+                If (Not myGlobalDataTO.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return (myGlobalDataTO)
+        End Function
+
 
 #End Region
     End Class

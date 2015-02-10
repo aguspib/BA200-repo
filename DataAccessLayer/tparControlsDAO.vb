@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Partial Public Class tparControlsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
 
@@ -21,6 +21,7 @@ Partial Public Class tparControlsDAO
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Changed the SQL: ExpirationDate and ActivationDate cannot be Nulls; removed InUse field
+    '''              XB 01/09/2014 - add ControlLevel field - BA #1868
     ''' </remarks>
     Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlDS As ControlsDS) As GlobalDataTO
         Dim resultData As New GlobalDataTO
@@ -31,7 +32,7 @@ Partial Public Class tparControlsDAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
                 Dim cmdText As String = " INSERT INTO tparControls (ControlName, SampleType, LotNumber, ActivationDate, ExpirationDate, " & vbCrLf & _
-                                                                  " TS_User, TS_DateTime) " & vbCrLf & _
+                                                                  " TS_User, TS_DateTime, ControlLevel) " & vbCrLf & _
                                         " VALUES (N'" & pControlDS.tparControls(0).ControlName.ToString.Replace("'", "''") & "', " & vbCrLf & _
                                                   "'" & pControlDS.tparControls(0).SampleType & "', " & vbCrLf & _
                                                  "N'" & pControlDS.tparControls(0).LotNumber.ToString.Replace("'", "''") & "', " & vbCrLf & _
@@ -40,18 +41,20 @@ Partial Public Class tparControlsDAO
 
                 If (String.IsNullOrEmpty(pControlDS.tparControls(0).TS_User.ToString)) Then
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
-                    cmdText &= "N'" & currentSession.GetSessionInfo().UserName.Replace("'", "''") & "', " & vbCrLf
+                    'Dim currentSession As New GlobalBase
+                    cmdText &= "N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "', " & vbCrLf
                 Else
                     cmdText &= "N'" & pControlDS.tparControls(0).TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
                 End If
 
                 If (String.IsNullOrEmpty(pControlDS.tparControls(0).TS_DateTime.ToString)) Then
                     'Get the current DateTime
-                    cmdText &= "'" & Now.ToString("yyyyMMdd HH:mm:ss") & "')" & vbCrLf
+                    cmdText &= "'" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 Else
-                    cmdText &= "'" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "')" & vbCrLf
+                    cmdText &= "'" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 End If
+
+                cmdText &= " " & pControlDS.tparControls(0).ControlLevel & ") " & vbCrLf
 
                 'Finally, get the automatically generated ID for the created control
                 cmdText &= " SELECT SCOPE_IDENTITY()"
@@ -79,8 +82,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.Create", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -116,8 +119,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.Delete", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -160,8 +163,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.Read", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -205,8 +208,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.ReadAll", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadAll", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -260,8 +263,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByControlName", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByControlName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -309,8 +312,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -326,6 +329,7 @@ Partial Public Class tparControlsDAO
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Changed the SQL: SampleType cannot be Null; removed InUse field.
+    '''              XB 01/09/2014 - add ControlLevel field - BA #1868
     ''' </remarks>
     Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlDS As ControlsDS) As GlobalDataTO
         Dim resultData As New GlobalDataTO
@@ -344,17 +348,19 @@ Partial Public Class tparControlsDAO
 
                 If (pControlDS.tparControls(0).IsTS_UserNull) Then
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
-                    cmdText &= " TS_User = N'" & currentSession.GetSessionInfo().UserName.Trim.Replace("'", "''") & "', " & vbCrLf
+                    'Dim currentSession As New GlobalBase
+                    cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                 Else
                     cmdText &= " TS_User = N'" & pControlDS.tparControls(0).TS_User.Replace("'", "''") & "', " & vbCrLf
                 End If
 
                 If (pControlDS.tparControls(0).IsTS_DateTimeNull) Then
-                    cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
+                    cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 Else
-                    cmdText &= " TS_DateTime = '" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
+                    cmdText &= " TS_DateTime = '" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 End If
+
+                cmdText &= " ControlLevel = " & pControlDS.tparControls(0).ControlLevel.ToString & " " & vbCrLf
 
                 cmdText &= " WHERE ControlID = " & pControlDS.tparControls(0).ControlID & vbCrLf
 
@@ -368,8 +374,8 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.Update", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -405,25 +411,46 @@ Partial Public Class tparControlsDAO
             Else
                 Dim cmdText As String
                 If (Not pUpdateForExcluded) Then
+                    'AJG 
+                    'cmdText = " UPDATE tparControls " & vbCrLf & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                    '          " WHERE  ControlID IN (SELECT TC.ControlID " & vbCrLf & _
+                    '                               " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                    '                                                          " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                    '                                                          " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                               " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                    '                               " AND    O.SampleClass = 'CTRL') " & vbCrLf
                     cmdText = " UPDATE tparControls " & vbCrLf & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                              " WHERE  ControlID IN (SELECT TC.ControlID " & vbCrLf & _
-                                                   " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
-                                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
-                                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                   " AND    O.SampleClass = 'CTRL') " & vbCrLf
+                              " WHERE  EXISTS (SELECT TC.ControlID " & vbCrLf & _
+                                              " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                                                                         " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                              " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                              " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                              " AND    O.SampleClass = 'CTRL' AND tparControls.ControlID = TC.ControlID) " & vbCrLf
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparControls " & vbCrLf & _
+                    '          " SET    InUse = 0 " & vbCrLf & _
+                    '          " WHERE  ControlID NOT IN (SELECT TC.ControlID " & vbCrLf & _
+                    '                                   " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                    '                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                    '                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                    '                                   " AND    O.SampleClass = 'CTRL') " & vbCrLf & _
+                    '          " AND    InUse = 1 " & vbCrLf
                     cmdText = " UPDATE tparControls " & vbCrLf & _
                               " SET    InUse = 0 " & vbCrLf & _
-                              " WHERE  ControlID NOT IN (SELECT TC.ControlID " & vbCrLf & _
-                                                       " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
-                                                                                  " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
-                                                                                  " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                       " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                       " AND    O.SampleClass = 'CTRL') " & vbCrLf & _
+                              " WHERE  NOT EXISTS (SELECT TC.ControlID " & vbCrLf & _
+                                                  " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                                                                             " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                  " AND    O.SampleClass = 'CTRL' AND tparControls.ControlID = TC.ControlID) " & vbCrLf & _
                               " AND    InUse = 1 " & vbCrLf
                 End If
 
@@ -437,8 +464,8 @@ Partial Public Class tparControlsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparControlsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function

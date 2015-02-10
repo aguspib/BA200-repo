@@ -1,4 +1,4 @@
-﻿Option Strict On
+﻿'Option Strict On
 Option Explicit On
 
 Imports Biosystems.Ax00.Global
@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Text
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.TO
 
 Namespace Biosystems.Ax00.BL
     Public Class HisWSResultsDelegate
@@ -58,8 +59,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -105,8 +106,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -154,8 +155,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -171,7 +172,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: DL 24/04/2013
         ''' AG 25/04/2013 before call clear in my DAO call clear method in historic order tests delegate
-        ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
+        ''' Modified AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
         ''' </remarks>
         Public Function ClearIdentifiersForLIS(ByVal pDBConnection As SqlClient.SqlConnection,
                                                ByVal pLISMessageID As String) As GlobalDataTO
@@ -184,10 +185,10 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'AG 24/07/2014 - RQ00086
+                        'AG 24/07/2014 - #1886 - RQ00086
                         'Dim myHistOTDlg As New HisWSOrderTestsDelegate
                         'resultData = myHistOTDlg.ClearIdentifiersForLIS(Nothing, pLISMessageID)
-                        'AG 24/07/2014 - RQ00086
+                        'AG 24/07/2014
 
                         If Not resultData.HasError Then
                             Dim myDao As New thisWSResultsDAO
@@ -212,8 +213,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -310,8 +311,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -388,8 +389,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForCalibCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForCalibCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -403,42 +404,87 @@ Namespace Biosystems.Ax00.BL
 
 #Region " Get Historical Results "
         ''' <summary>
-        ''' 
+        ''' Get all Historic Patient Results that fulfill the specified filters
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pSamplePatientId"></param>
-        ''' <param name="pSampleClasses"></param>
-        ''' <param name="pSampleTypes"></param>
-        ''' <param name="pStatFlag"></param>
-        ''' <param name="pTestTypes"></param>
-        ''' <param name="pTestStartName"></param>
-        ''' <returns></returns>
-        ''' <remarks>Modified by DL 23/10/2012 Add optional Worksession ID filter</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pPatientData">Part of the Patient ID, LastName or FirstName</param>
+        ''' <param name="pSampleTypes">List of Sample Types</param>
+        ''' <param name="pStatFlag">Priority Flag</param>
+        ''' <param name="pTestTypes">List of Test Types</param>
+        ''' <param name="pTestName">Part of the Test Name</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pSpecimenID">Part of the SpecimenID (Barcode)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Patient results that fulfill the
+        '''          specified search criteria</returns>
+        ''' <remarks>
+        ''' Created by:  JB 19/10/2012
+        ''' Modified by: DL 23/10/2012 - Added new optional parameter pWorkSessionID
+        '''              SA 01/08/2014 - BA-1861 ==> - Added new optional parameter pSpecimenID
+        '''                                          - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pSamplePatientId As String = "", Optional ByVal pSampleClasses As List(Of String) = Nothing, _
-                                                     Optional ByVal pSampleTypes As List(Of String) = Nothing, Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
-                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestStartName As String = "", _
-                                                     Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
-
+                                                     Optional ByVal pPatientData As String = "", Optional ByVal pSampleTypes As List(Of String) = Nothing, _
+                                                     Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
+                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestName As String = "", _
+                                                     Optional ByVal pWorkSessionID As String = "", Optional ByVal pSpecimenID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New thisWSResultsDAO
-                        resultData = myDAO.GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, _
-                                                                        pDateFrom, pDateTo, _
-                                                                        pSamplePatientId, pSampleClasses, pSampleTypes, pStatFlag, _
-                                                                        pTestTypes, pTestStartName, pWorkSessionID)
+                        resultData = myDAO.GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, pDateFrom, pDateTo, pPatientData, pSampleTypes, pStatFlag, _
+                                                                        pTestTypes, pTestName, pWorkSessionID, pSpecimenID)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
 
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalResults", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get the Historic Blank and Calibrator Results that fulfill the specified filters
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pTestNameContains">Part of the Test Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Blank and Calibrator results that 
+        '''          fulfill the specified search criteria</returns>
+        ''' <remarks>
+        ''' Created by:  AG 22/10/2012
+        ''' </remarks>
+        Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                               Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
+                                                               Optional ByVal pTestNameContains As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New thisWSResultsDAO
+                        resultData = myDAO.GetHistoricalBlankCalibResultsByFilter(dbConnection, pAnalyzerID, pDateFrom, pDateTo, pTestNameContains)
                     End If
                 End If
 
@@ -448,17 +494,14 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Transform the historic AlarmList into a HisWSResultsDS.vhisWSResultsRow.Remarks (description of alarms in alarmList)
@@ -471,7 +514,8 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTo with error or not. pRow.Remark and RemarkAlert updated</returns>
         ''' <remarks>AG 22/10/2012 Creation
         ''' AG 13/02/2014 - #1505 Historic improvments - Not open connection, it is not used and method is called inside a wide loop</remarks>
-        Public Function GetAvgAlarmsForScreen(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pAlarmsDefinition As AlarmsDS, ByRef pRow As HisWSResultsDS.vhisWSResultsRow) As GlobalDataTO
+        Public Function GetAvgAlarmsForScreen(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pAlarmsDefinition As AlarmsDS, _
+                                              ByRef pRow As HisWSResultsDS.vhisWSResultsRow) As GlobalDataTO
             Dim resultData As New GlobalDataTO  'AG 13/02/2014 - #1505 'Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -486,7 +530,7 @@ Namespace Biosystems.Ax00.BL
 
                 '1) Convert alarmList into Remarks description with "," char as separator
                 Dim myAlarms() As String
-                Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
+                'Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
 
                 If Not pRow.IsAlarmListNull AndAlso Not String.IsNullOrEmpty(pRow.AlarmList) Then
                     pRow.BeginEdit()
@@ -498,15 +542,31 @@ Namespace Biosystems.Ax00.BL
 
                     For Each ID As String In myAlarms
                         If String.Compare(ID, "", False) <> 0 Then
-                            list = (From a As AlarmsDS.tfmwAlarmsRow In pAlarmsDefinition.tfmwAlarms _
-                                    Where String.Compare(a.AlarmID, ID, False) = 0 Select a).ToList
-                            If list.Count > 0 Then
+                            'Dim list = (From a As AlarmsDS.tfmwAlarmsRow In pAlarmsDefinition.tfmwAlarms _
+                            '        Where (String.Compare(a.AlarmID, ID, False) = 0) Select a)
+
+                            'If list.Count > 0 Then
+                            '    If pRow.IsRemarksNull Then
+                            '        pRow.Remarks = list(0).Description
+                            '    Else
+                            '        pRow.Remarks &= ", " & list(0).Description
+                            '    End If
+                            'End If
+
+
+                            Dim result As AlarmsDS.tfmwAlarmsRow = Nothing
+                            For Each a In From a1 In pAlarmsDefinition.tfmwAlarms Where String.Compare(a1.AlarmID, ID, False) = 0
+                                result = a
+                                Exit For
+                            Next
+                            If result IsNot Nothing Then
                                 If pRow.IsRemarksNull Then
-                                    pRow.Remarks = list(0).Description
+                                    pRow.Remarks = result.Description
                                 Else
-                                    pRow.Remarks &= ", " & list(0).Description
+                                    pRow.Remarks &= ", " & result.Description
                                 End If
                             End If
+
                         End If
                     Next
 
@@ -514,7 +574,7 @@ Namespace Biosystems.Ax00.BL
                     pRow.AcceptChanges()
                 End If
 
-                list = Nothing
+                'list = Nothing
                 Erase myAlarms
 
                 'AG 13/02/2014 - #1505
@@ -528,56 +588,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForScreens", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-
-            Return resultData
-        End Function
-
-
-        ''' <summary>
-        ''' Get the historical blank and calibrator results with the selected filter in screen
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pTestNameContains"></param>
-        ''' <returns>GlobalDataTo (data as HisWSResultsDS.vhisWSResults</returns>
-        ''' <remarks>AG 22/10/2012</remarks>
-        Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                     Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pTestNameContains As String = "") As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New thisWSResultsDAO
-                        resultData = myDAO.GetHistoricalBlankCalibResultsByFilter(dbConnection, pAnalyzerID, _
-                                                                        pDateFrom, pDateTo, pTestNameContains)
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForScreens", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -666,8 +678,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsForReports", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsForReports", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -697,8 +709,8 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get labels for Header Report in the active language
-                        Dim currentLanguageGlobal As New GlobalBase
-                        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                        'Dim currentLanguageGlobal As New GlobalBase
+                        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
                         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
                         Dim literalPatientID As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
@@ -708,7 +720,7 @@ Namespace Biosystems.Ax00.BL
                         Dim literalAge As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
                         Dim literalPerformedBy As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
                         Dim literalComments As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)   'EF 03/06/2014 #1650  (cargar texto LBL_FLags)
-                        
+
                         'Get Historic Patient data
                         Dim myHistPatientsDelegate As New HisPatientsDelegate
                         Dim SelectedPatients As List(Of String) = (From row In pHisWSResults _
@@ -744,12 +756,12 @@ Namespace Biosystems.Ax00.BL
                                 Dim PatientIDList As New List(Of String)
                                 Dim SamplesList As List(Of HisWSResultsDS.vhisWSResultsRow)
                                 Dim StatFlag() As Boolean = {True, False}
-                                Dim FullID As String
+                                Dim FullID As String = String.Empty
                                 Dim FullName As String
                                 Dim FullGender As String
                                 Dim FullBirthDate As String
                                 Dim FullAge As String
-                                Dim FullPerformedBy As String
+                                Dim FullPerformedBy As String = String.Empty
                                 Dim FullComments As String
                                 Dim ReportDate As DateTime = DateTime.Now 'IT 30/07/2014 #BA-1893
                                 Dim LinqPat As HisPatientDS.thisPatientsRow
@@ -766,8 +778,9 @@ Namespace Biosystems.Ax00.BL
 
                                 'Fill ReportMaster table ********************************************************************************************
                                 For i As Integer = 0 To 1
+                                    Dim linqIndex = i
                                     SamplesList = (From row In pHisWSResults _
-                                                   Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(i) _
+                                                   Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(linqIndex) _
                                                    Select row).ToList()
 
                                     For Each sampleRow As HisWSResultsDS.vhisWSResultsRow In SamplesList
@@ -810,7 +823,7 @@ Namespace Biosystems.Ax00.BL
                                                 End If
                                             End If
 
-                                            'EF 03/06/2014 #1650  v3.0.1 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado, anular campos Performedby, Comments)
+                                            'EF 03/06/2014 #1650  v3.0.1 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado, anular campos Performedby)
                                             'FullID = String.Format("{0}: {1}", literalPatientID, myPatientID)
                                             'FullName = String.Format("{1} {2}", literalFullName, LinqPat.FirstName, LinqPat.LastName)
                                             'FullGender = String.Format("{0}: {1}", literalGender, myGender) 'LinqPat.Gender)
@@ -819,7 +832,9 @@ Namespace Biosystems.Ax00.BL
                                             'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, String.Empty) ' LinqPat.PerformedBy. NO IN V1
                                             FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)   'EF 31/07/2014 #1893 (Comments info)
 
+
                                             FullID = String.Format("{0}", myPatientID)
+
                                             If (LinqPat.FirstName <> "-" And LinqPat.FirstName <> "") Or (LinqPat.LastName <> "-" And LinqPat.LastName <> "") Then FullName = String.Format("{0}, {1}", LinqPat.LastName, LinqPat.FirstName) Else FullName = ""
                                             FullGender = String.Format("{0}", myGender)
                                             FullBirthDate = String.Format("{0}", LinqPat.FormatedDateOfBirth)
@@ -836,6 +851,14 @@ Namespace Biosystems.Ax00.BL
                                                    Order By detail.ResultDateTime Descending).First
 
                                             ReportDate = resultsRow.ResultDateTime
+
+                                            'IT 23/09/2014 #BA-1937 INI
+                                            resultData = GetSpecimentIdList(myPatientID, pHisWSResults)
+                                            If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                                                Dim patientSpecimen = DirectCast(resultData.SetDatos, PatientSpecimenTO)
+                                                FullID &= patientSpecimen.GetSpecimenIdListForReports()
+                                            End If
+                                            'IT 23/09/2014 #BA-1937 END
 
                                             ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow _
                                                     (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments, ReportDate)
@@ -857,6 +880,8 @@ Namespace Biosystems.Ax00.BL
                                                    Select detail).ToList
 
                                     For Each detail As HisWSResultsDS.vhisWSResultsRow In DetailsList
+
+                                        FullID = String.Format("{0}", SampleID)
                                         'BT #1608 - Check if fields TestName and TestLongName are informed. Always that field TestLongName is informed 
                                         '           it has to be used as Test Name in the Report
                                         myTestName = IIf(detail.IsTestNameNull, String.Empty, detail.TestName).ToString
@@ -882,7 +907,12 @@ Namespace Biosystems.Ax00.BL
                                         'EF 04/03/2014 END
                                         ResultDate = detail.ResultDateTime.ToString(DatePattern) & " " & detail.ResultDateTime.ToString(TimePattern)
 
-                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
+                                        ''EF 09/09/2014 BA-1937: El campo PatientID que se imprime es: 'PatientID + (Barcode)' or 'SampleID' (que puede coincidir con Barcode o no)
+                                        If Not detail.IsSpecimenIDNull And CStr(detail.SpecimenID) <> CStr(SampleID) Then
+                                            FullID &= " (" & detail.SpecimenID & ")"
+                                        End If
+
+                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, FullID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
                                                                                                          ReferenceRanges, Unit, ResultDate, Remarks)
                                     Next detail
 
@@ -900,330 +930,372 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
 
+        ' ''' <summary>
+        ' ''' Get Historic Results info by Patient Sample for Report
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ' ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  DL 24/10/2012
+        ' ''' </remarks>
+        'Public Function GetHistoricResultsByPatientSampleForReportOLD(ByVal pDBConnection As SqlClient.SqlConnection, _
+        '                                                           ByVal pAnalyzerID As String, _
+        '                                                           ByVal pWorkSessionID As String, _
+        '                                                           ByVal myHisWSResultsDS As List(Of HisWSResultsDS.vhisWSResultsRow)) As GlobalDataTO
+        '' EF 03/06/2014 (comentada completa)
+        'Dim resultData As GlobalDataTO = Nothing
+        'Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        'Try
+        '    resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '        dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '        If (Not dbConnection Is Nothing) Then
+        '            resultData = GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, , , , , , , , , pWorkSessionID)
+
+        '            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                Dim myHisWSResults As HisWSResultsDS = DirectCast(resultData.SetDatos, HisWSResultsDS)
+
+        '                'Get Literal for heaader report
+        '                'begin
+        '                'Dim currentLanguageGlobal As New GlobalBase
+        '                Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
+        '                Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+        '                Dim literalPatientID As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
+        '                Dim literalFullName As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
+        '                Dim literalGender As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Gender", CurrentLanguage)
+        '                Dim literalBirthDate As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_DateOfBirth", CurrentLanguage)
+        '                Dim literalAge As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
+        '                Dim literalPerformedBy As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
+        '                Dim literalComments As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Remarks", CurrentLanguage)
+        '                'end
+
+        '                'Get Historic Patient data
+        '                Dim myHistPatientsDelegate As New HisPatientsDelegate
+        '                Dim SelectedPatients As List(Of String) = (From row In myHisWSResults.vhisWSResults _
+        '                                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+        '                                                           Select row.PatientID Distinct).ToList()
+        '                '.. AndAlso row.OrderToPrint = True AndAlso row.RerunNumber = 1 ..
+
+        '                resultData = myHistPatientsDelegate.GetPatientsForReport(dbConnection, CurrentLanguage, SelectedPatients)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    Dim myHisPatient As HisPatientDS = DirectCast(resultData.SetDatos, HisPatientDS)
+
+        '                    'Create info for not registered patients
+        '                    Dim myPatientID As String
+        '                    Dim newRow As HisPatientDS.thisPatientsRow
+
+        '                    For Each PatientID As String In SelectedPatients
+        '                        myPatientID = PatientID
+        '                        If (From row In myHisPatient.thisPatients Where String.Compare(row.PatientID, myPatientID, False) = 0 Select row).Count = 0 Then
+        '                            newRow = myHisPatient.thisPatients.NewthisPatientsRow()
+        '                            newRow.PatientID = PatientID
+        '                            myHisPatient.thisPatients.AddthisPatientsRow(newRow)
+        '                        End If
+        '                    Next PatientID
+
+        '                    Dim AgeUnitsListDS As New PreloadedMasterDataDS
+        '                    Dim preloadedMasterConfig As New PreloadedMasterDataDelegate
+
+        '                    resultData = preloadedMasterConfig.GetList(dbConnection, PreloadedMasterDataEnum.AGE_UNITS)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        AgeUnitsListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+        '                        'Dim ResultsForReportDS As New HisWSResultsDS
+        '                        Dim ResultsForReportDS As New ResultsDS
+        '                        Dim PatientIDList As New List(Of String)
+        '                        Dim SamplesList As List(Of HisWSResultsDS.vhisWSResultsRow)
+        '                        Dim StatFlag() As Boolean = {True, False}
+        '                        Dim FullID As String
+        '                        Dim FullName As String
+        '                        Dim FullGender As String
+        '                        Dim FullBirthDate As String
+        '                        Dim FullAge As String
+        '                        Dim FullPerformedBy As String
+        '                        Dim FullComments As String
+        '                        Dim LinqPat As HisPatientDS.thisPatientsRow
+
+        '                        Dim ABSValue As String
+        '                        Dim TestName As String
+        '                        Dim CONC_Value As String
+        '                        Dim SampleType As String
+        '                        Dim ReferenceRanges As String
+        '                        Dim ResultDate As String
+        '                        Dim Unit As String
+        '                        Dim Remarks As String
+        '                        Dim myGender As String
+
+        '                        'Fill ReportMaster table
+        '                        For i As Integer = 0 To 1
+        '                            SamplesList = (From row In myHisWSResults.vhisWSResults _
+        '                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(i) _
+        '                                           Select row).ToList()
+
+        '                            For Each sampleRow As HisWSResultsDS.vhisWSResultsRow In SamplesList
+        '                                myPatientID = sampleRow.PatientID
+
+        '                                If (Not PatientIDList.Contains(myPatientID)) Then
+        '                                    PatientIDList.Add(myPatientID)
+
+        '                                    LinqPat = (From row As HisPatientDS.thisPatientsRow In myHisPatient.thisPatients _
+        '                                               Where String.Compare(row.PatientID, myPatientID, False) = 0 _
+        '                                               Select row).First()
+
+        '                                    If (Not LinqPat.IsDateOfBirthNull) Then
+        '                                        LinqPat.AgeWithUnit = Utilities.GetAgeUnits(LinqPat.DateOfBirth, AgeUnitsListDS)
+        '                                        LinqPat.FormatedDateOfBirth = LinqPat.DateOfBirth.ToString(DatePattern)
+        '                                    Else
+        '                                        LinqPat.FormatedDateOfBirth = String.Empty
+        '                                        LinqPat.AgeWithUnit = String.Empty
+        '                                    End If
+
+        '                                    myGender = String.Empty
+
+        '                                    If Not LinqPat.Gender Is String.Empty Then
+        '                                        Dim myGlobalDataTO As New GlobalDataTO
+
+
+        '                                        resultData = preloadedMasterConfig.GetList(Nothing, PreloadedMasterDataEnum.SEX_LIST)
+        '                                        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '                                            Dim GenderListDS As New PreloadedMasterDataDS
+        '                                            Dim LinqGender As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow)
+
+        '                                            GenderListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+        '                                            If (GenderListDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+        '                                                LinqGender = (From row In GenderListDS.tfmwPreloadedMasterData _
+        '                                                              Where row.ItemID = LinqPat.Gender _
+        '                                                              Select row).ToList()
+
+        '                                                myGender = LinqGender.First.FixedItemDesc.ToString
+        '                                            End If
+        '                                        End If
+        '                                    End If
+
+        '                                    FullID = String.Format("{0}: {1}", literalPatientID, myPatientID)
+        '                                    FullName = String.Format("{1}", literalFullName, LinqPat.FirstName, LinqPat.LastName)
+        '                                    FullGender = String.Format("{0}: {1}", literalGender, myGender) 'LinqPat.Gender)
+        '                                    FullBirthDate = String.Format("{0}: {1}", literalBirthDate, LinqPat.FormatedDateOfBirth)
+        '                                    FullAge = String.Format("{0}: {1}", literalAge, LinqPat.AgeWithUnit)
+        '                                    FullPerformedBy = String.Empty 'String.Format("{1}", literalPerformedBy, LinqPat.PerformedBy) NO IN V1
+        '                                    FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)
+
+
+
+        '                                    ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(myPatientID, _
+        '                                                                                                   FullID, _
+        '                                                                                                   FullName, _
+        '                                                                                                   FullGender, _
+        '                                                                                                   FullBirthDate, _
+        '                                                                                                   FullAge, _
+        '                                                                                                   FullPerformedBy, _
+        '                                                                                                   FullComments)
+        '                                End If
+        '                            Next sampleRow
+        '                        Next i
+
+        '                        'Fill ReportDetails table
+        '                        Dim DetailsList As List(Of HisWSResultsDS.vhisWSResultsRow)
+
+        '                        For Each SampleID As String In PatientIDList
+        '                            DetailsList = (From detail In myHisWSResults.vhisWSResults _
+        '                                           Where String.Compare(detail.SampleClass, "PATIENT", False) = 0 _
+        '                                           AndAlso String.Compare(detail.PatientID, SampleID, False) = 0 _
+        '                                           Select detail).ToList
+        '                            'AndAlso String.Compare(detail.TestType, "CALC", False) <> 0 _
+
+        '                            For Each detail As HisWSResultsDS.vhisWSResultsRow In DetailsList
+        '                                Unit = String.Empty
+        '                                Remarks = String.Empty
+        '                                CONC_Value = String.Empty
+        '                                SampleType = String.Empty
+        '                                ReferenceRanges = String.Empty
+        '                                ResultDate = String.Empty
+        '                                ABSValue = String.Empty
+        '                                TestName = String.Empty
+
+        '                                'Insert Details row
+        '                                TestName = CStr(IIf(detail.IsTestNameNull, String.Empty, CStr(detail.TestName)))
+        '                                SampleType = CStr(IIf(detail.IsSampleTypeNull, String.Empty, CStr(detail.SampleType)))
+
+        '                                If String.Compare(detail.TestType, "OFFS", False) = 0 Then
+        '                                    If Not detail.IsManualResultNull Then
+        '                                        CONC_Value = CStr(detail.ManualResult)
+        '                                        Unit = detail.MeasureUnit
+        '                                    ElseIf Not detail.IsManualResultTextNull Then
+        '                                        CONC_Value = CStr(detail.ManualResultText)
+        '                                        Unit = String.Empty
+        '                                    End If
+
+        '                                Else
+        '                                    If Not detail.IsCONCValueNull Then CONC_Value = CStr(detail.CONCValue)
+        '                                    'If Not detail.IsABSValueNull Then ABSValue = CStr(detail.ABSValue)
+
+        '                                    If (Not detail.IsCONCValueNull) Then
+        '                                        'Dim hasConcentrationError As Boolean = False
+
+        '                                        'If (Not detail.iscon.IsCONC_ErrorNull) Then
+        '                                        'hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
+        '                                        'End If
+
+        '                                        'If (Not hasConcentrationError) Then
+        '                                        CONC_Value = detail.CONCValue.ToStringWithDecimals(detail.DecimalsAllowed)
+        '                                        'Else
+        '                                        'CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                        'End If
+        '                                    Else
+        '                                        'If (Not resultRow.IsManualResultTextNull) Then
+        '                                        'CONC_Value = resultRow.ManualResultText
+        '                                        'Else
+        '                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                        'End If
+        '                                    End If
+        '                                    Unit = detail.MeasureUnit
+        '                                End If
+
+        '                                If Not detail.IsMinRefRangeNull AndAlso Not detail.IsMaxRefRangeNull Then
+        '                                    ReferenceRanges = String.Format("{0} - {1}", detail.MinRefRange, detail.MaxRefRange)
+        '                                Else
+        '                                    ReferenceRanges = String.Empty
+        '                                End If
+
+        '                                'If (Not resultRow.IsABS_ErrorNull) Then
+        '                                '    If (Not String.IsNullOrEmpty(resultRow.ABS_Error)) Then
+        '                                '        ABSValue = GlobalConstants.ABSORBANCE_ERROR
+        '                                '        CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
+        '                                '    End If
+        '                                'End If
+
+        '                                'If Not detail.IsAlarmListNull AndAlso Not detail.AlarmList Is String.Empty Then
+        '                                '    Dim AlarmList() As String
+
+        '                                '    'If detail.AlarmList.ToString.Contains(GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR) Then
+        '                                '    AlarmList = Split(detail.AlarmList, GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR)
+        '                                '    'Else
+        '                                '    '   ReDim AlarmList(1)
+        '                                '    '  AlarmList(0) = detail.AlarmList
+        '                                '    'End If
+
+        '                                '    If AlarmList.Count > 0 Then
+        '                                '        Dim alarmDlg As New AlarmsDelegate
+        '                                '        Dim alarmsDefinition As New AlarmsDS
+        '                                '        Dim myGlobal As GlobalDataTO = Nothing
+
+        '                                '        myGlobal = alarmDlg.ReadAll(dbConnection)
+        '                                '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                                '            alarmsDefinition = CType(myGlobal.SetDatos, AlarmsDS)
+
+        '                                '            Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
+
+        '                                '            For Each myAlarm As String In AlarmList
+        '                                '                list = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefinition.tfmwAlarms _
+        '                                '                        Where String.Compare(a.AlarmID, myAlarm, False) = 0 Select a).ToList
+
+        '                                '                If list.Count > 0 Then
+        '                                '                    Remarks &= list(0).Description
+        '                                '                End If
+        '                                '            Next
+
+        '                                '        End If
+        '                                '    End If
+
+        '                                'End If
+
+        '                                Remarks = String.Empty
+
+        '                                'If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
+        '                                '    (IsNumeric(CONC_Value))) Then
+        '                                If (Not detail.IsMinRefRangeNull AndAlso Not detail.IsMaxRefRangeNull) Then
+        '                                    If (CSng(CONC_Value) < CSng(detail.MinRefRange)) OrElse _
+        '                                        CSng(CONC_Value) > CSng(detail.MaxRefRange) Then
+        '                                        Remarks = "*"
+        '                                    End If
+        '                                End If
+        '                                'End If
+
+        '                                ResultDate = detail.ResultDateTime.ToString(DatePattern) & " " & detail.ResultDateTime.ToString(TimePattern)
+
+        '                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow _
+        '                                        (SampleID, TestName, SampleType, "", "", CONC_Value, ReferenceRanges, Unit, ResultDate, Remarks)
+
+        '                            Next detail
+
+        '                        Next SampleID
+
+        '                        resultData.SetDatos = ResultsForReportDS
+        '                    End If
+        '                End If
+        '            End If
+        '        End If
+        '    End If
+
+        'Catch ex As Exception
+        '    resultData = New GlobalDataTO()
+        '    resultData.HasError = True
+        '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+        '    resultData.ErrorMessage = ex.Message
+
+        '    'Dim myLogAcciones As New ApplicationLogManager()
+        '    GlobalBase.CreateLogActivity(ex.Message, "ResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
+        'Finally
+        '    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        'End Try
+        'Return resultData
+        '' EF 03/06/2014 (comentada completa)
+        'End Function
+
         ''' <summary>
-        ''' Get Historic Results info by Patient Sample for Report
+        ''' Get the historic curve average results to generate a report
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pHistOrderTestID">Historic order test identifier</param>
+        ''' <param name="pDecimalsAllowed">Test decimals allowed configuration</param>
+        ''' <returns>GlobalDataTo with dataset as ResultsDS.ReportCalibCurve</returns>
         ''' <remarks>
-        ''' Created by:  DL 24/10/2012
+        ''' Created by XB 30/07/2014 - BT #1863
         ''' </remarks>
-        Public Function GetHistoricResultsByPatientSampleForReportOLD(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                                   ByVal pAnalyzerID As String, _
-                                                                   ByVal pWorkSessionID As String, _
-                                                                   ByVal myHisWSResultsDS As List(Of HisWSResultsDS.vhisWSResultsRow)) As GlobalDataTO
-            '' EF 03/06/2014 (comentada completa)
-            'Dim resultData As GlobalDataTO = Nothing
-            'Dim dbConnection As SqlClient.SqlConnection = Nothing
+        Public Function GetResultsCalibCurveForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
+                                                      ByVal pAnalyzerID As String, _
+                                                      ByVal pWorkSessionID As String, _
+                                                      ByVal pHistOrderTestID As Integer, _
+                                                      ByVal pDecimalsAllowed As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
-            'Try
-            '    resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-            '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            '        dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-            '        If (Not dbConnection Is Nothing) Then
-            '            resultData = GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, , , , , , , , , pWorkSessionID)
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New thisWSResultsDAO
+                        resultData = myDAO.GetResultsCalibCurveForReport(dbConnection, pAnalyzerID, pWorkSessionID, pHistOrderTestID, pDecimalsAllowed)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
 
-            '            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            '                Dim myHisWSResults As HisWSResultsDS = DirectCast(resultData.SetDatos, HisWSResultsDS)
-
-            '                'Get Literal for heaader report
-            '                'begin
-            '                Dim currentLanguageGlobal As New GlobalBase
-            '                Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-            '                Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            '                Dim literalPatientID As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
-            '                Dim literalFullName As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
-            '                Dim literalGender As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Gender", CurrentLanguage)
-            '                Dim literalBirthDate As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_DateOfBirth", CurrentLanguage)
-            '                Dim literalAge As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
-            '                Dim literalPerformedBy As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
-            '                Dim literalComments As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Remarks", CurrentLanguage)
-            '                'end
-
-            '                'Get Historic Patient data
-            '                Dim myHistPatientsDelegate As New HisPatientsDelegate
-            '                Dim SelectedPatients As List(Of String) = (From row In myHisWSResults.vhisWSResults _
-            '                                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
-            '                                                           Select row.PatientID Distinct).ToList()
-            '                '.. AndAlso row.OrderToPrint = True AndAlso row.RerunNumber = 1 ..
-
-            '                resultData = myHistPatientsDelegate.GetPatientsForReport(dbConnection, CurrentLanguage, SelectedPatients)
-            '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            '                    Dim myHisPatient As HisPatientDS = DirectCast(resultData.SetDatos, HisPatientDS)
-
-            '                    'Create info for not registered patients
-            '                    Dim myPatientID As String
-            '                    Dim newRow As HisPatientDS.thisPatientsRow
-
-            '                    For Each PatientID As String In SelectedPatients
-            '                        myPatientID = PatientID
-            '                        If (From row In myHisPatient.thisPatients Where String.Compare(row.PatientID, myPatientID, False) = 0 Select row).Count = 0 Then
-            '                            newRow = myHisPatient.thisPatients.NewthisPatientsRow()
-            '                            newRow.PatientID = PatientID
-            '                            myHisPatient.thisPatients.AddthisPatientsRow(newRow)
-            '                        End If
-            '                    Next PatientID
-
-            '                    Dim AgeUnitsListDS As New PreloadedMasterDataDS
-            '                    Dim preloadedMasterConfig As New PreloadedMasterDataDelegate
-
-            '                    resultData = preloadedMasterConfig.GetList(dbConnection, PreloadedMasterDataEnum.AGE_UNITS)
-            '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            '                        AgeUnitsListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
-
-            '                        'Dim ResultsForReportDS As New HisWSResultsDS
-            '                        Dim ResultsForReportDS As New ResultsDS
-            '                        Dim PatientIDList As New List(Of String)
-            '                        Dim SamplesList As List(Of HisWSResultsDS.vhisWSResultsRow)
-            '                        Dim StatFlag() As Boolean = {True, False}
-            '                        Dim FullID As String
-            '                        Dim FullName As String
-            '                        Dim FullGender As String
-            '                        Dim FullBirthDate As String
-            '                        Dim FullAge As String
-            '                        Dim FullPerformedBy As String
-            '                        Dim FullComments As String
-            '                        Dim LinqPat As HisPatientDS.thisPatientsRow
-
-            '                        Dim ABSValue As String
-            '                        Dim TestName As String
-            '                        Dim CONC_Value As String
-            '                        Dim SampleType As String
-            '                        Dim ReferenceRanges As String
-            '                        Dim ResultDate As String
-            '                        Dim Unit As String
-            '                        Dim Remarks As String
-            '                        Dim myGender As String
-
-            '                        'Fill ReportMaster table
-            '                        For i As Integer = 0 To 1
-            '                            SamplesList = (From row In myHisWSResults.vhisWSResults _
-            '                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(i) _
-            '                                           Select row).ToList()
-
-            '                            For Each sampleRow As HisWSResultsDS.vhisWSResultsRow In SamplesList
-            '                                myPatientID = sampleRow.PatientID
-
-            '                                If (Not PatientIDList.Contains(myPatientID)) Then
-            '                                    PatientIDList.Add(myPatientID)
-
-            '                                    LinqPat = (From row As HisPatientDS.thisPatientsRow In myHisPatient.thisPatients _
-            '                                               Where String.Compare(row.PatientID, myPatientID, False) = 0 _
-            '                                               Select row).First()
-
-            '                                    If (Not LinqPat.IsDateOfBirthNull) Then
-            '                                        LinqPat.AgeWithUnit = Utilities.GetAgeUnits(LinqPat.DateOfBirth, AgeUnitsListDS)
-            '                                        LinqPat.FormatedDateOfBirth = LinqPat.DateOfBirth.ToString(DatePattern)
-            '                                    Else
-            '                                        LinqPat.FormatedDateOfBirth = String.Empty
-            '                                        LinqPat.AgeWithUnit = String.Empty
-            '                                    End If
-
-            '                                    myGender = String.Empty
-
-            '                                    If Not LinqPat.Gender Is String.Empty Then
-            '                                        Dim myGlobalDataTO As New GlobalDataTO
-
-
-            '                                        resultData = preloadedMasterConfig.GetList(Nothing, PreloadedMasterDataEnum.SEX_LIST)
-            '                                        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-            '                                            Dim GenderListDS As New PreloadedMasterDataDS
-            '                                            Dim LinqGender As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow)
-
-            '                                            GenderListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
-
-            '                                            If (GenderListDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
-            '                                                LinqGender = (From row In GenderListDS.tfmwPreloadedMasterData _
-            '                                                              Where row.ItemID = LinqPat.Gender _
-            '                                                              Select row).ToList()
-
-            '                                                myGender = LinqGender.First.FixedItemDesc.ToString
-            '                                            End If
-            '                                        End If
-            '                                    End If
-
-            '                                    FullID = String.Format("{0}: {1}", literalPatientID, myPatientID)
-            '                                    FullName = String.Format("{1}", literalFullName, LinqPat.FirstName, LinqPat.LastName)
-            '                                    FullGender = String.Format("{0}: {1}", literalGender, myGender) 'LinqPat.Gender)
-            '                                    FullBirthDate = String.Format("{0}: {1}", literalBirthDate, LinqPat.FormatedDateOfBirth)
-            '                                    FullAge = String.Format("{0}: {1}", literalAge, LinqPat.AgeWithUnit)
-            '                                    FullPerformedBy = String.Empty 'String.Format("{1}", literalPerformedBy, LinqPat.PerformedBy) NO IN V1
-            '                                    FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)
-
-
-
-            '                                    ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(myPatientID, _
-            '                                                                                                   FullID, _
-            '                                                                                                   FullName, _
-            '                                                                                                   FullGender, _
-            '                                                                                                   FullBirthDate, _
-            '                                                                                                   FullAge, _
-            '                                                                                                   FullPerformedBy, _
-            '                                                                                                   FullComments)
-            '                                End If
-            '                            Next sampleRow
-            '                        Next i
-
-            '                        'Fill ReportDetails table
-            '                        Dim DetailsList As List(Of HisWSResultsDS.vhisWSResultsRow)
-
-            '                        For Each SampleID As String In PatientIDList
-            '                            DetailsList = (From detail In myHisWSResults.vhisWSResults _
-            '                                           Where String.Compare(detail.SampleClass, "PATIENT", False) = 0 _
-            '                                           AndAlso String.Compare(detail.PatientID, SampleID, False) = 0 _
-            '                                           Select detail).ToList
-            '                            'AndAlso String.Compare(detail.TestType, "CALC", False) <> 0 _
-
-            '                            For Each detail As HisWSResultsDS.vhisWSResultsRow In DetailsList
-            '                                Unit = String.Empty
-            '                                Remarks = String.Empty
-            '                                CONC_Value = String.Empty
-            '                                SampleType = String.Empty
-            '                                ReferenceRanges = String.Empty
-            '                                ResultDate = String.Empty
-            '                                ABSValue = String.Empty
-            '                                TestName = String.Empty
-
-            '                                'Insert Details row
-            '                                TestName = CStr(IIf(detail.IsTestNameNull, String.Empty, CStr(detail.TestName)))
-            '                                SampleType = CStr(IIf(detail.IsSampleTypeNull, String.Empty, CStr(detail.SampleType)))
-
-            '                                If String.Compare(detail.TestType, "OFFS", False) = 0 Then
-            '                                    If Not detail.IsManualResultNull Then
-            '                                        CONC_Value = CStr(detail.ManualResult)
-            '                                        Unit = detail.MeasureUnit
-            '                                    ElseIf Not detail.IsManualResultTextNull Then
-            '                                        CONC_Value = CStr(detail.ManualResultText)
-            '                                        Unit = String.Empty
-            '                                    End If
-
-            '                                Else
-            '                                    If Not detail.IsCONCValueNull Then CONC_Value = CStr(detail.CONCValue)
-            '                                    'If Not detail.IsABSValueNull Then ABSValue = CStr(detail.ABSValue)
-
-            '                                    If (Not detail.IsCONCValueNull) Then
-            '                                        'Dim hasConcentrationError As Boolean = False
-
-            '                                        'If (Not detail.iscon.IsCONC_ErrorNull) Then
-            '                                        'hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
-            '                                        'End If
-
-            '                                        'If (Not hasConcentrationError) Then
-            '                                        CONC_Value = detail.CONCValue.ToStringWithDecimals(detail.DecimalsAllowed)
-            '                                        'Else
-            '                                        'CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-            '                                        'End If
-            '                                    Else
-            '                                        'If (Not resultRow.IsManualResultTextNull) Then
-            '                                        'CONC_Value = resultRow.ManualResultText
-            '                                        'Else
-            '                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-            '                                        'End If
-            '                                    End If
-            '                                    Unit = detail.MeasureUnit
-            '                                End If
-
-            '                                If Not detail.IsMinRefRangeNull AndAlso Not detail.IsMaxRefRangeNull Then
-            '                                    ReferenceRanges = String.Format("{0} - {1}", detail.MinRefRange, detail.MaxRefRange)
-            '                                Else
-            '                                    ReferenceRanges = String.Empty
-            '                                End If
-
-            '                                'If (Not resultRow.IsABS_ErrorNull) Then
-            '                                '    If (Not String.IsNullOrEmpty(resultRow.ABS_Error)) Then
-            '                                '        ABSValue = GlobalConstants.ABSORBANCE_ERROR
-            '                                '        CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
-            '                                '    End If
-            '                                'End If
-
-            '                                'If Not detail.IsAlarmListNull AndAlso Not detail.AlarmList Is String.Empty Then
-            '                                '    Dim AlarmList() As String
-
-            '                                '    'If detail.AlarmList.ToString.Contains(GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR) Then
-            '                                '    AlarmList = Split(detail.AlarmList, GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR)
-            '                                '    'Else
-            '                                '    '   ReDim AlarmList(1)
-            '                                '    '  AlarmList(0) = detail.AlarmList
-            '                                '    'End If
-
-            '                                '    If AlarmList.Count > 0 Then
-            '                                '        Dim alarmDlg As New AlarmsDelegate
-            '                                '        Dim alarmsDefinition As New AlarmsDS
-            '                                '        Dim myGlobal As GlobalDataTO = Nothing
-
-            '                                '        myGlobal = alarmDlg.ReadAll(dbConnection)
-            '                                '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-            '                                '            alarmsDefinition = CType(myGlobal.SetDatos, AlarmsDS)
-
-            '                                '            Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
-
-            '                                '            For Each myAlarm As String In AlarmList
-            '                                '                list = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefinition.tfmwAlarms _
-            '                                '                        Where String.Compare(a.AlarmID, myAlarm, False) = 0 Select a).ToList
-
-            '                                '                If list.Count > 0 Then
-            '                                '                    Remarks &= list(0).Description
-            '                                '                End If
-            '                                '            Next
-
-            '                                '        End If
-            '                                '    End If
-
-            '                                'End If
-
-            '                                Remarks = String.Empty
-
-            '                                'If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
-            '                                '    (IsNumeric(CONC_Value))) Then
-            '                                If (Not detail.IsMinRefRangeNull AndAlso Not detail.IsMaxRefRangeNull) Then
-            '                                    If (CSng(CONC_Value) < CSng(detail.MinRefRange)) OrElse _
-            '                                        CSng(CONC_Value) > CSng(detail.MaxRefRange) Then
-            '                                        Remarks = "*"
-            '                                    End If
-            '                                End If
-            '                                'End If
-
-            '                                ResultDate = detail.ResultDateTime.ToString(DatePattern) & " " & detail.ResultDateTime.ToString(TimePattern)
-
-            '                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow _
-            '                                        (SampleID, TestName, SampleType, "", "", CONC_Value, ReferenceRanges, Unit, ResultDate, Remarks)
-
-            '                            Next detail
-
-            '                        Next SampleID
-
-            '                        resultData.SetDatos = ResultsForReportDS
-            '                    End If
-            '                End If
-            '            End If
-            '        End If
-            '    End If
-
-            'Catch ex As Exception
-            '    resultData = New GlobalDataTO()
-            '    resultData.HasError = True
-            '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-            '    resultData.ErrorMessage = ex.Message
-
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "ResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
-            'Finally
-            '    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            'End Try
-            'Return resultData
-            '' EF 03/06/2014 (comentada completa)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
         End Function
-
 #End Region
 
 #Region "METHODS FOR EXPORT RESULTS TO LIMS"
@@ -1246,7 +1318,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mythisWSResultsDAO As New thisWSResultsDAO()
-                        resultData = mythisWSResultsDAO.GetResultsToExportFromHIST(dbConnection, pHistOrderTestId)
+                        resultData = mythisWSResultsDAO.GetResultsToExportFromHIST(dbConnection, pHistOrderTestID)
                     End If
                 End If
 
@@ -1256,8 +1328,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1303,8 +1375,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1351,8 +1423,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISExportStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1408,8 +1480,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISMessageID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1467,8 +1539,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1477,6 +1549,52 @@ Namespace Biosystems.Ax00.BL
 
             Return resultData
         End Function
+#End Region
+
+#Region "Private Methods"
+        ''' <summary>
+        ''' Generate a list of speciment from a list of results
+        ''' </summary>
+        ''' <param name="patientId"></param>
+        ''' <param name="hisWSResults"></param>
+        ''' <returns></returns>
+        ''' <remarks>Created by IT 23/09/2014 #BA-1937</remarks>
+        Public Function GetSpecimentIdList(ByVal patientId As String, _
+                                            ByVal hisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)) As GlobalDataTO
+            Dim resultData As New GlobalDataTO()
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim patient As PatientSpecimenTO = Nothing
+
+            Try
+
+                patient = New PatientSpecimenTO()
+                patient.patientID = patientId
+
+                Dim results = (From row In hisWSResults _
+                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                           AndAlso String.Compare(row.PatientID, patientId, False) = 0 _
+                                           Select row).ToList
+
+                For Each row As HisWSResultsDS.vhisWSResultsRow In results
+                    patient.UpdateSpecimenList(row.SpecimenID)
+                Next
+
+                resultData.SetDatos = patient
+                resultData.HasError = False
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetSpecimentIdList", EventLogEntryType.Error, False)
+            Finally
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "NOT USED"
@@ -1520,8 +1638,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1570,8 +1688,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

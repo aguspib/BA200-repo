@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgTestContaminations
+Partial Class UiProgTestContaminations
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -473,7 +473,7 @@ Partial Class IProgTestContaminations
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IProgTestContaminations"
+        Me.Name = "UiProgTestContaminations"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestListGroupBox.ResumeLayout(False)

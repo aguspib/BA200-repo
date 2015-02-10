@@ -4,14 +4,12 @@ Option Explicit On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports System.Data.SqlTypes
 Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tparISETestSamplesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 
@@ -60,8 +58,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (pISETestSamplesRow.IsTS_UserNull) Then
                         'Get the logged User
-                        Dim currentSession As New GlobalBase
-                        cmdText &= " N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim currentSession As New GlobalBase
+                        cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         cmdText &= " N'" & pISETestSamplesRow.TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -93,23 +91,29 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Add a new ISETestSample
+        ''' Update an existing ISETestSample
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pISETestSamplesRow">Typed DataSet ISETestSamplesDS containing the data of the ISETestSample to add</param>
-        ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
-        ''' <remarks>Created by: XBC 15/10/2010
-        ''' AG 21/10/2010 - remove RangeLower and RangeUpper fields
-        ''' AG 27/10/2010 - parameter is row not DS</remarks>
-        ''' RH 12/06/2012 - Add QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, 
-        '''                 NumberOfSeries and TotalAllowedError fields. Code optimization.
+        ''' <param name="pISETestSamplesRow">Typed DataSet ISETestSamplesDS containing the data of the ISETestSample to update</param>
+        ''' <returns>GlobalDataTO containing the updated record and/or error information</returns>
+        ''' <remarks>
+        ''' Created by:  XB 15/10/2010
+        ''' Modified by: AG 21/10/2010 - Removed fields RangeLower and RangeUpper
+        '''              AG 27/10/2010 - Parameter is row not DS
+        '''              RH 12/06/2012 - Added fields QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, 
+        '''                              NumberOfSeries and TotalAllowedError fields. Code optimization.
+        '''              WE 30/07/2014 - BA-1865 ==> Added fields TestLongName, SlopeFactorA2 and SlopeFactorB2
+        '''              SA 05/11/2014 - BA-1944 (SubTask BA-2013) ==> Added field ISE_Volume. Replaced use of function ToStringSQL by use of 
+        '''                                                            function ReplaceNumericString for Real values and Format for DateTime values.
+        '''                                                            Removed final validation based on AffectedRecords = 1
+        ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestSamplesRow As ISETestSamplesDS.tparISETestSamplesRow) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
@@ -118,95 +122,120 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String
-                    cmdText = " UPDATE tparISETestSamples " & _
-                              " SET    SampleType_ResultID = N'" & pISETestSamplesRow.SampleType_ResultID & "', " & _
-                              "        Decimals =  " & pISETestSamplesRow.Decimals & ", "
+                    Dim cmdText As String = " UPDATE tparISETestSamples " & vbCrLf & _
+                                            " SET    SampleType_ResultID = N'" & pISETestSamplesRow.SampleType_ResultID & "', " & vbCrLf & _
+                                                   " Decimals =  " & pISETestSamplesRow.Decimals & ", " & vbCrLf
 
-                    If pISETestSamplesRow.IsISE_DilutionFactorNull Then
-                        cmdText &= " ISE_DilutionFactor = NULL, "
+                    If (pISETestSamplesRow.IsISE_DilutionFactorNull) Then
+                        cmdText &= " ISE_DilutionFactor = NULL, " & vbCrLf
                     Else
-                        cmdText &= " ISE_DilutionFactor = " & pISETestSamplesRow.ISE_DilutionFactor.ToSQLString() & ", "
+                        cmdText &= " ISE_DilutionFactor = " & ReplaceNumericString(pISETestSamplesRow.ISE_DilutionFactor) & ", " & vbCrLf
                     End If
 
-                    If pISETestSamplesRow.IsActiveRangeTypeNull Then
-                        cmdText &= " ActiveRangeType = NULL, "
+                    If (pISETestSamplesRow.IsISE_VolumeNull) Then
+                        cmdText &= " ISE_Volume = NULL, " & vbCrLf
                     Else
-                        cmdText &= " ActiveRangeType = N'" & pISETestSamplesRow.ActiveRangeType & "', "
+                        cmdText &= " ISE_Volume = " & ReplaceNumericString(pISETestSamplesRow.ISE_Volume) & ", " & vbCrLf
+                    End If
+
+                    'WE 30/07/2014 - #1865
+                    If (pISETestSamplesRow.IsTestLongNameNull Or pISETestSamplesRow.TestLongName = String.Empty) Then
+                        cmdText &= " TestLongName = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName.ToString.Replace("'", "''") & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
+                        cmdText &= " SlopeFactorA2 = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorA2) & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
+                        cmdText &= " SlopeFactorB2 = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorB2) & ", " & vbCrLf
+                    End If
+                    'WE 30/07/2014 - #1865 - End
+
+                    If (pISETestSamplesRow.IsActiveRangeTypeNull) Then
+                        cmdText &= " ActiveRangeType = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " ActiveRangeType = N'" & pISETestSamplesRow.ActiveRangeType & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsQCActiveNull) Then
+                        cmdText &= " QCActive = 0, " & vbCrLf
+                    Else
+                        cmdText &= " QCActive = " & IIf(pISETestSamplesRow.QCActive, 1, 0).ToString() & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsControlReplicatesNull) Then
+                        cmdText &= " ControlReplicates = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " ControlReplicates = " & pISETestSamplesRow.ControlReplicates & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsNumberOfControlsNull) Then
+                        cmdText &= " NumberOfControls = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " NumberOfControls = " & pISETestSamplesRow.NumberOfControls & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsRejectionCriteriaNull) Then
+                        cmdText &= " RejectionCriteria = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " RejectionCriteria = " & pISETestSamplesRow.RejectionCriteria.ToSQLString() & ", " & vbCrLf
+                    End If
+
+                    If (String.IsNullOrEmpty(pISETestSamplesRow.CalculationMode)) Then
+                        cmdText &= " CalculationMode = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " CalculationMode = '" & pISETestSamplesRow.CalculationMode & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsNumberOfSeriesNull) Then
+                        cmdText &= " NumberOfSeries = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " NumberOfSeries = " & pISETestSamplesRow.NumberOfSeries & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsTotalAllowedErrorNull) Then
+                        cmdText &= " TotalAllowedError = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & ", " & vbCrLf
                     End If
 
                     If (pISETestSamplesRow.IsTS_UserNull) Then
                         'Get the logged User
-                        Dim currentSession As New GlobalBase
-                        cmdText &= " TS_User = N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim currentSession As New GlobalBase
+                        cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                     Else
-                        cmdText &= " TS_User = N'" & pISETestSamplesRow.TS_User.Trim.Replace("'", "''") & "', "
+                        cmdText &= " TS_User = N'" & pISETestSamplesRow.TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
                     End If
 
                     If (pISETestSamplesRow.IsTS_DateTimeNull) Then
-                        cmdText &= " TS_DateTime = '" & DateTime.Now.ToSQLString() & "', "
+                        cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                     Else
-                        cmdText &= " TS_DateTime = '" & pISETestSamplesRow.TS_DateTime.ToSQLString() & "', "
+                        cmdText &= " TS_DateTime = '" & pISETestSamplesRow.TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
                     End If
 
-                    If (pISETestSamplesRow.IsQCActiveNull) Then
-                        cmdText &= " QCActive = 0, "
-                    Else
-                        cmdText &= " QCActive = " & IIf(pISETestSamplesRow.QCActive, 1, 0).ToString() & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsControlReplicatesNull) Then
-                        cmdText &= " ControlReplicates = NULL, "
-                    Else
-                        cmdText &= " ControlReplicates = " & pISETestSamplesRow.ControlReplicates & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsNumberOfControlsNull) Then
-                        cmdText &= " NumberOfControls = NULL, "
-                    Else
-                        cmdText &= " NumberOfControls = " & pISETestSamplesRow.NumberOfControls & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsRejectionCriteriaNull) Then
-                        cmdText &= " RejectionCriteria = NULL, "
-                    Else
-                        cmdText &= " RejectionCriteria = " & pISETestSamplesRow.RejectionCriteria.ToSQLString() & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsCalculationModeNull) Then
-                        cmdText &= " CalculationMode = '', "
-                    Else
-                        cmdText &= " CalculationMode = '" & pISETestSamplesRow.CalculationMode & "', "
-                    End If
-
-                    If (pISETestSamplesRow.IsNumberOfSeriesNull) Then
-                        cmdText &= " NumberOfSeries = NULL, "
-                    Else
-                        cmdText &= " NumberOfSeries = " & pISETestSamplesRow.NumberOfSeries & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsTotalAllowedErrorNull) Then
-                        cmdText &= " TotalAllowedError = NULL "
-                    Else
-                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & " "
-                    End If
-
-                    cmdText &= " WHERE ISETestID = " & pISETestSamplesRow.ISETestID & " " & _
-                               " AND   SampleType = '" & pISETestSamplesRow.SampleType & "' "
+                    cmdText &= " WHERE ISETestID = " & pISETestSamplesRow.ISETestID & vbCrLf & _
+                               " AND   SampleType = '" & pISETestSamplesRow.SampleType & "' " & vbCrLf
 
                     'Execute the SQL Sentence
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
                     End Using
 
-                    If (resultData.AffectedRecords = 1) Then
-                        resultData.HasError = False
-                        resultData.SetDatos = pISETestSamplesRow
-                    Else
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                    End If
-
+                    'If (resultData.AffectedRecords = 1) Then
+                    '    resultData.HasError = False
+                    '    resultData.SetDatos = pISETestSamplesRow
+                    'Else
+                    '    resultData.HasError = True
+                    '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                    'End If
                 End If
 
             Catch ex As Exception
@@ -214,10 +243,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Update", EventLogEntryType.Error, False)
             End Try
-
             Return resultData
         End Function
 
@@ -259,8 +287,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -295,7 +323,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
 
                         ' XB  04/06/2013
                         'Dim cmdText As String = " SELECT ITS.*, ITS.SampleType + '-' + MR.ResourceText AS SampleTypeDesc " & vbCrLf & _
@@ -303,7 +331,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         '                                                      " INNER JOIN tfmwMultiLanguageResources MR ON MD.ResourceID = MR.ResourceID " & vbCrLf & _
                         '                        " WHERE  MD.SubTableID = '" & GlobalEnumerates.MasterDataEnum.SAMPLE_TYPES.ToString & "' " & vbCrLf & _
                         '                        " AND    ITS.ISETestID = " & pISETestID & vbCrLf & _
-                        '                        " AND    MR.LanguageID = '" & myGlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
+                        '                        " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
 
                         'If (pSampleType <> "") Then cmdText &= " AND ITS.SampleType = '" & pSampleType & "' " & vbCrLf
                         'cmdText &= " ORDER BY MD.Position " & vbCrLf
@@ -314,7 +342,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                       " INNER JOIN tparISETests IT ON ITS.ISETestID =  IT.ISETestID " & vbCrLf & _
                         " WHERE  MD.SubTableID = '" & GlobalEnumerates.MasterDataEnum.SAMPLE_TYPES.ToString & "' " & vbCrLf & _
                         " AND    ITS.ISETestID = " & pISETestID & vbCrLf & _
-                        " AND    MR.LanguageID = '" & myGlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
+                        " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
                         If (pSampleType <> "") Then cmdText &= " AND ITS.SampleType = '" & pSampleType & "' " & vbCrLf
 
                         cmdText &= " UNION " & vbCrLf
@@ -347,8 +375,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetByISETestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetByISETestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -394,7 +422,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                             " inner join tcfgMasterData MD ON MD.ItemID = IT.ISE_Units " & vbCrLf
                         '                      " WHERE  MD.SubTableID = '" & GlobalEnumerates.MasterDataEnum.SAMPLE_TYPES.ToString & "' " & vbCrLf & _
                         '                       " AND    ITS.ISETestID = " & pISETestID & vbCrLf & _
-                        '                        " AND    MR.LanguageID = '" & myGlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
+                        '                        " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage.Trim & "' " & vbCrLf
 
                         'If (pSampleType <> "") Then cmdText &= " AND ITS.SampleType = '" & pSampleType & "' " & vbCrLf
                         'cmdText &= " ORDER BY MD.Position " & vbCrLf
@@ -417,8 +445,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetISEForReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetISEForReport", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -437,6 +465,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet HistoryQCTestSamples with all data needed to export the ISE Test/SampleType to QC Module</returns>
         ''' <remarks>
         ''' Created by:  SA 21/05/2012
+        ''' Modified by: WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name in IProgISETest.
         ''' </remarks>
         Public Function GetDefinitionForQCModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -449,7 +478,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT IT.ISETestID AS TestID, IT.Name AS TestName, IT.ShortName AS TestShortName, 1 AS PreloadedTest, " & vbCrLf & _
                                                        " IT.Units AS MeasureUnit, ITS.SampleType, ITS.Decimals AS DecimalsAllowed, ITS.RejectionCriteria, " & vbCrLf & _
-                                                       " ITS.CalculationMode, ITS.NumberOfSeries " & vbCrLf & _
+                                                       " ITS.CalculationMode, ITS.NumberOfSeries, ITS.TestLongName " & vbCrLf & _
                                                 " FROM   tparISETests IT INNER JOIN tparISETestSamples ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf & _
                                                 " WHERE  ITS.ISETestID  = " & pISETestID.ToString & vbCrLf & _
                                                 " AND    ITS.SampleType = '" & pSampleType & "' " & vbCrLf
@@ -471,8 +500,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetDefinitionForQCModule", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.GetDefinitionForQCModule", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -507,8 +536,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " NumberOfSeries = " & myRow.NumberOfSeries & ", " & vbCrLf
                     End If
 
-                    Dim myGlobalBase As New GlobalBase
-                    cmdText &= " TS_User = N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf & _
+                    'Dim myGlobalbase As New GlobalBase
+                    cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf & _
                                " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
                         " WHERE  ISETestID  = " & myRow.TestID.ToString & vbCrLf & _
                         " AND    SampleType = '" & myRow.SampleType.Trim & "' " & vbCrLf
@@ -523,8 +552,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.UpdateQCValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.UpdateQCValues", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -570,8 +599,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -579,6 +608,110 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 #End Region
 
-    End Class
+#Region "HISTORY methods"
+        ''' <summary>
+        ''' Get the current programming for the specified ISETestID/SampleType and fill a typed DataSet HistISETestSamplesDS needed to update 
+        ''' data in Historic Module.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisISETestSamplesDS with data in Parameters Programming for the informed ISETestID/SampleType</returns>
+        ''' <remarks>
+        ''' Created by: SA 04/09/2014 - BA-1865
+        ''' </remarks>
+        Public Function HIST_GetISETestSampleData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.ISETestID, TS.SampleType, T.Name AS ISETestName, TS.TestLongName, T.Units AS MeasureUnit, " & vbCrLf & _
+                                                       " TS.Decimals AS DecimalsAllowed, TS.SlopeFactorA2, TS.SlopeFactorB2 " & vbCrLf & _
+                                                " FROM   tparISETests T INNER JOIN tparISETestSamples TS ON T.ISETestID = TS.ISETestID " & vbCrLf & _
+                                                " WHERE  T.ISETestID = " & pISETestID.ToString & vbCrLf & _
+                                                " AND    TS.SampleType = '" & pSampleType & "' "
+
+                        Dim myDataSet As New HisISETestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.thisISETestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.HIST_GetISETestSampleData", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Get all data in table tparISETestSamples for the informed ISETestID and SampleType
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing an ISETestSamplesDS with all data of the informed ISETestID and SampleType</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2013)
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT ITS.*, IT.Name AS ISETestName, IT.ShortName AS ISETestShortName " & vbCrLf & _
+                                                " FROM   tparISETestSamples ITS INNER JOIN tparISETests IT ON ITS.ISETestID = IT.ISETestID " & vbCrLf & _
+                                                " WHERE  ITS.ISETestID  = " & pISETestID.ToString & vbCrLf & _
+                                                " AND    ITS.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
+
+                        Dim myISETestSamplesDS As New ISETestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dataAdapter As New SqlDataAdapter(dbCmd)
+                                dataAdapter.Fill(myISETestSamplesDS.tparISETestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myISETestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
+    End Class
 End Namespace

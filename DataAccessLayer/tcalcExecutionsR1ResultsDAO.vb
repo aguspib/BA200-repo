@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcalcExecutionsR1ResultsDAO
-        Inherits DAOBase
+
 
         Public Function InsertResult(ByVal pDBConnection As SqlClient.SqlConnection, _
                                      ByVal ptcalcExecutionsR1Results As ExecutionsR1ResultsDS.tcalcExecutionsR1ResultsRow) As GlobalDataTO
@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         'cmdText += ", " & ptcalcExecutionsR1Results.ABS_Value.ToString.Replace(",", ".") & vbCrLf
                         ' Modified by : DL 12/03/2010
-                        cmdText += ", " & ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
+                        cmdText += ", " & DAOBase.ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
                     End If
 
                     If ptcalcExecutionsR1Results.IsReadingNumberNull Then
@@ -76,8 +76,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.InsertResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.InsertResult", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         'cmdText += "  ABS_Value = " & ptcalcExecutionsR1Results.ABS_Value.ToString.Replace(",", ".") & vbCrLf
                         ' Modified by : DL 12/03/2010
-                        cmdText += "  ABS_Value = " & ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
+                        cmdText += "  ABS_Value = " & DAOBase.ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
                     End If
 
                     If ptcalcExecutionsR1Results.IsReadingNumberNull Then
@@ -143,8 +143,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.UpdateResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.UpdateResults", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -191,8 +191,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.ExistsResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.ExistsResult", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -242,8 +242,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsR1ResultsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

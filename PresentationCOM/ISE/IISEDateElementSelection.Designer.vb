@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IISEDateElementSelection
+Partial Class UiISEDateElementSelection
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -19,27 +19,27 @@ Partial Class IISEDateElementSelection
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsChangePwdGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsLiCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsLiDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.BsClCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsClDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.BsKCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsKDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.BsNaCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsNaDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.bsRefCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsRefDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.BsLabel5 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDateSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsLabel3 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsLabel4 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsChangePwdGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsLiCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsLiDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.BsClCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsClDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.BsKCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsKDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.BsNaCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsNaDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.bsRefCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsRefDateTimePicker = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.BsLabel5 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDateSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsLabel3 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsLabel4 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsChangePwdGroupBox.SuspendLayout()
         CType(Me.bsScreenErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -115,7 +115,7 @@ Partial Class IISEDateElementSelection
         Me.BsLiDateTimePicker.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.BsLiDateTimePicker.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsLiDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.BsLiDateTimePicker.Location = New System.Drawing.Point(85, 189)
+        Me.BsLiDateTimePicker.Location = New System.Drawing.Point(122, 189)
         Me.BsLiDateTimePicker.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.BsLiDateTimePicker.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.BsLiDateTimePicker.Name = "BsLiDateTimePicker"
@@ -148,7 +148,7 @@ Partial Class IISEDateElementSelection
         Me.BsClDateTimePicker.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.BsClDateTimePicker.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsClDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.BsClDateTimePicker.Location = New System.Drawing.Point(85, 156)
+        Me.BsClDateTimePicker.Location = New System.Drawing.Point(122, 156)
         Me.BsClDateTimePicker.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.BsClDateTimePicker.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.BsClDateTimePicker.Name = "BsClDateTimePicker"
@@ -181,7 +181,7 @@ Partial Class IISEDateElementSelection
         Me.BsKDateTimePicker.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.BsKDateTimePicker.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsKDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.BsKDateTimePicker.Location = New System.Drawing.Point(85, 121)
+        Me.BsKDateTimePicker.Location = New System.Drawing.Point(122, 121)
         Me.BsKDateTimePicker.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.BsKDateTimePicker.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.BsKDateTimePicker.Name = "BsKDateTimePicker"
@@ -214,7 +214,7 @@ Partial Class IISEDateElementSelection
         Me.BsNaDateTimePicker.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.BsNaDateTimePicker.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsNaDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.BsNaDateTimePicker.Location = New System.Drawing.Point(85, 87)
+        Me.BsNaDateTimePicker.Location = New System.Drawing.Point(122, 87)
         Me.BsNaDateTimePicker.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.BsNaDateTimePicker.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.BsNaDateTimePicker.Name = "BsNaDateTimePicker"
@@ -247,7 +247,7 @@ Partial Class IISEDateElementSelection
         Me.BsRefDateTimePicker.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.BsRefDateTimePicker.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsRefDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.BsRefDateTimePicker.Location = New System.Drawing.Point(85, 54)
+        Me.BsRefDateTimePicker.Location = New System.Drawing.Point(122, 54)
         Me.BsRefDateTimePicker.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.BsRefDateTimePicker.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.BsRefDateTimePicker.Name = "BsRefDateTimePicker"
@@ -256,12 +256,13 @@ Partial Class IISEDateElementSelection
         '
         'BsLabel5
         '
+        Me.BsLabel5.AutoSize = True
         Me.BsLabel5.BackColor = System.Drawing.Color.Transparent
         Me.BsLabel5.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsLabel5.ForeColor = System.Drawing.Color.Black
         Me.BsLabel5.Location = New System.Drawing.Point(34, 193)
         Me.BsLabel5.Name = "BsLabel5"
-        Me.BsLabel5.Size = New System.Drawing.Size(45, 14)
+        Me.BsLabel5.Size = New System.Drawing.Size(25, 13)
         Me.BsLabel5.TabIndex = 11
         Me.BsLabel5.Text = "Li+"
         Me.BsLabel5.Title = False
@@ -280,37 +281,40 @@ Partial Class IISEDateElementSelection
         '
         'bsLabel2
         '
+        Me.bsLabel2.AutoSize = True
         Me.bsLabel2.BackColor = System.Drawing.Color.Transparent
         Me.bsLabel2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.bsLabel2.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsLabel2.ForeColor = System.Drawing.Color.Black
         Me.bsLabel2.Location = New System.Drawing.Point(31, 91)
         Me.bsLabel2.Name = "bsLabel2"
-        Me.bsLabel2.Size = New System.Drawing.Size(48, 14)
+        Me.bsLabel2.Size = New System.Drawing.Size(31, 13)
         Me.bsLabel2.TabIndex = 8
         Me.bsLabel2.Text = "Na+"
         Me.bsLabel2.Title = False
         '
         'bsLabel3
         '
+        Me.bsLabel3.AutoSize = True
         Me.bsLabel3.BackColor = System.Drawing.Color.Transparent
         Me.bsLabel3.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsLabel3.ForeColor = System.Drawing.Color.Black
         Me.bsLabel3.Location = New System.Drawing.Point(31, 125)
         Me.bsLabel3.Name = "bsLabel3"
-        Me.bsLabel3.Size = New System.Drawing.Size(48, 14)
+        Me.bsLabel3.Size = New System.Drawing.Size(24, 13)
         Me.bsLabel3.TabIndex = 9
         Me.bsLabel3.Text = "K+"
         Me.bsLabel3.Title = False
         '
         'bsLabel4
         '
+        Me.bsLabel4.AutoSize = True
         Me.bsLabel4.BackColor = System.Drawing.Color.Transparent
         Me.bsLabel4.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsLabel4.ForeColor = System.Drawing.Color.Black
         Me.bsLabel4.Location = New System.Drawing.Point(31, 160)
         Me.bsLabel4.Name = "bsLabel4"
-        Me.bsLabel4.Size = New System.Drawing.Size(48, 15)
+        Me.bsLabel4.Size = New System.Drawing.Size(24, 13)
         Me.bsLabel4.TabIndex = 10
         Me.bsLabel4.Text = "Cl-"
         Me.bsLabel4.Title = False

@@ -4,22 +4,15 @@ Option Strict On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Imports DevExpress.XtraGrid
-Imports DevExpress.Data
 Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.Utils
-Imports DevExpress.XtraPrinting
 Imports DevExpress.XtraEditors.Repository
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports System.IO
-Imports Biosystems.Ax00.DAL.DAO
 Imports System.Globalization
 
 
-Public Class IHistoricalReports
+Public Class UiHistoricalReports
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -321,7 +314,7 @@ Public Class IHistoricalReports
             Recommendations.Width = 114
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " InitializeSamplesXtraGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeSamplesXtraGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -334,44 +327,44 @@ Public Class IHistoricalReports
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myutil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             'DL 20/04/2012. Substitute icons and optimize
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                SearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                SearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'DL 20/04/2012
 
@@ -384,9 +377,9 @@ Public Class IHistoricalReports
             'Dim myAuxImage As Image
             'If File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myutil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myAuxImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -400,40 +393,40 @@ Public Class IHistoricalReports
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'SaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    CancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'CancelButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''DELETE Button
             'auxIconName = GetIconName("REMOVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'DeleteButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''PRINT Button
             'auxIconName = GetIconName("PRINT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'PrintButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'ExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -461,7 +454,7 @@ Public Class IHistoricalReports
             GetScreenTooltip()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -477,14 +470,14 @@ Public Class IHistoricalReports
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -492,7 +485,7 @@ Public Class IHistoricalReports
     Private Sub DisableAll()
         Me.SearchButton.Enabled = False
         Me.SaveButton.Enabled = False
-        Me.CancelButton.Enabled = False
+        Me.ButtonCancel.Enabled = False
         Me.DeleteButton.Enabled = False
         Me.PrintButton.Enabled = False
         Me.AnalyzerCombo.Enabled = False
@@ -508,7 +501,7 @@ Public Class IHistoricalReports
         Try
             Me.SearchButton.Enabled = True
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
             Me.DeleteButton.Enabled = False
             Me.PrintButton.Enabled = False
             Me.ExitButton.Enabled = True
@@ -519,7 +512,7 @@ Public Class IHistoricalReports
             FillActionTypesCombo(GlobalEnumerates.PreloadedMasterDataEnum.SRV_ACT_ADJ_ALL)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Initializations ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -560,7 +553,7 @@ Public Class IHistoricalReports
                 ShowMessage("Error", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzerTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzerTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillAnalyzerTypesCombo ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -601,7 +594,7 @@ Public Class IHistoricalReports
                 ShowMessage("Error", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FillTaskTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillTaskTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillTaskTypesCombo ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -641,7 +634,7 @@ Public Class IHistoricalReports
                 ShowMessage("Error", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FillActionTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillActionTypesCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillActionTypesCombo ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -669,7 +662,7 @@ Public Class IHistoricalReports
             UnSelectAllRows()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".FormatDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".FormatDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FormatDataGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -682,7 +675,7 @@ Public Class IHistoricalReports
                 Me.GridView1.SetMasterRowExpanded(i, True)
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ExpandAllRows ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ExpandAllRows ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExpandAllRows ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         Finally
             Me.GridView1.EndUpdate()
@@ -696,7 +689,7 @@ Public Class IHistoricalReports
                 Me.GridView1.UnselectRow(i)
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".UnSelectAllRows ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".UnSelectAllRows ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UnSelectAllRows ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         Finally
             Me.GridView1.EndUpdate()
@@ -715,7 +708,7 @@ Public Class IHistoricalReports
                 .MessagesPanel.Label = Me.BsMessageLabel
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -732,12 +725,12 @@ Public Class IHistoricalReports
                 Me.PrintButton.Enabled = True
             Else
                 Me.SaveButton.Enabled = False
-                Me.CancelButton.Enabled = False
+                Me.ButtonCancel.Enabled = False
                 Me.PrintButton.Enabled = False
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".EnablingOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".EnablingOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EnablingOptions ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -757,7 +750,7 @@ Public Class IHistoricalReports
 
         Catch ex As Exception
             returnValue = False
-            CreateLogActivity(ex.Message, Me.Name & ".Validation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Validation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Validation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return returnValue
@@ -772,14 +765,14 @@ Public Class IHistoricalReports
                 If dialogResultToReturn = Windows.Forms.DialogResult.Yes Then
                     MyClass.SaveButton.PerformClick()
                 Else
-                    MyClass.CancelButton.PerformClick()
+                    MyClass.ButtonCancel.PerformClick()
                 End If
             End If
 
             Me.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -792,7 +785,7 @@ Public Class IHistoricalReports
         Try
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -806,7 +799,7 @@ Public Class IHistoricalReports
         Try
             'TODO
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -817,18 +810,18 @@ Public Class IHistoricalReports
 
     Private Sub IHistoricalReports_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 
             'Get the current user level
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             InitializeGridControl1()
 
@@ -843,7 +836,7 @@ Public Class IHistoricalReports
             ResetBorderSRV()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -872,7 +865,7 @@ Public Class IHistoricalReports
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".TasksCombo_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TasksCombo_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".TasksCombo_SelectedIndexChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -923,7 +916,7 @@ Public Class IHistoricalReports
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SearchButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -956,11 +949,11 @@ Public Class IHistoricalReports
 
                 Me.ChangedValue = False
                 Me.SaveButton.Enabled = False
-                Me.CancelButton.Enabled = False
+                Me.ButtonCancel.Enabled = False
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1000,7 +993,7 @@ Public Class IHistoricalReports
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DeleteButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeleteButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1014,11 +1007,11 @@ Public Class IHistoricalReports
 
                 Me.ChangedValue = True
                 Me.SaveButton.Enabled = True
-                Me.CancelButton.Enabled = True
+                Me.ButtonCancel.Enabled = True
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GridControl1_EditorKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GridControl1_EditorKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GridControl1_EditorKeyDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1028,21 +1021,21 @@ Public Class IHistoricalReports
             Me.EnablingOptions()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GridView1_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GridView1_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GridView1_SelectionChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             Me.SearchButton.PerformClick()
 
             Me.ChangedValue = False
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1059,7 +1052,7 @@ Public Class IHistoricalReports
                 Me.ExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1067,13 +1060,13 @@ Public Class IHistoricalReports
     Private Sub PrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintButton.Click
         Try
             If Not Me.GridControl1.IsPrintingAvailable Then
-                CreateLogActivity("The 'DevExpress.XtraPrinting' library is not found", Me.Name & ".PrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity("The 'DevExpress.XtraPrinting' library is not found", Me.Name & ".PrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Else
                 Me.GridControl1.ShowPrintPreview()
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1109,7 +1102,7 @@ Public Class IHistoricalReports
     '    '                path = Me.MonitorTaskIconNameAttr
     '    '        End Select
 
-    '    '        Dim bm_source As New Bitmap(Image.FromFile(path))
+    '    '        Dim bm_source As New Bitmap(ImageUtilities.ImageFromFile(path))
     '    '        Dim scale_factor As Integer = 20
     '    '        ' Make a bitmap for the result.
     '    '        Dim bm_dest As New Bitmap(CInt(scale_factor), CInt(scale_factor))
@@ -1171,7 +1164,7 @@ Public Class IHistoricalReports
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".GridView1_ShownEditor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GridView1_ShownEditor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".GridView1_ShownEditor ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub

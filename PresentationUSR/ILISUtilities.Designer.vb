@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ILISUtilities
+Partial Class UiLISUtilities
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -22,7 +22,7 @@ Partial Class ILISUtilities
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ILISUtilities))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiLISUtilities))
         Me.BsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.ExecuteActionButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.LISUtilitiesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -196,7 +196,7 @@ Partial Class ILISUtilities
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MinimizeBox = False
-        Me.Name = "ILISUtilities"
+        Me.Name = "UiLISUtilities"
         Me.Text = "*LIS Utilities"
         Me.BsGroupBox1.ResumeLayout(False)
         Me.MainGroupBox.ResumeLayout(False)

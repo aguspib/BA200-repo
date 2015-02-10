@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.App
 
-Public Class IErrorCodes
+Public Class UiErrorCodes
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -25,7 +25,7 @@ Public Class IErrorCodes
             MyClass.SetButtonImage(bsExitButton, "CANCEL")
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -46,7 +46,7 @@ Public Class IErrorCodes
             GetScreenTooltip()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -62,11 +62,11 @@ Public Class IErrorCodes
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(bsClearButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SRV_ClearResults", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(bsClearButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SRV_ClearResults", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -103,7 +103,7 @@ Public Class IErrorCodes
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".DisplayErrorCodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".DisplayErrorCodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DisplayErrorCodes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -114,8 +114,8 @@ Public Class IErrorCodes
     Private Sub IErrorCodes_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -125,7 +125,7 @@ Public Class IErrorCodes
             DisplayErrorCodes()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -147,7 +147,7 @@ Public Class IErrorCodes
                 bsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -162,13 +162,13 @@ Public Class IErrorCodes
                 If Not myGlobal.HasError Then
                     Me.BsRichTextBox1.Clear()
                 Else
-                    CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsClearButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsClearButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                     ShowMessage(Me.Name & ".bsClearButton_Click ", Messages.SYSTEM_ERROR.ToString, "Error when remove Error Codes List", Me)
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsClearButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsClearButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsClearButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -177,7 +177,7 @@ Public Class IErrorCodes
         Try
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

@@ -1,27 +1,21 @@
 ﻿Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
-'Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-'Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
+Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
 Imports System.ComponentModel
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Threading
 Imports Biosystems.Ax00.App
 
-'Imports System.Runtime.InteropServices
-'Imports Biosystems.Ax00.DAL
-'Imports System.IO
-
-Public Class IResults
+Public Class UiResults
     'RH 13/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
     '              Substitute every "Or" by "OrElse" (Only in boolean expressions, not in bitwise expressions!)
     'To evaluate the boolean expressions in short circuit and speed up mean processing velocity
@@ -37,10 +31,6 @@ Public Class IResults
     'http://support.microsoft.com/kb/817250/en-us
 
 #Region "Declarations"
-
-    'Private Const STATS As Integer = 0
-    'Private Const ROUTINES As Integer = 1
-
     Private Const CollapseColName As String = "Collapse"
     Private XtraCollapseColName As String = String.Empty 'It should be initialized
     Private RepImage As Byte() = Nothing
@@ -59,7 +49,6 @@ Public Class IResults
     Private INC_SENT_REPImage As Byte() = Nothing
     Private RED_SENT_REPImage As Byte() = Nothing
     Private EQ_SENT_REPImage As Byte() = Nothing
-    'Private PATIENT As Byte() = Nothing
     Private REP_INCImage As Byte() = Nothing
     Private EQUAL_REPImage As Byte() = Nothing
     Private RED_REPImage As Byte() = Nothing
@@ -97,17 +86,16 @@ Public Class IResults
     Private ControlTestName As String = String.Empty
     Private SampleTestName As String = String.Empty
     Private ProcessEvent As Boolean = True
+
     'Indicates if the patient list must be refreshed after recalculations or new result received
     Private UpdatePatientList As Boolean = True
-    'Private WithEvents ResultsChart As New bsResultsChart() 'SG 30/08/2010
+
     Private WithEvents ResultsChart As bsResultsChart 'RH 13/12/2010 Remove New because it creates an object that wont be used.
     Private PrintImage As Image
 
-    Private CurveToolTip As String ' DL 23/03/2011
-
+    Private CurveToolTip As String
     Private CreatingXlsResults As Boolean
     Private ChangeWS As Boolean = False
-
 
     Enum SortType
         ASC
@@ -123,40 +111,29 @@ Public Class IResults
     Private IsOrderHISSent As New Dictionary(Of String, Boolean)
     Private LanguageID As String
     Private NewFactorValue As Single = Single.NaN
-    Private OldFactorValue As Single = 0 'AG 09/11/2010
-
-    'AG 31/21/2010
+    Private OldFactorValue As Single = 0
     Private labelReportPrintAvailable As String = String.Empty
     Private labelReportPrintNOTAvailable As String = String.Empty
     Private labelHISSent As String = String.Empty
     Private labelHISNOTSent As String = String.Empty
-
     Private labelOpenAbsorbanceCurve As String = String.Empty
 
-    'TR 20/09/2013 #memory (Remove the private)
     Private PrintPictureBox As New PictureBox()
     Private HISPictureBox As New PictureBox()
 
-    'RH 04/06/2012
     Private LISSubHeaderImage As Byte() = Nothing
     Private LISHeadImage As Image = Nothing
+    Private LISHeadCheckImage As Image = Nothing 'IT 21/10/2014: BA-2036
     Private PrintHeadImage As Image = Nothing
-    'RH 04/06/2012
-
-    'RH 19/10/2011
     Private LISExperimentalHeadImage As Image = Nothing
     Private LISControlHeadImage As Image = Nothing
     Private LISSamplesHeadImage As Image = Nothing
     Private HeadImageSide As Integer = 16 'Set here the dimensions of the head images
     Private HeadRect As Rectangle = Nothing
-    'END RH 19/10/2011
 
-    'RH 20/10/2011
     Private labelManualRerunIncrease As String = String.Empty
     Private labelManualRerunDecrease As String = String.Empty
     Private labelManualRerunEqual As String = String.Empty
-    'END RH 20/10/2011
-
     Private labelPatient As String = String.Empty
     Private labelRerun As String = String.Empty
     Private labelConcentration As String = String.Empty
@@ -174,18 +151,19 @@ Public Class IResults
     'Private mdiAnalyzerCopy As AnalyzerManager 'AG 19/01/2012 '#REFACTORING
     'Private mdiESWrapperCopy As ESWrapper 'AG 11/03/2013
 
-    Private Shared OpenForms As Integer = 0 'RH 11/04/2012
-    Private copyRefreshDS As UIRefreshDS = Nothing 'AG 21/06/2012
+    'BA-1927: added to verify if it is possible to execute the Export process
+    Private mdiESWrapperCopy As ESWrapper
 
-    Private LISNameForColumnHeaders As String = "LIS" 'SGM 12/04/2013
+    Private Shared OpenForms As Integer = 0
+    Private copyRefreshDS As UIRefreshDS = Nothing
 
+    Private LISNameForColumnHeaders As String = "LIS"
 #End Region
 
 #Region "Fields (attributes)"
 
     Private WorkSessionIDField As String = ""
     Private AnalyzerIDField As String = ""
-    Private AnalyzerModelField As String = ""
     Private WSStatusField As String = "" 'AG 19/03/2012
     Private LISWorkingModeRerunsAttr As String = "BOTH" 'SGM 17/04/2013
 
@@ -213,16 +191,7 @@ Public Class IResults
         End Set
     End Property
 
-    Public Property AnalyzerModel() As String
-        Get
-            Return AnalyzerModelField
-        End Get
-        Set(ByVal value As String)
-            AnalyzerModelField = value
-        End Set
-    End Property
-
-    ' XB 26/02/2014 - task #1529
+    'XB 26/02/2014 - task #1529
     Public Property SampleClass As String
         Get
             Return SampleClassField
@@ -300,12 +269,6 @@ Public Class IResults
 #End Region
 
 #Region "Events"
-
-    'AG 04/06/2012
-    'Private Sub IResults_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
-    '    elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-    'End Sub
-
     ''' <summary>
     ''' When the  ESC key is pressed, the screen is closed 
     ''' </summary>
@@ -341,38 +304,40 @@ Public Class IResults
     End Sub
 
     ''' <summary>
-    ''' 
+    ''' Screen load 
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
-    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' Created by:
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Get a copy of the ESWrapper to check the status of the LIS Connection before execute the 
+    '''                                          Export to LIS process
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ResultForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'startTime = Now 'AG 04/06/2012
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 16/05/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 16/05/2012 -END
 
             'TR 11/07/2012 -Get the current Language from the current Application Session
-            LanguageID = MyGlobalBase.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
 
-            WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
-            AnalyzerIDField = IAx00MainMDI.ActiveAnalyzer
+            WorkSessionIDField = UiAx00MainMDI.ActiveWorkSession
+            AnalyzerIDField = UiAx00MainMDI.ActiveAnalyzer
             'AnalyzerModelField = IAx00MainMDI.AnalyzerModel 'AG 03/07/2012 - comment because causes AnalyzerModelField = ""
 
 
-            'If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
-            '    mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 11/03/2013 - Use the same ESWrapper as the MDI
-            'End If
+            'BA-1927: added to verify if it is possible to execute the Export process
+            If (Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing) Then
+                mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 11/03/2013 - Use the same ESWrapper as the MDI
+            End If
 
             InitializeScreen()
 
@@ -389,12 +354,12 @@ Public Class IResults
             CollapseAll(bsExperimentalsDataGridView) 'dl 23/07/2013 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultForm_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultForm_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -410,184 +375,48 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestsListDataGridView_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestsListDataGridView_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Manage the tab change (selection between Patients/Tests views)
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 18/09/2014 - BA-1927 ==> Code moved to a function
+    ''' </remarks>
     Private Sub bsTestDetailsTabs_Selected(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles bsTestDetailsTabControl.Selected
         Try
-            'Select Case UCase(bsTestDetailsTabControl.SelectedTab.Text)
-            '    Case "SAMPLES"
-            '        ExportButton.Visible = True
-            '        bsSamplesResultsTabControl.Visible = True
-            '        bsSamplesPanel.Visible = True
-
-            '        bsTestPanel.Visible = False
-            '        bsResultsTabControl.Visible = False
-
-
-            '    Case "TESTS"
-
-            '        If UCase(bsResultsTabControl.SelectedTab.Text) = "CONTROLS" Or UCase(bsResultsTabControl.SelectedTab.Text) = "SAMPLES" Then
-            '            ExportButton.Visible = True
-            '        Else
-            '            ExportButton.Visible = False
-            '        End If
-
-            '        bsSamplesResultsTabControl.Visible = False
-            '        bsSamplesPanel.Visible = False
-
-            '        bsTestPanel.Visible = True
-            '        bsResultsTabControl.Visible = True
-
-            'End Select
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            Select Case bsTestDetailsTabControl.SelectedTab.Name
-                Case bsSamplesTab.Name
-                    ExportButton.Visible = True
-                    bsSamplesResultsTabControl.Visible = True
-                    bsSamplesPanel.Visible = True
-
-                    bsTestPanel.Visible = False
-                    bsResultsTabControl.Visible = False
-
-
-                Case bsTestsTabTage.Name
-                    If String.Compare(bsResultsTabControl.SelectedTab.Name, bsControlsTabPage.Name, False) = 0 OrElse _
-                            String.Compare(bsResultsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-                        ExportButton.Visible = True
-                    Else
-                        ExportButton.Visible = False
-                    End If
-
-                    bsSamplesResultsTabControl.Visible = False
-                    bsSamplesPanel.Visible = False
-
-                    bsTestPanel.Visible = True
-                    bsResultsTabControl.Visible = True
-
-                    'JV #1502 21/02/2014 - los dos botones se esconden por estar pendiente pasar el test. Quitar las dos lineas siguientes si ok.
-                    PrintTestBlankButton.Visible = False
-                    PrintTestCtrlButton.Visible = False
-
-            End Select
-
-            ' JC 14-05-2013   Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" and Sample Class is Patient
-            Me.SendManRepButton.Enabled = Not (MyClass.LISWorkingModeReruns = "LIS" AndAlso _
-                                                        (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name _
-                                                         OrElse bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name))
-
-            If Not ProcessEvent Then Return
-
-            If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                'UpdateExperimentalsDataGrid()
-                ''AG 24/11/2010
-                'If UpdatePatientList Then
-                '    UpdateSamplesListDataGrid()
-                '    UpdatePatientList = False 'RH 13/12/2010
-                'End If
-                ''AG 24/11/2010
-
-                'RH 13/12/2010 Change the order of the instructions
-                'First update the sample list, and then update the experimental grid.
-                'That is the proper way to avoid calling UpdateExperimentalsDataGrid() twice
-                If UpdatePatientList Then
-                    UpdateSamplesListDataGrid()
-                    UpdatePatientList = False
-                End If
-                Application.DoEvents()
-                UpdateExperimentalsDataGrid()
-            Else
-                UpdateCurrentResultsGrid()
-            End If
-
-
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
-                                            " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
-                                            "IResults.bsTestDetailsTabs_Selected", EventLogEntryType.Information, False)
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
+            TestDetailsTabSelectedEvent()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestDetailsTabs_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestDetailsTabs_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Manage the Sample Class tab change in Tests View
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 18/09/2014 - BA-1927 ==> Code moved to a function
+    ''' </remarks>
     Private Sub bsResultsTabControl_Selected(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles bsResultsTabControl.Selected
         Try
-            'Select Case UCase(bsResultsTabControl.SelectedTab.Text)
-            '    Case "CONTROLS"
-            '        ExportButton.Visible = False
-
-            '    Case "SAMPLES"
-            '        ExportButton.Visible = True
-
-            '    Case "PATIENTS"
-            '        ExportButton.Visible = True
-
-            '    Case Else
-            '        ExportButton.Visible = False
-
-            'End Select
-
-            'Select Case bsResultsTabControl.SelectedIndex
-            '    Case 0 ' "BLANKS"
-            '        ExportButton.Visible = False
-
-            '    Case 1 ' "CALIB"
-            '        ExportButton.Visible = False
-
-            '    Case 2 ' "CONTROLS"
-            '        ExportButton.Visible = False
-
-            '        'Case "SAMPLES"
-            '        '    ExportButton.Visible = True
-
-            '    Case 3 '"PATIENTS"
-            '        ExportButton.Visible = True
-
-            '    Case Else
-            '        ExportButton.Visible = False
-
-            'End Select
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            'RH 94/06/2012
-            ExportButton.Visible = (String.Compare(bsResultsTabControl.SelectedTab.Name, XtraSamplesTabPage.Name, False) = 0)
-            ' JC 14-05-2013   Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" and Sample Class is Patient
-            Me.SendManRepButton.Enabled = Not (MyClass.LISWorkingModeReruns = "LIS" AndAlso _
-                                                        (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name _
-                                                         OrElse bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name))
-
-            If Not ProcessEvent Then Return
-
-            UpdateCurrentResultsGrid()
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
-                                            & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
-                                            "IResults.bsResultsTabControl_Selected", EventLogEntryType.Information, False)
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-
+            ResultsTabControlSelectedEvent()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsTabControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsTabControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Fixed errors raised when Option Strict On for the screen was activated (Graph column)
+    ''' </remarks>
     Private Sub GenericDataGridView_CellMouseEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) _
             Handles bsExperimentalsDataGridView.CellMouseEnter, bsBlanksDataGridView.CellMouseEnter, bsCalibratorsDataGridView.CellMouseEnter, _
                     bsControlsDataGridView.CellMouseEnter
@@ -695,7 +524,8 @@ Public Class IResults
                     If e.RowIndex < 0 Then
                         dgv.Cursor = Cursors.Default
                     Else
-                        If IsSubHeader(dgv, e.RowIndex) AndAlso String.Compare(dgv("Graph", e.RowIndex).Tag, "CURVE", False) <> 0 Then ' bsCurveButton.Visible dl 23/03/2011
+                        'BA-1927: Added ToString to compare value of Tag property in Graph column, but checking previously that it is not Nothing
+                        If IsSubHeader(dgv, e.RowIndex) AndAlso (dgv("Graph", e.RowIndex).Tag Is Nothing OrElse dgv("Graph", e.RowIndex).Tag.ToString <> "CURVE") Then ' bsCurveButton.Visible dl 23/03/2011
                             dgv.Cursor = Cursors.Hand
                         Else
                             dgv.Cursor = Cursors.Default
@@ -707,7 +537,7 @@ Public Class IResults
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GenericDataGridView_CellMouseEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GenericDataGridView_CellMouseEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -724,19 +554,24 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GenericDataGridView_CellMouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GenericDataGridView_CellMouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
 
+''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Fixed errors raised when Option Strict On for the screen was activated (Graph column)
+    ''' </remarks>
     Private Sub GenericDataGridView_CellMouseClick(ByVal sender As System.Object, _
                                                    ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsExperimentalsDataGridView.CellMouseClick, _
                                                                                                                            bsBlanksDataGridView.CellMouseClick, _
                                                                                                                            bsCalibratorsDataGridView.CellMouseClick, _
                                                                                                                            bsControlsDataGridView.CellMouseClick
 
-        Dim resultRow As ResultsDS.vwksResultsRow
+        Dim resultRow As ResultsDS.vwksResultsRow = Nothing
         Dim key As String = String.Empty
         Dim executionRow As ExecutionsDS.vwksWSExecutionsResultsRow 'SG 30/08/2010
         Dim ParentControl As System.Windows.Forms.Control
@@ -764,9 +599,10 @@ Public Class IResults
                     If (e.RowIndex >= 0) Then
                         If e.ColumnIndex = dgv.Columns("Factor").Index AndAlso IsSubHeader(dgv, e.RowIndex) Then
                             'AG 22/06/2012 - TO CONFIRM
-                            'If Not HasCurve AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'bsCurveButton.Visible Then 'AG note - Allow manual factor only when calibrator 1 point
-                            If dgv("Graph", e.RowIndex).Tag <> "CURVE" Then 'bsCurveButton.Visible Then 
+                            'If Not HasCurve AndAlso mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'bsCurveButton.Visible Then 'AG note - Allow manual factor only when calibrator 1 point
 
+                            'BA-1927: Added ToString to compare value of Tag property in Graph column, but checking previously that it is not Nothing
+                            If (dgv("Graph", e.RowIndex).Tag Is Nothing OrElse dgv("Graph", e.RowIndex).Tag.ToString <> "CURVE") Then 'bsCurveButton.Visible Then 
                                 dgv.CurrentCell.Style.BackColor = Color.White
                                 dgv.CurrentCell.Style.ForeColor = Color.Black
                                 dgv.CurrentCell.Style.Font = RegularFont
@@ -931,7 +767,8 @@ Public Class IResults
                     End If
 
                 Case dgv.Columns("Graph").Index
-                    If dgv("Graph", e.RowIndex).Tag <> "CURVE" Then 'AG 18/07/2012
+                    'BA-1927: Added ToString to compare value of Tag property in Graph column, but checking previously that it is not Nothing
+                    If (dgv("Graph", e.RowIndex).Tag Is Nothing OrElse dgv("Graph", e.RowIndex).Tag.ToString <> "CURVE") Then 'AG 18/07/2012
                         'SG 30/08/2010
                         If Not IsSubHeader(dgv, e.RowIndex) Then '(1)
 
@@ -967,13 +804,13 @@ Public Class IResults
                 Case dgv.Columns("Ok").Index
                     If Not IsSubHeader(dgv, e.RowIndex) Then
                         'AG 22/06/2012 - TO CONFIRM
-                        'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
+                        'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
                         changeInUseValue = True
                     Else
                         resultRow = CType(dgv.Rows(e.RowIndex).Tag, ResultsDS.vwksResultsRow)
                         If Not resultRow.AcceptedResultFlag Then
                             'AG 22/06/2012 - TO CONFIRM
-                            'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then ChangeAcceptedResult(dgv, resultRow, myGridSampleClass) 'AG 22/06/2012 - Do not allow change accepted results in RUNNING
+                            'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then ChangeAcceptedResult(dgv, resultRow, myGridSampleClass) 'AG 22/06/2012 - Do not allow change accepted results in RUNNING
                             'ChangeAcceptedResult(dgv, resultRow, myGridSampleClass)
                             'ChangeAcceptedResult(resultRow, myGridSampleClass)
                             ChangeAcceptedResultNEW(resultRow)
@@ -989,14 +826,16 @@ Public Class IResults
                 Case Else
                     If Not IsSubHeader(dgv, e.RowIndex) Then
                         'AG 22/06/2012 - TO CONFIRM
-                        'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
+                        'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
                         changeInUseValue = True
                     End If
             End Select
 
             'AG 18/07/2012 Graph and curve use the same column 'DL 23/03/2011
             'If myGridSampleClass = "CALIB" AndAlso e.ColumnIndex = dgv.Columns("Curve").Index Then
-            If String.Compare(myGridSampleClass, "CALIB", False) = 0 AndAlso e.ColumnIndex = dgv.Columns("Graph").Index AndAlso dgv("Graph", e.RowIndex).Tag = "CURVE" Then
+
+            'BA-1927: Added ToString to compare value of Tag property in Graph column, but checking previously that it is not Nothing
+            If (myGridSampleClass = "CALIB") AndAlso (e.ColumnIndex = dgv.Columns("Graph").Index) AndAlso (Not dgv("Graph", e.RowIndex).Tag Is Nothing) AndAlso (dgv("Graph", e.RowIndex).Tag.ToString = "CURVE") Then
                 If IsSubHeader(dgv, e.RowIndex) Then '(1)
                     resultRow = CType(dgv.Rows(e.RowIndex).Tag, ResultsDS.vwksResultsRow)
                     LotListViewText = resultRow.CalibratorLotNumber
@@ -1011,7 +850,7 @@ Public Class IResults
             'AG 09/11/2010
             Dim recoverExperimentalFactor As Boolean = False
             'AG 22/06/2012 - TO CONFIRM
-            'If Not changeInUseValue AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'AG 22/06/2012 - recover experimental factor allowed only out of Running
+            'If Not changeInUseValue AndAlso mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'AG 22/06/2012 - recover experimental factor allowed only out of Running
             If Not changeInUseValue Then
                 If dgv.Name = bsCalibratorsDataGridView.Name AndAlso IsSubHeader(dgv, e.RowIndex) AndAlso e.ColumnIndex <> dgv.Columns("Ok").Index Then
                     resultRow = CType(dgv.Rows(e.RowIndex).Tag, ResultsDS.vwksResultsRow)
@@ -1034,7 +873,7 @@ Public Class IResults
             'END AG 08/08/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GenericDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GenericDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -1055,7 +894,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalibratorsDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalibratorsDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1066,12 +905,17 @@ Public Class IResults
             If Not ValidateSpecialCharacters(e.KeyChar, "[\d\" & SystemInfoManager.OSDecimalSeparator & "\]") Then e.Handled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".dgvTextBox_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".dgvTextBox_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Fixed errors raised when Option Strict On for the screen was activated (Graph column)
+    ''' </remarks>
     Private Sub bsCalibratorsDataGridView_CellValidating(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellValidatingEventArgs) Handles bsCalibratorsDataGridView.CellValidating
         Try
             If sender Is Nothing Then Return
@@ -1079,10 +923,10 @@ Public Class IResults
             Dim dgv As BSDataGridView = CType(sender, BSDataGridView)
             If dgv.EditingControl Is Nothing Then Return
 
-            If e.ColumnIndex = dgv.Columns("Factor").Index AndAlso IsSubHeader(dgv, e.RowIndex) AndAlso String.Compare(dgv("Graph", e.RowIndex).Tag, "CURVE", False) <> 0 Then ' bsCurveButton.Visible Then
+            'BA-1927: Added ToString to compare value of Tag property in Graph column, but checking previously that it is not Nothing
+            If (e.ColumnIndex = dgv.Columns("Factor").Index) AndAlso (IsSubHeader(dgv, e.RowIndex)) AndAlso (dgv("Graph", e.RowIndex).Tag Is Nothing OrElse dgv("Graph", e.RowIndex).Tag.ToString <> "CURVE") Then ' bsCurveButton.Visible Then
                 Try
                     Dim FormattedValue As String = e.FormattedValue.ToString()
-
                     Dim SingleValue As Single = Single.Parse(FormattedValue)
 
                     'AG 09/11/2010 - If wrong value cancel cell edition
@@ -1101,14 +945,12 @@ Public Class IResults
                     'ShowMessage("Error", "WRONG_DATATYPE", ex.Message + " ((" + ex.HResult.ToString + "))")
                     NewFactorValue = OldFactorValue
                     dgv.CancelEdit()
-
                 End Try
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalibratorsDataGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalibratorsDataGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
         End Try
     End Sub
 
@@ -1143,52 +985,39 @@ Public Class IResults
             bsTestDetailsTabControl.Focus()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCalibratorsDataGridView_CellEndEdit ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCalibratorsDataGridView_CellEndEdit ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>Created by SG 30/08/2010</remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: SG 30/08/2010
+    ''' </remarks>
     Private Sub ResultsChart_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ResultsChart.Validated
         Try
             RemoveResultsChart()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ResultsChart_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ResultsChart_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks>Created by SG 30/08/2010</remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: SG 30/08/2010
+    ''' </remarks>
     Private Sub ResultsChart_Exit() Handles ResultsChart.ExitRequest
         Try
             RemoveResultsChart()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ResultsChart_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ResultsChart_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
-
-    'Private Sub bsPrintTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintTestButton.Click
-    '   Try
-    'MessageBox.Show(String.Format("Print Test '{0}' results...", TestsListViewText))
-
-    '  Catch ex As Exception
-    '     CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-    'End Try
-    'End Sub
 
     ''' <summary>
     ''' Prints the Patients Final Report
@@ -1200,19 +1029,19 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowPatientsFinalReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintReportButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintReportButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1220,25 +1049,25 @@ Public Class IResults
     ''' <summary>
     ''' Prints the compact version of the patient results report. 
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>Created by CF 26/09/2013</remarks>
+    ''' <remarks>
+    ''' Created by: CF 26/09/2013
+    ''' </remarks>
     Private Sub PrintCompactReportButton_Click(sender As Object, e As EventArgs) Handles PrintCompactReportButton.Click
         Try
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Stub
             XRManager.PrintCompactPatientsReport(ActiveAnalyzer, ActiveWorkSession, Nothing, False)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintCompactReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintCompactReportButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintCompactReportButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1253,75 +1082,70 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowResultsByTestReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' CREATED BY:    JV #1502 21/02/2014
-    ''' <remarks></remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by:  JV 21/02/2014 - BT #1502
+    ''' </remarks>
     Private Sub PrintTestBlankButton_Click(sender As Object, e As EventArgs) Handles PrintTestBlankButton.Click
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
+            'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestBlankButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestBlankButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestBlankButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' CREATED BY:    JV #1502 21/02/2014
-    ''' <remarks></remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by:  JV 21/02/2014 - BT #1502
+    ''' Modified by: IT 01/10/2014 - #BA-1864
+    ''' </remarks>
     Private Sub PrintTestCtrlButton_Click(sender As Object, e As EventArgs) Handles PrintTestCtrlButton.Click
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "CTRL")
+            XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False) 'IT 01/10/2014 - #BA-1864
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Ctrl Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestCtrlButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestCtrlButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintTestCtrlButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1337,7 +1161,7 @@ Public Class IResults
             XRManager.ShowResultsByPatientSampleReport(ActiveAnalyzer, ActiveWorkSession)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintSampleButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintSampleButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1346,7 +1170,7 @@ Public Class IResults
     Private Sub ExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitButton.Click
         Try
             'AG 28/05/2014 - New trace
-            CreateLogActivity("Start Closing IResults", "IResults.bsExitButton_Click", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Start Closing IResults", "IResults.bsExitButton_Click", EventLogEntryType.Information, False)
 
             'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not show message here!!!) ' XB 18/02/2014 BT #1499
             Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
@@ -1356,12 +1180,12 @@ Public Class IResults
 
             ' XB 26/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
             ExitingScreen()
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
             Application.DoEvents()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'SGM 17/04/2013
@@ -1395,21 +1219,21 @@ Public Class IResults
                 Close()
             Else
                 'TR 18/05/2012 - indicate to monitor form there was a change on the worsession.
-                IMonitor.WorkSessionChange = ChangeWS
+                UiMonitor.WorkSessionChange = ChangeWS
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1419,12 +1243,12 @@ Public Class IResults
     ''' Shows the summary table
     ''' </summary>
     ''' <remarks>
-    ''' Created by: RH - 21/09/2010
+    ''' Created by:  RH 21/09/2010
     ''' </remarks>
     Private Sub SummaryButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SummaryButton.Click
         Try
             'RH 19/10/2010 Introduce the Using statement
-            Using SummaryResult As New IResultsSummaryTable
+            Using SummaryResult As New UiResultsSummaryTable
                 SummaryResult.AverageResultsDS = AverageResultsDS
                 SummaryResult.ExecutionsResultsDS = ExecutionsResultsDS
                 SummaryResult.ActiveAnalyzer = ActiveAnalyzer
@@ -1433,41 +1257,31 @@ Public Class IResults
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSumaryButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSumaryButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>AG 11/05/2011
-    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by:  AG 11/05/2011
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Call new function ActivateDeactivateAllButtons to deactivate/activate buttons when the 
+    '''                                          process starts/finishes 
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub bsXlsresults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsXlsresults.Click
-
         Try
-            'TR 04/08/2011 -Enable menu bar.
-            IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = False
-            ExportButton.Enabled = False
-            OffSystemResultsButton.Enabled = False
-            SendManRepButton.Enabled = False
-            PrintTestButton.Enabled = False
-            PrintSampleButton.Enabled = False
-            SummaryButton.Enabled = False
-            PrintReportButton.Enabled = False
-            'TR 04/08/2011 -END.
+            'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
+            ActivateDeactivateAllButtons(False)
 
             Cursor = Cursors.WaitCursor
+
             'Get the analyzer status due this method is only allowed in StandBy or Sleep
 
             If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY OrElse AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 bsXlsresults.Enabled = False
-                IAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
+                UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
 
                 Dim workingThread As New Threading.Thread(AddressOf ExportResults)
                 CreatingXlsResults = True
@@ -1475,196 +1289,215 @@ Public Class IResults
                 workingThread.Start()
 
                 While CreatingXlsResults
-                    IAx00MainMDI.InitializeMarqueeProgreesBar()
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
                     Cursor = Cursors.WaitCursor
                     Application.DoEvents()
                 End While
 
                 workingThread = Nothing
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsXlsresults_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsXlsresults_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
             CreatingXlsResults = False
             ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
             bsXlsresults.Enabled = True
-            IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
             Cursor = Cursors.Default
 
-            'TR 04/08/2011 -Enable menu bar.
-            'IAx00MainMDI.EnableMenusBar(True)
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = True
-            ExportButton.Enabled = True
-            OffSystemResultsButton.Enabled = True
-
-            'AG 19/03/2012
-            'SendManRepButton.Enabled = True
-            SendManRepButton.Enabled = IIf(String.Compare(WSStatusField, "ABORTED", False) = 0, False, True)
-
-            PrintTestButton.Enabled = True
-            PrintSampleButton.Enabled = True
-            SummaryButton.Enabled = True
-            PrintReportButton.Enabled = True
-            'TR 04/08/2011 -END.
-
+            'Enable all screen buttons, and enable also all buttons and menus in the MainMDI
+            ActivateDeactivateAllButtons(True)
         End Try
-
     End Sub
-
-
-
 
     ''' <summary>
     ''' Manually LIS export
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
-    ''' Created by DL 22/03/2011
-    ''' Modified by SG 10/04/2013 - Call method ExportToLISManualNEW with parameters pIncludeSent = TRUE
-    ''' AG 13/02/2014 - #1505 (results screen export only the still not sent results)
-    ''' AG 17/02/2014 - #1505 use merge instead of loops
+    ''' Created by:  DL 22/03/2011
+    ''' Modified by: SG 10/04/2013 - Call method ExportToLISManualNEW with parameters pIncludeSent = TRUE
+    '''              AG 13/02/2014 - BT #1505 ==> Results screen export only the still not sent results
+    '''              AG 17/02/2014 - BT #1505 ==> Use merge instead of loops
+    '''              SA 19/08/2014 - BA-1927  ==> Code moved to new function ExportResultsToLIS
     ''' </remarks>
     Private Sub ExportButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExportButton.Click
-
-        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
-        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
-
-            'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here!!!) ' XB 18/02/2014 BT #1499
-            Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
-            PCounters.GetAllCounters()
-            PCounters = Nothing
-            ' XB 18/02/2014 BT #1499
-
-            Dim resultData As New GlobalDataTO
-
-            'TR 04/08/2011 -Enable menu bar.
-            'IAx00MainMDI.EnableMenusBar(False)
-            IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = False
-            bsXlsresults.Enabled = False
-            OffSystemResultsButton.Enabled = False
-            SendManRepButton.Enabled = False
-            PrintTestButton.Enabled = False
-            PrintSampleButton.Enabled = False
-            SummaryButton.Enabled = False
-            PrintReportButton.Enabled = False
-            'TR 04/08/2011 -END.
-
-            Dim myExport As New ExportDelegate
-            'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
-
-            'TR 12/07/2012 -NEW IMPLEMENTATION TO EXPORT MANUAL. 
-            'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'SG 10/04/2013 - pIncludeSent = TRUE
-            resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
-
-            'AG 18/03/2013 - upload results to LIS
-            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                Dim exportResults As New ExecutionsDS
-                exportResults = CType(resultData.SetDatos, ExecutionsDS)
-                If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
-                    'Inform the new results to be updated into MDI property
-                    IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
-
-                    'Call assynchronously to a synchronous process using another thread but not wait
-                    'AG + SG 05/04/2013
-                    'Do not use the same AverageResultsDS as 2 different parameters because the Dataset always are treated as ByRef
-                    'and the system loss information
-                    'Solution: create a new variable only with alarms information
-
-                    'IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, AverageResultsDS, Nothing)
-                    Dim myResultsAlarmsDS As New ResultsDS
-
-                    'AG 17/02/2017 - #1505 improvement, copy DS using Merge instead of loops
-                    'For Each row As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms
-                    '    myResultsAlarmsDS.vwksResultsAlarms.ImportRow(row)
-                    'Next
-                    'myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
-
-                    myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
-                    myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
-                    'AG 17/02/2014 - #1505
-
-                    CreateLogActivity("Current Results manual upload", Me.Name & ".ExportButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                    IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
-                    'AG + SG 05/04/2013
-                End If 'AG 17/02/2014 - #1505
-            End If
-            'AG 18/03/2013
-
+            ExportResultsToLIS()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExportButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        Finally
-
-
-
-            'DL 30/09/2011. Improvement + BUGS. ID: 162
-            UpdateScreenGlobalDSWithAffectedResults()
-
-            If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                UpdateSamplesListDataGrid()
-            Else
-                Select Case bsResultsTabControl.SelectedTab.Name
-                    Case bsBlanksTabPage.Name
-                        'UpdateBlanksDataGrid()
-                    Case bsCalibratorsTabPage.Name
-                        'UpdateCalibratorsDataGrid()
-                    Case bsControlsTabPage.Name
-                        UpdateControlsDataGrid()
-                    Case XtraSamplesTabPage.Name
-                        UpdateSamplesXtraGrid()
-                End Select
-                Application.DoEvents()
-            End If
-            'END DL 24/09/2011
-
-            'TR 04/08/2011 -Enable menu bar.
-            'IAx00MainMDI.EnableMenusBar(True)
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = True
-            bsXlsresults.Enabled = True
-            'OffSystemResultsButton.Enabled = True
-            'TR 11/07/2012 -Use function that activate offSystems results button.
-            OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
-
-            'AG 19/03/2012
-            'SendManRepButton.Enabled = True
-            SendManRepButton.Enabled = IIf(WSStatusField = "ABORTED", False, True)
-
-            PrintTestButton.Enabled = True
-            PrintSampleButton.Enabled = True
-            SummaryButton.Enabled = True
-            PrintReportButton.Enabled = True
-            'TR 04/08/2011 -END.
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IResults.ExportButton_Click", EventLogEntryType.Information, False)
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            'for refreshing data when ack from lis
-            ExperimentalSampleIndex = -1 'SGM 16/03/2013
-
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ExportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+
+        ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        'Dim StartTime As DateTime = Now
+        ''Dim myLogAcciones As New ApplicationLogManager()
+        ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        'Try
+
+        '    'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here!!!) ' XB 18/02/2014 BT #1499
+        '    Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
+        '    PCounters.GetAllCounters()
+        '    PCounters = Nothing
+        '    ' XB 18/02/2014 BT #1499
+
+        '    Dim resultData As New GlobalDataTO
+
+        '    'TR 04/08/2011 -Enable menu bar.
+        '    'IAx00MainMDI.EnableMenusBar(False)
+        '    IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+        '    ExitButton.Enabled = False
+        '    bsXlsresults.Enabled = False
+        '    OffSystemResultsButton.Enabled = False
+        '    SendManRepButton.Enabled = False
+        '    PrintTestButton.Enabled = False
+        '    PrintSampleButton.Enabled = False
+        '    SummaryButton.Enabled = False
+        '    PrintReportButton.Enabled = False
+        '    'TR 04/08/2011 -END.
+
+        '    Dim myExport As New ExportDelegate
+        '    'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
+
+        '    'AG 29/07/2014 - #1887 - Re-send results
+        '    'Export by Patient view uses the OrderToExport field
+        '    'Export by Test view uses ??? - PENDING CONFIRM
+        '    'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+        '    If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
+        '        'PATIENTs view re-send process
+        '        resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
+        '    Else
+        '        'TESTs view re-send process
+        '        resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'From test view user export only the still not sent results!!! (SPECIFICATION: NO changes in export from tests view)
+        '    End If
+        '    'AG 29/07/2014
+
+        '    'AG 18/03/2013 - upload results to LIS
+        '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '        Dim exportResults As New ExecutionsDS
+        '        exportResults = CType(resultData.SetDatos, ExecutionsDS)
+
+        '        'AG 29/07/2014 #1887 Max number of results to export each time 100
+        '        Dim maxResultsToExport As Integer = 100 'Default value
+        '        Dim swParamDlg As New SwParametersDelegate
+        '        resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+        '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '            Dim myDS As New ParametersDS
+        '            myDS = DirectCast(resultData.SetDatos, ParametersDS)
+        '            If myDS.tfmwSwParameters.Rows.Count > 0 Then
+        '                If Not myDS.tfmwSwParameters(0).IsValueNumericNull Then
+        '                    maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+        '                End If
+        '            End If
+        '        End If
+
+        '        If exportResults.twksWSExecutions.Rows.Count > maxResultsToExport Then
+        '            'Show message and leave method - MESSAGE NOT IN DATABASE (same as in historical results!!!)
+        '            MessageBox.Show(Me, "Please, export to LIS in groups of " & maxResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+        '            Return
+        '        End If
+        '        'AG 29/07/2014
+
+        '        If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
+        '            'Inform the new results to be updated into MDI property
+        '            IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+
+        '            'Call assynchronously to a synchronous process using another thread but not wait
+        '            'AG + SG 05/04/2013
+        '            'Do not use the same AverageResultsDS as 2 different parameters because the Dataset always are treated as ByRef
+        '            'and the system loss information
+        '            'Solution: create a new variable only with alarms information
+
+        '            'IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, AverageResultsDS, Nothing)
+        '            Dim myResultsAlarmsDS As New ResultsDS
+
+        '            'AG 17/02/2017 - #1505 improvement, copy DS using Merge instead of loops
+        '            'For Each row As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms
+        '            '    myResultsAlarmsDS.vwksResultsAlarms.ImportRow(row)
+        '            'Next
+        '            'myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+
+        '            myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
+        '            myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+        '            'AG 17/02/2014 - #1505
+
+        '            GlobalBase.CreateLogActivity("Current Results manual upload", Me.Name & ".ExportButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+        '            IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
+        '            'AG + SG 05/04/2013
+        '        End If 'AG 17/02/2014 - #1505
+        '    End If
+        '    'AG 18/03/2013
+
+        'Catch ex As Exception
+        '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExportButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+
+        'Finally
+
+
+
+        '    'DL 30/09/2011. Improvement + BUGS. ID: 162
+        '    UpdateScreenGlobalDSWithAffectedResults()
+
+        '    UpdateSamplesListDataGrid()
+        '    If (bsTestDetailsTabControl.SelectedTab.Name = bsTestsTabTage.Name) Then
+
+        '        'If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
+        '        '    UpdateSamplesListDataGrid()
+        '        'Else
+        '        Select Case bsResultsTabControl.SelectedTab.Name
+        '            Case bsBlanksTabPage.Name
+        '                'UpdateBlanksDataGrid()
+        '            Case bsCalibratorsTabPage.Name
+        '                'UpdateCalibratorsDataGrid()
+        '            Case bsControlsTabPage.Name
+        '                UpdateControlsDataGrid()
+        '            Case XtraSamplesTabPage.Name
+        '                UpdateSamplesXtraGrid()
+        '        End Select
+        '        Application.DoEvents()
+        '    End If
+        '    'END DL 24/09/2011
+
+        '    'TR 04/08/2011 -Enable menu bar.
+        '    'IAx00MainMDI.EnableMenusBar(True)
+        '    IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
+        '    ExitButton.Enabled = True
+        '    bsXlsresults.Enabled = True
+        '    'OffSystemResultsButton.Enabled = True
+        '    'TR 11/07/2012 -Use function that activate offSystems results button.
+        '    OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
+
+        '    'AG 19/03/2012
+        '    'SendManRepButton.Enabled = True
+        '    SendManRepButton.Enabled = IIf(WSStatusField = "ABORTED", False, True)
+
+        '    PrintTestButton.Enabled = True
+        '    PrintSampleButton.Enabled = True
+        '    SummaryButton.Enabled = True
+        '    PrintReportButton.Enabled = True
+        '    'TR 04/08/2011 -END.
+
+        '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        '    GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        '                                    "IResults.ExportButton_Click", EventLogEntryType.Information, False)
+        '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+        '    'for refreshing data when ack from lis
+        '    ExperimentalSampleIndex = -1 'SGM 16/03/2013
+
+        'End Try
 
     End Sub
 
     Private Sub OffSystemResultsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OffSystemResultsButton.Click
         Try
             OpenOffSystemResultsScreen()
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemResultsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1685,7 +1518,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim mySendManRepButton As BSButton = TryCast(sender, BSButton)
@@ -1742,7 +1575,7 @@ Public Class IResults
                     ''AG 19/01/2012
 
                     'SGM 17/04/2013 - not to refresh grids when screen closing
-                    If mySendManRepButton.Tag = Nothing Then
+                    If (mySendManRepButton.Tag Is Nothing) Then
                         UpdateScreenGlobalDSWithAffectedResults()
 
 
@@ -1761,18 +1594,18 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.SendmanRepButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendManRepButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendManRepButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SendManRepButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
             'SGM 17/04/2013
-            If SendManRepButton.Tag = Nothing Then
-                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
+            If (SendManRepButton.Tag Is Nothing) Then
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
                 SendManRepButton.Enabled = True 'RH 17/05/2012
                 Cursor = Cursors.Default 'RH 17/05/2012
             End If
@@ -1784,20 +1617,19 @@ Public Class IResults
     ''' <summary>
     ''' Draws the icon header for column LISExperimental in bsExperimentalsDataGridView
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>Created by RH 19/10/2011</remarks>
     Private Sub bsExperimentalsDataGridView_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles bsExperimentalsDataGridView.CellPainting
         Exit Sub 'Not to draw the header icon - SGM 16/04/2013
-        If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
-            HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                     e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
-                                     HeadImageSide, HeadImageSide)
 
-            e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
-            e.Graphics.DrawImage(LISExperimentalHeadImage, HeadRect)
-            e.Handled = True
-        End If
+        'If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
+        '    HeadRect = New Rectangle(Convert.ToInt32(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+        '                             Convert.ToInt32(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
+        '                             HeadImageSide, HeadImageSide)
+
+        '    e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
+        '    e.Graphics.DrawImage(LISExperimentalHeadImage, HeadRect)
+        '    e.Handled = True
+        'End If
     End Sub
 
     ''' <summary>
@@ -1808,15 +1640,16 @@ Public Class IResults
     ''' <remarks>Created by RH 19/10/2011</remarks>
     Private Sub bsControlsDataGridView_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles bsControlsDataGridView.CellPainting
         Exit Sub 'Not to draw the header icon - SGM 16/04/2013
-        If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
-            HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                     e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
-                                     HeadImageSide, HeadImageSide)
 
-            e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
-            e.Graphics.DrawImage(LISControlHeadImage, HeadRect)
-            e.Handled = True
-        End If
+        'If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
+        '    HeadRect = New Rectangle(Convert.ToInt32(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+        '                             Convert.ToInt32(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
+        '                             HeadImageSide, HeadImageSide)
+
+        '    e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
+        '    e.Graphics.DrawImage(LISControlHeadImage, HeadRect)
+        '    e.Handled = True
+        'End If
     End Sub
 
     ''' <summary>
@@ -1827,55 +1660,59 @@ Public Class IResults
     ''' <remarks>Created by RH 19/10/2011</remarks>
     Private Sub bsSamplesDataGridView_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs)
         Exit Sub 'Not to draw the header icon - SGM 16/04/2013
-        If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
-            HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                     e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
-                                     HeadImageSide, HeadImageSide)
 
-            e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
-            e.Graphics.DrawImage(LISSamplesHeadImage, HeadRect)
-            e.Handled = True
-        End If
+        'If e.RowIndex = -1 AndAlso e.ColumnIndex = 2 Then
+        '    HeadRect = New Rectangle(Convert.ToInt32(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+        '                             Convert.ToInt32(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
+        '                             HeadImageSide, HeadImageSide)
+
+        '    e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
+        '    e.Graphics.DrawImage(LISSamplesHeadImage, HeadRect)
+        '    e.Handled = True
+        'End If
     End Sub
 
     ''' <summary>
     ''' Draws the icon header for column LISExperimental in bsExperimentalsDataGridView
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>Created by RH 04/06/2012</remarks>
+    ''' <remarks>
+    ''' Created by:  RH 04/06/2012
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Fixed errors raised when Option Strict On for the screen was activated (values have to be converted to Integer)
+    '''                                          Added Try/Catch block
+    ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles bsSamplesListDataGridView.CellPainting
+        Try
+            If (e.RowIndex = -1) Then
+                Dim OrderToPrintIndex As Integer = bsSamplesListDataGridView.Columns("OrderToPrint").Index
+                Dim OrderToExportIndex As Integer = bsSamplesListDataGridView.Columns("OrderToExport").Index
 
-        If e.RowIndex = -1 Then
-            Dim OrderToPrintIndex As Integer = bsSamplesListDataGridView.Columns("OrderToPrint").Index
-            Dim OrderToExportIndex As Integer = bsSamplesListDataGridView.Columns("OrderToExport").Index
+                If (e.ColumnIndex = OrderToExportIndex OrElse e.ColumnIndex = OrderToPrintIndex) Then
+                    'BA-1927 ==> Convert values to Integer
+                    HeadRect = New Rectangle(Convert.ToInt32(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+                                             Convert.ToInt32(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
+                                             HeadImageSide, HeadImageSide)
 
-            If e.ColumnIndex = OrderToExportIndex OrElse e.ColumnIndex = OrderToPrintIndex Then
-                HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                         e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
-                                         HeadImageSide, HeadImageSide)
+                    e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
 
-                e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
-
-                If e.ColumnIndex = OrderToPrintIndex Then
-                    e.Graphics.DrawImage(PrintHeadImage, HeadRect)
-                    e.Handled = True
-                Else
-                    'Not to draw the header icon - SGM 16/04/2013
-                    'e.Graphics.DrawImage(LISHeadImage, HeadRect)
+                    If (e.ColumnIndex = OrderToPrintIndex) Then
+                        e.Graphics.DrawImage(PrintHeadImage, HeadRect)
+                        e.Handled = True
+                    Else
+                        'Not to draw the header icon - SGM 16/04/2013
+                        e.Graphics.DrawImage(LISHeadCheckImage, HeadRect) 'IT 21/10/2014: BA-2036
+                        e.Handled = True 'IT 21/10/2014: BA-2036
+                    End If
+                    'e.Handled = True SGM 16/04/2013
                 End If
-
-                'e.Handled = True SGM 16/04/2013
             End If
-        End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSamplesListDataGridView_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
-
 #End Region
 
-#Region "Private Methods"
-
 #Region "General Private Methods"
-
     ''' <summary>
     ''' Gets the list of Order Tests Results from the Executions
     ''' </summary>
@@ -1891,86 +1728,79 @@ Public Class IResults
     '''                              and not in slices
     '''              AG 25/06/2012 - Improve speed. Do not AverageResultsDS.vwksResults.Clear and then call results order by order test and import
     '''                              Open directly the contents of the new view vwksCompleteAvgResults
+    '''              SA 22/09/2014 - BA-1927 ==>
     ''' </remarks>
     Private Sub LoadExecutionsResults()
         Dim StartTime As DateTime = Now 'AG 21/06/2012 - time estimation
+
         Try
             Dim resultData As GlobalDataTO
             Dim myExecutionDelegate As New ExecutionsDelegate
 
             resultData = myExecutionDelegate.GetWSExecutionsResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                ExecutionsResultsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-            If (Not resultData.HasError) Then
-                ExecutionsResultsDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                'AverageResultsDS.vwksResults.Clear() 'AG 25/06/2012 - Do not clear average results. Else all current grid information is lost!!!
-
-                AverageResultsDS.vwksResultsAlarms.Clear()    'AG 28/07/2010 - Clear average alarms
-                ExecutionsResultsDS.vwksWSExecutionsAlarms.Clear() 'AG 28/07/2010 - Clear executions alarms
-                IsOrderPrinted.Clear() 'RH 06/10/2010 Very important!
-
-                Dim myResultsDelegate As New ResultsDelegate
-
+                'Clear Average and Execution Alarms
+                AverageResultsDS.vwksResultsAlarms.Clear()
+                ExecutionsResultsDS.vwksWSExecutionsAlarms.Clear()
 
                 'Get all results for current Analyzer & WorkSession
+                Dim myResultsDelegate As New ResultsDelegate
                 resultData = myResultsDelegate.GetCompleteResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-                If (Not resultData.HasError) Then
-                    AverageResultsDS = CType(resultData.SetDatos, ResultsDS)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
                 Else
                     ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
                 End If
-                'AG 25/06/2012
 
                 'Read Reference Range Limits
-                Dim MinimunValue As Nullable(Of Single) = Nothing
-                Dim MaximunValue As Nullable(Of Single) = Nothing
+                Dim minimunValue As Nullable(Of Single) = Nothing
+                Dim maximunValue As Nullable(Of Single) = Nothing
 
-                'TR 06/06/2012 -Variable to set the Panic Values.
-                Dim PanicMinimunValue As Nullable(Of Single) = Nothing
-                Dim PanicMaximunValue As Nullable(Of Single) = Nothing
+                Dim panicMinimunValue As Nullable(Of Single) = Nothing
+                Dim panicMaximunValue As Nullable(Of Single) = Nothing
 
-                'TR 11/07/2012 -Declare Outside the for
                 Dim mySampleType As String = String.Empty
-                Dim myOrderTestsDelegate As New OrderTestsDelegate
                 Dim myTestRefRangesDS As TestRefRangesDS
+                Dim myOrderTestsDelegate As New OrderTestsDelegate
 
                 For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
                     If (Not resultRow.IsActiveRangeTypeNull) Then
-                        If resultRow.TestID = 1000 Then
-                            Console.Write("stop")
-                        End If
+                        If (resultRow.TestID = 1000) Then Console.Write("stop")
 
                         mySampleType = String.Empty
                         If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
 
                         'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
-                        'Dim myOrderTestsDelegate As New OrderTestsDelegate
                         resultData = myOrderTestsDelegate.GetReferenceRangeInterval(Nothing, resultRow.OrderTestID, resultRow.TestType, _
                                                                                     resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
+
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            'Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
                             myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
                             If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
-                                MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
-                                'TR -06/06/2012 -Validate if the panic limits are not null.
-                                If Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineLowerLimitNull AndAlso _
-                                      Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineUpperLimitNull Then
-                                    PanicMinimunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineLowerLimit
-                                    PanicMaximunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineUpperLimit
+                                minimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
+                                maximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
+
+                                'Validate if Panic Limits are not NULL 
+                                If (Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineLowerLimitNull) AndAlso _
+                                   (Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineUpperLimitNull) Then
+                                    panicMinimunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineLowerLimit
+                                    panicMaximunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineUpperLimit
                                 End If
                             End If
                         End If
 
-                        If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
-                            If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
-                                resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                        If (minimunValue.HasValue AndAlso maximunValue.HasValue) Then
+                            If (minimunValue <> -1 AndAlso maximunValue <> -1) Then
+                                resultRow.NormalLowerLimit = minimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                                resultRow.NormalUpperLimit = maximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
                             End If
-                            'TR 06/06/2012 -Set the panic values 
-                            If (PanicMinimunValue <> -1 AndAlso PanicMaximunValue <> -1) Then
-                                resultRow.PanicLowerLimit = PanicMinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.PanicUpperLimit = PanicMaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+
+                            If (panicMinimunValue <> -1 AndAlso panicMaximunValue <> -1) Then
+                                resultRow.PanicLowerLimit = panicMinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                                resultRow.PanicUpperLimit = panicMaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
                             End If
                         End If
                     End If
@@ -1978,304 +1808,102 @@ Public Class IResults
 
                 'Get Average Result Alarms
                 resultData = myResultsDelegate.GetResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    'AG 26/02/2014 - #1521 - remove wide loops and use Merge
-                    'For Each resultRow As ResultsDS.vwksResultsAlarmsRow In CType(resultData.SetDatos, ResultsDS).vwksResultsAlarms.Rows
-                    '    AverageResultsDS.vwksResultsAlarms.ImportRow(resultRow)
-                    'Next resultRow
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    'AG 26/02/2014 - BT #1521: Remove loops and use Merge
                     AverageResultsDS.vwksResultsAlarms.Merge(DirectCast(resultData.SetDatos, ResultsDS).vwksResultsAlarms)
                     AverageResultsDS.vwksResultsAlarms.AcceptChanges()
-                    'AG 26/02/2014 - #1521
                 Else
                     ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
                 End If
 
                 'Get Execution Result Alarms
                 resultData = myExecutionDelegate.GetWSExecutionResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    'AG 26/02/2014 - #1521 - remove wide loops and use Merge
-                    'For Each resultRow As ExecutionsDS.vwksWSExecutionsAlarmsRow In CType(resultData.SetDatos, ExecutionsDS).vwksWSExecutionsAlarms.Rows
-                    '    ExecutionsResultsDS.vwksWSExecutionsAlarms.ImportRow(resultRow)
-                    'Next resultRow
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    'AG 26/02/2014 - BT #1521: Remove loops and use Merge
                     ExecutionsResultsDS.vwksWSExecutionsAlarms.Merge(DirectCast(resultData.SetDatos, ExecutionsDS).vwksWSExecutionsAlarms)
                     ExecutionsResultsDS.vwksWSExecutionsAlarms.AcceptChanges()
-                    'AG 26/02/2014 - #1521
                 Else
                     ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
                 End If
 
-                Dim RowIndex As Integer = 0 'RH 10/04/2012
-
-                'TR 06/06/2012 *-Set the panic range limit on alarm if exist.
+                'Set the Panic Limit Alarm if it exists
                 GetPanicRangeValuesExecutions()
                 GetPanicRangeValuesAverage()
-                'TR 06/06/2012 -END.
 
-                'RH 21/09/2010
-                'Fill ExecutionsResultsDS.vwksWSExecutionsResults colums PrintAvailable and HIS_Sent
-
-                'TR 11/07/2012 -Declare Outside the for.
-                Dim PrintedFalse As Integer = 0
-                Dim HISSent As Integer = 0
+                Dim hisSent As Integer = 0
+                Dim rowIndex As Integer = 0
+                Dim printedFalse As Integer = 0
                 Dim relatedResults As Integer = 0
+                Dim lstResultsByOrderID As List(Of ResultsDS.vwksResultsRow)
+
+                IsOrderPrinted.Clear() 'RH 06/10/2010 Very important!
+                IsOrderHISSent.Clear()
 
                 For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-                    If executionRow.SampleClass = "PATIENT" Then
-                        If IsOrderPrinted.ContainsKey(executionRow.OrderID) Then 'Already computed
+                    If (executionRow.SampleClass = "PATIENT") Then
+                        If (IsOrderPrinted.ContainsKey(executionRow.OrderID)) Then 'Already computed
                             executionRow.PrintAvailable = Not IsOrderPrinted(executionRow.OrderID)
                             executionRow.HIS_Sent = IsOrderHISSent(executionRow.OrderID)
                         Else
-                            'Dim PrintedFalse As Integer = 0
-                            'Dim HISSent As Integer = 0
-                            'Dim relatedResults As Integer = 0
-                            PrintedFalse = 0
-                            HISSent = 0
+                            hisSent = 0
+                            printedFalse = 0
                             relatedResults = 0
 
-                            For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
-                                    If Not resultRow.Printed Then PrintedFalse += 1
+                            lstResultsByOrderID = (From a As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults _
+                                                  Where a.OrderID = executionRow.OrderID _
+                                                 Select a).ToList()
 
-                                    'AG 18/11/2010
-                                    'relatedResults += 1
-                                    'If resultRow.ExportStatus = "SENT" Then HISSent += 1
-                                    If resultRow.AcceptedResultFlag = True Then
-                                        relatedResults += 1
-                                        If String.Compare(resultRow.ExportStatus, "SENT", False) = 0 Then HISSent += 1
-                                    End If
-                                    'END AG 18/11/2010
+                            For Each resultRow As ResultsDS.vwksResultsRow In lstResultsByOrderID
+                                If (Not resultRow.Printed) Then printedFalse += 1
 
-                                    'Take advantage of this loop for setting Result Patient Name
-                                    resultRow.PatientName = executionRow.PatientName
-                                    resultRow.PatientID = executionRow.PatientID
+                                If (resultRow.AcceptedResultFlag) Then
+                                    relatedResults += 1
+                                    If (resultRow.ExportStatus = "SENT") Then hisSent += 1
                                 End If
-                            Next resultRow
 
-                            executionRow.PrintAvailable = (PrintedFalse > 0)
-                            executionRow.HIS_Sent = (HISSent = relatedResults)
+                                resultRow.PatientName = executionRow.PatientName
+                                resultRow.PatientID = executionRow.PatientID
+                            Next
+
+                            'For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+                            '    If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
+                            '        If Not resultRow.Printed Then printedFalse += 1
+
+                            '        'AG 18/11/2010
+                            '        'relatedResults += 1
+                            '        'If resultRow.ExportStatus = "SENT" Then HISSent += 1
+                            '        If resultRow.AcceptedResultFlag = True Then
+                            '            relatedResults += 1
+                            '            If String.Compare(resultRow.ExportStatus, "SENT", False) = 0 Then hisSent += 1
+                            '        End If
+                            '        'END AG 18/11/2010
+
+                            '        'Take advantage of this loop for setting Result Patient Name
+                            '        resultRow.PatientName = executionRow.PatientName
+                            '        resultRow.PatientID = executionRow.PatientID
+                            '    End If
+                            'Next resultRow
+
+                            executionRow.PrintAvailable = (printedFalse > 0)
+                            executionRow.HIS_Sent = (hisSent = relatedResults)
 
                             IsOrderPrinted(executionRow.OrderID) = Not executionRow.PrintAvailable
                             IsOrderHISSent(executionRow.OrderID) = executionRow.HIS_Sent
                         End If
                     End If
 
-                    'RH 10/04/2012
-                    executionRow.RowIndex = RowIndex 'IMPORTANT!!! The index starts in zero
-                    RowIndex += 1
-                    'END RH 10/04/2012
-
+                    executionRow.RowIndex = rowIndex 'IMPORTANT!!! The index starts in zero
+                    rowIndex += 1
                 Next executionRow
 
-                'TR 25/09/2013 #memory
                 myTestRefRangesDS = Nothing
-                'TR 25/09/2013 #memory
-
+                lstResultsByOrderID = Nothing
             Else
                 ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-        Debug.Print("IResults.LoadExecutionsResults: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
-    End Sub
-
-
-
-    ''' <summary>
-    ''' Gets the list of Order Tests Results from the Executions
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  RH 15/07/2010
-    ''' Modified by: AG 01/12/2010 - Adapted for ISE and OFF-SYSTEM tests
-    '''              SA 25/01/2011 - Changed the way of getting the Reference Range Intervals, also get all Patients
-    '''                              having only OFF-SYSTEM Order Tests and add them to ExecutionsResultsDS.vwksWSExecutionsResults
-    '''              RH 31/01/2011 - Remove the previous code for getting OffSystem info because does not work properly.
-    '''                              We need executionRow.OrderStatus, which do not exist in ResultsDS.vwksResultsRow.
-    '''                              Also breakes the logic of the method. Now all the executions (STD, ISE and OFFS) come
-    '''                              at the beginning from myExecutionDelegate.GetWSExecutionsResults() as it was planned before,
-    '''                              and not in slices
-    ''' </remarks>
-    Private Sub LoadExecutionsResultsOLD_RH31022011()
-        Dim StartTime As DateTime = Now 'AG 21/06/2012 - time estimation
-        Try
-            Dim resultData As GlobalDataTO
-            Dim myExecutionDelegate As New ExecutionsDelegate
-
-            resultData = myExecutionDelegate.GetWSExecutionsResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-
-            If (Not resultData.HasError) Then
-                ExecutionsResultsDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                AverageResultsDS.vwksResults.Clear()
-                AverageResultsDS.vwksResultsAlarms.Clear()    'AG 28/07/2010 - Clear average alarms
-                ExecutionsResultsDS.vwksWSExecutionsAlarms.Clear() 'AG 28/07/2010 - Clear executions alarms
-                IsOrderPrinted.Clear() 'RH 06/10/2010 Very important!
-
-                Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                         Select row.OrderTestID Distinct).ToList()
-
-                Dim myResultsDelegate As New ResultsDelegate
-                For Each OrderTestID As Integer In OrderTestList
-                    'Get all results for current OrderTestID.
-                    resultData = myResultsDelegate.GetResults(Nothing, OrderTestID)
-                    If (Not resultData.HasError) Then
-                        For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                            AverageResultsDS.vwksResults.ImportRow(resultRow)
-                        Next resultRow
-                    Else
-                        ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                        Exit For
-                    End If
-                Next OrderTestID
-
-                'Get Calculated Results
-                resultData = myResultsDelegate.GetCalculatedTestResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                    Next
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                'AG 01/12/2010 - Get ISE & OffSystem tests Results
-                resultData = myResultsDelegate.GetISEOFFSTestResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-                'END AG 01/12/2010
-
-                'Read Reference Range Limits
-                Dim MinimunValue As Nullable(Of Single) = Nothing
-                Dim MaximunValue As Nullable(Of Single) = Nothing
-
-                'TR 06/06/2012 -Variable to set the Panic Values.
-                Dim PanicMinimunValue As Nullable(Of Single) = Nothing
-                Dim PanicMaximunValue As Nullable(Of Single) = Nothing
-
-
-                For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                    If (Not resultRow.IsActiveRangeTypeNull) Then
-                        Dim mySampleType As String = String.Empty
-                        If (String.Compare(resultRow.TestType, "CALC", False) <> 0) Then mySampleType = resultRow.SampleType
-
-                        'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
-                        Dim myOrderTestsDelegate As New OrderTestsDelegate
-                        resultData = myOrderTestsDelegate.GetReferenceRangeInterval(Nothing, resultRow.OrderTestID, resultRow.TestType, _
-                                                                                    resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                            If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
-                                MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
-                                'TR -06/06/2012 -Validate if the panic limits are not null.
-                                If Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineLowerLimitNull AndAlso _
-                                      Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineUpperLimitNull Then
-                                    PanicMinimunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineLowerLimit
-                                    PanicMaximunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineUpperLimit
-                                End If
-                            End If
-                        End If
-
-                        If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
-                            If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
-                                resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                            End If
-                            'TR 06/06/2012 -Set the panic values 
-                            If (PanicMinimunValue <> -1 AndAlso PanicMaximunValue <> -1) Then
-                                resultRow.PanicLowerLimit = PanicMinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.PanicUpperLimit = PanicMaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                            End If
-                        End If
-                    End If
-                Next resultRow
-
-                'Get Average Result Alarms
-                resultData = myResultsDelegate.GetResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsAlarmsRow In CType(resultData.SetDatos, ResultsDS).vwksResultsAlarms.Rows
-                        AverageResultsDS.vwksResultsAlarms.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                'Get Execution Result Alarms
-                resultData = myExecutionDelegate.GetWSExecutionResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ExecutionsDS.vwksWSExecutionsAlarmsRow In CType(resultData.SetDatos, ExecutionsDS).vwksWSExecutionsAlarms.Rows
-                        ExecutionsResultsDS.vwksWSExecutionsAlarms.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                Dim RowIndex As Integer = 0 'RH 10/04/2012
-
-                'TR 06/06/2012 *-Set the panic range limit on alarm if exist.
-                GetPanicRangeValuesExecutions()
-                GetPanicRangeValuesAverage()
-                'TR 06/06/2012 -END.
-
-                'RH 21/09/2010
-                'Fill ExecutionsResultsDS.vwksWSExecutionsResults colums PrintAvailable and HIS_Sent
-                For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-                    If executionRow.SampleClass = "PATIENT" Then
-                        If IsOrderPrinted.ContainsKey(executionRow.OrderID) Then 'Already computed
-                            executionRow.PrintAvailable = Not IsOrderPrinted(executionRow.OrderID)
-                            executionRow.HIS_Sent = IsOrderHISSent(executionRow.OrderID)
-                        Else
-                            Dim PrintedFalse As Integer = 0
-                            Dim HISSent As Integer = 0
-                            Dim relatedResults As Integer = 0
-
-                            For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
-                                    If Not resultRow.Printed Then PrintedFalse += 1
-
-                                    'AG 18/11/2010
-                                    'relatedResults += 1
-                                    'If resultRow.ExportStatus = "SENT" Then HISSent += 1
-                                    If resultRow.AcceptedResultFlag = True Then
-                                        relatedResults += 1
-                                        If resultRow.ExportStatus = "SENT" Then HISSent += 1
-                                    End If
-                                    'END AG 18/11/2010
-
-                                    'Take advantage of this loop for setting Result Patient Name
-                                    resultRow.PatientName = executionRow.PatientName
-                                    resultRow.PatientID = executionRow.PatientID
-                                End If
-                            Next resultRow
-
-                            executionRow.PrintAvailable = (PrintedFalse > 0)
-                            executionRow.HIS_Sent = (HISSent = relatedResults)
-
-                            IsOrderPrinted(executionRow.OrderID) = Not executionRow.PrintAvailable
-                            IsOrderHISSent(executionRow.OrderID) = executionRow.HIS_Sent
-                        End If
-                    End If
-
-                    'RH 10/04/2012
-                    executionRow.RowIndex = RowIndex 'IMPORTANT!!! The index starts in zero
-                    RowIndex += 1
-                    'END RH 10/04/2012
-
-                Next executionRow
-            Else
-                ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Debug.Print("IResults.LoadExecutionsResults: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
@@ -2284,7 +1912,9 @@ Public Class IResults
     ''' <summary>
     ''' For Each Execution validate the alarm ID to add the panic reference values.
     ''' </summary>
-    ''' <remarks>CREATED BY: TR 06/06/2012</remarks>
+    ''' <remarks>
+    ''' Created by: TR 06/06/2012
+    ''' </remarks>
     Private Sub GetPanicRangeValuesExecutions()
         Try
             Dim ExecutionID As Integer = 0
@@ -2329,7 +1959,7 @@ Public Class IResults
             'TR 25/09/2013 #memory
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetPanicRangeValuesExecutions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetPanicRangeValuesExecutions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2337,10 +1967,11 @@ Public Class IResults
     ''' <summary>
     ''' For Each Average validate the alarm ID to add the panic reference values.
     ''' </summary>
-    ''' <remarks>CREATED BY: TR 06/6/2012</remarks>
+    ''' <remarks>
+    ''' Created by: TR 06/6/2012
+    ''' </remarks>
     Private Sub GetPanicRangeValuesAverage()
         Try
-
             For Each resultRow As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms.Rows
                 Select Case resultRow.AlarmID
                     Case "CONC_REMARK9", "CONC_REMARK10"
@@ -2363,7 +1994,7 @@ Public Class IResults
             Next resultRow
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetPanicRangeValuesAverage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetPanicRangeValuesAverage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2376,9 +2007,10 @@ Public Class IResults
     ''' <param name="pRerunNumber">Rerun Number</param>
     ''' <param name="pMultipoinNumber">Multipoint Number</param>
     ''' <returns></returns>
-    ''' <remarks>CREATED BY: TR 07/06/2012</remarks>
-    Private Function GetRangeAlarmsLetter(ByVal pOrderTestID As Integer, _
-                                          ByVal pRerunNumber As Integer, ByVal pMultipoinNumber As Integer) As String
+    ''' <remarks>
+    ''' Created by: TR 07/06/2012
+    ''' </remarks>
+    Private Function GetRangeAlarmsLetter(ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer, ByVal pMultipoinNumber As Integer) As String
         Dim myResult As String = String.Empty
         Try
             'AverageResultsDS.vwksResultsAlarms
@@ -2416,7 +2048,7 @@ Public Class IResults
             myAverageResultList = Nothing
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetRangeAlarmsLetter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetRangeAlarmsLetter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myResult
@@ -2428,11 +2060,12 @@ Public Class IResults
     ''' </summary>
     ''' <param name="pExecutionID"></param>
     ''' <returns></returns>
-    ''' <remarks>CREATED BY: TR 08/06/2012</remarks>
+    ''' <remarks>
+    ''' Created by:  TR 08/06/2012
+    ''' </remarks>
     Private Function GetReplicatesRangeAlarmsLetter(ByVal pExecutionID As Integer) As String
         Dim myResult As String = String.Empty
         Try
-            'AverageResultsDS.vwksResultsAlarms
             Dim myExecutionsAlarmsList As New List(Of ExecutionsDS.vwksWSExecutionsAlarmsRow)
             myExecutionsAlarmsList = (From row In ExecutionsResultsDS.vwksWSExecutionsAlarms _
                              Where row.ExecutionID = pExecutionID _
@@ -2465,61 +2098,56 @@ Public Class IResults
             'TR 02/08/2012 set value to nothin to release memory.
             myExecutionsAlarmsList = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetRangeAlarmsLetter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetRangeAlarmsLetter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myResult
     End Function
 
-
     ''' <summary>
     ''' Initializes all the controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: RH - 12/07/2010
+    ''' Created by:  RH 12/07/2010
     ''' Modified by: PG 14/10/2010 - Get the current language
-    ''' Modified by: RH 18/10/2010 - Remove the currentLanguage local variable/parameter.
-    '''              Initialize the LanguageID new class property.
-    '''              XB 26/02/2014 - Change the way to open the screen using OpenMDIChildForm generic method to avoid OutOfMem errors when back to Monitor - task #1529
+    ''' Modified by: RH 18/10/2010 - Remove the currentLanguage local variable/parameter. Initialize the LanguageID new class property.
+    '''              SG 12/04/2013 - Added code to get value of Software Parameter LIS_NAME
+    '''              SG 17/04/2013 - Added code to get value of User Setting LIS_WORKING_MODE_RERUNS
+    '''              XB 26/02/2014 - BT #1529 ==> Change the way to open the screen using OpenMDIChildForm generic method to avoid OutOfMem errors when back to Monitor
+    '''              SA 19/09/2014 - BA-1927  ==> Removed code to verify if button SendManRepButton has to be enabled or disabled due to that checking is done 
+    '''                                           previously in function PrepareButtons
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
-            Dim myGlobal As New GlobalDataTO
-
             LoadExecutionsResults()
 
             InitializeSamplesListGrid()
             InitializeTestsListGrid()
 
-            InitializeUserSelectionStep1()   ' XB 26/02/2014 - task #1529
+            InitializeUserSelectionStep1()   'XB 26/02/2014 - task #1529
 
             GetScreenLabels()
             PrepareButtons()
 
-            'SGM 12/04/2013 - get LIS name for headers
+            'Get value of Software Parameter LIS Name for headers
+            Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
-            Dim myParametersDS As New ParametersDS
-            myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.LIS_NAME.ToString, Nothing)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
-                If myParametersDS.tfmwSwParameters.Rows.Count > 0 Then
-                    MyClass.LISNameForColumnHeaders = myParametersDS.tfmwSwParameters.Item(0).ValueText
-                End If
-            End If
-            'end SGM 12/04/2013
 
-            'SGM 17/04/2013 - get LIS_WORKING_MODE_RERUNS user setting value
+            myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.LIS_NAME.ToString, Nothing)
+            If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
+                Dim myParametersDS As ParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
+
+                If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then MyClass.LISNameForColumnHeaders = myParametersDS.tfmwSwParameters.Item(0).ValueText
+            End If
+
+            'Get value of User Setting LIS_WORKING_MODE_RERUNS
             Dim myRerunLISMode As String = "LIS"
             Dim myUsersSettingsDelegate As New UserSettingsDelegate
+
             myGlobal = myUsersSettingsDelegate.GetCurrentValueBySettingID(Nothing, GlobalEnumerates.UserSettingsEnum.LIS_WORKING_MODE_RERUNS.ToString)
             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                 MyClass.LISWorkingModeRerunsAttr = TryCast(myGlobal.SetDatos, String)
-                ' JC 14-05-2013   Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" and Sample Class is Patient
-                Me.SendManRepButton.Enabled = Not (MyClass.LISWorkingModeReruns = "LIS" AndAlso _
-                                                        (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name _
-                                                         OrElse bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name))
             End If
-            'end SGM 17/04/2013
 
             'Experimentals Grid
             InitializeExperimentalsGrid()
@@ -2544,12 +2172,11 @@ Public Class IResults
             UpdateTestsListDataGrid()
             UpdateSamplesListDataGrid()
 
-            InitializeUserSelectionStep2()   ' XB 26/02/2014 - task #1529
+            InitializeUserSelectionStep2()   'XB 26/02/2014 - task #1529
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
         End Try
     End Sub
 
@@ -2561,7 +2188,6 @@ Public Class IResults
     ''' </remarks>
     Private Sub InitializeUserSelectionStep1()
         Try
-
             If Not SampleClass Is Nothing Then
                 Select Case SampleClass
                     Case "PATIENT"
@@ -2575,12 +2201,11 @@ Public Class IResults
 
                     Case "CTRL"
                         TestsListViewText = SampleOrTestName
-
                 End Select
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeUserSelectionStep1 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeUserSelectionStep1 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2593,60 +2218,56 @@ Public Class IResults
     ''' </remarks>
     Private Sub InitializeUserSelectionStep2()
         Try
-
-            If Not SampleClass Is Nothing Then
+            If (Not SampleClass Is Nothing) Then
                 Select Case SampleClass
                     Case "PATIENT"
                         bsTestDetailsTabControl.SelectedTab = bsSamplesTab
 
-                        ExportButton.Visible = True
                         bsSamplesResultsTabControl.Visible = True
                         bsSamplesPanel.Visible = True
+                        ExportButton.Visible = True
 
                         bsTestPanel.Visible = False
                         bsResultsTabControl.Visible = False
 
                     Case "BLANK"
                         bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
-                        bsResultsTabControl.SelectedTab = bsBlanksTabPage
 
+                        bsTestPanel.Visible = True
+                        bsResultsTabControl.Visible = True
+                        bsResultsTabControl.SelectedTab = bsBlanksTabPage
                         ExportButton.Visible = False
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
-
-                        bsTestPanel.Visible = True
-                        bsResultsTabControl.Visible = True
 
                     Case "CALIB"
                         bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
-                        bsResultsTabControl.SelectedTab = bsCalibratorsTabPage
 
+                        bsTestPanel.Visible = True
+                        bsResultsTabControl.Visible = True
+                        bsResultsTabControl.SelectedTab = bsCalibratorsTabPage
                         ExportButton.Visible = False
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
 
+                    Case "CTRL"
+                        bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
+
                         bsTestPanel.Visible = True
                         bsResultsTabControl.Visible = True
 
-                    Case "CTRL"
-                        bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
                         bsResultsTabControl.SelectedTab = bsControlsTabPage
-
                         ExportButton.Visible = True
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
-
-                        bsTestPanel.Visible = True
-                        bsResultsTabControl.Visible = True
-
                 End Select
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeUserSelectionStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeUserSelectionStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2695,7 +2316,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetResultAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetResultAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
 
@@ -2747,7 +2368,7 @@ Public Class IResults
             Descriptions = Nothing
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetExecutionAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
 
@@ -2778,7 +2399,7 @@ Public Class IResults
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCurrentResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCurrentResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -2827,7 +2448,7 @@ Public Class IResults
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RepaintCurrentResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RepaintCurrentResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))") 'AG 07/07/2010 GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -2842,11 +2463,14 @@ Public Class IResults
     '''              RH 23/08/2010 - Modified the way of loading the icons
     '''              SA 20/01/2011 - Load Icon for new button for opening screen of results for Off-System Order Tests;
     '''                              control the availability of this new button when the screen is loaded
+    '''              SA 19/09/2014 - BA-1927 ==> Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+    '''              WE 13/01/2015 - BA-2153: •	Changed the initialization order of the ImageList 'TestTypeIconList'. Note that this sequence must always
+    '''                                         be in-sync with array 'TestType' in Sub UpdateTestsListDataGrid (Class IResultsTestsListDataGridView).
     ''' </remarks>
     Private Sub PrepareButtons()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -2857,49 +2481,51 @@ Public Class IResults
             'dl 12/05/2011
             'Excel Export Button
             'auxIconName = GetIconName("BTN_EXCELEXPORT")
-            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = Image.FromFile(iconPath & auxIconName)
+            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'TEST()
             'PRINT REPORT Button
             auxIconName = GetIconName("FINALPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'cf 26/09/2013
             'Print compact report button
             auxIconName = GetIconName("COMPACTPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
+            auxIconName = GetIconName("COMPACTPRINTCTR")
+            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SUMMARY Button
             auxIconName = GetIconName("GRID")
-            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Buttons: PrintSampleButton, PrintTestButton
             auxIconName = GetIconName("PRINT")
             If Not String.Equals(auxIconName, String.Empty) Then
-                PrintSampleButton.Image = Image.FromFile(iconPath & auxIconName)
-                '                bsPrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
-                PrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                '                bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SEND MANUAL REPETITION Button
             auxIconName = GetIconName("MANUAL_REP")
-            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'OFF SYSTEM TESTS RESULTS Button
             auxIconName = GetIconName("OFFSYSTEMBUT")
-            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' Export Button
             auxIconName = GetIconName("MANUAL_EXP")
-            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Icons to be used in Grids
             auxIconName = GetIconName("PRINTL")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             auxIconName = GetIconName("LOGIN")
             If Not String.Equals(auxIconName, String.Empty) Then RepImage = preloadedDataConfig.GetIconImage("LOGIN")
 
@@ -2914,28 +2540,25 @@ Public Class IResults
             End If
 
             '
-            bsXlsresults.Image = Image.FromFile(iconPath & "BTN_EXCELEXPORT.png")
-            PrintReportButton.Image = Image.FromFile(iconPath & "FinalPrint.png")
-            SummaryButton.Image = Image.FromFile(iconPath & "Grid_16.png")
+            bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & "BTN_EXCELEXPORT.png")
+            PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & "FinalPrint.png")
+            SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & "Grid_16.png")
             '
-            PrintSampleButton.Image = Image.FromFile(iconPath & "Print.png")
-            '            bsPrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
-            PrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
+            PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            '            bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
             '
-            SendManRepButton.Image = Image.FromFile(iconPath & "Manual_Repeat.png")
-            OffSystemResultsButton.Image = Image.FromFile(iconPath & "OFFSTestButton.png")
+            SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & "Manual_Repeat.png")
+            OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & "OFFSTestButton.png")
 
-            ExportButton.Image = Image.FromFile(iconPath & "Export.png")
-            ExitButton.Image = Image.FromFile(iconPath & "Cancel.png")
+            ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & "Export.png")
+            ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & "Cancel.png")
 
-            PrintImage = Image.FromFile(iconPath & "PrintL.png")
+            PrintImage = ImageUtilities.ImageFromFile(iconPath & "PrintL.png")
 
             'RepImage = preloadedDataConfig.GetIconImage("LOGIN")
             auxIconName = GetIconName("LOGIN")
             If Not String.Equals(auxIconName, String.Empty) Then RepImage = preloadedDataConfig.GetIconImage("LOGIN")
-
-
-
 
             auxIconName = GetIconName("EQ_NEW_REP")
             If (auxIconName <> String.Empty) Then
@@ -3024,25 +2647,32 @@ Public Class IResults
             'IMAGES FOR Tests TreeView
             TestTypeIconList = New ImageList()
 
+            ' WE 13/01/2015 (BA-2153) - Sync order of Test Types with array 'TestType' in Sub UpdateTestsListDataGrid (Class IResultsTestsListDataGridView).
             auxIconName = GetIconName("TESTICON") 'STD Tests Icon
             If (auxIconName <> String.Empty) Then
                 AddIconToImageList(TestTypeIconList, auxIconName)
             End If
 
-            auxIconName = GetIconName("TCALC") 'CALC Tests Icon
-            If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
-            End If
+            'auxIconName = GetIconName("TCALC") 'CALC Tests Icon
+            'If (auxIconName <> String.Empty) Then
+            '    TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
+            'End If
 
             auxIconName = GetIconName("TISE_SYS") 'ISE Tests Icon
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TOFF_SYS") 'OFFS Tests Icon
             If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
+
+            auxIconName = GetIconName("TCALC") 'CALC Tests Icon
+            If (auxIconName <> String.Empty) Then
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
+            End If
+            ' WE 13/01/2015 (BA-2153) - End.
 
             auxIconName = GetIconName("INC_SENT_REP")
             If (auxIconName <> String.Empty) Then
@@ -3066,34 +2696,37 @@ Public Class IResults
             'End If
 
             'Control availability and visibility of special buttons
-            'AG 19/03/2012
-            'SendManRepButton.Enabled = True
-            SendManRepButton.Enabled = IIf(String.Equals(WSStatusField, "ABORTED"), False, True)
-
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
             OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
 
             auxIconName = GetIconName("PRINTHEAD")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                'PrintPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                PrintHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
+                'PrintPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
 
             auxIconName = GetIconName("EXPORTHEAD")
             If (auxIconName <> String.Empty) Then
                 'HISSentImage = preloadedDataConfig.GetIconImage("MANUAL_EXP")
                 'LISHeadImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
-                'HISPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                'HISPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 'RH 19/10/2011
-                LISExperimentalHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISControlHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISSamplesHeadImage = Image.FromFile(iconPath & auxIconName)
+                LISExperimentalHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISControlHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISSamplesHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 LISSubHeaderImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
                 'END RH 19/10/2011
 
-                LISHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
-
+                LISHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
+
+            'IT 21/10/2014: INI BA-2036
+            auxIconName = GetIconName("EXPORTHEADCHECK")
+            If (auxIconName <> String.Empty) Then
+                LISHeadCheckImage = ImageUtilities.ImageFromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
+            End If
+            'IT 21/10/2014: END BA-2036
 
 
             Const PicLeft As Integer = 7
@@ -3173,16 +2806,16 @@ Public Class IResults
             auxIconName = GetIconName("XTRAVERTICALBAR")
             'auxIconName = "XtraVerticalBar.png"
             If (auxIconName <> String.Empty) Then
-                XtraVerticalBar = Image.FromFile(iconPath & auxIconName)
+                XtraVerticalBar = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.PrepareButtons", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -3210,9 +2843,8 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemResultsButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         End Try
         Return (numOffSystems > 0)
     End Function
@@ -3223,6 +2855,11 @@ Public Class IResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 20/01/2011
+    ''' Modified by: AG 30/09/2014 - BA-1440 ==> Inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    '''              XB 28/11/2014 - BA-1867 ==> Recalculates calculated tests also for OFFS tests
+    '''              SA 14/01/2015 - BA-2153 ==> Undo changes made for BA-1867. Recalculation of affected Calculated Tests is moved to function 
+    '''                                          SaveOffSystemResults to execute it also when results of OffSystem Tests are saved from WS Samples  
+    '''                                          Requests Screen  
     ''' </remarks>
     Private Sub OpenOffSystemResultsScreen()
         Try
@@ -3235,7 +2872,7 @@ Public Class IResults
                 myOffSystemTestsResultsDS = DirectCast(resultData.SetDatos, OffSystemTestsResultsDS)
 
                 'Open the auxiliary screen for results of OffSystem OrderTests
-                Using myAuxOFFSResultsScreen As New IResultsOffSystemsTest
+                Using myAuxOFFSResultsScreen As New UiResultsOffSystemsTest
                     myAuxOFFSResultsScreen.OffSystemTestsList = myOffSystemTestsResultsDS
                     myAuxOFFSResultsScreen.ShowDialog()
                     If (myAuxOFFSResultsScreen.DialogResult = DialogResult.OK) Then
@@ -3246,12 +2883,23 @@ Public Class IResults
                         Dim myResultsDelegate As New ResultsDelegate(MyBase.AnalyzerModel)
                         resultData = myResultsDelegate.SaveOffSystemResults(Nothing, myOffSystemTestsResultsDS, AnalyzerIDField, WorkSessionIDField)
 
-                        'TR 28/06/2013 -Prepare and send results to LIS.
+                        ' ''XB 28/11/2014 - BA-1867
+                        'Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        '' recalculate calculated tests
+                        'For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In myOffSystemTestsResultsDS.OffSystemTestsResults
+                        '    myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
+                        '    myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
+                        '    resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, offSystemTestResult.OrderTestID, True)
+                        'Next
+                        ''XB 28/11/2014 - BA-1867
+
+
+                        'TR 28/06/2013 - Prepare and send results to LIS.
                         If (Not resultData.HasError) Then
                             If myResultsDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
-                                CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                                IAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
-                                IAx00MainMDI.InvokeUploadResultsLIS(False)
+                                GlobalBase.CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                                UiAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
+                                UiAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
                                 'Clear the executions
                                 myResultsDelegate.ClearLastExportedResults()
@@ -3298,7 +2946,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenOffSystemResultsScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenOffSystemResultsScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenOffSystemResultsScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -3320,7 +2968,7 @@ Public Class IResults
         Dim myReturnValue As GlobalEnumerates.PostDilutionTypes = PostDilutionTypes.WITHOUT
         Try
             'RH 19/10/2010 Introduce the Using statement
-            Using myScreen As New IWSManualRepetition
+            Using myScreen As New UiWSManualRepetition
                 myScreen.ActiveAnalyzer = AnalyzerIDField
                 myScreen.ActiveWorkSession = WorkSessionIDField
                 myScreen.ActiveOrderTestID = pOrderTestID
@@ -3331,7 +2979,7 @@ Public Class IResults
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ShowManualRepetitions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ShowManualRepetitions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -3427,7 +3075,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCollapse ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCollapse ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             finalResultOK = False
 
@@ -3436,72 +3084,62 @@ Public Class IResults
         Return finalResultOK
     End Function
 
-
-
     ''' <summary>
-    ''' The manual repetition icon will be only available for the standard tests and the last rerun
-    ''' and user can add repetitions to the worksession only when the orderTest becomes CLOSED
-    '''
+    ''' The manual Repetition icon will be available in following conditions: 
+    ''' ** For STD and ISE Tests 
+    ''' ** For the last Rerun and only when the status of the OrderTest is CLOSED (all Reruns are finished)
+    ''' ** For PATIENT Results, only if value of setting LIS RERUN WORKING MODE is different of LIS ONLY
     ''' </summary>
-    ''' <param name="pRow"></param>
-    ''' <param name="MaxRerunNumber"></param>
+    ''' <param name="pRow">Row of typed DataSet ResultsDS.vwksResultsRow</param>
+    ''' <param name="pMaxRerunNumber">Number of the last Rerun requested for the OrderTest</param>
     ''' <param name="pRepetitionCriteriaSent"></param>
-    ''' <returns></returns>
-    ''' <remarks>Created by AG 15/08/2010
-    ''' Modified by AG 31/08/2010 - Dont use Count ... get the RerunNumber of pRow and search and compare the OrderTestID max rerun number
-    ''' AG 08/03/2011 -
-    '''             RH 23/04/2012 - Pass MaxRerunNumber instead. 
-    ''' Modified by: SG 17/04/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS"
-    ''' Modified by: JC 14/05/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" if SampleClass is PATIENT
+    ''' <returns>True if a manual Repetition is allowed; otherwise, False</returns>
+    ''' <remarks>
+    ''' Created by:  AG 15/08/2010
+    ''' Modified by: AG 31/08/2010 - Do not use Count ... get the RerunNumber of pRow and search and compare the OrderTestID max rerun number
+    '''              AG 08/03/2011 -
+    '''              RH 23/04/2012 - Pass pMaxRerunNumber instead
+    '''              SG 17/04/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS"
+    '''              JC 14/05/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" but only if SampleClass is PATIENT
     ''' </remarks>
-    Private Function AllowManualRepetitions(ByVal pRow As ResultsDS.vwksResultsRow, ByVal MaxRerunNumber As Integer, _
+    Private Function AllowManualRepetitions(ByVal pRow As ResultsDS.vwksResultsRow, ByVal pMaxRerunNumber As Integer, _
                                             ByVal pSampleClass As String, ByRef pRepetitionCriteriaSent As String) As Boolean
         Dim manualRepAllowed As Boolean = False
 
         Try
-            'SGM 17/04/2013
-            If MyClass.LISWorkingModeReruns = "LIS" AndAlso pSampleClass = "PATIENTS" Then
-                Return False
-            End If
-            'end SGM 17/04/2013
+            'SG 17/04/2013 / JC 14/05/2013
+            If (MyClass.LISWorkingModeReruns = "LIS" AndAlso pSampleClass = "PATIENTS") Then Return False
 
-            '1st condition: Only for standard and ISE TESTs
-            If String.Compare(pRow.TestType, "STD", False) = 0 OrElse String.Compare(pRow.TestType, "ISE", False) = 0 Then
-
-                '2on condition: Average belongs to the max orderTest rerun number
-                'AG 31/08/2010
-                If pRow.RerunNumber = MaxRerunNumber Then
-
-                    '3th condition: All reruns are finished ... ordertest is closed
-                    If pRow.OrderTestStatus = "CLOSED" Then
+            '1st condition: Manual Repetitions are allowed only for STANDARD and ISE Tests
+            If (pRow.TestType = "STD" OrElse pRow.TestType = "ISE") Then
+                '2nd condition: Average belongs to the max orderTest rerun number (the last requested)
+                If (pRow.RerunNumber = pMaxRerunNumber) Then
+                    '3rd condition: All reruns are finished ... the OrderTest is CLOSED
+                    If (pRow.OrderTestStatus = "CLOSED") Then
                         manualRepAllowed = True
                     End If
+                End If
 
-                End If 'If pRow.RerunNumber = maxOrderTestRerun Then
+                If (Not manualRepAllowed) Then
+                    Dim myRow As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                                                                    Where row.OrderTestID = pRow.OrderTestID _
+                                                                                  AndAlso row.RerunNumber = pRow.RerunNumber _
+                                                                                  AndAlso row.MultiItemNumber = pRow.MultiPointNumber _
+                                                                                   Select row).ToList()
 
-                If Not manualRepAllowed Then
-                    Dim myRow As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
-                    myRow = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                             Where row.OrderTestID = pRow.OrderTestID _
-                             AndAlso row.RerunNumber = pRow.RerunNumber _
-                             AndAlso row.MultiItemNumber = pRow.MultiPointNumber _
-                             Select row).ToList()
-
-                    If myRow.Count > 0 Then
-                        If Not myRow(0).IsSentNewRerunPostdilutionNull Then
+                    If (myRow.Count > 0) Then
+                        If (Not myRow(0).IsSentNewRerunPostdilutionNull) Then
                             pRepetitionCriteriaSent = myRow(0).SentNewRerunPostdilution
                         End If
                     End If
+                    myRow = Nothing
                 End If
-            End If 'If pRow.TestType = "STD" Then
-
+            End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " AllowManualRepetitions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " AllowManualRepetitions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             manualRepAllowed = False
-
         End Try
-
         Return manualRepAllowed
     End Function
 
@@ -3552,224 +3190,177 @@ Public Class IResults
     End Sub
 
     ''' <summary>
-    ''' Generates and prints the final report for the Patient
+    ''' Release elements not handle by the GC.
     ''' </summary>
     ''' <remarks>
-    ''' Created by: RH - 28/09/2010
+    ''' Created by:  AG 01/08/2012
+    ''' Modified by: AG 10/02/2014 - BT #1496 ==> Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub PrintReport(ByVal forPrintingDS As ExecutionsDS, ByVal ReportTitle As String)
+    Private Sub ReleaseElements()
         Try
-            'Dim myResultsDelegate As New ResultsDelegate
-            'Dim myResultsDS As New ResultsDS
-            'Dim newRow As ResultsDS.twksResultsRow
-            'Dim IsAverageDone As New Dictionary(Of String, Boolean)
+            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
-            'Dim ResultsForReportDS As New ResultsDS
-            'Dim ReportMasterRow As ResultsDS.ReportMasterRow
-            'Dim ReportDetailRow As ResultsDS.ReportDetailsRow
+            'Class variables
+            RepImage = Nothing
+            OKImage = Nothing
+            UnCheckImage = Nothing
+            KOImage = Nothing
+            NoImage = Nothing
+            ClassImage = Nothing
+            ABS_GRAPHImage = Nothing
+            AVG_ABS_GRAPHImage = Nothing
+            CURVE_GRAPHImage = Nothing
+            INC_NEW_REPImage = Nothing
+            RED_NEW_REPImage = Nothing
+            EQ_NEW_REPImage = Nothing
+            NO_NEW_REPImage = Nothing
+            INC_SENT_REPImage = Nothing
+            RED_SENT_REPImage = Nothing
+            EQ_SENT_REPImage = Nothing
 
-            ''Fill the Report tables with data
-            'For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In forPrintingDS.vwksWSExecutionsResults.Rows
-            '    Dim TestsList As List(Of ResultsDS.vwksResultsRow)
-            '    Dim myOrderTestID As Integer = sampleRow.OrderTestID
+            REP_INCImage = Nothing
+            EQUAL_REPImage = Nothing
+            RED_REPImage = Nothing
+            PATIENT_STATImage = Nothing
+            PATIENT_ROUTINEImage = Nothing
+            SampleIconList = Nothing
+            TestTypeIconList = Nothing
+            XtraGridIconList = Nothing
+            CollapseIconList = Nothing
+            XtraVerticalBar = Nothing
 
-            '    'TestsList = (From row In AverageResultsDS.vwksResults _
-            '    '             Where (row.OrderTestID = myOrderTestID OrElse (row.TestType = "CALC")) _
-            '    '             AndAlso row.AcceptedResultFlag _
-            '    '             Select row).ToList()
+            AverageResultsDS = Nothing
+            ExecutionsResultsDS = Nothing
+            IsColCollapsed = Nothing
+            IsTestSTD = Nothing
+            ResultsChart = Nothing
+            PrintImage = Nothing
 
-            '    TestsList = (From row In AverageResultsDS.vwksResults _
-            '                 Where row.OrderTestID = myOrderTestID _
-            '                 AndAlso row.AcceptedResultFlag _
-            '                 Select row).ToList()
+            ExperimentalSortType = Nothing
+            CalibratorSortType = Nothing
+            BlankSortType = Nothing
+            ControlSortType = Nothing
+            SampleSortType = Nothing
+            IsOrderPrinted = Nothing
+            IsOrderHISSent = Nothing
+            LISSubHeaderImage = Nothing
+            LISHeadImage = Nothing
+            PrintHeadImage = Nothing
+            LISExperimentalHeadImage = Nothing
+            LISControlHeadImage = Nothing
+            LISSamplesHeadImage = Nothing
+            HeadRect = Nothing
+            SamplesAverageList = Nothing
+            tblXtraSamples = Nothing
+            'mdiAnalyzerCopy = Nothing 'not this variable
+            copyRefreshDS = Nothing
 
-            '    For Each resultRow As ResultsDS.vwksResultsRow In TestsList
-            '        Dim Filter As String = resultRow.OrderTestID.ToString()
-            '        If Not IsAverageDone.ContainsKey(Filter) Then
-            '            IsAverageDone(Filter) = True
+            'Buttons with images
 
-            '            'ReportMasterRow = myResultsDS.ReportMaster.NewReportMasterRow()
-            '            'ReportMasterRow.PatientID = resultRow.PatientID
-            '            'ReportMasterRow.PatientName = resultRow.PatientName
+            PrintReportButton.Image = Nothing
+            PrintCompactReportButton.Image = Nothing
+            SummaryButton.Image = Nothing
+            PrintSampleButton.Image = Nothing
+            PrintTestButton.Image = Nothing
+            SendManRepButton.Image = Nothing
+            OffSystemResultsButton.Image = Nothing
+            ExportButton.Image = Nothing
+            ExitButton.Image = Nothing
+            bsXlsresults.Image = Nothing
 
-            '            ReportDetailRow = myResultsDS.ReportDetails.NewReportDetailsRow()
-            '            ReportDetailRow.PatientID = resultRow.PatientID
-            '            ReportDetailRow.TestName = resultRow.TestName
-            '            ReportDetailRow.SampleType = resultRow.SampleType
-            '            'ReportDetailRow.ReplicateNumber = 
+            'TR 25/09/2013 #memory
+            StrikeFont = Nothing
+            RegularFont = Nothing
+            XtraStrikeFont = Nothing
+            RegularBkColor = Nothing
+            StrikeBkColor = Nothing
+            StrikeForeColor = Nothing
+            AverageBkColor = Nothing
+            AverageForeColor = Nothing
+            PrintPictureBox.Image = Nothing
+            HISPictureBox.Image = Nothing
+            'TR 25/09/2013 #memory
 
-            '            If Not resultRow.IsCONC_ValueNull Then
-            '                Dim hasConcentrationError As Boolean = False
+            With CollapseColumnControls
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
 
-            '                If Not resultRow.IsCONC_ErrorNull Then
-            '                    hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
-            '                End If
+            With CollapseColumnExperimentals
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
 
-            '                If Not hasConcentrationError Then
-            '                    PatientListDataGridView("Concentration", i).Value = resultRow.CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-            '                Else
-            '                    PatientListDataGridView("Concentration", i).Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-            '                End If
-            '            End If
+            With CollapseColumnCalibrators
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
 
-            '            PatientListDataGridView("Unit", i).Value = resultRow.MeasureUnit
+            With CollapseColumnBlanks
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
 
-            '            If Not String.IsNullOrEmpty(resultRow.NormalLowerLimit) AndAlso _
-            '                   Not String.IsNullOrEmpty(resultRow.NormalUpperLimit) Then
-            '                PatientListDataGridView("ReferenceRanges", i).Value = String.Format("{0} - {1}", resultRow.NormalLowerLimit, resultRow.NormalUpperLimit)
-            '            End If
+            '--- Detach variable defined using WithEvents ---
+            bsErrorProvider1 = Nothing
+            bsProgTestToolTips = Nothing
+            bsPanel2 = Nothing
+            bsPanel4 = Nothing
+            Cycle = Nothing
+            Abs1 = Nothing
+            Abs2 = Nothing
+            Diff = Nothing
+            OrderToExportCheckBox = Nothing
+            OrderToPrintCheckBox = Nothing
+            STATImage = Nothing
+            ExitButton = Nothing
+            bsXlsresults = Nothing
+            ExportButton = Nothing
+            OffSystemResultsButton = Nothing
+            SendManRepButton = Nothing
+            bsResultFormGroupBox = Nothing
+            bsSamplesResultsTabControl = Nothing
+            bsExperimentalsTabPage = Nothing
+            bsExperimentalsDataGridView = Nothing
+            bsResultsTabControl = Nothing
+            bsBlanksTabPage = Nothing
+            bsBlanksDataGridView = Nothing
+            bsCalibratorsTabPage = Nothing
+            bsCalibratorsDataGridView = Nothing
+            bsControlsTabPage = Nothing
+            bsControlsDataGridView = Nothing
+            bsTestDetailsTabControl = Nothing
+            bsSamplesTab = Nothing
+            bsSamplesListDataGridView = Nothing
+            bsTestsTabTage = Nothing
+            bsTestsListDataGridView = Nothing
+            bsResultsFormLabel = Nothing
+            bsTestPanel = Nothing
+            PrintTestButton = Nothing
+            bsSamplesPanel = Nothing
+            PrintReportButton = Nothing
+            SummaryButton = Nothing
+            PrintSampleButton = Nothing
+            XtraSamplesTabPage = Nothing
+            SamplesXtraGrid = Nothing
+            SamplesXtraGridView = Nothing
+            ToolTipController1 = Nothing
+            AlarmsDS1 = Nothing
+            PrintCompactReportButton = Nothing
+            PrintTestBlankButton = Nothing
+            PrintTestCtrlButton = Nothing
+            '------------------------------------------------
 
-            '            Dim Remark As String = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
-
-            '            If Not String.IsNullOrEmpty(Remark) Then
-            '                PatientListDataGridView("Remarks", i).Value = Remark
-            '            End If
-
-            '            resultRow.Printed = True
-            '            newRow = myResultsDS.twksResults.NewtwksResultsRow()
-            '            newRow.Printed = resultRow.Printed
-            '            newRow.OrderTestID = resultRow.OrderTestID
-            '            myResultsDS.twksResults.AddtwksResultsRow(newRow)
-
-            '            IsOrderPrinted(resultRow.OrderID) = resultRow.Printed
-            '        End If
-            '    Next
-            'Next
-
-            ''Print all patients available for final print
-            'If PatientListDataGridView.Rows.Count > 1 Then 'Take the Row Header into account
-            '    'AG 17/2010 - Temporally commented
-            '    'Dim Printer As DGVPrinter = New DGVPrinter
-            '    'Printer.Title = ReportTitle
-            '    'Printer.SubTitle = Today.ToShortDateString()
-            '    'Printer.SubTitleFormatFlags = StringFormatFlags.LineLimit Or StringFormatFlags.NoClip
-            '    'Printer.PageNumbers = True
-            '    'Printer.PageNumberInHeader = False
-            '    'Printer.PorportionalColumns = True
-            '    'Printer.HeaderCellAlignment = StringAlignment.Near
-            '    'Printer.Footer = "*Biosystems AX00 Automatic Analyzer*"
-            '    'Printer.FooterSpacing = 15
-
-            '    'Printer.TitleSpacing = 10
-            '    'Printer.SubTitleSpacing = 40
-            '    'Printer.ShowTotalPageNumber = True
-            '    'Printer.printDocument.DocumentName = Printer.Title
-            '    'Printer.ColumnWidths.Add("Remarks", 250)
-
-            '    'Printer.PrintDataGridView(PatientListDataGridView)
-
-            '    'Mark these patients as printed (twksResults.Printed = True)
-            '    'myResultsDelegate.UpdatePrinted(Nothing, myResultsDS)
-
-            '    ''Update SamplesListDataGridView. That is, erase the Printer icon.
-            '    'For j As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
-            '    '    Dim OrderID As String = bsSamplesListDataGridView("OrderID", j).Value.ToString()
-            '    '    If IsOrderPrinted(OrderID) Then bsSamplesListDataGridView("Print", j).Value = NoImage
-            '    'Next
-
-            'Else
-            '    ShowMessage(Me.Name & ".PrintReport", GlobalEnumerates.Messages.NO_DATA_TO_PRINT.ToString())
-            'End If
+            'GC.Collect() 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".PrintReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
-
     End Sub
-
-    ''' <summary>
-    ''' Creates the structure for the PatientListDataGridView for the Final Report Printing
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: RH - 28/09/2010
-    ''' </remarks>
-    Private Function GetNewPatientListDataGridView() As DataGridView
-        Dim PatientListDataGridView As DataGridView = Nothing
-
-        Try
-            PatientListDataGridView = New DataGridView()
-
-            Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle
-            'Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle
-            Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle
-
-            PatientListDataGridView.BackgroundColor = System.Drawing.Color.LightGray
-            PatientListDataGridView.BorderStyle = BorderStyle.Fixed3D
-            PatientListDataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
-            PatientListDataGridView.ColumnHeadersHeight = 20
-            PatientListDataGridView.EnableHeadersVisualStyles = True
-            PatientListDataGridView.GridColor = System.Drawing.Color.Silver
-            PatientListDataGridView.Name = "PatientListDataGridView"
-            'PatientListDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.[Single]
-            PatientListDataGridView.RowHeadersVisible = False
-
-            DataGridViewCellStyle1.BackColor = System.Drawing.Color.DarkGray
-            DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-            DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-            DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            PatientListDataGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
-
-            'DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
-            'DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 7.25!)
-            'DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
-            'DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.LightSlateGray
-            'DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
-            'DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            'PatientListDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle2
-
-            DataGridViewCellStyle3.BackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black
-            PatientListDataGridView.RowsDefaultCellStyle = DataGridViewCellStyle3
-            PatientListDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle3
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("PatientName", "Patient Name")
-            PatientListDataGridView.Columns("PatientName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("TestName", "Test")
-            PatientListDataGridView.Columns("TestName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Concentration", "Concentration")
-            PatientListDataGridView.Columns("Concentration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Concentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Unit", "Unit")
-            PatientListDataGridView.Columns("Unit").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("ReferenceRanges", "Ref. Ranges")
-            PatientListDataGridView.Columns("ReferenceRanges").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("ReferenceRanges").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Remarks", "Remarks")
-            PatientListDataGridView.Columns("Remarks").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Remarks").DefaultCellStyle.WrapMode = DataGridViewTriState.True
-
-        Catch ex As Exception
-            PatientListDataGridView = Nothing
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetNewPatientListDataGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        End Try
-
-        Return PatientListDataGridView
-    End Function
-
 #End Region
 
 #Region "Generic DataGridView Methods"
-
     ''' <summary>
     ''' View TEST-PATIENT results: Update grid when selected test has patient (or calibrator or blank) results changes
     ''' View TEST-CONTROL results: Update grid when selected test has control (or calibrator or blank) results changes
@@ -3778,7 +3369,10 @@ Public Class IResults
     ''' View PATIENT results: Update grid when selected patient results changes (or new calibrator or blank affects the results of the selected patient)
     ''' </summary>
     ''' <param name="pRefreshDS"></param>
-    ''' <remarks>AG 22/06/2012 - creation</remarks>
+    ''' <remarks>
+    ''' Created by:  AG 22/06/2012
+    ''' Modified by: SA 19/09/2014 - BA-1927 ==> Fixed errors raised when Option Strict On for the screen was activated (linqs to search new results by SampleClass)
+    ''' </remarks>
     Private Sub PrepareFlagsForRefreshAffectedGrids(ByVal pRefreshDS As UIRefreshDS)
         Try
             If Not pRefreshDS Is Nothing Then 'New results received
@@ -3789,14 +3383,22 @@ Public Class IResults
                 Dim AverageList As List(Of ResultsDS.vwksResultsRow)
 
                 'Search for new results by sample class
-                newBlanks = (From a As UIRefreshDS.ExecutionStatusChangedRow In pRefreshDS.ExecutionStatusChanged.Rows _
-                               Where a.SampleClass = "BLANK" Select a.OrderTestID Distinct).ToList
-                newCalibs = (From a As UIRefreshDS.ExecutionStatusChangedRow In pRefreshDS.ExecutionStatusChanged.Rows _
-                             Where a.SampleClass = "CALIB" Select a.OrderTestID Distinct).ToList
-                newControls = (From a As UIRefreshDS.ExecutionStatusChangedRow In pRefreshDS.ExecutionStatusChanged.Rows _
-                             Where a.SampleClass = "CTRL" Select a.OrderTestID Distinct).ToList
-                newPatients = (From a As UIRefreshDS.ExecutionStatusChangedRow In pRefreshDS.ExecutionStatusChanged.Rows _
-                             Where a.SampleClass = "PATIENT" Select a.OrderTestID Distinct).ToList
+                'BA-1927: Changed the way the Linq was written to avoid errors raised due to Option Strict On has been activated
+                newBlanks = (From a In pRefreshDS.ExecutionStatusChanged _
+                            Where a.SampleClass = "BLANK" _
+                           Select a.OrderTestID Distinct).ToList
+
+                newCalibs = (From a In pRefreshDS.ExecutionStatusChanged _
+                            Where a.SampleClass = "CALIB" _
+                           Select a.OrderTestID Distinct).ToList
+
+                newControls = (From a In pRefreshDS.ExecutionStatusChanged _
+                              Where a.SampleClass = "CTRL" _
+                             Select a.OrderTestID Distinct).ToList
+
+                newPatients = (From a In pRefreshDS.ExecutionStatusChanged _
+                              Where a.SampleClass = "PATIENT" _
+                             Select a.OrderTestID Distinct).ToList
 
 
                 Dim testViewRefreshRequired As Boolean = False
@@ -3838,16 +3440,16 @@ Public Class IResults
                                 'Dim myTestType As String = String.Empty
                                 myTestID = String.Empty
                                 myTestType = String.Empty
-                                If Not AverageList(0).IsTestIDNull Then myTestID = AverageList(0).TestID
+                                If Not AverageList(0).IsTestIDNull Then myTestID = AverageList(0).TestID.ToString
                                 If Not AverageList(0).IsTestTypeNull Then myTestType = AverageList(0).TestType
 
-                                If Not myTestID = String.Empty AndAlso Not myTestType = String.Empty Then
+                                If (Not myTestID = String.Empty AndAlso Not myTestType = String.Empty) Then
                                     'Dim mySelectedPatientID As String = bsSamplesListDataGridView.SelectedRows(0).Cells("PatientID").Value.ToString()
                                     mySelectedPatientID = bsSamplesListDataGridView.SelectedRows(0).Cells("PatientID").Value.ToString()
 
                                     AverageList = (From row In AverageResultsDS.vwksResults _
                                                    Where row.PatientID = mySelectedPatientID AndAlso row.SampleClass = "PATIENT" AndAlso _
-                                                   row.TestID = myTestID AndAlso row.TestType = myTestType Select row).ToList()
+                                                   row.TestID = Convert.ToInt32(myTestID) AndAlso row.TestType = myTestType Select row).ToList()
 
                                     If AverageList.Count > 0 Then
                                         patientViewRefreshRequired = True
@@ -3909,7 +3511,7 @@ Public Class IResults
                                 myTestID = String.Empty
                                 myTestType = String.Empty
 
-                                If Not AverageList(0).IsTestIDNull Then myTestID = AverageList(0).TestID
+                                If Not AverageList(0).IsTestIDNull Then myTestID = AverageList(0).TestID.ToString
                                 If Not AverageList(0).IsTestTypeNull Then myTestType = AverageList(0).TestType
 
                                 If Not myTestID = String.Empty AndAlso Not myTestType = String.Empty Then
@@ -3919,7 +3521,7 @@ Public Class IResults
                                     AverageList = (From row In AverageResultsDS.vwksResults _
                                                    Where row.PatientID = mySelectedPatientID _
                                                    AndAlso row.SampleClass = "PATIENT" _
-                                                   AndAlso row.TestID = myTestID _
+                                                   AndAlso row.TestID = Convert.ToInt32(myTestID) _
                                                    AndAlso row.TestType = myTestType _
                                                    Select row).ToList()
 
@@ -4087,7 +3689,7 @@ Public Class IResults
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " PrepareFlagsForRefreshAffectedGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " PrepareFlagsForRefreshAffectedGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4096,53 +3698,66 @@ Public Class IResults
     ''' Loads the Result datasets and updates the data grid views
     ''' </summary>
     ''' <remarks>
-    ''' Created by: RH - 30/08/2010
+    ''' Created by:  RH 30/08/2010
+    ''' Modified by: AG 10/02/2014 - BT #1496 ==> Avoid Screen Refresh when it is closing
+    '''              SA 22/09/2014 - BA-1927  ==> Added Try/Catch block
     ''' </remarks>
     Public Sub UpdateScreenGlobalDSWithAffectedResults(Optional ByVal ReloadExecutions As Boolean = True)
-        If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+        Try
+            If (isClosingFlag) Then Exit Sub
 
-        'Update screen global DS with the affected results
-        If ReloadExecutions Then LoadExecutionsResults()
+            'Update screen global DS with the affected results
+            If (ReloadExecutions) Then LoadExecutionsResults()
 
-        'AG 22/06/2012 - evaluate if refresh current grid is required
-        'This forces the methods UpdateXXXXDataGrid() to repaint de grid.
-        'BlankTestName = String.Empty
-        'CalibratorTestName = String.Empty
-        'ControlTestName = String.Empty
-        'SampleTestName = String.Empty
-        'ExperimentalSampleIndex = -1
-        PrepareFlagsForRefreshAffectedGrids(Nothing)
+            'Evaluate if it is needed to refresh the current grids
+            PrepareFlagsForRefreshAffectedGrids(Nothing)
 
-        If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-            UpdateExperimentalsDataGrid()
-        Else
-            RepaintCurrentResultsGrid()
-        End If
-
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name) Then
+                UpdateExperimentalsDataGrid()
+            Else
+                RepaintCurrentResultsGrid()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateScreenGlobalDSWithAffectedResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 
-    'PENDING TO VALIDATE - SG
+    ''' <summary>
+    ''' Refresh the Results Screen after Export Results to LIS (this function is executed when the LIS delivered notification is received) 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: AG 10/02/2014 - BT #1496 ==> Avoid Screen Refresh when it is closing
+    '''              SA 22/09/2014 - BA-1927 ==> * Refresh the list of Patients also when the Export to LIS has been executed from Tests View to update CheckBox 
+    '''                                            ExportToLIS for all Patients which results have been exported 
+    '''                                          * Added Try/Catch block
+    ''' </remarks>
     Public Sub RefreshExportStatusChanged()
+        Try
+            If (isClosingFlag) Then Exit Sub
+            MyClass.UpdateScreenGlobalDSWithAffectedResults(True)
 
-        If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
-        MyClass.UpdateScreenGlobalDSWithAffectedResults(True)
-
-        If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
+            'BA-1927: The list of Patients have to be refreshed also when the Export to LIS has been executed from Tests View 
+            '         to update CheckBox ExportToLIS for all Patients which results have been exported 
             UpdateSamplesListDataGrid()
-        Else
-            Select Case bsResultsTabControl.SelectedTab.Name
-                Case bsBlanksTabPage.Name
-                    'UpdateBlanksDataGrid()
-                Case bsCalibratorsTabPage.Name
-                    'UpdateCalibratorsDataGrid()
-                Case bsControlsTabPage.Name
-                    UpdateControlsDataGrid()
-                Case XtraSamplesTabPage.Name
-                    UpdateSamplesXtraGrid()
-            End Select
-            Application.DoEvents()
-        End If
-
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsTestsTabTage.Name) Then
+                Select Case bsResultsTabControl.SelectedTab.Name
+                    Case bsBlanksTabPage.Name
+                        'UpdateBlanksDataGrid()
+                    Case bsCalibratorsTabPage.Name
+                        'UpdateCalibratorsDataGrid()
+                    Case bsControlsTabPage.Name
+                        UpdateControlsDataGrid()
+                    Case XtraSamplesTabPage.Name
+                        UpdateSamplesXtraGrid()
+                End Select
+                Application.DoEvents()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " RefreshExportStatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 
     ''' <summary>
@@ -4161,7 +3776,7 @@ Public Class IResults
         Try
             Dim ContinuePro As Boolean = True
 
-            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow
+            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow = Nothing
             If (Not dgv.Rows(RowIndex).Tag Is Nothing) Then
                 ExecutionResultRow = CType(dgv.Rows(RowIndex).Tag, ExecutionsDS.vwksWSExecutionsResultsRow)
             Else
@@ -4179,7 +3794,7 @@ Public Class IResults
                     Dim myGlobal As GlobalDataTO
                     Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                    myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                    myRecalDelegate.AnalyzerModel = AnalyzerModel()
                     'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                     myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -4203,7 +3818,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeInUseFlagReplicate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeInUseFlagReplicate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeInUseFlagReplicate ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
             Cursor = Cursors.Default
@@ -4306,7 +3921,7 @@ Public Class IResults
                 Dim myGlobal As GlobalDataTO
                 Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                myRecalDelegate.AnalyzerModel = AnalyzerModel()
                 'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                 myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -4328,7 +3943,7 @@ Public Class IResults
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeInUseFlagReplicate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeInUseFlagReplicate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeInUseFlagReplicate ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
             Cursor = Cursors.Default
@@ -4368,7 +3983,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetStrike ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetStrike ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4384,7 +3999,7 @@ Public Class IResults
             CType(dgv(SpanColName, RowIndex), DataGridViewTextBoxSpanCell).RowSpan = RowSpan
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " MergeCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " MergeCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4400,7 +4015,7 @@ Public Class IResults
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).CollapseAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " CollapseAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " CollapseAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4416,7 +4031,7 @@ Public Class IResults
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).ExpandAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ExpandAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ExpandAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4435,7 +4050,7 @@ Public Class IResults
             dgv.Rows(RowIndex).DefaultCellStyle.SelectionForeColor = AverageForeColor
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetSubHeaderColors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetSubHeaderColors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4451,7 +4066,7 @@ Public Class IResults
             Return dgv(dgv.ColumnCount - 1, RowIndex).Style.BackColor = StrikeBkColor
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " IsStriked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " IsStriked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -4468,7 +4083,7 @@ Public Class IResults
             Return CType(dgv(CollapseColName, RowIndex), bsDataGridViewCollapseCell).IsSubHeader
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " IsSubHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " IsSubHeader ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -4485,7 +4100,7 @@ Public Class IResults
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).IsEnabled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " EnableCollapseColumn ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " EnableCollapseColumn ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4501,7 +4116,7 @@ Public Class IResults
             CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).IsEnabled = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " DisableCollapseColumn ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " DisableCollapseColumn ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4515,8 +4130,8 @@ Public Class IResults
     ''' <param name="PostDilutionType"></param>
     ''' <param name="pAllowManualRepetition" ></param>
     ''' <remarks>
-    ''' Created by: RH - 27/08/2010
-    ''' AG 08/03/2011 - add parameter allowmanualrepetition
+    ''' Created by:  RH 27/08/2010
+    ''' Modified by: AG 08/03/2011 - Added new parameter pAllowManualRepetition
     ''' </remarks>
     Private Sub SetRepPostDilutionImage(ByRef dgv As BSDataGridView, ByVal ColName As String, ByVal RowIndex As Integer, ByVal PostDilutionType As String, ByVal pAllowManualRepetition As Boolean)
         If pAllowManualRepetition Then
@@ -4599,7 +4214,7 @@ Public Class IResults
     ''' <param name="RowIndex"></param>
     ''' <param name="PostDilutionType"></param>
     ''' <remarks>
-    ''' Created by: RH - 30/08/2010
+    ''' Created by: RH 30/08/2010
     ''' </remarks>
     Private Sub SetPostDilutionImage(ByRef dgv As BSDataGridView, ByVal ColName As String, ByVal RowIndex As Integer, ByVal PostDilutionType As String)
         Select Case PostDilutionType
@@ -4626,7 +4241,7 @@ Public Class IResults
     ''' <param name="RowIndex"></param>
     ''' <param name="PostDilutionType"></param>
     ''' <remarks>
-    ''' Created by: DL - 23/09/2011
+    ''' Created by:  DL 23/09/2011
     ''' Modified by: RH 20/10/2011 Code optimization
     ''' </remarks>
     Private Sub SetPostDilutionText(ByRef dgv As BSDataGridView, _
@@ -4686,7 +4301,7 @@ Public Class IResults
     ''' </summary>
     ''' <param name="dgv"></param>
     ''' <remarks>
-    ''' Created by: RH - 10/09/2010
+    ''' Created by: RH 10/09/2010
     ''' </remarks>
     Private Sub RemoveOldSortGlyph(ByRef dgv As BSDataGridView)
         'Remove the old SortGlyph
@@ -4702,7 +4317,7 @@ Public Class IResults
     ''' <param name="ColIndex"></param>
     ''' <param name="Asc"></param>
     ''' <remarks>
-    ''' Created by: RH - 10/09/2010
+    ''' Created by: RH 10/09/2010
     ''' </remarks>
     Private Sub SortDataGrigView(ByRef dgv As BSDataGridView, ByVal ColIndex As Integer, Optional ByVal Asc As SortType = SortType.ASC)
         Try
@@ -4728,7 +4343,7 @@ Public Class IResults
 
                 For i As Integer = 0 To dgv.Rows.Count - 1
                     If IsSubHeader(dgv, i) Then NewValue = dgv(ColIndex, i).Value
-                    dgv(SortingCol, i).Value = NewValue + (dgv.Rows.Count - i).ToString("0000")
+                    dgv(SortingCol, i).Value = NewValue.ToString + (dgv.Rows.Count - i).ToString("0000")
                 Next
             Else
                 'Put the new SortGlyph
@@ -4736,17 +4351,16 @@ Public Class IResults
 
                 For i As Integer = 0 To dgv.Rows.Count - 1
                     If IsSubHeader(dgv, i) Then NewValue = dgv(ColIndex, i).Value
-                    dgv(SortingCol, i).Value = NewValue + i.ToString("0000")
+                    dgv(SortingCol, i).Value = NewValue.ToString + i.ToString("0000")
                 Next
             End If
 
             'Sort the fake column
             dgv.Sort(dgv.Columns(SortingCol), direction)
-
             dgv.Columns.Remove(SortingCol)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SortDataGrigView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SortDataGrigView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -4756,7 +4370,7 @@ Public Class IResults
     ''' </summary>
     ''' <param name="TestName"></param>
     ''' <remarks>
-    ''' Created by: RH 2011
+    ''' Created by: RH 
     ''' </remarks>
     Private Sub UpdateAverageFromDB(ByVal TestName As String)
         Try
@@ -4839,156 +4453,8 @@ Public Class IResults
             'TR 25/09/2013 #memory
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateAverageFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateAverageFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Change accepted result (different rerun result) for a OrderTestID
-    ''' </summary>
-    ''' <param name="RowValues"></param>
-    ''' <param name="pSampleClass" ></param>
-    ''' <remarks></remarks>
-    Private Sub ChangeAcceptedResult(ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
-        Try
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim myGlobal As GlobalDataTO
-
-            Dim executionToRecalculate As Integer = -1
-
-            If String.Compare(RowValues.TestType, "STD", False) = 0 Then
-                'Get the maximum replicate belongs the selected OrderTestID, RerunNumber 
-                Dim maxItemNumber As Integer = _
-                                (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                 Where row.OrderTestID = RowValues.OrderTestID _
-                                 AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                 Select row.MultiItemNumber).Max()
-
-                Dim maxReplicate As Integer = _
-                    (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                     Where row.OrderTestID = RowValues.OrderTestID _
-                     AndAlso row.RerunNumber = RowValues.RerunNumber _
-                     Select row.ReplicateNumber).Max()
-
-                executionToRecalculate = _
-                    (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                     Where row.OrderTestID = RowValues.OrderTestID _
-                     AndAlso row.RerunNumber = RowValues.RerunNumber _
-                     AndAlso row.MultiItemNumber = maxItemNumber _
-                     AndAlso row.ReplicateNumber = maxReplicate _
-                     Select row.ExecutionID).Max()
-
-            Else 'ISE, OFFS, CALC
-                executionToRecalculate = -1
-            End If
-
-            Cursor = Cursors.WaitCursor     'AG 14/10/2010
-            myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass)
-
-            Dim actionAllowed As Boolean = False
-
-            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                actionAllowed = CType(myGlobal.SetDatos, Boolean)
-
-                If actionAllowed Then
-                    'UpdateScreenGlobalDSWithAffectedResults()
-
-                    UpdateAverageFromDB(RowValues.TestName)
-
-                    'AG 24/11/2010 - After change accepted result the HIS export icon maybe changes
-                    If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                        UpdateSamplesListDataGrid()
-                    Else
-                        UpdatePatientList = True
-                    End If
-                    'AG 24/11/2010 
-                End If
-            End If
-
-        Catch ex As Exception
-            Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ChangeAcceptedResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        Finally
-            Cursor = Cursors.Default
-
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Change calibration type between Experimental or Factor due the manual calibration factor feature
-    ''' </summary>
-    ''' <param name="pUseManualFactor"></param>
-    ''' <param name="pDgv"></param>
-    ''' <param name="RowValues"></param>
-    ''' <param name="pManualFactorValue"></param>
-    ''' <remarks>AG 09/11/2010</remarks>
-    Private Sub ChangeCalibrationType(ByVal pUseManualFactor As Boolean, ByRef pDgv As BSDataGridView, ByVal RowValues As ResultsDS.vwksResultsRow, _
-                                      ByVal pManualFactorValue As Single)
-        Try
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim myGlobal As New GlobalDataTO
-
-            'Get the maximum replicate belongs the selected OrderTestID, RerunNumber 
-            Dim maxItemNumber As Integer = _
-                            (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                             Where row.OrderTestID = RowValues.OrderTestID _
-                             AndAlso row.RerunNumber = RowValues.RerunNumber _
-                             Select row.MultiItemNumber).Max
-
-            If maxItemNumber = 1 Then
-                Cursor = Cursors.WaitCursor     'AG 14/10/2010
-
-                'Get some execution for recalculation works properly
-                Dim myExecution As Integer = _
-                (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                 Where row.OrderTestID = RowValues.OrderTestID _
-                 AndAlso row.RerunNumber = RowValues.RerunNumber _
-                 AndAlso row.MultiItemNumber = maxItemNumber _
-                 Select row.ExecutionID).Max
-
-                myGlobal = myRecalDelegate.UpdateManualCalibrationFactor(Nothing, AnalyzerIDField, WorkSessionIDField, pUseManualFactor, _
-                                                                             pManualFactorValue, myExecution, RowValues.OrderTestID, RowValues.MultiPointNumber, RowValues.RerunNumber)
-
-
-                Dim actionAllowed As Boolean = False
-                If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                    actionAllowed = CType(myGlobal.SetDatos, Boolean)
-
-                    If actionAllowed Then
-                        UpdateScreenGlobalDSWithAffectedResults()
-                        'AG 24/11/2010 - After manual factor recalculations the HIS export icon maybe changes
-                        If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-                            UpdateSamplesListDataGrid()
-                            'Else
-                            'AG 24/11/2010 - After manual factor recalculations the HIS export icon maybe changes= True
-                        End If
-                        'AG 24/11/2010 
-
-                        'AG 26/07/2012 - new versions set the strike row when grid is repainted
-                        'If pUseManualFactor Then
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = StrikeFont
-                        '    pDgv.CurrentCell.Style.Font = RegularFont
-                        'Else
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = RegularFont
-                        'End If
-
-                    End If
-
-                End If
-                Cursor = Cursors.Default
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ChangeCalibrationType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-            Cursor = Cursors.Default    'AG 14/10/2010
-        Finally
-            Cursor = Cursors.Default
         End Try
     End Sub
 
@@ -5001,7 +4467,7 @@ Public Class IResults
     ''' <param name="pMultiItemNumber">multiitem number</param> 
     ''' <param name="pReplicate">rerun number</param>
     ''' <remarks>
-    ''' Created by DL 11/02/2011
+    ''' Created by: DL 11/02/2011
     ''' </remarks>
     Private Sub ShowResultsChart(ByVal pExecutionNumber As Integer, _
                                  ByVal pOrderTestID As Integer, _
@@ -5010,7 +4476,7 @@ Public Class IResults
                                  ByVal pReplicate As Integer)
 
         Try
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
                 myForm.SourceForm = GlobalEnumerates.ScreenCallsGraphical.RESULTSFRM
                 myForm.AnalyzerID = AnalyzerIDField
                 myForm.WorkSessionID = WorkSessionIDField
@@ -5020,24 +4486,24 @@ Public Class IResults
                 myForm.OrderTestID = pOrderTestID
                 myForm.Replicate = pReplicate
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception
             Cursor = Cursors.Default
             Application.DoEvents()
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ShowResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ShowResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks>Created by SG 30/08/2010</remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: SG 30/08/2010
+    ''' </remarks>
     Private Sub RemoveResultsChart()
         Try
             Dim father As System.Windows.Forms.Control = ResultsChart.Parent
@@ -5055,7 +4521,7 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " RemoveResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " RemoveResultsChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -5067,8 +4533,11 @@ Public Class IResults
     ''' <param name="dgv"></param>
     ''' <param name="RowValues"></param>
     ''' <param name="pSampleClass" ></param>
-    ''' <remarks>Created AG 17/02/2011 - allow do not accept any result
-    ''' AG - add pSampleClass parameter
+    ''' <remarks>
+    ''' Created by:  AG 17/02/2011 
+    ''' AG 16/10/2014 BA-2011: 
+    '''    Re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    '''    For patient and controls re-evaluate the OrderToExport value
     ''' </remarks>
     Private Sub RejectResult(ByRef dgv As BSDataGridView, ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -5080,15 +4549,23 @@ Public Class IResults
             myGlobal = myResDelegate.UpdateAcceptedResult(Nothing, RowValues.OrderTestID, RowValues.RerunNumber, False)
 
             If Not myGlobal.HasError Then
-                'When the OrderTestID is STD_TEST and belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
-                If String.Compare(RowValues.TestType, "STD", False) = 0 And String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                'When the OrderTestID belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
+                'AG 16/10/2014 BA-2011
+                'If String.Compare(RowValues.TestType, "STD", False) = 0 And String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                If String.Compare(pSampleClass, "PATIENT", False) = 0 Then
                     Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                     myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
                     myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
                     myGlobal = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, RowValues.OrderTestID, True)
                 End If
-
             End If
+
+            'AG 16/10/2014 BA-2011
+            If Not myGlobal.HasError AndAlso (pSampleClass = "CTRL" OrElse pSampleClass = "PATIENT") Then
+                Dim ordersDlg As New OrdersDelegate
+                myGlobal = ordersDlg.SetNewOrderToExportValue(Nothing, , RowValues.OrderTestID)
+            End If
+            'AG 16/10/2014 BA-2011
 
             If Not myGlobal.HasError Then
                 UpdateScreenGlobalDSWithAffectedResults()
@@ -5105,7 +4582,7 @@ Public Class IResults
             Cursor = Cursors.Default    'AG 14/10/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RejectResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RejectResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.Cursor = Cursors.Default    'AG 14/10/2010
 
@@ -5119,8 +4596,11 @@ Public Class IResults
     ''' </summary>
     ''' <param name="RowValues"></param>
     ''' <param name="pSampleClass" ></param>
-    ''' <remarks>Created AG 17/02/2011 - allow do not accept any result
-    ''' AG - add pSampleClass parameter
+    '''<remarks>
+    ''' Created by:  AG 17/02/2011 
+    ''' AG 16/10/2014 BA-2011
+    '''    Re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    '''    For patient and controls re-evaluate the OrderToExport value
     ''' </remarks>
     Private Sub RejectResult(ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -5132,14 +4612,23 @@ Public Class IResults
             myGlobal = myResDelegate.UpdateAcceptedResult(Nothing, RowValues.OrderTestID, RowValues.RerunNumber, False)
 
             If Not myGlobal.HasError Then
-                'When the OrderTestID is STD_TEST and belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
-                If RowValues.TestType = "STD" AndAlso String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                'When the OrderTestID belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
+                'AG 16/10/2014 BA-2011
+                'If RowValues.TestType = "STD" AndAlso String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                If String.Compare(pSampleClass, "PATIENT", False) = 0 Then
                     Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                     myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
                     myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
                     myGlobal = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, RowValues.OrderTestID, True)
                 End If
             End If
+
+            'AG 16/10/2014 BA-2011
+            If Not myGlobal.HasError AndAlso (pSampleClass = "CTRL" OrElse pSampleClass = "PATIENT") Then
+                Dim ordersDlg As New OrdersDelegate
+                myGlobal = ordersDlg.SetNewOrderToExportValue(Nothing, , RowValues.OrderTestID)
+            End If
+            'AG 16/10/2014 BA-2011
 
             If Not myGlobal.HasError Then
                 'UpdateScreenGlobalDSWithAffectedResults()
@@ -5157,7 +4646,7 @@ Public Class IResults
 
         Catch ex As Exception
             Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RejectResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " RejectResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -5203,7 +4692,7 @@ Public Class IResults
             bsProgTestToolTips.SetToolTip(ExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_ManualExport", LanguageID))
             bsProgTestToolTips.SetToolTip(PrintSampleButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintPatient", LanguageID))
             bsProgTestToolTips.SetToolTip(PrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintTest", LanguageID)) 'DL 26/07/2012
-            'bsProgTestToolTips.SetToolTip(bsPrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintTest", LanguageID))
+            bsProgTestToolTips.SetToolTip(PrintTestCtrlButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintControls", LanguageID)) 'IT 01/10/2014 - #BA-1864
             bsProgTestToolTips.SetToolTip(PrintReportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_IndividualReport", LanguageID))
             bsProgTestToolTips.SetToolTip(SendManRepButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_ManualRerun", LanguageID))
             bsProgTestToolTips.SetToolTip(SummaryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_OpenSummary", LanguageID))
@@ -5236,200 +4725,287 @@ Public Class IResults
             labelType = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", LanguageID)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
     End Sub
-
-    '''' <summary>
-    '''' Get texts in the current application language for all screen controls
-    '''' </summary>
-    '''' <remarks>
-    '''' '<param name="pLanguageID"> The current Language of Application </param>
-    '''' Created by: PG 20/10/2010
-    '''' 
-    '''' </remarks>
-    'Private Sub GetScreenLabelsGraph(ByVal ReplicateGraph As bsResultsChart)
-    '    Try
-    '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-    '        ReplicateGraph.CalibratorNumberCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_CalibNo", LanguageID) + ":"
-    '        ReplicateGraph.SampleCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SampleVolume", LanguageID) + ":"
-    '        ReplicateGraph.TestCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", LanguageID) + ":"
-    '        ReplicateGraph.WellCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Well", LanguageID) + ":"
-    '        ReplicateGraph.ReplicateCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Rep", LanguageID) + ":"
-
-    '        ReplicateGraph.ChartAbs1Title = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs1", LanguageID) + ":"
-    '        ReplicateGraph.ChartAbs2Title = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs2", LanguageID) + ":"
-    '        ReplicateGraph.ChartDiffTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Diff", LanguageID) + ":"
-
-    '        ReplicateGraph.ExitButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_ExitBtnTTip", LanguageID)
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage(Me.Name & ".GetScreenLabelsGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-    '    End Try
-    'End Sub
-
-    '''' <summary>
-    '''' Get texts in the current application language for all screen controls
-    '''' </summary>
-    '''' <remarks>
-    '''' <param name="pLanguageID"> The current Language of Application </param>
-    '''' Created by: PG 20/10/2010
-    '''' </remarks>
-    'Private Sub GetScreenLabelsAxesGraph(ByVal ReplicateGraph As bsResultsChart)
-    '    Try
-    '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-    '        'For Chart
-    '        ReplicateGraph.ChartVerticalAxisName = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", LanguageID)
-    '        ReplicateGraph.ChartHorizontalAxisName = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Cycles", LanguageID)
-
-    '        ReplicateGraph.ChartCycleGrid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_Cycle", LanguageID)
-    '        ReplicateGraph.ChartAbs1Grid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs1_Short", LanguageID)
-    '        ReplicateGraph.ChartAbs2Grid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs2_Short", LanguageID)
-    '        ReplicateGraph.ChartDiffGrid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Diff_Short", LanguageID)
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsAxesGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage(Me.Name & ".GetScreenLabelsAxesGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-    '    End Try
-    'End Sub
-
 #End Region
 
 #Region "Other methods"
 
+    ''' <summary>
+    ''' Click on the patient list (header or item)
+    ''' - Click on item (name) select item and load results
+    ''' - Click on item (column OrderToPrint) change current field value (screen and database)
+    ''' - Click on item (column OrderToExport): checks if complies with rule (7) for sending to LIS; if not show warning; if true => change current field value (screen and database). {BA-2018}
+    ''' 
+    ''' - Click on header (name) sort alphabetical
+    ''' - Click on header (columns OrderToExport /OrderToPrint) select all (if any not selected) or deselect all (if all selected) -> New 31/07/2014 #1187
+    ''' - Click on header (column OrderToExport): If some or all are not selected => All checkboxes will be selected that comply with rule (7) for sending to LIS;
+    '''                                                                              if at least 1 does not comply => show warning; change current field value (screen and database) accordingly. {BA-2018}
+    '''                                           If all are selected => All checkboxes will be unchecked.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  RH 04/06/2012
+    ''' Modified by: AG 31/07/2014 - BT #1887 ==> Click on header select all / deselect all
+    '''              WE 17/10/2014 - BA-2018 Req.7
+    '''              AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
+    ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
-            'RH 04/06/2012
-            If e.RowIndex < 0 Then Return
+            ' AG 31/07/2014 - #1887
+            Dim updateDSRequired As Boolean = False
 
-            If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 OrElse _
-               String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+            ' Define variables common used for click on item and also on header.
+            Dim updateColumnOrderToExport As Boolean = False    ' OrderToExport column (True) or OrderToPrint (False).
 
+            Dim myPatientID As String = ""  ' Patient to refresh, "" -> all.
+            Dim myOrdersDelegate As New OrdersDelegate
+            Dim myOrderToExportValue As Boolean = False
+            Dim myOrderToPrintValue As Boolean = False
+            Dim resultData As GlobalDataTO = Nothing
+            Dim linqRes As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            Dim dgv As BSDataGridView = bsSamplesListDataGridView
+            Dim warningShown As Boolean = False
+            Dim ShowWarning As Boolean = False
+            Dim currentPatientID As String
 
-                Cursor = Cursors.WaitCursor
+            If e.RowIndex >= 0 Then
+                ' Click on item.
 
-                Dim dgv As BSDataGridView = bsSamplesListDataGridView
-                Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                ' TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
+                myPatientID = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
 
-                dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value)
+                ' ## Part below only execute for OrderToExport AND Only if Send to LIS checkbox has just been checked (from state unchecked to checked).
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) Then
 
-                'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
-                Dim myPatientID As String = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
+                    ' Determine OrderID(s) for selected Patient.
+                    Dim linqOrderID As List(Of String)
+                    linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                    Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a.OrderID Distinct).ToList
 
-                Dim myOrderToExport As Boolean = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
-                Dim myOrderToPrint As Boolean = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
+                    updateDSRequired = False
 
-                Dim myOrdersDelegate As New OrdersDelegate
-                Dim resultData As GlobalDataTO
+                    ' Check if all results are not valid/accepted or all related Tests not mapped to LIS.
+                    Dim myResultsDlg As New ResultsDelegate
+                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
+                        ' Display message "Results cannot be sent".
+                        warningShown = True
+                        GlobalBase.CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
+                        ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
+                    End If
+                End If
 
-                resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrint, myOrderToExport)
+                ' ## Execute part below for OrderToExport (but only in case "Results cannot be sent" message is not displayed) and for OrderToPrint.
+                If (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not warningShown) OrElse _
+                     String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
 
-                ' Update Data Set
-                If Not resultData.HasError Then
-                    For Each Row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-                        If Row.PatientID = myPatientID AndAlso Row.SampleClass = "PATIENT" Then
-                            Row.OrderToPrint = myOrderToPrint
-                            Row.OrderToExport = myOrderToExport
+                    Cursor = Cursors.WaitCursor
+
+                    ' DS refresh at the end is required.
+                    updateDSRequired = True
+                    updateColumnOrderToExport = (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0)
+
+                    ' Refresh list.
+                    Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                    dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
+
+                    myOrderToExportValue = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
+                    myOrderToPrintValue = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
+                    resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrintValue, myOrderToExportValue)
+                End If
+
+            Else
+                ' Click on header.
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+                    ' ORDER TO PRINT
+                    ' Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
+
+                    Cursor = Cursors.WaitCursor
+
+                    ' DS refresh at the end is required.
+                    updateDSRequired = True
+                    updateColumnOrderToExport = False
+                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToPrint = False Select a).ToList
+                    If linqRes.Count > 0 Then
+                        ' Some not selected.
+                        myOrderToPrintValue = True
+                    Else
+                        myOrderToPrintValue = False
+                    End If
+
+                    resultData = myOrdersDelegate.UpdateOrderToPrint(Nothing, myOrderToPrintValue)
+
+                    ' Refresh list.
+                    If Not resultData.HasError Then
+                        For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+                            bsSamplesListDataGridView("OrderToPrint", i).Value = myOrderToPrintValue
+                        Next
+                    End If
+
+                ElseIf String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 Then
+                    ' ORDER TO EXPORT
+                    ' Search new value: Some or All NOT selected -> SELECT ALL // All selected -> SELECT NONE
+
+                    ' Inform DS refresh at the end of this procedure is not required. It will be done inside the main loop.
+                    updateDSRequired = False
+                    updateColumnOrderToExport = True
+
+                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
+                    If linqRes.Count > 0 Then
+                        ' Previous state:   Some or All checkboxes are NOT selected.
+                        ' New state:        All checkboxes are selected that comply with rule (7) for sending to LIS.
+
+                        Cursor = Cursors.WaitCursor
+
+                        ' FOR EACH Patient Row in column OrderToExport.
+                        For item As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+
+                            ' Check if for current Patient Row the checkbox was NOT selected.
+                            If Not CBool(bsSamplesListDataGridView("OrderToExport", item).Value) Then
+                                ' Complies with rule 7 for sending to LIS ==> Select this checkbox.
+
+                                currentPatientID = bsSamplesListDataGridView("PatientIDToSearch", item).Value.ToString()
+
+                                ' Determine OrderID(s) for selected Patient(i).
+                                Dim linqOrderID As List(Of String)
+                                linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                Where a.SampleClass = "PATIENT" AndAlso a.PatientID = currentPatientID Select a.OrderID Distinct).ToList
+
+                                ' Look for more orders related to the same patient as in linqOrder.
+                                If linqOrderID.Count = 1 Then
+                                    Dim ordersDlg As New OrdersDelegate
+                                    resultData = ordersDlg.ReadRelatedOrdersByOrderID(Nothing, linqOrderID(0), "PATIENT")
+                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+
+                                        For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
+                                            If Not linqOrderID.Contains(row.OrderID) Then
+                                                linqOrderID.Add(row.OrderID)
+                                            End If
+                                        Next
+                                    End If
+                                End If
+
+                                ' Check if for Patient(i) all results are NOT valid/accepted OR all related Tests NOT mapped to LIS.
+                                Dim myResultsDlg As New ResultsDelegate
+                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
+                                    ' After processing of this loop display message "Results cannot be sent".
+                                    ShowWarning = True
+                                    ' Don´t allow State (OrderToExport) to change because current Patient Row does NOT comply with rule 7.
+                                    ' => myOrderToExportValue stays False.
+                                    myOrderToExportValue = False
+                                Else
+                                    ' Set New state (OrderToExport).
+                                    myOrderToExportValue = True
+                                End If
+
+                                ' Call UpdateOrderToExport for current Patient's Orders - inform only first element, UpdateOrderToExport seeks all related orders.
+                                resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, True, linqOrderID(0).ToString)
+
+                                ' Refresh the current row in the list.
+                                If Not resultData.HasError Then
+                                    bsSamplesListDataGridView("OrderToExport", item).Value = myOrderToExportValue
+                                End If
+
+                                ' Update DS for the linqOrder elements.
+                                If Not resultData.HasError Then
+                                    For Each myOrderID As String In linqOrderID
+                                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                                   Where a.SampleClass = "PATIENT" AndAlso a.OrderID = myOrderID Select a).ToList
+
+                                        For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                                            row.BeginEdit()
+                                            row.OrderToExport = myOrderToExportValue
+                                            row.EndEdit()
+                                        Next
+                                        ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
+                                    Next
+                                End If
+
+                            Else
+                                ' For current Patient Row the checkbox was selected:
+                                ' -> Do nothing...
+                            End If
+
+                        Next    ' FOR EACH Patient Row in column OrderToExport.
+
+                        ' Show warning if at least 1 Patient Row does NOT comply with rule 7 for sending to LIS.
+                        If ShowWarning Then
+                            GlobalBase.CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
+                            ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
                         End If
-                    Next Row
+
+                    Else
+                        ' Previous state:   All checkboxes were selected
+                        ' New state:        Deselect all checkboxes
+                        myOrderToExportValue = False
+
+                        Cursor = Cursors.WaitCursor
+
+                        updateDSRequired = True
+                        updateColumnOrderToExport = True
+
+                        ' Force the value for OrderToExport because it is the user desire!!
+                        resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, True)
+
+                        ' Refresh list.
+                        If Not resultData.HasError Then
+                            For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+                                bsSamplesListDataGridView("OrderToExport", i).Value = myOrderToExportValue
+                            Next
+                        End If
+
+                    End If
+                End If
+
+            End If
+
+            ' Finally update DS if required. Applies for:
+            ' OrderToPrint:  click on item
+            '                click on header
+            '
+            ' OrderToExport: click on item 
+            '                click on header only when new state = unselect all
+            '                (NOTE: click on header when new state = select all the DataSet refresh will be done in previous loop)
+            If updateDSRequired Then
+                If Not resultData Is Nothing AndAlso Not resultData.HasError Then
+                    If myPatientID <> "" Then 'Click on item
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
+
+                    Else 'Click on header
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" Select a).ToList
+                    End If
+
+                    For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                        row.BeginEdit()
+                        If Not updateColumnOrderToExport Then
+                            row.OrderToPrint = myOrderToPrintValue
+                        Else
+                            row.OrderToExport = myOrderToExportValue
+                        End If
+                        row.EndEdit()
+                    Next
 
                     ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
                 End If
             End If
+            linqRes = Nothing ' Release memory.
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
-            'If Cursor <> Cursors.Default Then Cursor = Cursors.Default
+            ' If Cursor <> Cursors.Default Then Cursor = Cursors.Default
 
             Cursor = Cursors.Default
         End Try
     End Sub
-
-    'Private Sub DataGridView_ShownEditor(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGridView.ShownEditor
-    '    If TypeOf (TryCast(sender, GridView)).ActiveEditor Is CheckEdit Then
-    '        Dim edit As CheckEdit = TryCast((TryCast(sender, GridView)).ActiveEditor, CheckEdit)
-    '        AddHandler edit.CheckedChanged, AddressOf CheckedChanged
-    '    End If
-    'End Sub
-
-
-    'Private Sub CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles OrderToExportCheckBox.CheckedChanged
-
-    '    Try
-    '        Cursor = Cursors.WaitCursor
-
-    '        Dim myPatientID As String = DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "PatientID")
-    '        Dim myOrderToExport As Boolean = Convert.ToBoolean(DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "OrderToExport"))
-    '        Dim myOrderToPrint As Boolean = Convert.ToBoolean(DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "OrderToPrint"))
-
-    '        Select Case DataGridView.FocusedColumn.FieldName
-    '            Case "OrderToPrint"
-
-    '                'If myOrderToPrint Then
-    '                '    myOrderToPrint = False
-    '                'Else
-    '                '    myOrderToPrint = True
-    '                'End If
-
-    '                'RH 24/03/2011 A more simple way to obtain the same result
-    '                myOrderToPrint = Not myOrderToPrint
-
-    '            Case "OrderToExport"
-
-    '                'If myOrderToExport Then
-    '                '    myOrderToExport = False
-    '                'Else
-    '                '    myOrderToExport = True
-    '                'End If
-
-    '                'RH 24/03/2011 A more simple way to obtain the same result
-    '                myOrderToExport = Not myOrderToExport
-    '        End Select
-
-    '        Dim myOrdersDelegate As New OrdersDelegate
-    '        'Dim resultData As New GlobalDataTO
-    '        Dim resultData As GlobalDataTO
-    '        resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrint, myOrderToExport)
-
-    '        ' Update Data Set
-    '        If Not resultData.HasError Then
-    '            For Each Row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-    '                If Row.PatientID = myPatientID AndAlso Row.SampleClass = "PATIENT" Then
-    '                    Row.OrderToPrint = myOrderToPrint
-    '                    Row.OrderToExport = myOrderToExport
-    '                    'Row.AcceptChanges()
-    '                End If
-    '            Next Row
-
-    '            'RH 25/03/2011
-    '            ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
-
-    '        End If
-
-    '        'Cursor = Cursors.Default
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " OrderToExportCheckBox_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-    '    Finally
-    '        'RH 24/03/2011 Move Cursor = Cursors.Default here because we want to restore the default cursor in any case
-    '        'wherever there is an exception or not
-    '        Cursor = Cursors.Default
-
-    '    End Try
-
-    'End Sub
 
     Private Sub bsSamplesListDataGridView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSamplesListDataGridView.Click
         Try
@@ -5450,24 +5026,24 @@ Public Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSamplesListDataGridView_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSamplesListDataGridView_SelectionChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
     ''' <summary>
-    ''' manages the index when grid is manually sorted
+    ''' Manages the index when grid is manually sorted
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>Created by SGM 10/07/2013</remarks>
+    ''' <remarks>
+    ''' Created by:  SG 10/07/2013
+    ''' </remarks>
     Private Sub bsSamplesListDataGridView_Sorted(sender As Object, e As EventArgs) Handles bsSamplesListDataGridView.Sorted
         Try
             If bsSamplesListDataGridView.SelectedRows.Count > 0 Then
                 SamplesListViewIndex = bsSamplesListDataGridView.SelectedRows(0).Index
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsSamplesListDataGridView_Sorted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsSamplesListDataGridView_Sorted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSamplesListDataGridView_Sorted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5477,15 +5053,15 @@ Public Class IResults
     ''' </summary>
     ''' <param name="pSampleType"></param>
     ''' <remarks>
-    ''' Created by Dl 23/03/2011
-    ''' AG 18/07/2012 - add parameter pSampleType and apply it to linq
+    ''' Created by:  DL 23/03/2011
+    ''' Modified by: AG 18/07/2012 - Added parameter pSampleType and apply it to linq
     ''' </remarks>
     Private Sub ShowCurve(ByVal pSampleType As String)
         Try
             Cursor = Cursors.WaitCursor
 
             'RH 19/10/2010 Introduce the Using statement
-            Using myCurveForm As New IResultsCalibCurve
+            Using myCurveForm As New UiResultsCalibCurve
 
                 'Inform the properties
                 Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = _
@@ -5496,7 +5072,7 @@ Public Class IResults
                 With myCurveForm
                     .ActiveAnalyzer = AnalyzerIDField
                     .ActiveWorkSession = WorkSessionIDField
-                    .AnalyzerModel = AnalyzerModelField
+                    .AnalyzerModel = AnalyzerModel()
                     .AverageResults = AverageResultsDS
                     .ExecutionResults = ExecutionsResultsDS
                     .SelectedTestName = TestsListViewText
@@ -5511,10 +5087,10 @@ Public Class IResults
                                             Select row.RerunNumber).First
                 End With
 
-                IAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
                 myCurveForm.ShowDialog()
                 UpdateScreenGlobalDSWithAffectedResults()
-                IAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
 
                 'TR 25/09/2013 #memory
                 TestList = Nothing
@@ -5523,7 +5099,7 @@ Public Class IResults
 
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCurveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCurveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -5539,179 +5115,6 @@ Public Class IResults
             bsSamplesListDataGridView_Click(Nothing, Nothing)
         End If
     End Sub
-
-
-#End Region
-
-    ''' <summary>
-    ''' Release elements not handle by the GC.
-    ''' </summary>
-    ''' <remarks>AG 01/08/2012
-    ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
-    ''' </remarks>
-    Private Sub ReleaseElements()
-        Try
-            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
-
-            'Class variables
-            RepImage = Nothing
-            OKImage = Nothing
-            UnCheckImage = Nothing
-            KOImage = Nothing
-            NoImage = Nothing
-            ClassImage = Nothing
-            ABS_GRAPHImage = Nothing
-            AVG_ABS_GRAPHImage = Nothing
-            CURVE_GRAPHImage = Nothing
-            INC_NEW_REPImage = Nothing
-            RED_NEW_REPImage = Nothing
-            EQ_NEW_REPImage = Nothing
-            NO_NEW_REPImage = Nothing
-            INC_SENT_REPImage = Nothing
-            RED_SENT_REPImage = Nothing
-            EQ_SENT_REPImage = Nothing
-
-            REP_INCImage = Nothing
-            EQUAL_REPImage = Nothing
-            RED_REPImage = Nothing
-            PATIENT_STATImage = Nothing
-            PATIENT_ROUTINEImage = Nothing
-            SampleIconList = Nothing
-            TestTypeIconList = Nothing
-            XtraGridIconList = Nothing
-            CollapseIconList = Nothing
-            XtraVerticalBar = Nothing
-
-            AverageResultsDS = Nothing
-            ExecutionsResultsDS = Nothing
-            IsColCollapsed = Nothing
-            IsTestSTD = Nothing
-            ResultsChart = Nothing
-            PrintImage = Nothing
-
-            ExperimentalSortType = Nothing
-            CalibratorSortType = Nothing
-            BlankSortType = Nothing
-            ControlSortType = Nothing
-            SampleSortType = Nothing
-            IsOrderPrinted = Nothing
-            IsOrderHISSent = Nothing
-            LISSubHeaderImage = Nothing
-            LISHeadImage = Nothing
-            PrintHeadImage = Nothing
-            LISExperimentalHeadImage = Nothing
-            LISControlHeadImage = Nothing
-            LISSamplesHeadImage = Nothing
-            HeadRect = Nothing
-            SamplesAverageList = Nothing
-            tblXtraSamples = Nothing
-            'mdiAnalyzerCopy = Nothing 'not this variable
-            copyRefreshDS = Nothing
-
-            'Buttons with images
-
-            PrintReportButton.Image = Nothing
-            PrintCompactReportButton.Image = Nothing
-            SummaryButton.Image = Nothing
-            PrintSampleButton.Image = Nothing
-            PrintTestButton.Image = Nothing
-            SendManRepButton.Image = Nothing
-            OffSystemResultsButton.Image = Nothing
-            ExportButton.Image = Nothing
-            ExitButton.Image = Nothing
-            bsXlsresults.Image = Nothing
-
-            'TR 25/09/2013 #memory
-            StrikeFont = Nothing
-            RegularFont = Nothing
-            XtraStrikeFont = Nothing
-            RegularBkColor = Nothing
-            StrikeBkColor = Nothing
-            StrikeForeColor = Nothing
-            AverageBkColor = Nothing
-            AverageForeColor = Nothing
-            PrintPictureBox.Image = Nothing
-            HISPictureBox.Image = Nothing
-            'TR 25/09/2013 #memory
-
-            With CollapseColumnControls
-                .Name = CollapseColName
-                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
-            End With
-
-            With CollapseColumnExperimentals
-                .Name = CollapseColName
-                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
-            End With
-
-            With CollapseColumnCalibrators
-                .Name = CollapseColName
-                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
-            End With
-
-            With CollapseColumnBlanks
-                .Name = CollapseColName
-                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
-            End With
-
-            '--- Detach variable defined using WithEvents ---
-            bsErrorProvider1 = Nothing
-            bsProgTestToolTips = Nothing
-            bsPanel2 = Nothing
-            bsPanel4 = Nothing
-            Cycle = Nothing
-            Abs1 = Nothing
-            Abs2 = Nothing
-            Diff = Nothing
-            OrderToExportCheckBox = Nothing
-            OrderToPrintCheckBox = Nothing
-            STATImage = Nothing
-            ExitButton = Nothing
-            bsXlsresults = Nothing
-            ExportButton = Nothing
-            OffSystemResultsButton = Nothing
-            SendManRepButton = Nothing
-            bsResultFormGroupBox = Nothing
-            bsSamplesResultsTabControl = Nothing
-            bsExperimentalsTabPage = Nothing
-            bsExperimentalsDataGridView = Nothing
-            bsResultsTabControl = Nothing
-            bsBlanksTabPage = Nothing
-            bsBlanksDataGridView = Nothing
-            bsCalibratorsTabPage = Nothing
-            bsCalibratorsDataGridView = Nothing
-            bsControlsTabPage = Nothing
-            bsControlsDataGridView = Nothing
-            bsTestDetailsTabControl = Nothing
-            bsSamplesTab = Nothing
-            bsSamplesListDataGridView = Nothing
-            bsTestsTabTage = Nothing
-            bsTestsListDataGridView = Nothing
-            bsResultsFormLabel = Nothing
-            bsTestPanel = Nothing
-            PrintTestButton = Nothing
-            bsSamplesPanel = Nothing
-            PrintReportButton = Nothing
-            SummaryButton = Nothing
-            PrintSampleButton = Nothing
-            XtraSamplesTabPage = Nothing
-            SamplesXtraGrid = Nothing
-            SamplesXtraGridView = Nothing
-            ToolTipController1 = Nothing
-            AlarmsDS1 = Nothing
-            PrintCompactReportButton = Nothing
-            PrintTestBlankButton = Nothing
-            PrintTestCtrlButton = Nothing
-            '------------------------------------------------
-
-            'GC.Collect() 
-
-        Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
-        End Try
-    End Sub
-
 #End Region
 
 #Region "Public Methods"
@@ -5730,6 +5133,668 @@ Public Class IResults
         ' Add any initialization after the InitializeComponent() call.
     End Sub
 
+    ''' <summary>
+    ''' Updates the Results gridview
+    ''' </summary>
+    ''' <param name="pRefreshEventType">RefreshEventType</param>
+    ''' <param name="pRefreshDS">UIRefreshDS with info to update</param>
+    ''' <remarks>
+    ''' Created by:  RH 10/01/2011
+    ''' Modified by: AG 12/04/2011 - Rename for RefreshScreen method (use the same method name in all screen)
+    ''' </remarks>
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+        Try
+            Dim startTime As DateTime = Now 'AG 26/06/2012 - time estimation
+
+            If isClosingFlag Then Exit Sub 'AG 03/08/2012 - #1496 No refresh if screen is closing
+
+            'AG 21/06/2012
+            If Not pRefreshDS Is Nothing Then
+                Dim lockThis As New Object()
+                SyncLock lockThis
+                    copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
+                End SyncLock
+            Else
+                copyRefreshDS = Nothing
+            End If
+            'AG 21/06/2012
+
+            LoadExecutionsResults()
+
+            'AG 22/06/2012 - evaluate if refresh current grid is required
+            'RH 03/08/2011 This forces the methods UpdateXXXXDataGrid() to repaint de grid.
+            'BlankTestName = String.Empty
+            'CalibratorTestName = String.Empty
+            'ControlTestName = String.Empty
+            'SampleTestName = String.Empty
+            'ExperimentalSampleIndex = -1
+            'SamplesListViewIndex = -1
+            PrepareFlagsForRefreshAffectedGrids(pRefreshDS)
+
+            UpdateTestsListDataGrid()
+            UpdateSamplesListDataGrid()
+            Debug.Print("IResults.RefreshScreen (TOTAL): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 26/06/2012 - time estimation
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+
+        End Try
+        copyRefreshDS = Nothing 'AG 21/06/2012
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
+    ''' </remarks>
+    Public Sub ExportResults()
+        Try
+            Dim resultData As GlobalDataTO
+            Dim swParams As New SwParametersDelegate
+            resultData = swParams.ReadByAnalyzerModel(Nothing, AnalyzerModel)
+
+            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                Dim myDS As ParametersDS
+                myDS = CType(resultData.SetDatos, ParametersDS)
+
+                Dim myList As List(Of ParametersDS.tfmwSwParametersRow)
+                myList = (From a As ParametersDS.tfmwSwParametersRow In myDS.tfmwSwParameters _
+                          Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.XLS_RESULTS_DOC.ToString(), False) = 0 _
+                          Select a).ToList()
+
+                Dim filename As String = ""
+                If myList.Count > 0 Then filename = myList(0).ValueText
+
+                myList = (From a As ParametersDS.tfmwSwParametersRow In myDS.tfmwSwParameters _
+                          Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.XLS_PATH.ToString(), False) = 0 _
+                          Select a).ToList()
+
+                Dim pathname As String = ""
+                If myList.Count > 0 Then pathname = myList(0).ValueText
+
+                If pathname.StartsWith("\") AndAlso Not pathname.StartsWith("\\") Then
+                    pathname = Application.StartupPath & pathname & DateTime.Now.ToString("dd-MM-yyyy HH-mm") & "\"
+                End If
+
+                If String.Compare(filename, "", False) <> 0 AndAlso String.Compare(pathname, "", False) <> 0 Then
+                    Dim xlsResults As New ResultsFileDelegate
+                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
+
+                    If resultData.HasError Then
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
+
+                        'DL 15/05/2013
+                        'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)
+                        Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me))
+                        'DL 15/05/2013
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            'DL 15/05/2013
+            'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))"))
+            'DL 15/05/2013
+
+        Finally
+            CreatingXlsResults = False
+            ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
+        End Try
+    End Sub
+
+    Public Function ExportResultsWithParameters(ByVal pFileName As String, ByVal pPath As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Dim resultData As GlobalDataTO = Nothing
+
+        Try
+
+            If String.Compare(pFileName, "", False) <> 0 AndAlso String.Compare(pPath, "", False) <> 0 Then
+                Dim xlsResults As New ResultsFileDelegate
+                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+
+        Return resultData
+
+    End Function
+
+    ''' <summary>
+    ''' Enable or disable functionallity by user level.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: TR 16/05/2012
+    ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+    ''' </remarks>
+    Private Sub ScreenStatusByUserLevel()
+        Try
+            Select Case CurrentUserLevel    '.ToUpper()
+                Case "SUPERVISOR"
+                    bsXlsresults.Visible = False
+                    Exit Select
+
+                Case "OPERATOR"
+                    bsXlsresults.Visible = False
+                    Exit Select
+
+                Case "ADMINISTRATOR"
+                    bsXlsresults.Visible = False
+                    Exit Select
+
+            End Select
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "NEW METHODS"
+    ''' <summary>
+    ''' Change accepted result (different rerun result) for an OrderTestID
+    ''' </summary>
+    ''' <param name="RowValues">Row of a typed DataSet ResultsDS containing data of the result (OrderTestID/RerunNumber) selected to be accepted</param>
+    ''' <remarks>
+    ''' Created by:  SA 16/07/2012 - Based on ChangeAcceptedResult
+    ''' AG 16/10/2014 BA-2011 For ISE, CALC and OFFS inform test type and sample class in dataset before call RecalculateResultsDelegate
+    ''' </remarks>
+    Private Sub ChangeAcceptedResultNEW(ByVal RowValues As ResultsDS.vwksResultsRow)
+        Try
+            Dim myGlobal As New GlobalDataTO
+            Dim myRecalDelegate As New RecalculateResultsDelegate
+
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
+            Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
+
+            If String.Equals(RowValues.TestType, "STD") Then
+                'Get the maximum MultiItemNumber and ReplicateNumber for the selected OrderTestID/RerunNumber 
+                Dim maxItemNumber As Integer = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                               Where row.OrderTestID = RowValues.OrderTestID _
+                                             AndAlso row.RerunNumber = RowValues.RerunNumber _
+                                              Select row.MultiItemNumber).Max
+
+                'Get all data of the Execution for the maximum MultiItemNumber and ReplicateNumber 
+                executionRowToRecalculate = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                            Where row.OrderTestID = RowValues.OrderTestID _
+                                          AndAlso row.RerunNumber = RowValues.RerunNumber _
+                                          AndAlso row.MultiItemNumber = maxItemNumber _
+                                         Order By row.ReplicateNumber Descending _
+                                           Select row).First
+            Else
+                'ISE, OFFS, CALC - Inform the data needed to update the AcceptedResultFlag of the results
+                executionRowToRecalculate = ExecutionsResultsDS.vwksWSExecutionsResults.NewvwksWSExecutionsResultsRow 'DL 19/07/2012 
+                executionRowToRecalculate.BeginEdit()
+                executionRowToRecalculate.AnalyzerID = RowValues.AnalyzerID
+                executionRowToRecalculate.WorkSessionID = RowValues.WorkSessionID
+                executionRowToRecalculate.OrderTestID = RowValues.OrderTestID
+                executionRowToRecalculate.RerunNumber = RowValues.RerunNumber
+
+                'AG 16/10/2014 BA-2011
+                executionRowToRecalculate.SampleClass = RowValues.SampleClass
+                executionRowToRecalculate.TestType = RowValues.TestType
+                'AG 16/10/2014 BA-2011
+
+                executionRowToRecalculate.EndEdit()
+            End If
+
+            Cursor = Cursors.WaitCursor
+
+            'AG 16/10/2014 BA-2011
+            'myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate)
+            Dim myExportStatus As String = ""
+            If Not RowValues.IsExportStatusNull Then myExportStatus = RowValues.ExportStatus
+            myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate, RowValues.ExportStatus)
+            'AG 15/10/2014 BA-2011
+
+            If (Not myGlobal.HasError) Then
+                UpdateScreenGlobalDSWithAffectedResults()
+
+                If (String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0) Then
+                    UpdateSamplesListDataGrid()
+                Else
+                    UpdatePatientList = True
+                End If
+            End If
+
+            Cursor = Cursors.Default
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeAcceptedResultNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ChangeAcceptedResultNEW ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+
+            Me.Cursor = Cursors.Default
+        Finally
+            Cursor = Cursors.Default
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Change Calibration Type from Experimental to Factor when the Manual Factor is informed OR
+    ''' Change Calibration Type from Factor to Experimental when the Manual Factor is deleted
+    ''' This change can be done in Calibrators DataGridView in Results Screen and in WS Preparation Screen
+    ''' </summary>
+    ''' <param name="pUseManualFactor">When TRUE, it indicates the Calibration will be changed from Experimental to Manual
+    '''                                When FALSE, it indicates the Calibration will be changed from Manual to Experimental</param>
+    ''' <param name="RowValues">Row of typed DataSet ResultsDS (subtable vwksResultsRow) containing all data of the selected 
+    '''                         single-point Calibrator</param>
+    ''' <param name="pManualFactorValue">When pUseManualFactor is TRUE, the entered Manual Calibration Factor
+    '''                                  When pUseManualFactot is FALSE, zero</param>
+    ''' <param name="pDgv">Calibrators DataGridView</param>
+    ''' <remarks>
+    ''' Created by:  SA 16/07/2012 - Based on ChangeCalibrationType
+    ''' </remarks>
+    Private Sub ChangeCalibrationTypeNEW(ByVal pUseManualFactor As Boolean, ByVal RowValues As ResultsDS.vwksResultsRow, _
+                                         ByVal pManualFactorValue As Single, ByRef pDgv As BSDataGridView)
+        Try
+            Dim myGlobal As New GlobalDataTO
+            Dim myRecalDelegate As New RecalculateResultsDelegate
+
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
+            Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
+
+            'Get the maximum MultiItemNumber for the selected OrderTestID/RerunNumber 
+            Dim maxItemNumber As Integer = (From row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                           Where row.OrderTestID = RowValues.OrderTestID _
+                                         AndAlso row.RerunNumber = RowValues.RerunNumber _
+                                          Select row.MultiItemNumber).Max
+            If (maxItemNumber = 1) Then
+                Cursor = Cursors.WaitCursor
+
+                'Get all data of the Execution for the maximum MultiItemNumber and ReplicateNumber 
+                executionRowToRecalculate = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                            Where row.OrderTestID = RowValues.OrderTestID _
+                                          AndAlso row.RerunNumber = RowValues.RerunNumber _
+                                          AndAlso row.MultiItemNumber = maxItemNumber _
+                                       Order By row.ReplicateNumber Descending _
+                                         Select row).First
+
+                myGlobal = myRecalDelegate.UpdateManualCalibrationFactorNEW(executionRowToRecalculate, pUseManualFactor, pManualFactorValue)
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    Dim actionAllowed As Boolean = CType(myGlobal.SetDatos, Boolean)
+
+                    If (actionAllowed) Then
+                        UpdateScreenGlobalDSWithAffectedResults()
+
+                        'After manual factor recalculations the HIS export icon maybe changes
+                        If (String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0) Then
+                            UpdateSamplesListDataGrid()
+                        End If
+
+                        'AG 26/07/2012 - new versions set the strike row when grid is repainted
+                        'If (pUseManualFactor) Then
+                        '    pDgv.CurrentRow.DefaultCellStyle.Font = StrikeFont
+                        '    pDgv.CurrentCell.Style.Font = RegularFont
+                        'Else
+                        '    pDgv.CurrentRow.DefaultCellStyle.Font = RegularFont
+                        'End If
+                    End If
+                End If
+                Cursor = Cursors.Default
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCalibrationTypeNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ChangeCalibrationTypeNEW", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+
+            Cursor = Cursors.Default
+        Finally
+            Cursor = Cursors.Default
+        End Try
+    End Sub
+#End Region
+
+#Region "METHODS ADDED FOR v3.1.0"
+    ''' <summary>
+    ''' Activate/Deactivate all screen buttons and also buttons and menu entries in the MainMDI, depending of value of parameter pStatusToSet
+    ''' </summary>
+    ''' <param name="pStatusToSet">True to activate buttons; False to deactivate them</param>
+    ''' <remarks>
+    ''' Created by:  SA 19/09/2014 - BA-1927 ==> Created due to this code was executed twice (to deactivate and then to activate) in several
+    '''                                          functions. Added PrintCompactReportButton to the list of buttons disabled/enabled (it was missing)
+    ''' </remarks>
+    Private Sub ActivateDeactivateAllButtons(ByVal pStatusToSet As Boolean)
+        Try
+            'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
+            UiAx00MainMDI.EnableButtonAndMenus(pStatusToSet)
+            PrintReportButton.Enabled = pStatusToSet
+            PrintCompactReportButton.Enabled = pStatusToSet
+            SummaryButton.Enabled = pStatusToSet
+            PrintSampleButton.Enabled = pStatusToSet
+            PrintTestButton.Enabled = pStatusToSet
+            bsXlsresults.Enabled = pStatusToSet
+            ExitButton.Enabled = pStatusToSet
+
+            'Buttons with special activation rules...
+            If (Not pStatusToSet) Then
+                OffSystemResultsButton.Enabled = pStatusToSet
+                SendManRepButton.Enabled = pStatusToSet
+            Else
+                OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
+                SendManRepButton.Enabled = SendManRepButtonEnabled()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ActivateDeactivateAllButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Manage the process of manual export of results to LIS 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 18/09/2014 - BA-1927 ==> * Code moved from event ExportButton.Click
+    '''                                          * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
+    '''                                          * Count the number of results to Export before start the process. If it is greater than 100, show the warning 
+    '''                                            message (using multilanguage) and stop the process
+    '''                                          * Call new function ActivateDeactivateAllButtons to deactivate/activate buttons when the process starts/finishes
+    '''                                          * Refresh the list of Patients also when the Export to LIS has been executed from Tests View to update CheckBox 
+    '''                                            ExportToLIS for all Patients which results have been exported 
+    ''' Modified by: AG 30/09/2014 - BA-1440 ==> Inform that is a manual exportation when call method InvokeUploadResultsLIS
+    ''' </remarks>
+    Private Sub ExportResultsToLIS()
+        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        Dim StartTime As DateTime = Now
+        'Dim myLogAcciones As New ApplicationLogManager()
+        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+        Try
+            'If LIS Connection is not available, do nothing
+            If (Not VerifyExportToLISAllowed()) Then Return
+
+            'BT #1499 - Use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here) 
+            Dim pCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
+            pCounters.GetAllCounters()
+            pCounters = Nothing
+
+            'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
+            ActivateDeactivateAllButtons(False)
+
+            'BA-1887: Get value of parameter for the maximum number of results that can be exported in a group (default value = 100)
+            Dim resultData As New GlobalDataTO
+            Dim swParamDlg As New SwParametersDelegate
+            Dim maxResultsToExport As Integer = 100
+
+            resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                Dim myDS As ParametersDS = DirectCast(resultData.SetDatos, ParametersDS)
+
+                If (myDS.tfmwSwParameters.Rows.Count > 0) AndAlso (Not myDS.tfmwSwParameters(0).IsValueNumericNull) Then
+                    maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+                End If
+            End If
+
+            'When the current screen view is by Patient, Patient results that have been already exported to LIS will be exported again;
+            'When the current screen view is by Test, only Patient and Control results with ExportStatus <> SENT will be exported to LIS
+            Dim includeExportedResults As Boolean = (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name)
+
+            'BA-1927: Count the number of results to Export to check if it is greater than the maximum allowed
+            Dim stopProcess As Boolean = False
+            Dim myResultsDelegate As New ResultsDelegate
+
+            resultData = myResultsDelegate.CountTotalResultsToExportToLIS(Nothing, AnalyzerIDField, WorkSessionIDField, includeExportedResults)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                If (CInt(resultData.SetDatos) > maxResultsToExport) Then
+                    'Show the warning message and stop the process 
+                    stopProcess = True
+                    ShowMessage(Me.Name, GlobalEnumerates.Messages.MAX_RESULTS_FOR_LISEXPORT.ToString, , Me)
+
+                ElseIf (CInt(resultData.SetDatos) = 0) Then
+                    'If there is nothing to Export, stop the process
+                    stopProcess = True
+                End If
+            Else
+                'If an error has happened, stop the export process
+                stopProcess = True
+            End If
+
+            If (Not stopProcess) Then
+                'AG 29/07/2014 - BA-1887 (if current screen view is Patient, includeExportedResults = True, which means that Patient Results already exported will be re-sent)
+                Dim myExport As New ExportDelegate
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, includeExportedResults)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    Dim exportResults As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+                    'AG 17/02/2014 - BT #1505
+                    If (exportResults.twksWSExecutions.Rows.Count > 0) Then
+                        'Pass the list of Results to be exported to LIS to the MainMDI
+                        UiAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+
+                        'AG 17/02/2014 - BT #1505: improvement, copy DS using Merge instead of loops
+                        Dim myResultsAlarmsDS As New ResultsDS
+                        myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
+                        myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+
+                        'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        GlobalBase.CreateLogActivity("Current Results manual upload", Me.Name & ".ExportResultsToLIS ", EventLogEntryType.Information, False)
+
+                        UiAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportResultsToLIS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ExportResultsToLIS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+
+        Finally
+            UpdateScreenGlobalDSWithAffectedResults()
+
+            'BA-1927: The list of Patients have to be refreshed also when the Export to LIS has been executed from Tests View 
+            '         to update CheckBox ExportToLIS for all Patients which results have been exported 
+            UpdateSamplesListDataGrid()
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsTestsTabTage.Name) Then
+                Select Case bsResultsTabControl.SelectedTab.Name
+                    Case bsBlanksTabPage.Name
+                        'UpdateBlanksDataGrid()
+                    Case bsCalibratorsTabPage.Name
+                        'UpdateCalibratorsDataGrid()
+                    Case bsControlsTabPage.Name
+                        UpdateControlsDataGrid()
+                    Case XtraSamplesTabPage.Name
+                        UpdateSamplesXtraGrid()
+                End Select
+                Application.DoEvents()
+            End If
+
+            'Enable screen buttons, and enable also all buttons and menus in the MainMDI
+            ActivateDeactivateAllButtons(True)
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "IResults.ExportResultsToLIS", EventLogEntryType.Information, False)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            'for refreshing data when ack from lis
+            ExperimentalSampleIndex = -1 'SG 16/03/2013
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of screen controls (panels, tab and buttons) according the view selected: by Patient or by Test
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927 ==> Code moved from event bsTestDetailsTabControl.Selected
+    '''                                         Changed the way of set the visibility of ExportButton (there was an error in the previous code)
+    '''                                         Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+    ''' </remarks>
+    Private Sub TestDetailsTabSelectedEvent()
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            'Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Select Case (bsTestDetailsTabControl.SelectedTab.Name)
+                Case bsSamplesTab.Name
+                    'View by PATIENT
+                    bsSamplesResultsTabControl.Visible = True
+                    bsSamplesPanel.Visible = True
+
+                    bsTestPanel.Visible = False
+                    bsResultsTabControl.Visible = False
+
+                    'BA-1927: The ExportButton will be always visible in Patients View
+                    ExportButton.Visible = True
+
+                Case bsTestsTabTage.Name
+                    'View by TEST
+                    bsSamplesResultsTabControl.Visible = False
+                    bsSamplesPanel.Visible = False
+
+                    bsTestPanel.Visible = True
+                    bsResultsTabControl.Visible = True
+
+                    'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
+                    '         The previous comparation by Name was wrong (bsResultsTabControl.SelectedTab.Name = "XtraSamplesTabPage",
+                    '         while bsSamplesTab.Name = "bsSamplesTab")
+                    ExportButton.Visible = (bsResultsTabControl.SelectedTab.Name = bsControlsTabPage.Name OrElse _
+                                            bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
+
+                    'BT #1502 - This two buttons are hide because the test of the new reports have not been executed
+                    PrintTestBlankButton.Visible = False
+            End Select
+
+            'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
+
+            If (Not ProcessEvent) Then Return
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name) Then
+                'RH 13/12/2010 
+                'Change the order of the instructions: first update the Samples list, and then update the experimental grid.
+                'That is the proper way to avoid calling UpdateExperimentalsDataGrid() twice
+                If (UpdatePatientList) Then
+                    UpdateSamplesListDataGrid()
+                    UpdatePatientList = False
+                End If
+                Application.DoEvents()
+                UpdateExperimentalsDataGrid()
+            Else
+                UpdateCurrentResultsGrid()
+            End If
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+                                            " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
+                                            "IResults.TestDetailsTabSelectedEvent", EventLogEntryType.Information, False)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestDetailsTabSelectedEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of screen buttons in view by Test according the tab of SampleClass selected 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927 ==> Code moved from event bsResultsTabControl.Selected
+    '''                                         Changed the way of set the visibility of ExportButton (there was an error in the previous code)
+    '''                                         Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+    ''' </remarks>
+    Private Sub ResultsTabControlSelectedEvent()
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            'Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
+            '         The previous comparation was incomplete due to for Controls the button remained hidden
+            ExportButton.Visible = (bsResultsTabControl.SelectedTab.Name = bsControlsTabPage.Name OrElse _
+                                    bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
+
+            'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
+
+            If (Not ProcessEvent) Then Return
+            UpdateCurrentResultsGrid()
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
+                                            & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
+                                            "IResults.ResultsTabControlSelectedEvent", EventLogEntryType.Information, False)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsTabControlSelectedEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of button for Send Manual Repetition. The button has to be disabled in following conditions:
+    ''' (1) If the status of the active Work Session is ABORTED
+    ''' (2) In Patients View, if setting LIS Working Mode for Reruns has been set to LIS ONLY
+    ''' (3) In Tests View, if the active Tab is Patients and setting LIS Working Mode for Reruns has been set to LIS ONLY
+    ''' </summary>
+    ''' <returns>True is the button can be enabled; otherwise False</returns>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927
+    ''' </remarks>
+    Private Function SendManRepButtonEnabled() As Boolean
+        Dim buttonEnabled As Boolean = True
+
+        Try
+            If (WSStatusField = "ABORTED") Then
+                '(1) If the Work Session is ABORTED, the button is not available
+                buttonEnabled = False
+            Else
+                If (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name) Then
+                    '(2) In Patients View, the button availability depends on value of setting LIS Rerun Mode
+                    buttonEnabled = (MyClass.LISWorkingModeReruns <> "LIS")
+                Else
+                    '(3) Tests View
+                    If (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name) Then
+                        'For PATIENTS, the button availability depends on value of setting LIS Rerun Mode
+                        buttonEnabled = (MyClass.LISWorkingModeReruns <> "LIS")
+                    Else
+                        'For BLANKS, CALIBRATORS and CONTROLS, the button is always available
+                        buttonEnabled = True
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SendManRepButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SendManRepButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return buttonEnabled
+    End Function
+
+    ''' <summary>
+    ''' Check the status of the LIS Connection (before execute the process of Export Results to LIS). 
+    ''' </summary>
+    ''' <returns>True is the Export Results to LIS can be executed; otherwise False</returns>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927
+    ''' </remarks>
+    Private Function VerifyExportToLISAllowed() As Boolean
+        Dim connectEnabled As Boolean = True
+        Try
+            If (AnalyzerController.IsAnalyzerInstantiated AndAlso Not mdiESWrapperCopy Is Nothing) Then
+                Dim myESBusinessDlg As New ESBusiness
+
+                Dim runningFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+                Dim connectingFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+
+                connectEnabled = myESBusinessDlg.AllowLISAction(Nothing, LISActions.HostQuery, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
+            Else
+                connectEnabled = False
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyExportToLISAllowed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".VerifyExportToLISAllowed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return connectEnabled
+    End Function
+#End Region
+
+#Region "TO DELETE"
     ' XB 26/02/2014 - Change the way to open the screen using OpenMDIChildForm generic method to avoid OutOfMem errors when back to Monitor - task #1529
     ' ''' <summary>
     ' ''' Creates a new instance of this class and shows SampleClass and SampleOrTestName info
@@ -5819,310 +5884,5 @@ Public Class IResults
 
     'End Sub
     ' XB 26/02/2014 - task #1529
-
-    ''' <summary>
-    ''' Updates the Results gridview
-    ''' </summary>
-    ''' <param name="pRefreshEventType">RefreshEventType</param>
-    ''' <param name="pRefreshDS">UIRefreshDS with info to update</param>
-    ''' <remarks>
-    ''' Created by: RH 10/01/2011
-    ''' AG 12/04/2011 - rename for RefreshScreen method (use the same method name in all screen)
-    ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
-        Try
-            Dim startTime As DateTime = Now 'AG 26/06/2012 - time estimation
-
-            If isClosingFlag Then Exit Sub 'AG 03/08/2012 - #1496 No refresh if screen is closing
-
-            'AG 21/06/2012
-            If Not pRefreshDS Is Nothing Then
-                Dim lockThis As New Object()
-                SyncLock lockThis
-                    copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
-                End SyncLock
-            Else
-                copyRefreshDS = Nothing
-            End If
-            'AG 21/06/2012
-
-            LoadExecutionsResults()
-
-            'AG 22/06/2012 - evaluate if refresh current grid is required
-            'RH 03/08/2011 This forces the methods UpdateXXXXDataGrid() to repaint de grid.
-            'BlankTestName = String.Empty
-            'CalibratorTestName = String.Empty
-            'ControlTestName = String.Empty
-            'SampleTestName = String.Empty
-            'ExperimentalSampleIndex = -1
-            'SamplesListViewIndex = -1
-            PrepareFlagsForRefreshAffectedGrids(pRefreshDS)
-
-            UpdateTestsListDataGrid()
-            UpdateSamplesListDataGrid()
-            Debug.Print("IResults.RefreshScreen (TOTAL): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 26/06/2012 - time estimation
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        End Try
-        copyRefreshDS = Nothing 'AG 21/06/2012
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks>
-    ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
-    ''' </remarks>
-    Public Sub ExportResults()
-        Try
-            Dim resultData As GlobalDataTO
-            Dim swParams As New SwParametersDelegate
-            resultData = swParams.ReadByAnalyzerModel(Nothing, AnalyzerModel)
-
-            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                Dim myDS As ParametersDS
-                myDS = CType(resultData.SetDatos, ParametersDS)
-
-                Dim myList As List(Of ParametersDS.tfmwSwParametersRow)
-                myList = (From a As ParametersDS.tfmwSwParametersRow In myDS.tfmwSwParameters _
-                          Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.XLS_RESULTS_DOC.ToString(), False) = 0 _
-                          Select a).ToList()
-
-                Dim filename As String = ""
-                If myList.Count > 0 Then filename = myList(0).ValueText
-
-                myList = (From a As ParametersDS.tfmwSwParametersRow In myDS.tfmwSwParameters _
-                          Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.XLS_PATH.ToString(), False) = 0 _
-                          Select a).ToList()
-
-                Dim pathname As String = ""
-                If myList.Count > 0 Then pathname = myList(0).ValueText
-
-                If pathname.StartsWith("\") AndAlso Not pathname.StartsWith("\\") Then
-                    pathname = Application.StartupPath & pathname & DateTime.Now.ToString("dd-MM-yyyy HH-mm") & "\"
-                End If
-
-                If String.Compare(filename, "", False) <> 0 AndAlso String.Compare(pathname, "", False) <> 0 Then
-                    Dim xlsResults As New ResultsFileDelegate
-                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
-
-                    If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
-
-                        'DL 15/05/2013
-                        'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)
-                        Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me))
-                        'DL 15/05/2013
-                    End If
-                End If
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            'DL 15/05/2013
-            'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-            Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))"))
-            'DL 15/05/2013
-
-        Finally
-            CreatingXlsResults = False
-            ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
-        End Try
-    End Sub
-
-    Public Function ExportResultsWithParameters(ByVal pFileName As String, ByVal pPath As String, ByVal pWorkSessionID As String) As GlobalDataTO
-        Dim resultData As GlobalDataTO
-
-        Try
-
-            If String.Compare(pFileName, "", False) <> 0 AndAlso String.Compare(pPath, "", False) <> 0 Then
-                Dim xlsResults As New ResultsFileDelegate
-                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-
-        Return resultData
-
-    End Function
-
-    ''' <summary>
-    ''' Enable or disable functionallity by user level.
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: TR 16/05/2012
-    ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
-    ''' </remarks>
-    Private Sub ScreenStatusByUserLevel()
-        Try
-            Select Case CurrentUserLevel    '.ToUpper()
-                Case "SUPERVISOR"
-                    bsXlsresults.Visible = False
-                    Exit Select
-
-                Case "OPERATOR"
-                    bsXlsresults.Visible = False
-                    Exit Select
-
-                Case "ADMINISTRATOR"
-                    bsXlsresults.Visible = False
-                    Exit Select
-
-            End Select
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
 #End Region
-
-#Region "NEW METHODS"
-    ''' <summary>
-    ''' Change accepted result (different rerun result) for an OrderTestID
-    ''' </summary>
-    ''' <param name="RowValues">Row of a typed DataSet ResultsDS containing data of the result (OrderTestID/RerunNumber) selected to be accepted</param>
-    ''' <remarks>
-    ''' Created by:  SA 16/07/2012 - Based on ChangeAcceptedResult
-    ''' </remarks>
-    Private Sub ChangeAcceptedResultNEW(ByVal RowValues As ResultsDS.vwksResultsRow)
-        Try
-            Dim myGlobal As New GlobalDataTO
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
-
-            If String.Equals(RowValues.TestType, "STD") Then
-                'Get the maximum MultiItemNumber and ReplicateNumber for the selected OrderTestID/RerunNumber 
-                Dim maxItemNumber As Integer = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                               Where row.OrderTestID = RowValues.OrderTestID _
-                                             AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                              Select row.MultiItemNumber).Max
-
-                'Get all data of the Execution for the maximum MultiItemNumber and ReplicateNumber 
-                executionRowToRecalculate = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                            Where row.OrderTestID = RowValues.OrderTestID _
-                                          AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                          AndAlso row.MultiItemNumber = maxItemNumber _
-                                         Order By row.ReplicateNumber Descending _
-                                           Select row).First
-            Else
-                'ISE, OFFS, CALC - Inform the data needed to update the AcceptedResultFlag of the results
-                executionRowToRecalculate = ExecutionsResultsDS.vwksWSExecutionsResults.NewvwksWSExecutionsResultsRow 'DL 19/07/2012 
-                executionRowToRecalculate.BeginEdit()
-                executionRowToRecalculate.AnalyzerID = RowValues.AnalyzerID
-                executionRowToRecalculate.WorkSessionID = RowValues.WorkSessionID
-                executionRowToRecalculate.OrderTestID = RowValues.OrderTestID
-                executionRowToRecalculate.RerunNumber = RowValues.RerunNumber
-                executionRowToRecalculate.EndEdit()
-            End If
-
-            Cursor = Cursors.WaitCursor
-            myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate)
-
-            If (Not myGlobal.HasError) Then
-                UpdateScreenGlobalDSWithAffectedResults()
-
-                If (String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0) Then
-                    UpdateSamplesListDataGrid()
-                Else
-                    UpdatePatientList = True
-                End If
-            End If
-
-            Cursor = Cursors.Default
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeAcceptedResultNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ChangeAcceptedResultNEW ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-            Me.Cursor = Cursors.Default
-        Finally
-            Cursor = Cursors.Default
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Change Calibration Type from Experimental to Factor when the Manual Factor is informed OR
-    ''' Change Calibration Type from Factor to Experimental when the Manual Factor is deleted
-    ''' This change can be done in Calibrators DataGridView in Results Screen and in WS Preparation Screen
-    ''' </summary>
-    ''' <param name="pUseManualFactor">When TRUE, it indicates the Calibration will be changed from Experimental to Manual
-    '''                                When FALSE, it indicates the Calibration will be changed from Manual to Experimental</param>
-    ''' <param name="RowValues">Row of typed DataSet ResultsDS (subtable vwksResultsRow) containing all data of the selected 
-    '''                         single-point Calibrator</param>
-    ''' <param name="pManualFactorValue">When pUseManualFactor is TRUE, the entered Manual Calibration Factor
-    '''                                  When pUseManualFactot is FALSE, zero</param>
-    ''' <param name="pDgv">Calibrators DataGridView</param>
-    ''' <remarks>
-    ''' Created by:  SA 16/07/2012 - Based on ChangeCalibrationType
-    ''' </remarks>
-    Private Sub ChangeCalibrationTypeNEW(ByVal pUseManualFactor As Boolean, ByVal RowValues As ResultsDS.vwksResultsRow, _
-                                         ByVal pManualFactorValue As Single, ByRef pDgv As BSDataGridView)
-        Try
-            Dim myGlobal As New GlobalDataTO
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
-
-            'Get the maximum MultiItemNumber for the selected OrderTestID/RerunNumber 
-            Dim maxItemNumber As Integer = (From row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                           Where row.OrderTestID = RowValues.OrderTestID _
-                                         AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                          Select row.MultiItemNumber).Max
-            If (maxItemNumber = 1) Then
-                Cursor = Cursors.WaitCursor
-
-                'Get all data of the Execution for the maximum MultiItemNumber and ReplicateNumber 
-                executionRowToRecalculate = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                            Where row.OrderTestID = RowValues.OrderTestID _
-                                          AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                          AndAlso row.MultiItemNumber = maxItemNumber _
-                                       Order By row.ReplicateNumber Descending _
-                                         Select row).First
-
-                myGlobal = myRecalDelegate.UpdateManualCalibrationFactorNEW(executionRowToRecalculate, pUseManualFactor, pManualFactorValue)
-                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    Dim actionAllowed As Boolean = CType(myGlobal.SetDatos, Boolean)
-
-                    If (actionAllowed) Then
-                        UpdateScreenGlobalDSWithAffectedResults()
-
-                        'After manual factor recalculations the HIS export icon maybe changes
-                        If (String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0) Then
-                            UpdateSamplesListDataGrid()
-                        End If
-
-                        'AG 26/07/2012 - new versions set the strike row when grid is repainted
-                        'If (pUseManualFactor) Then
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = StrikeFont
-                        '    pDgv.CurrentCell.Style.Font = RegularFont
-                        'Else
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = RegularFont
-                        'End If
-                    End If
-                End If
-                Cursor = Cursors.Default
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCalibrationTypeNEW ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ChangeCalibrationTypeNEW", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-            Cursor = Cursors.Default
-        Finally
-            Cursor = Cursors.Default
-        End Try
-    End Sub
-#End Region
-
-
-
 End Class

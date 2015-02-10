@@ -4,17 +4,7 @@
 
 
 Imports System.Xml
-Imports System.Xml.XPath
-Imports System.IO
 Imports System.Xml.Schema
-
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalConstants
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Types
 
 
 Namespace Biosystems.Ax00.LISCommunications
@@ -210,9 +200,9 @@ Namespace Biosystems.Ax00.LISCommunications
                 Dim myChars() As Char = pString.ToCharArray
                 For c As Integer = 0 To myChars.Length - 1 Step 1
                     Select Case myChars(c)
-                        Case "&" : res &= "&#x26;"
-                        Case "<" : res &= "&#x60;"
-                        Case ">" : res &= "&#x62;"
+                        Case "&"c : res &= "&#x26;"
+                        Case "<"c : res &= "&#x60;"
+                        Case ">"c : res &= "&#x62;"
                         Case Else : res &= myChars(c)
                     End Select
                 Next

@@ -13,8 +13,11 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO
 
 Imports System.Drawing 'SG 03/12/10
+Imports System.Text.RegularExpressions
 Imports System.Windows.Forms 'SG 03/12/10
 Imports Biosystems.Ax00.Controls.UserControls
+Imports DevExpress.Skins
+Imports DevExpress.UserSkins
 Imports DevExpress.XtraEditors
 Imports DevExpress.XtraTab
 
@@ -48,7 +51,7 @@ Public Class BSBaseForm
     Protected Const WM_WINDOWPOSCHANGING As Int32 = &H46
 
     'SGM 22/12/2012
-    Public WithEvents FormBack As IBackground
+    Public WithEvents FormBack As UiBackground
 
     Protected MsgParent As Form = Nothing
     Protected isClosingFlag As Boolean = False  'AG + RH 03/04/2012 - True when the screen is closing and the refreshscreen method has to be ignored
@@ -61,6 +64,7 @@ Public Class BSBaseForm
 #End Region
 
 #Region "Attributes"
+
     Private IconsPathAttribute As String
     Private LIMSImportFilePathAttribute As String
     Private LIMSImportMemoPathAttribute As String
@@ -71,32 +75,31 @@ Public Class BSBaseForm
 
     Private applicationMaxMemoryUsageAttribute As Single = 900 'AG 24/02/2014 - BT #1520
     Private SQLMaxMemoryUsageAttribute As Single = 1000        'AG 24/02/2014 - BT #1520
+
+    Private _currentUserNumericalLevel As USER_LEVEL
+
 #End Region
 
 #Region "Constructor" 'SG 03/12/10
-
+    Private Shared skinsLoaded As Boolean = False
     Protected Friend Sub New()
+
+        'Set it BEFORE adding controls, so they're created with the appropriate skin settings, instead of creating them and modifying them later
+        If Not skinsLoaded Then
+            'Register explicitly BonusSkins assembly and select Skin
+            BonusSkins.Register()
+            LookAndFeel.SkinName = "Blue"
+
+            SkinManager.EnableFormSkins()
+            SkinManager.EnableMdiFormSkins()
+            skinsLoaded = True
+        End If
+
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        ' Add any initialization after the InitializeComponent() call.
 
-        'RH 06/05/2011 Enable Forms child and MDI Forms child skin feature in Title bar
-        DevExpress.Skins.SkinManager.EnableFormSkins()
-        DevExpress.Skins.SkinManager.EnableMdiFormSkins()
-
-        'MsgBoxLookAndFeel = New DevExpress.LookAndFeel.UserLookAndFeel(Me)
-        'MsgBoxLookAndFeel.SkinName = "DevExpress Style" '"iMaginary"
-        'MsgBoxLookAndFeel.Style = Me.LookAndFeel.Style
-        'MsgBoxLookAndFeel.UseDefaultLookAndFeel = Me.LookAndFeel.UseDefaultLookAndFeel
-        'MsgBoxLookAndFeel.UseWindowsXPTheme = Me.LookAndFeel.UseWindowsXPTheme
-
-        '#If DEBUG Then
-        '        Me.TopMost = False
-        '#Else
-        '        Me.TopMost =True 
-        '#End If
     End Sub
 
 #End Region
@@ -141,7 +144,7 @@ Public Class BSBaseForm
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
 
-            myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.LIMS_IMPORT_PATH.ToString, Nothing)
+            myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, SwParameters.LIMS_IMPORT_PATH.ToString, Nothing)
             If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                 LIMSImportFilePathAttribute = CStr(myGlobalDataTO.SetDatos)
             Else
@@ -161,7 +164,7 @@ Public Class BSBaseForm
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
 
-            myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.LIMS_IMPORT_MEMORY_PATH.ToString, Nothing)
+            myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, SwParameters.LIMS_IMPORT_MEMORY_PATH.ToString, Nothing)
             If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                 LIMSImportMemoPathAttribute = CStr(myGlobalDataTO.SetDatos)
             Else
@@ -236,11 +239,11 @@ Public Class BSBaseForm
     ''' <remarks>
     ''' Created by:  TR
     ''' </remarks>
+    <Obsolete("Use GlobalBase.CreateLogActivity instead. there's no need to have duplicate implementations of this!")>
     Public Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, _
                                  ByVal InformSystem As Boolean)
         Try
-            Dim myGlobalBase As New GlobalBase
-            myGlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
+            GlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -254,16 +257,17 @@ Public Class BSBaseForm
     ''' Created to replace current calls to CreateLogActivity in Forms
     ''' PENDING: not used yet 
     ''' </remarks>
+    <Obsolete("USe GlobalBase.ShowExceptionDetails instead")>
     Public Sub ShowExceptionDetails(ByVal pException As Exception)
         Try
-            Dim myGlobalBase As New GlobalBase
-            myGlobalBase.ShowExceptionDetails(pException)
+            'Dim myGlobalbase As New GlobalBase
+            GlobalBase.ShowExceptionDetails(pException)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Public Overridable Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+    Public Overridable Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
 
     End Sub
 
@@ -397,9 +401,9 @@ Public Class BSBaseForm
                                             WarningMsgDisplayed += 1
 
                                             If ExceptionIDHResult = GlobalConstants.HResult_OutOfMemoryException Then
-                                                CreateLogActivity("Display a message instead of a catched 'Out Of Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                                GlobalBase.CreateLogActivity("Display a message instead of a catched 'Out Of Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                             Else
-                                                CreateLogActivity("Display a message instead of a catched 'Insufficient Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                                GlobalBase.CreateLogActivity("Display a message instead of a catched 'Insufficient Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                             End If
                                         Else
                                             Exit Try
@@ -413,7 +417,7 @@ Public Class BSBaseForm
                                         '    msgText = GlobalConstants.MAX_APP_MEMORY_USAGE
                                         '    myMessageType = "Information"
                                         '    WarningMsgDisplayed += 1
-                                        '    CreateLogActivity("Display a message instead of a catched 'Timeout Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                        '    GlobalBase.CreateLogActivity("Display a message instead of a catched 'Timeout Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                         'Else
                                         '    Exit Try
                                         'End If
@@ -436,7 +440,7 @@ Public Class BSBaseForm
                         'If (myMessagesDS.tfmwMessages(0).MessageType = "Error") Then
                         If (myMessageType = "Error") Then
                             ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
-                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
 
                             'Error Message 
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -459,7 +463,7 @@ Public Class BSBaseForm
                             'ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "FailureAudit") Then
                         ElseIf (myMessageType = "FailureAudit") Then
                             ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
-                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
 
                             'System Error Message - FailureAudit
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Stop)
@@ -508,7 +512,7 @@ Public Class BSBaseForm
             End If 'AG 15/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowMessage", EventLogEntryType.Error, False)
 
         End Try
 
@@ -530,7 +534,7 @@ Public Class BSBaseForm
     ''' Modified by SG: SG 22/06/2012 - Add text parameters (in texts that include $$$ tag)
     ''' </remarks>
     Public Function ShowMultipleMessage(ByVal pWindowTitle As String, ByVal pMessageIDList As List(Of String), _
-                            Optional ByVal pOwnerWindow As System.Windows.Forms.IWin32Window = Nothing, _
+                            Optional ByVal pOwnerWindow As IWin32Window = Nothing, _
                             Optional ByVal pTextParameters As List(Of String) = Nothing, _
                             Optional ByVal pAditionalText As String = "") As DialogResult
 
@@ -714,7 +718,7 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ShowMultipleMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.ShowMultipleMessage", EventLogEntryType.Error, False)
 
         End Try
 
@@ -749,7 +753,7 @@ Public Class BSBaseForm
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.GetMessageText ", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetMessageText ", EventLogEntryType.Error, False)
         End Try
         Return textMessage
     End Function
@@ -767,9 +771,9 @@ Public Class BSBaseForm
         myApplicationInfoSession = Nothing
         Try
             Dim myApplicationSessionManager As New ApplicationSessionManager
-            myApplicationInfoSession = myApplicationSessionManager.GetSessionInfo()
+            myApplicationInfoSession = GlobalBase.GetSessionInfo()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return myApplicationInfoSession
     End Function
@@ -792,7 +796,7 @@ Public Class BSBaseForm
             Dim myApplicationSessionManager As New ApplicationSessionManager
             result = myApplicationSessionManager.InitializeSession(pUserName, pUserLevel, IconsPath, pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.InitializeApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.InitializeApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return result
     End Function
@@ -811,7 +815,7 @@ Public Class BSBaseForm
             Dim myApplicationSessionManager As New ApplicationSessionManager
             result = myApplicationSessionManager.ResetSession()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ResetApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.ResetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return result
     End Function
@@ -829,17 +833,17 @@ Public Class BSBaseForm
         Try
             If (String.Compare(pValueToValidate, "", False) <> 0) Then
                 'Use regular expressions
-                Dim isNumber As System.Text.RegularExpressions.Regex
+                Dim isNumber As Regex
                 If (pIsDecimal) Then
                     '[-+]?[0-9]*\.?[0-9]*.
-                    isNumber = New System.Text.RegularExpressions.Regex("[-+]?[0-9]*\.?[0-9]*.")
+                    isNumber = New Regex("[-+]?[0-9]*\.?[0-9]*.")
                 Else
-                    isNumber = New System.Text.RegularExpressions.Regex("\b\d+(\.\d+)?\b")
+                    isNumber = New Regex("\b\d+(\.\d+)?\b")
                 End If
                 result = isNumber.Match(pValueToValidate).Success
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ValidateNumericValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateNumericValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return result
@@ -870,7 +874,7 @@ Public Class BSBaseForm
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetIconPath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetIconPath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myIconName
@@ -902,8 +906,8 @@ Public Class BSBaseForm
             'RH 18/10/2010
             'http://visualbasic.about.com/od/usingvbnet/a/disposeobj.htm
             'A Using block guarantees the disposal of one or more such resources when your code is finished with them.
-            If (IO.File.Exists(iconPath)) Then
-                Using myIconStream As Stream = System.IO.File.OpenRead(iconPath)
+            If (File.Exists(iconPath)) Then
+                Using myIconStream As Stream = File.OpenRead(iconPath)
                     myIconStream.Flush()
                     pImageList.Images.Add(pIconName, Image.FromStream(myIconStream))
                     myIconStream.Close()
@@ -911,8 +915,8 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AddIconToImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AddIconToImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -929,14 +933,14 @@ Public Class BSBaseForm
     Public Function ValidateSpecialCharacters(ByVal pCharacter As Char, ByVal pSpecialCharacters As String) As Boolean
         Dim myResult As Boolean = False
         Try
-            Dim myValidation As System.Text.RegularExpressions.Regex
-            myValidation = New System.Text.RegularExpressions.Regex(pSpecialCharacters)
+            Dim myValidation As Regex
+            myValidation = New Regex(pSpecialCharacters)
 
             If (myValidation.Match(pCharacter).Success) Then
                 myResult = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ValidateSpecialCharacters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateSpecialCharacters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myResult
@@ -953,8 +957,8 @@ Public Class BSBaseForm
         Me.ControlBox = False
         Me.MinimizeBox = False
         Me.MaximizeBox = False
-        Me.AutoScaleMode = Windows.Forms.AutoScaleMode.None
-        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+        Me.AutoScaleMode = AutoScaleMode.None
+        Me.FormBorderStyle = FormBorderStyle.None
         Me.WindowState = FormWindowState.Normal
         Me.Left = 0
         Me.Top = 0
@@ -973,8 +977,8 @@ Public Class BSBaseForm
         Me.ControlBox = False
         Me.MinimizeBox = False
         Me.MaximizeBox = False
-        Me.AutoScaleMode = Windows.Forms.AutoScaleMode.None
-        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+        Me.AutoScaleMode = AutoScaleMode.None
+        Me.FormBorderStyle = FormBorderStyle.None
         Me.WindowState = FormWindowState.Normal
         Me.Left = 0
         Me.Top = 0
@@ -989,7 +993,7 @@ Public Class BSBaseForm
     ''' <param name="pCurrentLanguage"></param>
     ''' <returns></returns>
     ''' <remarks>CREATE BY: TR 03/11/2011</remarks>
-    Public Function GetHelpFilePath(ByVal pTypeID As GlobalEnumerates.HELP_FILE_TYPE, ByVal pCurrentLanguage As String) As String
+    Public Function GetHelpFilePath(ByVal pTypeID As HELP_FILE_TYPE, ByVal pCurrentLanguage As String) As String
         Dim myHelpPath As String = ""
         Try
             Dim myHelpFilesSettingDelegate As New HelpFilesSettingDelegate
@@ -1000,12 +1004,12 @@ Public Class BSBaseForm
             If Not myGlobalDataTO.HasError Then
                 myHelpFilesSettingDS = DirectCast(myGlobalDataTO.SetDatos, HelpFilesSettingDS)
                 If myHelpFilesSettingDS.tfmwHelpFilesSetting.Count = 1 Then
-                    myHelpPath = System.AppDomain.CurrentDomain.BaseDirectory() & _
+                    myHelpPath = AppDomain.CurrentDomain.BaseDirectory() & _
                     myHelpFilesSettingDS.tfmwHelpFilesSetting(0).HelpFileName
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetHelpFilePath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetHelpFilePath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myHelpPath
@@ -1034,7 +1038,7 @@ Public Class BSBaseForm
                 ShowMessage("", myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenChapter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenChapter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return mySceenHelpChapter
@@ -1072,14 +1076,14 @@ Public Class BSBaseForm
                     End If
                 End If
             ElseIf Not myGlobalDataTO.ErrorCode = "MASTER_DATA_MISSING" Then
-                ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorMessage)
+                ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorMessage)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
         Return myReportSatDirectory
     End Function
@@ -1090,12 +1094,12 @@ Public Class BSBaseForm
             Dim myGlobalDataTO As New GlobalDataTO
             myGlobalDataTO = myUserSettingDelegate.Update(Nothing, "REPORTSAT_DIRECTORY", pNewPath)
             If myGlobalDataTO.HasError Then
-                ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorMessage)
+                ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
                                                     GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
 
@@ -1129,7 +1133,7 @@ Public Class BSBaseForm
 #Region "Events"
 
 
-    Private Sub BSBaseForm_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub BSBaseForm_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
         isClosingFlag = True
     End Sub
 
@@ -1140,7 +1144,17 @@ Public Class BSBaseForm
     ''' <remarks>
     ''' Created by: TR
     ''' </remarks>
-    Private Sub BSBaseForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub BSBaseForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
+
+        If Me.GetType().GetInterfaces().Contains(GetType(IPermissionLevel)) Then
+
+            Dim formType As Type = sender.GetType()
+            Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
+            'Dim myGlobalbase As New GlobalBase
+            form.ValidatePermissionLevel(GlobalBase.GetSessionInfo.UserLevelEnum)
+
+        End If
+
         'Validate if the screen is in design mode to avoid parameters error
         If (Not Me.DesignMode) Then
 
@@ -1224,25 +1238,33 @@ Public Class BSBaseForm
     ''' Modified by: AG 10/12/2010 - Do not executed code is ActiveControl is Nothing
     '''              TR 07/02/2012 - New implementation of sending TAB key instead ENTER
     '''              SA 12/03/2012 - Undo last DL changes for screen IWSSampleRequest; they do not work
+    '''              MI 30/01/2015 - http://confluence.ginper.local:8090/display/AREA/Don%27t+use+Name+property+of+WinForms+controls
     ''' </remarks>
-    Protected Overrides Function ProcessDialogKey(ByVal keyData As System.Windows.Forms.Keys) As Boolean
+    Protected Overrides Function ProcessDialogKey(ByVal keyData As Keys) As Boolean
         If (Me.ActiveControl IsNot Nothing) Then
-            If (Me.Name <> "IAx00MainMDI") AndAlso (keyData = Keys.Return AndAlso Me.ActiveControl.GetType.Name <> "BSButton") Then
-                If (String.Compare(Me.Name, "IAx00Login", False) <> 0) Then
-                    'Send the TAB key
-                    SendKeys.Send("{Tab}")
-                    Return True
-                End If
+            Dim returnIsPressed = (keyData = Keys.Return)
+            If returnIsPressed AndAlso ProcessEnterAsTab() AndAlso (Me.ActiveControl.GetType IsNot GetType(BSButton)) Then
+                SendKeys.Send("{Tab}")
+                Return True
             End If
         End If
         Return MyBase.ProcessDialogKey(keyData)
     End Function
 
 
+    ''' <summary>
+    ''' This function indicates if this form needs to process Enter key as a TAB key to navigate through application controls.
+    ''' </summary>
+    ''' <returns>A boolean, true means ENTER are TABS.</returns>
+    ''' <remarks>By default, any form that does not provide its own implementation, will process Enter as a TAB if it is not a MDI container</remarks>
+    Protected Overridable Function ProcessEnterAsTab() As Boolean
+        Return Not Me.IsMdiContainer
+    End Function
+
     'SGM 05/01/2012
     Private Sub FormBack_Exception(ByVal ex As Exception) Handles FormBack.ExceptionHappened
-        CreateLogActivity(ex.Message, Me.Name & ".FormBack", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-        ShowMessage(Me.Name & ".FormBack", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormBack", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        ShowMessage(Me.Name & ".FormBack", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     End Sub
 
 #End Region
@@ -1567,7 +1589,7 @@ Public Class BSBaseForm
     '            End Select
     '        Next
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.GetScreenTexts ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetScreenTexts ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.GetScreenTexts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -1622,7 +1644,7 @@ Public Class BSBaseForm
 
     '        myDataSet.Tables.Add(myTable)
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.CreateTempDataSet ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.CreateTempDataSet ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.CreateTempDataSet ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     '    Return myDataSet
@@ -1683,7 +1705,7 @@ Public Class BSBaseForm
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.InsertScreenTexts ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.InsertScreenTexts ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.InsertScreenTexts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -1697,8 +1719,18 @@ Public Class BSBaseForm
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function GetFormFromList(ByVal FormName As String) As Boolean
+        'TODO: Revisit this functionality. This function does 2 things:
+        '   1.- Checks if a mdi child with a given name is contained in a MDI container form
+        '   2.- If it is, it shows it and returns true
+        '   3.- Otherwise it returns false
+        '
+        'Flaws: If it's called GetForm, it should return the form.
+        '       If it shows the form, it should be called ShowForm or similar
+        '       If it's meant to tell if the form is on the children list, it should be called IsformContained or similar
+        '       If it needs to do both things (rare), it should be called something like TryToShowFormByName, and return true or false on success.
+        '       It does not check if the method is called from a inherited non MDI container form, which would make no sense at all.
+        Dim result As Boolean = False
         Try
-            Dim result As Boolean = False
             For Each MyForm As Form In Me.MdiChildren
                 If MyForm.Name = FormName Then
                     result = True
@@ -1709,12 +1741,14 @@ Public Class BSBaseForm
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+        Return result
+
     End Function
 
 #End Region
 
 
-    Private Sub BSBaseForm_FormClosed(ByVal sender As System.Object, ByVal e As FormClosedEventArgs) Handles MyBase.FormClosed
+    Private Sub BSBaseForm_FormClosed(ByVal sender As Object, ByVal e As FormClosedEventArgs) Handles MyBase.FormClosed
         Try
             'RH 18/04/2012 Do not release controls in common forms.
             'Release them in their own FormClosed event
@@ -1725,8 +1759,8 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BSBaseForm_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".BSBaseForm_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BSBaseForm_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".BSBaseForm_FormClosed", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1791,8 +1825,8 @@ Public Class BSBaseForm
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
         End Try
 
     End Sub

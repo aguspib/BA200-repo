@@ -1,12 +1,12 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL
 
-Public Class IWSNotPosWarning
+Public Class UiWSNotPosWarning
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -41,14 +41,14 @@ Public Class IWSNotPosWarning
     Private Sub ScreenLoad()
         Try
             'DL 28/07/2011
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load images for graphical buttons and picture boxes
             PrepareButtons()
@@ -93,7 +93,7 @@ Public Class IWSNotPosWarning
             'the Create Executions button was clicked in Rotor Positioning Screen
             bsPositioningButton.Visible = (OpenModeAttribute = "TO_EXIT")
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -123,7 +123,7 @@ Public Class IWSNotPosWarning
             bsNotPositionedDataGridView.Columns(0).Width = CInt(0.2 * gridWidth)
             bsNotPositionedDataGridView.Columns(1).Width = CInt(0.8 * gridWidth)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScren", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScren", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScren", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -146,7 +146,7 @@ Public Class IWSNotPosWarning
             'POSITIONING Button
             auxIconName = GetIconName("SENDTOPOS")
             If (auxIconName <> "") Then
-                bsPositioningButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPositioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 27/09/2013 - Validate the OpenModeAttribute to set the corresponding ICON
@@ -158,11 +158,11 @@ Public Class IWSNotPosWarning
             End If
             'TR 27/09/2013 -END.
             If auxIconName <> "" Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -210,7 +210,7 @@ Public Class IWSNotPosWarning
 
             bsNotPositionedDataGridView.ScrollBars = ScrollBars.Vertical
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeNotPosWarningGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeNotPosWarningGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeNotPosWarningGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -227,10 +227,10 @@ Public Class IWSNotPosWarning
             Dim WARNING_IconName As String = ""
             WARNING_IconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
 
-            bsWarningPictureBox.BackgroundImage = Image.FromFile(MyBase.IconsPath & WARNING_IconName)
+            bsWarningPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & WARNING_IconName)
             bsWarningPictureBox.BackgroundImageLayout = ImageLayout.Stretch
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareIconNames ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareIconNames ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareIconNames ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -251,7 +251,7 @@ Public Class IWSNotPosWarning
                 If (myMessagesDS.tfmwMessages.Rows.Count > 0) Then Me.bsAdviceLabel.Text = myMessagesDS.tfmwMessages(0).MessageText
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadWarningLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadWarningLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadWarningLabel", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -286,7 +286,7 @@ Public Class IWSNotPosWarning
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -306,7 +306,7 @@ Public Class IWSNotPosWarning
                 bsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSNotPosWarning_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -315,7 +315,7 @@ Public Class IWSNotPosWarning
         Try
             ScreenLoad()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSNotPosWarning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSNotPosWarning_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.Close()
         End Try
@@ -335,7 +335,7 @@ Public Class IWSNotPosWarning
     Private Sub bsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsExitButton.Click
         ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
         ExitingScreen()
-        IAx00MainMDI.EnableButtonAndMenus(True)
+        UiAx00MainMDI.EnableButtonAndMenus(True)
         Application.DoEvents()
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         Me.Close()
@@ -351,8 +351,8 @@ Public Class IWSNotPosWarning
         Try
             If m.Msg = WM_WINDOWPOSCHANGING Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)
@@ -361,7 +361,7 @@ Public Class IWSNotPosWarning
 
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

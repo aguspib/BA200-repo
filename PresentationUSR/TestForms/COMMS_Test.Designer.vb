@@ -27,9 +27,7 @@ Partial Class bsReception
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.BsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
-        Me.bsXmlButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton2 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsImport = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsErrorCodes = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsClear = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsSendNext = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -51,7 +49,7 @@ Partial Class bsReception
         Me.BsLockProcess = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsExecution = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.BsExecuteCalc = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsShortAction = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCustomSelection = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsDecodeEnBase2 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsNewGUID = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsHistoricCalibCurve = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -63,9 +61,7 @@ Partial Class bsReception
         '
         'BsGroupBox1
         '
-        Me.BsGroupBox1.Controls.Add(Me.bsXmlButton)
         Me.BsGroupBox1.Controls.Add(Me.BsButton2)
-        Me.BsGroupBox1.Controls.Add(Me.BsImport)
         Me.BsGroupBox1.Controls.Add(Me.bsErrorCodes)
         Me.BsGroupBox1.Controls.Add(Me.BsClear)
         Me.BsGroupBox1.Controls.Add(Me.BsSendNext)
@@ -80,7 +76,7 @@ Partial Class bsReception
         Me.BsGroupBox1.Controls.Add(Me.BsLockProcess)
         Me.BsGroupBox1.Controls.Add(Me.BsExecution)
         Me.BsGroupBox1.Controls.Add(Me.BsExecuteCalc)
-        Me.BsGroupBox1.Controls.Add(Me.BsShortAction)
+        Me.BsGroupBox1.Controls.Add(Me.bsCustomSelection)
         Me.BsGroupBox1.ForeColor = System.Drawing.Color.Black
         Me.BsGroupBox1.Location = New System.Drawing.Point(12, 11)
         Me.BsGroupBox1.Name = "BsGroupBox1"
@@ -88,16 +84,6 @@ Partial Class bsReception
         Me.BsGroupBox1.TabIndex = 10
         Me.BsGroupBox1.TabStop = False
         Me.BsGroupBox1.Text = "AG Testings"
-        '
-        'bsXmlButton
-        '
-        Me.bsXmlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsXmlButton.Location = New System.Drawing.Point(959, 50)
-        Me.bsXmlButton.Name = "bsXmlButton"
-        Me.bsXmlButton.Size = New System.Drawing.Size(130, 24)
-        Me.bsXmlButton.TabIndex = 54
-        Me.bsXmlButton.Text = "Tasks 11-03-2013"
-        Me.bsXmlButton.UseVisualStyleBackColor = True
         '
         'BsButton2
         '
@@ -108,16 +94,6 @@ Partial Class bsReception
         Me.BsButton2.TabIndex = 53
         Me.BsButton2.Text = "Calculations NEW"
         Me.BsButton2.UseVisualStyleBackColor = True
-        '
-        'BsImport
-        '
-        Me.BsImport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsImport.Location = New System.Drawing.Point(959, 20)
-        Me.BsImport.Name = "BsImport"
-        Me.BsImport.Size = New System.Drawing.Size(130, 24)
-        Me.BsImport.TabIndex = 52
-        Me.BsImport.Text = "Import"
-        Me.BsImport.UseVisualStyleBackColor = True
         '
         'bsErrorCodes
         '
@@ -376,15 +352,15 @@ Partial Class bsReception
         Me.BsExecuteCalc.Text = "Calculations"
         Me.BsExecuteCalc.UseVisualStyleBackColor = True
         '
-        'BsShortAction
+        'bsCustomSelection
         '
-        Me.BsShortAction.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsShortAction.Location = New System.Drawing.Point(6, 20)
-        Me.BsShortAction.Name = "BsShortAction"
-        Me.BsShortAction.Size = New System.Drawing.Size(129, 23)
-        Me.BsShortAction.TabIndex = 12
-        Me.BsShortAction.Text = "Positions InProcess"
-        Me.BsShortAction.UseVisualStyleBackColor = True
+        Me.bsCustomSelection.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsCustomSelection.Location = New System.Drawing.Point(6, 20)
+        Me.bsCustomSelection.Name = "bsCustomSelection"
+        Me.bsCustomSelection.Size = New System.Drawing.Size(129, 23)
+        Me.bsCustomSelection.TabIndex = 12
+        Me.bsCustomSelection.Text = "Custom selection"
+        Me.bsCustomSelection.UseVisualStyleBackColor = True
         '
         'bsDecodeEnBase2
         '
@@ -393,7 +369,7 @@ Partial Class bsReception
         Me.bsDecodeEnBase2.Name = "bsDecodeEnBase2"
         Me.bsDecodeEnBase2.Size = New System.Drawing.Size(151, 23)
         Me.bsDecodeEnBase2.TabIndex = 54
-        Me.bsDecodeEnBase2.Text = "Decodificar en base2"
+        Me.bsDecodeEnBase2.Text = "Un poco de todo"
         Me.bsDecodeEnBase2.UseVisualStyleBackColor = True
         '
         'bsNewGUID
@@ -445,7 +421,7 @@ Partial Class bsReception
 
     End Sub
     Friend WithEvents BsGroupBox1 As Biosystems.Ax00.Controls.UserControls.BSGroupBox
-    Friend WithEvents BsShortAction As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents bsCustomSelection As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsExecution As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents BsExecuteCalc As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsLockProcess As Biosystems.Ax00.Controls.UserControls.BSButton
@@ -466,11 +442,9 @@ Partial Class bsReception
     Friend WithEvents BsInstructionComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents BsClear As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsErrorCodes As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents BsImport As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsButton2 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsRestore As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsDecodeEnBase2 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsNewGUID As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsHistoricCalibCurve As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents bsXmlButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

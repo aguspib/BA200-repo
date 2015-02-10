@@ -1,14 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
-
     Public Class tparFormulasDAO
-        Inherits DAOBase
 
 #Region "CRUD Methods"
 
@@ -78,8 +75,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -115,13 +112,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
-        
+
 #End Region
 
 #Region "Other Methods"
@@ -136,6 +133,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              the Test Name for Formula members with ValueType=TEST
         '''              SA  12/03/2012 - Changed the function template
         '''              JB  31/01/2013 - Add optional parameter DataBaseName and use it in query
+        '''              WE  11/11/2014 - RQ00035C (BA-1867).
         '''</remarks>
         Public Function GetFormulaValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, Optional pDataBaseName As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -161,6 +159,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    F.ValueType = 'TEST' " & vbCrLf & _
                                                 " AND    F.TestType = 'CALC' " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
+                                                " SELECT F.*, IT.Name + ' ['+ F.SampleType + ']' AS TestName " & vbCrLf & _
+                                                " FROM   " & strFromLeft & "tparFormulas F INNER JOIN " & strFromLeft & "tparISETests IT ON CONVERT(int, F.[Value]) = IT.ISETestID " & vbCrLf & _
+                                                " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
+                                                " AND    F.ValueType = 'TEST' " & vbCrLf & _
+                                                " AND    F.TestType = 'ISE' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
+                                                " SELECT F.*, OT.Name + ' ['+ F.SampleType + ']' AS TestName " & vbCrLf & _
+                                                " FROM   " & strFromLeft & "tparFormulas F INNER JOIN " & strFromLeft & "tparOffSystemTests OT ON CONVERT(int, F.[Value]) = OT.OffSystemTestID " & vbCrLf & _
+                                                " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
+                                                " AND    F.ValueType = 'TEST' " & vbCrLf & _
+                                                " AND    F.TestType = 'OFFS' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
                                                 " SELECT F.*, NULL AS TestName " & vbCrLf & _
                                                 " FROM   " & strFromLeft & "tparFormulas F " & vbCrLf & _
                                                 " WHERE  F.CalcTestID = " & pCalcTestID.ToString & _
@@ -184,8 +194,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.GetFormulaValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.GetFormulaValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -205,6 +215,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA  26/05/2010 - Query changed to get also the name of the informed Calculated Test and the Formula Text
         '''              SA  12/03/2012 - Changed the function template
         '''              SA  18/04/2012 - Changed the SQL by adding a DISTINCT due to the same Test can be more than once in a Formula Text
+        '''              SA  28/01/2015 - BA-1610 ==> Changed the SQL Query to get also value of field EnableStatus for all STD Tests included 
+        '''                                           in the Formula of the specified Calculated Test. For the rest of Test Types EnableStatus 
+        '''                                           is returned as TRUE 
         ''' </remarks>
         Public Function ReadTestsInFormula(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -215,8 +228,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT DISTINCT F.CalcTestID, TC.CalcTestLongName AS TestName, TC.FormulaText, F.TestType, " & vbCrLf & _
-                                                                " F.ValueType, F.[Value], F.SampleType " & vbCrLf & _
+                        Dim cmdText As String = " SELECT DISTINCT  F.CalcTestID, TC.CalcTestLongName AS TestName, TC.FormulaText, F.TestType, " & vbCrLf & _
+                                                                "  F.ValueType, F.[Value], F.SampleType, " & vbCrLf & _
+                                                                " (CASE WHEN F.TestType = 'STD' THEN (SELECT EnableStatus FROM tparTestSamples TS " & vbCrLf & _
+                                                                                                    " WHERE F.[Value] = TS.TestID AND F.SampleType = TS.SampleType) " & vbCrLf & _
+                                                                "  ELSE 1 END) AS EnableStatus " & vbCrLf & _
                                                 " FROM   tparFormulas F INNER JOIN tparCalculatedTests TC ON F.CalcTestID = TC.CalcTestID " & vbCrLf & _
                                                 " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
                                                 " AND    F.ValueType  = 'TEST' " & vbCrLf & _
@@ -239,8 +255,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.ReadTestsInFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.ReadTestsInFormula", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -248,22 +264,23 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Verify if the specified Test is included in the formula of a Calculated Test, filtering data by
-        ''' Sample Type if this value has been informed
+        ''' Verify if the specified Test (Standard, ISE, Off-System or Calculated Test) is included in the formula of a Calculated Test,
+        ''' filtering data by Sample Type if this value has been informed.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <param name="pTestType">Type of Test</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC).</param>
         ''' <param name="pExcludeSampleTypes">When True, it indicates the Test will be searched in Formulas but using a
-        '''                                   SampleType different of the specified ones. Optional parameter</param>
+        '''                                   SampleType different of the specified ones. Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet FormulasDS with the Identifier and Name of the Calculated
-        '''          Test in which formula the specified Test is included</returns>
+        '''          Test(s) in which formula the specified Test is included.</returns>
         ''' <remarks>
         ''' Created by:  TR 17/05/2010
         ''' Modified by: SA 14/01/2010 - Added new optional parameter to allow search a Test in a Formula but using a SampleType 
         '''                              different of the specified ones
         '''              SA 12/03/2012 - Changed the function template
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadFormulaByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
                                             ByVal pTestType As String, Optional ByVal pExcludeSampleTypes As Boolean = False) As GlobalDataTO
@@ -306,8 +323,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.ReadFormulaByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.ReadFormulaByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -349,8 +366,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.UpdateCalcTestValueAfterDBUpdate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.UpdateCalcTestValueAfterDBUpdate", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -399,8 +416,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparFormulasDAO.GetCalculatedTestIntoFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparFormulasDAO.GetCalculatedTestIntoFormula", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

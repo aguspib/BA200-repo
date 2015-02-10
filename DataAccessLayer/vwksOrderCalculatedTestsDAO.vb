@@ -1,14 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksOrderCalculatedTestsDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Get data (ViewOrderCalculatedTestsDS) with all the OrderTestID (CALC) that used the entry parameter OrderTestID (STD)
@@ -56,8 +55,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByStdOrderTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByStdOrderTest", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -110,8 +109,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByCalcOrderTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByCalcOrderTest", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

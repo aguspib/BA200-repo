@@ -3,7 +3,6 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
@@ -15,7 +14,7 @@ Imports System.Runtime.InteropServices 'WIN32
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Entities
 
-Public Class IISEUtilities
+Public Class UiISEUtilities
 
 #Region "Declarations"
     'Private WithEvents mdiAnalyzerCopy As AnalyzerManagerOLD '#REFACTORING
@@ -445,7 +444,7 @@ Public Class IISEUtilities
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ManageReceptionEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
     End Function
@@ -469,8 +468,8 @@ Public Class IISEUtilities
     '        End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -540,13 +539,13 @@ Public Class IISEUtilities
                         Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOffText)
                         MyClass.IsSwitchOffInformed = True
                     ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON And MyClass.IsSwitchOffInformed Then
-                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.GeneralCheckings Then
 
                             'Dim myISEOnText As String = vbCrLf + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_ON_WRN", currentLanguage) + " - " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_CONNECT_PDT", currentLanguage) + vbCrLf + vbCrLf SGM 26/10/2012
 
                             'SGM 26/10/2012
                             Dim myISEOnText As String = vbCrLf + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_ON_WRN", currentLanguage) + vbCrLf + vbCrLf
-                            Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOnText, ISEAnalyzerEntity.ISEProcedureResult.NOK)
+                            Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOnText, ISEManager.ISEProcedureResult.NOK)
                             'Show current Alarms
                             MyClass.CurrentOperation = OPERATIONS.CHECK_ALARMS
                             MyClass.PrepareTestedMode()
@@ -613,11 +612,11 @@ Public Class IISEUtilities
 
                         If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                             If MyClass.IsInitialPollSent Then
-                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.GeneralCheckings AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.ActivateReagentsPack Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.GeneralCheckings AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.ActivateReagentsPack Then
                                     MyClass.DisplayISEInfo()
                                 End If
                             ElseIf Not MyClass.IsScreenCloseRequested Then
-                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
                                     If Me.CurrentOperation <> OPERATIONS.INITIALIZE_ISE_MODULE Then
                                         MyClass.DisableAll()
                                         Dim myText As String = ""
@@ -628,7 +627,7 @@ Public Class IISEUtilities
                                     End If
                                 End If
                             End If
-                        ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
+                        ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
                             MyClass.DisplayISEInfo()
                         End If
 
@@ -658,7 +657,7 @@ Public Class IISEUtilities
             'AG 15/03/2012
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -741,11 +740,11 @@ Public Class IISEUtilities
 
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
-                            Dim myUtil As New Utilities
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                            myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
+                            'Dim myUtil As New Utilities.
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                            myGlobalDataTO = Utilities.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 Me.BsMessageImage.BackgroundImage = myImage
                             End If
@@ -765,7 +764,7 @@ Public Class IISEUtilities
             Application.DoEvents()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisplayMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisplayMessage", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -871,12 +870,12 @@ Public Class IISEUtilities
                     ISECommands.BUBBLE_CAL, ISECommands.SHOW_BUBBLE_CAL, ISECommands.READ_mV, ISECommands.READ_PAGE_0_DALLAS, _
                     ISECommands.READ_PAGE_1_DALLAS, ISECommands.VERSION_CHECKSUM
 
-                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.SingleReadCommand
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.SingleReadCommand
                         AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO = myScreenIseCmdTo
 
                     Case Else
 
-                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.SingleCommand
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.SingleCommand
                         AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO = myScreenIseCmdTo
 
                 End Select
@@ -888,8 +887,8 @@ Public Class IISEUtilities
 
                 'SGM 17/10/2012 - Log ISE Operation
                 If myScreenIseCmdTo.ISECommandID <> ISECommands.NONE Then
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
                 End If
                 'end SGM 17/10/2012
 
@@ -901,7 +900,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISEInstruction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISEInstruction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'MyBase.ShowMessage(Me.Name & ".SendISEInstruction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".SendISEInstruction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -1027,8 +1026,8 @@ Public Class IISEUtilities
                 Me.BsStopButton.Enabled = True
 
                 'SGM 17/10/2012 - Log ISE Operation
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
 
             End If
 
@@ -1040,7 +1039,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'MyBase.ShowMessage(Me.Name & ".SendISEAction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".SendISEAction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -1103,7 +1102,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISECMD", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SendISECMD", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendISECMD", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1132,7 +1131,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateMaintenanceExitIsNeeded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateMaintenanceExitIsNeeded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateMaintenanceExitIsNeeded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1141,9 +1140,10 @@ Public Class IISEUtilities
     ''' Execute ISE managemenet internal action Instruction
     ''' </summary>
     ''' <remarks>
-    ''' Created by XBC 06/03/2012
-    ''' Modified by XBC 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
+    ''' Created by   XB 06/03/2012
+    ''' Modified by  XB 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
     '''                              if is called from SendISEAction Function. This operation is placed here, like other ones (Bugs tracking #1108)
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ExecuteISEAction(ByVal pNode As TreeNode)
@@ -1191,7 +1191,7 @@ Public Class IISEUtilities
                     'verify if there is any Li+ Test in use
                     Dim InUse As Boolean = MyClass.LithiumTestInUse()
 
-                    Using myForm As New IISEDateElementSelection(AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser, InUse)
+                    Using myForm As New UiISEDateElementSelection(AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser, InUse)
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallElectrodes", currentLanguage)
 
                         myForm.Element1Name = "Ref:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RefElectrode", currentLanguage)
@@ -1202,7 +1202,12 @@ Public Class IISEUtilities
                             myForm.Element1DateTime = Now.Date
                         End If
 
-                        myForm.Element2Name = "Na+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NaElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        Dim ISETestList As New ISETestsDelegate
+                        'myForm.Element2Name = "Na+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NaElectrode", currentLanguage)
+                        myForm.Element2Name = ISETestList.GetName(Nothing, ISE_Tests.Na) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element2Selected = True
                         If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasNaInstallDate Then   ' XBC 29/06/2012
                             myForm.Element2DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.NaInstallDate
@@ -1210,7 +1215,11 @@ Public Class IISEUtilities
                             myForm.Element2DateTime = Now.Date
                         End If
 
-                        myForm.Element3Name = "K+:"     ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element3Name = "K+:"     ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KElectrode", currentLanguage)
+                        myForm.Element3Name = ISETestList.GetName(Nothing, ISE_Tests.K) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element3Selected = True
                         If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasKInstallDate Then   ' XBC 29/06/2012
                             myForm.Element3DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.KInstallDate
@@ -1218,7 +1227,11 @@ Public Class IISEUtilities
                             myForm.Element3DateTime = Now.Date
                         End If
 
-                        myForm.Element4Name = "Cl-:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ClElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element4Name = "Cl-:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ClElectrode", currentLanguage)
+                        myForm.Element4Name = ISETestList.GetName(Nothing, ISE_Tests.Cl) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element4Selected = True
                         If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasClInstallDate Then   ' XBC 29/06/2012
                             myForm.Element4DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ClInstallDate
@@ -1226,7 +1239,11 @@ Public Class IISEUtilities
                             myForm.Element4DateTime = Now.Date
                         End If
 
-                        myForm.Element5Name = "Li+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LiElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element5Name = "Li+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LiElectrode", currentLanguage)
+                        myForm.Element5Name = ISETestList.GetName(Nothing, ISE_Tests.Li) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element5Selected = True
                         If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasLiInstallDate Then   ' XBC 29/06/2012
                             myForm.Element5DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.LiInstallDate
@@ -1287,7 +1304,7 @@ Public Class IISEUtilities
 
                 Case "ACT_PUMP_TUB"
 
-                    Using myForm As New IISEDateElementSelection()
+                    Using myForm As New UiISEDateElementSelection()
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallTubing", currentLanguage)
 
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallPumpTubing", currentLanguage)
@@ -1321,7 +1338,7 @@ Public Class IISEUtilities
 
                 Case "ACT_FLUID_TUB"
 
-                    Using myForm As New IISEDateElementSelection()
+                    Using myForm As New UiISEDateElementSelection()
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallTubing", currentLanguage)
 
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallFluidTubing", currentLanguage)
@@ -1394,7 +1411,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExecuteISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExecuteISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExecuteISEAction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1418,70 +1435,70 @@ Public Class IISEUtilities
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If (auxIconName <> "") Then
-            '    BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''Exit button
             'auxIconName = GetIconName("CANCEL")
             'If (auxIconName <> "") Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If (auxIconName <> "") Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If (auxIconName <> "") Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If (auxIconName <> "") Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
 
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '            BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '            BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '           BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             '          End If
 
             'EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveAsButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsClearButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStopButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1494,7 +1511,7 @@ Public Class IISEUtilities
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -1503,9 +1520,9 @@ Public Class IISEUtilities
             auxIconName = GetIconName(pImageName)
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myButtonImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -1518,7 +1535,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SetButtonImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1568,7 +1585,7 @@ Public Class IISEUtilities
             GetScreenTooltip()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1591,7 +1608,7 @@ Public Class IISEUtilities
             Me.bsScreenToolTips.SetToolTip(BsStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1608,19 +1625,19 @@ Public Class IISEUtilities
             'NONE Image
             auxIconName = GetIconName("FREECELL") ' NONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("NONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("NONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'DONE Image SGM 08/06/2012
             auxIconName = GetIconName("ACCEPT1") ' ACTION DONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("DONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("DONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
 
@@ -1631,7 +1648,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTreeViewImages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1648,7 +1665,7 @@ Public Class IISEUtilities
             Me.BsExitButton.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableButtons ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1665,7 +1682,7 @@ Public Class IISEUtilities
             Me.BsExitButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisableButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableButtons ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1683,7 +1700,7 @@ Public Class IISEUtilities
             Me.FeaturesGroupBox.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableAll ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1700,7 +1717,7 @@ Public Class IISEUtilities
             Me.FeaturesGroupBox.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableAll ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1734,8 +1751,8 @@ Public Class IISEUtilities
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
     End Function
@@ -1756,7 +1773,7 @@ Public Class IISEUtilities
     ''' </remarks>
     Public Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             Me.DisableAll()
 
@@ -1855,11 +1872,11 @@ Public Class IISEUtilities
                                     Me.AppendPcSendText(Me.BsRichTextBox1, myText)
                                     Me.BsExitButton.Enabled = False
                                     Me.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE
-                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
                                         MyClass.SendISEAction()
                                     End If
 
-                                ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
+                                ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                     'else, send poll
                                     MyClass.IsInitialPollSent = True
                                     MyClass.SendISECMD(ISECommands.POLL)
@@ -1885,7 +1902,7 @@ Public Class IISEUtilities
                                 MyClass.EnableAll()
                             End If
 
-                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
                             'if the Initializing process is being performed
                             Dim myText As String = ""
                             myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_INITIALIZING_ISE", currentLanguage) + vbCrLf
@@ -1925,7 +1942,7 @@ Public Class IISEUtilities
             myResultData.HasError = True
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1982,7 +1999,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateAnalyzerReadiness ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateAnalyzerReadiness ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateAnalyzerReadiness ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Function
@@ -2009,7 +2026,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -2029,7 +2046,7 @@ Public Class IISEUtilities
             Me.Cursor = Cursors.WaitCursor
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2042,6 +2059,7 @@ Public Class IISEUtilities
     ''' Created by:  XB 24/01/2012
     ''' Modified by: XB 27/09/2013 - BT #1294 ==> Set the value by default to ISE Washing solution position tube
     '''              XB 28/04/2014 - Disable screen when saving consumptions
+    '''              XB 08/09/2014 - Use ISE new FormatAffected method in ISEManager layer instead of the old method in ISEErrorTO - BA-1902
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub PrepareTestedMode(Optional ByVal pResponse As RESPONSE_TYPES = RESPONSE_TYPES.OK)
@@ -2117,7 +2135,7 @@ Public Class IISEUtilities
 
             Else
 
-                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.Exception Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.Exception Then
 
                     'SERVICE: In case of alarm not to treat
                     If ThisIsService Then
@@ -2143,7 +2161,7 @@ Public Class IISEUtilities
 
                     'SGM 26/10/2012 - ISE Alarms
                     If MyClass.CurrentOperation = OPERATIONS.CHECK_ALARMS Then
-                        Dim myPendingCal As New List(Of ISEAnalyzerEntity.MaintenanceOperations)
+                        Dim myPendingCal As New List(Of ISEManager.MaintenanceOperations)
                         myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
@@ -2158,7 +2176,7 @@ Public Class IISEUtilities
                     Select Case MyClass.CurrentOperation
                         Case OPERATIONS.ISECMD
 
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.OK Then
                                 myGlobal.HasError = True
 
                                 AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
@@ -2183,7 +2201,7 @@ Public Class IISEUtilities
 
                                     'SGM 15/10/2012 - in case of LongTermDeactivation, if not Initiated yet, launch initialization
                                 ElseIf Me.CurrentISECommand.ISECommandID = ISECommands.READ_PAGE_1_DALLAS Then
-                                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                         If MyClass.IsInstallGroupNodeActive And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                             Application.DoEvents()
                                             Me.CurrentISECommand.ISECommandID = ISECommands.NONE
@@ -2249,7 +2267,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.R2_TO_WASHING ' moved away SGM 04/07/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 IsActionCompleted = True
                                 MyClass.IsR2ArmAwayFromParking = True
                                 Me.Cursor = Cursors.Default
@@ -2259,7 +2277,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.R2_TO_PARKING ' moved back SGM 04/07/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 IsActionCompleted = True
                                 MyClass.IsR2ArmAwayFromParking = False
 
@@ -2277,7 +2295,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.INITIALIZE_ISE_MODULE 'SGM 04/04/2012 initialize (Connect) after ISE is previously switched on
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 System.Threading.Thread.Sleep(1000)
                                 MyClass.IsInitialPollSent = True
                                 IsActionCompleted = True
@@ -2335,7 +2353,7 @@ Public Class IISEUtilities
                         Case OPERATIONS.INSTALL_ELECTRODES
 
                             'SGM 12/03/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 ''SGM 17/05/2012
                                 'AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser = Me.UserLiSelectedAttr
                                 ''Update Installation dates
@@ -2353,7 +2371,7 @@ Public Class IISEUtilities
                         Case OPERATIONS.INSTALL_REAGENT_PACK
 
                             'SGM 12/03/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 ' XBC 02/04/2012 - Refresh Changes
                                 'myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetReagentsPackInstallDate(DateTime.Now, True)
                                 ' XBC 02/04/2012 - Refresh Changes
@@ -2420,7 +2438,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.CHECK_CLEAN_PACK
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.OK Then
                                 myGlobal.HasError = True
                             Else
                                 ' XBC 07/05/2012 - disable ISE preparations
@@ -2440,7 +2458,7 @@ Public Class IISEUtilities
 
                         Case OPERATIONS.CLEANING
                             'SGM 12/03/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
 
                             Else
                                 Me.DisplayISEInfo() 'SGM 21/09/2012 - show received string
@@ -2451,7 +2469,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.ENABLE_ISE_PREPARATIONS
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
 
                                 ' XBC 20/03/2012 
                                 'AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateISEPreparations()
@@ -2475,12 +2493,12 @@ Public Class IISEUtilities
 
                                     'SGM 25/09/2012 - check if any calibration is needed
                                     Dim isReady As Boolean = False
-                                    Dim myAffectedElectrodes As List(Of String)
+                                    Dim myAffectedElectrodes As List(Of String) = Nothing
                                     myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                                     End If
-                                    CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
+                                    GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                                     myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
@@ -2502,7 +2520,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.PRIME_CALIBRATION 'SGM 11/06/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
 
                             Else
                                 myGlobal.HasError = True
@@ -2512,7 +2530,7 @@ Public Class IISEUtilities
                             MyClass.PrepareReadyForTestingMode()
 
                         Case OPERATIONS.PRIME_X2_CALIBRATION 'SGM 11/06/2012
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
 
                             Else
                                 myGlobal.HasError = True
@@ -2522,7 +2540,7 @@ Public Class IISEUtilities
                             MyClass.PrepareReadyForTestingMode()
 
                         Case OPERATIONS.QUIT_UTILITIES
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 '    SendISECMD(ISECommands.DEBUG_mV_OFF)
                                 'End If
@@ -2559,7 +2577,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.CHECK_ALARMS 'SGM 26/10/2012
-                            Dim myPendingCal As New List(Of ISEAnalyzerEntity.MaintenanceOperations)
+                            Dim myPendingCal As New List(Of ISEManager.MaintenanceOperations)
                             myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
@@ -2572,7 +2590,7 @@ Public Class IISEUtilities
                     End Select
 
                     'SGM 29/06/2012
-                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.Exception Then
+                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
                         MyClass.PrepareReadyForTestingMode()
                     End If
 
@@ -2614,8 +2632,8 @@ Public Class IISEUtilities
                     If MyClass.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE Then
                         'If MyClass.CurrentOperation <> OPERATIONS.SAVE_ISE_INSTALLATION Then
                         If Not MyClass.IsR2ArmAwayFromParking Then
-                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.Exception Then
-                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.CancelError Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.CancelError Then
                                     Me.PrepareTestingMode()
                                     MyClass.DisplayMessage("")
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ISE_R2_OUT", currentLanguage) + vbCrLf
@@ -2643,14 +2661,14 @@ Public Class IISEUtilities
             If Me.CurrentOperation <> OPERATIONS.QUIT_UTILITIES And Me.CurrentOperation <> OPERATIONS.R2_TO_PARKING Then
                 RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
             Else
-                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.Exception Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.Exception Then
                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) + vbCrLf + vbCrLf
                     If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk Then
                         Dim myISEnoAnswerText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_NO_ANSWER", currentLanguage)
                         myText = myText.Trim + " - " + myISEnoAnswerText + vbCrLf
                     End If
                     If myText.Length > 0 Then
-                        Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myText, ISEAnalyzerEntity.ISEProcedureResult.Exception, True)
+                        Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myText, ISEManager.ISEProcedureResult.Exception, True)
                     End If
 
                     RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
@@ -2679,11 +2697,11 @@ Public Class IISEUtilities
                 'SGM 30/03/2012
                 If Me.CurrentOperation <> OPERATIONS.NONE And Me.CurrentOperation <> OPERATIONS.QUIT_UTILITIES Then
                     If IsActionCompleted Then
-                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.None Then
                             Dim isCalibration As Boolean = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
                             Select Case AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult
-                                Case ISEAnalyzerEntity.ISEProcedureResult.OK : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
-                                Case ISEAnalyzerEntity.ISEProcedureResult.NOK
+                                Case ISEManager.ISEProcedureResult.OK : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
+                                Case ISEManager.ISEProcedureResult.NOK
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage)
                                     If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                         myText = myText & ":"
@@ -2697,12 +2715,16 @@ Public Class IISEUtilities
                                                 'End If
                                             Else
                                                 Dim myDesc = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEErrorDescription(E, False, isCalibration)
-                                                myText = myText & vbCrLf & myDesc & " (" & ISEErrorTO.FormatAffected(E.Affected) & ")"
+
+                                                ' XB 08/09/2014 - BA-1902
+                                                'myText = myText & vbCrLf & myDesc & " (" & ISEErrorTO.FormatAffected(E.Affected) & ")"
+                                                myText = myText & vbCrLf & myDesc & " (" & ISEManager.FormatAffected(E.Affected) & ")"
+                                                ' XB 08/09/2014 - BA-1902
                                             End If
                                         Next
                                     End If
 
-                                Case ISEAnalyzerEntity.ISEProcedureResult.CancelError
+                                Case ISEManager.ISEProcedureResult.CancelError
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage)
                                     If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.IsCancelError AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                         For Each E As ISEErrorTO In AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors
@@ -2714,7 +2736,7 @@ Public Class IISEUtilities
                                         Next
                                     End If
 
-                                Case ISEAnalyzerEntity.ISEProcedureResult.Exception : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
+                                Case ISEManager.ISEProcedureResult.Exception : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
                             End Select
                         Else
                             If pResponse = RESPONSE_TYPES.OK Then
@@ -2777,7 +2799,7 @@ Public Class IISEUtilities
             If (MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS Or IsInInstallActivateBlock) And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                 'If MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                 Dim myISEPdtText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_CONNECT_PDT", currentLanguage) + vbCrLf + vbCrLf
-                Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEPdtText, ISEAnalyzerEntity.ISEProcedureResult.NOK)
+                Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEPdtText, ISEManager.ISEProcedureResult.NOK)
             End If
             'end SGM 15/10/2012
 
@@ -2785,11 +2807,11 @@ Public Class IISEUtilities
             If Not MyClass.CurrentActionNode Is Nothing AndAlso Me.BSActionsTreeImageList IsNot Nothing AndAlso Me.BsActionsTreeView IsNot Nothing Then
 
                 'SGM 11/06/2012
-                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                     MyClass.CurrentActionNode.ImageKey = "DONE"
                     MyClass.CurrentActionNode.SelectedImageKey = "DONE"
                     MyClass.CurrentActionNode.ForeColor = MyClass.CurrentActionNode.Parent.ForeColor
-                ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
+                ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.None Then
                     MyClass.CurrentActionNode.ImageKey = "ACTION"
                     MyClass.CurrentActionNode.SelectedImageKey = "ACTION"
                     MyClass.CurrentActionNode.ForeColor = Color.Black
@@ -2874,7 +2896,7 @@ Public Class IISEUtilities
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             'Me.ReportHistoryError()    PDT !!!
         Finally
@@ -2903,7 +2925,7 @@ Public Class IISEUtilities
             Me.BsStopButton.Visible = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReadyForTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReadyForTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareReadyForTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2942,7 +2964,7 @@ Public Class IISEUtilities
             'end SGM 23/10/2012
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -2963,7 +2985,7 @@ Public Class IISEUtilities
             MyClass.CurrentAlarmType = pAlarmType
 
             If MyClass.CurrentOperation <> OPERATIONS.NONE Then
-                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.None Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
                     AnalyzerController.Instance.Analyzer.ISEAnalyzer.AbortCurrentProcedureDueToException()
                 End If
                 MyClass.CurrentOperation = OPERATIONS.NONE
@@ -2972,7 +2994,7 @@ Public Class IISEUtilities
             RaiseEvent StopCurrentOperationFinished(pAlarmType)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -3066,7 +3088,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisplayISEInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DisplayISEInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisplayISEInfo ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3092,12 +3114,12 @@ Public Class IISEUtilities
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendPcSendText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendPcSendText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AppendPcSendText ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    Private Sub AppendAnalyzerResponseText(ByVal RTC As RichTextBox, ByVal text As String, Optional ByVal pForcedResult As ISEAnalyzerEntity.ISEProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.None, Optional ByVal pForceWrite As Boolean = False)
+    Private Sub AppendAnalyzerResponseText(ByVal RTC As RichTextBox, ByVal text As String, Optional ByVal pForcedResult As ISEManager.ISEProcedureResult = ISEManager.ISEProcedureResult.None, Optional ByVal pForceWrite As Boolean = False)
         Try
 
             If Not pForceWrite And Me.IsScreenCloseRequested Then Exit Sub
@@ -3109,8 +3131,8 @@ Public Class IISEUtilities
                 myColor = Color.DarkOliveGreen
             Else
 
-                Dim myResult As ISEAnalyzerEntity.ISEProcedureResult
-                If pForcedResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
+                Dim myResult As ISEManager.ISEProcedureResult
+                If pForcedResult <> ISEManager.ISEProcedureResult.None Then
                     myResult = pForcedResult
                 Else
                     myResult = AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult '#REFACTORING
@@ -3119,10 +3141,10 @@ Public Class IISEUtilities
                 myColor = Color.DarkOliveGreen
                 '#REFACTORING
                 Select Case myResult
-                    Case ISEAnalyzerEntity.ISEProcedureResult.OK : myColor = Color.DarkOliveGreen
-                    Case ISEAnalyzerEntity.ISEProcedureResult.NOK : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.RESULT_ERROR.ToString) ': text += myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_RESULT_ERROR", currentLanguage)
-                    Case ISEAnalyzerEntity.ISEProcedureResult.CancelError : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
-                    Case ISEAnalyzerEntity.ISEProcedureResult.Exception : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
+                    Case ISEManager.ISEProcedureResult.OK : myColor = Color.DarkOliveGreen
+                    Case ISEManager.ISEProcedureResult.NOK : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.RESULT_ERROR.ToString) ': text += myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_RESULT_ERROR", currentLanguage)
+                    Case ISEManager.ISEProcedureResult.CancelError : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
+                    Case ISEManager.ISEProcedureResult.Exception : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
                 End Select
 
 
@@ -3137,7 +3159,7 @@ Public Class IISEUtilities
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendAnalyzerResponseText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendAnalyzerResponseText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AppendAnalyzerResponseText ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3149,7 +3171,7 @@ Public Class IISEUtilities
     ''' <param name="pAlarmsList"></param>
     ''' <remarks></remarks>
     Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of GlobalEnumerates.Alarms), _
-                                    ByVal pPendingCalibrations As List(Of ISEAnalyzerEntity.MaintenanceOperations))
+                                    ByVal pPendingCalibrations As List(Of ISEManager.MaintenanceOperations))
         Try
 
             Dim myTextList As New List(Of String)
@@ -3183,12 +3205,12 @@ Public Class IISEUtilities
             'get pending calibrations
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             If pPendingCalibrations IsNot Nothing AndAlso pPendingCalibrations.Count > 0 Then
-                For Each C As ISEAnalyzerEntity.MaintenanceOperations In pPendingCalibrations
+                For Each C As ISEManager.MaintenanceOperations In pPendingCalibrations
                     Dim myCalText As String = ""
                     Select Case C
-                        Case ISEAnalyzerEntity.MaintenanceOperations.ElectrodesCalibration : myCalText = "CALB: "
-                        Case ISEAnalyzerEntity.MaintenanceOperations.PumpsCalibration : myCalText = "PMCL: "
-                        Case ISEAnalyzerEntity.MaintenanceOperations.BubbleCalibration : myCalText = "BBCL: "
+                        Case ISEManager.MaintenanceOperations.ElectrodesCalibration : myCalText = "CALB: "
+                        Case ISEManager.MaintenanceOperations.PumpsCalibration : myCalText = "PMCL: "
+                        Case ISEManager.MaintenanceOperations.BubbleCalibration : myCalText = "BBCL: "
                     End Select
 
                     If myCalText.Length > 0 Then
@@ -3221,7 +3243,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendISEAlarmsText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AppendISEAlarmsText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AppendISEAlarmsText ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3326,7 +3348,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionTreeViewNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionTreeViewNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadActionTreeViewNode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -3350,7 +3372,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteActionRepetitions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteActionRepetitions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DeleteActionRepetitions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return returnValue
@@ -3388,7 +3410,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionsServiceTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionsServiceTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadActionsServiceTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -3423,7 +3445,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionsServiceTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadActionsServiceTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadActionsServiceTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -3523,7 +3545,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateActionNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateActionNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateActionNode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -3608,7 +3630,7 @@ Public Class IISEUtilities
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTimesUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareTimesUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTimesUpDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3616,6 +3638,7 @@ Public Class IISEUtilities
     ''' Modified by SA 14/05/2012 - Call to function IsThereAnyISETest changed by call to new function IsThereAnyTestByType 
     '''                             informing TestType parameter as ISE
     '''             IT 23/10/2014 - REFACTORING (BA-2016)
+    '''             XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     Private Function ValidateISEAction(ByVal pNode As TreeNode) As Boolean
 
         Dim resultValue As Boolean = True
@@ -3668,7 +3691,7 @@ Public Class IISEUtilities
                                         If CBool(myGlobal.SetDatos) Then
                                             'SGM 25/09/2012 - check if calibrations are ok
                                             Dim isReady As Boolean = False
-                                            Dim myAffectedElectrodes As List(Of String)
+                                            Dim myAffectedElectrodes As List(Of String) = Nothing
                                             myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
 
@@ -3716,8 +3739,14 @@ Public Class IISEUtilities
                 ' general validations
                 If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then ' XBC 19/04/2012 
 
-                    'resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk
-                    resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
+                    ' XB 12/12/2014 - BA-2178
+                    ''resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk
+                    'resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
+                    If myAction <> "INIT_ISE" Then
+                        resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
+                    End If
+                    ' XB 12/12/2014 - BA-2178
+
                 End If
 
             End If
@@ -3730,7 +3759,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateISEAction", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateISEAction", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return resultValue
@@ -3743,6 +3772,7 @@ Public Class IISEUtilities
     ''' <returns></returns>
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     ''' </remarks>
     Private Function ValidateNodeByBlock(ByVal pNode As TreeNode) As Boolean
         Dim resultValue As Boolean = False
@@ -3804,9 +3834,11 @@ Public Class IISEUtilities
                         End If
                     End If
 
+                    ' XB 12/12/2014 - BA-2178
+                    ' If Not MyClass.myISEManager.IsISESwitchON Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON And pNode.Tag.ToString <> "INIT_ISE" Then
+                        ' XB 12/12/2014 - BA-2178
 
-
-                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                         resultValue = False
                     End If
 
@@ -3839,7 +3871,7 @@ Public Class IISEUtilities
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateNodeByBlock", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateNodeByBlock", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateNodeByBlock", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return resultValue
@@ -3850,10 +3882,11 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Modified by XBC 31/08/2012 - Add special case from PrepareLoadingMode 
+    ''' Modified by XB 31/08/2012 - Add special case from PrepareLoadingMode 
     '''                              managed with the Optional parameter (pLoadingScreen). 
     '''                              For the case when Initialization ISE module is required
-    '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
+    '''             XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     ''' </remarks>
     Private Function ValidateISEAvailability(Optional ByVal pLoadingScreen As Boolean = False) As Boolean
         Dim resultValue As Boolean = False
@@ -3870,6 +3903,14 @@ Public Class IISEUtilities
                             resultValue = False
                         Else
                             resultValue = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
+
+                            ' XB 15/12/2014 - BA-2178
+                            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEOnceInitiatedOK OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
+                                    resultValue = True
+                                End If
+                            End If
+                            ' XB 15/12/2014 - BA-2178
 
                             ' XBC 27/07/2012 - While User is intalling the module all functions under its Node must be Enable
                             If MyClass.IsInstallGroupNodeActive Then
@@ -3908,7 +3949,7 @@ Public Class IISEUtilities
             'Me.FeaturesGroupBox.Enabled = resultValue
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateISEAvailability", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateISEAvailability", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateISEAvailability", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return resultValue
@@ -3926,7 +3967,7 @@ Public Class IISEUtilities
             myStreamWriter.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreateFileOutput ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4037,7 +4078,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateButtonWithAlarms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateButtonWithAlarms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " ActivateButtonWithAlarms, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myStatus
@@ -4085,7 +4126,7 @@ Public Class IISEUtilities
 
         Catch ex As Exception
             MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -4121,7 +4162,7 @@ Public Class IISEUtilities
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myGlobal
@@ -4197,7 +4238,7 @@ Public Class IISEUtilities
         End Try
 
         If myGlobal.HasError Then
-            MyBase.CreateLogActivity(exMessage, Me.Name & " SaveAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(exMessage, Me.Name & " SaveAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, exMessage)
         End If
         Return myGlobal
@@ -4219,7 +4260,7 @@ Public Class IISEUtilities
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SendLOAD_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SendLOAD_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myResultData
@@ -4242,7 +4283,7 @@ Public Class IISEUtilities
             Me.UpdateTemporalSpecificAdjustmentsDS(GlobalEnumerates.Ax00Adjustsments.ISEINS.ToString, myValueToSave)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -4271,7 +4312,7 @@ Public Class IISEUtilities
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Me.SelectedAdjustmentsDS.AcceptChanges()
@@ -4324,7 +4365,7 @@ Public Class IISEUtilities
 
         Catch ex As Exception
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FormClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FormClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FormClosed ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4340,8 +4381,8 @@ Public Class IISEUtilities
     '            PrepareTestedMode()
     '        End If
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -4357,7 +4398,7 @@ Public Class IISEUtilities
         Try
 
             'Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
             If (AnalyzerController.IsAnalyzerInstantiated) Then
@@ -4365,10 +4406,10 @@ Public Class IISEUtilities
             End If
 
             'Get the current user level SGM 07/06/2012
-            MyBase.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            MyBase.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             Me.GetScreenLabels()
@@ -4376,7 +4417,7 @@ Public Class IISEUtilities
             Me.PrepareTreeViewImages()
 
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
 
             If ThisIsService Then
 
@@ -4425,7 +4466,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4456,7 +4497,7 @@ Public Class IISEUtilities
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResizeForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResizeForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResizeForm ", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4521,7 +4562,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4541,8 +4582,8 @@ Public Class IISEUtilities
 
         Try
             'TRAZA DE CIERRE DE PANTALLA
-            Dim myApplicationLogMang As New ApplicationLogManager
-            myApplicationLogMang.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
+            'Dim myApplicationLogMang As New ApplicationLogManager
+            GlobalBase.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
             'TRAZA DE CIERRE DE PANTALLA
 
             MyClass.IsScreenCloseRequested = True 'SGM 13/06/2012
@@ -4577,14 +4618,14 @@ Public Class IISEUtilities
 
                         'SGM 25/09/2012 - check if any calibration is needed
                         Dim isReady As Boolean = False
-                        Dim myAffectedElectrodes As List(Of String)
+                        Dim myAffectedElectrodes As List(Of String) = Nothing
                         myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                         End If
 
                         If isReady Then ' XBC 15/04/2013 - if ISE still Not Ready, is no need re-generate executions because there no changes and it is long time process
-                            CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
+                            GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                             Dim myExecutionDelegate As New ExecutionsDelegate
                             myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                                                                               createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
@@ -4659,7 +4700,7 @@ Public Class IISEUtilities
             'Me.Close()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4668,7 +4709,7 @@ Public Class IISEUtilities
         Try
             Me.BsActionsTreeView.Focus()
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsActionsTreeView_AfterExpand ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsActionsTreeView_AfterExpand ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsActionsTreeView_AfterExpand ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4678,7 +4719,7 @@ Public Class IISEUtilities
             Me.BsAdjustButton.Enabled = False
             Me.BsActionsTreeView.SelectedNode = Nothing
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsActionsTreeView_BeforeExpand ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsActionsTreeView_BeforeExpand ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsActionsTreeView_BeforeExpand ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4691,6 +4732,7 @@ Public Class IISEUtilities
     ''' <param name="e"></param>
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''               XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     ''' </remarks>
     Private Sub BsScreenActionsTreeView_NodeMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles BsActionsTreeView.NodeMouseClick
         Try
@@ -4746,7 +4788,11 @@ Public Class IISEUtilities
                                 Me.BsTimesUpDown.Value = 1
                                 If MyClass.ValidateISEAction(currNode) Then
                                     MyClass.CurrentActionNode = currNode
-                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
+
+                                    ' XB 12/12/2014 - BA-2178
+                                    ' If Not myISEManager.IsLongTermDeactivation Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation AndAlso currNode.Tag.ToString <> "INIT_ISE" Then
+                                        ' XB 12/12/2014 - BA-2178
                                         Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
                                     Else
                                         Me.BsAdjustButton.Enabled = True
@@ -4760,7 +4806,7 @@ Public Class IISEUtilities
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsScreenActionsTreeView.NodeMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsScreenActionsTreeView.NodeMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsScreenActionsTreeView.NodeMouseClick ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4773,14 +4819,14 @@ Public Class IISEUtilities
                 Dim myISECommand As New ISECommandTO()
 
                 If MyClass.CurrentActionNode.Tag.ToString = "ISE_ALMS" Then
-                    CreateLogActivity("ISE: " & MyClass.CurrentActionNode.Tag.ToString, Me.Name & ".BsAdjustButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+                    GlobalBase.CreateLogActivity("ISE: " & MyClass.CurrentActionNode.Tag.ToString, Me.Name & ".BsAdjustButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
                     MyClass.ExecuteISEAction(MyClass.CurrentActionNode)
                 Else
                     If MyClass.ValidateNodeByBlock(MyClass.CurrentActionNode) Then
                         myGlobal = MyClass.ValidateActionNode(MyClass.CurrentActionNode.Tag.ToString, True)
                         If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                             myISECommand = CType(myGlobal.SetDatos, ISECommandTO)
-                            CreateLogActivity("ISE: " & myISECommand.ISECommandID.ToString, Me.Name & ".BsAdjustButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+                            GlobalBase.CreateLogActivity("ISE: " & myISECommand.ISECommandID.ToString, Me.Name & ".BsAdjustButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
                             If myISECommand.ISECommandID <> ISECommands.NONE Then
                                 'ISE CMD ACTION
                                 Me.NumRepetitionsSelectedByUser = 1
@@ -4810,7 +4856,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsAdjustButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsAdjustButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsAdjustButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4833,11 +4879,13 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
+    ''' Modified by XB 15/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
+    ''' 
     Private Sub IIseAdjustments_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyUp
         Try
 
@@ -4872,7 +4920,15 @@ Public Class IISEUtilities
                                     Me.BsTimesUpDown.Value = 1
                                     If MyClass.ValidateISEAction(Me.BsActionsTreeView.SelectedNode) Then
                                         MyClass.CurrentActionNode = Me.BsActionsTreeView.SelectedNode
-                                        Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
+
+                                        ' XB 15/12/2014 - BA-2178
+                                        If Me.BsActionsTreeView.SelectedNode.Tag.ToString = "INIT_ISE" Then
+                                            Me.BsAdjustButton.Enabled = True
+                                        Else
+                                            ' XB 15/12/2014 - BA-2178
+                                            Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
+                                        End If
+
                                     End If
                                 End If
                             End If
@@ -4912,7 +4968,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4929,7 +4985,7 @@ Public Class IISEUtilities
             'Me.PrepareTestedMode()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsStopButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsStopButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStopButton", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4965,7 +5021,7 @@ Public Class IISEUtilities
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveAsButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveAsButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveAsButtonown ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4973,9 +5029,9 @@ Public Class IISEUtilities
     Private Sub BsRichTextBox1_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsRichTextBox1.GotFocus
         Try
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRichTextBox1_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4987,7 +5043,7 @@ Public Class IISEUtilities
             Me.BsClearButton.Enabled = (Me.BsRichTextBox1.Text.Length > 0)
             Me.BsRichTextBox1.ScrollToCaret() 'SGM 14/05/2012
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRichTextBox1_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4999,13 +5055,21 @@ Public Class IISEUtilities
     ''' Check if a Li+ Test is in Use
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>SGM 17/05/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 17/05/2012
+    ''' Modified by: XB 05/09/2014 - Use ISETestID field instead of ISE Name field - BA-1902
+    ''' </remarks>
     Public Function LithiumTestInUse() As Boolean
         Dim myGlobal As New GlobalDataTO
         Dim InUse As Boolean = False
         Try
             Dim myISETestDelegate As New ISETestsDelegate
-            myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+
+            ' XB 05/09/2014 - BA-1902
+            'myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            myGlobal = myISETestDelegate.ExistsISETestID(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
+
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISETestsDS As ISETestsDS = CType(myGlobal.SetDatos, ISETestsDS)
                 If myISETestsDS.tparISETests.Count > 0 Then
@@ -5018,7 +5082,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LithiumTestInUse", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LithiumTestInUse", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LithiumTestInUse", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return InUse
@@ -5029,13 +5093,20 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <param name="pEnabled"></param>
     ''' <returns></returns>
-    ''' <remarks>SGM 17/05/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 17/05/2012
+    ''' Modified by: XB 05/09/2014 - Use ISETestID field instead of ISE Name field - BA-1902
+    ''' </remarks>
     Public Function UpdateLithiumTestEnabled(ByVal pEnabled As Boolean) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myISETestDelegate As New ISETestsDelegate
 
-            myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            ' XB 05/09/2014 - BA-1902
+            'myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            myGlobal = myISETestDelegate.ExistsISETestID(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
+
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISETestsDS As ISETestsDS = CType(myGlobal.SetDatos, ISETestsDS)
                 If myISETestsDS.tparISETests.Count > 0 Then
@@ -5049,7 +5120,7 @@ Public Class IISEUtilities
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateLithiumTestEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateLithiumTestEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateLithiumTestEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobal
@@ -5080,10 +5151,10 @@ Public Class IISEUtilities
                 If myDocs IsNot Nothing Then
                     Dim myDocRow As SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow = CType(myDocs.srv_tfmwInfoDocuments.Rows(0), SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow)
 
-                    Dim myGlobalbase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
-                        myDocumentPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.DocumentPath
+                        myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath
 
                         Dim isScrollable As Boolean = myDocRow.Expandable
 
@@ -5145,7 +5216,7 @@ Public Class IISEUtilities
                                 myGlobal.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
 
 
-                                MyBase.CreateLogActivity(GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                                GlobalBase.CreateLogActivity(GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                                 'Myclass.ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                             End If
 
@@ -5155,14 +5226,14 @@ Public Class IISEUtilities
 
                     'video NOT V1
                     'If myDocRow.VideoPath.Length > 0 Then
-                    '    myVideoPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.VideoPath
+                    '    myVideoPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.VideoPath
                     '    If File.Exists(myVideoPath) Then
 
                     '    Else
                     '        myGlobal.HasError = True
                     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
 
-                    '        MyBase.CreateLogActivity(GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                    '        GlobalBase.CreateLogActivity(GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                     '        MyClass.ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                     '    End If
                     'End If
@@ -5174,7 +5245,7 @@ Public Class IISEUtilities
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -5199,7 +5270,7 @@ Public Class IISEUtilities
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5214,7 +5285,7 @@ Public Class IISEUtilities
     '            e.Cancel = True
     '        End If
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub

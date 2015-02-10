@@ -6,8 +6,13 @@ Public Class SummaryResultsReport
         'XrHeaderLabel.Text = aText
     End Sub
 
-    Public Sub SetDataSource(ByVal aDataSource As DataTable)
+    Public Overloads Sub SetDataSource(ByVal aDataSource As DataTable)
         DataSource = aDataSource
+        Dim detailDataMember As String = String.Format("{0}.{1}", aDataSource.TableName,
+                aDataSource.ChildRelations("Values").RelationName)
+
+        DetailReport.DataSource = aDataSource.ChildRelations("Values").ChildTable
+        DetailReport.DataMember = detailDataMember
     End Sub
 
     Public Sub AddTableRowCells(ByVal Cells As XRTableCell())
@@ -25,10 +30,17 @@ Public Class SummaryResultsReport
         Dim Margin As Single = 20.0!
         Dim Height As Single = 20.0!
 
-        ' XrHeaderLabel.SizeF = New System.Drawing.SizeF(Width, Height)
-        XrTableHeader.SizeF = New System.Drawing.SizeF(Width - Margin, Height)
-        XrTableDetails.SizeF = New System.Drawing.SizeF(Width - Margin, Height)
-        XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(Width - Margin, Height)
+        'XrTableHeader.SizeF = New System.Drawing.SizeF(120.0F * 7, Height)
+        'XrTableDetails.SizeF = New System.Drawing.SizeF(120.0F * 7, Height)
+
+        XrWSStartDateTimeLabel.LocationF = New System.Drawing.PointF(PageWidth - (XrWSStartDateTimeLabel.WidthF + Margins.Right + Margins.Left), Height)
     End Sub
 
+    Private Sub DetailReport_BeforePrint(sender As Object, e As Drawing.Printing.PrintEventArgs) Handles DetailReport.BeforePrint
+
+        Dim groupId As Integer = Convert.ToInt32(Me.GetCurrentColumnValue("GroupId"))
+        Dim detailReportBand As DetailReportBand = CType(sender, DetailReportBand)
+        detailReportBand.FilterString = String.Format("[GroupId] = {0}", groupId)
+
+    End Sub
 End Class

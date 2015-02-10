@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IPhotometryAdjustments
+Partial Class UiPhotometryAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -22,186 +22,186 @@ Partial Class IPhotometryAdjustments
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IPhotometryAdjustments))
-        Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle14 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle15 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle16 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle17 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle18 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle19 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle20 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle21 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle22 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle23 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle24 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim XyDiagram3 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim Series8 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim SideBySideBarSeriesLabel4 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel
-        Dim SideBySideBarSeriesView2 As DevExpress.XtraCharts.SideBySideBarSeriesView = New DevExpress.XtraCharts.SideBySideBarSeriesView
-        Dim Series9 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim SideBySideBarSeriesLabel5 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel
-        Dim SideBySideBarSeriesLabel6 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel
-        Dim ChartTitle6 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Dim XyDiagram4 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim Series10 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel3 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim LineSeriesView3 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim PointSeriesLabel4 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim LineSeriesView4 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim ChartTitle7 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Dim SwiftPlotDiagram4 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram
-        Dim Series11 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim SwiftPlotSeriesView8 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
-        Dim Series12 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim SwiftPlotSeriesView9 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
-        Dim SwiftPlotSeriesView10 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
-        Dim ChartTitle8 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Dim SwiftPlotDiagram3 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram
-        Dim ConstantLine13 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine14 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine15 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine16 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine17 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine18 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine19 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine20 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine21 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine22 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine23 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim ConstantLine24 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
-        Dim Series7 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim SwiftPlotSeriesView6 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
-        Dim SwiftPlotSeriesView7 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
-        Dim ChartTitle5 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
+        Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiPhotometryAdjustments))
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim SideBySideBarSeriesLabel1 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
+        Dim SideBySideBarSeriesView1 As DevExpress.XtraCharts.SideBySideBarSeriesView = New DevExpress.XtraCharts.SideBySideBarSeriesView()
+        Dim Series2 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim SideBySideBarSeriesLabel2 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
+        Dim SideBySideBarSeriesLabel3 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
+        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Dim XyDiagram2 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim Series3 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim ChartTitle2 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Dim SwiftPlotDiagram1 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram()
+        Dim Series4 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim SwiftPlotSeriesView1 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
+        Dim Series5 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim SwiftPlotSeriesView2 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
+        Dim SwiftPlotSeriesView3 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
+        Dim ChartTitle3 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Dim SwiftPlotDiagram2 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram()
+        Dim ConstantLine1 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine2 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine3 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine4 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine5 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine6 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine7 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine8 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine9 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine10 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine11 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim ConstantLine12 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
+        Dim Series6 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim SwiftPlotSeriesView4 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
+        Dim SwiftPlotSeriesView5 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
+        Dim ChartTitle4 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
-        Me.TabBaselineDarkness = New System.Windows.Forms.TabPage
-        Me.BsStep1InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoStep1XPSViewer = New BsXPSViewer
-        Me.BsBaselineInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsStep1LEDsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsDataGridViewLeds = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.BsStep1ITExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsStep1DacsReferenceButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsStep1DACSIntensityLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSelectAllITsCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.BsDataGridViewLedsChecks = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.BsDataGridViewLeds2 = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.BsStep1ITSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsStep1RefDACSIntensityLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1ResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1ConfigurationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep1AutoFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep1ManualFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep1WellUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.BsStep1WellLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1UpDownWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BSStep1BLChart = New DevExpress.XtraCharts.ChartControl
-        Me.BsStep1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1DCphRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsphRefDCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1DCphMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsphMainDCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1WLsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsWLsListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.BsStep1BLphRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsphRefWarningsListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.BsphRefBLListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.BsStep1BLphMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsphMainWarningsListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.BsphMainBLListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.BsStep1DCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep1BaselineLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.TabRepeatabilityStability = New System.Windows.Forms.TabPage
-        Me.BsStep2InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoStep2XPSViewer = New BsXPSViewer
-        Me.BsStep2InfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep2AbsorbanceRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2RepeatabilityRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2StabilityRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.Step2ChartAbs = New DevExpress.XtraCharts.ChartControl
-        Me.BsStep2RangeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2LightRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2MinLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2DarkRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2MaxLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2CVevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2ConfigurationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep2AutoFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2ManualFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsStep2WellUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.BsStep2Well2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2UpDownWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsStep2SDevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2MeanLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Step2Chart = New DevExpress.XtraCharts.ChartControl
-        Me.BsStep2ResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2WLCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.BsStep2WavelengthLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep2phMainRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phMainMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep2phRefRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2phRefMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsorbanceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep2AbsMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep2AbsRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.TabVerificationRotor = New System.Windows.Forms.TabPage
-        Me.BsStep3InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoStep3XPSViewer = New BsXPSViewer
-        Me.BsStep3InfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsStep3TestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.Step3Chart = New DevExpress.XtraCharts.ChartControl
-        Me.BsGroupBox6 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep3RangeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3MinLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3MaxLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3CVevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3SDevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3MeanLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsorbanceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsStep3AbsMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3AbsRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsResultsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3WLCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.BsFillModeCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.BsWavelengthLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsFillModeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsStep3Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
+        Me.TabBaselineDarkness = New System.Windows.Forms.TabPage()
+        Me.BsStep1InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoStep1XPSViewer = New BsXPSViewer()
+        Me.BsBaselineInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsStep1LEDsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsDataGridViewLeds = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.BsStep1ITExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsStep1DacsReferenceButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsStep1DACSIntensityLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSelectAllITsCheckbox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.BsDataGridViewLedsChecks = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.BsDataGridViewLeds2 = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.BsStep1ITSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsStep1RefDACSIntensityLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1ResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1ConfigurationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep1AutoFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep1ManualFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep1WellUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.BsStep1WellLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1UpDownWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BSStep1BLChart = New DevExpress.XtraCharts.ChartControl()
+        Me.BsStep1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1DCphRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsphRefDCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1DCphMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsphMainDCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1WLsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsWLsListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.BsStep1BLphRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsphRefWarningsListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.BsphRefBLListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.BsStep1BLphMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsphMainWarningsListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.BsphMainBLListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.BsStep1DCLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep1BaselineLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.TabRepeatabilityStability = New System.Windows.Forms.TabPage()
+        Me.BsStep2InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoStep2XPSViewer = New BsXPSViewer()
+        Me.BsStep2InfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep2AbsorbanceRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2RepeatabilityRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2StabilityRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.Step2ChartAbs = New DevExpress.XtraCharts.ChartControl()
+        Me.BsStep2RangeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2LightRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2MinLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2DarkRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2MaxLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2CVevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2ConfigurationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep2AutoFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2ManualFillRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsStep2WellUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.BsStep2Well2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2UpDownWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsStep2SDevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2MeanLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Step2Chart = New DevExpress.XtraCharts.ChartControl()
+        Me.BsStep2ResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2WLCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.BsStep2WavelengthLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep2phMainRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phMainMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep2phRefRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2phRefMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsorbanceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep2AbsMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep2AbsRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.TabVerificationRotor = New System.Windows.Forms.TabPage()
+        Me.BsStep3InfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoStep3XPSViewer = New BsXPSViewer()
+        Me.BsStep3InfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsStep3TestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.Step3Chart = New DevExpress.XtraCharts.ChartControl()
+        Me.BsGroupBox6 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep3RangeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3MinLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3MaxLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3CVevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3SDevLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3MeanLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsorbanceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsStep3AbsMeanResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsCVResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsMinResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsMaxResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsSDResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3AbsRangeResult = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsResultsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3WLCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.BsFillModeCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.BsWavelengthLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsFillModeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsStep3Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.CurrentOperationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsTabPagesControl.SuspendLayout()
         Me.TabBaselineDarkness.SuspendLayout()
@@ -214,13 +214,13 @@ Partial Class IPhotometryAdjustments
         Me.BsStep1ConfigurationGroupBox.SuspendLayout()
         CType(Me.BsStep1WellUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BSStep1BLChart, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(XyDiagram3, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series8, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SideBySideBarSeriesLabel4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SideBySideBarSeriesView2, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series9, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SideBySideBarSeriesLabel5, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SideBySideBarSeriesLabel6, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(XyDiagram1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SideBySideBarSeriesLabel1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SideBySideBarSeriesView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SideBySideBarSeriesLabel2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SideBySideBarSeriesLabel3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsStep1DCphRefGroupBox.SuspendLayout()
         Me.BsStep1DCphMainGroupBox.SuspendLayout()
         Me.BsStep1WLsGroupBox.SuspendLayout()
@@ -231,21 +231,21 @@ Partial Class IPhotometryAdjustments
         Me.BsStep2AdjustPanel.SuspendLayout()
         Me.BsGroupBox1.SuspendLayout()
         CType(Me.Step2ChartAbs, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(XyDiagram4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series10, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(PointSeriesLabel3, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(LineSeriesView3, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(PointSeriesLabel4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(LineSeriesView4, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(XyDiagram2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series3, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(LineSeriesView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(PointSeriesLabel2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(LineSeriesView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsStep2ConfigurationGroupBox.SuspendLayout()
         CType(Me.BsStep2WellUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Step2Chart, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotDiagram4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series11, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotSeriesView8, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series12, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotSeriesView9, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotSeriesView10, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotDiagram1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series4, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotSeriesView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series5, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotSeriesView2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotSeriesView3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsStep2phMainGroupBox.SuspendLayout()
         Me.BsStep2phRefGroupBox.SuspendLayout()
         Me.BsStep2AbsorbanceGroupBox.SuspendLayout()
@@ -253,10 +253,10 @@ Partial Class IPhotometryAdjustments
         Me.BsStep3InfoPanel.SuspendLayout()
         Me.BsStep3AdjustPanel.SuspendLayout()
         CType(Me.Step3Chart, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotDiagram3, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Series7, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotSeriesView6, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(SwiftPlotSeriesView7, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotDiagram2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Series6, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotSeriesView4, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SwiftPlotSeriesView5, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsGroupBox6.SuspendLayout()
         Me.BsStep3AbsorbanceGroupBox.SuspendLayout()
         Me.BsMessagesPanel.SuspendLayout()
@@ -317,9 +317,10 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep1XPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoStep1XPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoStep1XPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoStep1XPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoStep1XPSViewer.HorizontalPageMargin = 0
         Me.BsInfoStep1XPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoStep1XPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoStep1XPSViewer.IsLoaded = False
         Me.BsInfoStep1XPSViewer.IsScrollable = False
         Me.BsInfoStep1XPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoStep1XPSViewer.MenuBarVisible = False
@@ -332,7 +333,7 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep1XPSViewer.TabIndex = 36
         Me.BsInfoStep1XPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoStep1XPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoStep1XPSViewer.VerticalPageMargin = 10
+        Me.BsInfoStep1XPSViewer.VerticalPageMargin = 0
         Me.BsInfoStep1XPSViewer.Visible = False
         Me.BsInfoStep1XPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoStep1XPSViewer.WholePageButtonVisible = True
@@ -340,7 +341,7 @@ Partial Class IPhotometryAdjustments
         'BsBaselineInfoTitle
         '
         Me.BsBaselineInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsBaselineInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsBaselineInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsBaselineInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -354,8 +355,8 @@ Partial Class IPhotometryAdjustments
         'BsStep1AdjustPanel
         '
         Me.BsStep1AdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStep1AdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsStep1AdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsStep1AdjustPanel.Controls.Add(Me.BsStep1LEDsGroupBox1)
@@ -401,32 +402,32 @@ Partial Class IPhotometryAdjustments
         Me.BsDataGridViewLeds.AllowUserToDeleteRows = False
         Me.BsDataGridViewLeds.AllowUserToResizeColumns = False
         Me.BsDataGridViewLeds.AllowUserToResizeRows = False
-        DataGridViewCellStyle13.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle13.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        Me.BsDataGridViewLeds.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle13
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        Me.BsDataGridViewLeds.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
         Me.BsDataGridViewLeds.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.BsDataGridViewLeds.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders
         Me.BsDataGridViewLeds.BackgroundColor = System.Drawing.Color.LightGray
         Me.BsDataGridViewLeds.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.BsDataGridViewLeds.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle14.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle14.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle14.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle14
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
         Me.BsDataGridViewLeds.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle15.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle15.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds.DefaultCellStyle = DataGridViewCellStyle15
+        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds.DefaultCellStyle = DataGridViewCellStyle3
         Me.BsDataGridViewLeds.Enabled = False
         Me.BsDataGridViewLeds.EnterToTab = False
         Me.BsDataGridViewLeds.GridColor = System.Drawing.Color.Silver
@@ -434,14 +435,14 @@ Partial Class IPhotometryAdjustments
         Me.BsDataGridViewLeds.MultiSelect = False
         Me.BsDataGridViewLeds.Name = "BsDataGridViewLeds"
         Me.BsDataGridViewLeds.ReadOnly = True
-        DataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle16.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle16.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds.RowHeadersDefaultCellStyle = DataGridViewCellStyle16
+        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle4.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle4.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
         Me.BsDataGridViewLeds.RowHeadersVisible = False
         Me.BsDataGridViewLeds.Size = New System.Drawing.Size(594, 43)
         Me.BsDataGridViewLeds.TabIndex = 45
@@ -518,46 +519,46 @@ Partial Class IPhotometryAdjustments
         Me.BsDataGridViewLedsChecks.AllowUserToDeleteRows = False
         Me.BsDataGridViewLedsChecks.AllowUserToResizeColumns = False
         Me.BsDataGridViewLedsChecks.AllowUserToResizeRows = False
-        DataGridViewCellStyle17.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle17.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        Me.BsDataGridViewLedsChecks.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle17
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        Me.BsDataGridViewLedsChecks.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle5
         Me.BsDataGridViewLedsChecks.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.BsDataGridViewLedsChecks.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders
         Me.BsDataGridViewLedsChecks.BackgroundColor = System.Drawing.Color.LightGray
         Me.BsDataGridViewLedsChecks.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.BsDataGridViewLedsChecks.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle18.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle18.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle18.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLedsChecks.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle18
+        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle6.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle6.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle6.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLedsChecks.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle6
         Me.BsDataGridViewLedsChecks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.BsDataGridViewLedsChecks.ColumnHeadersVisible = False
-        DataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle19.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle19.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLedsChecks.DefaultCellStyle = DataGridViewCellStyle19
+        DataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle7.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle7.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLedsChecks.DefaultCellStyle = DataGridViewCellStyle7
         Me.BsDataGridViewLedsChecks.EnterToTab = False
         Me.BsDataGridViewLedsChecks.GridColor = System.Drawing.Color.Silver
         Me.BsDataGridViewLedsChecks.Location = New System.Drawing.Point(53, 116)
         Me.BsDataGridViewLedsChecks.MultiSelect = False
         Me.BsDataGridViewLedsChecks.Name = "BsDataGridViewLedsChecks"
-        DataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle20.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle20.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle20.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLedsChecks.RowHeadersDefaultCellStyle = DataGridViewCellStyle20
+        DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle8.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle8.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLedsChecks.RowHeadersDefaultCellStyle = DataGridViewCellStyle8
         Me.BsDataGridViewLedsChecks.RowHeadersVisible = False
         Me.BsDataGridViewLedsChecks.Size = New System.Drawing.Size(594, 24)
         Me.BsDataGridViewLedsChecks.TabIndex = 67
@@ -570,32 +571,32 @@ Partial Class IPhotometryAdjustments
         Me.BsDataGridViewLeds2.AllowUserToDeleteRows = False
         Me.BsDataGridViewLeds2.AllowUserToResizeColumns = False
         Me.BsDataGridViewLeds2.AllowUserToResizeRows = False
-        DataGridViewCellStyle21.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle21.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        Me.BsDataGridViewLeds2.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle21
+        DataGridViewCellStyle9.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle9.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        Me.BsDataGridViewLeds2.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle9
         Me.BsDataGridViewLeds2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.BsDataGridViewLeds2.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders
         Me.BsDataGridViewLeds2.BackgroundColor = System.Drawing.Color.LightGray
         Me.BsDataGridViewLeds2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.BsDataGridViewLeds2.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle22.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle22.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle22.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds2.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle22
+        DataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle10.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle10.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle10.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds2.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle10
         Me.BsDataGridViewLeds2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle23.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle23.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle23.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle23.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds2.DefaultCellStyle = DataGridViewCellStyle23
+        DataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle11.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle11.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds2.DefaultCellStyle = DataGridViewCellStyle11
         Me.BsDataGridViewLeds2.Enabled = False
         Me.BsDataGridViewLeds2.EnterToTab = False
         Me.BsDataGridViewLeds2.GridColor = System.Drawing.Color.Silver
@@ -603,14 +604,14 @@ Partial Class IPhotometryAdjustments
         Me.BsDataGridViewLeds2.MultiSelect = False
         Me.BsDataGridViewLeds2.Name = "BsDataGridViewLeds2"
         Me.BsDataGridViewLeds2.ReadOnly = True
-        DataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle24.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle24.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle24.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle24.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle24.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle24.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.BsDataGridViewLeds2.RowHeadersDefaultCellStyle = DataGridViewCellStyle24
+        DataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle12.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle12.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.BsDataGridViewLeds2.RowHeadersDefaultCellStyle = DataGridViewCellStyle12
         Me.BsDataGridViewLeds2.RowHeadersVisible = False
         Me.BsDataGridViewLeds2.Size = New System.Drawing.Size(594, 64)
         Me.BsDataGridViewLeds2.TabIndex = 65
@@ -732,42 +733,41 @@ Partial Class IPhotometryAdjustments
         '
         'BSStep1BLChart
         '
-        Me.BSStep1BLChart.AppearanceName = "Dark Flat"
+        Me.BSStep1BLChart.AppearanceNameSerializable = "Dark Flat"
         Me.BSStep1BLChart.BackColor = System.Drawing.Color.Transparent
         Me.BSStep1BLChart.BorderOptions.Color = System.Drawing.Color.White
-        XyDiagram3.AxisX.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        XyDiagram3.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        XyDiagram3.AxisX.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        XyDiagram3.AxisX.MinorCount = 1
-        XyDiagram3.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram3.AxisX.Range.SideMarginsEnabled = True
-        XyDiagram3.AxisX.Tickmarks.MinorVisible = False
-        XyDiagram3.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
-        XyDiagram3.AxisX.Title.Text = "wavelength"
-        XyDiagram3.AxisX.Title.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        XyDiagram3.AxisX.Title.Visible = True
-        XyDiagram3.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram3.AxisY.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        XyDiagram3.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
-        XyDiagram3.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        XyDiagram3.AxisY.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        XyDiagram3.AxisY.MinorCount = 1
-        XyDiagram3.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram3.AxisY.Range.SideMarginsEnabled = True
-        XyDiagram3.AxisY.Tickmarks.MinorVisible = False
-        XyDiagram3.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
-        XyDiagram3.AxisY.Title.Text = "Number of Counts"
-        XyDiagram3.AxisY.Title.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        XyDiagram3.AxisY.Title.Visible = True
-        XyDiagram3.AxisY.VisibleInPanesSerializable = "-1"
-        XyDiagram3.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.BSStep1BLChart.Diagram = XyDiagram3
+        Me.BSStep1BLChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.[False]
+        XyDiagram1.AxisX.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        XyDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
+        XyDiagram1.AxisX.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        XyDiagram1.AxisX.MinorCount = 1
+        XyDiagram1.AxisX.Tickmarks.MinorVisible = False
+        XyDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
+        XyDiagram1.AxisX.Title.Text = "wavelength"
+        XyDiagram1.AxisX.Title.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        XyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
+        XyDiagram1.AxisX.WholeRange.AutoSideMargins = True
+        XyDiagram1.AxisY.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        XyDiagram1.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
+        XyDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
+        XyDiagram1.AxisY.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        XyDiagram1.AxisY.MinorCount = 1
+        XyDiagram1.AxisY.Tickmarks.MinorVisible = False
+        XyDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
+        XyDiagram1.AxisY.Title.Text = "Number of Counts"
+        XyDiagram1.AxisY.Title.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        XyDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
+        XyDiagram1.AxisY.WholeRange.AutoSideMargins = True
+        XyDiagram1.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.BSStep1BLChart.Diagram = XyDiagram1
         Me.BSStep1BLChart.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Right
         Me.BSStep1BLChart.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.TopOutside
         Me.BSStep1BLChart.Legend.Antialiasing = True
         Me.BSStep1BLChart.Legend.BackColor = System.Drawing.Color.Transparent
         Me.BSStep1BLChart.Legend.BackImage.Stretch = True
-        Me.BSStep1BLChart.Legend.Border.Visible = False
+        Me.BSStep1BLChart.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.BSStep1BLChart.Legend.Font = New System.Drawing.Font("Verdana", 8.0!)
         Me.BSStep1BLChart.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.BSStep1BLChart.Location = New System.Drawing.Point(6, 181)
@@ -778,33 +778,33 @@ Partial Class IPhotometryAdjustments
         Me.BSStep1BLChart.Padding.Top = 10
         Me.BSStep1BLChart.PaletteBaseColorNumber = 2
         Me.BSStep1BLChart.PaletteName = "Nature Colors"
-        Series8.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        SideBySideBarSeriesLabel4.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        SideBySideBarSeriesLabel4.LineVisible = True
-        SideBySideBarSeriesLabel4.TextColor = System.Drawing.Color.Black
-        SideBySideBarSeriesLabel4.Visible = False
-        Series8.Label = SideBySideBarSeriesLabel4
-        Series8.LegendText = "Ph1"
-        Series8.Name = "Ph1"
-        SideBySideBarSeriesView2.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Series8.View = SideBySideBarSeriesView2
-        Series9.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        SideBySideBarSeriesLabel5.LineVisible = True
-        SideBySideBarSeriesLabel5.Visible = False
-        Series9.Label = SideBySideBarSeriesLabel5
-        Series9.LegendText = "Ph2"
-        Series9.Name = "Ph2"
-        Me.BSStep1BLChart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series8, Series9}
-        SideBySideBarSeriesLabel6.LineVisible = True
-        Me.BSStep1BLChart.SeriesTemplate.Label = SideBySideBarSeriesLabel6
+        Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        SideBySideBarSeriesLabel1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        SideBySideBarSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
+        SideBySideBarSeriesLabel1.TextColor = System.Drawing.Color.Black
+        Series1.Label = SideBySideBarSeriesLabel1
+        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
+        Series1.LegendText = "Ph1"
+        Series1.Name = "Ph1"
+        SideBySideBarSeriesView1.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Series1.View = SideBySideBarSeriesView1
+        Series2.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        SideBySideBarSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
+        Series2.Label = SideBySideBarSeriesLabel2
+        Series2.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
+        Series2.LegendText = "Ph2"
+        Series2.Name = "Ph2"
+        Me.BSStep1BLChart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1, Series2}
+        SideBySideBarSeriesLabel3.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
+        Me.BSStep1BLChart.SeriesTemplate.Label = SideBySideBarSeriesLabel3
         Me.BSStep1BLChart.Size = New System.Drawing.Size(469, 339)
         Me.BSStep1BLChart.SmallChartText.Text = ""
         Me.BSStep1BLChart.TabIndex = 60
-        ChartTitle6.Font = New System.Drawing.Font("Tahoma", 10.0!)
-        ChartTitle6.Text = "Absorbance"
-        ChartTitle6.TextColor = System.Drawing.Color.Black
-        ChartTitle6.Visible = False
-        Me.BSStep1BLChart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle6})
+        ChartTitle1.Font = New System.Drawing.Font("Tahoma", 10.0!)
+        ChartTitle1.Text = "Absorbance"
+        ChartTitle1.TextColor = System.Drawing.Color.Black
+        ChartTitle1.Visibility = DevExpress.Utils.DefaultBoolean.[False]
+        Me.BSStep1BLChart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1})
         '
         'BsStep1Label
         '
@@ -1038,9 +1038,10 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep2XPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoStep2XPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoStep2XPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoStep2XPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoStep2XPSViewer.HorizontalPageMargin = 0
         Me.BsInfoStep2XPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoStep2XPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoStep2XPSViewer.IsLoaded = False
         Me.BsInfoStep2XPSViewer.IsScrollable = False
         Me.BsInfoStep2XPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoStep2XPSViewer.MenuBarVisible = False
@@ -1053,14 +1054,14 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep2XPSViewer.TabIndex = 36
         Me.BsInfoStep2XPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoStep2XPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoStep2XPSViewer.VerticalPageMargin = 10
+        Me.BsInfoStep2XPSViewer.VerticalPageMargin = 0
         Me.BsInfoStep2XPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoStep2XPSViewer.WholePageButtonVisible = True
         '
         'BsStep2InfoTitle
         '
         Me.BsStep2InfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStep2InfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsStep2InfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsStep2InfoTitle.ForeColor = System.Drawing.Color.Black
@@ -1074,8 +1075,8 @@ Partial Class IPhotometryAdjustments
         'BsStep2AdjustPanel
         '
         Me.BsStep2AdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStep2AdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsStep2AdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsStep2AdjustPanel.Controls.Add(Me.BsGroupBox1)
@@ -1151,39 +1152,38 @@ Partial Class IPhotometryAdjustments
         '
         'Step2ChartAbs
         '
-        Me.Step2ChartAbs.AppearanceName = "Dark Flat"
+        Me.Step2ChartAbs.AppearanceNameSerializable = "Dark Flat"
         Me.Step2ChartAbs.BackColor = System.Drawing.Color.Transparent
         Me.Step2ChartAbs.BorderOptions.Color = System.Drawing.Color.White
-        XyDiagram4.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        XyDiagram4.AxisX.Label.TextColor = System.Drawing.Color.Black
-        XyDiagram4.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram4.AxisX.Range.SideMarginsEnabled = True
-        XyDiagram4.AxisX.Tickmarks.MinorVisible = False
-        XyDiagram4.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        XyDiagram4.AxisX.Title.TextColor = System.Drawing.Color.Black
-        XyDiagram4.AxisX.Title.Visible = True
-        XyDiagram4.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram4.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
-        XyDiagram4.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        XyDiagram4.AxisY.Label.TextColor = System.Drawing.Color.Black
-        XyDiagram4.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram4.AxisY.Range.SideMarginsEnabled = True
-        XyDiagram4.AxisY.Tickmarks.MinorVisible = False
-        XyDiagram4.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        XyDiagram4.AxisY.Title.TextColor = System.Drawing.Color.Black
-        XyDiagram4.AxisY.Title.Visible = True
-        XyDiagram4.AxisY.VisibleInPanesSerializable = "-1"
-        XyDiagram4.DefaultPane.BackColor = System.Drawing.Color.White
-        Me.Step2ChartAbs.Diagram = XyDiagram4
+        Me.Step2ChartAbs.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.[False]
+        XyDiagram2.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        XyDiagram2.AxisX.Label.TextColor = System.Drawing.Color.Black
+        XyDiagram2.AxisX.Tickmarks.MinorVisible = False
+        XyDiagram2.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        XyDiagram2.AxisX.Title.TextColor = System.Drawing.Color.Black
+        XyDiagram2.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        XyDiagram2.AxisX.VisibleInPanesSerializable = "-1"
+        XyDiagram2.AxisX.WholeRange.AutoSideMargins = True
+        XyDiagram2.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
+        XyDiagram2.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        XyDiagram2.AxisY.Label.TextColor = System.Drawing.Color.Black
+        XyDiagram2.AxisY.Tickmarks.MinorVisible = False
+        XyDiagram2.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        XyDiagram2.AxisY.Title.TextColor = System.Drawing.Color.Black
+        XyDiagram2.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        XyDiagram2.AxisY.VisibleInPanesSerializable = "-1"
+        XyDiagram2.AxisY.WholeRange.AutoSideMargins = True
+        XyDiagram2.DefaultPane.BackColor = System.Drawing.Color.White
+        Me.Step2ChartAbs.Diagram = XyDiagram2
         Me.Step2ChartAbs.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Right
         Me.Step2ChartAbs.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.TopOutside
         Me.Step2ChartAbs.Legend.Antialiasing = True
         Me.Step2ChartAbs.Legend.BackColor = System.Drawing.Color.Transparent
         Me.Step2ChartAbs.Legend.BackImage.Stretch = True
-        Me.Step2ChartAbs.Legend.Border.Visible = False
+        Me.Step2ChartAbs.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.Step2ChartAbs.Legend.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.Step2ChartAbs.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.Step2ChartAbs.Legend.Visible = False
+        Me.Step2ChartAbs.Legend.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.Step2ChartAbs.Location = New System.Drawing.Point(3, 181)
         Me.Step2ChartAbs.Name = "Step2ChartAbs"
         Me.Step2ChartAbs.Padding.Bottom = 10
@@ -1192,28 +1192,28 @@ Partial Class IPhotometryAdjustments
         Me.Step2ChartAbs.Padding.Top = 10
         Me.Step2ChartAbs.PaletteBaseColorNumber = 2
         Me.Step2ChartAbs.PaletteName = "Nature Colors"
-        Series10.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel3.LineVisible = True
-        PointSeriesLabel3.Visible = False
-        Series10.Label = PointSeriesLabel3
-        Series10.LegendText = "Ph1"
-        Series10.Name = "Ph1"
-        LineSeriesView3.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        LineSeriesView3.LineStyle.Thickness = 1
-        Series10.View = LineSeriesView3
-        Me.Step2ChartAbs.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series10}
-        PointSeriesLabel4.LineVisible = True
-        Me.Step2ChartAbs.SeriesTemplate.Label = PointSeriesLabel4
-        LineSeriesView4.LineStyle.Thickness = 1
-        Me.Step2ChartAbs.SeriesTemplate.View = LineSeriesView4
+        Series3.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
+        Series3.Label = PointSeriesLabel1
+        Series3.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
+        Series3.LegendText = "Ph1"
+        Series3.Name = "Ph1"
+        LineSeriesView1.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        LineSeriesView1.LineStyle.Thickness = 1
+        Series3.View = LineSeriesView1
+        Me.Step2ChartAbs.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series3}
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
+        Me.Step2ChartAbs.SeriesTemplate.Label = PointSeriesLabel2
+        LineSeriesView2.LineStyle.Thickness = 1
+        Me.Step2ChartAbs.SeriesTemplate.View = LineSeriesView2
         Me.Step2ChartAbs.Size = New System.Drawing.Size(469, 339)
         Me.Step2ChartAbs.SmallChartText.Text = ""
         Me.Step2ChartAbs.TabIndex = 82
-        ChartTitle7.Font = New System.Drawing.Font("Tahoma", 10.0!)
-        ChartTitle7.Text = "Absorbance"
-        ChartTitle7.TextColor = System.Drawing.Color.Black
-        ChartTitle7.Visible = False
-        Me.Step2ChartAbs.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle7})
+        ChartTitle2.Font = New System.Drawing.Font("Tahoma", 10.0!)
+        ChartTitle2.Text = "Absorbance"
+        ChartTitle2.TextColor = System.Drawing.Color.Black
+        ChartTitle2.Visibility = DevExpress.Utils.DefaultBoolean.[False]
+        Me.Step2ChartAbs.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle2})
         '
         'BsStep2RangeLabel
         '
@@ -1395,40 +1395,38 @@ Partial Class IPhotometryAdjustments
         '
         'Step2Chart
         '
-        Me.Step2Chart.AppearanceName = "Dark Flat"
+        Me.Step2Chart.AppearanceNameSerializable = "Dark Flat"
         Me.Step2Chart.BackColor = System.Drawing.Color.Gainsboro
         Me.Step2Chart.BorderOptions.Color = System.Drawing.Color.Gray
-        SwiftPlotDiagram4.AxisX.Color = System.Drawing.Color.DimGray
-        SwiftPlotDiagram4.AxisX.GridSpacingAuto = False
-        SwiftPlotDiagram4.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        SwiftPlotDiagram4.AxisX.Label.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram4.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram4.AxisX.Range.SideMarginsEnabled = True
-        SwiftPlotDiagram4.AxisX.Tickmarks.MinorVisible = False
-        SwiftPlotDiagram4.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
-        SwiftPlotDiagram4.AxisX.Title.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram4.AxisX.Title.Visible = True
-        SwiftPlotDiagram4.AxisX.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram4.AxisY.Color = System.Drawing.Color.DimGray
-        SwiftPlotDiagram4.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
-        SwiftPlotDiagram4.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        SwiftPlotDiagram4.AxisY.Label.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram4.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram4.AxisY.Range.SideMarginsEnabled = True
-        SwiftPlotDiagram4.AxisY.Tickmarks.MinorVisible = False
-        SwiftPlotDiagram4.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
-        SwiftPlotDiagram4.AxisY.Title.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram4.AxisY.Title.Visible = True
-        SwiftPlotDiagram4.AxisY.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram4.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        SwiftPlotDiagram4.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Step2Chart.Diagram = SwiftPlotDiagram4
+        SwiftPlotDiagram1.AxisX.Color = System.Drawing.Color.DimGray
+        SwiftPlotDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
+        SwiftPlotDiagram1.AxisX.Label.TextColor = System.Drawing.Color.Black
+        SwiftPlotDiagram1.AxisX.NumericScaleOptions.AutoGrid = False
+        SwiftPlotDiagram1.AxisX.Tickmarks.MinorVisible = False
+        SwiftPlotDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
+        SwiftPlotDiagram1.AxisX.Title.TextColor = System.Drawing.Color.Black
+        SwiftPlotDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram1.AxisX.VisibleInPanesSerializable = "-1"
+        SwiftPlotDiagram1.AxisX.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram1.AxisY.Color = System.Drawing.Color.DimGray
+        SwiftPlotDiagram1.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
+        SwiftPlotDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
+        SwiftPlotDiagram1.AxisY.Label.TextColor = System.Drawing.Color.Black
+        SwiftPlotDiagram1.AxisY.Tickmarks.MinorVisible = False
+        SwiftPlotDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
+        SwiftPlotDiagram1.AxisY.Title.TextColor = System.Drawing.Color.Black
+        SwiftPlotDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram1.AxisY.VisibleInPanesSerializable = "-1"
+        SwiftPlotDiagram1.AxisY.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram1.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        SwiftPlotDiagram1.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Step2Chart.Diagram = SwiftPlotDiagram1
         Me.Step2Chart.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Right
         Me.Step2Chart.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.TopOutside
         Me.Step2Chart.Legend.Antialiasing = True
         Me.Step2Chart.Legend.BackColor = System.Drawing.Color.Transparent
         Me.Step2Chart.Legend.BackImage.Stretch = True
-        Me.Step2Chart.Legend.Border.Visible = False
+        Me.Step2Chart.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.Step2Chart.Legend.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.Step2Chart.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.Step2Chart.Location = New System.Drawing.Point(3, 181)
@@ -1439,25 +1437,25 @@ Partial Class IPhotometryAdjustments
         Me.Step2Chart.Padding.Top = 10
         Me.Step2Chart.PaletteBaseColorNumber = 2
         Me.Step2Chart.PaletteName = "Nature Colors"
-        Series11.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        Series11.LegendText = "Ph1"
-        Series11.Name = "Ph1"
-        SwiftPlotSeriesView8.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Series11.View = SwiftPlotSeriesView8
-        Series12.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        Series12.LegendText = "Ph2"
-        Series12.Name = "Ph2"
-        Series12.View = SwiftPlotSeriesView9
-        Me.Step2Chart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series11, Series12}
-        Me.Step2Chart.SeriesTemplate.View = SwiftPlotSeriesView10
+        Series4.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        Series4.LegendText = "Ph1"
+        Series4.Name = "Ph1"
+        SwiftPlotSeriesView1.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Series4.View = SwiftPlotSeriesView1
+        Series5.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        Series5.LegendText = "Ph2"
+        Series5.Name = "Ph2"
+        Series5.View = SwiftPlotSeriesView2
+        Me.Step2Chart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series4, Series5}
+        Me.Step2Chart.SeriesTemplate.View = SwiftPlotSeriesView3
         Me.Step2Chart.Size = New System.Drawing.Size(469, 339)
         Me.Step2Chart.SmallChartText.Text = ""
         Me.Step2Chart.TabIndex = 73
-        ChartTitle8.Font = New System.Drawing.Font("Tahoma", 10.0!)
-        ChartTitle8.Text = "Absorbance"
-        ChartTitle8.TextColor = System.Drawing.Color.Black
-        ChartTitle8.Visible = False
-        Me.Step2Chart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle8})
+        ChartTitle3.Font = New System.Drawing.Font("Tahoma", 10.0!)
+        ChartTitle3.Text = "Absorbance"
+        ChartTitle3.TextColor = System.Drawing.Color.Black
+        ChartTitle3.Visibility = DevExpress.Utils.DefaultBoolean.[False]
+        Me.Step2Chart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle3})
         '
         'BsStep2ResultsLabel
         '
@@ -1824,9 +1822,10 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep3XPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoStep3XPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoStep3XPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoStep3XPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoStep3XPSViewer.HorizontalPageMargin = 0
         Me.BsInfoStep3XPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoStep3XPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoStep3XPSViewer.IsLoaded = False
         Me.BsInfoStep3XPSViewer.IsScrollable = False
         Me.BsInfoStep3XPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoStep3XPSViewer.MenuBarVisible = False
@@ -1839,14 +1838,14 @@ Partial Class IPhotometryAdjustments
         Me.BsInfoStep3XPSViewer.TabIndex = 36
         Me.BsInfoStep3XPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoStep3XPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoStep3XPSViewer.VerticalPageMargin = 10
+        Me.BsInfoStep3XPSViewer.VerticalPageMargin = 0
         Me.BsInfoStep3XPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoStep3XPSViewer.WholePageButtonVisible = True
         '
         'BsStep3InfoTitleLabel
         '
         Me.BsStep3InfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStep3InfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsStep3InfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsStep3InfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -1860,8 +1859,8 @@ Partial Class IPhotometryAdjustments
         'BsStep3AdjustPanel
         '
         Me.BsStep3AdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStep3AdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsStep3AdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsStep3AdjustPanel.Controls.Add(Me.BsStep3TestButton)
@@ -1892,139 +1891,140 @@ Partial Class IPhotometryAdjustments
         '
         'Step3Chart
         '
-        Me.Step3Chart.AppearanceName = "Dark Flat"
+        Me.Step3Chart.AppearanceNameSerializable = "Dark Flat"
         Me.Step3Chart.BackColor = System.Drawing.Color.Gainsboro
         Me.Step3Chart.BorderOptions.Color = System.Drawing.Color.White
-        SwiftPlotDiagram3.AxisX.Color = System.Drawing.Color.LightGray
-        ConstantLine13.AxisValueSerializable = "0"
-        ConstantLine13.Color = System.Drawing.Color.LightGray
-        ConstantLine13.LineStyle.DashStyle = DevExpress.XtraCharts.DashStyle.Solid
-        ConstantLine13.LineStyle.Thickness = 8
-        ConstantLine13.Name = "OldWall1"
-        ConstantLine13.ShowBehind = True
-        ConstantLine13.ShowInLegend = False
-        ConstantLine13.Title.Visible = False
-        ConstantLine14.AxisValueSerializable = "40"
-        ConstantLine14.Color = System.Drawing.Color.LightGray
-        ConstantLine14.LineStyle.Thickness = 4
-        ConstantLine14.Name = "OldWall2"
-        ConstantLine14.ShowBehind = True
-        ConstantLine14.ShowInLegend = False
-        ConstantLine14.Title.Visible = False
-        ConstantLine15.AxisValueSerializable = "80"
-        ConstantLine15.Color = System.Drawing.Color.LightGray
-        ConstantLine15.LineStyle.Thickness = 4
-        ConstantLine15.Name = "OldWall3"
-        ConstantLine15.ShowBehind = True
-        ConstantLine15.ShowInLegend = False
-        ConstantLine15.Title.Visible = False
-        ConstantLine16.AxisValueSerializable = "120"
-        ConstantLine16.Color = System.Drawing.Color.LightGray
-        ConstantLine16.LineStyle.Thickness = 4
-        ConstantLine16.Name = "OldWall4"
-        ConstantLine16.ShowBehind = True
-        ConstantLine16.ShowInLegend = False
-        ConstantLine16.Title.Visible = False
-        ConstantLine17.AxisValueSerializable = "160"
-        ConstantLine17.Color = System.Drawing.Color.LightGray
-        ConstantLine17.LineStyle.Thickness = 4
-        ConstantLine17.Name = "OldWall5"
-        ConstantLine17.ShowBehind = True
-        ConstantLine17.ShowInLegend = False
-        ConstantLine17.Title.Visible = False
-        ConstantLine18.AxisValueSerializable = "200"
-        ConstantLine18.Color = System.Drawing.Color.LightGray
-        ConstantLine18.LineStyle.Thickness = 8
-        ConstantLine18.Name = "OldWall6"
-        ConstantLine18.ShowBehind = True
-        ConstantLine18.ShowInLegend = False
-        ConstantLine19.AxisValueSerializable = "0"
-        ConstantLine19.Color = System.Drawing.Color.Gainsboro
-        ConstantLine19.LineStyle.Thickness = 8
-        ConstantLine19.Name = "NewWall1"
-        ConstantLine19.ShowBehind = True
-        ConstantLine19.ShowInLegend = False
-        ConstantLine19.Title.Visible = False
-        ConstantLine20.AxisValueSerializable = "40"
-        ConstantLine20.Color = System.Drawing.Color.Gainsboro
-        ConstantLine20.LineStyle.Thickness = 4
-        ConstantLine20.Name = "NewWall2"
-        ConstantLine20.ShowBehind = True
-        ConstantLine20.ShowInLegend = False
-        ConstantLine20.Title.Visible = False
-        ConstantLine20.Visible = False
-        ConstantLine21.AxisValueSerializable = "80"
-        ConstantLine21.Color = System.Drawing.Color.Gainsboro
-        ConstantLine21.LineStyle.Thickness = 4
-        ConstantLine21.Name = "NewWall3"
-        ConstantLine21.ShowBehind = True
-        ConstantLine21.ShowInLegend = False
-        ConstantLine21.Title.Visible = False
-        ConstantLine21.Visible = False
-        ConstantLine22.AxisValueSerializable = "120"
-        ConstantLine22.Color = System.Drawing.Color.Gainsboro
-        ConstantLine22.LineStyle.Thickness = 4
-        ConstantLine22.Name = "NewWall4"
-        ConstantLine22.ShowBehind = True
-        ConstantLine22.ShowInLegend = False
-        ConstantLine22.Title.Visible = False
-        ConstantLine22.Visible = False
-        ConstantLine23.AxisValueSerializable = "160"
-        ConstantLine23.Color = System.Drawing.Color.Gainsboro
-        ConstantLine23.LineStyle.Thickness = 4
-        ConstantLine23.Name = "NewWall5"
-        ConstantLine23.ShowBehind = True
-        ConstantLine23.ShowInLegend = False
-        ConstantLine23.Title.Visible = False
-        ConstantLine23.Visible = False
-        ConstantLine24.AxisValueSerializable = "200"
-        ConstantLine24.Color = System.Drawing.Color.Gainsboro
-        ConstantLine24.LineStyle.DashStyle = DevExpress.XtraCharts.DashStyle.Solid
-        ConstantLine24.LineStyle.Thickness = 8
-        ConstantLine24.Name = "NewWall6"
-        ConstantLine24.ShowBehind = True
-        ConstantLine24.ShowInLegend = False
-        ConstantLine24.Title.Visible = False
-        SwiftPlotDiagram3.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine13, ConstantLine14, ConstantLine15, ConstantLine16, ConstantLine17, ConstantLine18, ConstantLine19, ConstantLine20, ConstantLine21, ConstantLine22, ConstantLine23, ConstantLine24})
-        SwiftPlotDiagram3.AxisX.GridLines.Color = System.Drawing.Color.LightGray
-        SwiftPlotDiagram3.AxisX.GridLines.MinorColor = System.Drawing.Color.LightGray
-        SwiftPlotDiagram3.AxisX.GridLines.MinorVisible = True
-        SwiftPlotDiagram3.AxisX.GridLines.Visible = True
-        SwiftPlotDiagram3.AxisX.Label.Antialiasing = True
-        SwiftPlotDiagram3.AxisX.Label.Font = New System.Drawing.Font("Tahoma", 10.0!)
-        SwiftPlotDiagram3.AxisX.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        SwiftPlotDiagram3.AxisX.Range.Auto = False
-        SwiftPlotDiagram3.AxisX.Range.MaxValueSerializable = "200"
-        SwiftPlotDiagram3.AxisX.Range.MinValueSerializable = "0"
-        SwiftPlotDiagram3.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram3.AxisX.Range.SideMarginsEnabled = True
-        SwiftPlotDiagram3.AxisX.Visible = False
-        SwiftPlotDiagram3.AxisX.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram3.AxisY.Color = System.Drawing.Color.Gray
-        SwiftPlotDiagram3.AxisY.GridLines.Color = System.Drawing.Color.LightGray
-        SwiftPlotDiagram3.AxisY.Label.Antialiasing = True
-        SwiftPlotDiagram3.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        SwiftPlotDiagram3.AxisY.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        SwiftPlotDiagram3.AxisY.Range.Auto = False
-        SwiftPlotDiagram3.AxisY.Range.MaxValueSerializable = "1044887"
-        SwiftPlotDiagram3.AxisY.Range.MinValueSerializable = "0"
-        SwiftPlotDiagram3.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram3.AxisY.Range.SideMarginsEnabled = False
-        SwiftPlotDiagram3.AxisY.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram3.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        SwiftPlotDiagram3.DefaultPane.BorderColor = System.Drawing.Color.DarkGray
-        SwiftPlotDiagram3.EnableAxisXZooming = True
-        SwiftPlotDiagram3.EnableAxisYScrolling = True
-        SwiftPlotDiagram3.EnableAxisYZooming = True
-        SwiftPlotDiagram3.ZoomingOptions.UseKeyboard = False
-        SwiftPlotDiagram3.ZoomingOptions.UseKeyboardWithMouse = False
-        Me.Step3Chart.Diagram = SwiftPlotDiagram3
+        SwiftPlotDiagram2.AxisX.Color = System.Drawing.Color.LightGray
+        ConstantLine1.AxisValueSerializable = "0"
+        ConstantLine1.Color = System.Drawing.Color.LightGray
+        ConstantLine1.LineStyle.DashStyle = DevExpress.XtraCharts.DashStyle.Solid
+        ConstantLine1.LineStyle.Thickness = 8
+        ConstantLine1.Name = "OldWall1"
+        ConstantLine1.ShowBehind = True
+        ConstantLine1.ShowInLegend = False
+        ConstantLine1.Title.Visible = False
+        ConstantLine2.AxisValueSerializable = "40"
+        ConstantLine2.Color = System.Drawing.Color.LightGray
+        ConstantLine2.LineStyle.Thickness = 4
+        ConstantLine2.Name = "OldWall2"
+        ConstantLine2.ShowBehind = True
+        ConstantLine2.ShowInLegend = False
+        ConstantLine2.Title.Visible = False
+        ConstantLine3.AxisValueSerializable = "80"
+        ConstantLine3.Color = System.Drawing.Color.LightGray
+        ConstantLine3.LineStyle.Thickness = 4
+        ConstantLine3.Name = "OldWall3"
+        ConstantLine3.ShowBehind = True
+        ConstantLine3.ShowInLegend = False
+        ConstantLine3.Title.Visible = False
+        ConstantLine4.AxisValueSerializable = "120"
+        ConstantLine4.Color = System.Drawing.Color.LightGray
+        ConstantLine4.LineStyle.Thickness = 4
+        ConstantLine4.Name = "OldWall4"
+        ConstantLine4.ShowBehind = True
+        ConstantLine4.ShowInLegend = False
+        ConstantLine4.Title.Visible = False
+        ConstantLine5.AxisValueSerializable = "160"
+        ConstantLine5.Color = System.Drawing.Color.LightGray
+        ConstantLine5.LineStyle.Thickness = 4
+        ConstantLine5.Name = "OldWall5"
+        ConstantLine5.ShowBehind = True
+        ConstantLine5.ShowInLegend = False
+        ConstantLine5.Title.Visible = False
+        ConstantLine6.AxisValueSerializable = "200"
+        ConstantLine6.Color = System.Drawing.Color.LightGray
+        ConstantLine6.LineStyle.Thickness = 8
+        ConstantLine6.Name = "OldWall6"
+        ConstantLine6.ShowBehind = True
+        ConstantLine6.ShowInLegend = False
+        ConstantLine7.AxisValueSerializable = "0"
+        ConstantLine7.Color = System.Drawing.Color.Gainsboro
+        ConstantLine7.LineStyle.Thickness = 8
+        ConstantLine7.Name = "NewWall1"
+        ConstantLine7.ShowBehind = True
+        ConstantLine7.ShowInLegend = False
+        ConstantLine7.Title.Visible = False
+        ConstantLine8.AxisValueSerializable = "40"
+        ConstantLine8.Color = System.Drawing.Color.Gainsboro
+        ConstantLine8.LineStyle.Thickness = 4
+        ConstantLine8.Name = "NewWall2"
+        ConstantLine8.ShowBehind = True
+        ConstantLine8.ShowInLegend = False
+        ConstantLine8.Title.Visible = False
+        ConstantLine8.Visible = False
+        ConstantLine9.AxisValueSerializable = "80"
+        ConstantLine9.Color = System.Drawing.Color.Gainsboro
+        ConstantLine9.LineStyle.Thickness = 4
+        ConstantLine9.Name = "NewWall3"
+        ConstantLine9.ShowBehind = True
+        ConstantLine9.ShowInLegend = False
+        ConstantLine9.Title.Visible = False
+        ConstantLine9.Visible = False
+        ConstantLine10.AxisValueSerializable = "120"
+        ConstantLine10.Color = System.Drawing.Color.Gainsboro
+        ConstantLine10.LineStyle.Thickness = 4
+        ConstantLine10.Name = "NewWall4"
+        ConstantLine10.ShowBehind = True
+        ConstantLine10.ShowInLegend = False
+        ConstantLine10.Title.Visible = False
+        ConstantLine10.Visible = False
+        ConstantLine11.AxisValueSerializable = "160"
+        ConstantLine11.Color = System.Drawing.Color.Gainsboro
+        ConstantLine11.LineStyle.Thickness = 4
+        ConstantLine11.Name = "NewWall5"
+        ConstantLine11.ShowBehind = True
+        ConstantLine11.ShowInLegend = False
+        ConstantLine11.Title.Visible = False
+        ConstantLine11.Visible = False
+        ConstantLine12.AxisValueSerializable = "200"
+        ConstantLine12.Color = System.Drawing.Color.Gainsboro
+        ConstantLine12.LineStyle.DashStyle = DevExpress.XtraCharts.DashStyle.Solid
+        ConstantLine12.LineStyle.Thickness = 8
+        ConstantLine12.Name = "NewWall6"
+        ConstantLine12.ShowBehind = True
+        ConstantLine12.ShowInLegend = False
+        ConstantLine12.Title.Visible = False
+        SwiftPlotDiagram2.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine1, ConstantLine2, ConstantLine3, ConstantLine4, ConstantLine5, ConstantLine6, ConstantLine7, ConstantLine8, ConstantLine9, ConstantLine10, ConstantLine11, ConstantLine12})
+        SwiftPlotDiagram2.AxisX.GridLines.Color = System.Drawing.Color.LightGray
+        SwiftPlotDiagram2.AxisX.GridLines.MinorColor = System.Drawing.Color.LightGray
+        SwiftPlotDiagram2.AxisX.GridLines.MinorVisible = True
+        SwiftPlotDiagram2.AxisX.GridLines.Visible = True
+        SwiftPlotDiagram2.AxisX.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram2.AxisX.Label.Font = New System.Drawing.Font("Tahoma", 10.0!)
+        SwiftPlotDiagram2.AxisX.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        SwiftPlotDiagram2.AxisX.Visibility = DevExpress.Utils.DefaultBoolean.[False]
+        SwiftPlotDiagram2.AxisX.VisibleInPanesSerializable = "-1"
+        SwiftPlotDiagram2.AxisX.VisualRange.Auto = False
+        SwiftPlotDiagram2.AxisX.VisualRange.AutoSideMargins = True
+        SwiftPlotDiagram2.AxisX.VisualRange.MaxValueSerializable = "4"
+        SwiftPlotDiagram2.AxisX.VisualRange.MinValueSerializable = "0"
+        SwiftPlotDiagram2.AxisX.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram2.AxisY.Color = System.Drawing.Color.Gray
+        SwiftPlotDiagram2.AxisY.GridLines.Color = System.Drawing.Color.LightGray
+        SwiftPlotDiagram2.AxisY.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram2.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
+        SwiftPlotDiagram2.AxisY.Label.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        SwiftPlotDiagram2.AxisY.VisibleInPanesSerializable = "-1"
+        SwiftPlotDiagram2.AxisY.VisualRange.Auto = False
+        SwiftPlotDiagram2.AxisY.VisualRange.AutoSideMargins = False
+        SwiftPlotDiagram2.AxisY.VisualRange.MaxValueSerializable = "9.8"
+        SwiftPlotDiagram2.AxisY.VisualRange.MinValueSerializable = "0"
+        SwiftPlotDiagram2.AxisY.VisualRange.SideMarginsValue = 0.0R
+        SwiftPlotDiagram2.AxisY.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram2.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        SwiftPlotDiagram2.DefaultPane.BorderColor = System.Drawing.Color.DarkGray
+        SwiftPlotDiagram2.EnableAxisXZooming = True
+        SwiftPlotDiagram2.EnableAxisYScrolling = True
+        SwiftPlotDiagram2.EnableAxisYZooming = True
+        SwiftPlotDiagram2.ZoomingOptions.UseKeyboard = False
+        SwiftPlotDiagram2.ZoomingOptions.UseKeyboardWithMouse = False
+        Me.Step3Chart.Diagram = SwiftPlotDiagram2
         Me.Step3Chart.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Right
         Me.Step3Chart.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.Bottom
         Me.Step3Chart.Legend.Antialiasing = True
         Me.Step3Chart.Legend.BackColor = System.Drawing.Color.Transparent
         Me.Step3Chart.Legend.BackImage.Stretch = True
-        Me.Step3Chart.Legend.Border.Visible = False
+        Me.Step3Chart.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.Step3Chart.Legend.Font = New System.Drawing.Font("Verdana", 8.0!)
         Me.Step3Chart.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.Step3Chart.Location = New System.Drawing.Point(6, 79)
@@ -2035,21 +2035,21 @@ Partial Class IPhotometryAdjustments
         Me.Step3Chart.Padding.Top = 10
         Me.Step3Chart.PaletteBaseColorNumber = 2
         Me.Step3Chart.PaletteName = "Nature Colors"
-        Series7.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        Series7.LegendText = "Absorbance"
-        Series7.Name = "Absorbance"
-        SwiftPlotSeriesView6.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        SwiftPlotSeriesView6.LineStyle.Thickness = 3
-        Series7.View = SwiftPlotSeriesView6
-        Me.Step3Chart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series7}
-        Me.Step3Chart.SeriesTemplate.View = SwiftPlotSeriesView7
+        Series6.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
+        Series6.LegendText = "Absorbance"
+        Series6.Name = "Absorbance"
+        SwiftPlotSeriesView4.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        SwiftPlotSeriesView4.LineStyle.Thickness = 3
+        Series6.View = SwiftPlotSeriesView4
+        Me.Step3Chart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series6}
+        Me.Step3Chart.SeriesTemplate.View = SwiftPlotSeriesView5
         Me.Step3Chart.Size = New System.Drawing.Size(474, 384)
         Me.Step3Chart.SmallChartText.Text = ""
         Me.Step3Chart.TabIndex = 74
-        ChartTitle5.Font = New System.Drawing.Font("Tahoma", 10.0!)
-        ChartTitle5.Text = "Absorbance"
-        ChartTitle5.TextColor = System.Drawing.Color.Black
-        Me.Step3Chart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle5})
+        ChartTitle4.Font = New System.Drawing.Font("Tahoma", 10.0!)
+        ChartTitle4.Text = "Absorbance"
+        ChartTitle4.TextColor = System.Drawing.Color.Black
+        Me.Step3Chart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle4})
         '
         'BsGroupBox6
         '
@@ -2313,7 +2313,7 @@ Partial Class IPhotometryAdjustments
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.ProgressBar1)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
@@ -2416,7 +2416,6 @@ Partial Class IPhotometryAdjustments
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
@@ -2425,9 +2424,10 @@ Partial Class IPhotometryAdjustments
         Me.Controls.Add(Me.BsButtonsPanel)
         Me.Controls.Add(Me.BsMessagesPanel)
         Me.Controls.Add(Me.BsTabPagesControl)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IPhotometryAdjustments"
+        Me.Name = "UiPhotometryAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "PhotometryAdjustments"
         Me.BsTabPagesControl.ResumeLayout(False)
@@ -2442,13 +2442,13 @@ Partial Class IPhotometryAdjustments
         Me.BsStep1ConfigurationGroupBox.ResumeLayout(False)
         Me.BsStep1ConfigurationGroupBox.PerformLayout()
         CType(Me.BsStep1WellUpDown, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(XyDiagram3, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SideBySideBarSeriesLabel4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SideBySideBarSeriesView2, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series8, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SideBySideBarSeriesLabel5, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series9, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SideBySideBarSeriesLabel6, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(XyDiagram1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SideBySideBarSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SideBySideBarSeriesView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SideBySideBarSeriesLabel2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SideBySideBarSeriesLabel3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BSStep1BLChart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsStep1DCphRefGroupBox.ResumeLayout(False)
         Me.BsStep1DCphMainGroupBox.ResumeLayout(False)
@@ -2461,22 +2461,22 @@ Partial Class IPhotometryAdjustments
         Me.BsStep2AdjustPanel.PerformLayout()
         Me.BsGroupBox1.ResumeLayout(False)
         Me.BsGroupBox1.PerformLayout()
-        CType(XyDiagram4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(PointSeriesLabel3, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(LineSeriesView3, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series10, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(PointSeriesLabel4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(LineSeriesView4, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(XyDiagram2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(LineSeriesView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series3, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(PointSeriesLabel2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(LineSeriesView2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Step2ChartAbs, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsStep2ConfigurationGroupBox.ResumeLayout(False)
         Me.BsStep2ConfigurationGroupBox.PerformLayout()
         CType(Me.BsStep2WellUpDown, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotDiagram4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotSeriesView8, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series11, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotSeriesView9, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series12, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotSeriesView10, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotDiagram1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotSeriesView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series4, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotSeriesView2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series5, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotSeriesView3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Step2Chart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsStep2phMainGroupBox.ResumeLayout(False)
         Me.BsStep2phRefGroupBox.ResumeLayout(False)
@@ -2485,10 +2485,10 @@ Partial Class IPhotometryAdjustments
         Me.BsStep3InfoPanel.ResumeLayout(False)
         Me.BsStep3AdjustPanel.ResumeLayout(False)
         Me.BsStep3AdjustPanel.PerformLayout()
-        CType(SwiftPlotDiagram3, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotSeriesView6, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Series7, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(SwiftPlotSeriesView7, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotDiagram2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotSeriesView4, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Series6, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SwiftPlotSeriesView5, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Step3Chart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsGroupBox6.ResumeLayout(False)
         Me.BsStep3AbsorbanceGroupBox.ResumeLayout(False)

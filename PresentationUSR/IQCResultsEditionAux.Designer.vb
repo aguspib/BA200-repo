@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCResultsEditionAux
+Partial Class UiQCResultsEditionAux
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class IQCResultsEditionAux
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCResultsEditionAux))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCResultsEditionAux))
         Me.bsResultEditionGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsExcludeResultCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
         Me.bsRemarksLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -303,7 +303,7 @@ Partial Class IQCResultsEditionAux
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCResultsEditionAux"
+        Me.Name = "UiQCResultsEditionAux"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

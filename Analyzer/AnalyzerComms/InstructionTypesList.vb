@@ -2,10 +2,8 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL.DAO
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
@@ -25,7 +23,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function GetInstructionParameterList() As List(Of InstructionParameterTO)
             Dim Instructions As New List(Of InstructionParameterTO)
             Try
-                Dim myInstructionTO As New InstructionParameterTO
+                'Dim myInstructionTO As New InstructionParameterTO
 
                 'TEST INSTRUCTION (Sw -> Fw)
                 GetTESTInstruction(Instructions)
@@ -155,8 +153,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 GetANSFBLDInstruction(Instructions) 'AG 28/10/2014 BA-2062
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetInstructionParameterList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetInstructionParameterList", EventLogEntryType.Error, False)
             End Try
             Return Instructions
         End Function
@@ -293,8 +291,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetTESTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetTESTInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -376,8 +374,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetSTATUSInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetSTATUSInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -608,8 +606,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetSHORTInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetSHORTInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -733,8 +731,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetBASELINEInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetBASELINEInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -858,8 +856,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSPHRInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSPHRInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -944,8 +942,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLDInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1005,8 +1003,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1066,8 +1064,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSDLInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSDLInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1109,8 +1107,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSISEInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSISEInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1176,8 +1174,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSCMDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSCMDInstruction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1269,8 +1267,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetABSORBANCE_RECEIVEDInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetABSORBANCE_RECEIVEDInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub
@@ -1384,8 +1382,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsADJInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsADJInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1454,8 +1452,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetISETESTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetISETESTInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1619,8 +1617,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetPTESTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetPTESTInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1729,8 +1727,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetISECommandInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetISECommandInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1833,8 +1831,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetFWUtilInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetFWUtilInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1915,8 +1913,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetWASHInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetWASHInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -1996,8 +1994,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetWRUNInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetWRUNInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -2036,8 +2034,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetWSCTRLInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetWSCTRLInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -2236,8 +2234,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetCodeBarInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetCodeBarInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -2410,8 +2408,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsInfoOrAlarmInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsInfoOrAlarmInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -2566,8 +2564,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSArmsInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSArmsInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -3767,8 +3765,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLHWInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLHWInstruction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -3807,8 +3805,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetTANKSTESTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetTANKSTESTInstruction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -3978,8 +3976,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsSTRESSInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsSTRESSInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4451,8 +4449,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLFWInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLFWInstruction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -4485,8 +4483,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsRESETInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsRESETInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4519,8 +4517,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsLOADFACTORYADJInstructions", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsLOADFACTORYADJInstructions", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub
@@ -4559,8 +4557,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsUPDATEFWInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsUPDATEFWInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4654,8 +4652,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsFWEVENTSInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsFWEVENTSInstructions", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4699,8 +4697,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetSOUNDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetSOUNDInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4751,8 +4749,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetCONFIGInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetCONFIGInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4808,8 +4806,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetUTILInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetUTILInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4864,8 +4862,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSUTILInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSUTILInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -4921,8 +4919,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLSNInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLSNInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -5032,8 +5030,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLRDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLRDInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -5132,8 +5130,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLDInstruction", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -5239,8 +5237,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetSENSORDATA_ANSWERInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetSENSORDATA_ANSWERInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub
@@ -5339,8 +5337,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_EMPTY_LC_OKInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_EMPTY_LC_OKInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub
@@ -5439,8 +5437,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_FILL_DW_OKInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_FILL_DW_OKInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub
@@ -5539,8 +5537,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_TRANSFER_DWLC_OKInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetTEST_TRANSFER_DWLC_OKInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         'End Sub

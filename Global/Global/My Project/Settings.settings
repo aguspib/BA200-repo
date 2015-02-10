@@ -197,5 +197,8 @@
     <Setting Name="ServiceProjectName" Type="System.String" Scope="User">
       <Value Profile="(Default)">PresentationSRV</Value>
     </Setting>
+    <Setting Name="UpdateVersionProcessLogFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ax00UpdateVersion.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

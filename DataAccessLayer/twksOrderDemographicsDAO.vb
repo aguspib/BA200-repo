@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksOrderDemographicsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -70,8 +70,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = "SYSTEM_ERROR"
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -98,9 +98,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Else
                     Dim cmdText As String
+
+                    'AJG
+                    'cmdText = "DELETE twksOrderDemographics" & vbCrLf & _
+                    '          "  WHERE OrderID NOT IN (SELECT OrderID" & vbCrLf & _
+                    '          "                          FROM twksOrderTests)"
+
                     cmdText = "DELETE twksOrderDemographics" & vbCrLf & _
-                              "  WHERE OrderID NOT IN (SELECT OrderID" & vbCrLf & _
-                              "                          FROM twksOrderTests)"
+                              "  WHERE NOT EXISTS (SELECT OrderID" & vbCrLf & _
+                              "                   FROM twksOrderTests WHERE twksOrderDemographics.OrderID = OrderID)"
 
                     Dim cmd As SqlCommand
 
@@ -115,8 +121,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

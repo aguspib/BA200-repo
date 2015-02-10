@@ -4,11 +4,12 @@ Option Explicit On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
+Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tparTestProfilesDAO
-        Inherits DAOBase
+          
 
 
 #Region "CRUD Methods"
@@ -22,6 +23,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 01/09/2014 - BA-1869 new columns CustomPosition, Available are informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -39,23 +41,33 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim cmdText As String
                         cmdText = " INSERT INTO tparTestProfiles (TestProfileName, SampleType, TestProfilePosition, InUse, " & _
-                                                                " TS_User, TS_DateTime) " & _
+                                                                " TS_User, TS_DateTime, CustomPosition, Available ) " & _
                                   " VALUES(N'" & pTestProfile.tparTestProfiles(0).TestProfileName.Replace("'", "''") & "', " & _
                                          "  '" & pTestProfile.tparTestProfiles(0).SampleType.ToString & "', " & _
                                                 testProfilePosition & ", 0, "
 
                         If (pTestProfile.tparTestProfiles(0).IsTS_UserNull) Then
-                            Dim objGlobal As New GlobalBase
-                            cmdText &= " N'" & objGlobal.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                            'Dim objGlobal As New GlobalBase
+                            cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                         Else
                             cmdText &= " N'" & pTestProfile.tparTestProfiles(0).TS_User.Trim.Replace("'", "''") & "', "
                         End If
 
                         If (pTestProfile.tparTestProfiles(0).IsTS_DateTimeNull) Then
-                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                         Else
-                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                         End If
+
+                        'AG 01/09/2014 - BA-1869
+                        cmdText &= " , " & pTestProfile.tparTestProfiles(0).CustomPosition.ToString & " "
+                        If pTestProfile.tparTestProfiles(0).IsAvailableNull OrElse pTestProfile.tparTestProfiles(0).Available Then
+                            cmdText &= " , 1 )"
+                        Else
+                            cmdText &= " , 0 )"
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
                         cmdText &= " SELECT SCOPE_IDENTITY() "
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -84,8 +96,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -133,8 +145,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.ReadAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -150,6 +162,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 02/09/2014 - BA-1869 update Available only when informed
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -167,8 +180,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                      " TestProfilePosition = " & pTestProfile.tparTestProfiles(0).TestProfilePosition & ", "
 
                     If (pTestProfile.tparTestProfiles(0).IsTS_UserNull) Then
-                        Dim objGlobal As New GlobalBase
-                        cmdText &= " TS_User = N'" & objGlobal.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim objGlobal As New GlobalBase
+                        cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         cmdText &= " TS_User = N'" & pTestProfile.tparTestProfiles(0).TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -178,6 +191,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         cmdText &= " TS_DateTime = '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 02/09/2014 - BA-1869
+                    If Not pTestProfile.tparTestProfiles(0).IsAvailableNull Then
+                        cmdText &= " , Available = " & CInt(IIf(pTestProfile.tparTestProfiles(0).Available, 1, 0))
+                    End If
+                    'AG 02/09/2014 - BA-1869
 
                     cmdText &= " WHERE TestProfileID = " & pTestProfile.tparTestProfiles(0).TestProfileID
 
@@ -194,8 +213,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -221,10 +240,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
-                    Dim objGlobal As New GlobalBase
+                    'Dim objGlobal As New GlobalBase
                     cmdText = " UPDATE tparTestProfiles " & vbCrLf & _
                               "    SET TestProfilePosition = " & pNewPosition & ", " & vbCrLf & _
-                                     " TS_User             = N'" & objGlobal.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf & _
+                                     " TS_User             = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf & _
                                      " TS_DateTime         = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
                               "  WHERE TestProfileId =  " & pTestProfileId
 
@@ -241,8 +260,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateTestProfilePosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateTestProfilePosition", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -281,8 +300,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -306,8 +325,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM tparTestProfiles " & _
+                    '          " WHERE TestProfileID NOT IN (SELECT TestProfileID FROM tparTestProfileTests) "
+
                     cmdText = " DELETE FROM tparTestProfiles " & _
-                              " WHERE TestProfileID NOT IN (SELECT TestProfileID FROM tparTestProfileTests) "
+                              " WHERE NOT EXISTS (SELECT TestProfileID FROM tparTestProfileTests WHERE tparTestProfiles.TestProfileID = TestProfileID) "
 
                     'cmdText = " DELETE FROM tparTestProfiles" & vbCrLf & _
                     '          " WHERE  TestProfileID IN (SELECT tp.TestProfileID " & vbCrLf & _
@@ -327,8 +350,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.DeleteEmptyProfiles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.DeleteEmptyProfiles", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -376,8 +399,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -431,8 +454,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetNextPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetNextPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -490,8 +513,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.ExistsTestProfile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.ExistsTestProfile", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -503,6 +526,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfilesTestsDS with the list of all Test Profiles defined
         '''          for the specified SampleType plus the list of Tests included in each one</returns>
         ''' <remarks>
@@ -510,8 +534,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 19/10/2010 - Changed the SQL to get also Calculated and ISE Tests included in the returned Profiles
         '''              SA 02/12/2010 - Changed the SQL to get also OffSystem Tests included in the returned Profiles
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -522,35 +547,63 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String
                         cmdText = " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, T.TestID, T.TestName, " & _
-                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos " & _
+                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparTests T ON TPT.TestID = T.TestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'STD' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'STD' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
-                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos " & _
+                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparCalculatedTests CT ON TPT.TestID = CT.CalcTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'CALC' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'CALC' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, IT.IseTestID AS TestID, IT.[Name] AS TestName, " & _
-                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos " & _
+                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparISETests IT ON TPT.TestID = IT.IseTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'ISE' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'ISE' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, " & _
-                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos " & _
+                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparOffSystemTests OT ON TPT.TestID = OT.OffSystemTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'OFFS' " & _
-                                  " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                                  " AND      TPT.TestType = 'OFFS' "
 
-                        '" WHERE    UPPER(TP.SampleType) = '" & pSampleType.ToUpper & "' " & _
+                        'AG 01/09/2014 - BA-1869
+                        '" ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        If Not pCustomizedTestSelection Then 'Use the old order by clause
+                            cmdText &= " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        Else 'New order by clause by customized order
+                            cmdText &= " AND TP.Available = 1 "
+                            cmdText &= " ORDER BY TP.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim dbCmd As New SqlClient.SqlCommand
                         dbCmd.Connection = dbConnection
@@ -569,8 +622,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetProfilesBySampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetProfilesBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -604,23 +657,44 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparTestProfiles " & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                        '          " WHERE  TestProfileID IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                        '                                   " FROM   vwksWSOrderTests WSOT " & _
+                        '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                   " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                   " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                   " AND    WSOT.TestProfileID IS NOT NULL) "
+
                         cmdText = " UPDATE tparTestProfiles " & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                                  " WHERE  TestProfileID IN (SELECT DISTINCT WSOT.TestProfileID " & _
-                                                           " FROM   vwksWSOrderTests WSOT " & _
-                                                           " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                           " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                           " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                           " AND    WSOT.TestProfileID IS NOT NULL) "
+                                  " WHERE  EXISTS (SELECT DISTINCT WSOT.TestProfileID " & _
+                                                  " FROM   vwksWSOrderTests WSOT " & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                                  " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                  " AND    WSOT.SampleClass = 'PATIENT' " & _
+                                                  " AND    WSOT.TestProfileID IS NOT NULL AND tparTestProfiles.TestProfileID = WSOT.TestProfileID) "
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparTestProfiles " & _
+                        '          " SET    InUse = 0 " & _
+                        '          " WHERE  TestProfileID NOT IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                        '                                       " FROM   vwksWSOrderTests WSOT " & _
+                        '                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                       " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                       " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                       " AND    WSOT.TestProfileID IS NOT NULL) " & _
+                        '          " AND    InUse = 1 "
+
                         cmdText = " UPDATE tparTestProfiles " & _
                                   " SET    InUse = 0 " & _
-                                  " WHERE  TestProfileID NOT IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                                  " WHERE  NOT EXISTS (SELECT DISTINCT WSOT.TestProfileID " & _
                                                                " FROM   vwksWSOrderTests WSOT " & _
                                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
                                                                " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
                                                                " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                               " AND    WSOT.TestProfileID IS NOT NULL) " & _
+                                                               " AND    WSOT.TestProfileID IS NOT NULL AND tparTestProfiles.TestProfileID = WSOT.TestProfileID) " & _
                                   " AND    InUse = 1 "
                     End If
 
@@ -643,11 +717,212 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparTestProfiles "
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Gets all profile tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT 'PROFILE' AS TestType, TestProfileID AS TestID, CustomPosition AS TestPosition, TestProfileName AS TestName, " & vbCrLf & _
+                                                " 0 AS PreloadedTest, Available FROM tparTestProfiles ORDER BY CustomPosition ASC "
+
+                        Dim myDataSet As New ReportsTestsSortingDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.tcfgReportsTestsSorting)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparTestProfilesDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for test profiles
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As New StringBuilder
+                    For Each testrow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting
+                        'Check there is something to update in this row
+                        If Not (testrow.IsTestPositionNull AndAlso testrow.IsAvailableNull) Then
+                            cmdText.Append(" UPDATE tparTestProfiles SET ")
+
+                            'Update CustomPosition = TestPosition if informed
+                            If Not testrow.IsTestPositionNull Then
+                                cmdText.Append(" CustomPosition = " & testrow.TestPosition.ToString)
+                            End If
+
+                            'Update Available = Available if informed
+                            If Not testrow.IsAvailableNull Then
+                                'Add coma when required
+                                If Not testrow.IsTestPositionNull Then
+                                    cmdText.Append(" , ")
+                                End If
+
+                                cmdText.Append(" Available = " & CInt(IIf(testrow.Available, 1, 0)))
+                            End If
+
+                            cmdText.Append(" WHERE TestProfileID  = " & testrow.TestID.ToString)
+                            cmdText.Append(vbCrLf)
+                        End If
+                    Next
+
+                    If cmdText.ToString.Length <> 0 Then
+                        Using dbCmd As New SqlCommand(cmdText.ToString, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update profile Available value depending his components: All Available -- profile available // Some NOT available -- profile not available
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 17/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateAvailableCascadeByComponents(ByVal pDBConnection As SqlClient.SqlConnection, pAvailableValue As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As New StringBuilder
+                    If Not pAvailableValue Then
+                        'Update to Available = 0 when some component not available
+                        cmdText.Append(" UPDATE tparTestProfiles  SET Available = 0 WHERE TestProfileID IN ")
+                    Else
+                        'Update to Available = 1 when all components available
+                        cmdText.Append(" UPDATE tparTestProfiles  SET Available = 1 WHERE TestProfileID NOT IN ")
+                    End If
+
+                    cmdText.Append(" (SELECT DISTINCT PT.testprofileID FROM tparTestProfileTests  PT ")
+                    cmdText.Append(" LEFT OUTER JOIN tparTests T ON PT.TestType = 'STD' AND PT.TestID = T.TestID ")
+                    cmdText.Append(" LEFT OUTER JOIN tparCalculatedTests  CT ON PT.TestType = 'CALC' AND PT.TestID = CT.CalcTestID  ")
+                    cmdText.Append(" LEFT OUTER JOIN tparISETests IT ON PT.TestType = 'ISE' AND PT.TestID = IT.ISETestID  ")
+                    cmdText.Append(" LEFT OUTER JOIN tparOffSystemTests OFT ON PT.TestType = 'OFFS' AND PT.TestID = OFT.OffSystemTestID  ")
+                    cmdText.Append(" WHERE (CASE PT.TestType WHEN 'STD' THEN T.Available WHEN 'CALC' THEN CT.Available WHEN 'ISE' THEN IT.Available WHEN 'OFFS' THEN OFT.Available END) = 0) ")
+
+                    If cmdText.ToString.Length <> 0 Then
+                        Using dbCmd As New SqlCommand(cmdText.ToString, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateAvailableCascadeByComponents", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
 
 #End Region
 

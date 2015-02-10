@@ -26,6 +26,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  DL 29/11/2010
         ''' Modified by: SA 03/01/2011 - Function name changed to Add; function logic changed: add also the Sample Type information;
         '''                              call new function SaveReferenceRanges to save the Reference Ranges
+        '''              AG 01/09/2014 - BA-1869 ==> When new OFFS test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS, _
                             ByVal pTestSampleTypesDS As OffSystemTestSamplesDS, ByVal pRefRangesDS As TestRefRangesDS) _
@@ -40,33 +41,46 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Insert the new OFF-SYSTEM Test 
                         Dim offSystemTestToAdd As New tparOffSystemTestsDAO
-                        resultData = offSystemTestToAdd.Create(dbConnection, pOffSystemTestDS)
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            'Get the generated OffSystemTestID from the dataset returned 
-                            Dim generatedID As Integer = -1
-                            generatedID = DirectCast(resultData.SetDatos, OffSystemTestsDS).tparOffSystemTests(0).OffSystemTestID
+                        'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
+                        resultData = offSystemTestToAdd.GetLastCustomPosition(dbConnection)
+                        If Not resultData.HasError Then
+                            If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
+                                pOffSystemTestDS.tparOffSystemTests(0).CustomPosition = 1
+                            Else
+                                pOffSystemTestDS.tparOffSystemTests(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1
+                            End If
+                            'AG 01/09/2014 - BA-1869
 
-                            'Set value of OffSystemTestID in the dataset containing the data of the Selected Sample Type
-                            For i As Integer = 0 To pTestSampleTypesDS.tparOffSystemTestSamples.Rows.Count - 1
-                                pTestSampleTypesDS.tparOffSystemTestSamples(i).OffSystemTestID = generatedID
-                            Next i
+                            resultData = offSystemTestToAdd.Create(dbConnection, pOffSystemTestDS)
 
-                            'Set value of OffSystemTestID in the dataset containing the Reference Ranges
-                            For i As Integer = 0 To pRefRangesDS.tparTestRefRanges.Rows.Count - 1
-                                pRefRangesDS.tparTestRefRanges(i).TestID = generatedID
-                            Next
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                'Get the generated OffSystemTestID from the dataset returned 
+                                Dim generatedID As Integer = -1
+                                generatedID = DirectCast(resultData.SetDatos, OffSystemTestsDS).tparOffSystemTests(0).OffSystemTestID
 
-                            'Insert the Test Sample Type values
-                            Dim sampleTypeToAdd As New OffSystemTestSamplesDelegate
-                            resultData = sampleTypeToAdd.Add(dbConnection, pTestSampleTypesDS)
-                            If (Not resultData.HasError) Then
-                                'Finally, insert the Reference Ranges
-                                If (pRefRangesDS.tparTestRefRanges.Rows.Count > 0) Then
-                                    resultData = SaveReferenceRanges(dbConnection, pRefRangesDS)
+                                'Set value of OffSystemTestID in the dataset containing the data of the Selected Sample Type
+                                For i As Integer = 0 To pTestSampleTypesDS.tparOffSystemTestSamples.Rows.Count - 1
+                                    pTestSampleTypesDS.tparOffSystemTestSamples(i).OffSystemTestID = generatedID
+                                Next i
+
+                                'Set value of OffSystemTestID in the dataset containing the Reference Ranges
+                                For i As Integer = 0 To pRefRangesDS.tparTestRefRanges.Rows.Count - 1
+                                    pRefRangesDS.tparTestRefRanges(i).TestID = generatedID
+                                Next
+
+                                'Insert the Test Sample Type values
+                                Dim sampleTypeToAdd As New OffSystemTestSamplesDelegate
+                                resultData = sampleTypeToAdd.Add(dbConnection, pTestSampleTypesDS)
+                                If (Not resultData.HasError) Then
+                                    'Finally, insert the Reference Ranges
+                                    If (pRefRangesDS.tparTestRefRanges.Rows.Count > 0) Then
+                                        resultData = SaveReferenceRanges(dbConnection, pRefRangesDS)
+                                    End If
                                 End If
                             End If
-                        End If
+
+                        End If 'AG 01/09/2014 - BA-1869
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -89,8 +103,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -98,10 +112,13 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all the specified OFF-SYSTEM Tests (Test Definition, Sample Type data and Reference Ranges) 
+        ''' - Delete the specified set of OFF-SYSTEM Tests (Test Definition, Sample Type data and Reference Ranges).
+        ''' - Delete all affected Calculated Tests that contain these Off-System Tests in their formulas.
+        ''' - Delete all related Calculated Tests that contain these affected Calculated Tests in their formulas.
+        ''' - Perform some Calculated Test related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS. 
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pOffSystemTests">Typed DataSet OffSystemTestsDS with the list of Off System Tests to delete</param>        
+        ''' <param name="pOffSystemTests">Typed DataSet OffSystemTestsDS with the list of Off-System Tests to delete</param>        
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  DL 01/12/2010
@@ -112,6 +129,7 @@ Namespace Biosystems.Ax00.BL
         '''                              has to be marked as closed in Historic Module
         '''              XB 18/02/2013 - Fix the use of parameter pTestType which is not used in this function nowadays (BugsTracking #1136)
         '''              AG 10/05/2013 - Mark as deleted test if this test form part of a LIS saved worksession
+        '''              WE 25/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests and updating all affected Test Profiles.
         ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTests As OffSystemTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -128,8 +146,29 @@ Namespace Biosystems.Ax00.BL
                         Dim myOffSystemTestsDelete As New tparOffSystemTestsDAO
                         Dim myOffSystemTestSamples As New OffSystemTestSamplesDelegate
                         Dim mySavedWS As New SavedWSOrderTestsDelegate
+                        Dim myCalcTestsDelegate As New CalculatedTestsDelegate
 
                         For Each offSystemTest As OffSystemTestsDS.tparOffSystemTestsRow In pOffSystemTests.tparOffSystemTests.Rows
+
+                            ' WE 25/11/2014 - RQ00035C (BA-1867).
+                            ' Remove all affected Calculated Tests that have the currently deleted Off-System Test in their formula.
+                            ' Due to the deletion of the Off-System Test on screen by the user, and the Off-System Test may occur in other Calculated Tests and/or Test Profiles, 
+                            ' the following 2 steps must be performed:
+                            '
+                            ' Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+                            '    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+                            '    2. Remove the Calculated Test from all Test Profiles in which it is included.
+                            '    3. Delete Reference Ranges for the affected Calculated Test.
+                            '    4. Delete the elements of the Formula of the affected Calculated Test.
+                            '    5. Delete the affected Calculated Test.
+                            '    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+                            ' Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
+
+                            '*** Perform step 1 + 2 (affected Calculated Test and Test Profile actions) ***
+                            resultData = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(dbConnection, offSystemTest.OffSystemTestID, "", "OFFS")
+                            ' WE 25/11/2014 - RQ00035C (BA-1867) - END.
+
+                            '*** Perform Off-System Test related actions ***
                             'Mark as DeletedFlag if exists into a saved Worksession from LIS
                             resultData = mySavedWS.UpdateDeletedTestFlag(dbConnection, "OFFS", offSystemTest.OffSystemTestID)
                             If resultData.HasError Then Exit For
@@ -175,8 +214,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -191,13 +230,18 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one</param>
         ''' <param name="pOffSystemTestID">OFF-SYSTEM Test Identifier. It is an optional parameter informed
         '''                                only in case of updation</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if there is another OFF-SYSTEM Test with the same 
-        '''          name; otherwise, False</returns>
+        ''' <param name="pReturnOFFSTestsDS">When TRUE, the function will return an OffSystemTestsDS instead a Boolean value. It is 
+        '''                                  an optional parameter with default value FALSE</param>
+        ''' <returns>GlobalDataTO containing a Boolean value (True if there is another OFF-SYSTEM Test with the same 
+        '''          name; otherwise, False) or an OffSystemTestsDS, depending on value of optional parameter pReturnOFFSTestsDS</returns>
         ''' <remarks>
-        ''' Created by:  SA 03/01/2011 
+        ''' Created by:  SA 03/01/2011
+        ''' Modified by: XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (BT #1112)
+        '''              SA 21/11/2014 - BA-2105 ==> Added optional parameter pReturnOFFSTestsDS to allow return an OffSystemTestsDS instead
+        '''                                          of a Boolean value when the function is used by UpdateVersion process
         ''' </remarks>
-        Public Function ExistsOffSystemTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestName As String, _
-                                            ByVal pNameToSearch As String, Optional ByVal pOffSystemTestID As Integer = 0) As GlobalDataTO
+        Public Function ExistsOffSystemTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestName As String, ByVal pNameToSearch As String, _
+                                            Optional ByVal pOffSystemTestID As Integer = 0, Optional ByVal pReturnOFFSTestsDS As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -207,7 +251,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim offSystemTestDAO As New tparOffSystemTestsDAO
-                        resultData = offSystemTestDAO.ExistsOffSystemTest(dbConnection, pOffSystemTestName, pNameToSearch, pOffSystemTestID)
+                        resultData = offSystemTestDAO.ExistsOffSystemTest(dbConnection, pOffSystemTestName, pNameToSearch, pOffSystemTestID, pReturnOFFSTestsDS)
                     End If
                 End If
             Catch ex As Exception
@@ -216,10 +260,10 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ExistsOffSystemTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ExistsOffSystemTest", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -229,12 +273,14 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet OffSystemTestsDS with data of the OffSystemTests using
         '''          the specified SampleType</returns>
         ''' <remarks>
         ''' Created by DL: 29/11/2010
+        ''' Modified by: AG 01/09/2014 - BA-1869 ==> EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -244,7 +290,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOffSystemTests As New tparOffSystemTestsDAO
-                        resultData = myOffSystemTests.ReadBySampleType(dbConnection, pSampleType)
+                        resultData = myOffSystemTests.ReadBySampleType(dbConnection, pSampleType, pCustomizedTestSelection)
                     End If
                 End If
             Catch ex As Exception
@@ -253,8 +299,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -292,8 +338,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetByTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -327,8 +373,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -336,7 +382,12 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update data of the specified OFF-SYSTEM Test (basic data, sample type data and reference ranges)
+        ''' - Update data of the specified OFF-SYSTEM Test (Basic data, Sample Type data and Reference Ranges).
+        ''' - Update data of the OFF-SYSTEM Test/SampleType in Historic Module.
+        ''' - When the Name of the Off-System Test is changed: Update field FormulaText for those Calculated Tests
+        '''   in which formula the modified Off-System Test Name has been included.
+        ''' - When the Sample Type has been changed,  it also manages the change of all affected Test Profiles and
+        '''   deletion of all affected Calculated Tests.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOffSystemTestDS">Typed DataSet OffSystemTestsDS with basic data of the OFF-SYSTEM Test to add</param>
@@ -358,7 +409,8 @@ Namespace Biosystems.Ax00.BL
         '''                            - Added optional parameter pCloseHistory to indicate if the OffSystem Test has to be marked as closed in Historic Module
         '''                            - Depending on value of the added parameters call function to update data or mark the Test as closed in Historic Module
         '''              SA 17/09/2012 - Removed parameter pCloseHistory and its related functionality; it is not needed due to function HIST_UpdateByOFFSTestIDAndSampleType 
-        '''                              verifies if fields ResultType and/or SampleType have been changed and in this case close the OFFSystemTest 
+        '''                              verifies if fields ResultType and/or SampleType have been changed and in this case close the OFFSystemTest
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests and updating all affected Test Profiles.
         ''' </remarks>
         Public Function Modify(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS, ByVal pTestSampleTypesDS As OffSystemTestSamplesDS, _
                                ByVal pRefRangesDS As TestRefRangesDS, ByVal pAffectedElementsDS As DependenciesElementsDS, Optional ByVal pUpdateHistory As Boolean = False) _
@@ -370,11 +422,38 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'If there are affected Elements, remove the OFF-SYSTEM Test from all Profiles in which it is included 
+
                         If (pAffectedElementsDS.DependenciesElements.Count > 0) Then
+                            ' The SampleType of the modified Off-System Test is changed on screen and there are elements affected.
+
+                            ' Remove the specified OFF-SYSTEM Test from all Test Profiles in which it has been included.
                             Dim myTestProfileDelegate As New TestProfilesDelegate
                             resultData = myTestProfileDelegate.DeleteByTestIDSampleType(dbConnection, pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+
+                            ' WE 24/11/2014 - RQ00035C (BA-1867).
+                            If (Not resultData.HasError) Then
+                                ' Remove all affected Calculated Tests that have the currently modified Off-System Test in their formula.
+                                ' Due to the change of Sample Type on screen by the user, and the Off-System Test may occur in other Calculated Tests and/or Test Profiles, 
+                                ' the following 2 steps must be performed:
+                                '
+                                ' Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+                                '    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+                                '    2. Remove the Calculated Test from all Test Profiles in which it is included.
+                                '    3. Delete Reference Ranges for the affected Calculated Test.
+                                '    4. Delete the elements of the Formula of the affected Calculated Test.
+                                '    5. Delete the affected Calculated Test.
+                                '    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+                                ' Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
+
+                                '*** Perform step 1 + 2 (affected Calculated Test and Test Profile actions) ***
+                                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                                resultData = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(dbConnection, pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+                            End If
+                            ' WE 24/11/2014 - RQ00035C (BA-1867) - END.
+
                         End If
+
+                        '*** Perform Off-System Test related actions ***
 
                         'Update basic data of the OFF-SYSTEM Test
                         If (Not resultData.HasError) Then
@@ -387,6 +466,16 @@ Namespace Biosystems.Ax00.BL
                             Dim myOffSystemTestSamplesDelegate As New OffSystemTestSamplesDelegate
                             resultData = myOffSystemTestSamplesDelegate.Modify(dbConnection, pTestSampleTypesDS)
                         End If
+
+                        ' WE 19/11/2014 - RQ00035C (BA-1867): Update field FormulaText for those Calculated Tests in which formula
+                        ' the modified Off-System Test Name has been included (when the Name of the Off-System Test is changed).
+                        If (Not resultData.HasError) Then
+                            Dim myCalcTestDelegate As New CalculatedTestsDelegate
+                            If pOffSystemTestDS.tparOffSystemTests.Rows.Count > 0 Then
+                                resultData = myCalcTestDelegate.UpdateFormulaText(dbConnection, "OFFS", pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID)
+                            End If
+                        End If
+                        ' WE 19/11/2014 - RQ00035C (BA-1867) - END.
 
                         'Update the Reference Ranges
                         If (Not resultData.HasError) Then
@@ -427,6 +516,8 @@ Namespace Biosystems.Ax00.BL
                             End If
                         End If
 
+                        '*** END of Perform Off-System Test related actions ***
+
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
@@ -445,8 +536,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Modify", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Modify", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -457,12 +548,16 @@ Namespace Biosystems.Ax00.BL
         ''' Get data of the specified OFF-SYSTEM Test
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pOffSystemTestID">Identifier of the OffSystem Test</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet OffSystemTestsDS with data of the specified offsystem Test</returns>
+        ''' <param name="pID">Unique OffSystem Test Identifier (OffSystemTestID or BiosystemsID)</param>
+        ''' <param name="pSearchByBiosystemsID">When TRUE, the search is executed by field BiosystemsID instead of by field OffSystemTestID.
+        '''                                     Optional parameter with FALSE as default value</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OffSystemTestsDS with data of the specified OffSystem Test</returns>
         ''' <remarks>
-        ''' Created by: DL 29/11/2010
+        ''' Created by:  DL 29/11/2010
+        ''' Modified by: SA 20/11/2014 - BA-2105 ==> Added optional parameter pSearchByBiosystemsID to allow search the OffSystem Test by 
+        '''                                          BiosystemsID instead of by OffSystemTestID (needed in UpdateVersion process)
         ''' </remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestID As Integer) As GlobalDataTO
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pID As Integer, Optional ByVal pSearchByBiosystemsID As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -472,7 +567,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOffSystemTestsDAO As New tparOffSystemTestsDAO
-                        resultData = myOffSystemTestsDAO.Read(dbConnection, pOffSystemTestID)
+                        resultData = myOffSystemTestsDAO.Read(dbConnection, pID, pSearchByBiosystemsID)
                     End If
                 End If
             Catch ex As Exception
@@ -481,8 +576,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -517,8 +612,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadWithUnitDesc", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadWithUnitDesc", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -570,23 +665,24 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
 
-
         ''' <summary>
-        ''' Update the field InUse by TestID
+        ''' Update field InUse for the informed OffSystem Test
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pInUseFlag"></param>
-        ''' <returns></returns>
-        ''' <remarks>AG 08/05/2013</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">OffSystem Test Identifier</param>
+        ''' <param name="pInUseFlag">InUse value to update for the informed OffSystem Test</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  AG 08/05/2013
+        ''' </remarks>
         Public Function UpdateInUseByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pInUseFlag As Boolean) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -616,26 +712,119 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Update fields Name and ShortName for the informed OFF-SYSTEM Test. Used for the Update Version process to rename User OFFS Tests when needed
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pOffSystemTestDS">Typed DataSet OffSystemTestsDS containing the data of the OFF-SYSTEM Test to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 20/11/2014 - BA-2105
+        ''' </remarks>
+        Public Function UpdateTestNames(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Update Name and ShortName for the informed OFFS Test
+                        Dim offSystemTestToUpdate As New tparOffSystemTestsDAO
+                        resultData = offSystemTestToUpdate.UpdateTestNames(dbConnection, pOffSystemTestDS)
+
+                        'If the OFFS is in the Formula of one or more Calculated Tests, rebuild field FormulaText for all of them using the new Name of the OFFS Test
+                        If (Not resultData.HasError) Then
+                            Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                            resultData = myCalcTestsDelegate.UpdateFormulaText(dbConnection, "OFFS", pOffSystemTestDS.tparOffSystemTests.First.OffSystemTestID)
+                        End If
+
+                        'Update data of the OFF-SYSTEM Test/SampleType in Historic Module
+                        If (HISTWorkingMode) Then
+                            If (Not resultData.HasError) Then
+                                'Prepare the DS needed to update data in Historic Module
+                                Dim myHisOFFSTestSamplesDS As New HisOFFSTestSamplesDS
+                                Dim myHisOFFSTestSamplesRow As HisOFFSTestSamplesDS.thisOffSystemTestSamplesRow
+
+                                myHisOFFSTestSamplesRow = myHisOFFSTestSamplesDS.thisOffSystemTestSamples.NewthisOffSystemTestSamplesRow
+                                myHisOFFSTestSamplesRow.OffSystemTestID = pOffSystemTestDS.tparOffSystemTests.First.OffSystemTestID
+                                myHisOFFSTestSamplesRow.SampleType = pOffSystemTestDS.tparOffSystemTests.First.SampleType
+                                myHisOFFSTestSamplesRow.OffSystemTestName = pOffSystemTestDS.tparOffSystemTests.First.Name
+                                myHisOFFSTestSamplesRow.DecimalsAllowed = CInt(pOffSystemTestDS.tparOffSystemTests.First.Decimals)
+                                myHisOFFSTestSamplesRow.MeasureUnit = pOffSystemTestDS.tparOffSystemTests.First.Units
+                                myHisOFFSTestSamplesRow.ResultType = pOffSystemTestDS.tparOffSystemTests.First.ResultType
+
+                                myHisOFFSTestSamplesDS.thisOffSystemTestSamples.AddthisOffSystemTestSamplesRow(myHisOFFSTestSamplesRow)
+
+                                'Update data of the OFF-SYSTEM Test/Sample Type if it exists in Historic Module
+                                resultData = HIST_UpdateByOFFSTestIDAndSampleType(dbConnection, myHisOFFSTestSamplesDS)
+                            End If
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateTestNames", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 
         ''' <summary>
-        ''' Validate if the deletion of the specified OFF-SYSTEM Tests affects Test Profiles in which they are included
+        ''' Validate if the deletion of the specified OFF-SYSTEM Tests (due to deletion of the Off-System Test or having updated its Sample Type)
+        ''' affects Test Profiles and/or Calculated Tests in which they are included.
+        ''' For each Off-System Test to be deleted or having its Sample Type updated, search the list of affected elements:
+        '''   1 - Test Profiles containing the Off-System Test.
+        '''   2 - Calculated Tests containing the Off-System Test in their Formula
+        '''     2.1 - Calculated Tests containing each affected Calculated Test (from step 2) in their Formula.
+        '''       2.1.1 - Test Profiles containing each affected Calculated Test (from step 2.1) in their Formula.
+        '''     2.2 - Test Profiles containing each affected Calculated Test (from step 2).
+        '''     
         ''' </summary>
+        ''' <param name="pOffSystemTestsDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM Test(s)
+        '''                                 selected to be deleted, or containing the OFF-SYSTEM Test to be updated.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet DependenciesElementsDS with the list of affected elements</returns>
         ''' <remarks>
-        ''' Created by: SA 03/11/2011
+        ''' Created by:  SA 03/11/2011
+        ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Extend with Calculated Tests as possible affected elements.
+        '''              WE 26/11/2015 - RQ00035C (BA-1867)/BA-2142: - Solved issue regarding not selecting Test Profiles that contain affected Calculated Tests (case 2.2).
+        '''                                                          - Column 'Additional Information' in the Affected Elements Warning is now showing the correct data.
+        '''                                                          - Disabled myDependenciesElementsRow.Related because it is not being used anywhere.
+        '''              WE 28/11/2015 - RQ00035C (BA-1867/BA-2142): Don´t pass Sample Type of the current Calculated Test because all Test Profiles must be returned
+        '''                                                          independent of the Test Profile's Sample Type. This is to assure that also Calculated Tests (nested)
+        '''                                                          of type Multiple will be returned (case 2.1.1 and 2.2).
         ''' </remarks>
         Public Function ValidatedDependencies(ByVal pOffSystemTestsDS As OffSystemTestsDS) As GlobalDataTO
             Dim myResult As New GlobalDataTO
             Try
-                Dim imageBytes As Byte()
+                Dim imageBytesTPROF As Byte()
+                Dim imageBytesTCALC As Byte()
                 Dim preloadedDataConfig As New PreloadedMasterDataDelegate()
 
                 Dim myDependeciesElementsDS As New DependenciesElementsDS
@@ -644,55 +833,168 @@ Namespace Biosystems.Ax00.BL
                 Dim myGlobalDataTO As New GlobalDataTO
                 Dim myTestProfileTestDS As New TestProfileTestsDS
 
+                Dim myFormulasDS As New FormulasDS
+                Dim myRelatedElements As New FormulasDS
+                Dim myFormulasDelegate As New FormulasDelegate
+
+                ' Get icon for TestProfiles and Calculated Tests.
+                imageBytesTPROF = preloadedDataConfig.GetIconImage("PROFILES")
+                imageBytesTCALC = preloadedDataConfig.GetIconImage("TCALC")
+
+                ' Search for each Off-System Test all its affected elements (Calculated Tests (2 levels) and Profiles (3 levels).
                 For Each offSystemTestRow As OffSystemTestsDS.tparOffSystemTestsRow In pOffSystemTestsDS.tparOffSystemTests.Rows
-                    'Clean the Test Profiles DS for each new OFF-SYSTEM Test to process
+                    ' 1. Get the Test Profiles in which the OFF-SYSTEM Test is included.
+
+                    ' Clean the Test Profiles DS for each new OFF-SYSTEM Test to process.
                     myTestProfileTestDS.tparTestProfileTests.Clear()
 
-                    'Get the Test Profiles in which the OFF-SYSTEM Test is included
                     Dim myTestProfilesTestDelegate As New TestProfileTestsDelegate
                     myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
 
-                        'Get icon for TestProfiles; load the returned Test Profiles in the list of affected Elements to return
-                        imageBytes = preloadedDataConfig.GetIconImage("PROFILES")
+                        ' Load the returned Test Profiles in the list of affected Elements to return.
                         For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
                             myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
 
-                            myDependenciesElementsRow.Type = imageBytes
+                            myDependenciesElementsRow.Type = imageBytesTPROF
                             myDependenciesElementsRow.Name = testProfTest.TestProfileName
                             myDependenciesElementsRow.FormProfileMember = offSystemTestRow.Name
 
-                            'Insert on dependencies table
+                            'Insert in dependencies table
                             myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
                         Next
                     Else
-                        myResult = myGlobalDataTO
+                        'Error verifying affected Test Profiles - 1st level
+                        'myResult = myGlobalDataTO
                         Exit For
                     End If
+                    ' END OF 1. Get the Test Profiles in which the OFF-SYSTEM Test is included.
+
+                    ' 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
+                    myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myFormulasDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                        For Each formRow As FormulasDS.tparFormulasRow In myFormulasDS.tparFormulas.Rows
+                            myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                            myDependenciesElementsRow.Type = imageBytesTCALC
+                            myDependenciesElementsRow.Name = formRow.TestName
+                            myDependenciesElementsRow.FormProfileMember = "=" & formRow.FormulaText
+                            'myDependenciesElementsRow.Related = False
+
+                            myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+
+                            ' For the affected Calculated Test: 
+                            ' 2.1 - Search if it is included in the Formula of other Calculated Tests (nested Calculated Test).
+                            myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, formRow.CalcTestID, formRow.SampleType, "CALC")
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myRelatedElements = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                                For Each relatedElementRow As FormulasDS.tparFormulasRow In myRelatedElements.tparFormulas.Rows
+ 
+                                    ' Check if current Calc.Test has not already been added to the Dependencies List in the Outer For Each loop.
+                                    If (myFormulasDS.tparFormulas.ToList.Where(Function(a) a.CalcTestID = CInt(relatedElementRow.CalcTestID)).Count = 0) Then
+                                        myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                        myDependenciesElementsRow.Type = imageBytesTCALC
+                                        myDependenciesElementsRow.Name = relatedElementRow.TestName
+                                        myDependenciesElementsRow.FormProfileMember = formRow.TestName    ' "=" & relatedElementRow.FormulaText
+                                        'myDependenciesElementsRow.Related = True
+
+                                        myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+
+                                        ' 2.1.1 - Search if current Calculated Test (nested) is included in any Test Profile.
+                                        ' Don´t pass Sample Type of the current Calculated Test (nested) because all Test Profiles must be returned independent of the Test Profile's Sample Type.
+                                        ' This is to assure that also Calculated Tests (nested) of type Multiple will be returned.
+                                        myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, "", "CALC")
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
+
+                                            For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
+                                                myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                                myDependenciesElementsRow.Type = imageBytesTPROF
+                                                myDependenciesElementsRow.Name = testProfTest.TestProfileName
+                                                myDependenciesElementsRow.FormProfileMember = relatedElementRow.TestName    ' offSystemTestRow.Name
+
+                                                myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                            Next
+                                        Else
+                                            'Error verifying affected Test Profiles - 3rd level
+                                            Exit For
+                                        End If
+                                    End If
+                                Next
+                            Else
+                                'Error verifying affected Calculated Tests - 2nd level
+                                Exit For
+                            End If
+                            ' END OF 2.1 - Search if it is included in the Formula of other Calculated Tests (nested Calculated Test).
+
+                            ' 2.2 - Search if the current Calculated Test is included in any Test Profile.
+                            ' Don´t pass Sample Type of the current Calculated Test because all Test Profiles must be returned independent of the Test Profile's Sample Type.
+                            ' This is to assure that also Calculated Tests of type Multiple will be returned.
+                            myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, formRow.CalcTestID, "", "CALC")
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
+
+                                For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
+                                    myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                    myDependenciesElementsRow.Type = imageBytesTPROF
+                                    myDependenciesElementsRow.Name = testProfTest.TestProfileName
+                                    myDependenciesElementsRow.FormProfileMember = formRow.TestName   ' offSystemTestRow.Name
+
+                                    myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                Next
+                            Else
+                                'Error verifying affected Test Profiles - 2nd level
+                                Exit For
+                            End If
+
+                        Next
+                    Else
+                        'Error verifying affected Calculated Tests - 2nd level
+                        Exit For
+                    End If
+                    ' END OF 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
+
                 Next
-                myResult.SetDatos = myDependeciesElementsDS
+                ' END OF Search for each Off-System Test all its affected elements (Calculated Tests (2 levels) and Profiles (3 levels).
+
+                imageBytesTPROF = Nothing
+                imageBytesTCALC = Nothing
+
+                If (Not myGlobalDataTO.HasError) Then
+                    'Return the list of affected Elements
+                    myGlobalDataTO.SetDatos = myDependeciesElementsDS
+                End If
+
+                myResult = myGlobalDataTO
+
             Catch ex As Exception
                 myResult.HasError = True
                 myResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResult.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
             End Try
             Return myResult
         End Function
 
         ''' <summary>
-        ''' Udate the LIS value by the Off System Test ID.
+        ''' Update field LISValue for the informed OffSystem Test
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pOFFSystemTestID">Off System Test ID.</param>
-        ''' <param name="pLISValue">LIS Value.</param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pOFFSystemTestID">OffSystem Test Identifier</param>
+        ''' <param name="pLISValue">LIS mapping value to update for the informed OffSystem Test</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' CREATED BY: TR 04/03/2013
+        ''' Created by:  TR 04/03/2013
         ''' </remarks>
         Public Function UpdateLISValueByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOFFSystemTestID As Integer, pLISValue As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -724,12 +1026,114 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Gets all OFFS Tests ordered by CustomPosition (returned columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' Created by:  AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparOffSystemTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OffSystemTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for OFFS Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all Tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) _
+                                                         As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparOffSystemTestsDAO
+                        myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Update CALCTEST available in cascade depending their components (all components available -> CalcTest available // else CalcTest NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            myGlobalDataTO = myCalcTestDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
+
+                        'Update PROFILE available in cascade depending their components (all components available -> Profile available // else Profile NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myTestProfileDlg As New TestProfilesDelegate
+                            myGlobalDataTO = myTestProfileDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
+
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return (myGlobalDataTO)
         End Function
 
 #End Region
@@ -789,8 +1193,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_CloseOFFSTestSample", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_CloseOFFSTestSample", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -800,8 +1204,8 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' When basic data of an OFFSTest/SampleType (OffSystemTestName, MeasureUnit and/or DecimalsAllowed) is changed in OFF-SYSTEM Tests 
         ''' Programming Screen,  values are updated for the corresponding record in the Historics Module table (the one having the same 
-        ''' OffSystemTestID and SampleType,  and having ClosedOffSystemTest = False)But when besides basic data, the ResultType is changed,
-        ''' But when besides basic data, the ResultType is changed, then the OffSystem Test is marked as closed and the data is not updated 
+        ''' OffSystemTestID and SampleType,  and having ClosedOffSystemTest = False).
+        ''' But when besides basic data, the ResultType and/or Sample Type is changed, then the OffSystem Test is marked as closed and the data is not updated.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pHisOFFSTestsDS">Typed DataSet HisOFFSTestSamplesDS containing the OFFTest/SampleType to update</param>
@@ -865,8 +1269,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_UpdateByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_UpdateByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -883,14 +1287,16 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 03/01/2011
+        ''' Modified by: SA 21/11/2014 - Inform the open DB Connection in the call to function SaveTestRefRanges to maintain the DB Transaction 
+        '''                              opened for Add or Modify an OffSystem Test
         ''' </remarks>
         Private Function SaveReferenceRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRefRangesDS As TestRefRangesDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Separate added, updated and deleted Reference Ranges in three different DS
@@ -898,18 +1304,17 @@ Namespace Biosystems.Ax00.BL
                         Dim updatedRefRangesDS As New TestRefRangesDS
                         Dim deletedRefRangesDS As New TestRefRangesDS
 
-                        Dim myGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
                         Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
 
-
                         'CREATE: Get all added Reference Ranges
-                        myTestRefRanges = (From a In pRefRangesDS.tparTestRefRanges _
+                        myTestRefRanges = (From a As TestRefRangesDS.tparTestRefRangesRow In pRefRangesDS.tparTestRefRanges _
                                           Where a.IsNew = True _
                                          Select a).ToList()
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -917,14 +1322,14 @@ Namespace Biosystems.Ax00.BL
                         Next
 
                         'UPDATE: Get all updated Reference Ranges
-                        myTestRefRanges = (From a In pRefRangesDS.tparTestRefRanges _
+                        myTestRefRanges = (From a As TestRefRangesDS.tparTestRefRangesRow In pRefRangesDS.tparTestRefRanges _
                                           Where a.IsNew = False _
                                             And a.IsDeleted = False _
                                          Select a).ToList()
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -932,7 +1337,7 @@ Namespace Biosystems.Ax00.BL
                         Next
 
                         'DELETE: Get all Reference Ranges marked to delete
-                        myTestRefRanges = (From a In pRefRangesDS.tparTestRefRanges _
+                        myTestRefRanges = (From a As TestRefRangesDS.tparTestRefRangesRow In pRefRangesDS.tparTestRefRanges _
                                           Where a.IsDeleted = True _
                                          Select a).ToList()
 
@@ -941,7 +1346,7 @@ Namespace Biosystems.Ax00.BL
                         Next
 
                         'Save Reference Ranges
-                        resultData = SaveTestRefRanges(Nothing, newRefRangesDS, updatedRefRangesDS, deletedRefRangesDS)
+                        resultData = SaveTestRefRanges(dbConnection, newRefRangesDS, updatedRefRangesDS, deletedRefRangesDS)
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
@@ -953,19 +1358,21 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
+                resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
 
         ''' <summary>
         ''' Save Reference Ranges for an OFF-SYSTEM Test: add new ranges, update values of existing ranges, and/or remove deleted 
@@ -1028,8 +1435,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveTestRefRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveTestRefRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1089,8 +1496,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Create", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Create", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1159,8 +1566,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveOffSystemRefRanges", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveOffSystemRefRanges", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1262,8 +1669,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1326,8 +1733,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveNewOffSystemTest", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveNewOffSystemTest", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1362,8 +1769,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

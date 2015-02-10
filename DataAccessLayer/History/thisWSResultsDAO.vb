@@ -1,14 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisWSResultsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -26,6 +25,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 22/10/2012 - Added columns ABSInitial, ABSWorkReagent and ABSMainFilter
         '''              SA 25/10/2012 - Added column RemarkAlert
         '''              AG 24/04/2013 - Added column LISMessageID
+        '''              SA 08/09/2014 - BA-1919 ==> Added a call to Replace function for fields ManualResultText and UserComments
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisWSResultsDS As HisWSResultsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -72,13 +72,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End If
 
                             If (Not myHisWSResultsRow.IsManualResultTextNull AndAlso myHisWSResultsRow.ManualResultText.Trim <> String.Empty) Then
-                                cmdText.Append(", N'" & myHisWSResultsRow.ManualResultText.Trim.Replace("''", "'") & "'")
+                                cmdText.Append(", N'" & myHisWSResultsRow.ManualResultText.Trim.Replace("'", "''") & "'")
                             Else
                                 cmdText.Append(", NULL")
                             End If
 
                             If (Not myHisWSResultsRow.IsUserCommentNull AndAlso myHisWSResultsRow.UserComment.Trim <> String.Empty) Then
-                                cmdText.Append(", N'" & myHisWSResultsRow.UserComment.Trim.Replace("''", "'") & "'")
+                                cmdText.Append(", N'" & myHisWSResultsRow.UserComment.Trim.Replace("'", "''") & "'")
                             Else
                                 cmdText.Append(", NULL")
                             End If
@@ -227,8 +227,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -254,8 +254,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
 
                 ElseIf (Not pHisWSOrderTestsDS Is Nothing) Then
-                    Dim myGlobalBase As New GlobalBase
-                    Dim myUserName As String = myGlobalBase.GetSessionInfo().UserName().Trim
+                    'Dim myGlobalbase As New GlobalBase
+                    Dim myUserName As String = GlobalBase.GetSessionInfo().UserName().Trim
 
                     Dim i As Integer = 0
                     Dim maxDeletes As Integer = 10000
@@ -308,8 +308,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteResults", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -345,8 +345,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -386,20 +386,38 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (String.Compare(pSampleClass.Trim, String.Empty, False) <> 0) Then sampleClassFilter = " = '" & pSampleClass.Trim & "' "
 
                     If (String.Compare(pAnalyzerID.Trim, String.Empty, False) = 0) Then
+                        'AJG
+                        'cmdText &= " WHERE ClosedResult = 0 " & vbCrLf & _
+                        '           " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                        '                                     " WHERE  SampleClass " & sampleClassFilter & vbCrLf & _
+                        '                                     " AND    TestType   =  'STD' " & vbCrLf & _
+                        '                                     " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+
                         cmdText &= " WHERE ClosedResult = 0 " & vbCrLf & _
-                                   " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                                   " AND EXISTS (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
                                                              " WHERE  SampleClass " & sampleClassFilter & vbCrLf & _
                                                              " AND    TestType   =  'STD' " & vbCrLf & _
-                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf & _
+                                                             " AND thisWSResults.HistOrderTestID = HistOrderTestID" & vbCrLf
 
                     Else
+                        'AJG
+                        'cmdText &= " WHERE  AnalyzerID  = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '           " AND   ClosedResult = 0 " & vbCrLf & _
+                        '           " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                        '                                     " WHERE  AnalyzerID =  N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                     " AND    SampleClass " & sampleClassFilter & vbCrLf & _
+                        '                                     " AND    TestType   =  'STD' " & vbCrLf & _
+                        '                                     " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+
                         cmdText &= " WHERE  AnalyzerID  = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                    " AND   ClosedResult = 0 " & vbCrLf & _
-                                   " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                                   " AND EXISTS (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
                                                              " WHERE  AnalyzerID =  N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                              " AND    SampleClass " & sampleClassFilter & vbCrLf & _
                                                              " AND    TestType   =  'STD' " & vbCrLf & _
-                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf & _
+                                                             " AND thisWSResults.HistOrderTestID = HistOrderTestID" & vbCrLf
                     End If
 
                     If (String.Compare(pSampleType.Trim, String.Empty, False) <> 0) Then cmdText &= " AND SampleType =  '" & pSampleType.Trim & "' " & vbCrLf
@@ -415,8 +433,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -458,8 +476,84 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResults", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get the historic curve average results to generate a report
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pHistOrderTestID">Historic order test identifier</param>
+        ''' <param name="pDecimalsAllowed">Test decimals allowed configuration</param>
+        ''' <returns>GlobalDataTo with dataset as ResultsDS.ReportCalibCurve</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' Modified by XB 26/11/2014 - Correction: add HR.CurveSlope , HR.CurveOffset, HR.CurveCorrelation fields - BA-2141
+        ''' </remarks>
+        Public Function GetResultsCalibCurveForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
+                                                      ByVal pAnalyzerID As String, _
+                                                      ByVal pWorkSessionID As String, _
+                                                      ByVal pHistOrderTestID As Integer, _
+                                                      ByVal pDecimalsAllowed As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText = "SELECT HOT.HistOrderTestID, HOT.SampleType,HR.MultipointNumber, " & _
+                                  "       CAST(HR.ABSValue AS DECIMAL(20,4)) AS ABSValue, " & _
+                                  "       CAST(HR.CONCValue AS DECIMAL(20," & pDecimalsAllowed & ")) AS CONC_Value, " & _
+                                  "       CAST(HR.RelativeErrorCurve AS DECIMAL(20,4)) AS RelativeErrorCurve, " & _
+                                  "       HR.CalibratorBlankAbsUsed, HTS.CurveGrowthType, HTS.CurveType, HTS.CurveAxisXType, " & _
+                                  "       HTS.CurveAxisYType, HTS.TestLongName, HTCV.TheoreticalConcentration As TheoricalConcentration, " & _
+                                  "       MD.FixedItemDesc As MeasureUnit, HR.CurveSlope , HR.CurveOffset, HR.CurveCorrelation " & _
+                                  " FROM thisWSResults HR INNER JOIN thisWSOrderTests HOT ON HR.HistOrderTestID = HOT.HistOrderTestID " & _
+                                  "                       INNER JOIN thisTestSamples HTS ON HOT.HistTestID = HTS.HistTestID AND HOT.SampleType = HTS.SampleType " & _
+                                  "                                                     AND HOT.TestVersionNumber = HTS.TestVersionNumber " & _
+                                  "                       INNER JOIN thisTestCalibratorsValues HTCV ON HOT.HistTestID = HTCV.HistTestID " & _
+                                  "                                                                AND HOT.SampleType = HTCV.SampleType " & _
+                                  "                                                                AND HOT.TestVersionNumber = HTCV.TestVersionNumber " & _
+                                  "                                                                AND HOT.HistCalibratorID = HTCV.HistCalibratorID " & _
+                                  "                                                                AND HR.MultiPointNumber = HTCV.CalibratorNum " & _
+                                  "                       INNER JOIN tcfgMasterData MD ON HTS.MeasureUnit = MD.ItemID AND MD.SubTableID = 'TEST_UNITS' " & _
+                                  " WHERE HOT.HistOrderTestID = " & pHistOrderTestID & _
+                                  " AND HOT.SampleClass = 'CALIB' " & _
+                                  " AND HOT.TestType = 'STD' " & _
+                                  " AND HR.AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                                  " AND HR.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
+
+                        Dim myDataSet As New ResultsDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.ReportCalibCurve)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -514,8 +608,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -529,103 +623,110 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 #Region " Get Historical Results "
         ''' <summary>
-        ''' Gets all Historical Patient Results that fulfill the specified filters
+        ''' Get all Historic Patient Results that fulfill the specified filters
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pSamplePatientId"></param>
-        ''' <param name="pSampleClasses"></param>
-        ''' <param name="pSampleTypes"></param>
-        ''' <param name="pStatFlag"></param>
-        ''' <param name="pTestTypes"></param>
-        ''' <param name="pTestStartName"></param>
-        ''' <returns>GlobalDataTo with dataset as HisWSResultsDS.vhisWSResults</returns>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pPatientData">Part of the Patient ID, LastName or FirstName</param>
+        ''' <param name="pSampleTypes">List of Sample Types</param>
+        ''' <param name="pStatFlag">Priority Flag</param>
+        ''' <param name="pTestTypes">List of Test Types</param>
+        ''' <param name="pTestName">Part of the Test Name</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pSpecimenID">Part of the SpecimenID (Barcode)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Patient results that fulfill the
+        '''          specified search criteria</returns>
         ''' <remarks>
         ''' Created by:  JB 19/10/2012
-        ''' Modified by: AG 29/10/2012 (AG + EF MEETING) DEFAULT ORDER BY PATIENTID, RESULTDATE DESC
-        '''              JB 07/11/2012 Fixed search query
+        ''' Modified by: AG 29/10/2012 - Sort returned records by PatientID and ResultDateTime (DESC) 
+        '''              JB 07/11/2012 - Fixed search query
+        '''              SA 01/08/2014 - BA-1861 ==> - Added new optional parameter pSpecimenID and the corresponding filter in the SQL when it is informed
+        '''                                          - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        '''                                          - Changed the use of parameter pPatientData: when it is informed, the query searches if it is part of 
+        '''                                            fields PatientID, LastName or FirstName
+        '''                                          - Changed the ORDER BY: sort returned data by PatientID, SpecimenID and ResultDateTime
         ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pSamplePatientId As String = "", Optional ByVal pSampleClasses As List(Of String) = Nothing, _
-                                                     Optional ByVal pSampleTypes As List(Of String) = Nothing, Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
-                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestStartName As String = "", _
-                                                     Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                                     Optional ByVal pPatientData As String = "", Optional ByVal pSampleTypes As List(Of String) = Nothing, _
+                                                     Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
+                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestName As String = "", _
+                                                     Optional ByVal pWorkSessionID As String = "", Optional ByVal pSpecimenID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        Dim cmdInFilter As String = ""
-                        cmdText = "  SELECT * FROM vhisWSResults WHERE "
+                        Dim cmdInFilter As String = String.Empty
+                        Dim cmdText As String = " SELECT * FROM vhisWSResults " & vbCrLf & _
+                                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND    SampleClass = 'PATIENT' " & vbCrLf
 
-                        cmdText &= " AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                        '******************************************************************************
+                        '* Add additional filters when the different optional parameters are informed *
+                        '******************************************************************************
 
-                        'DL 23/10/2012
-                        If String.Compare(pWorkSessionID, "", False) <> 0 Then cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
-                        'DL 23/10/2012
+                        '(1) Range of dates
+                        If (pDateFrom <> Nothing) Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
+                        If (pDateTo <> Nothing) Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
 
-                        'JB 07/11/2012 - Fixed search filter
-                        'If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & pDateFrom.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & pDateTo.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If Not String.IsNullOrEmpty(pSamplePatientId) Then cmdText &= " AND PatientID LIKE '%" & pSamplePatientId & "%' "
-
-                        If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
-                        If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
-                        If Not String.IsNullOrEmpty(pSamplePatientId) Then cmdText &= " AND UPPER(PatientID) LIKE UPPER(N'%" & pSamplePatientId.Trim.Replace("'", "''") & "%') "
-                        'JB 07/11/2012
-
-                        If pSampleClasses IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pSampleClasses
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
-                                cmdText &= " AND SampleClass IN (" & cmdInFilter & ") "
-                            End If
+                        '(2) Patient data
+                        If (Not String.IsNullOrEmpty(pPatientData)) Then
+                            cmdText &= " AND (UPPER(PatientID) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%') " & vbCrLf & _
+                                       " OR   UPPER(LastName) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%') " & vbCrLf & _
+                                       " OR   UPPER(FirstName) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%')) " & vbCrLf
                         End If
 
-                        If pSampleTypes IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pSampleTypes
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
+                        '(3) SpecimenID (Barcode)
+                        If (Not String.IsNullOrEmpty(pSpecimenID)) Then cmdText &= " AND SpecimenID LIKE UPPER(N'%" & pSpecimenID.Trim.Replace("'", "''") & "%') " & vbCrLf
+
+                        '(4) Priority
+                        If (pStatFlag <> TriState.UseDefault) Then cmdText &= " AND StatFlag = " & IIf(pStatFlag = TriState.False, 0, 1).ToString
+
+                        '(5) List of Sample Types
+                        If (Not pSampleTypes Is Nothing AndAlso pSampleTypes.Count > 0) Then
+                            If (pSampleTypes.Count = 1) Then
+                                cmdText &= " AND SampleType = '" & pSampleTypes.First & "' "
+                            Else
+                                For Each elem As String In pSampleTypes
+                                    If (Not String.IsNullOrEmpty(cmdInFilter)) Then cmdInFilter &= ", "
+                                    cmdInFilter &= " '" & elem & "' "
+                                Next
                                 cmdText &= " AND SampleType IN (" & cmdInFilter & ") "
                             End If
                         End If
 
-                        If pStatFlag = TriState.False Then cmdText &= " AND StatFlag = 0 "
-                        If pStatFlag = TriState.True Then cmdText &= "  AND StatFlag = 1 "
-
-                        If pTestTypes IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pTestTypes
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
+                        '(6) List of Test Types
+                        If (Not pTestTypes Is Nothing AndAlso pTestTypes.Count > 0) Then
+                            If (pTestTypes.Count = 1) Then
+                                cmdText &= " AND TestType = '" & pTestTypes.First & "' "
+                            Else
+                                cmdInFilter = String.Empty
+                                For Each elem As String In pTestTypes
+                                    If (Not String.IsNullOrEmpty(cmdInFilter)) Then cmdInFilter &= ", "
+                                    cmdInFilter &= " '" & elem & "' "
+                                Next
                                 cmdText &= " AND TestType IN (" & cmdInFilter & ") "
                             End If
                         End If
 
-                        If Not String.IsNullOrEmpty(pTestStartName) Then cmdText &= " AND TestName LIKE '%" & pTestStartName.Trim & "%' "
+                        '(7) Test Name
+                        If (Not String.IsNullOrEmpty(pTestName)) Then cmdText &= " AND TestName LIKE N'%" & pTestName.Trim.replace("'", "''") & "%' "
 
-                        'cmdText &= " ORDER BY ResultDateTime DESC "
-                        cmdText &= "ORDER BY PatientID, ResultDateTime DESC "
+                        '(8) Work Session Identifier
+                        If (pWorkSessionID.Trim <> String.Empty) Then cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
+
+                        '*********************************************************************************
+                        '* Sort returned data by PatientID, HistPatientID, SpecimenID and ResultDateTime *
+                        '*********************************************************************************
+                        cmdText &= " ORDER BY PatientID, HistPatientID, SpecimenID, ResultDateTime DESC "
 
                         Dim myDataSet As New HisWSResultsDS
-
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(myDataSet.vhisWSResults)
@@ -642,65 +743,55 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetHistoricalResultsByFilter", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetHistoricalResultsByFilter", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Get the historical blank and calibrator results with the selected filter in screen
+        ''' Get the Historic Blank and Calibrator Results that fulfill the specified filters
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pTestNameContains"></param>
-        ''' <returns>GlobalDataTo (data as HisWSResultsDS.vhisWSResults</returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pTestNameContains">Part of the Test Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Blank and Calibrator results that 
+        '''          fulfill the specified search criteria</returns>
         ''' <remarks>
         ''' Created by:  AG 22/10/2012
-        ''' Modified by: AG 29/10/2012 order by TestName, ResultDateTime DESC (AG + EF meeting)
-        '''              JB 07/11/2012 fixed search filter 
+        ''' Modified by: AG 29/10/2012 - Order by TestName, ResultDateTime DESC (AG + EF meeting)
+        '''              JB 07/11/2012 - Fixed search filter 
         ''' </remarks>
         Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                     Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pTestNameContains As String = "") As GlobalDataTO
+                                                               Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
+                                                               Optional ByVal pTestNameContains As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        'Const cmdInFilter As String = ""
-                        cmdText = "  SELECT * FROM vhisWSBlankCalibResults WHERE "
+                        Dim cmdText As String = " SELECT * FROM vhisWSBlankCalibResults " & vbCrLf & _
+                                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
 
-                        cmdText &= " AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                        'Range of dates
+                        If (pDateFrom <> Nothing) Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
+                        If (pDateTo <> Nothing) Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
 
-                        'JB 07/11/2012 - Fixed search filter
-                        'If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & pDateFrom.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & pDateTo.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If Not String.IsNullOrEmpty(pTestNameContains) Then cmdText &= " AND TestName LIKE '%" & pTestNameContains.Trim & "%' "
+                        'Test Name
+                        If (Not String.IsNullOrEmpty(pTestNameContains)) Then cmdText &= " AND UPPER(TestName) LIKE UPPER(N'%" & pTestNameContains.Trim.Replace("'", "''") & "%') "
 
-                        If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
-                        If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
-                        If Not String.IsNullOrEmpty(pTestNameContains) Then cmdText &= " AND UPPER(TestName) LIKE UPPER(N'%" & pTestNameContains.Trim.Replace("'", "''") & "%') "
-                        'JB 07/11/2012
-
-                        'cmdText &= " ORDER BY ResultDateTime DESC "
+                        'Sort records by TestName and ResultDateTime (DESC)
                         cmdText &= " ORDER BY TestName, ResultDateTime DESC "
 
                         Dim myDataSet As New HisWSResultsDS
-
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(myDataSet.vhisWSResults)
@@ -717,14 +808,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 #End Region
@@ -794,8 +883,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -850,8 +939,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateExportStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateExportStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -896,8 +985,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateLISExportStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateLISExportStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -934,7 +1023,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " WHERE HistOrderTestID = " & HistResultRow.HistOrderTestID
                         'cmdText &= " AND ExportStatus = 'SENDING'" 'AG 24/03/2014 - AG 17/02/2014 this line must be COMMENTED when implement #1505 point 7 '(AG 14/02/2014 - #1505 comment this line)
 
-                        'AG 25/07/2014 RQ00086 - improve memory usage
+                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                             resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
                             If resultData.AffectedRecords > 0 Then
@@ -945,7 +1034,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 resultData.AffectedRecords = 0
                             End If
                         End Using
-                        'AG 25/07/2014 RQ00086
+                        'AG 25/07/2014
                     Next
 
                 End If
@@ -955,8 +1044,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateLISMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateLISMessageID", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -993,7 +1082,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "'"
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -1003,7 +1092,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -1012,8 +1101,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -1058,8 +1147,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -1108,8 +1197,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteResults", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSResultsDAO.DeleteResults", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function

@@ -1,16 +1,14 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.IO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
 Imports Biosystems.Ax00.InfoAnalyzer
@@ -20,7 +18,7 @@ Imports Biosystems.Ax00.App
 'PENDING:
 'Add Information XPS Docs for each Action
 'The Reagents Pack Dallas Information MUST BE HIDE!!!!!!!!!! (DisplayISEInfo)
-Public Class IISEResultsHistory
+Public Class UiISEResultsHistory
 
 #Region "Events definitions"
 
@@ -170,9 +168,9 @@ Public Class IISEResultsHistory
         auxIconName = GetIconName(pKey)
         If Not String.IsNullOrEmpty(auxIconName) Then
             If mImageDict.ContainsKey(pKey) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
 
@@ -216,6 +214,9 @@ Public Class IISEResultsHistory
     ''' Created by: JB 02/08/2012
     ''' </remarks>
     Private Function GetDescAlarm(ByVal pAlarmId As String) As String
+
+        Dim result As String = String.Empty
+
         Try
             Dim myAlarmsDelegate As New AlarmsDelegate
             Dim myGlobal As GlobalDataTO = myAlarmsDelegate.Read(Nothing, pAlarmId)
@@ -224,37 +225,69 @@ Public Class IISEResultsHistory
                 Dim myAlarmsDS As AlarmsDS
                 myAlarmsDS = CType(myGlobal.SetDatos, AlarmsDS)
                 If myAlarmsDS.tfmwAlarms.Count > 0 Then
-                    Return myAlarmsDS.tfmwAlarms(0).Description
+                    result = myAlarmsDS.tfmwAlarms(0).Description
                 End If
             End If
 
-            Return ""
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDescAlarm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDescAlarm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetDescAlarm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+
+        Return result
+
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pError"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
+    ''' </remarks>
     Private Function DecodeAffectedElectrodes(ByVal pError As ISEErrorTO) As String
         Dim strRes As String = ""
 
+        ' XB 05/09/2014 - BA-1902
+        'If pError.Affected.Contains("Na") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Sodium")
+        'End If
+        'If pError.Affected.Contains("K") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Potassium")
+        'End If
+        'If pError.Affected.Contains("Cl") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Chlorine")
+        'End If
+        'If pError.Affected.Contains("Li") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Lithium")
+        'End If
+        'If Not String.IsNullOrEmpty(strRes) Then strRes &= ": "
+
+        Dim ISETestList As New ISETestsDelegate
         If pError.Affected.Contains("Na") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Sodium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Na)
         End If
         If pError.Affected.Contains("K") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Potassium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.K)
         End If
         If pError.Affected.Contains("Cl") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Chlorine")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Cl)
         End If
         If pError.Affected.Contains("Li") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Lithium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Li)
         End If
         If Not String.IsNullOrEmpty(strRes) Then strRes &= ": "
+        ' XB 05/09/2014 - BA-1902
+
 
         Return strRes
     End Function
@@ -270,7 +303,7 @@ Public Class IISEResultsHistory
     Private Function DecodeERCErrors(ByVal pErrorStr As String) As String
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myRecepcionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
+            Dim myRecepcionDecoder As New ISEReception(AnalyzerController.Instance.Analyzer) '#REFACTORING
             Dim myISEResultTO As ISEResultTO
             Dim strRes As String = ""
 
@@ -292,8 +325,9 @@ Public Class IISEResultsHistory
 
             Return strRes
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeErrors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeErrors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DecodeErrors ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            Return ""
         End Try
     End Function
 
@@ -310,7 +344,7 @@ Public Class IISEResultsHistory
     Private Function DecodeResultsAndErrorsForElectrodes(ByVal pResultStr As String, ByVal pErrorStr As String, ByVal pLiEnabled As Boolean) As String
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myRecepcionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
+            Dim myRecepcionDecoder As New ISEReception(AnalyzerController.Instance.Analyzer) '#REFACTORING
             Dim myISEResultTO As ISEResultTO
             Dim strRes As String = DecodeERCErrors(pErrorStr)
 
@@ -360,8 +394,9 @@ Public Class IISEResultsHistory
 
             Return strRes
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeResultsAndErrorsForElectrodes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeResultsAndErrorsForElectrodes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DecodeResultsAndErrorsForElectrodes ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            Return ""
         End Try
     End Function
 
@@ -391,7 +426,7 @@ Public Class IISEResultsHistory
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelectedRowsFromGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelectedRowsFromGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -416,7 +451,8 @@ Public Class IISEResultsHistory
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 27/07/2012
+    ''' Created by:  JB 27/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -434,10 +470,18 @@ Public Class IISEResultsHistory
             bsDateFromLabel.Text = GetText("LBL_Date_From") & ":"
             bsDateToLabel.Text = GetText("LBL_Date_To") & ":"
             bsElectrodesFilterGroup.Text = GetText("LBL_ISE_Electrodes")
-            bsElectrodesFilterNaCheck.Text = GetText("LBL_Sodium")
-            bsElectrodesFilterKCheck.Text = GetText("LBL_Potassium")
-            bsElectrodesFilterClCheck.Text = GetText("LBL_Chlorine")
-            bsElectrodesFilterLiCheck.Text = GetText("LBL_Lithium")
+
+            ' XB 05/09/2014 - BA-1902
+            'bsElectrodesFilterNaCheck.Text = GetText("LBL_Sodium")
+            'bsElectrodesFilterKCheck.Text = GetText("LBL_Potassium")
+            'bsElectrodesFilterClCheck.Text = GetText("LBL_Chlorine")
+            'bsElectrodesFilterLiCheck.Text = GetText("LBL_Lithium")
+            Dim ISETestList As New ISETestsDelegate
+            bsElectrodesFilterNaCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodesFilterKCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodesFilterClCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodesFilterLiCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
 
             '
             'Conditioning Tab
@@ -458,7 +502,7 @@ Public Class IISEResultsHistory
             bsConditioningsFilterCleanCheck.Text = GetText("LBL_ISE_CLEAN")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -508,7 +552,7 @@ Public Class IISEResultsHistory
             bsConditioningPrintButton.Visible = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -517,8 +561,9 @@ Public Class IISEResultsHistory
     ''' Initializes the grid in the Electrodes Tab
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 27/07/2012
+    ''' Created by:  JB 27/07/2012
     ''' Modified by: JC 12/11/2012 - Modify column width.
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub PrepareElectrodeResultsGrid(ByVal pGrid As BSDataGridView)
         Try
@@ -595,7 +640,13 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsNa: Na+
-            pGrid.Columns.Add("ResultsNa", GetText("LBL_Sodium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsNa", GetText("LBL_Sodium"))
+            Dim ISETestList As New ISETestsDelegate
+            pGrid.Columns.Add("ResultsNa", ISETestList.GetName(Nothing, ISE_Tests.Na))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsNa")
                 .DataPropertyName = "ResultsNa"
                 .DefaultCellStyle.NullValue = Nothing
@@ -606,12 +657,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanNa: Na+
-            pGrid.Columns.Add("MeanNa", GetText("LBL_Sodium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanNa", GetText("LBL_Sodium"))
+            pGrid.Columns.Add("MeanNa", ISETestList.GetName(Nothing, ISE_Tests.Na))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanNa")
                 .DataPropertyName = "MeanNa"
                 .DefaultCellStyle.NullValue = Nothing
@@ -627,7 +683,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsK: K+
-            pGrid.Columns.Add("ResultsK", GetText("LBL_Potassium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsK", GetText("LBL_Potassium"))
+            pGrid.Columns.Add("ResultsK", ISETestList.GetName(Nothing, ISE_Tests.K))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsK")
                 .DataPropertyName = "ResultsK"
                 .DefaultCellStyle.NullValue = Nothing
@@ -638,12 +699,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanK: K+
-            pGrid.Columns.Add("MeanK", GetText("LBL_Potassium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanK", GetText("LBL_Potassium"))
+            pGrid.Columns.Add("MeanK", ISETestList.GetName(Nothing, ISE_Tests.K))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanK")
                 .DataPropertyName = "MeanK"
                 .DefaultCellStyle.NullValue = Nothing
@@ -659,7 +725,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsCl: Cl-
-            pGrid.Columns.Add("ResultsCl", GetText("LBL_Chlorine"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsCl", GetText("LBL_Chlorine"))
+            pGrid.Columns.Add("ResultsCl", ISETestList.GetName(Nothing, ISE_Tests.Cl))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsCl")
                 .DataPropertyName = "ResultsCl"
                 .DefaultCellStyle.NullValue = Nothing
@@ -670,12 +741,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanCl: Cl-
-            pGrid.Columns.Add("MeanCl", GetText("LBL_Chlorine"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanCl", GetText("LBL_Chlorine"))
+            pGrid.Columns.Add("MeanCl", ISETestList.GetName(Nothing, ISE_Tests.Cl))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanCl")
                 .DataPropertyName = "MeanCl"
                 .DefaultCellStyle.NullValue = Nothing
@@ -691,7 +767,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsLi: Li+
-            pGrid.Columns.Add("ResultsLi", GetText("LBL_Lithium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsLi", GetText("LBL_Lithium"))
+            pGrid.Columns.Add("ResultsLi", ISETestList.GetName(Nothing, ISE_Tests.Li))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsLi")
                 .DataPropertyName = "ResultsLi"
                 .DefaultCellStyle.NullValue = Nothing
@@ -702,12 +783,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanLi: Li+
-            pGrid.Columns.Add("MeanLi", GetText("LBL_Lithium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanLi", GetText("LBL_Lithium"))
+            pGrid.Columns.Add("MeanLi", ISETestList.GetName(Nothing, ISE_Tests.Li))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanLi")
                 .DataPropertyName = "MeanLi"
                 .DefaultCellStyle.NullValue = Nothing
@@ -739,7 +825,7 @@ Public Class IISEResultsHistory
             pGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
             pGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareElectrodeResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareElectrodeResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -884,7 +970,7 @@ Public Class IISEResultsHistory
             pGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
             pGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConditioningResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConditioningResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -925,7 +1011,7 @@ Public Class IISEResultsHistory
             bsElectrodesFilterClCheck.Checked = True
             bsElectrodesFilterLiCheck.Checked = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeElectrodeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeElectrodeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -945,7 +1031,7 @@ Public Class IISEResultsHistory
             bsConditioningsFilterBubbleCheck.Checked = True
             bsConditioningsFilterCleanCheck.Checked = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeConditioningFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeConditioningFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -962,12 +1048,12 @@ Public Class IISEResultsHistory
             mTextDict = New Dictionary(Of String, String)()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             'SGM 31/05/2013 - Get Level of the connected User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ScreenStatusByUserLevel()
 
             GetScreenLabels()
@@ -986,7 +1072,7 @@ Public Class IISEResultsHistory
 
             OnResultsTabSelectedIndexChanged()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1010,7 +1096,7 @@ Public Class IISEResultsHistory
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1082,7 +1168,7 @@ Public Class IISEResultsHistory
             CALCleanIcon.BackgroundImageLayout = ImageLayout.Center
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CleanLastResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CleanLastResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CleanLastResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1233,7 +1319,7 @@ Public Class IISEResultsHistory
             Me.Refresh()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindLastResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindLastResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FindLastResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1334,7 +1420,7 @@ Public Class IISEResultsHistory
             pGrid.DataSource = mLastElectrodeDataTable
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetElectrodeResultDatasource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetElectrodeResultDatasource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetElectrodeResultDatasource ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1358,7 +1444,7 @@ Public Class IISEResultsHistory
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindElectrodeResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindElectrodeResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FindElectrodeResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1381,7 +1467,7 @@ Public Class IISEResultsHistory
             'Li+
             pGrid.Columns("ResultsLi").Visible = filter.electrodeLi
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HideElectrodeResultsColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HideElectrodeResultsColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".HideElectrodeResultsColumns ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1406,7 +1492,7 @@ Public Class IISEResultsHistory
             mLastElectrodesFilter = currentFilter
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetElectrodeResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetElectrodeResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetElectrodeResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1422,7 +1508,7 @@ Public Class IISEResultsHistory
     Private Function DecodeResultToLiNaKClValues(ByVal pResultStr As String) As ISEResultTO.LiNaKCl?
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myReceptionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
+            Dim myReceptionDecoder As New ISEReception(AnalyzerController.Instance.Analyzer) '#REFACTORING
             myGlobal = myReceptionDecoder.GetLiNaKClValues(pResultStr)
 
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
@@ -1431,7 +1517,7 @@ Public Class IISEResultsHistory
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeResultToLiNaKClValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeResultToLiNaKClValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DecodeResultToLiNaKClValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Function
@@ -1442,7 +1528,7 @@ Public Class IISEResultsHistory
         Try
             If mLastElectrodeDataTable.Rows.Count = 0 Then Exit Sub
 
-            Using myISEGraph As New IISEResultsHistoryGraph()
+            Using myISEGraph As New UiISEResultsHistoryGraph()
                 myISEGraph.SetData(mLastElectrodesFilter.Value, mLastElectrodeDataTable)
                 myISEGraph.ShowDialog()
 
@@ -1450,7 +1536,7 @@ Public Class IISEResultsHistory
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowElectrodeGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowElectrodeGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowElectrodeGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1459,7 +1545,7 @@ Public Class IISEResultsHistory
         Try
             'TODO: Show the ISE Electrodes Calibration Report
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowElectrodeReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowElectrodeReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowElectrodeReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1527,7 +1613,7 @@ Public Class IISEResultsHistory
             pGrid.DataSource = mLastConditioningDataTable
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetConditioningResultDatasource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetConditioningResultDatasource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetConditioningResultDatasource ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1551,7 +1637,7 @@ Public Class IISEResultsHistory
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindConditioningResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindConditioningResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FindConditioningResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1572,7 +1658,7 @@ Public Class IISEResultsHistory
             mLastConditioningFilter = currentFilter
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetConditioningResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetConditioningResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetConditioningResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1583,7 +1669,7 @@ Public Class IISEResultsHistory
         Try
             'TODO: Show The Conditioning Report
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowConditioningReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowConditioningReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowConditioningReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1610,7 +1696,7 @@ Public Class IISEResultsHistory
                 'End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IISECalibHistory_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1632,7 +1718,7 @@ Public Class IISEResultsHistory
             ResetBorder()
             Application.DoEvents()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IISECalibHistory_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1652,7 +1738,7 @@ Public Class IISEResultsHistory
             '    ScreenStatusByUserLevel()
             'End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IISECalibHistory_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IISECalibHistory_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1666,10 +1752,10 @@ Public Class IISEResultsHistory
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1737,7 +1823,7 @@ Public Class IISEResultsHistory
                 e.CellStyle.ForeColor = Color.Red
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".grids_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".grids_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".grids_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

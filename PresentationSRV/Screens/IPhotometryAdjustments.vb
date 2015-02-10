@@ -13,7 +13,7 @@ Imports Biosystems.Ax00.BL
 Imports System.IO
 Imports Biosystems.Ax00.App
 
-Public Class IPhotometryAdjustments
+Public Class UiPhotometryAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -55,7 +55,7 @@ Public Class IPhotometryAdjustments
     Private UnableHandlers As Boolean
     Private RunningTest As Boolean
     Private FirstIteration As Boolean
-    Private ExitingScreen As Boolean
+    Private FlagExitingScreen As Boolean
     Private WarningLeds As String
 #End Region
 
@@ -274,7 +274,7 @@ Public Class IPhotometryAdjustments
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
@@ -304,7 +304,7 @@ Public Class IPhotometryAdjustments
             PrepareArea()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -327,7 +327,7 @@ Public Class IPhotometryAdjustments
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -353,7 +353,7 @@ Public Class IPhotometryAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -392,12 +392,12 @@ Public Class IPhotometryAdjustments
             myGlobal = myScreenDelegate.Initialize()
             If myGlobal.HasError Then
                 PrepareErrorMode()
-                CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage(Me.Name & ".Initializations ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Initializations ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -432,12 +432,12 @@ Public Class IPhotometryAdjustments
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
-                CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -515,7 +515,7 @@ Public Class IPhotometryAdjustments
             GetScreenTooltip()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -531,17 +531,17 @@ Public Class IPhotometryAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1DacsReferenceButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1ITSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1ITExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1DacsReferenceButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1ITSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1ITExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             WarningLeds = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_LEDS_WARNINGS", currentLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -553,7 +553,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -573,33 +573,33 @@ Public Class IPhotometryAdjustments
             'DL 20/04/2012. Substitute icons
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                BsStep1DacsReferenceButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1DacsReferenceButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsStep1ITSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                BsStep1ITExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'DL 20/04/2012
 
@@ -609,21 +609,21 @@ Public Class IPhotometryAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsAdjustButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsAdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsCancelButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsCancelButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -631,7 +631,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -640,7 +640,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsTestButton.Image = myImage
             '    BsTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -649,7 +649,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("EDIT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1DacsReferenceButton.Image = myImage
             '    BsStep1DacsReferenceButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -658,7 +658,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITSaveButton.Image = myImage
             '    BsStep1ITSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -667,7 +667,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("UNDO")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITExitButton.Image = myImage
             '    BsStep1ITExitButton.ImageAlign = ContentAlignment.MiddleCenter
             '    'BsStep1ITExitButton.BackgroundImageLayout = ImageLayout.Stretch
@@ -681,20 +681,20 @@ Public Class IPhotometryAdjustments
             'STEP2 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep2TestButtonTODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep2TestButtonTODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep2TestButtonTODELETE.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''STEP3 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep3TestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep3TestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep3TestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             Dim myNewNGImage As Bitmap = Nothing
             Dim myNGImage As Image = Nothing
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
 
             ' Icons used to informate about warning Limits into ListViews PhMain & PhRef and also Intesities of the LEDs
@@ -703,9 +703,9 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("FREECELL")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myClearImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -717,9 +717,9 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myWarningImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -734,12 +734,12 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myImage = CType(myGlobal.SetDatos, Image)
             '    End If
-            '    'Me.BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-            '    'Me.BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    'Me.BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+            '    'Me.BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsStep1UpDownWSButton.Image = myImage
             '    Me.BsStep1UpDownWSButton.ImageAlign = ContentAlignment.MiddleCenter
             '    Me.BsStep2UpDownWSButton.Image = myImage
@@ -747,7 +747,7 @@ Public Class IPhotometryAdjustments
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -804,7 +804,7 @@ Public Class IPhotometryAdjustments
             Me.ManageTabPages = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DisableAll ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -869,7 +869,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -880,7 +880,7 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 23/02/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPhotometryDataTO As PhotometryDataTO
         Try
             DisableAll()
@@ -900,7 +900,7 @@ Public Class IPhotometryAdjustments
                 myResultData = PrepareScreen()
 
                 ' Check Previous completed BLDC tests
-                Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
                 If IO.File.Exists(myPathBLFile) Then
                     ' Recover BLDC test previously completed
                     myResultData = myScreenDelegate.GetLastBLDCCompletedTest(myPathBLFile)
@@ -951,7 +951,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareLoadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1042,7 +1042,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1057,7 +1057,7 @@ Public Class IPhotometryAdjustments
             ManageTabPages = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1069,7 +1069,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareTestedMode()
         Dim myResultData As New GlobalDataTO
         'Dim myPhotometryDataTO As PhotometryDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPath As String
         Try
             Select Case Me.SelectedPage
@@ -1116,7 +1116,7 @@ Public Class IPhotometryAdjustments
                                 Me.BsExitButton.Enabled = True
 
                                 ' Save BLDC Test
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                                myPath = Application.StartupPath & GlobalBase.PhotometryTestsFile
                                 myResultData = myScreenDelegate.SaveBLDCFile(myPath, Me.ActiveAnalyzer)
 
                                 MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
@@ -1130,7 +1130,7 @@ Public Class IPhotometryAdjustments
                                 PopulateBLChart(myScreenDelegate.BaseLineMainCounts, myScreenDelegate.BaseLineRefCounts)
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryBLFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryBLFileOut
                                 CreateBLResultsFileOutput(myPath)
                             Else
                                 If myScreenDelegate.HomesDone Then
@@ -1229,18 +1229,18 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueRepeatabilityResult(0), _
                                     'myScreenDelegate.GetMinValueRepeatabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryRepeatabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryRepeatabilityFileOut
                                 CreateRepeatabilityResultsFileOutput(myPath)
 
                             Else
@@ -1326,19 +1326,19 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueStabilityResult(0), _
                                     'myScreenDelegate.GetMinValueStabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
                                 'End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryStabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryStabilityFileOut
                                 CreateStabilityResultsFileOutput(myPath)
 
                             Else
@@ -1413,7 +1413,7 @@ Public Class IPhotometryAdjustments
                                 PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                 ' Clear Chart
                                 PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                             End If
 
                     End Select
@@ -1436,7 +1436,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1451,7 +1451,7 @@ Public Class IPhotometryAdjustments
             Me.ManageTabPages = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestExitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1462,16 +1462,16 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 15/03/2011</remarks>
     Private Sub PrepareTestExitedMode()
         Try
-            If Me.ExitingScreen Then
-                MyBase.ActivateMDIMenusButtons(True) 'SGM 27/09/2011
-                Me.Close()
+            If FlagExitingScreen Then
+                ActivateMDIMenusButtons(True) 'SGM 27/09/2011
+                Close()
             Else
                 PrepareLoadedMode()
                 MyBase.DisplayMessage(Messages.SRV_TEST_EXIT_COMPLETED.ToString)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestExitedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareTestExitedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1486,7 +1486,7 @@ Public Class IPhotometryAdjustments
             Me.ManageTabPages = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareSavingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1507,7 +1507,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareSavedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -1526,7 +1526,7 @@ Public Class IPhotometryAdjustments
             Me.ManageTabPages = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareParkingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1550,7 +1550,7 @@ Public Class IPhotometryAdjustments
             MyBase.DisplayMessage("")
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareParkedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1567,7 +1567,7 @@ Public Class IPhotometryAdjustments
             Me.BsExitButton.Enabled = True ' Just Exit button is enabled in error case
             MyBase.ActivateMDIMenusButtons(True)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -1682,7 +1682,7 @@ Public Class IPhotometryAdjustments
             Me.UnableHandlers = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myResultData
@@ -1712,7 +1712,7 @@ Public Class IPhotometryAdjustments
             Me.EditedValues(Me.EditedValues.Length - 1) = myLed
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".InitializeEditedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeEditedValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeEditedValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1762,7 +1762,7 @@ Public Class IPhotometryAdjustments
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -1783,7 +1783,7 @@ Public Class IPhotometryAdjustments
     '        myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID)
     '    Catch ex As Exception
     '        'Write error SYSTEM_ERROR in the Application Log
-    '        CreateLogActivity(ex.Message, Me.Name & " GetControlsLimits ", EventLogEntryType.Error, _
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetControlsLimits ", EventLogEntryType.Error, _
     '                                                        GetApplicationInfoSession().ActivateSystemLog)
     '        'Show error message
     '        ShowMessage(Me.Name & " GetControlsLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
@@ -1803,7 +1803,7 @@ Public Class IPhotometryAdjustments
             ' Populate here parameters values which are needed for presentation layer ...
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -1863,7 +1863,7 @@ Public Class IPhotometryAdjustments
                 ShowMessage(Me.Name & ".PopulateLEDSIntensity", "ID_MSG PDT !!!", "TXT_MSG PDT !!!", Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateLEDSIntensity ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1877,7 +1877,7 @@ Public Class IPhotometryAdjustments
                 bm_dest = Me.myClearImage
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".VisibleIcon ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".VisibleIcon ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".VisibleIcon ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return bm_dest
@@ -1921,7 +1921,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulatephMainBL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulatephMainBL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulatephMainBL ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1964,7 +1964,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulatephRefBL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulatephRefBL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulatephRefBL ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1984,6 +1984,10 @@ Public Class IPhotometryAdjustments
             If BSStep1BLChart.Series(1).Points.Count > 0 Then
                 BSStep1BLChart.Series(1).Points.RemoveRange(0, BSStep1BLChart.Series(1).Points.Count)
             End If
+
+            BSStep1BLChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            BSStep1BLChart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
 
@@ -1994,22 +1998,31 @@ Public Class IPhotometryAdjustments
                 Dim myMin As Single = 0
                 ' XBC 01/03/2012
 
-                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                     If myMax = myMin Then
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin - 1
                     Else
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
                     End If
                 End If
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MinValue = 0
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.GridSpacingAuto = True
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = True
+
+                'IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
                 ' Populate new values
                 For i As Integer = 0 To pCountsphMain.Count - 1
@@ -2020,7 +2033,7 @@ Public Class IPhotometryAdjustments
                 Me.BSStep1BLChart.Refresh()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateBLChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateBLChart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateBLChart ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2060,7 +2073,7 @@ Public Class IPhotometryAdjustments
                 Me.BsStep2AbsRangeResult.Text = ""
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateABSStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateABSStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateABSStep2 ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2087,7 +2100,7 @@ Public Class IPhotometryAdjustments
                 ' Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulatephMainStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulatephMainStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulatephMainStep2 ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2114,7 +2127,7 @@ Public Class IPhotometryAdjustments
                 ' Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulatephRefStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulatephRefStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulatephRefStep2 ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2137,6 +2150,10 @@ Public Class IPhotometryAdjustments
                     Step2ChartAbs.Series(0).Points.RemoveRange(0, Step2ChartAbs.Series(0).Points.Count)
                 End If
 
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2ChartAbs.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2ChartAbs.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2144,26 +2161,35 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
                         End If
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                         End If
                     End If
 
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' Populate new values
                     For i As Integer = 0 To pCounts.Count - 1
@@ -2188,6 +2214,11 @@ Public Class IPhotometryAdjustments
                 If Step2Chart.Series(1).Points.Count > 0 Then
                     Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
                 End If
+
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2Chart.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2195,16 +2226,24 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min - 1
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     End If
+
 
                     'If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= pCounts.Max Then
                     '    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
@@ -2218,7 +2257,7 @@ Public Class IPhotometryAdjustments
                     '    End If
                     'End If
 
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' XBC 21/02/2012
                     'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCounts.Count + 1
@@ -2235,9 +2274,12 @@ Public Class IPhotometryAdjustments
 
             End If
 
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateStep2Chart ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2258,6 +2300,11 @@ Public Class IPhotometryAdjustments
             If Step2Chart.Series(1).Points.Count > 0 Then
                 Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
             End If
+
+            'AJG ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            Step2Chart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
                 Dim myMax As Single = Math.Max(pCountsphMain.Max, pCountsphRef.Max)
@@ -2265,14 +2312,18 @@ Public Class IPhotometryAdjustments
                 If myMax = 0 And myMin = 0 Then
                     Exit Sub
                 End If
-                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
                 End If
-                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 ' XBC 21/02/2012
                 'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
@@ -2287,8 +2338,12 @@ Public Class IPhotometryAdjustments
                 Next
             End If
 
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateStep2Chart ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2333,10 +2388,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxRepeatability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2356,7 +2413,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2378,7 +2435,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2390,10 +2447,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxStability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2413,7 +2472,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2435,7 +2494,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2447,10 +2506,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 24/02/2012
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxWaveLengths
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MinValue = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacing = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacingAuto = False
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.GridSpacing = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = False
                             ' XBC 24/02/2012
 
                             Me.BsStep2phMainGroupBox.Visible = False
@@ -2475,7 +2536,7 @@ Public Class IPhotometryAdjustments
                             ' Populate results of the readed Absorbances to screen
                             PopulateABSStep2(pLedpPosition)
                             PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                            Step2Chart.Legend.Visible = False
+                            Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                             ' XBC 24/02/2012
                             'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Wavelength", currentLanguage)
@@ -2499,7 +2560,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".RefreshResultLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshResultLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshResultLists ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2529,7 +2590,7 @@ Public Class IPhotometryAdjustments
             Me.BsDataGridViewLeds2.Refresh()
             Me.BsDataGridViewLeds2.CurrentCell.Selected = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateCurrentLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateCurrentLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateCurrentLEDSIntensity ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2549,7 +2610,7 @@ Public Class IPhotometryAdjustments
             Me.BsDataGridViewLedsChecks.Refresh()
             Me.BsDataGridViewLedsChecks.CurrentCell.Selected = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PopulateReferenceLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateReferenceLEDSIntensity ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PopulateReferenceLEDSIntensity ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2605,7 +2666,7 @@ Public Class IPhotometryAdjustments
             Me.BsStep1LEDsGroupBox1.Size = New System.Drawing.Size(727, 158)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DisableForItsEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableForItsEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DisableForItsEdition ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2678,7 +2739,7 @@ Public Class IPhotometryAdjustments
             PrepareLoadedMode()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".RestorePostItsEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RestorePostItsEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RestorePostItsEdition ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2723,7 +2784,7 @@ Public Class IPhotometryAdjustments
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ExitPhotometryTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitPhotometryTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitPhotometryTest ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2767,7 +2828,7 @@ Public Class IPhotometryAdjustments
                 End Select
             End With
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2795,7 +2856,7 @@ Public Class IPhotometryAdjustments
             myStreamWriter.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CreateBLResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CreateBLResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreateBLResultsFileOutput ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2877,7 +2938,7 @@ Public Class IPhotometryAdjustments
             myStreamWriter.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CreateRepeatabilityResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CreateRepeatabilityResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreateRepeatabilityResultsFileOutput ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2958,7 +3019,7 @@ Public Class IPhotometryAdjustments
             myStreamWriter.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CreateStabilityResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CreateStabilityResultsFileOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreateStabilityResultsFileOutput ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2981,7 +3042,7 @@ Public Class IPhotometryAdjustments
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2989,7 +3050,10 @@ Public Class IPhotometryAdjustments
     ''' <summary>
     ''' Load Adjustments High Level Instruction to move Washing Station
     ''' </summary>
-    ''' <remarks>Created by XBC 20/02/2012</remarks>
+    ''' <remarks>
+    ''' Created by XBC 20/02/2012
+    ''' Modified by XB 13/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub SendWASH_STATION_CTRL()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -3012,7 +3076,8 @@ Public Class IPhotometryAdjustments
                     Else
                         ' Manage instruction for Washing Station UP/DOWN
                         If myScreenDelegate.IsWashingStationUp Then
-                            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            'myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            myScreenDelegate.SendNEW_ROTOR()
                         Else
                             myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
                         End If
@@ -3022,7 +3087,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendWASH_STATION_CTRL", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3049,7 +3114,7 @@ Public Class IPhotometryAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         MyClass.SelectedAdjustmentsDS.AcceptChanges()
@@ -3076,7 +3141,7 @@ Public Class IPhotometryAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Me.TemporalAdjustmentsDS.AcceptChanges()
@@ -3096,7 +3161,7 @@ Public Class IPhotometryAdjustments
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3145,7 +3210,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadGlobalAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3158,7 +3223,7 @@ Public Class IPhotometryAdjustments
     End Function
 
     ''' <summary>
-    ''' Gets the value corresponding to informed Axis from the selected adjustments dataset
+    ''' Gets the value corresponding to informed Adjustment identificator from the selected adjustments dataset
     ''' </summary>
     ''' <param name="pAdjustmentID"></param>
     ''' <returns></returns>
@@ -3191,8 +3256,53 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+        If myAdjustmentRowData.Value = "" Then myAdjustmentRowData.Value = "0"
+
+        Return myAdjustmentRowData
+    End Function
+
+    ''' <summary>
+    ''' Gets the value corresponding to informed Axis from the selected adjustments dataset (overwritten)
+    ''' </summary>
+    ''' <param name="pAxis"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+    ''' </remarks>
+    Private Function ReadSpecificAdjustmentData(ByVal pAxis As GlobalEnumerates.AXIS) As AdjustmentRowData
+        'Dim myGlobal As New GlobalDataTO
+        Dim myAdjustmentRowData As New AdjustmentRowData("")
+        Try
+            Dim myAxis As String = pAxis.ToString
+            If myAxis = "NONE" Then myAxis = ""
+
+            Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
+            myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
+                                In Me.SelectedAdjustmentsDS.srv_tfmwAdjustments _
+                                Where a.AxisID.Trim = myAxis.Trim _
+                                Select a).ToList
+            'Where a.AxisID.Trim.ToUpper = myAxis.Trim.ToUpper _
+
+            If myAdjustmentRows.Count > 0 Then
+                With myAdjustmentRowData
+                    .AnalyzerID = myAdjustmentRows(0).AnalyzerID
+                    .CodeFw = myAdjustmentRows(0).CodeFw
+                    .Value = myAdjustmentRows(0).Value
+                    .AxisID = myAdjustmentRows(0).AxisID
+                    .GroupID = myAdjustmentRows(0).GroupID
+                    .CanSave = myAdjustmentRows(0).CanSave
+                    .CanMove = myAdjustmentRows(0).CanMove
+                    .InFile = myAdjustmentRows(0).InFile
+                End With
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
         If myAdjustmentRowData.Value = "" Then myAdjustmentRowData.Value = "0"
@@ -3204,7 +3314,10 @@ Public Class IPhotometryAdjustments
     ''' Gets the Dataset that corresponds to the editing adjustments
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>XBC 16/05/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 16/05/2011
+    ''' Modified by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+    ''' </remarks>
     Private Function LoadAdjustmentGroupData() As GlobalDataTO
         Dim resultData As New GlobalDataTO
         Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = MyClass.SelectedAdjustmentsDS
@@ -3214,6 +3327,7 @@ Public Class IPhotometryAdjustments
                 MyClass.SelectedAdjustmentsDS.Clear()
             End If
             myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.LEDS_CURRENT_REF.ToString)
+            myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.PHOTOMETRY.ToString)     ' XB 13/10/2014 - BA-1953
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 MyClass.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
@@ -3221,7 +3335,7 @@ Public Class IPhotometryAdjustments
 
         Catch ex As Exception
             MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
-            CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return resultData
@@ -3255,18 +3369,18 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub PhotometryAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3278,7 +3392,7 @@ Public Class IPhotometryAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -3348,7 +3462,7 @@ Public Class IPhotometryAdjustments
             myScreenDelegate.IsWashingStationUp = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3369,7 +3483,7 @@ Public Class IPhotometryAdjustments
             Me.BsInfoStep2XPSViewer.RefreshPage()
             Me.BsInfoStep3XPSViewer.RefreshPage()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3398,7 +3512,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsTabPagesControl_Selected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3431,12 +3545,21 @@ Public Class IPhotometryAdjustments
             PrepareLoadedMode()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsTabControl_Selecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    ' XBC 27-04-2011 - Place test buttons outside testing area into buttons below area
+    ' 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by XBC 27-04-2011 - Place test buttons outside testing area into buttons below area
+    '''              XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953 
+    ''' </remarks>
     Private Sub BsTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsTestButton.Click
         Dim myGlobal As New GlobalDataTO
         Dim myAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing
@@ -3453,6 +3576,9 @@ Public Class IPhotometryAdjustments
                         myScreenDelegate.HomesDone = False
                         myScreenDelegate.TestBaseLineDone = False
                         myScreenDelegate.WellToUse = CInt(Me.BsStep1WellUpDown.Value)
+                        ' XB 13/10/2014 - BA-1953
+                        myScreenDelegate.pValueAdjust = ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).Value
+
                         If Me.BsStep1ManualFillRadioButton.Checked Then
                             myScreenDelegate.FillMode = FILL_MODE.MANUAL
                         ElseIf Me.BsStep1AutoFillRadioButton.Checked Then
@@ -3647,7 +3773,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsTestButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3663,7 +3789,7 @@ Public Class IPhotometryAdjustments
             PopulateReferenceLEDSIntensity()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsDacsReferenceButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsDacsReferenceButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsDacsReferenceButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3673,7 +3799,7 @@ Public Class IPhotometryAdjustments
             MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_CANCELLED.ToString)
             RestorePostItsEdition()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsITExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsITExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsITExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3758,7 +3884,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsITSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsITSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsITSaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3768,7 +3894,7 @@ Public Class IPhotometryAdjustments
             Me.ExitScreen()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3790,7 +3916,7 @@ Public Class IPhotometryAdjustments
                 BsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3799,7 +3925,7 @@ Public Class IPhotometryAdjustments
         Try
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2WLCombo.SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2WLCombo.SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2WLCombo.SelectedIndexChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3810,7 +3936,7 @@ Public Class IPhotometryAdjustments
     '            Me.BsStep1WellUpDown.Enabled = True
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".bsStep1ManualFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsStep1ManualFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".bsStep1ManualFillRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -3822,7 +3948,7 @@ Public Class IPhotometryAdjustments
     '            Me.BsStep1WellUpDown.Enabled = False
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".bsStep1AutoFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsStep1AutoFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".bsStep1AutoFillRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -3834,7 +3960,7 @@ Public Class IPhotometryAdjustments
     '            Me.BsStep2WellUpDown.Enabled = False
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".bsStep2AutoFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsStep2AutoFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".bsStep2AutoFillRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -3845,7 +3971,7 @@ Public Class IPhotometryAdjustments
     '            Me.BsStep2WellUpDown.Enabled = True
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".bsStep2ManualFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsStep2ManualFillRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".bsStep2ManualFillRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -3955,7 +4081,7 @@ Public Class IPhotometryAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsStep2TestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2TestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsStep2TestButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '        PrepareErrorMode()
     '    End Try
@@ -3965,7 +4091,7 @@ Public Class IPhotometryAdjustments
         Try
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2RepeatabilityRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2RepeatabilityRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2RepeatabilityRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             PrepareErrorMode()
         End Try
@@ -3975,7 +4101,7 @@ Public Class IPhotometryAdjustments
         Try
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2StabilityRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2StabilityRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2StabilityRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             PrepareErrorMode()
         End Try
@@ -3985,7 +4111,7 @@ Public Class IPhotometryAdjustments
         Try
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2AbsorbanceRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2AbsorbanceRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2AbsorbanceRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             PrepareErrorMode()
         End Try
@@ -3999,7 +4125,7 @@ Public Class IPhotometryAdjustments
             End If
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2DarkRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2DarkRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2DarkRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4011,7 +4137,7 @@ Public Class IPhotometryAdjustments
             End If
             Me.RefreshResultLists(Me.BsStep2WLCombo.SelectedIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsStep2LightRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep2LightRadioButton.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsStep2LightRadioButton.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4046,7 +4172,7 @@ Public Class IPhotometryAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsSelectAllITsCheckbox.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsSelectAllITsCheckbox.CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSelectAllITsCheckbox.CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4063,7 +4189,7 @@ Public Class IPhotometryAdjustments
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BSStep1BLChart.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BSStep1BLChart.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -4082,7 +4208,7 @@ Public Class IPhotometryAdjustments
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Step2Chart.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Step2Chart.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -4101,7 +4227,7 @@ Public Class IPhotometryAdjustments
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Step2ChartAbs.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Step2ChartAbs.CustomDrawAxisLabel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -4117,7 +4243,7 @@ Public Class IPhotometryAdjustments
             Me.ProgressBar1.Value += 1
             Me.ProgressBar1.Refresh()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CurrentOperationTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CurrentOperationTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CurrentOperationTimer.Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4135,7 +4261,7 @@ Public Class IPhotometryAdjustments
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsDataGridViewLedsChecks.CellContentClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsDataGridViewLedsChecks.CellContentClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsDataGridViewLedsChecks.CellContentClick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4159,7 +4285,7 @@ Public Class IPhotometryAdjustments
     '        Dim a As New ToolTip
     '        a.SetToolTip(Me.BsphMainWarningsListView, "")
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsphMainWarningsListView.MouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsphMainWarningsListView.MouseLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsphMainWarningsListView.MouseLeave ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4178,7 +4304,7 @@ Public Class IPhotometryAdjustments
     '            a.SetToolTip(Me.BsphMainWarningsListView, "")
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsphMainWarningsListView.MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsphMainWarningsListView.MouseMove ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsphMainWarningsListView.MouseMove ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4193,7 +4319,7 @@ Public Class IPhotometryAdjustments
     '        End With
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsDataGridViewLeds.CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsDataGridViewLeds.CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsDataGridViewLeds.CellFormatting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4203,7 +4329,7 @@ Public Class IPhotometryAdjustments
             Me.SendWASH_STATION_CTRL()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton1_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton1_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsUpDownWSButton1_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4237,7 +4363,7 @@ Public Class IPhotometryAdjustments
     '            Next
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsphMainBLListView.ItemChecked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsphMainBLListView.ItemChecked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsphMainBLListView.ItemChecked ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4294,7 +4420,7 @@ Public Class IPhotometryAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsStep3TestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsStep3TestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsStep3TestButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '        PrepareErrorMode()
     '    End Try
@@ -4309,7 +4435,7 @@ Public Class IPhotometryAdjustments
     '        Me.FirstIteration = True
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsTestTypeCombo.SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestTypeCombo.SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsTestTypeCombo.SelectedIndexChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4319,8 +4445,8 @@ Public Class IPhotometryAdjustments
     '    Dim myGlobal As New GlobalDataTO
     '    Try
     '        ' Save BLDC Test
-    '        Dim myGlobalbase As New GlobalBase
-    '        Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+    '        'Dim myGlobalbase As New GlobalBase
+    '        Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
     '        myGlobal = myScreenDelegate.SaveBLDCFile(myPathBLFile)
     '        If myGlobal.HasError Then
     '            PrepareErrorMode()
@@ -4330,7 +4456,7 @@ Public Class IPhotometryAdjustments
     '        Me.BsCancelButton.Enabled = False
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsSaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4340,7 +4466,7 @@ Public Class IPhotometryAdjustments
     '        PrepareLoadedMode()
     '        Me.BsCancelButton.Enabled = False
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".BsCancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4357,7 +4483,7 @@ Public Class IPhotometryAdjustments
     '        Me.BsStep3AbsMinResult.Text = myScreenDelegate.GetMinValueCheckRotorResult.ToString() ' ("##,####0.00")
     '        Me.BsStep3AbsRangeResult.Text = myScreenDelegate.GetRangeValueCheckRotorResult.ToString() ' ("##,####0.00")
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".PopulateABSStep3 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateABSStep3 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".PopulateABSStep3 ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4398,7 +4524,7 @@ Public Class IPhotometryAdjustments
     '            Next
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".PopulateStep3Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateStep3Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".PopulateStep3Chart ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4505,7 +4631,7 @@ Public Class IPhotometryAdjustments
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

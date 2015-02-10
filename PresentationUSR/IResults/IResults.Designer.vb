@@ -1,19 +1,21 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IResults
+﻿Imports Biosystems.Ax00.Global
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class UiResults
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
-            CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
             If disposing AndAlso components IsNot Nothing Then
                 components.Dispose()
             End If
             ReleaseElements()
         Finally
             MyBase.Dispose(disposing)
-            CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -27,7 +29,7 @@ Partial Class IResults
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim GridView1 As DevExpress.XtraGrid.Views.Grid.GridView
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResults))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiResults))
         Dim DataGridViewCellStyle21 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle22 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle23 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -151,7 +153,7 @@ Partial Class IResults
         GridView1.Name = "GridView1"
         GridView1.OptionsSelection.EnableAppearanceFocusedCell = False
         GridView1.OptionsView.EnableAppearanceEvenRow = True
-        GridView1.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
+        GridView1.OptionsView.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
         '
         'Cycle
         '
@@ -888,11 +890,10 @@ Partial Class IResults
         Me.PrintTestCtrlButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.PrintTestCtrlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.PrintTestCtrlButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.PrintTestCtrlButton.Location = New System.Drawing.Point(38, 0)
+        Me.PrintTestCtrlButton.Location = New System.Drawing.Point(0, 0)
         Me.PrintTestCtrlButton.Name = "PrintTestCtrlButton"
         Me.PrintTestCtrlButton.Size = New System.Drawing.Size(32, 32)
         Me.PrintTestCtrlButton.TabIndex = 8
-        Me.PrintTestCtrlButton.Text = "CT"
         Me.PrintTestCtrlButton.UseVisualStyleBackColor = True
         '
         'PrintTestButton
@@ -1006,7 +1007,7 @@ Partial Class IResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResults"
+        Me.Name = "UiResults"
         Me.Text = "Results Screen"
         CType(GridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsPanel4.ResumeLayout(False)

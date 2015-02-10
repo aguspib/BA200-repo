@@ -33,8 +33,9 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,8 +44,9 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,20 +54,22 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x86\Release\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,20 +77,28 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x64\Release\</OutputPath>
     <DocumentationFile>AX00Types.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -281,6 +293,14 @@
     <Compile Include="GraphDS.vb">
       <DependentUpon>GraphDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="GridColsConfigDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="GridColsConfigDS.vb">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </Compile>
     <Compile Include="HelpFilesSettingDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -391,6 +411,7 @@
     <Compile Include="HisWSResultsDS.vb">
       <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="FunctionalInterfaces\IMonitorCurveResultsRow.vb" />
     <Compile Include="ISEInformationDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -416,6 +437,14 @@
     </Compile>
     <Compile Include="QCSummaryByTestSampleDS.vb">
       <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportsDS.vb">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
     </Compile>
     <Compile Include="ReportsTestsSortingDS.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -488,6 +517,14 @@
     </Compile>
     <Compile Include="TimeEstimationDS.vb">
       <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateVersionChangesDS.vb">
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateVersionChangesDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
     </Compile>
     <Compile Include="VersionsDS.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -1548,6 +1585,17 @@
     <None Include="GraphDS.xss">
       <DependentUpon>GraphDS.xsd</DependentUpon>
     </None>
+    <None Include="GridColsConfigDS.xsc">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="GridColsConfigDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GridColsConfigDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="GridColsConfigDS.xss">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </None>
     <None Include="HelpFilesSettingDS.xsc">
       <DependentUpon>HelpFilesSettingDS.xsd</DependentUpon>
     </None>
@@ -1801,6 +1849,17 @@
     <None Include="QCResultsForWestgardDS.xss">
       <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
     </None>
+    <None Include="ReportsDS.xsc">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReportsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReportsDS.xss">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </None>
     <None Include="ReportsTestsSortingDS.xsc">
       <DependentUpon>ReportsTestsSortingDS.xsd</DependentUpon>
     </None>
@@ -1932,6 +1991,17 @@
     </None>
     <None Include="TemporalTableDS.xss">
       <DependentUpon>TemporalTableDS.xsd</DependentUpon>
+    </None>
+    <None Include="UpdateVersionChangesDS.xsc">
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
+    </None>
+    <None Include="UpdateVersionChangesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UpdateVersionChangesDS1.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="UpdateVersionChangesDS.xss">
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
     </None>
     <None Include="VersionsDS.xsc">
       <DependentUpon>VersionsDS.xsd</DependentUpon>

@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports System.Xml
 Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Windows.Forms
 'Imports System.Configuration
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -14,7 +16,7 @@ Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Public Class ISEReceptionEntity
+    Public Class ISEReception
 
 #Region "Declarations"
 
@@ -26,14 +28,14 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ReadOnly myISEModuleErrorHT As New Hashtable()
         Private ReadOnly myResultErrorDescHT As New Hashtable() 'SGM 20/07/2012
 
-        Private myAnalyzer As IAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
+        Private myAnalyzer As IAnalyzerManager 'SGM 23/07/2012 '#REFACTORING
         'Private myISEManager As IISEAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
 
 #End Region
 
 #Region "Constructor"
 
-        Public Sub New(ByVal pAnalyzer As IAnalyzerEntity) '#REFACTORING
+        Public Sub New(ByVal pAnalyzer As IAnalyzerManager) '#REFACTORING
             MyClass.LoadISEErrorsDataHT()
             MyClass.FillAffectedElementHT()
             MyClass.FillISECancelErrorDescHT()
@@ -58,7 +60,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myISEParamXmlDS As New DataSet
 
                 Dim myISEParamXml As New XmlDocument
-                Dim myXmlPath As String = Windows.Forms.Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath
+                Dim myXmlPath As String = Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath
                 myISEParamXml.Load(myXmlPath)
                 myISEParamXmlDS.ReadXml(myXmlPath)
 
@@ -74,8 +76,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -223,8 +225,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetResultErrors", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetResultErrors", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -317,8 +319,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetCancelError", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetCancelError", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -346,19 +348,23 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                                               one than exists and applies)
         '''                                          ** Changed the way of getting Alarms for the Average Result, due to the previous process has several errors
         '''                                          ** For CONTROLS it is not needed to update field AcceptedResultFlag = FALSE for the previous Rerun results
+        ''' Modified by: XB 28/11/2014 - Recalculates calculated tests for ISE Tests - BA-1867
+        '''              SA 01/12/2014 - Call to deprecated function UpdateStatusClosedNOK has been changed for the new version of that function (UpdateStatusClosedNOK_NEW)
+        '''                              The old function was called by error and it has to be deleted
+        '''              XB 16/01/2015 - Returns errors on Concentration when ISE modules returns an error - BA-1064
         ''' </remarks>
-        Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
+        Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
                                                  ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 Dim myReturnValue As New ExecutionsDS
 
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         Dim myDebugModeOn As Boolean
@@ -369,7 +375,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         'Decode the received ISE Result
-                        Dim myISECycle As GlobalEnumerates.ISECycles = GlobalEnumerates.ISECycles.NONE
+                        Dim myISECycle As ISECycles = ISECycles.NONE
                         Dim myISEResultStr As String = pISEResult.ReceivedResults
 
                         myGlobalDataTO = ConvertISETESTResultToISEResultTO(myISEResultStr, myDebugModeOn)
@@ -421,13 +427,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myAverage As Single = 0
                             Dim myControlID As Integer = -1
                             Dim alarmExists As Boolean = False
-                            Dim currentSession As New GlobalBase
+                            'Dim currentSession As New GlobalBase
                             Dim mySampleClass As String = String.Empty
 
                             'Get all ISE Executions for the informed PreparationID
                             Dim myCalc As New RecalculateResultsDelegate
                             Dim myExecutionDelegate As New ExecutionsDelegate
                             Dim myCalculationISEDelegate As New CalculationISEDelegate
+
+                            ' XB 28/11/2014 - BA-1867
+                            Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
 
                             myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -448,28 +457,28 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'Set the Concentration value depenting on the ISE_ResultID
                                         Select Case (execRow.ISE_ResultID)
                                             Case "Na"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "K"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Cl"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Li"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
@@ -478,6 +487,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Case Else
                                                 Exit Select
                                         End Select
+
+                                        'AG 15/09/2014 - BA-1918 apply the user defined slope (if any)
+                                        If Not myGlobalDataTO.HasError Then
+                                            myGlobalDataTO = myCalculationISEDelegate.CalculateUserDefinedConcentrationCorrection(execRow.SampleType, execRow.TestID, execRow.CONC_Value)
+                                            If Not myGlobalDataTO.HasError Then
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                            End If
+                                        End If
+                                        'AG 15/09/2014 - BA-1918
+
+                                        ' XB 16/01/2015 - BA-1064
+                                        If (pISEResult.IsCancelError) Then
+                                            execRow.CONC_Value = -1
+                                            execRow.CONC_Error = AbsorbanceErrors.INCORRECT_DATA.ToString
+                                        End If
+                                        ' XB 16/01/2015 - BA-1064
 
                                         'Get all received ISE Alarms and move them to a typed DataSet WSExecutionAlarmsDS
                                         qAlarmResult = (From a In pISEResult.Errors _
@@ -492,18 +517,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             If (ISEError.IsCancelError) Then
                                                 Select Case (pISEResult.Errors(0).CancelErrorCode)
-                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
-                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
-                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
-                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
-                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
-                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
-                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
-                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
-                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
-                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
-                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
-                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
+                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = Alarms.ISE_ERROR_A
+                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = Alarms.ISE_ERROR_B
+                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = Alarms.ISE_ERROR_C
+                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = Alarms.ISE_ERROR_D
+                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = Alarms.ISE_ERROR_F
+                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = Alarms.ISE_ERROR_M
+                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = Alarms.ISE_ERROR_N
+                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = Alarms.ISE_ERROR_P
+                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = Alarms.ISE_ERROR_R
+                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = Alarms.ISE_ERROR_S
+                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = Alarms.ISE_ERROR_T
+                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = Alarms.ISE_ERROR_W
                                                 End Select
                                                 myExecutionAlarmsRow.AlarmID = myAlarmID.ToString
                                             Else
@@ -526,12 +551,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                         myResultsRow.ExportStatus = "NOTSENT"
                                         myResultsRow.Printed = False
                                         myResultsRow.CONC_Value = execRow.CONC_Value
+                                        myResultsRow.CONC_Error = execRow.CONC_Error  ' XB 16/01/2015 - BA-1064
                                         myResultsRow.TestID = execRow.TestID
                                         myResultsRow.SampleType = execRow.SampleType
                                         myResultsRow.SampleClass = mySampleClass
                                         If (mySampleClass = "CTRL") Then myResultsRow.ControlID = execRow.ControlID
                                         myResultsRow.ResultDateTime = execRow.ResultDate
-                                        myResultsRow.TS_User = currentSession.GetSessionInfo.UserName
+                                        myResultsRow.TS_User = GlobalBase.GetSessionInfo.UserName
                                         myResultsRow.TS_DateTime = DateTime.Now
                                         myResultsRow.ExecutionID = execRow.ExecutionID
                                         myResultDS.twksResults.AddtwksResultsRow(myResultsRow)
@@ -654,6 +680,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'Delete all Alarms saved previously for the Average Result
                                         myGlobalDataTO = myResultAlarmsDelegate.DeleteAll(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
                                         If (myGlobalDataTO.HasError) Then Exit For
+
                                     Next
                                 End If
 
@@ -675,6 +702,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If (execRow.ReplicatesTotalNum = execRow.ReplicateNumber) Then
                                             myGlobalDataTO = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, execRow.OrderTestID, "CLOSED")
                                             If (myGlobalDataTO.HasError) Then Exit For
+
+
+                                            ' XB 28/11/2014 - BA-1867
+                                            ' recalculate calculated tests
+                                            myCalcTestsDelegate.AnalyzerID = pAnalyzerID
+                                            myCalcTestsDelegate.WorkSessionID = pWorkSessionID
+                                            myGlobalDataTO = myCalcTestsDelegate.ExecuteCalculatedTest(dbConnection, execRow.OrderTestID, True)
+                                            If (myGlobalDataTO.HasError) Then Exit For
+                                            ' XB 28/11/2014 - BA-1867
                                         End If
                                     Next
                                 End If
@@ -706,13 +742,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'Validate the ISE Type to set the ISE Cycle
                                         Select Case pISEResult.ISEResultType
                                             Case ISEResultTO.ISEResultTypes.SER
-                                                myISECycle = GlobalEnumerates.ISECycles.SAMPLE
+                                                myISECycle = ISECycles.SAMPLE
                                                 Exit Select
                                             Case ISEResultTO.ISEResultTypes.URN
-                                                myISECycle = GlobalEnumerates.ISECycles.URINE1
+                                                myISECycle = ISECycles.URINE1
                                                 Exit Select
                                             Case ISEResultTO.ISEResultTypes.CAL
-                                                myISECycle = GlobalEnumerates.ISECycles.CALIBRATION
+                                                myISECycle = ISECycles.CALIBRATION
                                                 Exit Select
                                             Case Else
                                                 Exit Select
@@ -731,6 +767,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myReturnValue = myExecutionDS
                             End If
 
+                            ' XB 28/11/2014 - BA-1867
+                            myCalcTestsDelegate = Nothing
+
                         ElseIf (myGlobalDataTO.HasError) Then
                             'Get all ISE Executions for the informed PreparationID
                             Dim myExecutionDelegate As New ExecutionsDelegate
@@ -738,13 +777,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 Dim myExecutionDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-
-                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                    'Mark the Execution as CLOSEDNOK
-                                    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
-                                                                                               execRow.ReplicatesTotalNum, False)
-                                    If (myGlobalDataTO.HasError) Then Exit For
-                                Next
+                                'SA 01/12/2014 - Replaced the call to the old function UpdateStatusClosedNOK for its new version. The call to the previous version 
+                                '                remains in the code by error (it was forgotten to change it when this new version of ProcessISETESTResults was implemented)  
+                                myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK_NEW(dbConnection, myExecutionDS, False)
+                                'For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                '    'Mark the Execution as CLOSEDNOK
+                                '    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
+                                '                                                               execRow.ReplicatesTotalNum, False)
+                                '    If (myGlobalDataTO.HasError) Then Exit For
+                                'Next
 
                                 'The ExecutionsDS will be the function return value
                                 myReturnValue = myExecutionDS
@@ -766,11 +807,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResultsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResultsNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -789,9 +830,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function ProcessISECMDResults(ByVal pISEResult As ISEResultTO, ByVal pAnalyzerID As String, ByVal pBiosystemsValidation As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myEndIndex As Integer
-                Dim myDebugModeOn As Boolean = True
-                Dim myISEResultTO As ISEResultTO
+                Dim myISEResultTO As ISEResultTO = Nothing
                 Dim myISEResultItemType As ISEResultTO.ISEResultItemTypes = ISEResultTO.ISEResultItemTypes.None
 
                 Dim myResultStr As String = pISEResult.ReceivedResults.Trim
@@ -820,8 +859,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         myISEResultTO.Errors.Add(myError)
 
                         'SGM 04/09/2012
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("ISE - Wrong or uncomplete data received", "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("ISE - Wrong or uncomplete data received", "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
 
                     ElseIf myResultStr.StartsWith("<ERC ") Then
                         myISEResultTO.ISEResultType = ISEResultTO.ISEResultTypes.ERC
@@ -1153,8 +1192,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1239,8 +1278,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.SaveDebugModeResultData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.SaveDebugModeResultData", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobalDataTO
@@ -1262,12 +1301,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myISEParamXml As New XmlDocument
                 'myISEParamXml.Load(Windows.Forms.Application.StartupPath.ToString() & ConfigurationManager.AppSettings("ISEParammetersFilePath").ToString())
                 'TR 25/01/2011 -Replace by corresponding value on global base.
-                myISEParamXml.Load(Windows.Forms.Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath)
+                myISEParamXml.Load(Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath)
                 myResultDataSet.ReadXml(pXmlPath)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.LoadISEModuleParammeters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.LoadISEModuleParammeters", EventLogEntryType.Error, False)
             End Try
             Return myResultDataSet
         End Function
@@ -1280,15 +1319,15 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 Dim myISEParamXmlDS As New DataSet
 
-                myISEParamXmlDS = MyClass.LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = MyClass.LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("ResultErrorDescTable").Rows
                     myResultErrorDescHT.Add(iseRow("digit").ToString(), iseRow("ResultErrorDesc").ToString())
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.FillISEResultErrorDescHT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISEResultErrorDescHT", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1305,7 +1344,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myISEParamXmlDS As New DataSet
 
                 'TR 25/01/2011
-                myISEParamXmlDS = LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 'TR 25/01/2011
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("AffectedElementTable").Rows
@@ -1313,8 +1352,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.FillAffectedElementHT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillAffectedElementHT", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1326,15 +1365,15 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Sub FillISECancelErrorDescHT()
             Try
                 Dim myISEParamXmlDS As New DataSet
-                myISEParamXmlDS = LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("CancelErrorDescTable").Rows
                     myISEModuleErrorHT.Add(iseRow("code").ToString(), iseRow("CancelErrorDesc").ToString())
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.FillISECancelErrorDescHT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISECancelErrorDescHT", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1376,8 +1415,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -1506,8 +1545,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1552,8 +1591,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -1571,7 +1610,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myLiNaKClValues As New ISEResultTO.LiNaKCl(-1, -1, -1, -1)
 
@@ -1593,20 +1632,20 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     'it does not bring result errors
-                    If Not myIoneValuesStr.Contains(GlobalEnumerates.ISE_Electrodes.Cl.ToString & " ") Then
+                    If Not myIoneValuesStr.Contains(ISE_Electrodes.Cl.ToString & " ") Then
                         myIoneValuesStr = pISEResult.Substring(1, pISEResult.Length - 2).Trim()
                     End If
 
-                    Dim myLiPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Li.ToString & " ")
-                    Dim myNaPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Na.ToString & " ")
-                    Dim myKPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.K.ToString & " ")
-                    Dim myClPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Cl.ToString & " ")
+                    Dim myLiPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Li.ToString & " ")
+                    Dim myNaPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Na.ToString & " ")
+                    Dim myKPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.K.ToString & " ")
+                    Dim myClPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Cl.ToString & " ")
                     Dim myErrPos As Integer = myIoneValuesStr.LastIndexOf(" ")
 
                     'Lithium can be unused (urine tests)
                     If myLiPos >= 0 Then
                         Dim myLiStr As String = myIoneValuesStr.Substring(myLiPos, myNaPos - myLiPos).Trim
-                        Dim myLiValueStr As String = myLiStr.Substring(GlobalEnumerates.ISE_Electrodes.Li.ToString.Length + 1).Trim
+                        Dim myLiValueStr As String = myLiStr.Substring(ISE_Electrodes.Li.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myLiValueStr.Contains("-") Then
@@ -1614,14 +1653,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .Li = mySign * myUtil.FormatToSingle(myLiValueStr)
+                            .Li = mySign * Utilities.FormatToSingle(myLiValueStr)
                         End With
                     End If
 
                     'Sodium
                     If myNaPos >= 0 Then
                         Dim myNaStr As String = myIoneValuesStr.Substring(myNaPos, myKPos - myNaPos).Trim
-                        Dim myNaValueStr As String = myNaStr.Substring(GlobalEnumerates.ISE_Electrodes.Na.ToString.Length + 1).Trim
+                        Dim myNaValueStr As String = myNaStr.Substring(ISE_Electrodes.Na.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myNaValueStr.Contains("-") Then
@@ -1629,14 +1668,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .Na = mySign * myUtil.FormatToSingle(myNaValueStr)
+                            .Na = mySign * Utilities.FormatToSingle(myNaValueStr)
                         End With
                     End If
 
                     'Potassium 
                     If myKPos >= 0 Then
                         Dim myKStr As String = myIoneValuesStr.Substring(myKPos, myClPos - myKPos).Trim
-                        Dim myKValueStr As String = myKStr.Substring(GlobalEnumerates.ISE_Electrodes.K.ToString.Length + 1).Trim
+                        Dim myKValueStr As String = myKStr.Substring(ISE_Electrodes.K.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myKValueStr.Contains("-") Then
@@ -1644,7 +1683,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .K = mySign * myUtil.FormatToSingle(myKValueStr)
+                            .K = mySign * Utilities.FormatToSingle(myKValueStr)
                         End With
                     End If
 
@@ -1654,7 +1693,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myErrPos > myClPos + 3 Then
                             myClStr = myIoneValuesStr.Substring(myClPos, myErrPos - myClPos).Trim
                         End If
-                        Dim myClValueStr As String = myClStr.Substring(GlobalEnumerates.ISE_Electrodes.Cl.ToString.Length + 1).Trim
+                        Dim myClValueStr As String = myClStr.Substring(ISE_Electrodes.Cl.ToString.Length + 1).Trim
 
 
                         With myLiNaKClValues
@@ -1663,7 +1702,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .Cl = mySign * myUtil.FormatToSingle(myClValueStr)
+                            .Cl = mySign * Utilities.FormatToSingle(myClValueStr)
                         End With
                     End If
 
@@ -1678,8 +1717,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetLiNaKClValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetLiNaKClValues", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1697,7 +1736,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myPumpValues As New ISEResultTO.PumpCalibrationValues(-1, -1, -1)
 
@@ -1707,18 +1746,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Dim myPumpValuesStr As String = pISEResult.Substring(1, pISEResult.Length - 2).Trim
 
-                    Dim myPumpAPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.A.ToString & " ")
-                    Dim myPumpBPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.B.ToString & " ")
-                    Dim myPumpWPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.W.ToString & " ")
+                    Dim myPumpAPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.A.ToString & " ")
+                    Dim myPumpBPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.B.ToString & " ")
+                    Dim myPumpWPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.W.ToString & " ")
 
 
                     If myPumpAPos >= 0 And myPumpBPos >= 0 And myPumpWPos >= 0 Then
                         Dim myPumpAStr As String = myPumpValuesStr.Substring(myPumpAPos, myPumpBPos - myPumpAPos).Trim
-                        Dim myPumpAValueStr As String = myPumpAStr.Substring(GlobalEnumerates.ISE_Pumps.A.ToString.Length + 1).Trim
+                        Dim myPumpAValueStr As String = myPumpAStr.Substring(ISE_Pumps.A.ToString.Length + 1).Trim
                         Dim myPumpBStr As String = myPumpValuesStr.Substring(myPumpBPos, myPumpWPos - myPumpBPos).Trim
-                        Dim myPumpBValueStr As String = myPumpBStr.Substring(GlobalEnumerates.ISE_Pumps.B.ToString.Length + 1).Trim
+                        Dim myPumpBValueStr As String = myPumpBStr.Substring(ISE_Pumps.B.ToString.Length + 1).Trim
                         Dim myPumpWStr As String = myPumpValuesStr.Substring(myPumpWPos).Trim
-                        Dim myPumpWValueStr As String = myPumpWStr.Substring(GlobalEnumerates.ISE_Pumps.W.ToString.Length + 1).Trim
+                        Dim myPumpWValueStr As String = myPumpWStr.Substring(ISE_Pumps.W.ToString.Length + 1).Trim
 
                         With myPumpValues
                             If myPumpAStr.Contains("-") Then
@@ -1726,21 +1765,21 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .PumpA = mySign * myUtil.FormatToSingle(myPumpAValueStr)
+                            .PumpA = mySign * Utilities.FormatToSingle(myPumpAValueStr)
 
                             If myPumpBValueStr.Contains("-") Then
                                 myPumpBValueStr = myPumpBValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .PumpB = mySign * myUtil.FormatToSingle(myPumpBValueStr)
+                            .PumpB = mySign * Utilities.FormatToSingle(myPumpBValueStr)
 
                             If myPumpWValueStr.Contains("-") Then
                                 myPumpWValueStr = myPumpWValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .PumpW = mySign * myUtil.FormatToSingle(myPumpWValueStr)
+                            .PumpW = mySign * Utilities.FormatToSingle(myPumpWValueStr)
 
                         End With
                     End If
@@ -1756,8 +1795,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetPumpCalibrationValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetPumpCalibrationValues", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1775,7 +1814,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myBubbleCalibValues As New ISEResultTO.BubbleCalibrationValues(-1, -1, -1)
 
@@ -1785,18 +1824,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Dim myBubbleValuesStr As String = pISEResult.Substring(1, pISEResult.Length - 2).Trim
 
-                    Dim myBubbleAPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.A.ToString & " ")
-                    Dim myBubbleMPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.M.ToString & " ")
-                    Dim myBubbleLPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.L.ToString & " ")
+                    Dim myBubbleAPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.A.ToString & " ")
+                    Dim myBubbleMPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.M.ToString & " ")
+                    Dim myBubbleLPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.L.ToString & " ")
 
 
                     If myBubbleAPos >= 0 And myBubbleMPos >= 0 And myBubbleLPos >= 0 Then
                         Dim myBubbleAStr As String = myBubbleValuesStr.Substring(myBubbleAPos, myBubbleMPos - myBubbleAPos).Trim
-                        Dim myBubbleAValueStr As String = myBubbleAStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.A.ToString.Length + 1).Trim
+                        Dim myBubbleAValueStr As String = myBubbleAStr.Substring(ISE_Bubble_Detector.A.ToString.Length + 1).Trim
                         Dim myBubbleMStr As String = myBubbleValuesStr.Substring(myBubbleMPos, myBubbleLPos - myBubbleMPos).Trim
-                        Dim myBubbleMValueStr As String = myBubbleMStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.M.ToString.Length + 1).Trim
+                        Dim myBubbleMValueStr As String = myBubbleMStr.Substring(ISE_Bubble_Detector.M.ToString.Length + 1).Trim
                         Dim myBubbleLStr As String = myBubbleValuesStr.Substring(myBubbleLPos).Trim
-                        Dim myBubbleLValueStr As String = myBubbleLStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.L.ToString.Length + 1).Trim
+                        Dim myBubbleLValueStr As String = myBubbleLStr.Substring(ISE_Bubble_Detector.L.ToString.Length + 1).Trim
 
                         With myBubbleCalibValues
                             If myBubbleAValueStr.Contains("-") Then
@@ -1804,21 +1843,21 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 mySign = 1
                             End If
-                            .ValueA = mySign * myUtil.FormatToSingle(myBubbleAValueStr)
+                            .ValueA = mySign * Utilities.FormatToSingle(myBubbleAValueStr)
 
                             If myBubbleMValueStr.Contains("-") Then
                                 myBubbleMValueStr = myBubbleMValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .ValueM = mySign * myUtil.FormatToSingle(myBubbleMValueStr)
+                            .ValueM = mySign * Utilities.FormatToSingle(myBubbleMValueStr)
 
                             If myBubbleLValueStr.Contains("-") Then
                                 myBubbleLValueStr = myBubbleLValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .ValueL = mySign * myUtil.FormatToSingle(myBubbleLValueStr)
+                            .ValueL = mySign * Utilities.FormatToSingle(myBubbleLValueStr)
 
                         End With
                     End If
@@ -1834,8 +1873,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1871,9 +1910,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myPumpCalibrationValues As ISEResultTO.PumpCalibrationValues
                 Dim myBubbleCalibrationValues As ISEResultTO.BubbleCalibrationValues
 
-                Dim myDallasSN As ISEDallasSNTO
-                Dim myDallas00 As ISEDallasPage00TO
-                Dim myDallas01 As ISEDallasPage01TO
+                Dim myDallasSN As ISEDallasSNTO = Nothing
+                Dim myDallas00 As ISEDallasPage00TO = Nothing
+                Dim myDallas01 As ISEDallasPage01TO = Nothing
                 Dim myResultErrors As New List(Of ISEErrorTO)
                 myResultErrors = pISEResultTO.Errors
 
@@ -2023,8 +2062,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.FillISEResultValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISEResultValues", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2043,7 +2082,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function GetDallasSNValues(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myDallasSNData As New ISEDallasSNTO
 
             Try
@@ -2072,8 +2111,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetDallasSNValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasSNValues", EventLogEntryType.Error, False)
             End Try
 
             myGlobal.SetDatos = myDallasSNData
@@ -2091,7 +2130,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function GetDallasPage00Values(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             ''PENDING UNTIL INSTALLING BIOSYSTEMS REAGENTS PACKS
             ''If Environment.MachineName = "AUXSOFTWARE1" Then
@@ -2120,19 +2159,19 @@ Namespace Biosystems.Ax00.Core.Entities
                     .LotNumber = myLotNumberHex
 
                     'ExpirationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationDay = CInt(myGlobal.SetDatos)
                     End If
 
                     'ExpirationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationMonth = CInt(myGlobal.SetDatos)
                     End If
 
                     'ExpirationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
                     End If
@@ -2142,19 +2181,19 @@ Namespace Biosystems.Ax00.Core.Entities
                     '.ExpirationYear = 2000 + CInt(myExpirationYearHex)
 
                     'InitialCalibAVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
                     End If
 
                     'InitialCalibBVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
                     End If
 
                     'DistributorCode 
-                    myGlobal = myUtil.ConvertHexToUInt32(myDistributorCodeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myDistributorCodeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .DistributorCode = CStr(myGlobal.SetDatos)
                     End If
@@ -2172,8 +2211,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.SetDatos = myDallas00Data
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2189,7 +2228,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function GetDallasPage01Values(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             ''PENDING UNTIL INSTALLING BIOSYSTEMS REAGENTS PACKS
             ''If Environment.MachineName = "AUXSOFTWARE1" Then
@@ -2213,19 +2252,19 @@ Namespace Biosystems.Ax00.Core.Entities
                     .Page01DataString = pDataStr.Trim
 
                     'InstallationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationDay = CInt(myGlobal.SetDatos)
                     End If
 
                     'InstallationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationMonth = CInt(myGlobal.SetDatos)
                     End If
 
                     'InstallationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationYear = 2000 + CInt(myGlobal.SetDatos)
                     End If
@@ -2257,8 +2296,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.SetDatos = myDallas01Data
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2279,7 +2318,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function GetDallasPage00Values_NEW(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Dim myDallas00Data As New ISEDallasPage00TO
 
             Try
@@ -2302,7 +2341,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     .Page00DataString = pDataStr.Trim
 
                     'LotNumber
-                    myGlobal = myUtil.ConvertHexToUInt32(myLotNumberHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myLotNumberHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .LotNumber = CInt(myGlobal.SetDatos).ToString
                     Else
@@ -2311,7 +2350,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     'ExpirationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationDay = CInt(myGlobal.SetDatos)
                     Else
@@ -2319,7 +2358,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'ExpirationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationMonth = CInt(myGlobal.SetDatos)
                     Else
@@ -2327,7 +2366,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'ExpirationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
                     Else
@@ -2339,7 +2378,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     '.ExpirationYear = 2000 + CInt(myExpirationYearHex)
 
                     'InitialCalibAVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
                     Else
@@ -2347,7 +2386,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'InitialCalibBVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
                     Else
@@ -2355,7 +2394,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'DistributorCode 
-                    myGlobal = myUtil.ConvertHexToUInt32(myDistributorCodeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myDistributorCodeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .DistributorCode = CStr(myGlobal.SetDatos)
                     Else
@@ -2382,8 +2421,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
             End Try
 
             myGlobal.SetDatos = myDallas00Data
@@ -2403,7 +2442,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function GetDallasPage01Values_NEW(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Dim myDallas01Data As New ISEDallasPage01TO
 
             Try
@@ -2421,7 +2460,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     .Page01DataString = pDataStr.Trim
 
                     'InstallationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationDay = CInt(myGlobal.SetDatos)
                     Else
@@ -2429,7 +2468,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'InstallationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationMonth = CInt(myGlobal.SetDatos)
                     Else
@@ -2437,7 +2476,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'InstallationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationYear = 2000 + CInt(myGlobal.SetDatos)
                     Else
@@ -2481,8 +2520,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
             End Try
 
             myGlobal.SetDatos = myDallas01Data
@@ -2503,7 +2542,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Try
                 Dim myConsumption As Integer
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
 
                 'each byte (2 char) represents 8%, one per bit
                 Dim myBytes As New List(Of String)
@@ -2512,7 +2551,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Next c
                 For Each B As String In myBytes
                     Dim myBinaryString As String
-                    myGlobal = myUtil.ConvertHexToBinaryString(B)
+                    myGlobal = Utilities.ConvertHexToBinaryString(B)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myBinaryString = CStr(myGlobal.SetDatos)
                         Dim myHighWord As String = myBinaryString.Substring(0, 4)
@@ -2538,8 +2577,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetConsumptionVolume", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetConsumptionVolume", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2551,7 +2590,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Created by SGM 25/07/2012</remarks>
         Private Function SetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As GlobalDataTO
 
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            'Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -2645,8 +2684,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.SetISEErrorDescription", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.SetISEErrorDescription", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2658,936 +2697,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 #End Region
-
-#Region "NOT USED"
-        ''' <summary>
-        ''' IT IS REPLACED FOR NEW FUNCTION ProcessISETESTResults (BT #1660)
-        ''' Initializes structures, get the execution, set the results values and finaly save results into database
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pPreparationID">Preparation ID</param>
-        ''' <param name="pISEResult">Received ISE Result</param>
-        ''' <param name="pISEMode">Indicate the ISE module operating mode: SimpleMode / DebugMode1 / DebugMode2
-        ''' </param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <returns>GlobalDataTo with setDatos as ExecutionsDS</returns>
-        ''' <remarks>
-        ''' Created by:  TR 03/01/2010
-        ''' Modified by: AG 31/03/2011 - Added parameters pWorkSessionID and pAnalyzerID 
-        '''              AG 29/11/2011 - Returns a GlobalDataTO containing an ExecutionDS (executions affected) 
-        '''              SA 25/06/2012 - Inform AnalyzerID and WorkSessionID for each result added to the ResultsDS dataset 
-        '''              TR 19/07/2012 - Inform SampleClass for each result added to the ResultsDS dataset
-        '''              SA 26/07/2012 - Removed call to function GetISEExecutionsByOrderTestAndPreparationID; it has not sense due to 
-        '''                              it get the same data than GetExecutionByPreparationID excepting field ISE_ResultID (now it is 
-        '''                              returned for that function).  Removed calls to function GetOrderTest in OrderTestsDelegate: the 
-        '''                              total number of requested Replicates by OrderTest and the OrderID are returned by function
-        '''                              GetExecutionByPreparationID. Call to function ReadOrder to get the PatientID is executed only when
-        '''                              SampleClass is PATIENT
-        '''              SG 22/07/2013 - Update remarks only if the current rerun has result alarms Bug #1188
-        ''' </remarks>
-        Public Function ProcessISETESTResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
-                                              ByRef pISEResult As ISEResultTO, ByVal pISEMode As String, ByVal pWorkSessionID As String, _
-                                              ByVal pAnalyzerID As String) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                Dim myReturnValue As New ExecutionsDS  'AG 29/11/2011
-
-                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDebugModeOn As Boolean
-                        If String.Equals(pISEMode, "SimpleMode") Then
-                            myDebugModeOn = False
-                        ElseIf (String.Equals(pISEMode, "DebugMode1") OrElse String.Equals(pISEMode, "DebugMode2")) Then
-                            myDebugModeOn = True
-                        End If
-
-                        'Decode the recived ISE Result.
-                        Dim myISECycle As New GlobalEnumerates.ISECycles
-                        myISECycle = GlobalEnumerates.ISECycles.NONE
-
-                        Dim myISEResultStr As String = pISEResult.ReceivedResults
-
-                        myGlobalDataTO = MyClass.ConvertISETESTResultToISEResultTO(myISEResultStr, myDebugModeOn)
-                        If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing) Then
-                            'Set the result to my ISE result TO 
-                            pISEResult = DirectCast(myGlobalDataTO.SetDatos, ISEResultTO)
-                            pISEResult.ReceivedResults = myISEResultStr
-
-                            If (pISEResult.IsCancelError) Then
-                                myGlobalDataTO = MyClass.GetCancelError(pISEResult)
-                            Else
-                                myGlobalDataTO = MyClass.GetResultErrors(pISEResult)
-                            End If
-
-                            If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing) Then
-                                Dim myResultErrors As List(Of ISEErrorTO) = CType(myGlobalDataTO.SetDatos, List(Of ISEErrorTO))
-                                pISEResult.Errors = myResultErrors
-                                If (pISEResult.IsCancelError) Then
-
-                                    'SGM 01/08/2012
-                                    Select Case myResultErrors(0).CancelErrorCode
-                                        Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
-                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter += 1
-                                        Case ISEErrorTO.ISECancelErrorCodes.N
-                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 3
-                                    End Select
-
-                                Else
-                                    MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 0
-                                End If
-                            End If
-                            'SG 23/01/2012 -END.
-
-                            Dim myExecutionDS As New ExecutionsDS
-                            Dim myExecutionDelegate As New ExecutionsDelegate
-
-                            'Get all ISE Executions for the informed PreparationID
-                            myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myExecutionDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-
-                                'Prepare the Result DS
-                                Dim myResultDS As New ResultsDS
-                                Dim myResultsRow As ResultsDS.twksResultsRow
-                                Dim mySampleClass As String = String.Empty
-
-                                'Elements for Alarms treatment
-                                Dim myISEErrorsList As New List(Of ISEErrorTO)
-                                Dim qAlarmResult As New List(Of ISEErrorTO)
-                                Dim myExecutionsAlarmsDS As New WSExecutionAlarmsDS
-                                Dim myExecutionAlarmsRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow
-                                Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
-                                Dim myResultAlarmsDS As New ResultAlarmsDS
-                                Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-                                Dim myResultAlarmsDelegate As New ResultAlarmsDelegate 'TR 07/12/2011 
-                                Dim myCalculationISEDelegate As New CalculationISEDelegate 'TR 14/03/2012 
-
-                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                    'All Executions have the same SampleClass
-                                    If String.Equals(mySampleClass, String.Empty) Then mySampleClass = execRow.SampleClass
-
-                                    'Validate the Execution is not CLOSED (the Replicate Number is the same for all returned Executions)
-                                    If Not String.Equals(execRow.ExecutionStatus, "CLOSED") Then
-                                        'If (execRow.ReplicateNumber = myReplicateNumber AndAlso execRow.ExecutionStatus <> "CLOSED") Then
-                                        execRow.ExecutionStatus = "CLOSED"
-                                        execRow.InUse = True
-                                        execRow.ResultDate = DateTime.Now
-
-                                        'Set the concentration value depenting on the ISE ResultID
-                                        Select Case (execRow.ISE_ResultID)
-                                            Case "Na"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
-                                                If (myGlobalDataTO.HasError) Then Exit For
-
-                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
-
-                                                Exit Select
-
-                                            Case "K"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
-                                                If (myGlobalDataTO.HasError) Then Exit For
-
-                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
-                                                Exit Select
-
-                                            Case "Cl"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
-                                                If (myGlobalDataTO.HasError) Then Exit For
-
-                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
-                                                Exit Select
-
-                                            Case "Li"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
-                                                If (myGlobalDataTO.HasError) Then Exit For
-
-                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
-                                                Exit Select
-
-                                            Case Else
-                                                Exit Select
-                                        End Select
-
-                                        'Manage all received Alarms
-                                        qAlarmResult = (From a In pISEResult.Errors _
-                                                       Where ((a.Affected.Contains(execRow.ISE_ResultID)) AndAlso (a.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None)) _
-                                                      OrElse ((a.DigitNumber = 1) AndAlso (a.CancelErrorCode <> ISEErrorTO.ISECancelErrorCodes.None)) _
-                                                      Select a).ToList()
-
-                                        If (qAlarmResult.Count > 0) Then
-                                            For Each ISEError As ISEErrorTO In qAlarmResult
-                                                myExecutionAlarmsRow = myExecutionsAlarmsDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
-                                                myExecutionAlarmsRow.ExecutionID = execRow.ExecutionID
-                                                myExecutionAlarmsRow.AlarmDateTime = DateTime.Now
-
-                                                If (ISEError.IsCancelError) Then
-                                                    Dim myAlarmID As Alarms
-
-                                                    'SGM 30/07/2012
-                                                    Select Case pISEResult.Errors(0).CancelErrorCode
-                                                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
-                                                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
-                                                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
-                                                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
-                                                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
-                                                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
-                                                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
-                                                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
-                                                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
-                                                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
-                                                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
-                                                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
-
-                                                    End Select
-                                                    myExecutionAlarmsRow.AlarmID = myAlarmID.ToString
-
-                                                    'end SGM 30/07/2012
-
-                                                Else
-                                                    myExecutionAlarmsRow.AlarmID = ISEError.ErrorDesc
-                                                End If
-
-                                                myExecutionsAlarmsDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(myExecutionAlarmsRow)
-
-                                            Next
-                                        End If
-
-                                        'Fill the result row
-                                        myResultsRow = myResultDS.twksResults.NewtwksResultsRow()
-                                        myResultsRow.OrderTestID = execRow.OrderTestID
-                                        myResultsRow.RerunNumber = execRow.RerunNumber
-                                        myResultsRow.MultiPointNumber = execRow.MultiItemNumber
-                                        myResultsRow.AnalyzerID = pAnalyzerID
-                                        myResultsRow.WorkSessionID = pWorkSessionID
-                                        myResultsRow.ValidationStatus = "OK"
-                                        myResultsRow.AcceptedResultFlag = True
-                                        myResultsRow.ExportStatus = "NOTSENT" 'AG 17/01/2013 - Not is "False" it is "NOTSENT" !!!
-                                        myResultsRow.Printed = False
-                                        myResultsRow.CONC_Value = execRow.CONC_Value
-
-                                        'If (qAlarmResult.Count > 0) Then myResultsRow.CONC_Error = GlobalConstants.ABSORBANCE_ERROR 'DL 01/10/2012 DEL TO TEST
-
-                                        myResultsRow.TestID = execRow.TestID
-                                        myResultsRow.SampleType = execRow.SampleType
-                                        myResultsRow.SampleClass = mySampleClass
-                                        myResultsRow.ResultDateTime = execRow.ResultDate
-                                        myResultsRow.TS_DateTime = DateTime.Now
-
-                                        'Get the current application user.
-                                        Dim currentSession As New GlobalBase
-                                        myResultsRow.TS_User = currentSession.GetSessionInfo.UserName
-
-                                        'Add the new result row.
-                                        myResultDS.twksResults.AddtwksResultsRow(myResultsRow)
-
-
-                                        'XBC 16/02/2012
-                                        Dim myCalc As New RecalculateResultsDelegate
-                                        myGlobalDataTO = myCalc.IsValidISERefRanges(dbConnection, execRow.OrderTestID, execRow.TestID, execRow.SampleType, execRow.CONC_Value)
-                                        'XBC 16/02/2012
-
-                                        If (Not myGlobalDataTO.HasError AndAlso Not CBool(myGlobalDataTO.SetDatos)) Then
-                                            'Fill the result alarm DataRow
-                                            myExecutionAlarmsRow = myExecutionsAlarmsDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
-                                            myExecutionAlarmsRow.ExecutionID = execRow.ExecutionID
-                                            myExecutionAlarmsRow.AlarmDateTime = DateTime.Now
-
-                                            'DL 01/10/2012. Begin
-                                            Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-                                            Dim myISETestSampleDS As New ISETestSamplesDS
-                                            Dim resultData As GlobalDataTO = Nothing
-
-                                            resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, execRow.TestID, execRow.SampleType)
-
-                                            If Not resultData.HasError Then
-                                                myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
-
-                                                If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-                                                    Dim myOrderTestsDelegate As New OrderTestsDelegate
-                                                    'Get the Reference Range Interval defined for the Test.
-                                                    resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, execRow.OrderTestID, "ISE", _
-                                                                                                                execRow.TestID, execRow.SampleType, _
-                                                                                                                myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-                                                    If Not resultData.HasError Then
-                                                        'Validate the range
-                                                        Dim myTestRefRangesDS As New TestRefRangesDS
-                                                        myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                                                        With myTestRefRangesDS.tparTestRefRanges
-                                                            If (.Rows.Count = 1) Then
-                                                                If (Convert.ToInt16(execRow.CONC_Value) <> -1) Then
-
-                                                                    If (execRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
-                                                                        'Set lower alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK7.ToString
-                                                                    ElseIf (execRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
-                                                                        'Set hight alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK8.ToString
-                                                                    End If
-
-                                                                Else
-                                                                    'DL 01/10/2012 DEL TO TEST
-                                                                    'If (qAlarmResult.Count > 0) Then
-                                                                    'myExecutionAlarmsRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK11.ToString
-                                                                    'End If
-                                                                    'DL 01/10/2012 DEL TO TEST
-                                                                End If
-                                                            End If
-                                                        End With
-                                                    End If
-                                                End If
-                                            End If
-
-                                            'myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-                                            'DL 01/10/2012. End
-                                            If Not String.Equals(myExecutionAlarmsRow.AlarmID, String.Empty) Then 'dl 01/10/2012 test to del
-                                                myExecutionsAlarmsDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(myExecutionAlarmsRow)
-                                            End If
-
-                                        End If 'dl 01/10/2012 test to del
-                                        ''TR 05/12/2011 -END
-                                    Else
-                                        'Removed from dataset.
-                                        execRow.Delete()
-                                    End If
-                                Next
-
-                                'Accept all changes on dataset.
-                                myExecutionDS.AcceptChanges()
-
-                                'Save all the Executions 
-                                myGlobalDataTO = myExecutionDelegate.SaveExecutionsResults(dbConnection, myExecutionDS)
-                                myReturnValue = myExecutionDS 'AG 29/11/2011
-
-                                'Save the executions alarms
-                                If (Not myGlobalDataTO.HasError) Then
-                                    Dim myTempExecAlarmDS As New WSExecutionAlarmsDS
-                                    Dim newExecutionID As Integer = 0
-                                    For Each execAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                        'Remove all the alarms relate to this excetuction
-                                        If (execAlarmRow.ExecutionID <> newExecutionID) Then
-                                            'TR 07/12/2011 -First remove alarm if exist
-                                            myGlobalDataTO = myExecutionAlarmsDelegate.DeleteAll(dbConnection, execAlarmRow.ExecutionID)
-                                            If myGlobalDataTO.HasError Then Exit For
-
-                                            newExecutionID = execAlarmRow.ExecutionID
-                                        End If
-
-                                        myTempExecAlarmDS.Clear()
-                                        myTempExecAlarmDS.twksWSExecutionAlarms.ImportRow(execAlarmRow)
-
-                                        myGlobalDataTO = myExecutionAlarmsDelegate.Add(dbConnection, myTempExecAlarmDS)
-                                        If (myGlobalDataTO.HasError) Then Exit For
-                                    Next
-                                End If
-
-                                'Save results 
-                                If (Not myGlobalDataTO.HasError) Then
-                                    Dim myTemResultDS As New ResultsDS
-                                    Dim myTemExecutionDS As New ExecutionsDS
-                                    Dim myResultDelegate As New ResultsDelegate
-                                    Dim myResultExecutionsAlarmsDS As New WSExecutionAlarmsDS 'TR 24/01/2012
-
-                                    Dim myAverage As Single = 0
-                                    For Each ResultRow As ResultsDS.twksResultsRow In myResultDS.twksResults.Rows
-                                        'Get the accepted result to set the average value if there are 
-                                        'XBC 16/02/2012
-                                        Dim myCalc As New RecalculateResultsDelegate
-                                        myGlobalDataTO = myCalc.GetAverageConcentrationValue(dbConnection, ResultRow.OrderTestID, ResultRow.RerunNumber)
-                                        'XBC 16/02/2012
-
-                                        If (Not myGlobalDataTO.HasError) Then
-                                            'Get the concentration value to calculate the the average
-                                            myAverage = CType(myGlobalDataTO.SetDatos, Single)
-                                            ResultRow.CONC_Value = myAverage
-                                        Else
-                                            Exit For
-                                        End If
-                                        'AG 13/01/2011
-
-                                        'Import result row into temporal structure.
-                                        myTemResultDS.twksResults.ImportRow(ResultRow)
-
-                                        'Save results on result table.
-                                        myGlobalDataTO = myResultDelegate.SaveResults(dbConnection, myTemResultDS)
-                                        If (myGlobalDataTO.HasError) Then Exit For
-
-                                        'Reset the accepted result 
-                                        myGlobalDataTO = myResultDelegate.ResetAcceptedResultFlag(dbConnection, ResultRow.OrderTestID, ResultRow.RerunNumber)
-                                        If (Not myGlobalDataTO.HasError) Then
-                                            'Clear temporal structure to reuse
-                                            myTemResultDS.twksResults.Clear()
-                                        End If
-
-                                        'XBC 16/02/2012
-                                        myGlobalDataTO = myCalc.IsValidISERefRanges(dbConnection, ResultRow.OrderTestID, ResultRow.TestID, ResultRow.SampleType, myAverage)
-                                        'XBC 16/02/2012
-
-                                        If Not myGlobalDataTO.HasError Then
-                                            If Not CBool(myGlobalDataTO.SetDatos) Then
-                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                myResultAlarmRow.OrderTestID = ResultRow.OrderTestID
-                                                myResultAlarmRow.RerunNumber = ResultRow.RerunNumber
-                                                myResultAlarmRow.MultiPointNumber = 1
-
-
-
-                                                'DL 01/10/2012. Begin
-                                                Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-                                                Dim myISETestSampleDS As New ISETestSamplesDS
-                                                Dim resultData As GlobalDataTO = Nothing
-
-                                                resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, ResultRow.TestID, ResultRow.SampleType)
-
-                                                If Not resultData.HasError Then
-                                                    myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
-
-                                                    If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-                                                        Dim myOrderTestsDelegate As New OrderTestsDelegate
-                                                        'Get the Reference Range Interval defined for the Test.
-                                                        resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, ResultRow.OrderTestID, "ISE", _
-                                                                                                                    ResultRow.TestID, ResultRow.SampleType, _
-                                                                                                                    myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-                                                        If Not resultData.HasError Then
-                                                            'Validate the range
-                                                            Dim myTestRefRangesDS As New TestRefRangesDS
-                                                            myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                                                            With myTestRefRangesDS.tparTestRefRanges
-                                                                If (.Rows.Count = 1) Then
-                                                                    If Convert.ToInt16(ResultRow.CONC_Value) <> -1 Then
-                                                                        If (ResultRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
-                                                                            'Set lower alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
-                                                                        ElseIf (ResultRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
-                                                                            'Set hight alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
-                                                                        End If
-                                                                    End If
-                                                                End If
-                                                            End With
-                                                        End If
-                                                    End If
-                                                End If
-
-                                                'myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-                                                'DL 01/10/2012. End
-
-                                                'myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-
-                                                myResultAlarmRow.AlarmDateTime = Now
-
-                                                If Not String.Equals(myResultAlarmRow.AlarmID, String.Empty) Then 'dl 01/10/2012
-                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-                                                    myResultAlarmsDS.AcceptChanges()
-                                                End If 'dl 01/10/2012
-
-                                            End If
-                                        Else
-                                            Exit For
-                                        End If
-
-                                        'SGM 22/07/2013 - update only if the current rerun has alarms Bug #1188
-                                        If Not myExecutionAlarmsRow Is Nothing AndAlso Not String.Equals(myExecutionAlarmsRow.AlarmID, String.Empty) Then
-                                            'TR 24/01/2012 -Search if there're any alarm for the current result to show
-                                            If (Not myGlobalDataTO.HasError) Then
-                                                myGlobalDataTO = myExecutionDelegate.GetByOrderTest(dbConnection, pWorkSessionID, pAnalyzerID, ResultRow.OrderTestID, ResultRow.MultiPointNumber)
-                                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                    myTemExecutionDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-
-                                                    For Each execRow As ExecutionsDS.twksWSExecutionsRow In myTemExecutionDS.twksWSExecutions.Rows
-                                                        'Get the execution Alarm by the Execution ID 
-                                                        myGlobalDataTO = myExecutionAlarmsDelegate.Read(dbConnection, execRow.ExecutionID)
-                                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                            myResultExecutionsAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, WSExecutionAlarmsDS)
-
-                                                            For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                If (Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString) Then
-                                                                    'Before adding the row validate if not exist in curren Dataset
-                                                                    If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = ResultRow.OrderTestID _
-                                                                                                                   AndAlso a.RerunNumber = ResultRow.RerunNumber _
-                                                                                                                   AndAlso a.MultiPointNumber = ResultRow.MultiPointNumber _
-                                                                                                                   AndAlso a.AlarmID = ResultExeAlarmRow.AlarmID).Count > 0 Then
-                                                                        myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                                        myResultAlarmRow.OrderTestID = ResultRow.OrderTestID
-                                                                        myResultAlarmRow.RerunNumber = ResultRow.RerunNumber
-                                                                        myResultAlarmRow.MultiPointNumber = 1
-                                                                        myResultAlarmRow.AlarmID = ResultExeAlarmRow.AlarmID
-                                                                        myResultAlarmRow.AlarmDateTime = Now
-                                                                        myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-                                                                    End If
-                                                                End If
-                                                            Next
-                                                        End If
-                                                    Next
-
-                                                End If
-                                            End If
-                                            'TR 24/01/2012 -END
-                                        End If
-                                        'SGM 22/07/2013 END
-
-                                        'TR 07/12/2011 -Delete all related alarms before entering.
-                                        myGlobalDataTO = myResultAlarmsDelegate.DeleteAll(dbConnection, ResultRow.OrderTestID, ResultRow.RerunNumber, ResultRow.MultiPointNumber)
-                                    Next
-                                End If
-
-
-
-                                If (Not myGlobalDataTO.HasError) Then
-                                    'TR 05/12/2011 -Insert. The Result alarms
-                                    myGlobalDataTO = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
-                                End If
-
-                                'Update the OrderTest status
-                                Dim myOrderID As String = String.Empty
-                                If (Not myGlobalDataTO.HasError) Then
-                                    Dim myOrderTestDS As New OrderTestsDS
-                                    Dim myOrderTestDelegate As New OrderTestsDelegate
-
-                                    For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                        'The OrderID is the same for all Executions
-                                        If String.Equals(myOrderID, String.Empty) Then myOrderID = execRow.OrderID
-
-                                        'If it is the last Replicate Number then update the status of the OrderTest to CLOSE
-                                        If (execRow.ReplicatesTotalNum = execRow.ReplicateNumber) Then
-                                            myGlobalDataTO = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, execRow.OrderTestID, "CLOSED")
-                                            If (myGlobalDataTO.HasError) Then Exit For
-                                        End If
-                                    Next
-
-                                    'For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                    '    'Get the order Test to validate the replicate number.
-                                    '    myGlobalDataTO = myOrderTestDelegate.GetOrderTest(dbConnection, execRow.OrderTestID)
-                                    '    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                    '        myOrderTestDS = DirectCast(myGlobalDataTO.SetDatos, OrderTestsDS)
-
-                                    '        If (myOrderTestDS.twksOrderTests.Count > 0) Then
-                                    '            'Set the order id to get the patient id later 
-                                    '            myOrderID = myOrderTestDS.twksOrderTests(0).OrderID
-
-                                    '            'If the last Replicate Number then update the status to CLOSE
-                                    '            If (myOrderTestDS.twksOrderTests(0).ReplicatesNumber = execRow.ReplicateNumber) Then
-                                    '                myGlobalDataTO = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, execRow.OrderTestID, "CLOSED")
-                                    '                If (myGlobalDataTO.HasError) Then Exit For
-                                    '            End If
-                                    '        End If
-                                    '    Else
-                                    '        Exit For
-                                    '    End If
-                                    'Next
-                                End If
-
-                                'TR 14/01/2011 -If the debug mode is on then save the results on the IseDebugModes Result
-                                If (myDebugModeOn AndAlso Not myGlobalDataTO.HasError) Then
-                                    Dim myPatientID As String = ""
-
-                                    If String.Equals(mySampleClass, "PATIENT") Then
-                                        Dim myOrdersDelegate As New OrdersDelegate
-
-                                        myGlobalDataTO = myOrdersDelegate.ReadOrders(dbConnection, myOrderID)
-                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                            Dim myOrdersDS As OrdersDS = DirectCast(myGlobalDataTO.SetDatos, OrdersDS)
-
-                                            If (myOrdersDS.twksOrders.Rows.Count > 0) Then
-                                                If (Not myOrdersDS.twksOrders(0).IsPatientIDNull) Then
-                                                    myPatientID = myOrdersDS.twksOrders(0).PatientID
-
-                                                ElseIf (Not myOrdersDS.twksOrders(0).IsSampleIDNull) Then
-                                                    myPatientID = myOrdersDS.twksOrders(0).SampleID
-                                                End If
-                                            End If
-                                        End If
-                                    End If
-
-                                    If (Not myGlobalDataTO.HasError) Then
-                                        'Validate the ISE Type to set the ISE Cycle
-                                        Select Case pISEResult.ISEResultType
-                                            Case ISEResultTO.ISEResultTypes.SER
-                                                myISECycle = GlobalEnumerates.ISECycles.SAMPLE
-                                                Exit Select
-                                            Case ISEResultTO.ISEResultTypes.URN
-                                                myISECycle = GlobalEnumerates.ISECycles.URINE1
-                                                Exit Select
-                                            Case ISEResultTO.ISEResultTypes.CAL
-                                                myISECycle = GlobalEnumerates.ISECycles.CALIBRATION
-                                                Exit Select
-                                            Case Else
-                                                Exit Select
-                                        End Select
-
-                                        pISEResult.WorkSessionID = pWorkSessionID
-                                        pISEResult.PatientID = myPatientID
-
-                                        ''Call the save debug result data to save into XML file.
-                                        'myGlobalDataTO = SaveDebugModeResultData(pWorkSessionID, myPatientID, pISEResult.ReceivedResults, myISECycle)
-                                    End If
-                                End If
-
-                                'myGlobalDataTO = myOrdersDelegate.ReadOrders(dbConnection, myOrderID)
-                                'If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                '    Dim myOrdersDS As OrdersDS = DirectCast(myGlobalDataTO.SetDatos, OrdersDS)
-
-                                '    If (myOrdersDS.twksOrders.Rows.Count > 0) Then
-                                '        If (Not myOrdersDS.twksOrders(0).IsPatientIDNull) Then
-                                '            myPatientID = myOrdersDS.twksOrders(0).PatientID 'Set the patienID if not null
-                                '        ElseIf (Not myOrdersDS.twksOrders(0).IsSampleIDNull) Then
-                                '            myPatientID = myOrdersDS.twksOrders(0).SampleID 'set the sampleID if not null
-                                '        End If
-
-                                '        'Validate the ISE Type to set the ISE Cycle
-                                '        Select Case pISEResult.ISEResultType
-                                '            Case ISEResultTO.ISEResultTypes.SER
-                                '                myISECycle = GlobalEnumerates.ISECycles.SAMPLE
-                                '                Exit Select
-                                '            Case ISEResultTO.ISEResultTypes.URN
-                                '                myISECycle = GlobalEnumerates.ISECycles.URINE1
-                                '                Exit Select
-                                '            Case ISEResultTO.ISEResultTypes.CAL
-                                '                myISECycle = GlobalEnumerates.ISECycles.CALIBRATION
-                                '                Exit Select
-                                '            Case Else
-                                '                Exit Select
-                                '        End Select
-
-                                '        pISEResult.WorkSessionID = pWorkSessionID
-                                '        pISEResult.PatientID = myPatientID
-
-                                '        'Call the save debug result data to save into XML file.
-                                '        'myGlobalDataTO = SaveDebugModeResultData(myWorkSessionID, myPatientID, pISEResult.ReceivedResults, myISECycle)
-                                '    End If
-                                'End If
-                                'End If
-                                ' End If
-                                'End If
-
-                                qAlarmResult = Nothing 'AG 02/08/2012 release memory
-                            End If
-
-                        ElseIf (myGlobalDataTO.HasError) Then
-                            'AG 19/03/2012 - If the GlobalTO hasError mark the execution as CLOSEDNOK
-                            Dim myExecutionDS As New ExecutionsDS
-                            Dim myExecutionDelegate As New ExecutionsDelegate
-
-                            Dim myOrderTestDS As New OrderTestsDS
-                            Dim myOrderTestDelegate As New OrderTestsDelegate
-
-                            'Get the Executions by the Preparation ID 
-                            myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myExecutionDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-
-                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
-                                                                                               execRow.ReplicatesTotalNum, False)
-                                    If (myGlobalDataTO.HasError) Then Exit For
-                                Next
-
-                                'For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                '    'Get the number of Replicates requested for the ISE Test
-                                '    myGlobalDataTO = myOrderTestDelegate.GetOrderTest(dbConnection, execRow.OrderTestID)
-                                '    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                '        myOrderTestDS = DirectCast(myGlobalDataTO.SetDatos, OrderTestsDS)
-
-                                '        If (myOrderTestDS.twksOrderTests.Count > 0) Then
-                                '            myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
-                                '                                                                       myOrderTestDS.twksOrderTests(0).ReplicatesNumber, False)
-                                '        End If
-                                '    Else
-                                '        Exit For
-                                '    End If
-                                'Next
-                                myReturnValue = myExecutionDS
-                            End If
-                            'AG 19/03/2012
-                        End If
-
-                        If (Not myGlobalDataTO.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            myGlobalDataTO.SetDatos = myReturnValue 'AG 29/11/2011
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISETESTResults", EventLogEntryType.Error, False)
-            End Try
-            Return myGlobalDataTO
-        End Function
-
-
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pPumpName"></param>
-        '''' <param name="pDataStr"></param>
-        '''' <returns></returns>
-        '''' <remarks>Created by SGM 16/01/2012</remarks>
-        'Private Function GetPumpValue(ByVal pPumpName As String, ByVal pDataStr As String) As Single
-
-        '    Dim fieldSize As Integer = 1
-        '    Dim signChar As Integer = 1
-        '    Dim returnValue As Single = -1
-        '    Dim startIndex As Integer = -1
-        '    Dim myPumpStr As String
-
-        '    Try
-        '        'Get the decimal separator.
-        '        Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
-
-        '        'get the Pump's string
-        '        startIndex = pDataStr.IndexOf(pPumpName.Trim) + pPumpName.Trim.Length + 1
-        '        myPumpStr = pDataStr.Trim.Substring(startIndex, 4)
-
-        '        If myPumpStr.Trim.Length > 0 Then
-        '            If myPumpStr.Trim.Contains("-") Then
-        '                signChar = -1
-        '                'Remove '-' due sometimes there is a space between sign and value and the the IsNumeric, Csng methods do not work properly
-        '                myPumpStr.Replace("-", "")
-        '            End If
-
-        '            If IsNumeric(Trim(myPumpStr.ToString().Replace(".", myDecimalSeparator))) Then
-        '                returnValue = signChar * CSng(myPumpStr.ToString().Replace(".", myDecimalSeparator))
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetPumpValue", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return returnValue
-
-        'End Function
-
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pBubbleItem"></param>
-        '''' <param name="pDataStr"></param>
-        '''' <returns></returns>
-        '''' <remarks>Created by SGM 16/01/2012</remarks>
-        'Private Function GetBubbleValue(ByVal pBubbleItem As String, ByVal pDataStr As String) As Single
-
-        '    Dim fieldSize As Integer = 1
-        '    Dim returnValue As Single = -1
-        '    Dim startIndex As Integer = -1
-        '    Dim myBubbleStr As String
-
-        '    Try
-        '        'get the Bubble detector's string
-        '        startIndex = pDataStr.IndexOf(pBubbleItem.Trim) + pBubbleItem.Trim.Length + 1
-        '        myBubbleStr = pDataStr.Trim.Substring(startIndex, 3)
-
-        '        If myBubbleStr.Trim.Length > 0 Then
-        '            If IsNumeric(Trim(myBubbleStr.ToString())) Then
-        '                returnValue = CSng(myBubbleStr.ToString())
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetBubbleValue", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return returnValue
-
-        'End Function
-
-        '''' <summary>
-        '''' Method incharge to process the Remark (alarm)
-        '''' </summary>
-        '''' <param name="pError"></param>
-        '''' <returns></returns>
-        '''' <remarks>
-        '''' CREATE BY: TR 05/01/2010
-        '''' </remarks>
-        'Private Function ProcessISETESTErrors(ByVal pError As String) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Try
-        '        Dim myISEErrorTO As New ISEErrorTO
-        '        Dim myISEErrorsList As New List(Of ISEErrorTO)
-        '        Dim Position As Integer = 1
-        '        For Each posValue As Char In pError
-        '            'Start from position 1 because position 0 has the IseModule Error or independent errors
-        '            If Position > 1 And posValue <> "0" Then
-        '                myISEErrorTO = New ISEErrorTO
-
-        '                myISEErrorTO.DigitNumber = Position
-        '                myISEErrorTO.DigitValue = posValue
-        '                myISEErrorTO.Message = "ISE_REMARK" & Position
-        '                myISEErrorTO.Affected = GetAffectedElements(posValue)
-
-        '                myISEErrorsList.Add(myISEErrorTO)
-        '            ElseIf Position = 1 AndAlso Not posValue = "0" Then 'TR 12/12/2011 Valide if ISE module Error
-        '                myISEErrorTO = New ISEErrorTO
-        '                myISEErrorTO.DigitNumber = Position
-        '                myISEErrorTO.DigitValue = posValue
-        '                myISEErrorTO.Message = "ISE_REMARK" & posValue 'Set the position value
-        '                myISEErrorTO.Affected = GetISEModuleError(posValue)
-        '                myISEErrorsList.Add(myISEErrorTO)
-        '                'If ISE module error then exit for 
-        '                Exit For
-        '            End If
-        '            Position += 1
-        '        Next
-
-        '        myGlobalDataTO.SetDatos = myISEErrorsList
-
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISETESTErrors", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobalDataTO
-        'End Function
-
-        ''PENDING TO DEFINE
-        'Private Function CheckChecksum(ByVal pISEResultStr As String) As Boolean
-        '    Dim isOK As Boolean = False
-        '    Try
-        '        Dim myStr As String = pISEResultStr.Trim.Replace("<", "")
-        '        myStr = myStr.Replace(">", "")
-        '        Dim myReceivedString As String = myStr.Substring(0, myStr.Length - 1)
-        '        Dim myReceivedResultValue As Integer = Asc(pISEResultStr.Substring(pISEResultStr.LastIndexOf(">") - 1, 1))
-        '        Dim myChecksumVal As Integer = 0
-        '        For c As Integer = 0 To pISEResultStr.Length - 1 Step 1
-        '            myChecksumVal += Asc(pISEResultStr.Substring(c, 1))
-        '        Next
-
-        '        If myReceivedResultValue = myChecksumVal Then
-        '            isOK = True
-        '        End If
-
-        '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.CheckChecksum", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return isOK
-        'End Function
-
-        'Private Function CalculateCRC() As GlobalDataTO
-        '    Dim myGlobal As New GlobalDataTO
-        '    Try
-
-        '        Dim myCRC As Integer
-
-
-
-
-        '        myGlobal.SetDatos = myCRC
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.CalculateCRC", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pIoneName"></param>
-        '''' <param name="pISEResultStr"></param>
-        '''' <returns></returns>
-        '''' <remarks>Created by SGM 11/01/2012</remarks>
-        'Private Function GetIoneValue(ByVal pIoneName As String, ByVal pDataStr As String) As Single
-
-        '    Dim fieldSize As Integer = 1
-        '    Dim returnValue As Single = -1
-        '    Dim startIndex As Integer = -1
-        '    Dim myIoneStr As String
-
-        '    Try
-        '        'Get the decimal separator.
-        '        Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
-
-        '        'get the Ione's string
-        '        startIndex = pDataStr.IndexOf(pIoneName.Trim) + pIoneName.Trim.Length + 1
-        '        myIoneStr = pDataStr.Trim.Substring(startIndex, 5)
-
-        '        If myIoneStr.Trim.Length > 0 Then
-
-        '            returnValue = CSng(myIoneStr.ToString().Replace(".", myDecimalSeparator))
-
-        '        End If
-        '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.GetIoneValue", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return returnValue
-
-        'End Function
-
-        '''' <summary>
-        '''' Returns the ise result by Ione
-        '''' NOTE: This method does not implements try catch (the method who calls it implements)
-        '''' </summary>
-        '''' <param name="pIoneName"></param>
-        '''' <param name="pISEResult"></param>
-        '''' <param name="pStartChar"></param>
-        '''' <param name="pEndChar"></param>
-        '''' <returns></returns>
-        '''' <remarks>AG 02/12/2011</remarks>
-        'Private Function GetISEIoneValue(ByVal pIoneName As String, ByVal pISEResult As String, ByRef pStartChar As Integer, ByRef pEndChar As Integer) As Single
-        '    Dim fieldSize As Integer = 1
-        '    Dim signChar As Integer = 1
-        '    Dim returnValue As Single = -1
-
-        '    'Get the decimal separator.
-        '    Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
-
-        '    pStartChar = InStr(pISEResult, pIoneName, CompareMethod.Text)
-        '    If pStartChar <> 0 Then
-        '        pStartChar = pStartChar + 1
-        '        fieldSize = pEndChar - pStartChar
-
-        '        Dim newResult As String = pISEResult
-        '        'Remove '-' due sometimes there is a space between sign and value and the the IsNumeric, Csng methods do not work properly
-        '        signChar = InStr(pISEResult.Substring(pStartChar, fieldSize), "-", CompareMethod.Text)
-        '        If signChar > 0 Then
-        '            newResult = pISEResult.Substring(pStartChar, fieldSize).ToString().Replace("-", " ")
-        '            signChar = -1
-        '        Else
-        '            newResult = pISEResult.Substring(pStartChar, fieldSize).ToString()
-        '            signChar = 1
-        '        End If
-
-        '        If IsNumeric(Trim(newResult.ToString().Replace(".", myDecimalSeparator))) Then
-        '            returnValue = signChar * CSng(newResult.ToString().Replace(".", myDecimalSeparator))
-        '        End If
-        '        pEndChar = pStartChar - 2
-        '    End If
-
-        '    Return returnValue
-
-        'End Function
-
-#End Region
-
     End Class
-
 End Namespace
 

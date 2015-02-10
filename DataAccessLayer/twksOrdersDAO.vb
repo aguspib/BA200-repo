@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksOrdersDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -77,8 +77,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'Audit fields 
                     If (pNewOrder.twksOrders(0).IsTS_UserNull) Then
-                        Dim myGlobalBase As New GlobalBase
-                        cmdText = cmdText & " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
+                        'Dim myGlobalbase As New GlobalBase
+                        cmdText = cmdText & " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                     Else
                         cmdText = cmdText & " N'" & pNewOrder.twksOrders(0).TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
                     End If
@@ -99,8 +99,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -134,8 +134,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -178,8 +178,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -229,8 +229,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByOrderDateTime", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByOrderDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -275,8 +275,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadBySampleID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadBySampleID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -329,8 +329,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'Audit fields
                     If (pOrderDS.twksOrders(0).IsTS_UserNull) Then
-                        Dim myGlobalBase As New GlobalBase
-                        cmdText &= " TS_User = N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
+                        'Dim myGlobalbase As New GlobalBase
+                        cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                     Else
                         cmdText &= " TS_User = N'" & pOrderDS.twksOrders(0).TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
                     End If
@@ -352,8 +352,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -377,9 +377,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
+                    '                        " WHERE  OrderID = '" & pOrderID.Trim & "' " & vbCrLf & _
+                    '                        " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
                                             " WHERE  OrderID = '" & pOrderID.Trim & "' " & vbCrLf & _
-                                            " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " AND    NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         dataToReturn.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -392,8 +397,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.DeleteEmptyOrder", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.DeleteEmptyOrder", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -415,9 +420,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
+                    '                        " WHERE  SampleClass = '" & pSampleClass.Trim & "' " & vbCrLf & _
+                    '                        " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
                                             " WHERE  SampleClass = '" & pSampleClass.Trim & "' " & vbCrLf & _
-                                            " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " AND    NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         dataToReturn.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -430,8 +440,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.DeleteEmptyOrdersBySampleClass", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.DeleteEmptyOrdersBySampleClass", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -473,12 +483,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    UPPER(OT.SampleType) = UPPER('" & pSampleType.Trim & "') " & vbCrLf
 
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.TestType IN ('STD', 'ISE') " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE WorkSessionID = '" & pWorkSessionID.ToString & "' " & vbCrLf & _
+                            '                                  " AND   OpenOTFlag = 0 " & vbCrLf & _
+                            '                                  " AND   ToSendFlag = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
                                        " AND OT.TestType IN ('STD', 'ISE') " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE WorkSessionID = '" & pWorkSessionID.ToString & "' " & vbCrLf & _
                                                               " AND   OpenOTFlag = 0 " & vbCrLf & _
-                                                              " AND   ToSendFlag = 1) " & vbCrLf
+                                                              " AND   ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -503,8 +520,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.GetSampleClassesByTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.GetSampleClassesByTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -556,8 +573,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByExternalOID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByExternalOID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -602,8 +619,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -643,8 +660,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReOpenClosedOrder", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReOpenClosedOrder", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -664,8 +681,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksOrders " & vbCrLf & _
+                    '                        " WHERE  OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksOrders " & vbCrLf & _
-                                            " WHERE  OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " WHERE  NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -678,8 +699,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -720,8 +741,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdatePatientSampleFields", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdatePatientSampleFields", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -759,8 +780,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksOrdersDAO.UpdateOrderStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksOrdersDAO.UpdateOrderStatus", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -804,8 +825,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOutputBySampleID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOutputBySampleID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -852,8 +873,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrdersByTestType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrdersByTestType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -908,8 +929,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrderPatientByAnalyzerWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrderPatientByAnalyzerWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -962,13 +983,226 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrdersPatientByAnalyzerAndWSAllTypes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.GetOrdersPatientByAnalyzerAndWSAllTypes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Updates the column OrderToExport to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
+        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID
+        ''' AG 21/10/2014 BA-2011 sample class = patient or ctrl
+        ''' AG 22/10/2014 BA-2011 by default applies for patient or ctrl except from results screen clicking on LIS header that applies only for patients</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As List(Of String), pNewValue As Boolean, ByVal pOnlyPatientsFlag As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
+                                           " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf
+
+                    'AG 22/10/2014 - BA-2011
+                    '" WHERE  ( SampleClass = 'PATIENT' OR SampleClass = 'CTRL' )" & vbCrLf
+                    If Not pOnlyPatientsFlag Then
+                        cmdText &= " WHERE  ( SampleClass = 'PATIENT' OR SampleClass = 'CTRL' )" & vbCrLf
+                    Else
+                        cmdText &= " WHERE  ( SampleClass = 'PATIENT' )" & vbCrLf
+                    End If
+
+                    'AG 17/10/2014 BA-2011
+                    'If pOrderID <> "" Then
+                    '    cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    'End If
+                    If pOrderID.Count > 0 Then
+                        cmdText &= " AND ( "
+                        For item As Integer = 0 To pOrderID.Count - 1
+                            cmdText &= " OrderID = N'" & pOrderID(item).Trim.Replace("'", "''") & "' "
+                            If item < pOrderID.Count - 1 Then
+                                cmdText &= " OR "
+                            End If
+                        Next
+                        cmdText &= " ) "
+                    End If
+                    'AG 17/10/2014 BA-2011
+
+                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOrderToExport", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Read data of the Order to which the specified LISMessageID belongs 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pLISMessageID">LIS message Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified LIS message identifier belongs</returns>
+        ''' <remarks>
+        ''' Created by:  AG 30/07/2014 #1887 OrderToExport management
+        ''' </remarks>
+        Public Function ReadByLISMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT O.* FROM twksOrders O INNER JOIN twksOrderTests OT ON O.OrderID = OT.OrderID " & vbCrLf & _
+                                                " INNER JOIN twksResults R ON OT.OrderTestID = R.OrderTestID " & vbCrLf & _
+                                                " WHERE  R.LISMessageID = N'" & pLISMessageID.Trim.Replace("'", "''") & "' "
+
+                        Dim resultData As New OrdersDS
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(dbCmd)
+                                da.Fill(resultData.twksOrders)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = resultData
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByLISMessageID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Updates the column OrderToPrint to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToPrint management</remarks>
+        Public Function UpdateOrderToPrint(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As String, pNewValue As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
+                                           " SET    OrderToPrint = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
+                                           " WHERE  ( SampleClass   = 'PATIENT' )" & vbCrLf
+
+                    If pOrderID <> "" Then
+                        cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    End If
+
+                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOrderToPrint", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Look for different orderID belonging the same patient/control sample
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pOrderID">Order Identifier</param>
+        ''' <param name="pSampleClass">Sample class of the order</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified OrderTest belongs</returns>
+        ''' <remarks>
+        ''' Created by:  AG 16/10/2014 BA-2011
+        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
+        ''' </remarks>
+        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pSampleClass As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        If pSampleClass = "PATIENT" Then
+                            cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND (O.PatientID = O2.PatientID OR O.SampleID = O2.SampleID) " & vbCrLf & _
+                                      " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                      "AND (O.SampleClass = 'PATIENT' ) "
+                        Else
+                            'SampleClass = CTRL
+                            cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND O.SampleClass = O2.SampleClass " & vbCrLf & _
+                                      " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                      "AND (O.SampleClass = 'CTRL' ) "
+
+                        End If
+
+                        Dim resultData As New OrdersDS
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(dbCmd)
+                                da.Fill(resultData.twksOrders)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = resultData
+                        myGlobalDataTO.HasError = False
+                    End If
+                    End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadRelatedOrdersByOrderID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
 #End Region
+
     End Class
 End Namespace

@@ -1,7 +1,9 @@
-﻿Imports System.Timers
+﻿Option Strict Off
+
+Imports System.Timers
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
-
+Imports CommunicationsAx00
 Namespace Biosystems.Ax00.CommunicationsSwFw
     'Adapted from Enlace.vb (iPRO User Sw)
 
@@ -21,18 +23,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Private cls_serialPort As New CommunicationsAx00.ChannelClass
         'RH 14/10/2010 Remove New
         'Private cls_serialPort As New CommunicationsAx00.Channel
-        Private cls_serialPort As CommunicationsAx00.Channel
-        Private cls_tmrReception As New System.Timers.Timer()
+        Private cls_serialPort As Channel
+        Private cls_tmrReception As New Timers.Timer()
         'RH 14/10/2010 Remove New
         'Private WithEvents cls_notifier As New CommunicationsAx00.ReceptionNotifier
-        Private WithEvents cls_notifier As CommunicationsAx00.ReceptionNotifier
+        Private WithEvents cls_notifier As ReceptionNotifier
 
 #End Region
 
 #Region "Declarations"
 
         Private bytgAjustesByte() As Byte  '// trama de Ajustes en formato byte
-        Private myLogAcciones As New ApplicationLogManager()
+        'Private myLogAcciones As New ApplicationLogManager()
 
         Private Enum InstructionTypes
             'iPRO definitions (dont use them in Ax00)
@@ -70,16 +72,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             For Each p As Process In Process.GetProcessesByName("CommAx00")
                 If p.CloseMainWindow() Then
-                    'myLogAcciones.CreateLogActivity("[Link][Start] --->> CloseMainWindow OK", "Link.Start", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("[Link][Start] --->> CloseMainWindow OK", "Link.Start", EventLogEntryType.Information, False)
 
                 Else
                     p.Kill()
-                    'myLogAcciones.CreateLogActivity("[Link][Start] --->> Kill", "Link.Start", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("[Link][Start] --->> Kill", "Link.Start", EventLogEntryType.Information, False)
                 End If
             Next
 
             'cls_serialPort = CreateObject("CommunicationsAx00.Channel") 'AG 21/04/2010
-            cls_serialPort = New CommunicationsAx00.Channel 'RH 14/10/2010
+            cls_serialPort = New Channel 'RH 14/10/2010
 
             If Not cls_serialPort.Init() Then
                 Throw New Exception("[Link][Start] --->> Exception: Not cls_serialPort.Init()") 'RH 07/03/2012
@@ -115,7 +117,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             'Try                
             Open = cls_serialPort.OpenChannel(in_channel, "9600,N,8,1")
-            'myLogAcciones.CreateLogActivity("[Link][Open] --->> Open value: '" & Open & "'", "Link.Start", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity("[Link][Open] --->> Open value: '" & Open & "'", "Link.Start", EventLogEntryType.Information, False)
 
             CurrentChannel = in_channel
 
@@ -133,7 +135,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             'Try                
             Config = cls_serialPort.ChannelSettings(in_settings)
 
-            MyClass.CurrentSettings = in_settings
+            CurrentSettings = in_settings
 
             'RH 14/10/2010 It is a bad practice to catch an exception, do nothing with it and throw it again.
             'Catch an exception only if you want to do something with it
@@ -146,16 +148,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Public Function Arrancar() As Boolean
         Public Function StartComm(ByVal ConnectionData() As Byte) As Boolean
 
-            'myLogAcciones.CreateLogActivity("[Link][StartComm] --->> Try StartComm", "Link.StartComm", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity("[Link][StartComm] --->> Try StartComm", "Link.StartComm", EventLogEntryType.Information, False)
             Try
                 StartComm = cls_serialPort.StartComm(ConnectionData)
-                'myLogAcciones.CreateLogActivity("[Link][StartComm] --->> StartComm value: '" & StartComm & "'", "Link.StartComm", EventLogEntryType.Information, False)
+
+                'GlobalBase.CreateLogActivity("[Link][StartComm] --->> StartComm value: '" & StartComm & "'", "Link.StartComm", EventLogEntryType.Information, False)
 
                 ActivateReception()
-                'myLogAcciones.CreateLogActivity("[Link][StartComm] --->> after ActivateReception()", "Link.StartComm", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("[Link][StartComm] --->> after ActivateReception()", "Link.StartComm", EventLogEntryType.Information, False)
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity("[Link][StartComm] --->> Exception Error", "Link.StartComm", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("[Link][StartComm] --->> Exception Error", "Link.StartComm", EventLogEntryType.Error, False)
                 Throw 'ex
             End Try
 
@@ -173,7 +176,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             'Catch an exception only if you want to do something with it
             'Catch ex As Exception
             '    'AG 06/07/2012 - activate try ... catch
-            '    myLogAcciones.CreateLogActivity("[Link][SendSynchronousByte] --->> Exception Error", "Link.SendSynchronousByte", EventLogEntryType.Error, False)
+            '    GlobalBase.CreateLogActivity("[Link][SendSynchronousByte] --->> Exception Error", "Link.SendSynchronousByte", EventLogEntryType.Error, False)
             '    Throw 'ex
             'End Try
 
@@ -266,12 +269,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 cls_tmrReception.Enabled = False
 
                 'Reception byte array from CommAx00
+                'Dim auxArray = DirectCast(dataReceivedByte, System.Array)
+
+                'If cls_serialPort.ReceiveDataByteToString(auxArray) Then
                 If cls_serialPort.ReceiveDataByteToString(dataReceivedByte) Then
+
                     dataReceived = ""
 
                     If Not dataReceivedByte Is Nothing Then
                         ''AG 08/06/2012 - Comment when stress tests are finished
-                        'myLogAcciones.CreateLogActivity("Instruction received", "Link.cls_tmrReception_Timer", EventLogEntryType.Information, False)
+                        'GlobalBase.CreateLogActivity("Instruction received", "Link.cls_tmrReception_Timer", EventLogEntryType.Information, False)
 
                         For i = 0 To UBound(dataReceivedByte)
                             If i = 0 Then
@@ -303,7 +310,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                 Else
-                    myLogAcciones.CreateLogActivity("[Link][cls_tmrReception_Timer] --- Returns False", "Link.cls_tmrReception_Timer", EventLogEntryType.Information, False) 'AG 20/02/2014 - #1514 (change Error to Information)
+                    GlobalBase.CreateLogActivity("[Link][cls_tmrReception_Timer] --- Returns False", "Link.cls_tmrReception_Timer", EventLogEntryType.Information, False) 'AG 20/02/2014 - #1514 (change Error to Information)
                 End If
             End If
 
@@ -311,7 +318,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             '    'Catch an exception only if you want to do something with it
             'Catch ex As Exception
             '    'AG 06/07/2012 - activate try ... catch
-            '    myLogAcciones.CreateLogActivity("[Link][cls_tmrReception_Timer] --- Exception Error", "Link.cls_tmrReception_Timer", EventLogEntryType.Error, False)
+            '    GlobalBase.CreateLogActivity("[Link][cls_tmrReception_Timer] --- Exception Error", "Link.cls_tmrReception_Timer", EventLogEntryType.Error, False)
             '    Throw 'ex
             'End Try
 
@@ -356,22 +363,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Public Sub Terminar()
         Public Sub Terminate()
 
-            Try                
-                'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Closing...", "Link.Terminate", EventLogEntryType.Information, False)
+            Try
+                'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing...", "Link.Terminate", EventLogEntryType.Information, False)
                 Me.StopComm()
 
                 Me.Close()
-                'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Closing cls_serialPort...", "Link.Terminate", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing cls_serialPort...", "Link.Terminate", EventLogEntryType.Information, False)
 
                 'If Not cls_serialPort Is Nothing Then
                 cls_serialPort = Nothing
                 'End If
-                'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Closing cls_notifier...", "Link.Terminate", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing cls_notifier...", "Link.Terminate", EventLogEntryType.Information, False)
 
                 'If Not cls_notifier Is Nothing Then
                 cls_notifier = Nothing
                 'End If
-                'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Closing cls_tmrRecepcio...", "Link.Terminate", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing cls_tmrRecepcio...", "Link.Terminate", EventLogEntryType.Information, False)
 
                 'If Not cls_tmrReception Is Nothing Then
                 cls_tmrReception = Nothing
@@ -380,16 +387,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Force killing the CommAx00 process from tasks administrator
                 For Each p As Process In Process.GetProcessesByName("CommAx00")
                     If p.CloseMainWindow() Then
-                        'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> CloseMainWindow OK", "Link.Terminate", EventLogEntryType.Information, False)
+                        'GlobalBase.CreateLogActivity("[Link][Terminate] --->> CloseMainWindow OK", "Link.Terminate", EventLogEntryType.Information, False)
                     Else
                         p.Kill()
-                        'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Kill", "Link.Terminate", EventLogEntryType.Information, False)
+                        'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Kill", "Link.Terminate", EventLogEntryType.Information, False)
                     End If
                 Next
 
             Catch ex As Exception
                 'AG 06/07/2012 - activate try ... catch
-                myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Error !", "Link.Terminate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("[Link][Terminate] --->> Error !", "Link.Terminate", EventLogEntryType.Error, False)
                 Throw 'ex
             End Try
 
@@ -407,7 +414,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
 
                 'result=cls_serialPort.Synchronize()
-                
+
             Catch ex As Exception
                 result = False
             End Try

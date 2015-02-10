@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWarningAfectedElements
+Partial Class UiWarningAfectedElements
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class IWarningAfectedElements
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWarningAfectedElements))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWarningAfectedElements))
         Me.AfectedElementGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.MessageDetailGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsWarningPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
@@ -32,7 +32,7 @@ Partial Class IWarningAfectedElements
         Me.LBL_AfectedElementsWarning = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.AffectedElementsGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
         Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.AfectedElementGroupBox.SuspendLayout()
         Me.MessageDetailGroupBox.SuspendLayout()
         CType(Me.bsWarningPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -171,13 +171,13 @@ Partial Class IWarningAfectedElements
         '
         'CancelButton
         '
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.CancelButton.Location = New System.Drawing.Point(446, 456)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 2
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.ButtonCancel.Location = New System.Drawing.Point(446, 456)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 2
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'IWarningAfectedElements
         '
@@ -191,7 +191,7 @@ Partial Class IWarningAfectedElements
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(492, 500)
         Me.ControlBox = False
-        Me.Controls.Add(Me.CancelButton)
+        Me.Controls.Add(Me.ButtonCancel)
         Me.Controls.Add(Me.ExitButton)
         Me.Controls.Add(Me.AfectedElementGroupBox)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
@@ -200,7 +200,7 @@ Partial Class IWarningAfectedElements
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWarningAfectedElements"
+        Me.Name = "UiWarningAfectedElements"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "
         Me.AfectedElementGroupBox.ResumeLayout(False)
@@ -213,7 +213,7 @@ Partial Class IWarningAfectedElements
     Friend WithEvents AfectedElementGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
     Friend WithEvents AffectedElementsGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
     Friend WithEvents ExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents MessageDetailGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
     Friend WithEvents bsWarningPictureBox As Biosystems.Ax00.Controls.UserControls.BSPictureBox
     Friend WithEvents LBL_ElementsDeleteMessage As Biosystems.Ax00.Controls.UserControls.BSLabel

@@ -1,10 +1,7 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
+﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IInstrumentUpdateUtil
+Partial Class UiInstrumentUpdateUtil
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -761,7 +758,7 @@ Partial Class IInstrumentUpdateUtil
         Me.Controls.Add(Me.BsMessagesPanel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IInstrumentUpdateUtil"
+        Me.Name = "UiInstrumentUpdateUtil"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.BsTabPagesControl.ResumeLayout(False)
         Me.BsAdjustmentsTab.ResumeLayout(False)

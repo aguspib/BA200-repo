@@ -9,7 +9,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksResultsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
         ''' <summary>
@@ -250,8 +250,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         If (.IsTS_UserNull) Then
                             'Get the connected Username from the current Application Session
-                            Dim currentSession As New GlobalBase
-                            cmdText &= "N'" & currentSession.GetSessionInfo().UserName.Replace("'", "''") & "', "
+                            'Dim currentSession As New GlobalBase
+                            cmdText &= "N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "', "
                         Else
                             cmdText &= "N'" & .TS_User.Trim & "', "
                         End If
@@ -274,8 +274,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -558,8 +558,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         If .IsTS_UserNull Then
                             'Get the connected Username from the current Application Session
-                            Dim currentSession As New GlobalBase
-                            cmdText += ", N'" & currentSession.GetSessionInfo().UserName.Replace("'", "''") & "'"
+                            'Dim currentSession As New GlobalBase
+                            cmdText += ", N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "'"
                         Else
                             cmdText += ", '" & .TS_User & "'"
                         End If
@@ -577,7 +577,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += ")"
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -598,7 +598,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                             resultData.HasError = True
                         End If
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
             Catch ex As Exception
@@ -606,8 +606,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.InsertResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.InsertResult", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -665,8 +665,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ReadByOrderTestIDandRerunNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ReadByOrderTestIDandRerunNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -740,8 +740,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
                         If (myResultsRow.IsTS_UserNull) Then
                             'Get the connected Username from the current Application Session
-                            Dim currentSession As New GlobalBase
-                            cmdText.Append(", TS_User = N'" & currentSession.GetSessionInfo().UserName.Replace("'", "''") & "'" & vbCrLf)
+                            'Dim currentSession As New GlobalBase
+                            cmdText.Append(", TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "'" & vbCrLf)
                         Else
                             cmdText.Append(", TS_User = N'" & myResultsRow.TS_User.Trim.Replace("'", "''") & "'" & vbCrLf)
                         End If
@@ -772,8 +772,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -803,8 +803,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myNewStatus As String = String.Empty
 
                 'Get the connected Username from the current Application Session
-                Dim currentSession As New GlobalBase
-                Dim connectedUser As String = currentSession.GetSessionInfo().UserName
+                'Dim currentSession As New GlobalBase
+                Dim connectedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Open a DB Connection
                 myGlobalDataTO = GetOpenDBConnection(dbConnection)
@@ -899,8 +899,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatusMASIVE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatusMASIVE", EventLogEntryType.Error, False)
             Finally
                 If (Not dbConnection Is Nothing AndAlso openDBConn) Then dbConnection.Close()
             End Try
@@ -911,17 +911,24 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Update a specific row of twksResults
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pResultsDS">twksResults DataSet</param>
+        ''' <param name="pResultsDS">Typed DataSet ResultsDS containing all data for the Result to update</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, fields ABS_Initial, 
+        '''                               ABS_MainFilter, ABS_WorkReagent and SubstrateDepletion are not updated (to avoid the losing 
+        '''                               of these values)</param> 
         ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS with all affected records</returns> 
         ''' <remarks>
         ''' Created by: GDS 02/03/2010 
         ''' Modified by: RH 05/20/2010 - Added parameters ExportStatus and Printed
         '''              AG 12/07/2010 - Added ABS_WorkReagent (tested ok)
         '''              AG 21/07/2010 - If AcceptedResultFlag is not informed, do not update it
-        '''              AG 10/11/2010 - Add ManualResult and ManualResultText fields
-        '''              AG 01/07/2011 - Add columns CurveSlope, CurveOffset, CurveCorrelation
+        '''              AG 10/11/2010 - Added ManualResult and ManualResultText fields
+        '''              AG 01/07/2011 - Added columns CurveSlope, CurveOffset, CurveCorrelation
+        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. When value of this parameter is TRUE, 
+        '''                                          fields ABS_Initial, ABS_MainFilter, ABS_WorkReagent and SubstrateDepletion are not   
+        '''                                          updated (to avoid the losing of these values)
         ''' </remarks>
-        Public Function UpdateResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS) As GlobalDataTO
+        Public Function UpdateResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
+                                     Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -929,261 +936,219 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String
-                    With pResultsDS.twksResults(0)
-                        cmdText = "UPDATE twksResults SET"
-
-                        If .IsValidationStatusNull Then
-                            cmdText += " ValidationStatus = NULL"
+                    Dim cmdText As String = " UPDATE twksResults SET "
+                    With (pResultsDS.twksResults.First)
+                        If (.IsValidationStatusNull) Then
+                            cmdText &= " ValidationStatus = NULL"
                         Else
-                            cmdText += " ValidationStatus = '" & .ValidationStatus & "'"
+                            cmdText &= " ValidationStatus = '" & .ValidationStatus & "'"
                         End If
 
-                        If .IsTestVersionNull Then
-                            cmdText += ", TestVersion = NULL"
+                        If (.IsTestVersionNull) Then
+                            cmdText &= ", TestVersion = NULL"
                         Else
-                            cmdText += ", TestVersion = " & .TestVersion.ToString
+                            cmdText &= ", TestVersion = " & .TestVersion.ToString
                         End If
 
-                        If .IsAcceptedResultFlagNull Then
+                        If (.IsAcceptedResultFlagNull) Then
                             'AG 21/07/2010
-                            'cmdText += ", AcceptedResultFlag = 'False'"
+                            'cmdText &= ", AcceptedResultFlag = 0"
                         Else
-                            cmdText += ", AcceptedResultFlag = '" & .AcceptedResultFlag.ToString & "'"
+                            cmdText &= ", AcceptedResultFlag = " & IIf(.AcceptedResultFlag, 1, 0).ToString
                         End If
 
-                        If .IsManualResultFlagNull Then
-                            cmdText += ", ManualResultFlag = 'False'"
+                        If (.IsManualResultFlagNull) Then
+                            cmdText &= ", ManualResultFlag = 0"
                         Else
-                            cmdText += ", ManualResultFlag = '" & .ManualResultFlag.ToString & "'"
+                            cmdText &= ", ManualResultFlag = " & IIf(.ManualResultFlag, 1, 0).ToString
                         End If
 
-                        If .IsExportStatusNull Then
-                            cmdText += ", ExportStatus = NULL"
+                        If (.IsExportStatusNull) Then
+                            cmdText &= ", ExportStatus = NULL"
                         Else
-                            cmdText += ", ExportStatus = '" & .ExportStatus & "'"
+                            cmdText &= ", ExportStatus = '" & .ExportStatus & "'"
                         End If
 
-                        If .IsPrintedNull Then
-                            cmdText += ", Printed = 'False'"
+                        If (.IsPrintedNull) Then
+                            cmdText &= ", Printed = 0"
                         Else
-                            cmdText += ", Printed = '" & .Printed.ToString & "'"
+                            cmdText &= ", Printed = " & IIf(.Printed, 1, 0).ToString
                         End If
 
-                        If .IsABSValueNull Then
-                            cmdText += ", ABSValue = NULL"
+                        If (.IsABSValueNull) Then
+                            cmdText &= ", ABSValue = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABSValue = " & pResultsDS.twksResults(0).ABSValue.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABSValue = " & .ABSValue.ToSQLString()
-                            cmdText += ", ABSValue = " & ReplaceNumericString(.ABSValue)
+                            cmdText &= ", ABSValue = " & ReplaceNumericString(.ABSValue)
                         End If
 
-                        If .IsABS_ErrorNull Then
-                            cmdText += ", ABS_Error = NULL"
+                        If (.IsABS_ErrorNull) Then
+                            cmdText &= ", ABS_Error = NULL"
                         Else
-                            cmdText += ", ABS_Error = '" & .ABS_Error & "'"
+                            cmdText &= ", ABS_Error = '" & .ABS_Error & "'"
                         End If
 
-                        If .IsSubstrateDepletionNull Then
-                            cmdText += ", SubstrateDepletion = NULL"
+                        'BA-1616: Fields SubstrateDepletion, ABS_Initial, ABS_MainFilter and ABS_WorkReagent are updated only when
+                        '         parameter pRecalculusFlag is FALSE (to avoid the loss of these values when the result is recalculated)
+                        If (Not pRecalculusFlag) Then
+                            If (.IsSubstrateDepletionNull) Then
+                                cmdText &= ", SubstrateDepletion = NULL"
+                            Else
+                                cmdText &= ", SubstrateDepletion = " & .SubstrateDepletion.ToString
+                            End If
+
+                            If (.IsABS_InitialNull) Then
+                                cmdText &= ", ABS_Initial = NULL"
+                            Else
+                                cmdText &= ", ABS_Initial = " & ReplaceNumericString(.ABS_Initial)
+                            End If
+
+                            If (.IsABS_MainFilterNull) Then
+                                cmdText &= ", ABS_MainFilter = NULL"
+                            Else
+                                cmdText &= ", ABS_MainFilter = " & ReplaceNumericString(.ABS_MainFilter)
+                            End If
+
+                            If (.IsAbs_WorkReagentNull) Then
+                                cmdText &= ", ABS_WorkReagent = NULL"
+                            Else
+                                cmdText &= ", ABS_WorkReagent = " & ReplaceNumericString(.Abs_WorkReagent)
+                            End If
+                        End If
+                        
+                        If (.IsCalibratorFactorNull) Then
+                            cmdText &= ", CalibratorFactor = NULL"
                         Else
-                            cmdText += ", SubstrateDepletion = " & .SubstrateDepletion.ToString
+                            cmdText &= ", CalibratorFactor = " & ReplaceNumericString(.CalibratorFactor)
                         End If
 
-                        If .IsABS_InitialNull Then
-                            cmdText += ", ABS_Initial = NULL"
+                        If (.IsCalibrationErrorNull) Then
+                            cmdText &= ", CalibrationError = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABS_Initial = " & pResultsDS.twksResults(0).ABS_Initial.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABS_Initial = " & .ABS_Initial.ToSQLString()
-                            cmdText += ", ABS_Initial = " & ReplaceNumericString(.ABS_Initial)
+                            cmdText &= ", CalibrationError = '" & .CalibrationError & "'"
                         End If
 
-                        If .IsABS_MainFilterNull Then
-                            cmdText += ", ABS_MainFilter = NULL"
+                        If (.IsCalibratorBlankAbsUsedNull) Then
+                            cmdText &= ", CalibratorBlankAbsUsed = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABS_MainFilter = " & pResultsDS.twksResults(0).ABS_MainFilter.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABS_MainFilter = " & .ABS_MainFilter.ToSQLString()
-                            cmdText += ", ABS_MainFilter = " & ReplaceNumericString(.ABS_MainFilter)
+                            cmdText &= ", CalibratorBlankAbsUsed = " & ReplaceNumericString(.CalibratorBlankAbsUsed)
                         End If
 
-                        'AG 12/07/2010
-                        If .IsAbs_WorkReagentNull Then
-                            cmdText += ", ABS_WorkReagent = NULL"
+                        If (.IsCurveResultsIDNull) Then
+                            cmdText &= ", CurveResultsID = NULL"
                         Else
-                            cmdText += ", ABS_WorkReagent = " & ReplaceNumericString(.Abs_WorkReagent)
-                        End If
-                        'END AG 12/07/2010
-
-
-                        If .IsCalibratorFactorNull Then
-                            cmdText += ", CalibratorFactor = NULL"
-                        Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CalibratorFactor = " & pResultsDS.twksResults(0).CalibratorFactor.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CalibratorFactor = " & .CalibratorFactor.ToSQLString()
-                            cmdText += ", CalibratorFactor = " & ReplaceNumericString(.CalibratorFactor)
+                            cmdText &= ", CurveResultsID = " & .CurveResultsID.ToString
                         End If
 
-                        If .IsCalibrationErrorNull Then
-                            cmdText += ", CalibrationError = NULL"
+                        If (.IsCurveGrowthTypeNull) Then
+                            cmdText &= ", CurveGrowthType = NULL"
                         Else
-                            cmdText += ", CalibrationError = '" & .CalibrationError & "'"
+                            cmdText &= ", CurveGrowthType = '" & .CurveGrowthType & "'"
                         End If
 
-                        If .IsCalibratorBlankAbsUsedNull Then
-                            cmdText += ", CalibratorBlankAbsUsed = NULL"
+                        If (.IsCurveTypeNull) Then
+                            cmdText &= ", CurveType = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CalibratorBlankAbsUsed = " & pResultsDS.twksResults(0).CalibratorBlankAbsUsed.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CalibratorBlankAbsUsed = " & .CalibratorBlankAbsUsed.ToSQLString()
-                            cmdText += ", CalibratorBlankAbsUsed = " & ReplaceNumericString(.CalibratorBlankAbsUsed)
+                            cmdText &= ", CurveType = '" & .CurveType & "'"
                         End If
 
-                        If .IsCurveResultsIDNull Then
-                            cmdText += ", CurveResultsID = NULL"
+                        If (.IsCurveAxisXTypeNull) Then
+                            cmdText &= ", CurveAxisXType = NULL"
                         Else
-                            cmdText += ", CurveResultsID = " & .CurveResultsID.ToString
+                            cmdText &= ", CurveAxisXType = '" & .CurveAxisXType & "'"
                         End If
 
-                        If .IsCurveGrowthTypeNull Then
-                            cmdText += ", CurveGrowthType = NULL"
+                        If (.IsCurveAxisYTypeNull) Then
+                            cmdText &= ", CurveAxisYType = NULL"
                         Else
-                            cmdText += ", CurveGrowthType = '" & .CurveGrowthType & "'"
+                            cmdText &= ", CurveAxisYType = '" & .CurveAxisYType & "'"
                         End If
 
-                        If .IsCurveTypeNull Then
-                            cmdText += ", CurveType = NULL"
+                        If (.IsRelativeErrorCurveNull) Then
+                            cmdText &= ", RelativeErrorCurve = NULL"
                         Else
-                            cmdText += ", CurveType = '" & .CurveType & "'"
+                            cmdText &= ", RelativeErrorCurve = " & ReplaceNumericString(.RelativeErrorCurve)
                         End If
 
-                        If .IsCurveAxisXTypeNull Then
-                            cmdText += ", CurveAxisXType = NULL"
+                        If (.IsCurveSlopeNull) Then
+                            cmdText &= ", CurveSlope = NULL"
                         Else
-                            cmdText += ", CurveAxisXType = '" & .CurveAxisXType & "'"
+                            cmdText &= ", CurveSlope = " & ReplaceNumericString(.CurveSlope)
                         End If
 
-                        If .IsCurveAxisYTypeNull Then
-                            cmdText += ", CurveAxisYType = NULL"
+                        If (.IsCurveOffsetNull) Then
+                            cmdText &= ", CurveOffset = NULL"
                         Else
-                            'AG 12/03/2010
-                            'cmdText += ", CurveAxisYType = '" & pResultsDS.twksResults(0).IsCurveAxisYTypeNull.ToString & "'" & vbCrLf
-                            cmdText += ", CurveAxisYType = '" & .CurveAxisYType & "'"
-                            'AG 12/03/2010
+                            cmdText &= ", CurveOffset = " & ReplaceNumericString(.CurveOffset)
                         End If
 
-                        If .IsRelativeErrorCurveNull Then
-                            cmdText += ", RelativeErrorCurve = NULL"
+                        If (.IsCurveCorrelationNull) Then
+                            cmdText &= ", CurveCorrelation = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", RelativeErrorCurve = " & pResultsDS.twksResults(0).RelativeErrorCurve.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", RelativeErrorCurve = " & .RelativeErrorCurve.ToSQLString()
-                            cmdText += ", RelativeErrorCurve = " & ReplaceNumericString(.RelativeErrorCurve)
+                            cmdText &= ", CurveCorrelation = " & ReplaceNumericString(.CurveCorrelation)
                         End If
 
-                        'AG 01/07/2011
-                        If .IsCurveSlopeNull Then
-                            cmdText += ", CurveSlope = NULL"
+                        If (.IsCONC_ValueNull) Then
+                            cmdText &= ", CONC_Value = NULL"
                         Else
-                            cmdText += ", CurveSlope = " & ReplaceNumericString(.CurveSlope)
+                            cmdText &= ", CONC_Value = " & ReplaceNumericString(.CONC_Value)
                         End If
 
-                        If .IsCurveOffsetNull Then
-                            cmdText += ", CurveOffset = NULL"
+                        If (.IsCONC_ErrorNull) Then
+                            cmdText &= ", CONC_Error = NULL"
                         Else
-                            cmdText += ", CurveOffset = " & ReplaceNumericString(.CurveOffset)
+                            cmdText &= ", CONC_Error = '" & .CONC_Error & "'"
                         End If
 
-                        If .IsCurveCorrelationNull Then
-                            cmdText += ", CurveCorrelation = NULL"
+                        If (.IsResultDateTimeNull) Then
+                            cmdText &= ", ResultDateTime = NULL"
                         Else
-                            cmdText += ", CurveCorrelation = " & ReplaceNumericString(.CurveCorrelation)
-                        End If
-                        'AG 01/07/2011
-
-                        If .IsCONC_ValueNull Then
-                            cmdText += ", CONC_Value = NULL"
-                        Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CONC_Value = " & pResultsDS.twksResults(0).CONC_Value.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CONC_Value = " & .CONC_Value.ToSQLString()
-                            cmdText += ", CONC_Value = " & ReplaceNumericString(.CONC_Value)
-                        End If
-
-                        If .IsCONC_ErrorNull Then
-                            cmdText += ", CONC_Error = NULL"
-                        Else
-                            cmdText += ", CONC_Error = '" & .CONC_Error & "'"
-                        End If
-
-                        If .IsResultDateTimeNull Then
-                            cmdText += ", ResultDateTime = NULL"
-                        Else
-                            cmdText += ", ResultDateTime = '" & .ResultDateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
+                            cmdText &= ", ResultDateTime = '" & .ResultDateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
                         End If
 
                         'AG 10/11/2010 - Add new fields ManualResult and ManualResultText
-                        If .IsManualResultNull Then
-                            cmdText += ", ManualResult = NULL"
+                        If (.IsManualResultNull) Then
+                            cmdText &= ", ManualResult = NULL"
                         Else
-                            cmdText += ", ManualResult = " & ReplaceNumericString(.ManualResult)
+                            cmdText &= ", ManualResult = " & ReplaceNumericString(.ManualResult)
                         End If
 
-                        If .IsManualResultTextNull Then
-                            cmdText += ", ManualResultText = NULL"
+                        If (.IsManualResultTextNull) Then
+                            cmdText &= ", ManualResultText = NULL"
                         Else
-                            cmdText += ", ManualResultText = N'" & .ManualResultText.ToString.Replace("'", "''") & "'"
+                            cmdText &= ", ManualResultText = N'" & .ManualResultText.ToString.Replace("'", "''") & "'"
                         End If
-
                         'END AG 10/11/2010
 
-                        If .IsTS_UserNull Then
-                            cmdText += ", TS_User = ''"
+                        If (.IsTS_UserNull) Then
+                            cmdText &= ", TS_User = ''"
                         Else
-                            cmdText += ", TS_User = '" & .TS_User & "'"
+                            cmdText &= ", TS_User = N'" & .TS_User.Replace("'", "''") & "'"
                         End If
 
-                        If .IsTS_DateTimeNull Then 'If .IsResultDateTimeNull Then 
-                            cmdText += ", TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "'"
+                        If (.IsTS_DateTimeNull) Then
+                            cmdText &= ", TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "'"
                         Else
-                            cmdText += ", TS_DateTime = '" & .TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
+                            cmdText &= ", TS_DateTime = '" & .TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
                         End If
 
-                        cmdText += " WHERE OrderTestID      = " & .OrderTestID & _
-                                   "  AND RerunNumber      = " & .RerunNumber & _
-                                   "  AND MultiPointNumber = " & .MultiPointNumber
+                        cmdText &= " WHERE OrderTestID      = " & .OrderTestID.ToString & _
+                                   " AND   RerunNumber      = " & .RerunNumber.ToString & _
+                                   " AND   MultiPointNumber = " & .MultiPointNumber.ToString
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
-                    'Dim dbCmd As New SqlCommand
-                    'dbCmd.Connection = pDBConnection
-                    'dbCmd.CommandText = cmdText
-                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
-
                 End If
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateResult", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1224,10 +1189,81 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ClearCurveResultsID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ClearCurveResultsID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Count the total number of results selected to be Exported to LIS
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pIncludeExportedResults">When TRUE, it indicates that results that have been already sent to LIS (ExportStatus = SENT) will be sent to LIS again
+        '''                                       (apply only for Patient results). When FALSE, it means that all Patient and/or Control results that have not been still 
+        '''                                       sent to LIS will be sent to LIS</param>
+        ''' <returns>GlobalDataTO containing an integer value with the total number of results selected to be sent to LIS</returns>
+        ''' <remarks>
+        ''' Created by: SA 18/09/2014 - BA-1927
+        ''' </remarks>
+        Public Function CountTotalResultsToExportToLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                       ByVal pIncludeExportedResults As Boolean) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT COUNT(*) AS TotalNumber " & vbCrLf & _
+                                                " FROM twksResults R INNER JOIN twksOrderTests OT ON R.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                   " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                " WHERE  R.AnalyzerID         = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                " AND    R.WorkSessionID      = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                " AND    R.ValidationStatus   = 'OK' " & vbCrLf & _
+                                                " AND    R.AcceptedResultFlag = 1 " & vbCrLf & _
+                                                " AND    OT.OrderTestStatus   = 'CLOSED' " & vbCrLf & _
+                                                " AND    O.OrderToExport      = 1 " & vbCrLf
+
+                        If (pIncludeExportedResults) Then
+                            'Count only Patient Results; the ExportStatus is not used as filter
+                            cmdText &= " AND O.SampleClass = 'PATIENT' "
+                        Else
+                            'Count Control and Patient Results with ExportStatus <> SENT
+                            cmdText &= " AND O.SampleClass IN ('PATIENT', 'CTRL') " & vbCrLf & _
+                                       " AND R.ExportStatus <> 'SENT' "
+                        End If
+
+                        Dim myTotalNumber As Integer = 0
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Dim dbDataReader As SqlClient.SqlDataReader = dbCmd.ExecuteReader()
+
+                            If (dbDataReader.HasRows) Then
+                                dbDataReader.Read()
+                                If (Not dbDataReader.IsDBNull(0)) Then
+                                    myTotalNumber = CInt(dbDataReader.Item("TotalNumber"))
+                                End If
+                            End If
+                            dbDataReader.Close()
+                        End Using
+
+                        resultData.SetDatos = myTotalNumber
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.CountTotalResultsToExportToLIS", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
         End Function
 
         ''' <summary>
@@ -1252,14 +1288,24 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
+                    '                        " WHERE  TestVersion = " & pTestVersion.ToString & vbCrLf & _
+                    '                        " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                               " WHERE  O.SampleClass = 'CALIB' " & vbCrLf & _
+                    '                                               " AND    OT.TestType   = 'STD' " & vbCrLf & _
+                    '                                               " AND    OT.TestID     = " & pTestID.ToString & vbCrLf & _
+                    '                                               " AND    OT.SampleType = '" & pSampleType.Trim & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
                                             " WHERE  TestVersion = " & pTestVersion.ToString & vbCrLf & _
-                                            " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                                   " WHERE  O.SampleClass = 'CALIB' " & vbCrLf & _
-                                                                   " AND    OT.TestType   = 'STD' " & vbCrLf & _
-                                                                   " AND    OT.TestID     = " & pTestID.ToString & vbCrLf & _
-                                                                   " AND    OT.SampleType = '" & pSampleType.Trim & "') " & vbCrLf
+                                            " AND    EXISTS (SELECT OT.OrderTestID " & vbCrLf & _
+                                                            " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                            " WHERE  O.SampleClass = 'CALIB' " & vbCrLf & _
+                                                            " AND    OT.TestType   = 'STD' " & vbCrLf & _
+                                                            " AND    OT.TestID     = " & pTestID.ToString & vbCrLf & _
+                                                            " AND    OT.SampleType = '" & pSampleType.Trim & "' AND twksResults.OrderTestID = OT.OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -1271,8 +1317,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteCalibrationResultsByTestIdSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteCalibrationResultsByTestIdSampleType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1294,9 +1340,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & vbCrLf & _
+                    '                                               " WHERE OrderID = '" & pOrderID & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & vbCrLf & _
-                                                                   " WHERE OrderID = '" & pOrderID & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT OrderTestID FROM twksOrderTests " & vbCrLf & _
+                                                                   " WHERE OrderID = '" & pOrderID & "' AND twksResults.OrderTestID = OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -1308,8 +1359,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByOrderID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByOrderID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1345,8 +1396,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1371,13 +1422,21 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
+                    '                        " WHERE  TestVersion = " & pTestVersion.ToString & vbCrLf & _
+                    '                        " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                               " WHERE  O.SampleClass IN ('BLANK', 'CALIB') " & vbCrLf & _
+                    '                                               " AND    OT.TestType = 'STD' " & vbCrLf & _
+                    '                                               " AND    OT.TestID   = " & pTestID.ToString & ") " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksResults " & vbCrLf & _
                                             " WHERE  TestVersion = " & pTestVersion.ToString & vbCrLf & _
-                                            " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
+                                            " AND    EXISTS (SELECT OT.OrderTestID " & vbCrLf & _
                                                                    " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                    " WHERE  O.SampleClass IN ('BLANK', 'CALIB') " & vbCrLf & _
                                                                    " AND    OT.TestType = 'STD' " & vbCrLf & _
-                                                                   " AND    OT.TestID   = " & pTestID.ToString & ") " & vbCrLf
+                                                                   " AND    OT.TestID   = " & pTestID.ToString & " AND twksResults.OrderTestID = OT.OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -1390,8 +1449,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByTestId", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.DeleteResultsByTestId", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1437,8 +1496,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ExistsResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ExistsResult", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1588,8 +1647,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetAcceptedResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetAcceptedResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1650,8 +1709,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetCalculatedTestResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetCalculatedTestResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1671,6 +1730,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by: AG 25/06/2012
         ''' AG 17/02/2014 - #1505 new parameter pOnlineExportClause
+        ''' IT 05/09/2014 - #1884 Added join table tcfgReportsTestsSorting to the query
         ''' </remarks>
         Public Function GetCompleteResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                    Optional pOnlineExportClause As String = "") As GlobalDataTO
@@ -1683,8 +1743,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM vwksCompleteResults WHERE AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                " AND WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
+                        Dim cmdText As String = " SELECT * FROM vwksCompleteResults R "
+                        cmdText &= " INNER JOIN tcfgReportsTestsSorting TS ON TS.TestType = R.TestType AND TS.TestID = R.TestID "
+                        cmdText &= " WHERE AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                   " AND WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
+
 
                         'AG 17/02/2014 - #1505
                         If pOnlineExportClause <> "" Then
@@ -1692,7 +1755,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
                         'AG 17/02/2014 - #1505
 
-                        cmdText &= " ORDER BY ResultDateTime DESC "
+                        cmdText &= " ORDER BY ResultDateTime DESC"
 
                         Dim lastResultsDS As New ResultsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1711,8 +1774,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetCompleteResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetCompleteResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1762,8 +1825,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetOldBlankCalibToDelete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetOldBlankCalibToDelete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1855,8 +1918,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetLastExecutedBlank", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetLastExecutedBlank", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1963,8 +2026,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetLastExecutedCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetLastExecutedCalibrator", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2024,8 +2087,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetISEOFFSTestResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetISEOFFSTestResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2070,8 +2133,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2124,8 +2187,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2174,8 +2237,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2272,8 +2335,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsToExport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsToExport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2352,8 +2415,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsToExportForBLANKAndCALIB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsToExportForBLANKAndCALIB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2456,8 +2519,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSAcceptedResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSAcceptedResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2510,8 +2573,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSCResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSCResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2557,8 +2620,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ResetAcceptedResultFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ResetAcceptedResultFlag", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2580,11 +2643,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksResults " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
+                    '                                               " FROM   vwksOrderTests " & vbCrLf & _
+                    '                                               " WHERE  SampleClass = 'BLANK' " & vbCrLf & _
+                    '                                               " OR     SampleClass = 'CALIB') " & vbCrLf & _
+                    '                        " AND   (ValidationStatus != 'OK' " & vbCrLf & _
+                    '                        " OR     AcceptedResultFlag = 0) " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksResults " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
-                                                                   " FROM   vwksOrderTests " & vbCrLf & _
-                                                                   " WHERE  SampleClass = 'BLANK' " & vbCrLf & _
-                                                                   " OR     SampleClass = 'CALIB') " & vbCrLf & _
+                                            " WHERE  EXISTS (SELECT OrderTestID " & vbCrLf & _
+                                                            " FROM   vwksOrderTests " & vbCrLf & _
+                                                            " WHERE  (SampleClass = 'BLANK' " & vbCrLf & _
+                                                            " OR     SampleClass = 'CALIB') AND twksResults.OrderTestID = OrderTestID) " & vbCrLf & _
                                             " AND   (ValidationStatus != 'OK' " & vbCrLf & _
                                             " OR     AcceptedResultFlag = 0) " & vbCrLf
 
@@ -2598,8 +2670,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSBlankCalibResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSBlankCalibResults", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2656,8 +2728,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSControlResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ReadWSControlResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2685,11 +2757,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksResults " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
+                    '                                               " FROM   vwksOrderTests " & vbCrLf & _
+                    '                                               " WHERE  SampleClass = 'PATIENT' " & vbCrLf & _
+                    '                                               " OR     SampleClass = 'CTRL') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksResults " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
+                                            " WHERE  EXISTS (SELECT OrderTestID " & vbCrLf & _
                                                                    " FROM   vwksOrderTests " & vbCrLf & _
-                                                                   " WHERE  SampleClass = 'PATIENT' " & vbCrLf & _
-                                                                   " OR     SampleClass = 'CTRL') " & vbCrLf
+                                                                   " WHERE  (SampleClass = 'PATIENT' " & vbCrLf & _
+                                                                   " OR     SampleClass = 'CTRL') AND twksResults.OrderTestID = OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -2702,8 +2781,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSPatientCtrlResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSPatientCtrlResults", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2736,8 +2815,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.ResetWSResults", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2783,8 +2862,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateAcceptedResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateAcceptedResult", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2825,7 +2904,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += " AND MultiPointNumber = " & pMultiItemNumber
                     End If
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -2835,7 +2914,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -2844,8 +2923,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateCollapse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateCollapse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2862,16 +2941,18 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pOrderTestID">Order Test Identifier</param>
         ''' <param name="pMultiItemNumber">MultiItem Number (only for multipoint Calibrators; otherwise, its value is always one</param>
         ''' <param name="pRerunNumber">Rerun Number</param>
+        ''' <param name="pExportStatus">NOTE: The parameter value cannot be "SENT", is responsibility of method that calls pass a valid value</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: 
         ''' Modified by: SA 26/11/2010 - Changed parameter pRerunNumber to optional; when it is not informed, then the result
         '''                              to update will be the one accepted and validated
         '''              SA 21/01/2011 - Update also fields ResultDateTime, TS_User and TS_DateTime
+        '''              AG 16/1/2014 BA-2011 do not use optional parameters + add new parameter ExportStatus and also update ExportStatus and ExportDateTime
         ''' </remarks>
         Public Function UpdateManualResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pManualResultFlag As Boolean, ByVal pResultType As String, _
                                            ByVal pManualResult As Single, ByVal pManualResultText As String, ByVal pOrderTestID As Integer, _
-                                           ByVal pMultiItemNumber As Integer, Optional ByVal pRerunNumber As Integer = -1) As GlobalDataTO
+                                           ByVal pMultiItemNumber As Integer, ByVal pRerunNumber As Integer, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing) Then
@@ -2894,9 +2975,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += ", ManualResultText = N'" & pManualResultText.ToString.Replace("'", "''") & "' " & vbCrLf
                     End If
 
+                    'AG 16/10/2014 BA-2011 - inform also ExportStatus (it cannot be SENT!!!) and ExportDateTime NULL
+                    Dim newExportStatusValue As String = pExportStatus
+                    If pExportStatus = "" Then
+                        newExportStatusValue = "NOTSENT"
+                    End If
+                    cmdText += ", ExportStatus = N'" & newExportStatusValue.ToString.Replace("'", "''") & "' " & vbCrLf
+                    cmdText += ", ExportDateTime = NULL "
+                    'AG 16/10/2014 BA-2011
+
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
-                    cmdText += ", TS_User = N'" & currentSession.GetSessionInfo().UserName.Replace("'", "''") & "' " & vbCrLf
+                    'Dim currentSession As New GlobalBase
+                    cmdText += ", TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "' " & vbCrLf
 
                     'Update ResultDateTime and TS_DateTime with the current datetime
                     cmdText += ", ResultDateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
@@ -2922,8 +3012,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateManualResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateManualResult", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2954,7 +3044,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText += " Printed = " & CStr(IIf(pNewValue, 1, 0))
                     cmdText += " WHERE OrderTestID = " & pOrderTestID
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -2964,7 +3054,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -2973,8 +3063,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdatePrinted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdatePrinted", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -3018,7 +3108,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "   AND MultiPointNumber = " & pRow.MultiPointNumber
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3028,7 +3118,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
 
                 End If
@@ -3037,8 +3127,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateHistoryData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateHistoryData", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -3082,8 +3172,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsByOrderTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsByOrderTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3118,11 +3208,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " UPDATE twksResults SET ExportStatus = '" & dr.ExportStatus & "'" & ", LISMessageID = '" & dr.LISMessageID & "' "
                         cmdText &= " WHERE OrderTestID = " & dr.OrderTestID.ToString
                         cmdText &= " AND RerunNumber = " & dr.RerunNumber.ToString
+                        cmdText &= vbNewLine
                         'cmdText &= " AND ExportStatus = 'SENDING' " 'AG 24/03/2014 - AG 17/02/2014 this line must be COMMENTED when implement #1505 point 7 ('AG 14/02/2014 - #1505 comment this line)
 
                     Next
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3132,7 +3223,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -3141,8 +3232,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateLISMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateLISMessageID", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -3188,7 +3279,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "' "
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3198,7 +3289,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -3206,8 +3297,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -3216,13 +3307,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Get all OrderTests - Rerun - optionally Execution#1 which results was uploaded using the messageID in parameter
+        ''' Get all validated and accepted results by OrderID
         ''' </summary>
         ''' <param name="pDBConnection"></param>
-        ''' <param name="pLISMessageID"></param>
+        ''' <param name="pOrderID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 14/03/2014 - #1533 creation</remarks>
-        Public Function GetResultsByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+        ''' <remarks>AG 30/07/2014 - #1887 creation OrderToExport management
+        ''' AG 17/10/2014 BA-2011 pOrderID parameters changes is 'List (Of String)' instead of 'String'
+        ''' </remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String)) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -3233,15 +3326,33 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT r.OrderTestID, r.RerunNumber, ex.ExecutionID FROM twksResults r LEFT OUTER JOIN "
-                        cmdText &= " twksWSExecutions ex ON r.OrderTestID = ex.OrderTestID AND r.RerunNumber = ex.RerunNumber AND ex.ReplicateNumber = 1 "
-                        cmdText &= " WHERE r.LISMessageID = '" & pLISMessageID.Replace("'", "''") & "'"
+                        'By now get only ExportStatus, and OrderID
+                        Dim cmdText As String = " SELECT R.ExportStatus , O.OrderID, R.OrderTestID, R.RerunNumber, OT.TestType, OT.TestID   FROM twksResults R INNER JOIN twksOrderTests OT ON "
+                        cmdText &= " R.OrderTestID = OT.OrderTestID INNER JOIN twksOrders O ON "
+                        cmdText &= " O.OrderID = OT.OrderID "
+                        cmdText &= " WHERE R.ValidationStatus = 'OK' AND R.AcceptedResultFlag = 1  "
+                        cmdText &= " AND (O.SampleClass = 'PATIENT' OR O.SampleClass = 'CTRL') "
+                        cmdText &= " AND OT.OrderTestStatus = 'CLOSED' "
 
-                        Dim myDataSet As New ExecutionsDS
+                        'AG 17/10/2014 BA-2011
+                        'cmdText &= " AND O.OrderID = N'" & pOrderID.Replace("'", "''") & "'"
+                        If pOrderID.Count > 0 Then
+                            cmdText &= " AND ( "
+                            For item As Integer = 0 To pOrderID.Count - 1
+                                cmdText &= " O.OrderID = N'" & pOrderID(item).Trim.Replace("'", "''") & "' "
+                                If item < pOrderID.Count - 1 Then
+                                    cmdText &= " OR "
+                                End If
+                            Next
+                            cmdText &= " ) "
+                        End If
+                        'AG 17/10/2014 BA-2011
 
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dBConnection)
+                        Dim myDataSet As New ResultsDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myDataSet.twksWSExecutions)
+                                dbDataAdapter.Fill(myDataSet.vwksResults)
                             End Using
                         End Using
 
@@ -3256,8 +3367,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsByMessageID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultsDAO.GetAcceptedResultsByOrder", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

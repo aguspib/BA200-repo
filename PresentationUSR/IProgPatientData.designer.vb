@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgPatientData
+Partial Class UiProgPatientData
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -1001,7 +1001,7 @@ Partial Class IProgPatientData
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgPatientData"
+        Me.Name = "UiProgPatientData"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.Text = " "

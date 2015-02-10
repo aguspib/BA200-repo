@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ILotChangeAuxScreen
+Partial Class UiLotChangeAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class ILotChangeAuxScreen
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ILotChangeAuxScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiLotChangeAuxScreen))
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.bsLotNumberTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
         Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
@@ -232,7 +232,7 @@ Partial Class ILotChangeAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "ILotChangeAuxScreen"
+        Me.Name = "UiLotChangeAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsLoadSaveGroupBox.ResumeLayout(False)

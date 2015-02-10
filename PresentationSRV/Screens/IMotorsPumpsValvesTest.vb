@@ -157,7 +157,7 @@ Imports Biosystems.Ax00.App
 '''elements are displayed.
 ''' </summary>
 ''' <remarks>Created by SGM 03/05/2011</remarks>
-Public Class IMotorsPumpsValvesTest
+Public Class UiMotorsPumpsValvesTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Constructor"
@@ -751,7 +751,6 @@ Public Class IMotorsPumpsValvesTest
 
             Try
                 Dim myGlobal As New GlobalDataTO
-                Dim myUtil As New Utilities
                 Dim auxIconName As String = String.Empty
                 Dim iconPath As String = MyBase.IconsPath
                 Dim myStartStopButtonImage As Image
@@ -763,9 +762,9 @@ Public Class IMotorsPumpsValvesTest
                     If System.IO.File.Exists(iconPath & auxIconName) Then
 
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myStopImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -777,7 +776,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     myStartStopButtonImage = myStopImage
-                    bsScreenToolTips.SetToolTip(Col_StartStopButton, MyClass.myStopButtonToolTip)
+                    bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStopButtonToolTip)
 
                     Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
                     Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
@@ -790,7 +789,7 @@ Public Class IMotorsPumpsValvesTest
                     Me.Cursor = Cursors.Default
 
                     'SGM 25/10/2012
-                    Me.bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", MyClass.LanguageID))
+                    Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
                 Else
                     auxIconName = GetIconName("ADJUSTMENT")
@@ -798,9 +797,9 @@ Public Class IMotorsPumpsValvesTest
                     If System.IO.File.Exists(iconPath & auxIconName) Then
 
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myStartImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -812,7 +811,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     myStartStopButtonImage = myStartImage
-                    bsScreenToolTips.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
+                    bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
 
                     Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
                     Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
@@ -824,7 +823,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     'SGM 25/10/2012
-                    Me.bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
+                    Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
                 End If
 
@@ -1006,7 +1005,7 @@ Public Class IMotorsPumpsValvesTest
     Private Sub PrepareButtons()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
 
@@ -1037,14 +1036,14 @@ Public Class IMotorsPumpsValvesTest
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("HOME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsCancelButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -1054,9 +1053,9 @@ Public Class IMotorsPumpsValvesTest
             'Dim myStartImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(28, 28))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(28, 28))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myStartImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -1079,9 +1078,9 @@ Public Class IMotorsPumpsValvesTest
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myStopImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -1115,7 +1114,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1239,7 +1238,7 @@ Public Class IMotorsPumpsValvesTest
             GetScreenTooltip(pLanguageID)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1258,27 +1257,27 @@ Public Class IMotorsPumpsValvesTest
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            bsScreenToolTips.SetToolTip(InDo_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(ExWa_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(WSAsp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(WsDisp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(InOut_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID))
+            bsScreenToolTips2.SetToolTip(InDo_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(ExWa_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(WSAsp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(WsDisp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(InOut_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID))
 
-            bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
+            bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
 
-            bsScreenToolTips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Homes", pLanguageID))
-            bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
+            bsScreenToolTips2.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Homes", pLanguageID))
+            bsScreenToolTips2.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
 
             MyClass.myStartButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID)
             MyClass.myStopButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID)
 
             'SGM 18/05/2012
-            MyBase.bsScreenToolTips.SetToolTip(WSAsp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
-            MyBase.bsScreenToolTips.SetToolTip(WSDisp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(WSAsp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(WSDisp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1298,7 +1297,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -1338,7 +1337,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeCommonObjects ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeCommonObjects ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeCommonObjects ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1542,7 +1541,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInternalDosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInternalDosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeInternalDosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1623,7 +1622,7 @@ Public Class IMotorsPumpsValvesTest
             Me.ExWa_StopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeExternalWashing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeExternalWashing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeExternalWashing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1710,7 +1709,7 @@ Public Class IMotorsPumpsValvesTest
             Me.WSAsp_StopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeWSAspiration ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeWSAspiration ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeWSAspiration ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1881,7 +1880,7 @@ Public Class IMotorsPumpsValvesTest
             Me.WsDisp_StopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeWSDispensation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeWSDispensation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeWSDispensation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1956,7 +1955,7 @@ Public Class IMotorsPumpsValvesTest
             Me.InOut_StopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInOut ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeInOut ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1995,7 +1994,7 @@ Public Class IMotorsPumpsValvesTest
             'End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeCollision ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2017,7 +2016,7 @@ Public Class IMotorsPumpsValvesTest
             'MyBase.DisplayMessage(Messages.SRV_ENCODER_TEST_READY.ToString)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeEncoder ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeEncoder ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeEncoder ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2042,7 +2041,7 @@ Public Class IMotorsPumpsValvesTest
                 .ButtonsPanel.CancelButton = Me.BsCancelButton
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2080,7 +2079,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadTanksAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadTanksAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadTanksAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -2116,7 +2115,7 @@ Public Class IMotorsPumpsValvesTest
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateCurrentExternalTankLevels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateCurrentExternalTankLevels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateCurrentExternalTankLevels ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2124,11 +2123,16 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Enables the current page tab elements
     ''' </summary>
-    ''' <remarks>Created by SGM 13/05/2011</remarks>
+    ''' <remarks>
+    ''' Created by SGM 13/05/2011
+    ''' Modified by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub EnableCurrentPage()
         Try
             'SGM 21/05/2012
-            If MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN Or MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_UP Then
+            If MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN Or _
+               MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_UP Or _
+               MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR Then
                 Exit Sub
             End If
 
@@ -2216,7 +2220,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.IsWorking = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".EnableCurrentElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".EnableCurrentElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableCurrentElements", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2227,7 +2231,7 @@ Public Class IMotorsPumpsValvesTest
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub DisableCurrentPage(Optional ByRef pExcept As BsScadaControl = Nothing)
 
-        Dim myCopyOfExcept As BsScadaControl
+        Dim myCopyOfExcept As BsScadaControl = Nothing
         If pExcept IsNot Nothing Then
             myCopyOfExcept = pExcept
         End If
@@ -2325,7 +2329,7 @@ Public Class IMotorsPumpsValvesTest
             'Me.BsEncoderTabPage.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisableCurrentElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableCurrentElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableCurrentElements", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
         Finally
@@ -2345,7 +2349,7 @@ Public Class IMotorsPumpsValvesTest
                 Next
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".EnableCurrentSwitchGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".EnableCurrentSwitchGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableCurrentSwitchGroupBox", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2360,7 +2364,7 @@ Public Class IMotorsPumpsValvesTest
                 Next
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisableCurrentSwitchGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableCurrentSwitchGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableCurrentSwitchGroupBox", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2519,7 +2523,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSwitchElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSwitchElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestSwitchElement", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
             MyClass.ReportHistoryError()
@@ -2599,7 +2603,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSwitchElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSwitchElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestSwitchElement", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
             MyClass.MoveRequestedElement = Nothing
@@ -2717,7 +2721,7 @@ Public Class IMotorsPumpsValvesTest
 
         Catch ex As Exception
             MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadArmsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadArmsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadArmsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return resultData
@@ -2760,7 +2764,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadArmPositionData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadArmPositionData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadArmPositionData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2790,7 +2794,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchSimpleButtonClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchSimpleButtonClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SwitchSimpleButtonClick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -2819,7 +2823,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WhenElementCliked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WhenElementCliked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WhenElementCliked ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3101,7 +3105,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSelectElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RequestSelectElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RequestSelectElement ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
             MyClass.ReportHistoryError()
@@ -3143,7 +3147,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DeactivateAll ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3182,7 +3186,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TryActivateElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TryActivateElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TryActivateElement ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -3230,7 +3234,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CanCloseValve ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CanCloseValve ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CanCloseValve", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -3248,7 +3252,7 @@ Public Class IMotorsPumpsValvesTest
     '    Try
     '        'myGlobalDataTO = myScreenDelegate.GetParameters(Me.ActiveAnalyzerModel)
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     '    Return myGlobalDataTO
@@ -3268,7 +3272,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " GetMotorsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetMotorsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & " GetMotorsLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobalDataTO
@@ -3303,7 +3307,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             Next
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshSyringes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshSyringes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshSyringes ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3452,7 +3456,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ManageTabChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ManageTabChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ManageTabChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3473,7 +3477,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CurrentTestPanel_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CurrentTestPanel_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CurrentTestPanel_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3495,7 +3499,7 @@ Public Class IMotorsPumpsValvesTest
                 MyClass.SelectedMotor = Nothing
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UnSelectMotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UnSelectMotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UnSelectMotor ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3516,7 +3520,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateActivationMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateActivationMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateActivationMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3609,7 +3613,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.IsActionRequested = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".AsumeAllSwitchOff ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AsumeAllSwitchOff ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AsumeAllSwitchOff ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3663,7 +3667,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulatePumpPreActivations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulatePumpPreActivations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulatePumpPreActivations", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3720,7 +3724,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulatePumpPostActivations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulatePumpPostActivations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulatePumpPostActivations", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3923,7 +3927,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateSwitchCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateSwitchCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulateSwitchCompleted ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3955,7 +3959,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".SimulateStepPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateStepPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".SimulateStepPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3987,7 +3991,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".SimulateAbsPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateAbsPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".SimulateAbsPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4019,7 +4023,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".SimulateHOMEPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateHOMEPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".SimulateHOMEPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4031,7 +4035,10 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare Tab Area according with current operations
     ''' </summary>
-    ''' <remarks>Created by: XBC 19/04/2011</remarks>
+    ''' <remarks>
+    ''' Created by: XBC 19/04/2011
+    ''' Modified by: XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub PrepareArea()
         Try
             Application.DoEvents()
@@ -4047,6 +4054,14 @@ Public Class IMotorsPumpsValvesTest
 
                 Case ADJUSTMENT_MODES.MBEV_ALL_ARMS_IN_WASHING
                     MyClass.PrepareAllArmsInWashingMode()
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR
+                    MyClass.PrepareWashingStationIsDowningMode()
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_NROTOR_PERFORMED
+                    MyClass.WashingStationToDownAfterNRotor()
 
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
                     MyClass.PrepareWashingStationIsDownMode()
@@ -4094,7 +4109,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4148,7 +4163,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAdjustPreparedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4204,7 +4219,7 @@ Public Class IMotorsPumpsValvesTest
                             Else
 
                                 'keep on
-                                System.Threading.Thread.Sleep(MyClass.SwitchInterval) 'PDT continuous switch interval?
+                                System.Threading.Thread.Sleep(SwitchInterval) 'PDT continuous switch interval?
 
                                 If MyClass.CurrentActivationMode = ACTIVATION_MODES.CONTINUOUS Then
                                     Select Case MyClass.SwitchRequestedElement.ActivationState
@@ -4315,7 +4330,7 @@ Public Class IMotorsPumpsValvesTest
                                         '    SimulatePumpPreActivations(MyClass.SwitchRequestedElement.Identity)
                                         'End If
                                         'keep on
-                                        System.Threading.Thread.Sleep(MyClass.SwitchInterval) 'PDT continuous switch interval?
+                                        System.Threading.Thread.Sleep(SwitchInterval) 'PDT continuous switch interval?
                                         MyClass.StartActionTimer()
                                         MyClass.CurrentActionStep = ActionSteps.ACTION_REQUESTING
                                         Application.DoEvents()
@@ -4406,7 +4421,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4425,7 +4440,7 @@ Public Class IMotorsPumpsValvesTest
             Me.Col_StartStopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestEnablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestEnablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareCollisionTestEnablingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4447,7 +4462,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestEnabledMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestEnabledMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareCollisionTestEnabledMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4466,7 +4481,7 @@ Public Class IMotorsPumpsValvesTest
             Me.Col_StartStopButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestDisablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestDisablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareCollisionTestDisablingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4480,7 +4495,7 @@ Public Class IMotorsPumpsValvesTest
             MyBase.DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4566,7 +4581,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4592,7 +4607,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.PrepareArea()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestNotAllowedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestNotAllowedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestNotAllowedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4631,7 +4646,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareHomesFinishedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareHomesFinishedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4682,7 +4697,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerInfoReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAnalyzerInfoReadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareAnalyzerInfoReadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4736,7 +4751,7 @@ Public Class IMotorsPumpsValvesTest
             Exit Sub
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllArmsInWashingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllArmsInWashingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAllArmsInWashingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4787,10 +4802,43 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsDownMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsDownMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Prepare GUI for Washing Station is Downing Mode (NRotor)
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub PrepareWashingStationIsDowningMode()
+        Try
+            Dim myGlobal As New GlobalDataTO
+
+            If Not myGlobal.HasError Then
+
+                Me.WSAsp_UpDownButton.Enabled = False
+                Me.WSDisp_UpDownButton.Enabled = False
+
+                If MyBase.SimulationMode Then
+                    myGlobal = MyBase.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
+                    MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
+                    MyClass.PrepareArea()
+                End If
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsDowningMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsDowningMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
 
     End Sub
 
@@ -4850,7 +4898,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4908,7 +4956,7 @@ Public Class IMotorsPumpsValvesTest
             'Exit Sub
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllArmsInParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllArmsInParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAllArmsInParkingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5010,7 +5058,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllSwitchedOffMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAllSwitchedOffMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareAllSwitchedOffMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5036,7 +5084,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.StartArmsToWashingTimer()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".AllArmsToWashing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AllArmsToWashing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AllArmsToWashing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5057,7 +5105,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.StartArmsToParkingTimer()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".AllArmsToParking ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AllArmsToParking ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AllArmsToParking ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5065,7 +5113,10 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Brings the Washing Station Down
     ''' </summary>
-    ''' <remarks>SGM 21/11/2011</remarks>
+    ''' <remarks>
+    ''' Created by SGM 21/11/2011
+    ''' Modified by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub WashingStationToDown()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -5085,11 +5136,29 @@ Public Class IMotorsPumpsValvesTest
 
             MyClass.DisableCurrentPage()
 
+            'MyClass.StartWashingStationToDownTimer()
+            MyClass.StartWashingStationToNRotorTimer()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Brings the Washing Station Down
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub WashingStationToDownAfterNRotor()
+        Dim myGlobal As New GlobalDataTO
+        Try
             MyClass.StartWashingStationToDownTimer()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDownAfterNRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDownAfterNRotor ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -5120,7 +5189,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.StartWashingStationToUpTimer()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5149,7 +5218,7 @@ Public Class IMotorsPumpsValvesTest
             ' XBC 11/11/2011
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".AllItemsToDefault ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AllItemsToDefault ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".AllItemsToDefault ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5200,7 +5269,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TestSwitch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestSwitch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TestSwitch ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5242,7 +5311,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".MoveTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MoveTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".MoveTest ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -5291,12 +5360,12 @@ Public Class IMotorsPumpsValvesTest
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5333,7 +5402,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartArmsToWashingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartArmsToWashingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5358,7 +5427,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnArmsToWashingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnArmsToWashingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5394,7 +5463,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartArmsToParkingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartArmsToParkingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5428,7 +5497,43 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToDownTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToDownTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+        Return myGlobal
+    End Function
+
+    ''' <summary>
+    ''' Previous step to WASHING_STATION_IS_DOWN
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Function StartWashingStationToNRotorTimer() As GlobalDataTO
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            MyClass.DisableCurrentPage()
+
+            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR
+            MyClass.PrepareArea()
+
+            If MyBase.SimulationMode Then
+
+                System.Threading.Thread.Sleep(SimulationProcessTime)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN
+                MyClass.PrepareArea()
+            Else
+                Me.OnWashingStationToNRotorTimerTick()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToNRotorTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5462,7 +5567,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToUpTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToUpTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5488,7 +5593,34 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnArmsToParkingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnArmsToParkingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Sends NROTOR instruction
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub OnWashingStationToNRotorTimerTick()
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            If Not myGlobal.HasError Then
+                Me.Cursor = Cursors.WaitCursor
+                myScreenDelegate.SendNEW_ROTOR()
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToNRotorTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5513,7 +5645,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToDownTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToDownTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5537,7 +5669,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToUpTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToUpTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5576,7 +5708,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartSettingDefaultTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartSettingDefaultTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5601,7 +5733,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnSettingDefaultTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnSettingDefaultTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5641,7 +5773,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartHardwareReaderTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartHardwareReaderTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5692,7 +5824,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnReadingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnReadingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5803,7 +5935,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " ReadHardwareValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ReadHardwareValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -5840,7 +5972,7 @@ Public Class IMotorsPumpsValvesTest
     '        ' XBC 09/11/2011 - TEMPORAL - PENDING ON POLLHW INSTRUCTIONS !!!
 
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadManifoldElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadManifoldElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".ReadManifoldElements ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     '    Return myGlobal
@@ -5876,7 +6008,7 @@ Public Class IMotorsPumpsValvesTest
     '        ' XBC 09/11/2011 - TEMPORAL - PENDING ON POLLHW INSTRUCTIONS !!!
 
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadFluidicsElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadFluidicsElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".ReadFluidicsElements ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
 
@@ -5914,7 +6046,7 @@ Public Class IMotorsPumpsValvesTest
     '        ' XBC 09/11/2011 - TEMPORAL - PENDING ON POLLHW INSTRUCTIONS !!!
 
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadPhotometricsElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadPhotometricsElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".ReadPhotometricsElements ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
 
@@ -5958,7 +6090,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartActionTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartActionTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -6008,7 +6140,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnActionTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnActionTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6040,7 +6172,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToBoolean ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToBoolean ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertFwStringToBoolean ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return False
         End Try
@@ -6069,7 +6201,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFWStringToState ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFWStringToState ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertFWStringToState ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return BsScadaControl.States._NONE
         End Try
@@ -6084,7 +6216,7 @@ Public Class IMotorsPumpsValvesTest
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToDiagnosis ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToDiagnosis ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertFwStringToDiagnosis ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -6129,7 +6261,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToHomeStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToHomeStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertFwStringToHomeStatus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -6147,7 +6279,7 @@ Public Class IMotorsPumpsValvesTest
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToCollisionStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertFwStringToCollisionStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertFwStringToCollisionStatus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -6185,7 +6317,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSyringeColors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSyringeColors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateSyringeColors ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6290,7 +6422,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_RequestSwitchSource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_RequestSwitchSource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_RequestSwitchSource ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -6326,7 +6458,7 @@ Public Class IMotorsPumpsValvesTest
             MyClass.InDo_UpdateSyringeColors()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Indo_UpdateSource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Indo_UpdateSource ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Indo_UpdateSource ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6381,7 +6513,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSAsp_CanActivatePump ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSAsp_CanActivatePump ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSAsp_CanActivatePump", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -6410,7 +6542,7 @@ Public Class IMotorsPumpsValvesTest
             WsDisp_Plunger5Panel_Off.Visible = Not pOn
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WsDisp_UpdatePlungersState ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WsDisp_UpdatePlungersState ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WsDisp_UpdatePlungersState ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6454,7 +6586,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InOut_CanActivateElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InOut_CanActivateElement ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InOut_CanActivateElement", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -6515,7 +6647,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Col_EnableTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_EnableTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Col_EnableTest", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -6566,7 +6698,7 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Col_DisableTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_DisableTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Col_DisableTest", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -6602,7 +6734,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Col_SimulateCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_SimulateCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Col_SimulateCollision", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, Nothing, Me)
         End Try
     End Sub
@@ -6864,7 +6996,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -6882,7 +7014,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistoryError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6903,7 +7035,7 @@ Public Class IMotorsPumpsValvesTest
 
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6924,7 +7056,7 @@ Public Class IMotorsPumpsValvesTest
                 MyClass.CurrentTestPanel.Cursor = Me.Cursor
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".IMotorsPumpsValvesTest_CursorChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".IMotorsPumpsValvesTest_CursorChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IMotorsPumpsValvesTest_CursorChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6956,7 +7088,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -6984,8 +7116,8 @@ Public Class IMotorsPumpsValvesTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(LanguageID)
@@ -7116,7 +7248,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         'End If
@@ -7150,7 +7282,7 @@ Public Class IMotorsPumpsValvesTest
             Me.BsInfoColXPSViewer.RefreshPage()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7179,7 +7311,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7253,7 +7385,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_TrySelecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_TrySelecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_TrySelecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -7323,7 +7455,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabPagesControl_Selected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7411,7 +7543,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabControl_Selecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7431,7 +7563,7 @@ Public Class IMotorsPumpsValvesTest
                 Next
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchGroupBox_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchGroupBox_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SwitchGroupBox_EnabledChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7449,7 +7581,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchSimpleRButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchSimpleRButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SwitchSimpleRButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7467,7 +7599,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchContinuousRButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SwitchContinuousRButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SwitchContinuousRButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7490,7 +7622,7 @@ Public Class IMotorsPumpsValvesTest
             'MyClass.CurrentActivationMode = ACTIVATION_MODES.SIMPLE
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopContinuousButtons_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopContinuousButtons_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopContinuousButtons_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7543,7 +7675,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.IsActionRequested = False
         End Try
@@ -7560,7 +7692,7 @@ Public Class IMotorsPumpsValvesTest
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7588,7 +7720,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WS_UpDownButtonn_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WS_UpDownButtonn_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WS_UpDownButtonn_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7662,416 +7794,10 @@ Public Class IMotorsPumpsValvesTest
             End If
 
             Exit Sub
-            'end SGM 17/04/2012
 
-
-
-
-
-
-
-            '' XBC 09/11/2011
-            'myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
-            '' XBC 09/11/2011
-
-            'MANIFOLD ELEMENTS
-            If MyClass.IsManifoldRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.MANIFOLDVALUE_CHANGED) Then
-
-                Dim myManifoldValueChangedDT As New UIRefreshDS.ManifoldValueChangedDataTable
-                myManifoldValueChangedDT = pRefreshDS.ManifoldValueChanged
-                For Each E As UIRefreshDS.ManifoldValueChangedRow In myManifoldValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-                        Case MANIFOLD_ELEMENTS.JE1_MR1.ToString
-                            'Me.InDo_Reagent1_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR1H.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Reagent1_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR1A.ToString
-                            Me.InDo_Reagent1_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2.ToString
-                            'Me.InDo_Reagent2_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2H.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Reagent2_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2A.ToString
-                            Me.InDo_Reagent2_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MS.ToString
-                            'Me.InDo_Samples_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MSH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Samples_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MSA.ToString
-                            Me.InDo_Samples_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_B1.ToString
-                            Me.InDo_Samples_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B2.ToString
-                            Me.InDo_Reagent1_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B3.ToString
-                            Me.InDo_Reagent2_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV1.ToString
-                            Me.InDo_Samples_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV2.ToString
-                            Me.InDo_Reagent1_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV3.ToString
-                            Me.InDo_Reagent2_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV4.ToString
-                            Me.InDo_Air_Ws_3Evalve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV5.ToString
-                            Me.InDo_AirWs_Pw_3Evalve.ActivationState = ConvertFwStringToState(E.Value)
-
-
-
-                            'diagnosis
-
-                        Case MANIFOLD_ELEMENTS.JE1_B1D.ToString
-                            Me.InDo_Samples_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B2D.ToString
-                            Me.InDo_Reagent1_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B3D.ToString
-                            Me.InDo_Reagent2_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV1D.ToString
-                            Me.InDo_Samples_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV2D.ToString
-                            Me.InDo_Reagent1_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV3D.ToString
-                            Me.InDo_Reagent2_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV4D.ToString
-                            Me.InDo_Air_Ws_3Evalve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV5D.ToString
-                            Me.InDo_AirWs_Pw_3Evalve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                    End Select
-
-                    'update motor adjust control
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                'If E.ElementID.ToString.Contains(MyClass.SelectedMotor.Identity.ToUpper) Then
-                                If E.ElementID.ToString.Contains(MyClass.SelectedMotor.Identity) Then
-                                    MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                                End If
-                            End If
-                        End If
-                    End If
-
-
-                Next
-
-                MyClass.IsManifoldRequested = False
-
-            End If
-
-            If MyClass.SelectedPage = TEST_PAGES.INTERNAL_DOSING Then
-                MyClass.Indo_UpdateSource()
-            End If
-
-            'FLUIDICS ELEMENTS
-            If MyClass.IsFluidicsRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FLUIDICSVALUE_CHANGED) Then
-                Dim myFluidicsValueChangedDT As New UIRefreshDS.FluidicsValueChangedDataTable
-                myFluidicsValueChangedDT = pRefreshDS.FluidicsValueChanged
-                For Each E As UIRefreshDS.FluidicsValueChangedRow In myFluidicsValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-
-                        Case FLUIDICS_ELEMENTS.SF1_B1.ToString
-                            Me.ExWa_Samples_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B2.ToString
-                            Me.ExWa_Reagent1_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B3.ToString
-                            Me.ExWa_Reagent2_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B4.ToString
-                            Me.InOut_PW_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B5.ToString
-                            Me.InOut_LC_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B6.ToString
-                            Me.WsAsp_B6_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B7.ToString
-                            Me.WsAsp_B7_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B8.ToString
-                            Me.WsAsp_B8_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B9.ToString
-                            Me.WsAsp_B9_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B10.ToString
-                            Me.WsAsp_B10_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV1.ToString
-                            Me.InOut_PWTank_Valve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV2.ToString
-                            Me.InOut_PWSource_Valve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_GE1.ToString
-                            Me.WsDisp_GE1_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE2_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE3_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE4_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE5_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WSDisp_ValvesGroupDCUnit.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_MS.ToString
-                            'Me.WsDisp_M1_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_MSH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.WsDisp_M1_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-
-                        Case FLUIDICS_ELEMENTS.SF1_MSA.ToString
-                            Me.WsDisp_M1_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-
-                            'diagnosis
-                        Case FLUIDICS_ELEMENTS.SF1_B1D.ToString
-                            Me.ExWa_Samples_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B2D.ToString
-                            Me.ExWa_Reagent1_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B3D.ToString
-                            Me.ExWa_Reagent2_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B4D.ToString
-                            Me.InOut_PW_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B5D.ToString
-                            Me.InOut_LC_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B6D.ToString
-                            Me.WsAsp_B6_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B7D.ToString
-                            Me.WsAsp_B7_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B8D.ToString
-                            Me.WsAsp_B8_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B9D.ToString
-                            Me.WsAsp_B9_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B10D.ToString
-                            Me.WsAsp_B10_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV1D.ToString
-                            Me.InOut_PWTank_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV2D.ToString
-                            Me.InOut_PWSource_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-
-                        Case FLUIDICS_ELEMENTS.SF1_GE1D.ToString
-                            Me.WsDisp_GE1_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE2_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE3_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE4_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE5_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WSDisp_ValvesGroupDCUnit.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-
-                            'tanks
-                        Case FLUIDICS_ELEMENTS.SF1_HCW.ToString
-                            MyClass.CurrentHighContaminationTankLevel = CInt(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WSW.ToString
-                            MyClass.CurrentDistilledWaterTankLevel = CInt(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WAS.ToString
-                            MyClass.UpdateCurrentExternalTankLevels(E.ElementID, E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_SLS.ToString
-                            MyClass.UpdateCurrentExternalTankLevels(E.ElementID, E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WTS.ToString
-                            MyClass.IsNotLowContaminationTankEmptying = ConvertFwStringToBoolean(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_STS.ToString
-                            MyClass.IsNotSystemLiquidTankFilling = ConvertFwStringToBoolean(E.Value)
-
-                    End Select
-
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                            End If
-                        End If
-                    End If
-
-                Next
-
-                MyClass.IsFluidicsRequested = False
-
-            End If
-
-            'PHOTOMETRICS ELEMENTS
-            If MyClass.IsPhotometricsRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED) Then
-                Dim myPhotometricsValueChangedDT As New UIRefreshDS.PhotometricsValueChangedDataTable
-                myPhotometricsValueChangedDT = pRefreshDS.PhotometricsValueChanged
-                For Each E As UIRefreshDS.PhotometricsValueChangedRow In myPhotometricsValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MR.ToString
-                            'Me.Enco_ReactionsRotorMotor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.Enco_ReactionsRotorMotor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRA.ToString
-                            Me.Enco_ReactionsRotorMotor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRE.ToString
-                            If Not MyClass.CurrentActionStep = ActionSteps.PREVIOUS_READING Then
-                                Me.Enco_ReactionsRotorEncoderPos = CInt(E.Value)
-                                Me.Enco_EncoderPosLabel.Text = E.Value
-                            End If
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MW.ToString
-                            Me.Col_WashingStationMotor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MWH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.Col_WashingStationMotor, E.Value).ToString
-
-
-
-                            'diagnosis
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRED.ToString
-                            Me.IsReactionsRotorEncoderError = ConvertFwStringToDiagnosis(E.Value)
-
-                    End Select
-
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                If MyClass.CurrentMotorAdjustControl.CurrentValue <> CInt(E.Value) Then
-                                    MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                                End If
-                            End If
-                        End If
-                    End If
-
-                Next
-
-                MyClass.IsPhotometricsRequested = False
-
-                If Me.Enco_ReactionsRotorMotor.CurrentPosition <> Me.Enco_ReactionsRotorEncoderPos Then
-                    Me.Enco_EncoderPosLabel.ForeColor = Color.Red
-
-                Else
-                    Me.Enco_EncoderPosLabel.ForeColor = Color.LightSteelBlue ' Color.LawnGreen
-
-                End If
-            End If
-
-            'FIRMWARE EVENTS ELEMENTS
-            If MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_ENABLED Then
-                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWEVENT_CHANGED) Then
-                    Dim myCollisionTestValueChangedDT As New UIRefreshDS.FirmwareEventsValueChangedDataTable
-                    myCollisionTestValueChangedDT = pRefreshDS.FirmwareEventsValueChanged
-                    'For Each E As UIRefreshDS.FirmwareEventsValueChangedRow In myCollisionTestValueChangedDT.Rows
-                    '    'Dim IsMotorUpdated As Boolean = False
-
-                    '    Select Case E.EventID
-
-                    '        'status
-                    '        Case FW_EVENTS.WSCD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_WashingStationLED.CurrentStatus
-                    '            Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_WashingStationLED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.SCD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_SamplesLED.CurrentStatus
-                    '            Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_SamplesLED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.R1CD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_Reagent1LED.CurrentStatus
-                    '            Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_Reagent1LED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.R2CD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_Reagent2LED.CurrentStatus
-                    '            Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_Reagent2LED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '    End Select
-                    'Next
-
-                End If
-            End If
-
-            If MyClass.SelectedPage = TEST_PAGES.INTERNAL_DOSING Then
-                MyClass.InDo_UpdateSyringeColors()
-            End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -8133,7 +7859,7 @@ Public Class IMotorsPumpsValvesTest
             Me.BsExitButton.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8187,7 +7913,7 @@ Public Class IMotorsPumpsValvesTest
             Me.BsExitButton.Enabled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8228,7 +7954,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_Motors_AdjustControl_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8263,7 +7989,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_Motors_AdjustControl_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8299,7 +8025,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_Motors_AdjustControl_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8312,7 +8038,7 @@ Public Class IMotorsPumpsValvesTest
         Try
             MyBase.DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_Motors_AdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_Motors_AdjustControl_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8342,7 +8068,7 @@ Public Class IMotorsPumpsValvesTest
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InDo_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InDo_ElementSelected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8369,7 +8095,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExWa_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExWa_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExWa_ElementSelected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8401,7 +8127,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExWa_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExWa_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExWa_ElementSelected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8439,7 +8165,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_ElementSelected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8455,7 +8181,7 @@ Public Class IMotorsPumpsValvesTest
             WsDisp_GE5_Valve.Enabled = WSDisp_ValvesGroupDCUnit.Enabled
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_ValvesGroupDCUnit_EnableChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_ValvesGroupDCUnit_EnableChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_ValvesGroupDCUnit_EnableChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8493,7 +8219,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_MotorAdjustControl_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8530,7 +8256,7 @@ Public Class IMotorsPumpsValvesTest
             Me.WSDisp_UpDownButton.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ". WSDisp_MotorAdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ". WSDisp_MotorAdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ". WSDisp_MotorAdjustControl_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8568,7 +8294,7 @@ Public Class IMotorsPumpsValvesTest
             Me.WSDisp_UpDownButton.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_MotorAdjustControl_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8582,7 +8308,7 @@ Public Class IMotorsPumpsValvesTest
             MyBase.DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
             Me.WSDisp_UpDownButton.Enabled = True
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_MotorAdjustControl_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8624,7 +8350,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InOut_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InOut_ElementSelected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InOut_ElementSelected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8659,7 +8385,7 @@ Public Class IMotorsPumpsValvesTest
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Col_StopButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_StopButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Col_StopButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
     End Sub
@@ -8683,7 +8409,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Col_LED_StatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_LED_StatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Col_LED_StatusChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, Nothing, Me)
         End Try
     End Sub
@@ -8699,7 +8425,7 @@ Public Class IMotorsPumpsValvesTest
         Try
             Me.Enco_UnitsLabel.ForeColor = Me.Enco_EncoderPosLabel.ForeColor
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_EncoderPosLabel_ForeColorChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_EncoderPosLabel_ForeColorChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Enco_EncoderPosLabel_ForeColorChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8728,7 +8454,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Enco_Motor_AdjustControl_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8757,7 +8483,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Enco_Motor_AdjustControl_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8783,7 +8509,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motor_AdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Enco_Motor_AdjustControl_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8796,7 +8522,7 @@ Public Class IMotorsPumpsValvesTest
         Try
             MyBase.DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motors_AdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Enco_Motors_AdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Enco_Motors_AdjustControl_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8819,7 +8545,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsHomingSimulationTimer_Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -8835,7 +8561,7 @@ Public Class IMotorsPumpsValvesTest
             BsCollisionSimulationTimer.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsHomingSimulationTimer_Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8863,7 +8589,7 @@ Public Class IMotorsPumpsValvesTest
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -9014,7 +8740,7 @@ Public Class IMotorsPumpsValvesTest
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 

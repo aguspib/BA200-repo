@@ -1,12 +1,14 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSRotorPositions
+﻿Imports Biosystems.Ax00.Global
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class UiWSRotorPositions
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
-            CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
             If disposing AndAlso components IsNot Nothing Then
                 components.Dispose()
             End If
@@ -14,7 +16,7 @@ Partial Class IWSRotorPositions
         Finally
             MyBase.Dispose(disposing)
             isClosingFlag = False
-            CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -27,7 +29,7 @@ Partial Class IWSRotorPositions
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSRotorPositions))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSRotorPositions))
         Me.bsScreenTimer = New System.Windows.Forms.Timer(Me.components)
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
@@ -6282,7 +6284,7 @@ Partial Class IWSRotorPositions
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSRotorPositions"
+        Me.Name = "UiWSRotorPositions"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual

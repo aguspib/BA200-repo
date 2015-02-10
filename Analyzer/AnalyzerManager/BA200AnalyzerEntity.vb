@@ -5,7 +5,7 @@ Imports System.Data
 Namespace Biosystems.Ax00.Core.Entities
 
     Public Class BA200AnalyzerEntity
-        Inherits AnalyzerEntity
+        Inherits AnalyzerManager
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)

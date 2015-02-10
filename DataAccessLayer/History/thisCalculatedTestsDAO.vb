@@ -3,13 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports System.Text
-Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisCalculatedTestsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -48,8 +46,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.CloseCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.CloseCalculatedTest", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -106,8 +104,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -128,10 +126,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM thisCalculatedTests " & vbCrLf & _
+                    '                        " WHERE  ClosedCalcTest = 1 " & vbCrLf & _
+                    '                        " AND    HistCalcTestID NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                    '                                                                  " WHERE  TestType = 'CALC') " & vbCrLf
                     Dim cmdText As String = " DELETE FROM thisCalculatedTests " & vbCrLf & _
                                             " WHERE  ClosedCalcTest = 1 " & vbCrLf & _
-                                            " AND    HistCalcTestID NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
-                                                                                      " WHERE  TestType = 'CALC') " & vbCrLf
+                                            " AND NOT EXISTS (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                                                              " WHERE  TestType = 'CALC' AND thisCalculatedTests.HistCalcTestID = HistTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -143,8 +146,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -192,8 +195,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.ReadByHistCalcTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.ReadByHistCalcTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -239,15 +242,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Update field FormulaText of a Calculated Test saved in Historic Module when the long name of an Standard or Calculated Test included in its
-        ''' formula is changed in the corresponding Programming Screen
+        ''' Update field FormulaText of a Calculated Test saved in Historic Module when the long name of a Standard, ISE, Off-System or Calculated Test included in its
+        ''' formula is changed in the corresponding Programming Screen.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pHistCalcTestID">Identifier of the Calculated Test in Historic Module</param>
@@ -255,6 +258,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 20/09/2012
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary description with ISE and Off-System as possible sources for changing its name.
         ''' </remarks>
         Public Function UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistCalcTestID As Integer, ByVal pNewFormulaText As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -278,8 +282,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.UpdateFormulaText", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalculatedTestsDAO.UpdateFormulaText", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

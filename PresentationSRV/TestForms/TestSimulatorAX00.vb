@@ -2,11 +2,8 @@
 Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
@@ -25,7 +22,7 @@ Public Class TestSimulatorAX00
 
 #Region "Definitions"
 
-    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
+    Private WithEvents analyzer As IAnalyzerManager = AnalyzerController.Instance.Analyzer '#REFACTORING
 
 #End Region
 
@@ -42,8 +39,8 @@ Public Class TestSimulatorAX00
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -65,8 +62,8 @@ Public Class TestSimulatorAX00
 
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -487,7 +484,7 @@ Public Class TestSimulatorAX00
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub AnswerButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AnswerButton.Click
+    Private Sub AnswerButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AnswerButton.Click
         Try
             'Simulate instruction reception
 
@@ -523,15 +520,15 @@ Public Class TestSimulatorAX00
         End Try
     End Sub
 
-    Private Sub CloseButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseButton.Click
+    Private Sub CloseButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CloseButton.Click
         Me.Close()
     End Sub
 
-    Private Sub TestSimulatorAX00_Activated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Activated
+    Private Sub TestSimulatorAX00_Activated(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Activated
 
     End Sub
 
-    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceivedTextBox.TextChanged
+    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceivedTextBox.TextChanged
 
     End Sub
 

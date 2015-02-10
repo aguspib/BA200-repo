@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ICycleCountScreen
+Partial Class UiCycleCountScreen
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -379,7 +379,7 @@ Partial Class ICycleCountScreen
         Me.Controls.Add(Me.BsCycleAdjustPanel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "ICycleCountScreen"
+        Me.Name = "UiCycleCountScreen"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "DemoMode"
         Me.BsCycleCountInfoPanel.ResumeLayout(False)

@@ -1,14 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tparVirtualRotorsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -64,8 +63,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -118,8 +117,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorTypeAndVirtualRotorName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorTypeAndVirtualRotorName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -152,12 +151,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = ""
-                    Dim objGlobal As New GlobalBase
+                    'Dim objGlobal As New GlobalBase
                     cmdText = " INSERT INTO tparVirtualRotors(RotorType, VirtualRotorName, InternalRotor, TS_User, TS_DateTime) " & _
                               " VALUES ('" & pRotorType & "', " & _
                                      " N'" & pVirtualRotorName.Replace("'", "''") & "', " & _
                                              Convert.ToInt32(IIf(pInternalRotor, 1, 0)) & ", " & _
-                                     " N'" & objGlobal.GetSessionInfo.UserName.Replace("'", "''") & "', " & _
+                                     " N'" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & _
                                       " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
 
                     'Execute the SQL sentence 
@@ -188,8 +187,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -233,8 +232,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function

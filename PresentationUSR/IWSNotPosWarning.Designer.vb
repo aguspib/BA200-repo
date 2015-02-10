@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSNotPosWarning
+Partial Class UiWSNotPosWarning
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IWSNotPosWarning
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSNotPosWarning))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSNotPosWarning))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsAdviceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsWarningPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
@@ -220,7 +220,7 @@ Partial Class IWSNotPosWarning
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSNotPosWarning"
+        Me.Name = "UiWSNotPosWarning"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsAdviceGroupBox.ResumeLayout(False)

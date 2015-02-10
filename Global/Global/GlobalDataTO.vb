@@ -3,83 +3,57 @@ Option Explicit On
 
 Namespace Biosystems.Ax00.Global
     'Definition of the global TO used for Data Access 
-    Public Class GlobalDataTO
 
-#Region "Attributes"
-        Private affectedRecordsAttribute As Integer
-        Private hasErrrorAttribute As Boolean
-        Private errorCodeAttribute As String
-        Private errorMessageAttribute As String
-        Private setDatosAttribute As Object
-        Private setUserLevelAttribute As Object
-#End Region
+    Public Class TypedGlobalDataTo(Of T)
 
 #Region "Properties"
         'Get/Set the number of records affected for an SQL command
-        Public Property AffectedRecords() As Integer
-            Get
-                Return affectedRecordsAttribute
-            End Get
-            Set(ByVal value As Integer)
-                affectedRecordsAttribute = value
-            End Set
-        End Property
+        Public Property AffectedRecords As Integer
 
         'Get/Set if an error has happened when an SQL Sentence is executed
-        Public Property HasError() As Boolean
-            Get
-                Return hasErrrorAttribute
-            End Get
-            Set(ByVal value As Boolean)
-                hasErrrorAttribute = value
-            End Set
-        End Property
+        Public Property HasError As Boolean
 
         'When the execution of an SQL sentence generates an Error, 
         'Get/Set the ErrorCode (it can be an application error (controlled)
         'or a system/database error (uncontrolled)
-        Public Property ErrorCode() As String
-            Get
-                Return errorCodeAttribute
-            End Get
-            Set(ByVal value As String)
-                errorCodeAttribute = value
-            End Set
-        End Property
+        Public Property ErrorCode As String
 
         'When the execution of an SQL sentence generates an Error, 
         'Get/Set the ErrorCode (it can be an application error (controlled)
         'or a system/database error (uncontrolled)
-        Public Property ErrorMessage() As String
-            Get
-                Return errorMessageAttribute
-            End Get
-            Set(ByVal value As String)
-                errorMessageAttribute = value
-            End Set
-        End Property
+        Public Property ErrorMessage As String
 
         'Get/Set the dataset containing the data to insert/update or delete
-        Public Property SetDatos() As Object
-            Get
-                Return setDatosAttribute
-            End Get
-            Set(ByVal value As Object)
-                setDatosAttribute = value
-            End Set
-        End Property
+        Public Overridable Property SetDatos As T
 
         'Get/Set the value of the UserLevel
-        Public Property SetUserLevel() As Object
-            Get
-                Return setUserLevelAttribute
-            End Get
-            Set(ByVal value As Object)
-                setUserLevelAttribute = value
-            End Set
-        End Property
+        Public Property SetUserLevel As String
+
+#End Region
+
+#Region "Methods"
+        ''' <summary>
+        ''' This function creates a clone of this TypedGlobalDataTo as an older untyped GlobalDataTo. Use this for compatibility with older code.
+        ''' </summary>
+        ''' <returns>A GlobalDataTo.</returns>
+        ''' <remarks></remarks>
+        Overridable Function CloneUntyped() As GlobalDataTO
+            Dim globalDataTo As New GlobalDataTO()
+            globalDataTo.AffectedRecords = AffectedRecords
+            globalDataTo.ErrorCode = ErrorCode
+            globalDataTo.ErrorMessage = ErrorMessage
+            globalDataTo.HasError = HasError
+            globalDataTo.SetDatos = TryCast(SetDatos, Object)
+            globalDataTo.SetUserLevel = SetUserLevel
+            Return globalDataTo
+        End Function
 
 #End Region
 
     End Class
+
+    Public NotInheritable Class GlobalDataTO
+        Inherits TypedGlobalDataTo(Of Object)
+    End Class
+
 End Namespace

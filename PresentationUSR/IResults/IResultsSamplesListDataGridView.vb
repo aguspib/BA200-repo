@@ -1,33 +1,15 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
+'AG 26/07/2010
 
-Imports System.Text
-Imports System.ComponentModel
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraPrintingLinks
-Imports DevExpress.XtraEditors
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
-Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
-Imports DevExpress.XtraEditors.Controls
-Imports DevExpress.Utils
+Imports Biosystems.Ax00.Global.TO 'AG 22/09/2014 - BA-1940
 
-
-Partial Class IResults
+Partial Class UiResults
 
 #Region "SamplesListDataGridView Methods"
     ''' <summary>
@@ -99,7 +81,7 @@ Partial Class IResults
                 .Name = "OrderToPrint"
                 '.HeaderText = "Print"
                 .HeaderText = ""
-                .Width = 30
+                .Width = 25 'IT 21/10/2014: BA-2036
             End With
             bsSamplesListDataGridView.Columns.Add(PrintReportColumnNew)
 
@@ -107,8 +89,8 @@ Partial Class IResults
             With ExportColumn
                 .Name = "OrderToExport"
                 '.HeaderText = "OrderToExport"
-                .HeaderText = MyClass.LISNameForColumnHeaders '"" SGM 12/04/2013
-                .Width = 37 '30 SGM 16/04/2013
+                .HeaderText = "" 'IT 21/10/2014: BA-2036
+                .Width = 25 'IT 21/10/2014: BA-2036
             End With
             bsSamplesListDataGridView.Columns.Add(ExportColumn)
             ' End DL 16/03/2011
@@ -128,7 +110,7 @@ Partial Class IResults
             bsSamplesListDataGridView.Columns("PatientIDToSearch").Visible = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeSamplesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeSamplesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -150,9 +132,150 @@ Partial Class IResults
     '''                                           ** If PatientID = PatientName, only PatientID is shown 
     '''                                           ** If First Character of PatientName is "-" and Last Character of PatientName is "-", remove both  
     '''                                           ** If PatientName is empty, only PatientID is shown
+    '''              AG 22/09/2014 - BA-1940 1 patient with N specimenID will appear 1 row and all specimens separated by coma
+    '''                                      (tooltip = all specimed separated by coma and finally patientID between brackets)
     ''' </remarks>
     Private Sub UpdateSamplesListDataGrid()
         Try
+
+            'OLD CODE to remove
+            '=====================
+            'If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
+
+            'Dim startTime As DateTime = Now 'AG 21/06/2012 - time estimation
+            'Dim dgv As BSDataGridView = bsSamplesListDataGridView
+            'Dim RowIndex As Integer = -1
+            'Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            'Dim StatFlag() As Boolean = {True, False}
+            'Dim existsRow As Boolean = False
+
+            'ProcessEvent = False
+
+            'Dim hyphenIndex As Integer = -1
+            'Dim myPatientName As String = String.Empty
+
+            'Dim addedPatients As New List(Of String) 'AG 21/06/2012 -
+            'For i As Integer = 0 To 1
+            '    SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+            '                   Where row.SampleClass = "PATIENT" _
+            '                   AndAlso row.StatFlag = StatFlag(i) _
+            '                   AndAlso row.RerunNumber = 1 _
+            '                   Select row).ToList()
+
+            '    For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
+            '        existsRow = False
+
+            '        If addedPatients.Contains(sampleRow.PatientID) Then
+            '            existsRow = True
+            '        End If
+
+            '        'If not exist create row
+            '        If Not existsRow Then
+            '            RowIndex += 1
+            '            If RowIndex = dgv.Rows.Count Then dgv.Rows.Add()
+
+            '            dgv("STAT", RowIndex).Value = SampleIconList.Images(i)
+
+            '            'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
+            '            '           fields and shown only the PatientID
+            '            myPatientName = sampleRow.PatientName.Trim
+
+            '            If (sampleRow.PatientName.Trim.StartsWith("-") AndAlso sampleRow.PatientName.Trim.EndsWith("-")) Then
+            '                hyphenIndex = sampleRow.PatientName.Trim.IndexOf("-")
+            '                myPatientName = sampleRow.PatientName.Trim.Remove(hyphenIndex, 1)
+
+            '                hyphenIndex = myPatientName.Trim.LastIndexOf("-")
+            '                myPatientName = myPatientName.Trim.Remove(hyphenIndex, 1)
+            '            End If
+
+            '            'Inform the PatientID as Tag value for the row (it is used to load the Patient Results in the grid)
+            '            dgv("PatientID", RowIndex).Tag = sampleRow.PatientID
+
+            '            'BT #1667 - The TooolTip is built in the same way than in Monitor Screen and in Patients Grid shows in this screen but in Tests View
+            '            If (Not sampleRow.IsSpecimenIDListNull) Then
+            '                dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
+
+            '                'When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
+            '                'code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
+            '                '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
+            '                If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+            '                    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
+            '                Else
+            '                    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
+            '                End If
+
+            '            Else
+            '                dgv("PatientID", RowIndex).Value = sampleRow.PatientID
+
+            '                'When the Barcode is NOT informed, the ToolTip will be "PatientID - FirstName LastName" or, using the variables defined in  
+            '                'code: "auxString - PatientName", but with following exceptions (BT #1667):
+            '                '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "auxString"
+            '                If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+            '                    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+            '                Else
+            '                    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+            '                End If
+
+            '            End If
+
+            '            dgv("OrderID", RowIndex).Value = sampleRow.OrderID
+
+            '            'TR 02/12/2013 -BT #1300 Set the value to use it to search.
+            '            dgv("PatientIDToSearch", RowIndex).Value = sampleRow.PatientID
+
+            '            'DL 16/03/2011
+            '            dgv("OrderToPrint", RowIndex).Value = sampleRow.OrderToPrint
+            '            dgv("OrderToExport", RowIndex).Value = sampleRow.OrderToExport
+            '            'END DL 16/03/2011
+            '            existsRow = True
+
+            '            addedPatients.Add(sampleRow.PatientID)
+            '            If sampleRow.PatientID = SamplesListViewText Then dgv.Rows(RowIndex).Selected = True
+            '        End If
+
+            '        'Update Report Print available and HIS export icons
+            '        If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
+            '            'Print available
+            '            If sampleRow.PrintAvailable Then
+            '                'DL 09/11/2010
+            '                dgv("Print", RowIndex).Value = PrintImage
+            '                dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
+            '            Else
+            '                dgv("Print", RowIndex).Value = NoImage
+            '                dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
+            '            End If
+
+            '            'HIS sent
+            '            If sampleRow.HIS_Sent Then
+            '                dgv("HISExport", RowIndex).Value = OKImage
+            '                dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
+            '            Else
+            '                dgv("HISExport", RowIndex).Value = NoImage
+            '                dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
+            '            End If
+            '        Else
+            '            dgv("Print", RowIndex).Value = NoImage
+            '            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
+            '            dgv("HISExport", RowIndex).Value = NoImage
+            '            dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
+            '        End If
+            '    Next sampleRow
+
+            'Next i
+            'Debug.Print("IResults.UpdateSamplesListDataGrid (Update patient list): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
+
+            'Application.DoEvents()
+            'ProcessEvent = True
+            'bsSamplesListDataGridView_Click(Nothing, Nothing)
+
+            ''TR 30/09/2013
+            'If (Not isClosingFlag) Then
+            '    bsSamplesListDataGridView.Refresh()
+            'End If
+
+
+            'NEW CODE to uncomment and validate
+            '==================================
             If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
 
             Dim startTime As DateTime = Now 'AG 21/06/2012 - time estimation
@@ -167,25 +290,46 @@ Partial Class IResults
             Dim hyphenIndex As Integer = -1
             Dim myPatientName As String = String.Empty
 
-            Dim addedPatients As New List(Of String) 'AG 21/06/2012 - 
+            Dim addedPatients As New List(Of String) 'AG 21/06/2012 -
+
+            'AG 22/09/2014 - BA-1940 declare new variables
+            Dim patientIDSpecimensList As New List(Of PatientSpecimenTO)
+            Dim linqRes As List(Of PatientSpecimenTO) = Nothing
+            Dim auxPatientToolTipInfo As String = String.Empty
+            Dim updateRow As Boolean = False 'Update an existing item in grid list
+            'AG 22/09/2014 - BA-1940
+
             For i As Integer = 0 To 1
+                Dim aux_i = i
+                'AG 22/09/2014 - BA-1940 clear lists and dictionary when changes the priority
+                addedPatients.Clear()
+                patientIDSpecimensList.Clear()
+                'AG 22/09/2014 - BA-1940
+
                 SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where row.SampleClass = "PATIENT" _
-                               AndAlso row.StatFlag = StatFlag(i) _
+                               AndAlso row.StatFlag = StatFlag(aux_i) _
                                AndAlso row.RerunNumber = 1 _
                                Select row).ToList()
 
                 For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
                     existsRow = False
-                    'AG 21/06/2012
-                    'For k As Integer = 0 To RowIndex 'dgv.Rows.Count - 1
-                    '    If dgv("PatientID", k).Value.Equals(sampleRow.PatientID) Then
-                    '        existsRow = True
-                    '        Exit For
-                    '    End If
-                    'Next
+                    updateRow = False 'AG 16/09/2014 - BA-1940
+                    auxPatientToolTipInfo = String.Empty 'AG 16/09/2014 - BA-1940
+
                     If addedPatients.Contains(sampleRow.PatientID) Then
                         existsRow = True
+
+                        'AG 22/09/2014 - BA-1940 - Evaluate if is a new specimenID for the patienID and in this case update row
+                        If Not sampleRow.IsSpecimenIDListNull Then
+                            linqRes = (From a As PatientSpecimenTO In patientIDSpecimensList Where a.patientID = sampleRow.PatientID Select a).ToList
+                            If linqRes.Count > 0 Then
+                                If Not linqRes(0).Contains(sampleRow.SpecimenIDList) Then
+                                    updateRow = True
+                                End If
+                            End If
+                        End If
+                        'AG 22/09/2014 - BA-1940
                     End If
 
                     'If not exist create row
@@ -193,33 +337,7 @@ Partial Class IResults
                         RowIndex += 1
                         If RowIndex = dgv.Rows.Count Then dgv.Rows.Add()
 
-                        dgv("STAT", RowIndex).Value = SampleIconList.Images(i)
-
-                        'dgv("PatientName", RowIndex).Value = sampleRow.PatientName
-
-                        'AG 29/08/2013 - Reverse order: if exists show barcode and then patientID as tooltip
-                        'dgv("PatientID", RowIndex).Value = sampleRow.PatientID
-
-                        ''AG 14/06/2013
-                        ''dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'If Not sampleRow.IsSpecimenIDListNull Then
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.SpecimenIDList
-                        'Else
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'End If
-                        'AG 14/06/2013
-
-                        'dgv("PatientID", RowIndex).Tag = sampleRow.PatientID 'Inform the patient in the tag (used for load the results in grid)
-                        'If sampleRow.IsSpecimenIDListNull Then
-                        '    'Case NOT exists BARCODE
-                        '    dgv("PatientID", RowIndex).Value = sampleRow.PatientID
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'Else
-                        '    'Case exists BARCODE
-                        '    dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
-                        'End If
-                        ''AG 29/08/2013
+                        dgv("STAT", RowIndex).Value = SampleIconList.Images(aux_i)
 
                         'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
                         '           fields and shown only the PatientID
@@ -240,26 +358,52 @@ Partial Class IResults
                         If (Not sampleRow.IsSpecimenIDListNull) Then
                             dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
 
-                            'When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
-                            'code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
-                            '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
-                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
-                            Else
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
-                            End If
+                            'AG 22/09/2014 - BA-1940 - inform the tooltip without patienID / patientName, it will be added after loop completion
+                            ''When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
+                            ''code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
+                            ''** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
+                            'If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
+                            'Else
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
+                            'End If
+
+                            dgv("PatientID", RowIndex).ToolTipText = sampleRow.SpecimenIDList.Trim
+                            'AG 22/09/2014 - BA-1940
                         Else
                             dgv("PatientID", RowIndex).Value = sampleRow.PatientID
 
+                            'AG 22/09/2014 - BA-1940 - in case PatientID do not inform here the tooltip, it will be informed after loop completion
                             'When the Barcode is NOT informed, the ToolTip will be "PatientID - FirstName LastName" or, using the variables defined in  
                             'code: "auxString - PatientName", but with following exceptions (BT #1667):
                             '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "auxString"
-                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
-                            Else
-                                dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
-                            End If
+                            'If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+                            'Else
+                            '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+                            'End If
+                            dgv("PatientID", RowIndex).ToolTipText = String.Empty 'AG 23/09/2014 - BA-1940 - Initiate a clear value
+                            'AG 22/09/2014 - BA-1940
+
                         End If
+
+                        'AG 22/09/2014 - BA-1640 
+                        'Create new entry in TO list with: patientID, 1st specimen, row index in grid, tool tip ending string
+                        linqRes = (From a As PatientSpecimenTO In patientIDSpecimensList Where a.patientID = sampleRow.PatientID Select a).ToList
+                        If linqRes.Count = 0 Then
+                            Dim newItem As New PatientSpecimenTO
+                            newItem.patientID = sampleRow.PatientID
+                            newItem.UpdateSpecimenList(CStr(dgv("PatientID", RowIndex).Value))
+                            newItem.RowIndex = RowIndex
+                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                                auxPatientToolTipInfo = String.Format("({0}) - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+                            Else
+                                auxPatientToolTipInfo = String.Format("({0})", sampleRow.PatientID.Trim)
+                            End If
+                            newItem.EndingToolTip = auxPatientToolTipInfo
+                            patientIDSpecimensList.Add(newItem)
+                        End If
+                        'AG 22/09/2014 - BA-1640
 
                         dgv("OrderID", RowIndex).Value = sampleRow.OrderID
 
@@ -274,6 +418,19 @@ Partial Class IResults
 
                         addedPatients.Add(sampleRow.PatientID)
                         If sampleRow.PatientID = SamplesListViewText Then dgv.Rows(RowIndex).Selected = True
+
+                        'AG 22/09/2014 - BA-1940 update the specimenID list
+                    ElseIf updateRow Then
+                        'Get the row in grid
+                        If linqRes.Count > 0 Then
+                            Dim auxStr = dgv("PatientID", linqRes(0).RowIndex).Value.ToString
+                            dgv("PatientID", linqRes(0).RowIndex).Value = auxStr & ", " & sampleRow.SpecimenIDList
+                            dgv("PatientID", linqRes(0).RowIndex).ToolTipText &= ", " & sampleRow.SpecimenIDList
+
+                            linqRes(0).UpdateSpecimenList(sampleRow.SpecimenIDList) 'Add specimen to the TO list
+                        End If
+                        'AG 22/09/2014 - BA-1940
+
                     End If
 
                     'Update Report Print available and HIS export icons
@@ -303,8 +460,21 @@ Partial Class IResults
                         dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
                     End If
                 Next sampleRow
-            Next i
+
+                'AG 22/09/2014 - BA-1940 finally complete the tooltip in list with (PatID) - pat name
+                For Each item As PatientSpecimenTO In patientIDSpecimensList
+                    dgv("PatientID", item.RowIndex).ToolTipText &= " " & item.EndingToolTip
+                Next
+                'AG 22/09/2014 - BA-1940
+
+            Next
             Debug.Print("IResults.UpdateSamplesListDataGrid (Update patient list): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
+
+            'AG 22/09/2014 - BA-1940 - release memory
+            addedPatients = Nothing
+            patientIDSpecimensList = Nothing
+            linqRes = Nothing
+            'AG 22/09/2014 - BA-1940
 
             Application.DoEvents()
             ProcessEvent = True
@@ -316,7 +486,7 @@ Partial Class IResults
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Name & " UpdateSamplesListDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Name & " UpdateSamplesListDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub

@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global
@@ -6,7 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 
 
-Public Class IProgTestContaminations
+Public Class UiProgTestContaminations
 
 #Region "Declarations"
     Private EditionMode As Boolean                    'To control when the screen is in Edition Mode
@@ -68,46 +72,46 @@ Public Class IProgTestContaminations
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SUMMARY BY TEST Button
             auxIconName = GetIconName("GRID")
             If (auxIconName <> "") Then
-                bsSummaryByTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSummaryByTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -121,13 +125,13 @@ Public Class IProgTestContaminations
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-            Dim currentLanguage As String = MyGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
 
             'RH 27/09/2011 Initialize ExistsExecutions
-            ExistsExecutions = (IAx00MainMDI.ActiveStatus <> "EMPTY")
+            ExistsExecutions = (UiAx00MainMDI.ActiveStatus <> "EMPTY")
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(currentLanguage)
@@ -142,7 +146,7 @@ Public Class IProgTestContaminations
             ResetBorder()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenLoad ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -160,8 +164,8 @@ Public Class IProgTestContaminations
         Try
             'If pcurrentLanguage = "" Then
             '    'Get the current Language from the current Application Session
-            '    Dim currentLanguageGlobal As New GlobalBase
-            '    pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            '    'Dim currentLanguageGlobal As New GlobalBase
+            '    pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             'End If
 
             ''Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -179,8 +183,8 @@ Public Class IProgTestContaminations
 
             If String.IsNullOrEmpty(pCurrentLanguage) Then
                 'Get the current Language from the current Application Session
-                Dim currentLanguageGlobal As New GlobalBase
-                pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                'Dim currentLanguageGlobal As New GlobalBase
+                pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
             End If
 
             'Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -198,7 +202,7 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeGrids ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeGrids ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -242,7 +246,7 @@ Public Class IProgTestContaminations
             bsScreenToolTips.SetToolTip(bsSummaryByTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_ContaminationSummary", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -281,7 +285,7 @@ Public Class IProgTestContaminations
             'Fill ListView with the list of existing Standard Tests
             LoadTestContaminatorsList()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeListView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -298,17 +302,17 @@ Public Class IProgTestContaminations
 
             'Get the Icons defined for Preloaded Standard Tests that are inuse/not inuse in the current Work Session
             Dim iconName As String = GetIconName("TESTICON")
-            If (iconName <> "") Then myIcons.Images.Add("TESTICON", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("TESTICON", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             iconName = GetIconName("INUSETEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             'Get the Icon defined for User Defined Standard Tests that are not inuse/not inuse in the current Work Session
             iconName = GetIconName("USERTEST")
-            If (iconName <> "") Then myIcons.Images.Add("USERTEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("USERTEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -Correct the icon name.
             iconName = GetIconName("INUSUSTEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -END.
             'Assign the Icons to the Contaminator Tests List View
             bsTestContaminatorsListView.Items.Clear()
@@ -388,7 +392,7 @@ Public Class IProgTestContaminations
                             bsTestContaminatorsListView.Items(0).Selected = True
 
                             ReadOnlyMode()
-                            LoadContaminationsByTest(bsTestContaminatorsListView.Items(0).Name)
+                            LoadContaminationsByTest(CInt(bsTestContaminatorsListView.Items(0).Name))
                         End If
                     End If
 
@@ -404,7 +408,7 @@ Public Class IProgTestContaminations
             End If '(1)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestContaminatorsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestContaminatorsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadTestContaminatorsList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -581,7 +585,7 @@ Public Class IProgTestContaminations
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeGridViews ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeGridViews ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeGridViews ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -712,7 +716,7 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadWashingSolutionsComboBoxes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadWashingSolutionsComboBoxes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadWashingSolutionsComboBoxes ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -765,7 +769,7 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadGridViews ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadGridViews ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadGridViews ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -823,7 +827,7 @@ Public Class IProgTestContaminations
             bsWashingSolR1ComboBox.SelectedIndex = 0
             bsWashingSolR2ComboBox.SelectedIndex = 0
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeContaminatedArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeContaminatedArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeContaminatedArea ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -910,7 +914,7 @@ Public Class IProgTestContaminations
                 ShowMessage(Name & ".LoadContaminationsByTest", resultData.ErrorCode, resultData.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadContaminationsByTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadContaminationsByTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadContaminationsByTest ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -928,7 +932,7 @@ Public Class IProgTestContaminations
             If EditionMode Then ChangesMade = True
             If (pType = "R1") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R1TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -937,7 +941,7 @@ Public Class IProgTestContaminations
 
             ElseIf (pType = "R2") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R2TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -945,7 +949,7 @@ Public Class IProgTestContaminations
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestContaminatesEverything ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestContaminatesEverything ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestContaminatesEverything ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -982,7 +986,7 @@ Public Class IProgTestContaminations
                 bsWashingSolR2ComboBox.Enabled = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCuvettesSelection ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCuvettesSelection ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeCuvettesSelection ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1021,7 +1025,7 @@ Public Class IProgTestContaminations
                     bsR1ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1055,7 +1059,7 @@ Public Class IProgTestContaminations
                     bsR2ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR2ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1090,7 +1094,7 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeContaminatedAreaStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeContaminatedAreaStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeContaminatedAreaStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1126,7 +1130,7 @@ Public Class IProgTestContaminations
             bsPrintButton.Enabled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReadOnlyMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReadOnlyMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReadOnlyMode ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1164,7 +1168,7 @@ Public Class IProgTestContaminations
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ForceVisibilityFirstItem ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ForceVisibilityFirstItem ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ForceVisibilityFirstItem ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -1200,12 +1204,12 @@ Public Class IProgTestContaminations
                 'RH 28/06/2011
                 For i As Integer = 0 To bsR1ContaminatedDataGridView.RowCount - 1
                     bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = _
-                            (Not bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            (Not CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value))
                 Next
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditMode ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -1222,7 +1226,7 @@ Public Class IProgTestContaminations
             ChangesMade = False
 
             Using testNewContaminationsDS As New ContaminationsDS()
-                Dim myTestID As Integer = bsTestContaminatorsListView.SelectedItems(0).Name
+                Dim myTestID As Integer = CInt(bsTestContaminatorsListView.SelectedItems(0).Name)
                 Dim currentTestIsContaminator As Boolean = False
                 'Read current contaminations defined for current selected TEST
 
@@ -1247,11 +1251,11 @@ Public Class IProgTestContaminations
                         Distinct).Max
                         'Search for new, updated or deleted R1 contaminations
                         For i As Integer = 0 To bsR1ContaminatedDataGridView.Rows.Count - 1
-                            Dim mySelectedValue As Boolean = bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value
-                            Dim myContaminatedReagentID As Integer = bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value
+                            Dim mySelectedValue = CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            Dim myContaminatedReagentID = CInt(bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value)
                             Dim mwWashSolution As String = ""
                             If bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value.ToString <> "" Then
-                                mwWashSolution = bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value
+                                mwWashSolution = CStr(bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value)
                             End If
                             If mySelectedValue Then
                                 Dim newRow As ContaminationsDS.tparContaminationsRow
@@ -1321,14 +1325,14 @@ Public Class IProgTestContaminations
                 '(1)
                 If (Not resultData.HasError) Then
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
                 Else
                     'Error saving the list of Contaminations defined for the selected Test; shown it
                     ShowMessage(Name & ".SaveTestContaminations", resultData.ErrorCode, resultData.ErrorMessage, Me)
                 End If
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveTestContaminations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveTestContaminations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveTestContaminations", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1350,10 +1354,10 @@ Public Class IProgTestContaminations
 
             If (executeAction) Then
                 ReadOnlyMode()
-                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CancelEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1384,11 +1388,11 @@ Public Class IProgTestContaminations
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1405,7 +1409,7 @@ Public Class IProgTestContaminations
         Try
             unSavedChanges = ChangesMade
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangesPendingToSave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangesPendingToSave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangesPendingToSave", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return unSavedChanges
@@ -1437,7 +1441,7 @@ Public Class IProgTestContaminations
             End If
             'End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteAllContaminationsByTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteAllContaminationsByTest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteAllContaminationsByTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return hasError
@@ -1475,7 +1479,7 @@ Public Class IProgTestContaminations
 
                     originalSelectedIndex = bsTestContaminatorsListView.SelectedIndices(0)
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
 
                 Else 'Multi selection
                     CancelEdition()
@@ -1498,7 +1502,7 @@ Public Class IProgTestContaminations
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SelectItemInTreeView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SelectItemInTreeView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SelectItemInTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1512,13 +1516,13 @@ Public Class IProgTestContaminations
             If (ShowMessage(Name, GlobalEnumerates.Messages.DELETE_CONTAMINATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 Dim hasError As Boolean = False
                 For i As Integer = 0 To bsTestContaminatorsListView.SelectedItems.Count - 1
-                    hasError = DeleteAllContaminationsByTest(bsTestContaminatorsListView.SelectedItems(i).Name, i)
+                    hasError = DeleteAllContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(i).Name), i)
                     If hasError Then Exit For
                 Next
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteContaminations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteContaminations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteContaminations", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1542,7 +1546,7 @@ Public Class IProgTestContaminations
             bsContaminatesCuvettesCheckbox.Checked = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetEmptyValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetEmptyValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetEmptyValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1579,7 +1583,7 @@ Public Class IProgTestContaminations
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorFactoryValues ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorFactoryValues ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1623,7 +1627,7 @@ Public Class IProgTestContaminations
             End With
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintGridCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintGridCells ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PaintGridCells", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -1650,7 +1654,7 @@ Public Class IProgTestContaminations
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1697,10 +1701,10 @@ Public Class IProgTestContaminations
             '----------------------------------------------
             'GC.Collect()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-        
+
     End Sub
 
 #End Region
@@ -1712,13 +1716,13 @@ Public Class IProgTestContaminations
     Private Sub ProgTestContaminations_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             ''TR 23/04/2012 get the current user level
-            'Dim MyGlobalBase As New GlobalBase
-            'CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            ''Dim myGlobalbase As New GlobalBase
+            'CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ''TR 23/04/2012 -END.
 
             ScreenLoad()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestContaminations_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestContaminations_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProgTestContaminations_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1736,7 +1740,7 @@ Public Class IProgTestContaminations
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestContaminations_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestContaminations_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProgTestContaminations_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1773,7 +1777,7 @@ Public Class IProgTestContaminations
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestContaminatorsListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1794,7 +1798,7 @@ Public Class IProgTestContaminations
                 e.NewWidth = 0
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestContaminatorsListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1814,7 +1818,7 @@ Public Class IProgTestContaminations
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestContaminatorsListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1823,7 +1827,7 @@ Public Class IProgTestContaminations
         Try
             TestContaminatesEverything("R1", bsContaminesAllR1Checkbox.Checked)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminesAllR1Checkbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminesAllR1Checkbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsContaminesAllR1Checkbox_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1832,7 +1836,7 @@ Public Class IProgTestContaminations
         Try
             TestContaminatesEverything("R2", bsContaminesAllR2Checkbox.Checked)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminesAllR2Checkbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminesAllR2Checkbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsContaminesAllR2Checkbox_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1841,7 +1845,7 @@ Public Class IProgTestContaminations
         Try
             ChangeCuvettesSelection()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminatesCuvettesCheckbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsContaminatesCuvettesCheckbox_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsContaminatesCuvettesCheckbox_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1858,7 +1862,7 @@ Public Class IProgTestContaminations
                 bsWashingSolR2ComboBox.BackColor = SystemColors.MenuBar
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsWashingSolR1ComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsWashingSolR1ComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWashingSolR1ComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1877,15 +1881,15 @@ Public Class IProgTestContaminations
                 If Not EditionMode Then Return
 
                 If dgv.Columns(myColumn).Name = "Selected" Then
-                    dgv.Rows(myRow).Cells("Selected").Value = Not dgv.Rows(myRow).Cells("Selected").Value
-                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not dgv.Rows(myRow).Cells("Selected").Value
+                    dgv.Rows(myRow).Cells("Selected").Value = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
+                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
                     ChangesMade = True
-                    If Not dgv.Rows(myRow).Cells("Selected").Value Then
+                    If Not CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""
                     End If
 
                 ElseIf dgv.Columns(myColumn).Name = "WashingSolution" Then
-                    If dgv.Rows(myRow).Cells("Selected").Value Then
+                    If CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         ChangesMade = True
                     Else
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""
@@ -1897,7 +1901,7 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsR1ContaminatedDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsR1ContaminatedDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsR1ContaminatedDataGridView_CellMouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -1907,7 +1911,7 @@ Public Class IProgTestContaminations
         Try
             If EditionMode Then ChangesMade = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsWashingSolR2ComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsWashingSolR2ComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWashingSolR2ComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1923,13 +1927,13 @@ Public Class IProgTestContaminations
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestContaminatorsListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestContaminatorsListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub bsSummaryByTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSummaryByTestButton.Click
-        Using myProgAuxTestContaminations As New IProgAuxTestContaminations
+        Using myProgAuxTestContaminations As New UiProgAuxTestContaminations
             'myProgAuxTestContaminations.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedToolWindow
 
             'RH 20/06/2012 This is the right value
@@ -1968,7 +1972,7 @@ Public Class IProgTestContaminations
             XRManager.ShowContaminationsReport()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

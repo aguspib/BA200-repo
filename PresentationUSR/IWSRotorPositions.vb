@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -7,10 +11,11 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
-Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.App
+Imports PesentationLayer.RotorUtils
+'Imports Biosystems.Ax00.PresentationCOM.RotorUtils
 
-Public Class IWSRotorPositions
+Public Class UiWSRotorPositions
     'RH 14/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
     '              Substitute every "Or" by "OrElse"   (Only in boolean expressions, not in bitwise expressions!)
     'To evaluate the boolean expressions in short circuit and speed up mean processing velocity
@@ -251,7 +256,6 @@ Public Class IWSRotorPositions
     '21/12/2009 SA - Definition of Fields for the Screen Properties
     Private WorkSessionIDAttribute As String
     Private AnalyzerIDAttribute As String
-    Private AnalyzerModelAttribute As String
     Private WorkSessionStatusAttribute As String = ""             'AG 18/01/2010
     Private ShowHostQueryScreenAttribute As Boolean = False       'AG 03/04/2013 - When TRUE after open the rotorpos screen the hostquery screen is opened automatically
     Private OpenByAutomaticProcessAttribute As Boolean = False    'AG 09/07/2013
@@ -300,13 +304,6 @@ Public Class IWSRotorPositions
     Public WriteOnly Property ActiveAnalyzer() As String
         Set(ByVal value As String)
             AnalyzerIDAttribute = value
-        End Set
-    End Property
-
-    '13/01/2010 TR - Definition of screen property to inform the Analizer Model
-    Public WriteOnly Property AnalyzerModel() As String
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
         End Set
     End Property
 
@@ -621,8 +618,8 @@ Public Class IWSRotorPositions
             'GC.Collect()
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -647,7 +644,7 @@ Public Class IWSRotorPositions
             Return lisWithFilesMode
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsLisWithFilesMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsLisWithFilesMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "IsLisWithFilesMode()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -674,7 +671,7 @@ Public Class IWSRotorPositions
             LegendUnknownImage.ImageLocation = MyBase.IconsPath & LEGBCREAGENTUNKNOWN_IconName
             SelectedPictureBox.ImageLocation = MyBase.IconsPath & LEGREAGENTINPROCESS_IconName 'LEGREAGENTSELECTED_IconName
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareReagentLegendArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -843,7 +840,7 @@ Public Class IWSRotorPositions
             ADDSOL_IconName = GetIconName("ADD_SOL")
             SAMPLES_IconName = GetIconName("SAMPLESNODE")
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareIconNames ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareIconNames ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareIconNames ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -869,47 +866,47 @@ Public Class IWSRotorPositions
             'MOVE TO FIRST ROTOR POSITION Buttons
             auxIconName = GetIconName("BACKWARDL")
             If (auxIconName <> "") Then
-                bsSamplesMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO PREVIOUS ROTOR POSITION Buttons
             auxIconName = GetIconName("LEFT")
             If (auxIconName <> "") Then
-                bsReagentsDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsSamplesDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsReagentsDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsSamplesDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO NEXT ROTOR POSITION Buttons
             auxIconName = GetIconName("RIGHT")
             If (auxIconName <> "") Then
-                bsSamplesIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO LAST ROTO POSITION Buttons
             auxIconName = GetIconName("FORWARDL")
             If (auxIconName <> "") Then
-                bsSamplesMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'REFILL TUBE/BOTTLE Buttons
             auxIconName = GetIconName("REFILL")
             If (auxIconName <> String.Empty) Then
-                bsSamplesRefillPosButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsRefillPosButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesRefillPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsRefillPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHECK ROTOR POSITION VOLUME Button (only for Reagents
             auxIconName = GetIconName("VOLUMETEST")
-            If (auxIconName <> String.Empty) Then bsReagentsCheckVolumePosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsReagentsCheckVolumePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE POSITION Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsSamplesDeletePosButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsDeletePosButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesDeletePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsDeletePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             '********************
@@ -918,25 +915,25 @@ Public Class IWSRotorPositions
 
             'SAMPLES AUTOPOSITIONING Button
             auxIconName = GetIconName("SAMPLEPOS")
-            If (auxIconName <> "") Then bsSamplesAutoPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSamplesAutoPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'REAGENTS AUTOPOSITIONING Button
             auxIconName = GetIconName("REAGENTPOS")
-            If (auxIconName <> "") Then bsReagentAutoPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsReagentAutoPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' XB 25/03/2014 - Memory leaks - Improve Dispose (SplitContainer disallows dispose memory)
             ''EXPAND TREE VIEW Button
             'auxIconName = GetIconName("FORWARD")
-            'If (auxIconName <> "") Then BsForwardButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then BsForwardButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ''CONTRACT TREE VIEW Button
             'auxIconName = GetIconName("BACKWARD")
-            'If (auxIconName <> "") Then BsBackwardButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then BsBackwardButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ' XB 25/03/2014
 
             'SCANNING Button
             auxIconName = GetIconName("BARCODE")
-            If (auxIconName <> "") Then bsScanningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsScanningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'INCOMPLETE SAMPLES Button (if LIS is implemented with FILES) or HOST QUERY Button (if LIS is implemented with ES)
             If (Not LisWithFilesMode) Then
@@ -944,35 +941,35 @@ Public Class IWSRotorPositions
             Else
                 auxIconName = GetIconName("BCWARNING")
             End If
-            If (auxIconName <> "") Then BarcodeWarningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BarcodeWarningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SHOW NOT POSITIONED ELEMENTS Button
             auxIconName = GetIconName("WARNING")
-            If (auxIconName <> "") Then bsWarningsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsWarningsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
-            If (auxIconName <> "") Then bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CHECK ROTOR VOLUME Button
             auxIconName = GetIconName("VOLUME")
-            If (auxIconName <> String.Empty) Then bsCheckRotorVolumeButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsCheckRotorVolumeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE VIRTUAL ROTOR Button
             auxIconName = GetIconName("SAVE")
-            If (auxIconName <> "") Then bsSaveVRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSaveVRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'LOAD VIRTUAL ROTOR Button
             auxIconName = GetIconName("OPEN")
-            If (auxIconName <> "") Then bsLoadVRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsLoadVRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RESET ROTOR Button
             auxIconName = GetIconName("RESETROTOR")
-            If (auxIconName <> "") Then bsResetRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsResetRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EXIT Button 
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Get the Barcode reader activation/deactivation status
             Dim resultData As New GlobalDataTO
@@ -996,7 +993,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1015,14 +1012,14 @@ Public Class IWSRotorPositions
             Dim myRCPDelegate As New WSRotorContentByPositionDelegate
 
             'Get all available Tubes/Bottles 
-            myGlobalDataTO = myRCPDelegate.GetAllTubeSizes(Nothing, AnalyzerModelAttribute)
+            myGlobalDataTO = myRCPDelegate.GetAllTubeSizes(Nothing, AnalyzerModel)
             If (Not myGlobalDataTO.HasError) Then
                 AllTubeSizeList = CType(myGlobalDataTO.SetDatos, List(Of TubeSizeTO))
             Else
                 ShowMessage(Me.Name & ".GetAllTubeSizes", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAllTubeSizes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAllTubeSizes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetAllTubeSizes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1085,7 +1082,7 @@ Public Class IWSRotorPositions
             End If
             currentBottleSize = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetNextBottleSize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetNextBottleSize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetNextBottleSize", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return resultTubeCode
@@ -1161,7 +1158,7 @@ Public Class IWSRotorPositions
                                 'AG 10/10/2011 - Inform the calibrator to position only the not positioned tubes when multicalibrator
                                 If (reqElement.TubeContent = "CALIB" AndAlso rotorContentDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                                     rotorContentDS.twksWSRotorContentByPosition(0).BeginEdit()
-                                    rotorContentDS.twksWSRotorContentByPosition(0).CalibratorID = reqElement.ElementCode
+                                    rotorContentDS.twksWSRotorContentByPosition(0).CalibratorID = CInt(reqElement.ElementCode)
                                     rotorContentDS.twksWSRotorContentByPosition(0).EndEdit()
                                     rotorContentDS.twksWSRotorContentByPosition.AcceptChanges()
                                 End If
@@ -1217,7 +1214,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DragTreeViewElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DragTreeViewElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DragTreeViewElement", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1253,11 +1250,10 @@ Public Class IWSRotorPositions
             myPositionedElements = Nothing
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DragTreeViewElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DragTreeViewElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DragTreeViewElement", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-
 
     ''' <summary>
     ''' Add and fill one row (in a typed DataSet WSRotorContentByPositionDS) with information of the 
@@ -1300,7 +1296,7 @@ Public Class IWSRotorPositions
             resultData.SetDatos = resultDS
             resultData.HasError = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillRotorContentByPositionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillRotorContentByPositionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillRotorContentByPositionRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
             resultData.HasError = True
@@ -1347,17 +1343,17 @@ Public Class IWSRotorPositions
 
                 'RH 13/10/2011 Update mySelectedElementInfo
                 If Not mySelectedElementInfo Is Nothing Then
-                    Dim query As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+                    Dim query As EnumerableRowCollection(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
 
                     For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In mySelectedElementInfo.twksWSRotorContentByPosition
                         query = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
                                  Where a.RotorType = row.RotorType _
                                  AndAlso a.RingNumber = row.RingNumber _
                                  AndAlso a.CellNumber = row.CellNumber _
-                                 Select a).ToList()
+                                 Select a)
 
                         If (query.Count > 0) Then 'JV 03/12/2013: #1384 assure there are elements in the query
-                            row.ItemArray = query.First().ItemArray.Clone()
+                            row.ItemArray = CType(query.First().ItemArray.Clone(), Object())
                             row.Selected = True
                         End If
                     Next
@@ -1377,48 +1373,10 @@ Public Class IWSRotorPositions
                 ShowMessage(Me.Name & ".LoadRotorAreaInfo", result.ErrorCode, result.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".LoadRotorAreaInfo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".LoadRotorAreaInfo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadRotorAreaInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-
-    ''' <summary>
-    ''' Get the Expiration date from the reagent barcode information.
-    ''' Remember to change this function on Montitor screen.
-    ''' </summary>
-    ''' <param name="pReagentBarcode"></param>
-    ''' <returns></returns>
-    ''' <remarks>
-    ''' CREATED BY: TR 28/03/2014
-    '''             TR 10/04/2014 -Initialize the ExpirationDate variable to min Date value.
-    '''             XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
-    ''' </remarks>
-    Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
-        Dim ExpirationDate As Date = Date.MinValue
-        Try
-            Dim myMonth As String = ""
-            Dim myYear As String = ""
-            If pReagentBarcode <> "" Then
-                'The month start on position 6 to 7 (2pos)
-                myMonth = pReagentBarcode.Substring(5, 2)
-                'The year start on position 8 to 9 (2pos)
-                myYear = pReagentBarcode.Substring(7, 2)
-                'Add to year expiration the 2000 to avoid error of 1900
-                myYear = "20" & myYear
-
-                'Set the result value.
-                If myMonth <> "" OrElse myYear <> "" Then
-                    ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
-                    'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
-                End If
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentExpDateFromBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetReagentExpDateFromBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-        Return ExpirationDate
-    End Function
 
     ''' <summary>
     ''' Get the Lot Number from the reagent barcode information.
@@ -1436,7 +1394,7 @@ Public Class IWSRotorPositions
                 myLotNumber = pReagentBarcode.Substring(9, 5)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentLotNumberFromBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentLotNumberFromBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetReagentLotNumberFromBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myLotNumber
@@ -1492,7 +1450,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillItem", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillItem", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillItem", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1562,7 +1520,7 @@ Public Class IWSRotorPositions
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetTreeViewPositionedElements", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetTreeViewPositionedElements", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResetTreeViewPositionedElements", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1642,7 +1600,7 @@ Public Class IWSRotorPositions
                 'PendingPositioningElements(False)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1728,7 +1686,7 @@ Public Class IWSRotorPositions
                             End If
                         Else
                             Dim auxIconPath As String = ""
-                            Dim myRotorPicture As Object
+                            Dim myRotorPicture As Control = Nothing
 
                             If (pRotorType = "SAMPLES") Then
                                 myRotorPicture = Me.SamplesTab
@@ -1769,11 +1727,11 @@ Public Class IWSRotorPositions
                                 End If
 
                                 'Update the rotor area with the new icon path          
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                                UpdateRotorArea(rotorPosition, auxIconPath, CType(myRotorPicture, Control))
 
                             Else
                                 'Position is empty...icon is also empty, clean the cell
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                                UpdateRotorArea(rotorPosition, auxIconPath, CType(myRotorPicture, Control))
                             End If
                         End If
                     End If
@@ -1782,7 +1740,7 @@ Public Class IWSRotorPositions
                 LoadScreenStatus(WorkSessionStatusAttribute)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorTreeViewArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             If (Not IsDisposed) Then
@@ -1900,7 +1858,7 @@ Public Class IWSRotorPositions
                     Exit Select
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetIconNameByTubeContent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetIconNameByTubeContent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetIconNameByTubeContent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myIconPath
@@ -1931,7 +1889,7 @@ Public Class IWSRotorPositions
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PreparePositionsControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -1952,7 +1910,7 @@ Public Class IWSRotorPositions
             For Each myPosControl As Control In SamplesTab.Controls
                 If (myPosControl.Controls.Count = 0) Then
                     'Get the control type to validate if it will go to our list (only for PictureBox)
-                    myPosControlList.Add(myPosControl)
+                    myPosControlList.Add(CType(myPosControl, BSRImage))
 
                     lastIndex = (myPosControlList.Count - 1)
                     myPosControlList(lastIndex).Tag = myPosControlList(lastIndex).Name.Replace("Sam", String.Empty).Insert(1, ",")
@@ -1970,7 +1928,7 @@ Public Class IWSRotorPositions
             For Each myPosControl As Control In ReagentsTab.Controls
                 If (myPosControl.Controls.Count = 0) Then
                     'Get the control type to validate if it will go to our list (only for PictureBox)
-                    myPosControlList.Add(myPosControl)
+                    myPosControlList.Add(CType(myPosControl, BSRImage))
 
                     lastIndex = (myPosControlList.Count - 1)
                     myPosControlList(lastIndex).Tag = myPosControlList(lastIndex).Name.Replace("Reag", String.Empty).Insert(1, ",")
@@ -1984,7 +1942,7 @@ Public Class IWSRotorPositions
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControlsNEW", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControlsNEW", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PreparePositionsControlsNEW", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2031,13 +1989,13 @@ Public Class IWSRotorPositions
                     'Get the control type to validate if it will go to our list (only for PictureBox)
                     'If (myPosControl.GetType().Name = "BSRImage") Then
                     If TypeOf myPosControl Is BSRImage Then 'RH 11/02/2011
-                        myPosControlList.Add(myPosControl)
+                        myPosControlList.Add(CType(myPosControl, BSRImage))
                     End If
                 End If
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreatePosControlList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreatePosControlList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreatePosControlList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myPosControlList
@@ -2068,13 +2026,13 @@ Public Class IWSRotorPositions
                        Select a).ToList()
 
                 For Each myrow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In query
-                    myrow.ItemArray = pRotorContentByPosRow.ItemArray.Clone()
+                    myrow.ItemArray = CType(pRotorContentByPosRow.ItemArray.Clone(), Object())
                     'myrow.Selected = pRotorContentByPosRow.Selected
                 Next
                 result = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorContentByPositionDSForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorContentByPositionDSForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorContentByPositionDSForm", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             result = False
         End Try
@@ -2118,7 +2076,7 @@ Public Class IWSRotorPositions
             'Select Case pStatus
             '    Case "NO_INUSE"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If (pRingNumber = 1) Then
@@ -2134,7 +2092,7 @@ Public Class IWSRotorPositions
 
             '    Case "DEPLETED", "LOCKED"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If (pRingNumber = 1) Then
@@ -2150,36 +2108,36 @@ Public Class IWSRotorPositions
 
             '    Case "PENDING"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "INPROCESS"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "FINISHED"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "BARERROR"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+            '            pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "FEW"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FEWVOL_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FEWVOL_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If pRingNumber = 1 Then
@@ -2250,7 +2208,7 @@ Public Class IWSRotorPositions
             '    End Select
             'End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroung ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroung ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetPosControlBackGroung", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2388,7 +2346,7 @@ Public Class IWSRotorPositions
                 End Select
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroundForREAGENTSRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroundForREAGENTSRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetPosControlBackGroundForREAGENTSRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2417,37 +2375,37 @@ Public Class IWSRotorPositions
             If (pBarCodeStatus = String.Empty OrElse pBarCodeStatus = "OK" OrElse pBarCodeStatus = "EMPTY") Then
                 Select Case (pStatus)
                     Case "NO_INUSE"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
                         Exit Select
 
                     Case "DEPLETED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
                         Exit Select
 
                     Case "PENDING"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
 
                     Case "INPROCESS"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "FINISHED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "BARERROR"
-                        pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
                     Case Else
                         pPositionControl.BackgroundImage = Nothing
 
                         '' XB 19/12/2013 - add log traces
-                        'Dim myLogAcciones As New ApplicationLogManager()
-                        'myLogAcciones.CreateLogActivity("Not expected Case [" & pStatus & "] to paint on Rotor", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", EventLogEntryType.Information, False)
+                        ''Dim myLogAcciones As New ApplicationLogManager()
+                        'GlobalBase.CreateLogActivity("Not expected Case [" & pStatus & "] to paint on Rotor", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", EventLogEntryType.Information, False)
 
                 End Select
             Else
@@ -2458,7 +2416,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2513,9 +2471,19 @@ Public Class IWSRotorPositions
                     myControlName = String.Format("Reag{0}{1}", pRotorContenByPosRow.RingNumber, pRotorContenByPosRow.CellNumber)
                 End If
 
-                Dim lstRotorControl As List(Of Control) = (From a As Control In myControls _
-                                                          Where a.Name = myControlName _
-                                                         Select a).ToList()
+                'Dim lstRotorControl As IEnumerable(Of Control) = (From a As Object In myControls _
+                '                                          Where CType(a, Control).Name = myControlName _
+                '                                         Select a)
+                Dim lstRotorControl = New List(Of Control)
+                For Each Obj In myControls
+                    If Obj Is Nothing Then Continue For
+                    Dim ctrl = TryCast(Obj, Control)
+                    If ctrl Is Nothing Then Continue For
+                    If ctrl.Name = myControlName Then
+                        lstRotorControl.Add(ctrl)
+                    End If
+                Next
+
                 If (lstRotorControl.Count = 1) Then
                     Dim myBSRImage As BSRImage = CType(lstRotorControl(0), BSRImage)
 
@@ -2544,7 +2512,7 @@ Public Class IWSRotorPositions
                 Application.DoEvents()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2599,7 +2567,7 @@ Public Class IWSRotorPositions
                             Dim myGlobalDataTO As GlobalDataTO
                             Dim calibratorFullPositionedFlag As Boolean = True
                             myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, _
-                                                                    myNodeTag.ElementID, myNodeTag.ElementCode)
+                                                                    myNodeTag.ElementID, CInt(myNodeTag.ElementCode))
                             'If Not myGlobalDataTO.HasError Then
                             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then ' XB 11/03/2014 - #1523 No refresh if screen is closing
                                 Dim myReqElementDS As WSRequiredElementsDS
@@ -2637,7 +2605,7 @@ Public Class IWSRotorPositions
                     result = myNode
 
                     'RH 04/08/2011
-                    Dim myRotorPicture As Object
+                    Dim myRotorPicture As Control
                     If (pRotorType = "SAMPLES") Then
                         myRotorPicture = Me.SamplesTab
                     Else
@@ -2695,7 +2663,7 @@ Public Class IWSRotorPositions
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".ChangeTreeRotorElementsStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".ChangeTreeRotorElementsStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ChangeTreeRotorElementsStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -2732,7 +2700,7 @@ Public Class IWSRotorPositions
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsDilution", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsDilution", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".IsDilution", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     '    Return result
@@ -2760,9 +2728,12 @@ Public Class IWSRotorPositions
     '''              TR 20/01/2010 - Remove part of the code that duplicate the functionality of StatusInfoAreaControl function.
     '''              AG 28/01/2010 - show the tube contents description not the code
     '''              SA 26/10/2010 - Changed the way of getting the description of the Tube Content
-    '''              TR 15/11/2013 - BT #1383 Complete the information required to get the Remaining test for reagents with status NOT INUSE.
-    '''              JV 02/12/2013 - BT #1419 Don't show NumTestsRemaining when barcode is unknown.
-    '''              TR 28/03/2014 - BT #1562 Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              TR 15/11/2013 - BA-1383 ==> Complete the information required to get the Remaining test for reagents with status NOT INUSE.
+    '''              JV 02/12/2013 - BA-1419 ==> Don't show NumTestsRemaining when barcode is unknown.
+    '''              TR 28/03/2014 - BA-1562 ==> Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              WE 07/10/2014 - BA-1965 ==> Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    '''              SA 09/01/2015 - BA-1999 ==> When position Status is FREE, if BarcodeStatus is UNKNOWN, the Barcode has to be shown in the 
+    '''                                          corresponding field in Info Area 
     ''' </remarks>
     Private Sub ShowPositionInfoArea(ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                                      ByVal pRingNumber As Integer, ByVal pCellNumber As Integer)
@@ -2783,20 +2754,21 @@ Public Class IWSRotorPositions
             End If
 
             'If the current Position Status is FREE , it is not needed look additional data in the DataBase
-            If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR") Then 'AG 05/10/2011 - Change condition
-                CleanInfoArea(False, True) 'AG 03/10/2011 - Only in this case add optional parameter to TRUE for not disable barcode controls
+            'BA-1999: exclude from the area cleaning positions with Status FREE but BarcodeStatus = UNKNOWN
+            If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR" AndAlso barcodeStatus <> "UNKNOWN") Then 'AG 05/10/2011 - Change condition
+                CleanInfoArea(False, True)  'AG 03/10/2011 - Only in this case add optional parameter to TRUE for not disable barcode controls
 
                 If (pRotorType = "SAMPLES") Then
-                    bsSampleCellTextBox.Text = pCellNumber
+                    bsSampleCellTextBox.Text = CStr(pCellNumber)
                     bsSampleCellTextBox.Refresh()
-                    bsSampleRingNumTextBox.Text = pRingNumber
+                    bsSampleRingNumTextBox.Text = CStr(pRingNumber)
                     bsSampleRingNumTextBox.Refresh()
 
                     'TODO: when Status=IDLE maybe more fields can be informed?
                 ElseIf (pRotorType = "REAGENTS") Then
-                    bsReagentsCellTextBox.Text = pCellNumber
+                    bsReagentsCellTextBox.Text = CStr(pCellNumber)
                     bsReagentsCellTextBox.Refresh()
-                    bsReagentsRingNumTextBox.Text = pRingNumber
+                    bsReagentsRingNumTextBox.Text = CStr(pRingNumber)
                     bsReagentsRingNumTextBox.Refresh()
 
                     'TODO: when Status=IDLE maybe more fields can be informed?
@@ -2968,17 +2940,16 @@ Public Class IWSRotorPositions
                             bsReagentsBarCodeTextBox.Clear()
                             If (Not myCellPosInfoDS.PositionInformation(0).IsBarcodeInfoNull) Then
                                 bsReagentsBarCodeTextBox.Text = myCellPosInfoDS.PositionInformation(0).BarcodeInfo
-                                'TR 28/03/2014 -Set the expiration date 
-                                If myCellPosInfoDS.Reagents.Count > 0 AndAlso Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" Then
-                                    Dim myExpirationDate As Date = GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo)
+                                'TR 28/03/2014 -Set the expiration date
+                                ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                If myCellPosInfoDS.Reagents.Count > 0 AndAlso Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
+                                    Dim myExpirationDate As Date = ReagentExpirationParsing.GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo, Me)
                                     'Validate if date is diferent than the minimun date value
                                     If myExpirationDate > Date.MinValue Then
                                         myCellPosInfoDS.Reagents(0).ExpirationDate = myExpirationDate
                                     End If
                                 End If
                                 'TR 28/03/2014 -END.
-
-
                             End If
                         End If
 
@@ -3042,7 +3013,8 @@ Public Class IWSRotorPositions
                             bsReagentsRefillPosButton.Enabled = False
                             bsReagentsCheckVolumePosButton.Enabled = False
 
-                            If (barcodeStatus = "ERROR") Then
+                            'BA-1999: enable button for DELETE Position also when BarcodeStatus is UNKNOWN
+                            If (barcodeStatus = "ERROR" OrElse barcodeStatus = "UNKNOWN") Then
                                 bsReagentsDeletePosButton.Enabled = True
                             Else
                                 bsReagentsDeletePosButton.Enabled = False
@@ -3060,10 +3032,11 @@ Public Class IWSRotorPositions
             'RH 13/09/2011 Forces to refresh the Info Area controls
             Application.DoEvents()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowPositionInfoArea", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowPositionInfoArea", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShowPositionInfoArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
 
     ''' <summary>
     ''' Get the information that has to be shown in the Report related to the Rotor and the Info Area section
@@ -3071,171 +3044,168 @@ Public Class IWSRotorPositions
     ''' <param name="pAnalyzerID">Analyzer identifier</param>
     ''' <param name="pRotorType">Rotor type</param>
     ''' <remarks>
-    '''               Created by:  JV - 14/11/2013 - #1382: Get the info for the report using the 'ShowPositionInfoArea' method way to obtain the data.
-    '''               Modified by: JV - 19/11/2013 - #1382: The status description in the report must be the same as the screen legend. I can not use the 'GetStatusDescOnCurrentLanguage' function used in ShowPositionInfoArea
-    '''                            JV - 28/11/2013 - #1412: Show the used and no-used wells in the report. Unify all the status treated and their info.
-    '''                                                     Include the column 'CellNumber' in the Reagents table (CellPositionInformationDS), due to it was impossible to associate rows with 'ElementID=Null' between tables in dataset
-    '''                            JV - 29/11/2013 - #1419: Order correctly by well and don't show values "Type, Volume and/or Tests" depending the barcode status: error or unknown.
-    '''                            JV - 03/12/2013 - #1384: Changes in ElementId when reset the session and mantain status
-    '''                            TR - 28/03/2014 - #1562: Show the Expiration Date on te report.
-    '''                            XB - 03/06/2014 - #1648: Change the sort of this report alphabetically by the name of the reagent
+    ''' Created by:  JV 14/11/2013 - BA-1382 ==> Get the info for the report using the 'ShowPositionInfoArea' method way to obtain the data.
+    ''' Modified by: JV 19/11/2013 - BA-1382 ==> The status description in the report must be the same as the screen legend. I can not use 
+    '''                                          the 'GetStatusDescOnCurrentLanguage' function used in ShowPositionInfoArea
+    '''              JV 28/11/2013 - BA-1412 ==> Show the used and no-used wells in the report. Unify all the status treated and their info.
+    '''                                          Include the column 'CellNumber' in the Reagents table (CellPositionInformationDS), due to it was 
+    '''                                          impossible to associate rows with 'ElementID=Null' between tables in dataset
+    '''              JV 29/11/2013 - BA-1419 ==> Order correctly by CellNumber and don't show values "Type, Volume and/or Tests" depending the 
+    '''                                          Barcode Status: error or unknown
+    '''              JV 03/12/2013 - BA-1384 ==> Changes in ElementID when reset the session and mantain status
+    '''              TR 28/03/2014 - BA-1562 ==> Show the Expiration Date on the report.
+    '''              XB 03/06/2014 - BA-1648 ==> Change the sort of this report alphabetically by the name of the reagent
+    '''              WE 07/10/2014 - BA-1965 ==> Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes)
+    '''              SA 09/01/2015 - BA-1999 ==> Changed the linq used to get NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                          Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub GetInfoAreaForReport(ByVal pAnalyzerID As String, ByVal pRotorType As String)
         Try
-            'Select the rotor type cells and the positions with bottle
-            Dim myCellsDS As WSRotorContentByPositionDS
-            Dim myCellsTable As New WSRotorContentByPositionDS.twksWSRotorContentByPositionDataTable
-            Dim lStatus As New List(Of String) From {"FREE"}
+            'Select all not empty Cells in the specified Rotor
+            Dim query As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AsEnumerable _
+                                                                                                      Where a.AnalyzerID = AnalyzerIDAttribute _
+                                                                                                    AndAlso a.WorkSessionID = WorkSessionIDAttribute _
+                                                                                                    AndAlso a.RotorType = pRotorType _
+                                                                                                    AndAlso (a.Status <> "FREE" _
+                                                                                                     OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
+                                                                                                   Order By a.CellNumber _
+                                                                                                     Select a)
+            If (query.Count > 0) Then
+                Dim myCellsTable As New WSRotorContentByPositionDS.twksWSRotorContentByPositionDataTable
+                query.CopyToDataTable(myCellsTable, LoadOption.OverwriteChanges)
 
-            Dim query As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = _
-                            (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AsEnumerable _
-                                Where a.AnalyzerID = AnalyzerIDAttribute _
-                                And a.WorkSessionID = WorkSessionIDAttribute _
-                                And a.RotorType = pRotorType _
-                                And Not lStatus.Contains(a.Status) _
-                                OrElse (a.Status = "FREE" And a.BarcodeStatus = "ERROR") _
-                                Order By a.CellNumber _
-                                Select a)
+                Dim myCellsDS As WSRotorContentByPositionDS
+                myCellsDS = New WSRotorContentByPositionDS()
+                myCellsDS.Tables.Clear()
+                myCellsDS.Tables.Add(myCellsTable)
 
-            If Not (query.Count > 0) Then
-                Return
-            End If
+                'Read from DB data of all not empty Cells in the specified Rotor
+                Dim myGlobalDataTO As GlobalDataTO
+                Dim positionInformation As New WSRotorContentByPositionDelegate
 
-            query.CopyToDataTable(myCellsTable, LoadOption.OverwriteChanges)
+                myGlobalDataTO = positionInformation.GetPositionInfoForReport(Nothing, myCellsDS)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    Dim myCellPosInfoDS As CellPositionInformationDS = DirectCast(myGlobalDataTO.SetDatos, CellPositionInformationDS)
 
-            'Get all the information of the Rotor Positions from the Database
-            Dim myGlobalDataTO As GlobalDataTO
-            Dim positionInformation As New WSRotorContentByPositionDelegate
-            myCellsDS = New WSRotorContentByPositionDS()
-            myCellsDS.Tables.Clear()
-            myCellsDS.Tables.Add(myCellsTable)
-            'Use this method similar to 'GetPositionInfo', just modified for the report usage (treat more than one row of the WSRotorContentByPositionDS)
-            myGlobalDataTO = positionInformation.GetPositionInfoForReport(Nothing, myCellsDS)
-            If (Not myGlobalDataTO.HasError) Then
-                'Get the returned information
-                Dim myCellPosInfoDS As CellPositionInformationDS
-                myCellPosInfoDS = CType(myGlobalDataTO.SetDatos, CellPositionInformationDS)
+                    Dim myReport As New DataTable(myCellPosInfoDS.ReportTable.TableName)
+                    myReport = myCellPosInfoDS.ReportTable.Clone()
+                    myCellPosInfoDS.Tables.Remove(myCellPosInfoDS.ReportTable.TableName)
+                    myCellPosInfoDS.Tables.Add(myReport)
 
-                Dim myReport As New DataTable(myCellPosInfoDS.ReportTable.TableName)
-                myReport = myCellPosInfoDS.ReportTable.Clone()
-                myCellPosInfoDS.Tables.Remove(myCellPosInfoDS.ReportTable.TableName)
-                myCellPosInfoDS.Tables.Add(myReport)
-                Select Case myRotorTypeForm
-                    Case "REAGENTS"
-                        Dim row As DataRow
-                        Dim myReagent As IEnumerable(Of CellPositionInformationDS.ReagentsRow)
-                        Dim myCellsQuery As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = _
-                            From x In myCellsTable Select x 'Where Not x.IsElementIDNull Select x
+                    Select Case (myRotorTypeForm)
+                        Case "REAGENTS"
+                            Dim row As DataRow
+                            Dim myReagent As IEnumerable(Of CellPositionInformationDS.ReagentsRow)
+                            Dim myCellsQuery As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = (From x In myCellsTable Select x)
 
-                        Dim myExpirationDate As Date 'TR 10/04/2014 BT#1583
+                            Dim myExpirationDate As Date 'TR 10/04/2014 BT#1583
+                            For Each dr As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myCellsQuery
+                                row = myReport.NewRow()
+                                row(0) = dr.CellNumber
 
-                        For Each dr As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myCellsQuery
+                                myReagent = (From x In myCellPosInfoDS.Reagents Where x.CellNumber = dr.CellNumber Select x)
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsReagentNameNull) Then row(1) = myReagent.First.ReagentName
 
-                            row = myReport.NewRow()
-                            row(0) = dr.CellNumber
-                            myReagent = From x In myCellPosInfoDS.Reagents Where x.CellNumber = dr.CellNumber Select x
+                                'TR 28/03/2014 #1562
+                                If (Not dr.IsBarCodeInfoNull) Then row(2) = dr.BarCodeInfo
+                                If (dr.BarcodeStatus = "OK" AndAlso dr.BarCodeInfo <> "") Then
+                                    If (myReagent.Count > 0) Then
+                                        myReagent.First().BeginEdit()
 
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsReagentNameNull Then row(1) = myReagent.First.ReagentName
-                            If Not dr.IsBarCodeInfoNull Then row(2) = dr.BarCodeInfo
+                                        'TR 10/04/2014 BT #1583
+                                        myExpirationDate = Date.MinValue 'initialize variable
+                                        'WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                        If (myCellPosInfoDS.PositionInformation(0).Content = "REAGENT") Then
+                                            'Get the expiration date
+                                            myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo, Me)
 
-                            'TR 28/03/2014 #1562
-                            If dr.BarcodeStatus = "OK" AndAlso dr.BarCodeInfo <> "" Then
-                                If myReagent.Count > 0 Then
-                                    myReagent.First().BeginEdit()
+                                            'Validate if date is correct (different than the minimun date value).
+                                            If (myExpirationDate > Date.MinValue) Then
+                                                myReagent.First().ExpirationDate = myExpirationDate
+                                                myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                            End If
+                                        End If
+                                        'WE 07/10/2014 BA-1965 - End.
 
-                                    'TR 10/04/2014 BT#1583
-                                    myExpirationDate = Date.MinValue 'initialize variable
-                                    'Get the expiration date
-                                    myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                    'Validate if date is diferent than the minimun date value
-                                    If myExpirationDate > Date.MinValue Then
-                                        myReagent.First().ExpirationDate = myExpirationDate
-                                        myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                        myReagent.First().LotNumber = GetReagentLotNumberFromBarCode(dr.BarCodeInfo)
+                                        myReagent.First().EndEdit()
+
+                                        'TR 10/04/2014 BT#1583 Validate the date to be shown on report.
+                                        If (myExpirationDate > Date.MinValue) Then
+                                            'Set the Formated Date to be shown on Report
+                                            row("ExpDateFormated") = myReagent.First().ExpDateFormated
+                                        Else
+                                            row("ExpDateFormated") = String.Empty
+                                        End If
+                                        'TR 10/04/2014 BT#1583
+
+                                        'TR 06/05/2014 -Validate if LotNumber is a valid number to show on report
+                                        If (IsNumeric(myReagent.First().LotNumber) AndAlso CInt(myReagent.First().LotNumber) > 0) Then
+                                            'Set the lot number to shown on report
+                                            row("LotNumber") = myReagent.First().LotNumber
+                                        Else
+                                            row("LotNumber") = String.Empty
+                                        End If
                                     End If
-                                    'TR 10/04/2014 BT#1583
-                                    'myReagent.First().ExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                    'myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
-                                    myReagent.First().LotNumber = GetReagentLotNumberFromBarCode(dr.BarCodeInfo)
-                                    myReagent.First().EndEdit()
-
-                                    'TR 10/04/2014 BT#1583 Validate the date to be shown on report.
-                                    If myExpirationDate > Date.MinValue Then
-                                        'Set the Formated Date to be shown on Report
-                                        row("ExpDateFormated") = myReagent.First().ExpDateFormated
-                                    Else
-                                        row("ExpDateFormated") = String.Empty
-                                    End If
-                                    'TR 10/04/2014 BT#1583
-
-                                    'TR 06/05/2014 -Validate if LotNumber is a valid number to show on report
-                                    If IsNumeric(myReagent.First().LotNumber) AndAlso CInt(myReagent.First().LotNumber) > 0 Then
-                                        'Set the lot number to shown on report
-                                        row("LotNumber") = myReagent.First().LotNumber
-                                    Else
-                                        row("LotNumber") = ""
-                                    End If
-                                    'TR 06/05/2014 -END
                                 End If
-                            End If
-                            'TR 28/03/2014 #1562 -END
 
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsExpirationDateNull Then
-                                row(3) = myReagent.First.ExpirationDate.ToString(SystemInfoManager.OSDateFormat)
-                            End If
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsExpirationDateNull) Then
+                                    row(3) = myReagent.First.ExpirationDate.ToString(SystemInfoManager.OSDateFormat)
+                                End If
 
-                            If Not dr.IsTubeTypeNull Then
+                                If (Not dr.IsTubeTypeNull) Then
+                                    Dim result As List(Of TubeSizeTO) = (From a In AllTubeSizeList _
+                                                                        Where a.RingNumber = dr.RingNumber _
+                                                                      AndAlso a.RotorType = myRotorTypeForm _
+                                                                      AndAlso a.TubeCode = dr.TubeType _
+                                                                       Select a).ToList()
+                                    row(4) = IIf(result.Count > 0, result.First.FixedTubeName, String.Empty)
+                                End If
 
-                                Dim result As List(Of TubeSizeTO) = (From a In AllTubeSizeList _
-                                                                     Where a.RingNumber = dr.RingNumber _
-                                                                     AndAlso String.Compare(a.RotorType, myRotorTypeForm, False) = 0 _
-                                                                     AndAlso a.TubeCode = dr.TubeType _
-                                                                     Select a).ToList()
-                                row(4) = IIf(result.Count > 0, result.First.FixedTubeName, String.Empty)
-                            End If
-                            If Not dr.IsRealVolumeNull Then row(5) = dr.RealVolume.ToStringWithDecimals(2, True)
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsRemainingTestsNull Then row(6) = myReagent.First.RemainingTests.ToString
-                            If dr.Status = "FREE" AndAlso dr.BarcodeStatus = "ERROR" Then
-                                row(4) = String.Empty
-                                row(5) = String.Empty
-                                row(6) = String.Empty
-                                row(7) = bsBarcodeErrorRGLabel.Text
-                                row(8) = dr.BarcodeStatus
-                            ElseIf dr.BarcodeStatus = "UNKNOWN" Then
-                                row(6) = String.Empty
-                                row(7) = bsUnknownLabel.Text
-                                row(8) = dr.Status
-                            Else
-                                Select Case dr.Status
-                                    Case "FEW"
-                                        row(7) = bsLegReagLowVolLabel.Text
-                                    Case "DEPLETED"
-                                        row(7) = bsLegReagDepleteLabel.Text
-                                    Case Else
-                                        row(7) = String.Empty
-                                End Select
-                                row(8) = dr.Status
-                            End If
-                            myReport.Rows.Add(row)
-                        Next
+                                If (Not dr.IsRealVolumeNull) Then row(5) = dr.RealVolume.ToStringWithDecimals(2, True)
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsRemainingTestsNull) Then row(6) = myReagent.First.RemainingTests.ToString
 
-                        ' XB 03/06/2014 - BT #1648
-                        'myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
-                        myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+                                If (dr.BarcodeStatus = "ERROR") Then
+                                    row(4) = String.Empty
+                                    row(5) = String.Empty
+                                    row(6) = String.Empty
+                                    row(7) = bsBarcodeErrorRGLabel.Text
+                                    row(8) = dr.BarcodeStatus
+                                ElseIf (dr.BarcodeStatus = "UNKNOWN") Then
+                                    row(6) = String.Empty
+                                    row(7) = bsUnknownLabel.Text
+                                    row(8) = dr.Status
+                                Else
+                                    Select Case dr.Status
+                                        Case "FEW"
+                                            row(7) = bsLegReagLowVolLabel.Text
+                                        Case "DEPLETED"
+                                            row(7) = bsLegReagDepleteLabel.Text
+                                        Case Else
+                                            row(7) = String.Empty
+                                    End Select
+                                    row(8) = dr.Status
+                                End If
+                                myReport.Rows.Add(row)
+                            Next
 
-                        myReport = myReport.DefaultView.ToTable()
-                    Case Else
-                        'Nothing to do
-                        Return
-                End Select
-                myCellPosInfoDS.AcceptChanges()
-                'Finally we launch the report
-                XRManager.ShowRotorContentByPositionReport(myCellPosInfoDS)
-            Else
-                ShowMessage(Me.Name & ".GetInfoAreaForReport", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+                            'XB 03/06/2014 - BT #1648
+                            myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+                            myReport = myReport.DefaultView.ToTable()
+                        Case Else
+                            'Nothing to do
+                            Return
+                    End Select
+                    myCellPosInfoDS.AcceptChanges()
+
+                    'Finally we launch the report
+                    XRManager.ShowRotorContentByPositionReport(myCellPosInfoDS)
+                Else
+                    ShowMessage(Me.Name & ".GetInfoAreaForReport", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+                End If
             End If
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetInfoAreaForReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetInfoAreaForReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetInfoAreaForReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3248,7 +3218,9 @@ Public Class IWSRotorPositions
     ''' <returns>The status name on the application language.</returns>
     ''' <remarks>
     ''' Created by:  TR 29/04/2011
-    ''' Modified by: AG 06/10/2011 - Add pBarCodeStatus parameter for show new status due Barcode Error</remarks>
+    ''' Modified by: AG 06/10/2011 - Add pBarCodeStatus parameter for show new status due Barcode Error
+    '''              SA 09/01/2014 - BA-1999 ==> If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+    ''' </remarks>
     Private Function GetStatusDescOnCurrentLanguage(ByVal pItemID As String, ByVal pBarcodeStatus As String) As String
         Dim myResult As String = ""
         Try
@@ -3266,7 +3238,8 @@ Public Class IWSRotorPositions
             End Select
 
             'AG 06/10/2011 - Add Barcode Status information (by now, if Barcode Status is ERROR, status to shown will be NOT IN USE)
-            If (pBarcodeStatus = "ERROR") Then myItemID = "NO_INUSE"
+            'BA-1999: If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+            If (pBarcodeStatus = "ERROR" OrElse pBarcodeStatus = "UNKNOWN") Then myItemID = "NO_INUSE"
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
@@ -3278,8 +3251,8 @@ Public Class IWSRotorPositions
                 If (myPreloMasterDS.tfmwPreloadedMasterData.Count > 0) Then myResult = myPreloMasterDS.tfmwPreloadedMasterData(0).FixedItemDesc
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetStatusLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusDescOnCurrentLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".GetStatusDescOnCurrentLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
     End Function
@@ -3351,7 +3324,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentsSamplesAutoPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentsSamplesAutoPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReagentsSamplesAutoPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
@@ -3383,7 +3356,7 @@ Public Class IWSRotorPositions
             Return NotFreePos.Count
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RotorPositioned", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RotorPositioned", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RotorPositioned", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3402,6 +3375,8 @@ Public Class IWSRotorPositions
     '''                              ShowMessage 
     '''              TR 12/01/2010 - Show the question message before rotor is reset
     '''              DL 05/10/2011 - Included when status = FREE and barcodestatus = ERROR
+    '''              SA 08/01/2015 - BA-1999 ==> Added a call to function ClearSelection to clean the global DS of Selected 
+    '''                                          Elements once the reset has been executed
     ''' </remarks>
     Private Sub ResetRotor(ByVal pRotorType As String, ByVal pAnalizerID As String)
         Try
@@ -3430,25 +3405,22 @@ Public Class IWSRotorPositions
 
                     If (Not myGlobalTo.HasError) Then
                         'Prepare all the position controls
-                        PreparePositionsControls(pRotorType) 'RH 15/02/2010
+                        PreparePositionsControls(pRotorType)
+                        InitializeScreen(True, pRotorType)
 
-                        InitializeScreen(True, pRotorType) 'AG 11/11/2010 - add 2on parameter
+                        'BA-1999: Clean the DS of selected Rotor Positions
+                        ClearSelection()
                     Else
                         'Error reseting the Rotor
                         ShowMessage(Me.Name & ".ResetRotor", myGlobalTo.ErrorCode, myGlobalTo.ErrorMessage, Me)
                     End If
-
                 End If
-
             End If
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResetRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
             Me.Cursor = Cursors.Default
-
         End Try
     End Sub
 
@@ -3465,30 +3437,26 @@ Public Class IWSRotorPositions
     '''              DL 08/01/2010 - Changes and testing (Testing: OK)
     '''              AG 26/01/2010 - Changes in virtual rotor selection auxiliar screen
     '''              AG 14/03/2011 - define private
+    '''              SA 09/01/2014 - BA-1999 ==> Changed the linq used to count NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                          Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub SaveVirtualRotor(ByVal pRotorType As String)
         Try
+            'BA-1999: Count also positions with Status FREE but BarcodeStatus ERROR or UNKNOWN
+            Dim myElemFree As Integer = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
+                                        Where a.RotorType = pRotorType _
+                                      AndAlso (a.Status <> "FREE" _
+                                       OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
+                                       Select a.Status).Count
 
-            Dim myElemFree As Integer = 0
-            myElemFree = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                          Where a.RotorType = pRotorType AndAlso a.Status <> "FREE" _
-                          Select a.Status).Count
-
-            If myElemFree > 0 Then
-
-                'RH 19/10/2010 Introduce the Using statement
-                Using myLoadSaveAuxScreen As New IWSLoadSaveAuxScreen()
+            If (myElemFree > 0) Then
+                'RH 19/10/2010 - Introduce the Using statement
+                Using myLoadSaveAuxScreen As New UiWSLoadSaveAuxScreen()
                     myLoadSaveAuxScreen.ScreenUse = "VROTORS"
                     myLoadSaveAuxScreen.SourceButton = "SAVE"
                     myLoadSaveAuxScreen.RotorType = pRotorType
 
-                    'If (pRotorType = "SAMPLES") Then
-                    '    myLoadSaveAuxScreen.NameProperty = VirtualSampleRotorName
-                    'ElseIf (pRotorType = "REAGENTS") Then
-                    '    myLoadSaveAuxScreen.NameProperty = VirtualReagentRotorName
-                    'End If
-
-                    'RH 15/02/2011 Simplified code
+                    'RH 15/02/2011 - Simplified code
                     If (pRotorType = "SAMPLES") Then
                         myLoadSaveAuxScreen.NameProperty = VirtualSampleRotorName
                     Else
@@ -3503,26 +3471,21 @@ Public Class IWSRotorPositions
                         If (pRotorType = "SAMPLES") Then
                             VirtualSampleRotorID = myLoadSaveAuxScreen.IDProperty
                             VirtualSampleRotorName = myLoadSaveAuxScreen.NameProperty
-
                         Else
                             VirtualReagentRotorID = myLoadSaveAuxScreen.IDProperty
                             VirtualReagentRotorName = myLoadSaveAuxScreen.NameProperty
                         End If
 
                         GenerateAndSaveVRotorPositionDS(myRotorContentByPositionDSForm, pRotorType, myLoadSaveAuxScreen.IDProperty, myLoadSaveAuxScreen.NameProperty)
-                        'RH 15/02/2011 END
                     End If
                 End Using
             Else
                 'ShowMessage(Me.Name & ".SaveVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, , Me)
-                ShowMessage("AX00", GlobalEnumerates.Messages.EMPTYROTOR.ToString)
+                ShowMessage("BAX00", GlobalEnumerates.Messages.EMPTYROTOR.ToString)
             End If
-
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveVirtualRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveVirtualRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -3549,7 +3512,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub LoadVirtualRotor(ByVal pRotorType As String)
         Try
-            Using myLoadSaveAuxScreen As New IWSLoadSaveAuxScreen()
+            Using myLoadSaveAuxScreen As New UiWSLoadSaveAuxScreen()
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myLoadSaveAuxScreen.ScreenUse = "VROTORS"
                 myLoadSaveAuxScreen.SourceButton = "LOAD"
@@ -3602,7 +3565,7 @@ Public Class IWSRotorPositions
                 End If
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "LoadVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "LoadVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -3647,7 +3610,7 @@ Public Class IWSRotorPositions
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScren", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScren", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScren", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3845,7 +3808,7 @@ Public Class IWSRotorPositions
             'TR 27/11/2013 -BT# 1404 END
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".StatusInfoAreaControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".StatusInfoAreaControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StatusInfoAreaControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3926,7 +3889,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateAllowedActionInPause", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateAllowedActionInPause", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateAllowedActionInPause", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -3984,7 +3947,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanInfoArea", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanInfoArea", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CleanInfoArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4053,7 +4016,7 @@ Public Class IWSRotorPositions
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLocalPositionInfo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLocalPositionInfo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetLocalPositionInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -4145,24 +4108,24 @@ Public Class IWSRotorPositions
             '                String.Equals(myTubeContent, "CTRL")) Then
 
             '                If String.Equals(posContent.First.BarcodeStatus, "ERROR") Then
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
 
             '                Else
             '                    Select Case posContent.First.Status
             '                        Case "PENDING"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
 
             '                        Case "DEPLETED"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
 
             '                        Case "NO_INUSE"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
 
             '                        Case "FINISHED"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
 
             '                        Case "INPROCESS"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
 
             '                            'Case "FREE", "PATIENT"
             '                            'bsSamplesDeletePosButton.Enabled = True
@@ -4174,11 +4137,11 @@ Public Class IWSRotorPositions
 
             '            Else
             '                If String.Equals(posContent.First.BarcodeStatus, "ERROR") Then
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
 
             '                    If String.Equals(posContent.First.Status, "FREE") Then BarCodeErrorSampleFree = True
             '                Else
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
             '                End If
 
             '            End If
@@ -4332,7 +4295,7 @@ Public Class IWSRotorPositions
             '                        If String.Equals(posContent.First.BarcodeStatus, "ERROR") Or String.Equals(posContent.First.BarcodeStatus, "UNKNOWN") Then
             '                            BarCodeErrorReagentFree = True
             '                            'Else
-            '                            '    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+            '                            '    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
             '                        End If
 
             '                        ChangeControlPositionImage(controlQuery.First, Nothing, True)
@@ -4414,7 +4377,7 @@ Public Class IWSRotorPositions
             ''DL 05/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPosition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPosition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkSelectedPosition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4475,27 +4438,27 @@ Public Class IWSRotorPositions
                         myTubeContent = "SPEC_SOL" OrElse myTubeContent = "TUBE_SPEC_SOL" OrElse _
                         myTubeContent = "WASH_SOL" OrElse myTubeContent = "TUBE_WASH_SOL") Then
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                         Else
                             Select Case (posContent.First.Status)
                                 Case "NO_INUSE"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
                                 Case "DEPLETED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
                                 Case "PENDING"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
                                 Case "INPROCESS"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
                                 Case "FINISHED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
                             End Select
                         End If
                     Else
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                             If (posContent.First.Status = "FREE") Then BarCodeErrorSampleFree = True
                         Else
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
                         End If
                     End If
                 Else
@@ -4520,7 +4483,7 @@ Public Class IWSRotorPositions
             bsSamplesDecreaseButton.Enabled = enableDisplacementButtons
             bsSamplesIncreaseButton.Enabled = enableDisplacementButtons
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPositionInSAMPLESRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPositionInSAMPLESRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkSelectedPositionInSAMPLESRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4800,7 +4763,7 @@ Public Class IWSRotorPositions
             bsReagentsDecreaseButton.Enabled = enableDisplacementButtons
             bsReagentsIncreaseButton.Enabled = enableDisplacementButtons
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPositionInREAGENTSRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedPositionInREAGENTSRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkSelectedPositionInREAGENTSRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4818,6 +4781,7 @@ Public Class IWSRotorPositions
     '''              RH 13/09/2011 - Added new conditions: Position with barcode status = NULL or EMPTY or UNKNOWN or ERROR
     '''              AG 06/10/2011 - Added ByRef parameter pCellStatus
     '''              AG 29/05/2012 - Linq syntax has been corrected (previous versions returned always 1 record by position-rotor type + all records with bottle UNKOWN)
+    '''              SA 09/01/2015 - BA-1999 ==> Changed the linq to include also FREE Positions with BarcodeStatus = UNKNOWN
     ''' </remarks>
     Private Function IsPositionFree(ByVal pRingNumber As Integer, ByVal pCellNumber As Integer, Optional ByRef pCellBarcodeStatus As String = "", _
                                     Optional ByRef pCellBarcodeInfo As String = "") As Boolean
@@ -4828,18 +4792,17 @@ Public Class IWSRotorPositions
                          Where a.RotorType = myRotorTypeForm _
                        AndAlso a.RingNumber = pRingNumber _
                        AndAlso a.CellNumber = pCellNumber _
-                       AndAlso ((a.Status = "FREE" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus = "EMPTY" OrElse a.BarcodeStatus = "ERROR")) _
-                         OrElse (a.Status = "NO_INUSE" AndAlso (Not a.IsBarcodeStatusNull AndAlso a.BarcodeStatus = "UNKNOWN"))) _
+                       AndAlso (a.Status = "FREE" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus = "EMPTY" OrElse a.BarcodeStatus = "ERROR" OrElse a.BarcodeStatus = "UNKNOWN")) _
                         Select a).ToList()
 
                 If (query1.Count > 0 AndAlso Not query1.First.IsBarcodeStatusNull) Then pCellBarcodeStatus = query1.First.BarcodeStatus
                 If (query1.Count > 0 AndAlso Not query1.First.IsBarCodeInfoNull) Then pCellBarcodeInfo = query1.First.BarCodeInfo
                 Return (query1.Count > 0)
             Else
-                Return (0)
+                Return (False)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsPositionFree ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsPositionFree ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IsPositionFree", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return False
@@ -4865,15 +4828,15 @@ Public Class IWSRotorPositions
         Try
             If (mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then 'Modified: VR 24/12/2009 - Patch Added
                 'RH 13/09/2011 Do nothing if it is the same position
-                If mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber = pRingNumber AndAlso _
-                mySelectedElementInfo.twksWSRotorContentByPosition(0).CellNumber = pCellNumber Then Return
+                If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber = pRingNumber AndAlso _
+                    mySelectedElementInfo.twksWSRotorContentByPosition(0).CellNumber = pCellNumber) Then Return
 
                 'RH 10/10/2011 For Reagents, inner ring to outer ring position changing is not allowed
                 'when TubeType = "BOTTLE3" and BarCodeInfo <> String.Empty
-                If String.Compare(myRotorTypeForm, "REAGENTS", False) = 0 Then
-                    If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber > pRingNumber) _
-                    AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition(0).TubeType = "BOTTLE3") _
-                    AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then Return
+                If (myRotorTypeForm = "REAGENTS") Then
+                    If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber > pRingNumber) AndAlso _
+                       (mySelectedElementInfo.twksWSRotorContentByPosition(0).TubeType = "BOTTLE3") AndAlso _
+                       (mySelectedElementInfo.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then Return
                 End If
 
                 Dim myGlobalDataTO As GlobalDataTO
@@ -4893,15 +4856,14 @@ Public Class IWSRotorPositions
 
                     'TR 09/03/2012 -Validate if element status is Pos then Update the status for the same element id to POS
                     If (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "POS") Then
-                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                                                 mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
+                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
+
                     ElseIf mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "INCOMPLETE" Then
-                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                                                 mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
+                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
                     End If
                     'TR 09/03/2012 -END 
 
-                    ' XB 27/08/2013
+                    'XB 27/08/2013
                     Dim myBarcodePositionsWithNoRequestsDelegate As New BarcodePositionsWithNoRequestsDelegate
                     myGlobalDataTO = myBarcodePositionsWithNoRequestsDelegate.UpdateCellNumber(Nothing, pCellNumber, _
                                                                                                mySelectedElementInfo.twksWSRotorContentByPosition(0).AnalyzerID, _
@@ -4913,17 +4875,16 @@ Public Class IWSRotorPositions
                         ShowMessage(Me.Name & ".ChangeElementPosition", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
                         Exit Try
                     End If
-                    ' XB 27/08/2013
+                    'XB 27/08/2013
 
                     'Reload the info area with the new information 
                     ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, pRingNumber, pCellNumber)
-                    'TR 19/01/2010 END
                 Else
                     ShowMessage(Me.Name & ".ChangeElementPosition", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeElementPosition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeElementPosition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ChangeElementPosition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5010,7 +4971,7 @@ Public Class IWSRotorPositions
                 bsElementsTreeView.SelectedNode = myNodes(0)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteSelectedPositions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteSelectedPositions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteSelectedPositions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5072,7 +5033,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ChangeBottleSize " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ChangeBottleSize " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("ChangeBottleSize", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5114,7 +5075,7 @@ Public Class IWSRotorPositions
                     myGlobalDataTo.SetDatos = newRotorContentPosDS  'AG 05/01/2010
 
                     'TR 03/05/2012 -Update local values.
-                    LoadRotorAreaInfo(WorkSessionIDAttribute, AnalyzerIDAttribute, False, False)
+                    LoadRotorAreaInfo(WorkSessionIDAttribute, AnalyzerIDAttribute, False, False.ToString)
                     'TR 03/05/2012 -END.
 
                     'AG 28/01/2010 - show info area
@@ -5129,7 +5090,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RefillReagentSampleVolume " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RefillReagentSampleVolume " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefillReagentSampleVolume", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5208,7 +5169,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScrollButtonsInfoArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScrollButtonsInfoArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScrollButtonsInfoArea ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5519,7 +5480,7 @@ Public Class IWSRotorPositions
             'ValidateCheckRotorVolumeButtonEnabled()
             ''AG 03/10/2011
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".LoadScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".LoadScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5553,7 +5514,7 @@ Public Class IWSRotorPositions
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetValuesToControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetValuesToControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetValuesToControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myChildControls
@@ -5577,6 +5538,8 @@ Public Class IWSRotorPositions
     '''               AG 03/02/2012 - Changes for saving new field Status in table tparVirtualRotorPositions
     '''               SA 09/02/2012 - Removed last changes for saving new field Status: it is not needed to search value in DB again; information
     '''                               is already obtained when calling function GetPositionContent for NOT IN USE positions
+    '''               SA 09/01/2015 - BA-1999 ==> Changed the linq used to get NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                           Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub GenerateAndSaveVRotorPositionDS(ByVal myFormRotorContentByPositionDSObj As WSRotorContentByPositionDS, ByVal pRotorType As String, _
                                                 ByVal pVirtualRotorID As Integer, ByVal pVirtualRotorName As String)
@@ -5585,11 +5548,13 @@ Public Class IWSRotorPositions
                 Dim myGlobalDataTO As New GlobalDataTO
                 Dim myVirtualRotorPosititionsDS As New VirtualRotorPosititionsDS
 
-                'Get only not FREE positions from the Rotor
+                'Get only not FREE positions from the Rotor 
+                'BA-1999: Get also positions with Status FREE but BarcodeStatus ERROR or UNKNOWN
                 Dim lstRotorPositions As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                 lstRotorPositions = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
                                     Where a.RotorType = pRotorType _
-                                  AndAlso a.Status <> "FREE" _
+                                  AndAlso (a.Status <> "FREE" _
+                                   OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
                                    Select a).ToList()
 
                 Dim myWSRequiredElementsDS As WSRequiredElementsDS
@@ -5674,8 +5639,8 @@ Public Class IWSRotorPositions
                                     myVirtualRotorPosititionsRow.PredilutionFactor = myWSRequiredElementsDS.twksWSRequiredElements(0).PredilutionFactor
                                 End If
 
-                                'Status of cells marked as DEPLETED or with FEW volume has to be preserved
-                                If (myRow.IsStatusNull OrElse (myRow.Status <> "DEPLETED" AndAlso String.Compare(myRow.Status, "FEW", False) <> 0)) Then
+                                'Status of cells marked as DEPLETED or FEW has to be preserved
+                                If (myRow.IsStatusNull OrElse (myRow.Status <> "DEPLETED" AndAlso myRow.Status <> "FEW")) Then
                                     myVirtualRotorPosititionsRow.SetStatusNull()
                                 Else
                                     myVirtualRotorPosititionsRow.Status = myRow.Status
@@ -5748,7 +5713,8 @@ Public Class IWSRotorPositions
                                     myVirtualRotorPosititionsRow.PredilutionFactor = myNoInUsePos.tparVirtualRotorPosititions(0).PredilutionFactor
                                 End If
 
-                                If (myNoInUsePos.tparVirtualRotorPosititions(0).IsStatusNull) Then
+                                If (myNoInUsePos.tparVirtualRotorPosititions(0).IsStatusNull OrElse _
+                                   (myNoInUsePos.tparVirtualRotorPosititions(0).Status <> "DEPLETED" AndAlso myNoInUsePos.tparVirtualRotorPosititions(0).Status <> "FEW")) Then
                                     myVirtualRotorPosititionsRow.SetStatusNull()
                                 Else
                                     'Status of Not In Use Positions marked as DEPLETED or FEW is preserved
@@ -5778,7 +5744,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GenerateAndSaveVRotorPositionDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GenerateAndSaveVRotorPositionDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GenerateAndSaveVRotorPositionDS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5821,7 +5787,7 @@ Public Class IWSRotorPositions
             End With
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeVirtualRotorRow " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeVirtualRotorRow " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("InitializeVirtualRotorRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5894,7 +5860,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FilterAllTubesbyRingNumberRotorType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FilterAllTubesbyRingNumberRotorType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FilterAllTubesbyRingNumberRotorType", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -5956,7 +5922,7 @@ Public Class IWSRotorPositions
                     Dim StartTime As DateTime = Now 'AG 18/02/2014 - #1505
 
                     'Shown the Positioning Warnings Screen
-                    Using NotPositionedDialog As New IWSNotPosWarning()
+                    Using NotPositionedDialog As New UiWSNotPosWarning()
                         NotPositionedDialog.OpenMode = pOpenMode
                         NotPositionedDialog.ActiveWorkSession = Me.WorkSessionIDAttribute
                         NotPositionedDialog.ShowDialog()
@@ -5965,7 +5931,7 @@ Public Class IWSRotorPositions
                     End Using
 
                     'AG 18/02/2014 - #1505
-                    CreateLogActivity("Time with NOSPOS warning screen opened: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("Time with NOSPOS warning screen opened: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                 "IWSROTORPositions.ShowNotPositionedElements", EventLogEntryType.Information, False)
 
                     'AG 22/07/2013 - Stop the Buzzer is the process of automatic WS creation with LIS is active
@@ -5979,7 +5945,7 @@ Public Class IWSRotorPositions
                 closeRotorPosScreen = False
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowNotPositionedElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowNotPositionedElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShowNotPositionedElements", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
             closeRotorPosScreen = False
@@ -6073,7 +6039,7 @@ Public Class IWSRotorPositions
             LegReagentSelLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LGD_RotBInProcess", pLanguageID)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6143,7 +6109,7 @@ Public Class IWSRotorPositions
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             bsScreenToolTips.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenButtonToolTips ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenButtonToolTips ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenButtonToolTips ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6180,7 +6146,7 @@ Public Class IWSRotorPositions
                 'Validate if it's a calibrator
                 If (myReqElementTO.TubeContent = "CALIB") Then
                     Dim myWSReqElementDelegate As New WSRequiredElementsDelegate
-                    myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, myReqElementTO.ElementID, myReqElementTO.ElementCode)
+                    myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, myReqElementTO.ElementID, CInt(myReqElementTO.ElementCode))
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         'Validate if it's a Multipoint Calibrator to add all other elements on my element list.
                         Dim myReqElementDS As WSRequiredElementsDS = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS)
@@ -6210,7 +6176,7 @@ Public Class IWSRotorPositions
                             Dim myRotorPosRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
 
                             If (Not multiSel) Then 'Only one selected element
-                                myRotorPosRow = myWSRotorbPosDS.twksWSRotorContentByPosition.Rows(0)
+                                myRotorPosRow = CType(myWSRotorbPosDS.twksWSRotorContentByPosition.Rows(0), WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                 ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myRotorPosRow.RingNumber, myRotorPosRow.CellNumber)
                             Else
                                 'RH 10/10/2011
@@ -6242,7 +6208,7 @@ Public Class IWSRotorPositions
                 ClearSelection()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowInfoSelectedTreeNodeElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowInfoSelectedTreeNodeElement", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShowInfoSelectedTreeNodeElement", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6266,14 +6232,14 @@ Public Class IWSRotorPositions
                 pControl.IsTransparentImage = pTransparentImage
 
                 If (pImagePath <> Nothing) Then ' AndAlso Not setControlPosToNothing Then
-                    pControl.Image = Image.FromFile(pImagePath)
+                    pControl.Image = ImageUtilities.ImageFromFile(pImagePath)
                     pControl.BringToFront()
                 Else
                     pControl.Image = Nothing
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeControlPositionImage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ChangeControlPositionImage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ChangeControlPositionImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6295,6 +6261,8 @@ Public Class IWSRotorPositions
     '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              SA 18/12/2014 - Changed declaration of String list AffectedISEElectrodes to remove a build warning: it is now declared as New List (Of String)
+    '''              XB 08/01/2015 - Pumps Calibration do not lock ISE preparations during Running (even Pause) - BA-2187
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6302,7 +6270,7 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks
@@ -6319,7 +6287,7 @@ Public Class IWSRotorPositions
 
             'SGM 07/09/2012 - Check if there is any pending ISE Calibration
             Dim iseModuleReady As Boolean = True
-            Dim AffectedISEElectrodes As List(Of String) 'SGM 07/09/2012
+            Dim AffectedISEElectrodes As New List(Of String) 'SGM 07/09/2012
             Dim showISELockedMessage As Boolean = False 'SGM 07/09/2012
 
             'Verify there is at least an ISE Test requested in the WorkSession
@@ -6338,16 +6306,25 @@ Public Class IWSRotorPositions
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
 
-                                        ' XB 23/05/2014 - BT #1639
-                                        If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                                           (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
+                                        ' XB 08/01/2015 - BA-2187
+                                        '' XB 23/05/2014 - BT #1639
+                                        'If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                        '   (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
+                                        '    iseModuleReady = False
+                                        'End If
+
+                                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                                            Debug.Print("STANDBY ____________________________________________________________")
+                                            Debug.Print("LOCK ISE (1) ____________________________________________________________")
                                             iseModuleReady = False
                                         End If
-                                        ' XB 23/05/2014 - BT #1639
+                                        '' XB 23/05/2014 - BT #1639
+                                        ' XB 08/01/2015 - BA-2187
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
                                         If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                            Debug.Print("RUNNING ____________________________________________________________")
                                             ' Check if ISE Pumps calibration is required
                                             Dim PumpsCalibrationRequired As Boolean = False
                                             resultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
@@ -6357,6 +6334,44 @@ Public Class IWSRotorPositions
                                             If PumpsCalibrationRequired Then
                                                 showISELockedMessage = True
                                             End If
+
+                                            ' XB 08/01/2015 - BA-2187
+                                            If iseModuleReady Then
+                                                If AnalyzerController.Instance.Analyzer.AllowScanInRunning Then
+                                                    ' PAUSE mode 
+                                                    Debug.Print("PAUSE ____________________________________________________________")
+
+                                                    ' Check if ISE Electrodes calibration is required
+                                                    Dim ElectrodesCalibrationRequired As Boolean = False
+                                                    resultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        ElectrodesCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    ' Check if ISE Bubble calibration is required
+                                                    Dim BubbleCalibrationRequired As Boolean = False
+                                                    resultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckBubbleCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        BubbleCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    iseModuleReady = (Not ElectrodesCalibrationRequired) And (Not BubbleCalibrationRequired)
+                                                    If Not iseModuleReady Then Debug.Print("LOCK ISE (2) ____________________________________________________________")
+
+                                                Else
+                                                    Debug.Print("NOT IN PAUSE ____________________________________________________________")
+                                                    ' USUAL Running
+                                                End If
+
+                                                If iseModuleReady Then
+                                                    If AnalyzerController.Instance.Analyzer.LockISE Then
+                                                        Debug.Print("LOCK ISE (3) ____________________________________________________________")
+                                                        iseModuleReady = False
+                                                    End If
+                                                End If
+
+                                            End If
+                                            ' XB 08/01/2015 - BA-2187
                                         End If
                                         ' XB 28/10/2013
                                     End If
@@ -6410,12 +6425,12 @@ Public Class IWSRotorPositions
 
             'AG 18/02/2014 - #1505 (change text)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'myLogAcciones.CreateLogActivity("IWRotorPositions - Create WS Executions: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'GlobalBase.CreateLogActivity("IWRotorPositions - Create WS Executions: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
             '                                "IWSampleRequest.CreateWSExecutions ", EventLogEntryType.Information, False)
             If finalTime = "" Then
                 finalTime = Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)
             End If
-            myLogAcciones.CreateLogActivity("IWRotorPositions - Create WS Executions: " & finalTime, _
+            GlobalBase.CreateLogActivity("IWRotorPositions - Create WS Executions: " & finalTime, _
                                             "IWRotorPositions.CreateWSExecutions ", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 18/02/2014 - #1505 (change text)
@@ -6423,14 +6438,12 @@ Public Class IWSRotorPositions
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             AffectedISEElectrodes = Nothing 'AG 19/02/2014 - #1514
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateWSExecutions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateWSExecutions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorOnCreateWSExecutions = String.Format("{0}|{1}", GlobalEnumerates.Messages.SYSTEM_ERROR, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             ScreenWorkingProcess = False
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' Validate if there are Barcode position with no request and Enable or Disable Button BarcodeWarningButton.
@@ -6472,12 +6485,12 @@ Public Class IWSRotorPositions
             End If
 
             ' XB 01/08/2013 - add functionality according to disable LIS buttons
-            If IAx00MainMDI.DisableLISButtons() Then
+            If UiAx00MainMDI.DisableLISButtons() Then
                 BarcodeWarningButton.Enabled = False
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateBCNoRequest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateBCNoRequest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateBCNoRequest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6519,9 +6532,9 @@ Public Class IWSRotorPositions
                     'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                     If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
                        (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
-                        If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
+                        If (Not UiAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                             'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
-                            statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
+                            statusScanningButton = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
                         End If
                     End If
                 End If
@@ -6530,7 +6543,7 @@ Public Class IWSRotorPositions
             bsScanningButton.Enabled = statusScanningButton
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateScanningButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateScanningButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateScanningButtonEnabled ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6573,7 +6586,7 @@ Public Class IWSRotorPositions
             'bsSamplesCheckVolumePosButton.Enabled = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateCheckRotorVolumeButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateCheckRotorVolumeButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateCheckRotorVolumeButtonEnabled ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6600,7 +6613,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowActionMessageifApply ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowActionMessageifApply ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowActionMessageifApply ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6614,285 +6627,250 @@ Public Class IWSRotorPositions
     ''' </summary>
     ''' <param name="pRefreshDS"></param>
     ''' <remarks>
-    ''' AG 12/04/2011 - creation - Tested
-    ''' TR - adapt for barcode reception (using ROTORPOSITION_CHANGED)
-    ''' AG 22/09/2011 - Use the same method but 2 event types ROTORPOSITION_CHANGED or BARCODE_POSITION_READ due they have different updating screen dataset business
-    ''' AG 07/06/2012 - change code to improve execution time
+    ''' Created by:  AG 12/04/2011
+    ''' Modified by: TR            - Function adapted for Barcode reception (using ROTORPOSITION_CHANGED)
+    '''              AG 22/09/2011 - Use the same function but for two event types (ROTORPOSITION_CHANGED or BARCODE_POSITION_READ) due to they have 
+    '''                              different updating screen dataset business
+    '''              AG 07/06/2012 - Changed code to improve execution time
+    '''              XB 28/02/2014 - BA-1523 ==> No refresh if screen is closing
+    '''              IT 03/06/2014 - BA-1644 ==> No refresh if screen is disposed
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+            If (isClosingFlag) Then Return 'AG 03/08/2012
+            RefreshDoneField = False 'RH 28/03/2012
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
-            If isClosingFlag Then Return 'AG 03/08/2012
-
-            RefreshDoneField = False 'RH 28/03/2012
             Dim myLocalEventType As GlobalEnumerates.UI_RefreshEvents = GlobalEnumerates.UI_RefreshEvents.NONE
 
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED) Then
+            If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED)) Then
                 'This event has to update only CellStatus, elementStatus and optionally TestLeft, RealVolume
                 myLocalEventType = GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED
-            ElseIf pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
+
+            ElseIf (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ)) Then
                 myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ
             End If
 
-            If myLocalEventType <> GlobalEnumerates.UI_RefreshEvents.NONE Then
+            If (myLocalEventType <> GlobalEnumerates.UI_RefreshEvents.NONE) Then
+                If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
-                Dim selectedPosition As Boolean = False
-                Dim existSelection As Boolean = False 'True there is only one rotor position selected!!!
-                Dim myLinqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
-                If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
+                Dim myLinqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                 myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                             Where a.Selected = True AndAlso a.RotorType = myRotorTypeForm _
-                             Select a).ToList()
+                            Where a.Selected = True AndAlso a.RotorType = myRotorTypeForm _
+                           Select a).ToList()
 
-                If myLinqRes.Count = 1 Then
-                    existSelection = True
-                End If
+                Dim existSelection As Boolean = (myLinqRes.Count = 1) 'True if is only one rotor position selected!!!
+                Dim selectedPosition As Boolean = False
 
-                'Update internal RotorContentByPositionDS structure (myRotorContentByPositionDSForm and use a temporal structure for paint screen)
                 'AG 07/06/2012
-                'Dim tmpPositionDS As New WSRotorContentByPositionDS
-                Dim tmpReagentsPositionDS As New WSRotorContentByPositionDS
+                'Update internal RotorContentByPositionDS structure (myRotorContentByPositionDSForm and use a temporal structure for paint screen)
                 Dim tmpSamplesPositionDS As New WSRotorContentByPositionDS
+                Dim tmpReagentsPositionDS As New WSRotorContentByPositionDS
 
                 For Each updatedRow As UIRefreshDS.RotorPositionsChangedRow In pRefreshDS.RotorPositionsChanged.Rows
-                    If Not updatedRow.IsAnalyzerIDNull And Not updatedRow.IsWorkSessionIDNull _
-                        And Not updatedRow.IsRotorTypeNull And Not updatedRow.IsCellNumberNull Then
+                    If (Not updatedRow.IsAnalyzerIDNull AndAlso Not updatedRow.IsWorkSessionIDNull AndAlso _
+                        Not updatedRow.IsRotorTypeNull AndAlso Not updatedRow.IsCellNumberNull) Then
+                        If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
-                        If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
+                        'Search the row in myRotorContentByPositionDSForm to update data 
+                        myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
+                                    Where a.AnalyzerID = updatedRow.AnalyzerID _
+                                  AndAlso a.WorkSessionID = updatedRow.WorkSessionID _
+                                  AndAlso a.RotorType = updatedRow.RotorType _
+                                  AndAlso a.CellNumber = updatedRow.CellNumber _
+                                   Select a).ToList()
 
-                        'Search the row in myRotorContentByPositionDSForm and update DATA
-                        myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
-                                     myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                                     Where a.AnalyzerID = updatedRow.AnalyzerID _
-                                     And a.WorkSessionID = updatedRow.WorkSessionID _
-                                     And a.RotorType = updatedRow.RotorType _
-                                     And a.CellNumber = updatedRow.CellNumber _
-                                     Select a).ToList()
-
-                        If myLinqRes.Count > 0 Then
-                            ''updatedRow.Status = "NOT_INUSE" AndAlso
-                            'TR 07/09/2011 -Validate if position has a positioned element to change status on treeView 
-                            'AG 13/06/2014 #1661 - add condition Not myLinqRes(0).IsElementIDNull
-                            If myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull Then
+                        If (myLinqRes.Count > 0) Then
+                            'TR 07/09/2011 - Validate if the cell contains a positioned Element to change the status on TreeView 
+                            'AG 13/06/2014 - BA-1661: Added condition Not myLinqRes(0).IsElementIDNull
+                            If (myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull) Then
                                 'Change the tree status 
-
-                                If bsElementsTreeView Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
+                                If (bsElementsTreeView Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
                                 ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, myLinqRes(0), myRotorTypeForm)
                             End If
-                            'TR 07/09/2011 -END.
 
                             myLinqRes(0).BeginEdit()
-
-                            If Not updatedRow.IsStatusNull Then
+                            If (Not updatedRow.IsStatusNull) Then
                                 myLinqRes(0).Status = updatedRow.Status
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetStatusNull()
                             End If
 
-                            If Not updatedRow.IsElementStatusNull Then
+                            If (Not updatedRow.IsElementStatusNull) Then
                                 myLinqRes(0).ElementStatus = updatedRow.ElementStatus
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetElementStatusNull()
                             End If
 
-                            If Not updatedRow.IsRealVolumeNull Then
+                            If (Not updatedRow.IsRealVolumeNull) Then
                                 myLinqRes(0).RealVolume = updatedRow.RealVolume
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
-
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetRealVolumeNull()
                             End If
 
-                            If Not updatedRow.IsRemainingTestsNumberNull Then
+                            If (Not updatedRow.IsRemainingTestsNumberNull) Then
                                 myLinqRes(0).RemainingTestsNumber = updatedRow.RemainingTestsNumber
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetRemainingTestsNumberNull()
                             End If
 
-                            If Not updatedRow.IsBarCodeInfoNull Then
+                            If (Not updatedRow.IsBarCodeInfoNull) Then
                                 myLinqRes(0).BarCodeInfo = updatedRow.BarCodeInfo
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetBarCodeInfoNull()
                             End If
 
-                            If Not updatedRow.IsBarcodeStatusNull Then
+                            If (Not updatedRow.IsBarcodeStatusNull) Then
                                 myLinqRes(0).BarcodeStatus = updatedRow.BarcodeStatus
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetBarcodeStatusNull()
                             End If
 
-                            'TR 01/09/2011 -Update new inserted columns.
-                            If Not updatedRow.IsScannedPositionNull Then
+                            If (Not updatedRow.IsScannedPositionNull) Then
                                 myLinqRes(0).ScannedPosition = updatedRow.ScannedPosition
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetScannedPositionNull()
                             End If
 
-                            If Not updatedRow.IsElementIDNull Then
+                            If (Not updatedRow.IsElementIDNull) Then
                                 myLinqRes(0).ElementID = updatedRow.ElementID
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetElementIDNull()
                             End If
 
-                            If Not updatedRow.IsMultiTubeNumberNull Then
+                            If (Not updatedRow.IsMultiTubeNumberNull) Then
                                 myLinqRes(0).MultiTubeNumber = updatedRow.MultiTubeNumber
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetMultiTubeNumberNull()
                             End If
 
-                            If Not updatedRow.IsTubeTypeNull Then
+                            If (Not updatedRow.IsTubeTypeNull) Then
                                 myLinqRes(0).TubeType = updatedRow.TubeType
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetTubeTypeNull()
                             End If
 
-                            If Not updatedRow.IsTubeContentNull Then
+                            If (Not updatedRow.IsTubeContentNull) Then
                                 myLinqRes(0).TubeContent = updatedRow.TubeContent
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetTubeContentNull()
                             End If
-                            'TR 01/09/2011 -END.
-
                             myLinqRes(0).EndEdit()
 
-                            'If needed update the flag that inform us refresh position information is also needed
-                            If existSelection Then
-                                If myLinqRes(0).Selected Then selectedPosition = True Else selectedPosition = False
+                            'When needed, update the flag that inform us that refresh  the position information is also needed
+                            If (existSelection) Then
+                                selectedPosition = (myLinqRes(0).Selected)
                             End If
 
+                            If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
+
                             'Refresh screen using UpdateRotorTreeViewArea method (use a temporal DS only with the updated position)
-                            'tmpPositionDS.Clear()
-                            'AG 07/06/2012
-                            'Dim tmpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                            'tmpRow = tmpPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
-                            'tmpRow = myLinqRes(0)
-                            'tmpPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
-                            'tmpPositionDS.AcceptChanges()
-                            'myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
-
-                            If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
                             Dim tmpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                            If updatedRow.RotorType = "REAGENTS" Then
+                            If (updatedRow.RotorType = "REAGENTS") Then
                                 tmpRow = tmpReagentsPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                 tmpRow = myLinqRes(0)
                                 tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
                                 tmpReagentsPositionDS.AcceptChanges()
                                 myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
-                            ElseIf updatedRow.RotorType = "SAMPLES" Then
+
+                            ElseIf (updatedRow.RotorType = "SAMPLES") Then
                                 tmpRow = tmpSamplesPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                 tmpRow = myLinqRes(0)
                                 tmpSamplesPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
                                 tmpSamplesPositionDS.AcceptChanges()
                                 myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
                             End If
-                            'AG 07/06/2012
-                            If selectedPosition Then
-                                'Reload the info area with the new information 
 
-                                If mySelectedElementInfo Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
+                            If (selectedPosition) Then
+                                'Reload the info Area with the new information 
+                                If (mySelectedElementInfo Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
                                 mySelectedElementInfo = GetLocalPositionInfo(myLinqRes(0).RingNumber, myLinqRes(0).CellNumber, False)
                                 ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myLinqRes(0).RingNumber, myLinqRes(0).CellNumber)
                             End If
-
                         End If
                     End If
                 Next
 
-                'TR 21/11/2013 - BT #1380(2)
+                'TR 21/11/2013 - BT #1380 (2) - Get all Element INPROCESS in Reagents Rotor
                 Dim myWSRotorPosInProcessDS As New RotorPositionsInProcessDS
                 Dim myWSRotorPosInProcessDelegate As New WSRotorPositionsInProcessDelegate
-                'Get the all the elements
+
                 myGlobalDataTO = myWSRotorPosInProcessDelegate.ReadAllReagents(Nothing, AnalyzerIDAttribute)
-                If Not myGlobalDataTO.HasError Then
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myWSRotorPosInProcessDS = DirectCast(myGlobalDataTO.SetDatos, RotorPositionsInProcessDS)
 
-                    Dim myRCPList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
                     'Validate if the element in proces change status and is finished.
-                    For Each PosInProcess As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
-                                            myRotorContentByPositionDSForm.twksWSRotorContentByPosition.Where(Function(a) _
-                                                                                                a.InProcessElement).ToList()
-                        If (From a In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess _
-                            Where a.AnalyzerID = PosInProcess.AnalyzerID _
-                            AndAlso a.CellNumber = PosInProcess.CellNumber).Count = 0 Then
+                    For Each PosInProcess As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow _
+                                          In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.Where(Function(a) a.InProcessElement).ToList()
+
+                        If ((From a In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess _
+                            Where a.AnalyzerID = PosInProcess.AnalyzerID AndAlso a.CellNumber = PosInProcess.CellNumber).Count = 0) Then
+                            'Position is NOT INPROCESS, update value and import to the temporary structure used to update the Rotor Positions
                             PosInProcess.InProcessElement = False
-                            'Impor to the temporal structure use to update the positions.
                             tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(PosInProcess)
                         End If
                     Next
 
                     'Go throught each position in process and change value Posinprocess = true
-                    For Each PosInProcess As RotorPositionsInProcessDS.twksWSRotorPositionsInProcessRow In _
-                                                        myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess.Rows
-                        'Validate if position is in Process
+                    Dim myRCPList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+                    For Each PosInProcess As RotorPositionsInProcessDS.twksWSRotorPositionsInProcessRow In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess.Rows
+                        'Validate if the Element in the Reagents Rotor Position is in Process
                         myRCPList = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                                     Where a.AnalyzerID = PosInProcess.AnalyzerID _
-                                     AndAlso a.CellNumber = PosInProcess.CellNumber _
-                                     Select a).ToList()
+                                    Where a.AnalyzerID = PosInProcess.AnalyzerID _
+                                  AndAlso a.CellNumber = PosInProcess.CellNumber _
+                                   Select a).ToList()
 
-                        If myRCPList.Count > 0 Then
-                            'Position is in proces update value.
+                        If (myRCPList.Count > 0) Then
+                            'Position is INPROCESS, update value and import to the temporary structure used to update the Rotor Positions
                             myRCPList.First.InProcessElement = True
-                            'Impor to the temporal structure use to update the positions.
                             tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(myRCPList.First())
                         End If
-                        'Clear the objec
                         myRCPList.Clear()
                     Next
-
-                    'Set values to nothing 
                     myRCPList = Nothing
                     myWSRotorPosInProcessDS = Nothing
-
                 Else
-                    ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR, myGlobalDataTO.ErrorMessage)
+                    ShowMessage(Me.Name & ".RefreshScreen", CStr(GlobalEnumerates.Messages.SYSTEM_ERROR), myGlobalDataTO.ErrorMessage)
                 End If
-                'TR 21/11/2013 -BT #1380(2) END.
+                'TR 21/11/2013 -BT #1380 (2) END.
 
                 'AG 07/06/2012
-                'UpdateRotorTreeViewArea(tmpPositionDS, myLinqRes(0).RotorType)
-                If tmpReagentsPositionDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
+                If (tmpReagentsPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                     UpdateRotorTreeViewArea(tmpReagentsPositionDS, "REAGENTS")
                 End If
 
-                If tmpSamplesPositionDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
+                If (tmpSamplesPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                     UpdateRotorTreeViewArea(tmpSamplesPositionDS, "SAMPLES")
                 End If
                 'AG 07/06/2012
 
                 'AG-TR 10/05/2012 -validate the processingbeforerunnin.
-                If myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso IAx00MainMDI.processingBeforeRunning <> "0" Then
-                    'isScanningProcess = False
+                If (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso UiAx00MainMDI.processingBeforeRunning <> "0") Then
                     ScreenWorkingProcess = False
                     Me.Enabled = True 'Enable the screen
-                    'IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE)
                 End If
 
                 RefreshDoneField = True 'RH 28/03/2012
             End If
 
-            'AG 15/03/2012 - when FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then '#REFACTORING
+            'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working, Sw must reactivate UI
+            If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1) Then
                 ScreenWorkingProcess = False 'Process finished
-                IAx00MainMDI.EnableButtonAndMenus(True)
-                IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                 Me.Enabled = True 'Enable the screen
                 Cursor = Cursors.Default
                 RefreshDoneField = True 'RH 28/03/2012
@@ -6900,17 +6878,15 @@ Public Class IWSRotorPositions
             'AG 15/03/2012
 
             'AG 28/03/2012 -scan barcode, check rotor volume, ... buttons must be disabled if cover open while the cover detection is enabled
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
+            If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
                 ValidateScanningButtonEnabled()
                 ValidateCheckRotorVolumeButtonEnabled()
                 'RefreshDoneField = True 'AG 28/03/2012 The button activion or not depending the covers is is a special case
                 '                                       in this case do not activate the field
             End If
             'AG 28/03/2012
-
-
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6931,7 +6907,7 @@ Public Class IWSRotorPositions
             RefreshDoneField = True 'RH 28/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshAfterSamplesWithoutRequest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshAfterSamplesWithoutRequest ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshAfterSamplesWithoutRequest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6951,7 +6927,7 @@ Public Class IWSRotorPositions
             WorkSessionStatus(pNewAnalzyerStatus) = pWorkSessionStatus
             LoadScreenStatus(WorkSessionStatusAttribute)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6980,8 +6956,8 @@ Public Class IWSRotorPositions
 
         Try
             'XB 19/12/2013 - Add log traces
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity("Initiate Create Executions Process Function", Me.Name & ".CreateExecutionsProcess", _
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("Initiate Create Executions Process Function", Me.Name & ".CreateExecutionsProcess", _
                                             EventLogEntryType.Information, False)
 
             'SA 11/06/2013 - Verify if the status of the active WS has changed
@@ -6994,7 +6970,7 @@ Public Class IWSRotorPositions
             End If
 
             'XB 19/12/2013 - Add log traces
-            myLogAcciones.CreateLogActivity("WorkSessionStatusAttribute value : [" & WorkSessionStatusAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+            GlobalBase.CreateLogActivity("WorkSessionStatusAttribute value : [" & WorkSessionStatusAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                             EventLogEntryType.Information, False)
 
             If (WorkSessionStatusAttribute <> "EMPTY" AndAlso WorkSessionStatusAttribute <> "OPEN" AndAlso _
@@ -7002,9 +6978,9 @@ Public Class IWSRotorPositions
                 Cursor = Cursors.WaitCursor
 
                 'XB 19/12/2013 - Add log traces
-                myLogAcciones.CreateLogActivity("AutoWSCreationWithLISModeAttribute value : [" & AutoWSCreationWithLISModeAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+                GlobalBase.CreateLogActivity("AutoWSCreationWithLISModeAttribute value : [" & AutoWSCreationWithLISModeAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                                 EventLogEntryType.Information, False)
-                myLogAcciones.CreateLogActivity("OpenByAutomaticProcessAttribute value : [" & OpenByAutomaticProcessAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+                GlobalBase.CreateLogActivity("OpenByAutomaticProcessAttribute value : [" & OpenByAutomaticProcessAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                                 EventLogEntryType.Information, False)
 
                 'BT #1481 - Process of Automatic WS Creation with LIS should not stop when some of the required Elements are not positioned 
@@ -7020,10 +6996,10 @@ Public Class IWSRotorPositions
                     End If
 
                     If (Not pCreateExecutions) Then
-                        IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted)
-                        IAx00MainMDI.InitializeAutoWSFlags()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted)
+                        UiAx00MainMDI.InitializeAutoWSFlags()
                         OpenByAutomaticProcessAttribute = False
-                        IAx00MainMDI.EnableButtonAndMenus(True, True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True, True)
                     End If
                 Else
                     'The Create Executions process was launched manually by clicking in EXIT Button in Rotor Positions Screen
@@ -7069,7 +7045,7 @@ Public Class IWSRotorPositions
                     End If
                     'TR 16/04/2014 BT #1597 -END
 
-                    IAx00MainMDI.EnableButtonAndMenus(False)
+                    UiAx00MainMDI.EnableButtonAndMenus(False)
                     bsElementsTreeView.BackColor = SystemColors.MenuBar
                     Application.DoEvents()
 
@@ -7085,7 +7061,7 @@ Public Class IWSRotorPositions
                     If (Not RotorsTabs Is Nothing) Then RotorsTabs.Enabled = False
 
                     'XB 19/12/2013 - Add log traces
-                    myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".CreateExecutionsProcess", _
+                    GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".CreateExecutionsProcess", _
                                                     EventLogEntryType.Information, False)
 
 
@@ -7094,12 +7070,12 @@ Public Class IWSRotorPositions
                     workingThread.Start()
 
                     While ScreenWorkingProcess
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         Application.DoEvents()
                     End While
 
                     workingThread = Nothing
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'AG 11/12/2013 - BT #1433 ==> Comment these code lines because they fail when START/CONTINUE WS is clicked with Rotor
                     '                             Positions Screen open and no Tubes are found or LIS does not respond anything (v211 patch1)
@@ -7144,7 +7120,7 @@ Public Class IWSRotorPositions
                     Else
                         returnValue.HasError = True 'AG 10/05/2012
                         Application.DoEvents()
-                        Dim ErrorData As String() = ErrorOnCreateWSExecutions.Split("|")
+                        Dim ErrorData As String() = ErrorOnCreateWSExecutions.Split("|"c)
                         ErrorOnCreateWSExecutions = String.Empty 'Reset the value after using it
                         ShowMessage(Me.Name, ErrorData(0), ErrorData(1), Me)
                     End If
@@ -7157,7 +7133,7 @@ Public Class IWSRotorPositions
 
                 'AG 10/02/2014 - If worksession is EMPTY, ABORTED or OPEN and this screen is closed menu and buttons (vertical and screen buttons) disable!
             Else
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
                 If pFromOwnScreen Then
                     For Each c As Control In FunctionalityArea.Controls
                         If TypeOf (c) Is BSButton Then
@@ -7174,12 +7150,12 @@ Public Class IWSRotorPositions
 
         Catch ex As Exception
             returnValue.HasError = True
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateExecutionsProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateExecutionsProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Me.Cursor = Cursors.Default
             Application.DoEvents()
             ShowMessage(Me.Name & "CreateExecutionsProcess()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            If (pCreateExecutions) Then IAx00MainMDI.StopMarqueeProgressBar()
+            If (pCreateExecutions) Then UiAx00MainMDI.StopMarqueeProgressBar()
         End Try
         Return returnValue
     End Function
@@ -7249,7 +7225,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyActionsAllowedInReagentsRotor()", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyActionsAllowedInReagentsRotor()", EventLogEntryType.Error, _
                                                                             GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".VerifyActionsAllowedInReagentsRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -7305,8 +7281,8 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
-            CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted) 'AG 10/07/2013
+            GlobalBase.CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted) 'AG 10/07/2013
 
             'AG 26/09/2011 - Use progress bar thread as in WSPrep screen
             If (AnalyzerController.IsAnalyzerInstantiated) Then
@@ -7318,11 +7294,11 @@ Public Class IWSRotorPositions
                         Cursor = Cursors.WaitCursor
 
                         'DL 14/07/2011 Disable interface application
-                        IAx00MainMDI.DisabledMdiForms = Me
-                        IAx00MainMDI.EnableButtonAndMenus(False)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 22/03/2012
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING) 'AG 22/03/2012
-                        IAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
+                        UiAx00MainMDI.DisabledMdiForms = Me
+                        UiAx00MainMDI.EnableButtonAndMenus(False)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 22/03/2012
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING) 'AG 22/03/2012
+                        UiAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
 
                         Me.Enabled = False 'Disable the screen
                         'isScanningProcess = True
@@ -7335,7 +7311,7 @@ Public Class IWSRotorPositions
 
                         ' XB 06/02/2014 - CYCLE_MACHINE param is used instead of WDOG_TIME_BARCODE_SCAN due for accelerating the operation - Task #1438
                         'resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.WDOG_TIME_BARCODE_SCAN.ToString, Nothing)
-                        resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, AnalyzerModelAttribute)
+                        resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, AnalyzerModel())
                         ' XB 06/02/2014
 
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
@@ -7356,7 +7332,7 @@ Public Class IWSRotorPositions
 
                         ScreenWorkingProcess = True
 
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         'Dim prevMessage As String = IAx00MainMDI.bsAnalyzerStatus.Text
                         Application.DoEvents()
 
@@ -7364,40 +7340,40 @@ Public Class IWSRotorPositions
                         workingThread.Start()
 
                         While ScreenWorkingProcess 'isScanningProcess
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                         End While
                         workingThread = Nothing
                         watchDogTimer.Enabled = False
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
                         'SA 25/07/2013 - If the User clicked in HQ Button is Host Query Screen, the LIS Orders Download process is executed
                         If (HQButtonUserClickAttribute) Then
-                            IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
-                            IAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
-                            IAx00MainMDI.CreateAutomaticWSWithLIS()
+                            UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
+                            UiAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
+                            UiAx00MainMDI.CreateAutomaticWSWithLIS()
                         End If
 
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE) 'AG 22/03/2012
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)        'AG 22/03/2012
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE) 'AG 22/03/2012
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)        'AG 22/03/2012
                     End If
                 End If
             End If
             'AG 26/09/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsScanningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            IAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
+            UiAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
 
             'TR 03/04/2012
             Cursor = Cursors.Default
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             'TR 03/04/2012
 
             'TR 04/10/2011
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
         Cursor = Cursors.Default
     End Sub
@@ -7500,7 +7476,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScanningBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScanningBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Me.Name & ".ScanningBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".ScanningBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -7563,7 +7539,7 @@ Public Class IWSRotorPositions
             'Debug.Print("******************************* WATCHDOG INTERVAL CHANGED TO [" & pNewIntervalValue.ToString & "]")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshwatchDogTimer_Interval ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshwatchDogTimer_Interval ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshwatchDogTimer_Interval", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7582,7 +7558,7 @@ Public Class IWSRotorPositions
             Debug.Print("******************************* WATCHDOG ENABLE CHANGED TO [" & pEnableValue.ToString & "]")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshwatchDogTimer_Interval ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshwatchDogTimer_Interval ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshwatchDogTimer_Interval", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7600,7 +7576,7 @@ Public Class IWSRotorPositions
             Me.Enabled = True 'Enable the screen
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreenAfterWatchDogInvoke ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreenAfterWatchDogInvoke ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreenAfterWatchDogInvoke", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7618,7 +7594,7 @@ Public Class IWSRotorPositions
 
         'AG 02/01/2014 - BT #1433 - Change, activate a timer and call the acceptbutton when the timer ellapses
         If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
-            CreateLogActivity("AutoCreate WS with LIS: Before press Accept button automatically", "IWSRotorPositions.IWSRotorPositions_Shown", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Before press Accept button automatically", "IWSRotorPositions.IWSRotorPositions_Shown", EventLogEntryType.Information, False)
             Me.UIThread(Sub() bsAcceptButton.Enabled = True)
             Me.UIThread(Sub() bsAcceptButton.PerformClick())
         End If
@@ -7645,7 +7621,7 @@ Public Class IWSRotorPositions
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'DL 16/04/2013. BEGIN
@@ -7659,13 +7635,13 @@ Public Class IWSRotorPositions
             'AG 02/01/2014 - BT #1433
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             Dim validationOK As Boolean = (AnalyzerIDAttribute <> "" AndAlso WorkSessionIDAttribute <> "" AndAlso WorkSessionStatusAttribute <> "")
             If (validationOK) Then
                 'If the Analyzer Model is not informed, get it from the DB 
-                If (AnalyzerModelAttribute = String.Empty) Then
+                If (AnalyzerModel() = String.Empty) Then
                     Dim resultData As GlobalDataTO
                     Dim confAnalyzers As New AnalyzersDelegate
 
@@ -7675,8 +7651,7 @@ Public Class IWSRotorPositions
 
                         If (myAnalyzersDS.tcfgAnalyzers.Rows.Count = 1) Then
                             AnalyzerModel = myAnalyzersDS.tcfgAnalyzers(0).AnalyzerModel
-                            'AG 10/11/2014 BA-2077 add BA200
-                            validationOK = (AnalyzerModelAttribute = "A400") OrElse (AnalyzerModelAttribute = "A200")  'This screen is only for Analyzers with Model A400 
+                            validationOK = (AnalyzerModel = "A400")   'This screen is only for Analyzers with Model A400 
                         Else
                             validationOK = False
                         End If
@@ -7686,8 +7661,7 @@ Public Class IWSRotorPositions
                         validationOK = False
                     End If
                 Else
-                    'AG 10/11/2014 BA-2077 add BA200
-                    validationOK = (AnalyzerModelAttribute = "A400") OrElse (AnalyzerModelAttribute = "A200")    'This screen is only for Analyzers with Model A400 
+                    validationOK = (AnalyzerModel = "A400")   'This screen is only for Analyzers with Model A400 
                 End If
             End If
 
@@ -7703,7 +7677,7 @@ Public Class IWSRotorPositions
                 PrepareButtons(LisWithFilesMode) 'DL 10/05/2013
                 Application.DoEvents() 'RH 14/12/2010
 
-                IAx00MainMDI.bsTSInfoButton.Enabled = True 'RH 14/10/2011
+                UiAx00MainMDI.bsTSInfoButton.Enabled = True 'RH 14/10/2011
 
                 PrepareIconNames()
                 PrepareReagentLegendArea()
@@ -7723,7 +7697,7 @@ Public Class IWSRotorPositions
                 'AG 21/03/2012
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("IWSROTORPositions.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("IWSROTORPositions.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IWSROTORPositions.ReagentSamplePositioning_Load", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -7737,7 +7711,7 @@ Public Class IWSRotorPositions
                 PCounters = Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReagentSamplePositioning_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7766,7 +7740,7 @@ Public Class IWSRotorPositions
             End If
             'TR 09/03/2012 -END
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSamplesAutoPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSamplesAutoPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSamplesAutoPosButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -7798,7 +7772,7 @@ Public Class IWSRotorPositions
             End If
             'TR 09/03/2012 -END.
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReagentAutoPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReagentAutoPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsReagentAutoPosButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -7820,7 +7794,7 @@ Public Class IWSRotorPositions
                 e.Effect = DragDropEffects.None
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsElementsTreeView_DragEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsElementsTreeView_DragEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsElementsTreeView_DragEnter", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7840,15 +7814,15 @@ Public Class IWSRotorPositions
     Private Sub bsElementsTreeView_ItemDrag(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemDragEventArgs) Handles bsElementsTreeView.ItemDrag
         Try
             If isTreeDragDropAllowed = True Then
-                sourceNode = e.Item
+                sourceNode = CType(e.Item, TreeNode)
                 isDragging = True
-                DoDragDrop(e.Item.ToString(), DragDropEffects.Move + DragDropEffects.Copy)
+                DoDragDrop(e.Item.ToString(), DragDropEffects.Move Or DragDropEffects.Copy)
             Else
                 isDragging = False
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsElemeTreeNode: ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsElemeTreeNode: ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsElementsTreeView_ItemDrag", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7934,8 +7908,8 @@ Public Class IWSRotorPositions
                 'Dim myPictureBox As New BSRImage
                 Dim myPictureBox As BSRImage
                 myPictureBox = CType(sender, BSRImage)
-                ringNumberForm = CType(myPictureBox.Tag().ToString().Split(",")(0), Integer)
-                cellNumberForm = CType(myPictureBox.Tag().ToString().Split(",")(1), Integer)
+                ringNumberForm = CType(myPictureBox.Tag().ToString().Split(","c)(0), Integer)
+                cellNumberForm = CType(myPictureBox.Tag().ToString().Split(","c)(1), Integer)
 
                 'TR 04/01/2010 - Validate if the new selected position is free 
                 If IsPositionFree(ringNumberForm, cellNumberForm) Then
@@ -7958,7 +7932,7 @@ Public Class IWSRotorPositions
             End If 'AG 05/10/2010TreeNode: Agua Destilada (0,132)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_MouseHover ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_MouseHover ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PositionControl_MouseHover", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7992,8 +7966,8 @@ Public Class IWSRotorPositions
                 'Validate that the Tag property is not empty to get the information.
                 If (Not myPictureBox.Tag Is Nothing) Then
                     'Get the selected Ring and Cell Number
-                    Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(0), Integer)
-                    Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(1), Integer)
+                    Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(0), Integer)
+                    Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(1), Integer)
 
                     'Validate if the pressed key is Shift or Control to allow multiselection
                     If (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse (Control.ModifierKeys And Keys.Shift) = Keys.Shift Then
@@ -8157,7 +8131,7 @@ Public Class IWSRotorPositions
                 End If
             End If 'AG 05/10/2010
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_MouseDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PositionControl_MouseDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8267,7 +8241,7 @@ Public Class IWSRotorPositions
                 e.Effect = DragDropEffects.None
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_DragEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_DragEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PositionControl_DragEnter", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8329,8 +8303,8 @@ Public Class IWSRotorPositions
                     Dim myPictureBox As BSRImage = CType(sender, BSRImage)
                     If Not myPictureBox.Tag Is Nothing Then
                         'Get the new Ring and Cell values (from the Position where the Drop was done)
-                        Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(0), Integer)
-                        Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(1), Integer)
+                        Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(0), Integer)
+                        Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(1), Integer)
 
                         Dim myNewCellBarCodeStatus As String = "" 'AG 06/10/2011 - using barcode there are new situations:
                         '                                                   - drag (from rotor) one bottle into another with BarcodeStatus ERROR (status FREE) (no changes are required)
@@ -8354,7 +8328,7 @@ Public Class IWSRotorPositions
             End If 'AG 05/10/2010
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_DragDrop ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PositionControl_DragDrop ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PositionControl_DragDrop", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -8384,7 +8358,7 @@ Public Class IWSRotorPositions
             ' XB 06/03/2014 - Add Try Catch section
         Catch ex As Exception
             'Write error in the Application Log and show it  
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RotorsTabs_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RotorsTabs_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RotorsTabs_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8429,13 +8403,13 @@ Public Class IWSRotorPositions
             'i.e., that we are dragging a file. Ignore all other draggs
             If e.Data.GetDataPresent(DataFormats.Text) Then
                 'Change the feedback (the effect) to show that this drag is allowable
-                If e.AllowedEffect AndAlso DragDropEffects.Copy Then
-                    e.Effect = DragDropEffects.Copy
-                End If
+                'If e.AllowedEffect AndAlso DragDropEffects.Copy Then
+                e.Effect = DragDropEffects.Copy
+                'End If
             End If
         Catch ex As Exception
             'Write error in the Application Log and show it  
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_DragOver ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_DragOver ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReagentSamplePositioning_DragOver", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -8641,7 +8615,7 @@ Public Class IWSRotorPositions
                 End Select
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReagentSamplePositioning_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReagentSamplePositioning_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8739,7 +8713,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsBottleSizeComboBox_SelectedValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsBottleSizeComboBox_SelectedValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8780,7 +8754,7 @@ Public Class IWSRotorPositions
                 bsBottleSizeComboBox.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReadOnlyTextBox_GotFocus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReadOnlyTextBox_GotFocus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsReadOnlyTextBox_GotFocus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8796,7 +8770,7 @@ Public Class IWSRotorPositions
         Try
             ShowNotPositionedElements()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsWarningsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsWarningsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsWarningsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8824,13 +8798,13 @@ Public Class IWSRotorPositions
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             bsAcceptButton.Enabled = False 'AG 18/06/2014 #1669 - Disable button when this process starts
 
             'AG 28/05/2014 - New trace
-            myLogAcciones.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
 
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
             '           if at least one of them has been exceeded)
@@ -8843,12 +8817,12 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 28/05/2014 - change text  'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
+            GlobalBase.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCreateExecutionsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCreateExecutionsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "bsCreateExecutionsButton_Click()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
@@ -8856,7 +8830,7 @@ Public Class IWSRotorPositions
             If (createExecutionsFlag) Then
                 'TR 30/08/2012 Set the is closing  to true to avoid refresh screen executions
                 isClosingFlag = True
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
 
                 'ReleaseElement() 'AG 09/07/2013
                 'RH 09/02/2011
@@ -8866,14 +8840,14 @@ Public Class IWSRotorPositions
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IMonitor.WorkSessionChange = True
+                    UiMonitor.WorkSessionChange = True
                     Dim autoProcessFlag As Boolean = False
                     If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
                         autoProcessFlag = True
                     End If
 
-                    IAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
-                    IAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
+                    UiAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
+                    UiAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
                 End If
             Else
                 bsAcceptButton.Enabled = True 'AG 18/06/2014 #1669 - Enable button again if the screen is not closed!!
@@ -8889,7 +8863,7 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 28/05/2014 - change text 'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
+            GlobalBase.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         End Try
@@ -8932,7 +8906,7 @@ Public Class IWSRotorPositions
 
                 'Allow manual barcode only in free positions or in positions with patients
                 If (cellStatus = "FREE" OrElse cellTubeContent = "PATIENT") Then
-                    Using BarCodeForm As New IBarCodeEdit()
+                    Using BarCodeForm As New UiBarCodeEdit()
                         BarCodeForm.BarCode = bsSamplesBarcodeTextBox.Text
                         BarCodeForm.RotorType = GlobalEnumerates.Rotors.SAMPLES
 
@@ -8995,7 +8969,7 @@ Public Class IWSRotorPositions
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSamplesBarcodeTextBox_MouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSamplesBarcodeTextBox_MouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'ShowMessage(Me.Name & "bsSamplesBarcodeTextBox_MouseUp()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me) 'AG 20/02/2014 - #1516 EUA (in India) reports this error sometimes triggers, but we cannot reproduce and this is not a critical error -> SOLUTION AG+EF do not show error message in this method!!
         End Try
     End Sub
@@ -9020,7 +8994,7 @@ Public Class IWSRotorPositions
     Private Sub bsReagentsBarCodeTextBox_MouseUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsReagentsBarCodeTextBox.MouseUp
         Try
             If (Not mySelectedElementInfo Is Nothing AndAlso mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                Using BarCodeForm As New IBarCodeEdit()
+                Using BarCodeForm As New UiBarCodeEdit()
                     BarCodeForm.AnalyzerID = AnalyzerIDAttribute
                     BarCodeForm.BarCode = bsReagentsBarCodeTextBox.Text
                     BarCodeForm.RotorType = GlobalEnumerates.Rotors.REAGENTS
@@ -9063,7 +9037,7 @@ Public Class IWSRotorPositions
                 ReagentsTab.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReagentsBarCodeTextBox_MouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsReagentsBarCodeTextBox_MouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'ShowMessage(Me.Name & "bsReagentsBarCodeTextBox_MouseUp()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me) 'AG 20/02/2014 - #1516 EUA (in India) reports this error sometimes triggers, but we cannot reproduce and this is not a critical error -> SOLUTION AG+EF do not show error message in this method!!
         End Try
     End Sub
@@ -9092,7 +9066,7 @@ Public Class IWSRotorPositions
                 Dim createAutoWS As Boolean = False
                 Dim lisWithFilesMode As Boolean = IsLisWithFilesMode()
                 If (lisWithFilesMode) Then
-                    Using myForm As New IWSIncompleteSamplesAuxScreen()
+                    Using myForm As New UiWSIncompleteSamplesAuxScreen()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WorkSessionStatusAttribute
@@ -9102,7 +9076,7 @@ Public Class IWSRotorPositions
                         WorkSessionStatusAttribute = myForm.WorkSessionStatus
                     End Using
                 Else
-                    Using myForm As New HQBarcode()
+                    Using myForm As New UiHQBarcode()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WorkSessionStatusAttribute
@@ -9122,18 +9096,18 @@ Public Class IWSRotorPositions
                         '#End If
 
                         'Inform the MDI the HostQuery monitor screen is shown
-                        IAx00MainMDI.AddNoMDIChildForm = myForm
+                        UiAx00MainMDI.AddNoMDIChildForm = myForm
                         myForm.ShowDialog()
 
-                        IAx00MainMDI.RemoveNoMDIChildForm = myForm
+                        UiAx00MainMDI.RemoveNoMDIChildForm = myForm
                         WorkSessionStatusAttribute = myForm.WorkSessionStatus
                         createAutoWS = myForm.HQButtonUserClick
                     End Using
 
                     If (createAutoWS) Then
-                        IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
-                        IAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
-                        IAx00MainMDI.CreateAutomaticWSWithLIS()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
+                        UiAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
+                        UiAx00MainMDI.CreateAutomaticWSWithLIS()
                     End If
                 End If
 
@@ -9144,7 +9118,7 @@ Public Class IWSRotorPositions
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BarcodeWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BarcodeWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BarcodeWarningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -9161,7 +9135,7 @@ Public Class IWSRotorPositions
                 BarcodeWarningButton.PerformClick()
             ElseIf AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
                 'AG 02/01/2014 - BT #1433 - Change, activate a timer and call the acceptbutton when the timer ellapses (v211 patch2)
-                'CreateLogActivity("AutoCreate WS with LIS: Before press Accept button automatically", "IWSRotorPositions.IWSRotorPositions_Shown", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Before press Accept button automatically", "IWSRotorPositions.IWSRotorPositions_Shown", EventLogEntryType.Information, False)
                 'AcceptButton.PerformClick()
                 bsAcceptButton.Enabled = False
                 autoWSCreationTimer.Interval = 750
@@ -9172,7 +9146,7 @@ Public Class IWSRotorPositions
                 ShownScreen()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSRotorPositions_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IWSRotorPositions_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IWSRotorPositions_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         ShowHostQueryScreenAttribute = False
@@ -9189,7 +9163,7 @@ Public Class IWSRotorPositions
         Try
             GetInfoAreaForReport(AnalyzerIDAttribute, myRotorTypeForm)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -9228,7 +9202,7 @@ Public Class IWSRotorPositions
             End If
             bsWarningsButton.Enabled = pendingElements
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingPositioningElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingPositioningElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PendingPositioningElements", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return pendingElements
@@ -9318,7 +9292,7 @@ Public Class IWSRotorPositions
     '        Next
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PreparePositionsControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".PreparePositionsControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
     '    End Try
@@ -9351,7 +9325,7 @@ Public Class IWSRotorPositions
     ''        End If
     ''    Catch ex As Exception
     ''        'Write error in the Application Log and show it  
-    ''        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesAutoPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    ''        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SamplesAutoPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     ''        ShowMessage(Me.Name & ".SamplesAutoPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     ''    End Try
     ''End Sub

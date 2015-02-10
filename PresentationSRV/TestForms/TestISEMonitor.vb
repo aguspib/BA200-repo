@@ -2,21 +2,22 @@
 Option Explicit On
 Option Strict On
 
-Imports Biosystems.Ax00.Types
+Imports System.Data.SqlClient
+Imports System.IO
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Runtime.InteropServices 'WIN32
+'WIN32
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.PresentationCOM
+Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.App
 
 
 Public Class TestISEMonitor
-    Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+    Inherits BSBaseForm
 
     'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING 
 
@@ -35,8 +36,8 @@ Public Class TestISEMonitor
 
             'OK Icon
             auxIconName = GetIconName("STUS_FINISH")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            If File.Exists(iconPath & auxIconName) Then
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Ok.ToString, myImage)
                 End If
@@ -44,8 +45,8 @@ Public Class TestISEMonitor
 
             'Warning Icon
             auxIconName = GetIconName("STUS_WITHERRS")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            If File.Exists(iconPath & auxIconName) Then
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Warning.ToString, myImage)
                 End If
@@ -53,8 +54,8 @@ Public Class TestISEMonitor
 
             'Lock Icon
             auxIconName = GetIconName("STUS_LOCKED")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            If File.Exists(iconPath & auxIconName) Then
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Locked.ToString, myImage)
                 End If
@@ -62,8 +63,8 @@ Public Class TestISEMonitor
 
             'Error Icon
             auxIconName = GetIconName("WARNINGSMALL")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            If File.Exists(iconPath & auxIconName) Then
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Error_.ToString, myImage)
                 End If
@@ -72,26 +73,33 @@ Public Class TestISEMonitor
             Me.BsiseMonitorPanel1.ImagesData = myImageList
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareButtons", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-
+  
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pLanguageID"></param>
+    ''' <remarks>
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
+    ''' </remarks>
     Private Sub GetISEMonitorLabels(ByVal pLanguageID As String)
 
         Dim myGlobal As New GlobalDataTO
         Dim MLRD As New MultilanguageResourcesDelegate
-        Dim myLabelsData As New Dictionary(Of Biosystems.Ax00.Controls.UserControls.BSISEMonitorPanel.LabelElements, String)
-        Dim myWarningsData As New Dictionary(Of Biosystems.Ax00.Controls.UserControls.BSISEMonitorPanel.WarningElements, String)
-        Dim dbConnection As SqlClient.SqlConnection = Nothing
+        Dim myLabelsData As New Dictionary(Of BSISEMonitorPanel.LabelElements, String)
+        Dim myWarningsData As New Dictionary(Of BSISEMonitorPanel.WarningElements, String)
+        Dim dbConnection As SqlConnection = Nothing
 
         Try
 
-            myGlobal = DAOBase.GetOpenDBConnection(Nothing)
+            myGlobal = GetOpenDBConnection(Nothing)
 
             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+                dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
             End If
 
             If (Not dbConnection Is Nothing) Then
@@ -107,10 +115,18 @@ Public Class TestISEMonitor
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_InstallDate, MLRD.GetResourceText(dbConnection, "LBL_InstallDate", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_TestsCompleted, MLRD.GetResourceText(dbConnection, "LBL_TestsCompleted", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Reference, MLRD.GetResourceText(dbConnection, "LBL_Reference", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, MLRD.GetResourceText(dbConnection, "LBL_Sodium", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, MLRD.GetResourceText(dbConnection, "LBL_Potassium", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, MLRD.GetResourceText(dbConnection, "LBL_Chlorine", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, MLRD.GetResourceText(dbConnection, "LBL_Lithium", pLanguageID))
+
+                ' XB 05/09/2014 - BA-1902
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, MLRD.GetResourceText(dbConnection, "LBL_Sodium", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, MLRD.GetResourceText(dbConnection, "LBL_Potassium", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, MLRD.GetResourceText(dbConnection, "LBL_Chlorine", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, MLRD.GetResourceText(dbConnection, "LBL_Lithium", pLanguageID))
+                Dim ISETestList As New ISETestsDelegate
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, ISETestList.GetName(dbConnection, ISE_Tests.Na)) ' ID sodium = 1
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, ISETestList.GetName(dbConnection, ISE_Tests.K)) ' ID potassium = 2
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, ISETestList.GetName(dbConnection, ISE_Tests.Cl)) ' ID chlorine = 3
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, ISETestList.GetName(dbConnection, ISE_Tests.Li)) ' ID lithium = 4
+                ' XB 05/09/2014 - BA-1902
 
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.CAL_Title, MLRD.GetResourceText(dbConnection, "LBL_ISE_LastCalibrations", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.CAL_LastDate, MLRD.GetResourceText(dbConnection, "LBL_LastDate", pLanguageID))
@@ -140,8 +156,8 @@ Public Class TestISEMonitor
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Name & ".GetScreenLabels", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
         Finally
             If Not dbConnection Is Nothing Then dbConnection.Close()
@@ -156,7 +172,7 @@ Public Class TestISEMonitor
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub TestISEMonitor_1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Private Sub TestISEMonitor_1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         Try
             MyClass.PrepareISEMonitorIcons()
             MyClass.GetISEMonitorLabels("SPA")
@@ -292,11 +308,11 @@ Public Class TestISEMonitor
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SimulateMonitorData", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SimulateMonitorData", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function
@@ -309,32 +325,32 @@ Public Class TestISEMonitor
     ''' <remarks>Created by SGM 09/03/2012
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Try
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
+            If pRefreshEventType.Contains(UI_RefreshEvents.SENSORVALUE_CHANGED) Then
                 Dim sensorValue As Single = 0
 
                 'Monitor Data changed
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
 
                     Me.BsiseMonitorPanel1.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
 
-                    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR) 'Start ANSINF
                     End If
                 End If
 
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 End Class

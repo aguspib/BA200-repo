@@ -1,11 +1,13 @@
+Option Strict On
 Option Explicit On
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
 Imports System.Drawing
+Imports DevExpress.Utils
 
 Public Class QCIndividualResultsByTestControlReport
     Private mControlsRow As OpenQCResultsDS.tOpenResultsRow
@@ -23,7 +25,7 @@ Public Class QCIndividualResultsByTestControlReport
                      AndAlso ctrl.Selected).FirstOrDefault
 
         mLocalDecimalAllow = pLocalDecimalAllow
-        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.LEVEY_JENNINGS_GRAPH)
+        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.LEVEY_JENNINGS_GRAPH) AndAlso (Not mControlsRow.IsMeanNull)
         mRejectionCriteria = pRejectionCriteria
 
         Me.DataSource = pResultsDS
@@ -33,8 +35,8 @@ Public Class QCIndividualResultsByTestControlReport
         If (Me.DesignMode) Then Exit Sub
 
         'Get all Multilanguage texts for the report
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         XrLabelControlName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Control_Name", mCurrentLanguage)
@@ -58,8 +60,11 @@ Public Class QCIndividualResultsByTestControlReport
         'Generic Control Data
         XrControlName.Text = mControlsRow.ControlName
         XrLotNumber.Text = mControlsRow.LotNumber
-        XrMean.Text = mControlsRow.Mean.ToString("F" & mLocalDecimalAllow.ToString())
         XrUnit.Text = mControlsRow.MeasureUnit
+
+        'BA-1608 - Verify if field Mean is Null before format it to avoid errors when Statistic Mode is used
+        XrMean.Text = String.Empty
+        If (Not mControlsRow.IsMeanNull) Then XrMean.Text = mControlsRow.Mean.ToString("F" & mLocalDecimalAllow.ToString())
 
         XrSD.Text = String.Empty
         If (Not mControlsRow.IsSDNull) Then XrSD.Text = mControlsRow.SD.ToString("F" & (mLocalDecimalAllow + 1).ToString())
@@ -84,6 +89,9 @@ Public Class QCIndividualResultsByTestControlReport
         Else
             XrCellIncludedInMean.Text = String.Empty
         End If
+
+        'BA-1608 - The Result Value has to be shown with the number of decimals defined for the Test/Sample Type
+        XrCellVisibleResultValue.Text = CDbl(GetCurrentColumnValue("VisibleResultValue")).ToString("F" & mLocalDecimalAllow.ToString())
 
         XrCellABSError.Text = CDbl(GetCurrentColumnValue("ABSError")).ToString("F" & mLocalDecimalAllow.ToString())
         XrCellRELErrorPercent.Text = CDbl(GetCurrentColumnValue("RELErrorPercent")).ToString("F2")
@@ -159,12 +167,17 @@ Public Class QCIndividualResultsByTestControlReport
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 20/06/2014 - BT #1668 (rewritten based in the function used in screen IQCGraphs) 
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (convert to Integer runNumber("Argument")
+    '''                                          when use it in a Linq 
+    '''              SA 14/11/2014 - BA-1885 ==> When there are more than 50 QC Results to plot, the X-Axis should not show each RerunNumber (because 
+    '''                                          so many numbers cannot be readable); property ArgumentScaleType has to be set to Numeric to avoid
+    '''                                          overlapping of values in X-Axis
     ''' </remarks>
     Private Sub PrepareLJGraph()
 
         'Get all multilanguage labels
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         mLabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", mCurrentLanguage)
@@ -174,7 +187,7 @@ Public Class QCIndividualResultsByTestControlReport
 
         'Initialize the Graphic control
         XrLJGraph.Series.Clear()
-        XrLJGraph.Legend.Visible = True
+        XrLJGraph.Legend.Visibility = DefaultBoolean.True
         XrLJGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
 
         'Get RunNumbers to be used as Axis-X values for the Control to graph
@@ -190,19 +203,20 @@ Public Class QCIndividualResultsByTestControlReport
         'Create the Graph Serie for the Control
         XrLJGraph.Series.Add(mControlsRow.ControlNameLotNum, ViewType.Line)
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ShowInLegend = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).Label.Visible = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).PointOptions.PointView = PointView.ArgumentAndValues
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).LabelsVisibility = DefaultBoolean.False
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).Label.TextPattern = "{A}: {V}"
 
         'Set the Diagram properties
         Dim myDiagram As New XYDiagram
         myDiagram = CType(XrLJGraph.Diagram, XYDiagram)
         myDiagram.AxisY.ConstantLines.Clear()
         myDiagram.AxisX.ConstantLines.Clear()
-        myDiagram.AxisX.Range.Auto = True
+        myDiagram.AxisX.WholeRange.Auto = True
+        myDiagram.AxisX.VisualRange.Auto = True
         myDiagram.AxisY.GridLines.Visible = False
         myDiagram.AxisX.GridLines.Visible = False
-        myDiagram.AxisX.Title.Visible = False
-        myDiagram.AxisY.Title.Visible = False
+        myDiagram.AxisX.Title.Visibility = DefaultBoolean.False
+        myDiagram.AxisY.Title.Visibility = DefaultBoolean.False
 
         'In this Report, the LJ Graph is drawn individually for each Control
         Dim myUsedMean As Double = mControlsRow.Mean
@@ -251,21 +265,28 @@ Public Class QCIndividualResultsByTestControlReport
                 maxRelError = mRejectionCriteria
             End If
 
-            myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
+            myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
+                                                  Math.Round(myUsedMean + (maxRelError * mControlsRow.SD), 3) + 10)
+            myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
                                                   Math.Round(myUsedMean + (maxRelError * mControlsRow.SD), 3) + 10)
         Else
             If (mControlsRow.SD > 0) Then
-                myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
+                myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
+                                                      Math.Round(myUsedMean + (4 * mControlsRow.SD), 3))
+                myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
                                                       Math.Round(myUsedMean + (4 * mControlsRow.SD), 3))
             End If
         End If
 
+        myDiagram.AxisY.VisualRange.SideMarginsValue = 0
+
+        Dim minQCSeries = 50
         Dim validResultValues As List(Of QCResultsDS.tqcResultsRow)
         For Each runNumber As DataRow In myDataSourceTable.Rows
             'Search value of the Control/Lot for the Run Number 
             validResultValues = (From a As QCResultsDS.tqcResultsRow In DirectCast(Me.DataSource, QCResultsDS).tqcResults _
                                 Where a.QCControlLotID = mControlsRow.QCControlLotID _
-                              AndAlso a.CalcRunNumber = runNumber("Argument") _
+                              AndAlso a.CalcRunNumber = CInt(runNumber("Argument")) _
                              Order By a.CalcRunNumber _
                                Select a).ToList
 
@@ -277,6 +298,13 @@ Public Class QCIndividualResultsByTestControlReport
 
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).DataSource = myDataSourceTable
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentDataMember = "Argument"
+
+        'ADDED THIS FOR CORRECT SCALING
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
+
+        'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
+        If (myDataSourceTable.Rows.Count > minQCSeries) Then XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 
@@ -288,14 +316,14 @@ Public Class QCIndividualResultsByTestControlReport
         myDiagram.Margins.Right = 5
 
         'Set the Title for each axis
-        myDiagram.AxisX.Title.Visible = True
+        myDiagram.AxisX.Title.Visibility = DefaultBoolean.True
         myDiagram.AxisX.Title.Antialiasing = False
         myDiagram.AxisX.Title.TextColor = Color.Black
         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
         myDiagram.AxisX.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
         myDiagram.AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Serie", mCurrentLanguage)
 
-        myDiagram.AxisY.Title.Visible = True
+        myDiagram.AxisY.Title.Visibility = DefaultBoolean.True
         myDiagram.AxisY.Title.Antialiasing = False
         myDiagram.AxisY.Title.TextColor = Color.Black
         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -312,8 +340,8 @@ Public Class QCIndividualResultsByTestControlReport
                 myDiagram.AxisX.ConstantLines.Clear()
 
                 'Remove all axis titles
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DefaultBoolean.False
             End If
         End If
     End Sub
@@ -347,161 +375,6 @@ Public Class QCIndividualResultsByTestControlReport
                 End If
             End With
         End If
-    End Sub
-#End Region
-
-#Region "TO DELETE"
-    Private Sub PrepareLJGraphOLD()
-        'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-        mLabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", mCurrentLanguage)
-        mLabelMEAN = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", mCurrentLanguage)
-        XrLabelWarning.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WARNING", mCurrentLanguage)
-        XrLabelError.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ERROR", mCurrentLanguage) 'JB 01/10/2012 - Resource String unification
-
-        'The Graph
-        XrLJGraph.Series.Clear()
-        XrLJGraph.Legend.Visible = True
-        XrLJGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
-
-        Dim myDiagram As New XYDiagram
-        Dim myUsedMean As Double
-
-        XrLJGraph.Series.Add(mControlsRow.ControlNameLotNum, ViewType.Line)
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).ShowInLegend = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).Label.Visible = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).PointOptions.PointView = PointView.ArgumentAndValues
-
-        myDiagram = CType(XrLJGraph.Diagram, XYDiagram)
-        myDiagram.AxisY.GridLines.Visible = False
-        myDiagram.AxisX.GridLines.Visible = False
-
-        myDiagram.AxisY.ConstantLines.Clear()
-        myDiagram.AxisX.ConstantLines.Clear()
-
-        myDiagram.AxisX.Title.Visible = False
-        myDiagram.AxisY.Title.Visible = False
-
-        myUsedMean = mControlsRow.Mean
-        'Only one Control is selected to be graph
-        CreateConstantLine(mLabelMEAN, myDiagram, myUsedMean, Color.Black, DashStyle.Solid)
-        If mControlsRow.SD > 0 Then
-            'Create the Constant line for the Rejection Criteria
-
-            If (mRejectionCriteria = 1) Then
-                CreateConstantLine("+1 " & mLabelSD, myDiagram, myUsedMean + (1 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-                CreateConstantLine("-1 " & mLabelSD, myDiagram, myUsedMean - (1 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-            Else
-                CreateConstantLine("+1 " & mLabelSD, myDiagram, myUsedMean + (1 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-                CreateConstantLine("-1 " & mLabelSD, myDiagram, myUsedMean - (1 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-            End If
-
-            If (mRejectionCriteria = 2) Then
-                CreateConstantLine("+2 " & mLabelSD, myDiagram, myUsedMean + (2 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-                CreateConstantLine("-2 " & mLabelSD, myDiagram, myUsedMean - (2 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-            Else
-                CreateConstantLine("+2 " & mLabelSD, myDiagram, myUsedMean + (2 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-                CreateConstantLine("-2 " & mLabelSD, myDiagram, myUsedMean - (2 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-            End If
-
-            If (mRejectionCriteria = 3) Then
-                CreateConstantLine("+3 " & mLabelSD, myDiagram, myUsedMean + (3 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-                CreateConstantLine("-3 " & mLabelSD, myDiagram, myUsedMean - (3 * mControlsRow.SD), Color.Black, DashStyle.Solid)
-            Else
-                CreateConstantLine("+3 " & mLabelSD, myDiagram, myUsedMean + (3 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-                CreateConstantLine("-3 " & mLabelSD, myDiagram, myUsedMean - (3 * mControlsRow.SD), Color.Black, DashStyle.Dash)
-            End If
-
-            If (CBool(mRejectionCriteria Mod 1) OrElse mRejectionCriteria >= 4) Then
-                CreateConstantLine("+4 " & mLabelSD, myDiagram, myUsedMean + (mRejectionCriteria * mControlsRow.SD), Color.Black, DashStyle.Solid)
-                CreateConstantLine("-4 " & mLabelSD, myDiagram, myUsedMean - (mRejectionCriteria * mControlsRow.SD), Color.Black, DashStyle.Solid)
-            End If
-
-        End If
-
-        Dim resultsDT As QCResultsDS.tqcResultsDataTable = DirectCast(Me.DataSource, QCResultsDS).tqcResults
-
-        'Set the Controls limits
-        If (mRejectionCriteria < 1) Then
-            Dim MaxRelError As Double = 0
-
-            'Get maximum REL Error
-            MaxRelError = (From res In resultsDT Where res.QCControlLotID = mControlsRow.QCControlLotID AndAlso _
-                                                       res.ControlNameLotNum = mControlsRow.ControlNameLotNum Select res.RELError).Max
-
-            'Validate if calculation with max rel error is lower
-            If (Math.Round(myUsedMean + (MaxRelError * mControlsRow.SD), 3)) < _
-                          (myUsedMean + (mRejectionCriteria * mControlsRow.SD)) Then
-                MaxRelError = mRejectionCriteria
-            End If
-
-            myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (MaxRelError * mControlsRow.SD), 3) - 10 - 1, _
-                                                  Math.Round(myUsedMean + (MaxRelError * mControlsRow.SD), 3) + 10 + 1)
-        Else
-            'TR 21/06/2012 -Validate if sd value is 0 (zero)
-            If mControlsRow.SD > 0 Then
-                'Set the Min and Max Range for Y
-                myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3) - 1, _
-                                                      Math.Round(myUsedMean + (4 * mControlsRow.SD), 3) + 1)
-            End If
-
-        End If
-
-        'Set X Range limits
-        Dim XRange As List(Of Integer) = (From a In resultsDT _
-                                          Where Not a.Excluded _
-                                                AndAlso a.ControlNameLotNum = mControlsRow.ControlNameLotNum _
-                                                AndAlso a.QCControlLotID = mControlsRow.QCControlLotID _
-                                          Select a.CalcRunNumber).ToList
-
-        myDiagram.AxisX.Range.SetMinMaxValues(XRange.Min - 1, XRange.Max + 1)
-
-        Dim lst = From item In resultsDT.Rows _
-                  Where Not item.Excluded AndAlso _
-                        item.QCControlLotID = mControlsRow.QCControlLotID AndAlso _
-                        item.ControlNameLotNum = mControlsRow.ControlNameLotNum _
-                  Order By item.CalcRunNumber Ascending
-
-        For Each elem In lst
-            XrLJGraph.Series(mControlsRow.ControlNameLotNum.ToString).Points.Add(New SeriesPoint(elem.CalcRunNumber, elem.VisibleResultValue))
-        Next
-
-
-        'Set margins
-        myDiagram.Margins.Right = 5
-
-        'Set the Title for each axis
-        myDiagram.AxisX.Title.Visible = True
-        myDiagram.AxisX.Title.Antialiasing = False
-        myDiagram.AxisX.Title.TextColor = Color.Black
-        myDiagram.AxisX.Title.Alignment = StringAlignment.Center
-        myDiagram.AxisX.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
-        myDiagram.AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Serie", mCurrentLanguage)
-
-        myDiagram.AxisY.Title.Visible = True
-        myDiagram.AxisY.Title.Antialiasing = False
-        myDiagram.AxisY.Title.TextColor = Color.Black
-        myDiagram.AxisY.Title.Alignment = StringAlignment.Center
-        myDiagram.AxisY.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
-        myDiagram.AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Long", mCurrentLanguage)
-
-        'Validate if there are not series on the graph control to remove constant lines and axis titles
-        If (XrLJGraph.Series.Count = 0) Then
-            myDiagram = CType(XrLJGraph.Diagram, XYDiagram)
-            If (Not myDiagram Is Nothing) Then
-                'Remove all constant lines
-                myDiagram.AxisY.ConstantLines.Clear()
-                myDiagram.AxisX.ConstantLines.Clear()
-
-                'Remove all axis titles
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
-            End If
-        End If
-
     End Sub
 #End Region
 End Class

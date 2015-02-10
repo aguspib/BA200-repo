@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.BL
 
 Namespace Biosystems.Ax00.BL
 
@@ -99,8 +98,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -138,8 +137,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.DeleteEmptySavedWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.DeleteEmptySavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -179,8 +178,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.GetAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.GetAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -215,8 +214,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.ReadLISSavedWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.ReadLISSavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -257,8 +256,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.ExistsSavedWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.ExistsSavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -297,6 +296,7 @@ Namespace Biosystems.Ax00.BL
         '''                                 ** Removed assignation of NumReplicates for CALC and OFFS Tests due to import of these Test Types is not allowed  
         '''              SA  12/06/2012 - For Blanks, if TubeType is informed, save it.     
         '''              XB  25/04/2013 - Read required LIS data info to match it with every Control/Patient OrderTest requested from LIS
+        '''              XB  28/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSName As String, ByVal pWorkSessionResultDS As WorkSessionResultDS, _
                              ByVal pSavedWSID As Integer, Optional ByVal pFromLIMS As Boolean = False, _
@@ -362,6 +362,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.ReplicatesNumber = myBlankCalibratorsRow.NumReplicates
                                     mySavedWSOrderTestRow.CreationOrder = myBlankCalibratorsRow.CreationOrder
 
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myBlankCalibratorsRow.Selected
+
                                     If (Not myBlankCalibratorsRow.IsTubeTypeNull) Then
                                         mySavedWSOrderTestRow.TubeType = myBlankCalibratorsRow.TubeType
                                     End If
@@ -399,6 +402,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.ControlID = myControlsRow.ControlID
                                     mySavedWSOrderTestRow.CreationOrder = myControlsRow.CreationOrder
 
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myControlsRow.Selected
+
                                     ' XB 25/04/2013 - Match with the LIS data information for the corresponding OrderTestID
                                     If myControlsRow.LISRequest Then
                                         Dim lisInfoLinqRes As List(Of OrderTestsLISInfoDS.twksOrderTestsLISInfoRow)
@@ -431,6 +437,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.TestName = myPatientsRow.TestName
                                     mySavedWSOrderTestRow.SampleType = myPatientsRow.SampleType
                                     mySavedWSOrderTestRow.CreationOrder = myPatientsRow.CreationOrder
+
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myPatientsRow.Selected
 
                                     If (myPatientsRow.TestType = "STD" Or myPatientsRow.TestType = "ISE") Then
                                         mySavedWSOrderTestRow.TubeType = myPatientsRow.TubeType
@@ -524,8 +533,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.Save", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.Save", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -595,8 +604,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.SaveFromLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.SaveFromLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

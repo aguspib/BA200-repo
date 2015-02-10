@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 
 Namespace Biosystems.Ax00.BL
     Public Class HistoryTestControlLotsDelegate
@@ -51,8 +50,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -90,8 +89,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetAllControlsLinkedToTestSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetAllControlsLinkedToTestSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -133,8 +132,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetQCIDsForTestAndControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetQCIDsForTestAndControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -169,8 +168,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.ReadByTestSampleIDAndControlID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.ReadByTestSampleIDAndControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -276,8 +275,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.SaveLastCumulatedAsTarget", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.SaveLastCumulatedAsTarget", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -327,8 +326,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -379,191 +378,13 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.UpdateWestgardControlNum", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.UpdateWestgardControlNum", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
-#End Region
-
-#Region "TO DELETE - OLD FUNCTIONS"
-        '''' <summary>
-        '''' Get values of all Control/Lots linked to the specified Test/SampleType
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet HistoryTestControlLotsDS with all values defined for 
-        ''''          all Control/Lots linked to the specified Test/SampleType</returns>
-        '''' <remarks>
-        '''' Created by:  TR 27/05/2011
-        '''' </remarks>
-        'Public Function GetAllControlsLinkedToTestSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pQCTestSampleID As Integer) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myHistoryTestControlLotsDAO As New tqcHistoryTestControlLotsDAO
-        '                myGlobalDataTO = myHistoryTestControlLotsDAO.GetAllControlsLinkedToTestSampleType(dbConnection, pQCTestSampleID)
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetAllControlsLinkedToTestSampleType", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
-
-        '''' <summary>
-        '''' Get the identifiers in history tables of QC Module for the specified Test/SampleType and Control/Lot
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pTestID">Test Identifier</param>
-        '''' <param name="pSampleType">Sample Type Code</param>
-        '''' <param name="pControlID">Control Identifier</param>
-        '''' <param name="pLotNumber">Lot Number</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet HistoryTestControlLotsDS with the identifiers of the
-        ''''          Test/SampleType and the Control/Lot in QC Module</returns>
-        '''' <remarks>
-        '''' Created by:  SA 17/06/2011
-        '''' </remarks>
-        'Public Function GetQCIDsForTestAndControl(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
-        '                                          ByVal pControlID As Integer, ByVal pLotNumber As String) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myHistoryTestControlLotsDAO As New tqcHistoryTestControlLotsDAO
-        '                resultData = myHistoryTestControlLotsDAO.GetQCIDsForTestAndControl(dbConnection, pTestID, pSampleType, pControlID, pLotNumber)
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.GetQCIDsForTestAndControl", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Update Min/Max Concentration values for the specified QCTestSampleID and QCControlLotID in table tqcHistoryTestControlLots
-        '''' in QC Module, and for the correspondent TestID/SampleType in table tparTestControls. Besides, update CalculationMode to MANUAL
-        '''' for the specified QCTestSampleID in table tqcHistoryTestSamples in QC Module, and for the correspondent TestID/SampleType in
-        '''' table tparTestSamples
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC</param>
-        '''' <param name="pQCControlLotID">Identifier of Control/Lot in QC</param>
-        '''' <param name="pMinValue">Min concentration value</param>
-        '''' <param name="pMaxValue">Max concentration value</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by:  SA 02/01/2012
-        '''' </remarks>
-        'Public Function SaveLastCumulatedAsTargetOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pQCTestSampleID As Integer, _
-        '                                             ByVal pQCControlLotID As Integer, ByVal pMinValue As Single, ByVal pMaxValue As Single) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim dataOK As Boolean = False
-
-        '                'Update CalculationMode = MANUAL and NumberOfSeries = 0 for the Test/SampleType in tables tqcHistoryTestSamples and tparTestSamples
-        '                Dim myQCResultsDelegate As New QCResultsDelegate
-        '                myGlobalDataTO = myQCResultsDelegate.UpdateChangedValuesOLD(dbConnection, pQCTestSampleID, "MANUAL", 0, 0, String.Empty, String.Empty, Nothing)
-
-        '                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '                    Dim myHistoryTestSamplesDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
-
-        '                    If (myHistoryTestSamplesDS.tqcHistoryTestSamples.Count = 1) Then
-        '                        Dim myTestControlsDS As New TestControlsDS
-
-        '                        Dim myTestControlRow As TestControlsDS.tparTestControlsRow = myTestControlsDS.tparTestControls.NewtparTestControlsRow()
-        '                        myTestControlRow.TestID = myHistoryTestSamplesDS.tqcHistoryTestSamples.First.TestID
-        '                        myTestControlRow.SampleType = myHistoryTestSamplesDS.tqcHistoryTestSamples.First.SampleType
-
-        '                        myTestControlRow.TargetMean = (pMinValue + pMaxValue) / 2
-        '                        myTestControlRow.TargetSD = (pMaxValue - pMinValue) / (2 * myHistoryTestSamplesDS.tqcHistoryTestSamples.First.RejectionCriteria)
-        '                        myTestControlRow.MinConcentration = pMinValue
-        '                        myTestControlRow.MaxConcentration = pMaxValue
-
-        '                        'Get the ControlLot and LotNumber for the specified QCControlLotID
-        '                        Dim myHistoryControlLotDelegate As New HistoryControlLotsDelegate
-
-        '                        myGlobalDataTO = myHistoryControlLotDelegate.Read(dbConnection, pQCControlLotID)
-        '                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '                            Dim myHistoryControlLotsDS As HistoryControlLotsDS = DirectCast(myGlobalDataTO.SetDatos, HistoryControlLotsDS)
-
-        '                            If (myHistoryControlLotsDS.tqcHistoryControlLots.Count = 1) Then
-        '                                'Inform found values in the DS row 
-        '                                myTestControlRow.ControlID = myHistoryControlLotsDS.tqcHistoryControlLots.First.ControlID
-        '                                myTestControlRow.LotNumber = myHistoryControlLotsDS.tqcHistoryControlLots.First.LotNumber
-
-        '                                'Finally add the row to the local TestControlsDS and update values in table tparTestControls
-        '                                myTestControlsDS.tparTestControls.AddtparTestControlsRow(myTestControlRow)
-
-        '                                'Update Min/Max values in table tparTestControls 
-        '                                Dim myTestControlsDelegate As New TestControlsDelegate
-        '                                myGlobalDataTO = myTestControlsDelegate.UpdateTestControls(dbConnection, myTestControlsDS)
-
-        '                                If (Not myGlobalDataTO.HasError) Then
-        '                                    'Update Min/Max values in table tqcHistoryTestControlLots in QC Module
-        '                                    myGlobalDataTO = Update(dbConnection, pQCTestSampleID, pQCControlLotID, pMinValue, pMaxValue)
-        '                                    If (Not myGlobalDataTO.HasError) Then dataOK = True
-        '                                End If
-        '                            End If
-        '                        End If
-        '                    End If
-        '                    myGlobalDataTO.HasError = (Not dataOK)
-        '                End If
-        '                If (Not myGlobalDataTO.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Rollback is executed
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestControlLotsDelegate.SaveLastCumulatedAsTarget", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
 #End Region
 
     End Class

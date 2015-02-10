@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ILevelDetectionTest
+Partial Class UiLevelDetectionTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -22,7 +22,7 @@ Partial Class ILevelDetectionTest
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ILevelDetectionTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiLevelDetectionTest))
         Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
@@ -555,7 +555,7 @@ Partial Class ILevelDetectionTest
         Me.Controls.Add(Me.BsLevelDetectionTestPanel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "ILevelDetectionTest"
+        Me.Name = "UiLevelDetectionTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "StressModeTest"
         Me.BsMessagesPanel.ResumeLayout(False)

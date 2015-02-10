@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ICreateRestorePoint
+Partial Class UiCreateRestorePoint
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -25,7 +25,7 @@ Partial Class ICreateRestorePoint
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ICreateRestorePoint))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiCreateRestorePoint))
         Me.resetSaveButtonTimer = New System.Windows.Forms.Timer(Me.components)
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
@@ -154,7 +154,7 @@ Partial Class ICreateRestorePoint
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "ICreateRestorePoint"
+        Me.Name = "UiCreateRestorePoint"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsCreateRestorePointGroupBox.ResumeLayout(False)

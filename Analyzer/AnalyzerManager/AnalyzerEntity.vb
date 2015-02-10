@@ -8,15 +8,15 @@ Imports System.Data
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public MustInherit Class AnalyzerEntity
-        Implements IAnalyzerEntity
+    Partial Public MustInherit Class AnalyzerManager
+        Implements IAnalyzerManager
 
         Private WithEvents _baseLine As IBaseLineEntity
-        Private WithEvents _iseAnalyzer As IISEAnalyzerEntity
+        Private WithEvents _iseAnalyzer As IISEManager
 
 #Region "Properties"
 
-        Property BaseLine As IBaseLineEntity Implements IAnalyzerEntity.BaseLine
+        Property BaseLine As IBaseLineEntity Implements IAnalyzerManager.BaseLine
             Get
                 Return _baseLine
             End Get
@@ -25,19 +25,19 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Property ISEAnalyzer As IISEAnalyzerEntity Implements IAnalyzerEntity.ISEAnalyzer
+        Property ISEAnalyzer As IISEManager Implements IAnalyzerManager.ISEAnalyzer
             Get
                 Return _iseAnalyzer
             End Get
-            Set(value As IISEAnalyzerEntity)
+            Set(value As IISEManager)
                 _iseAnalyzer = value
             End Set
         End Property
 
-        Property BaseLineTypeForCalculations As BaseLineType Implements IAnalyzerEntity.BaseLineTypeForCalculations
-        Property BaseLineTypeForWellReject As BaseLineType Implements IAnalyzerEntity.BaseLineTypeForWellReject
+        Property BaseLineTypeForCalculations As BaseLineType Implements IAnalyzerManager.BaseLineTypeForCalculations
+        Property BaseLineTypeForWellReject As BaseLineType Implements IAnalyzerManager.BaseLineTypeForWellReject
 
-        Property Model As String Implements IAnalyzerEntity.Model
+        Property Model As String Implements IAnalyzerManager.Model
             Get
                 Return myAnalyzerModel
             End Get

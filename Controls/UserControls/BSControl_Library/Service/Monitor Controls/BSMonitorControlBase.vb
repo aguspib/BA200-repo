@@ -3,10 +3,6 @@ Option Explicit On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
 
 Imports PerpetuumSoft.Instrumentation
 Imports PerpetuumSoft.Instrumentation.Windows.Forms
@@ -37,14 +33,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            'MyClass.CurrentStatus = Status.DISABLED
+            'CurrentStatus = Status.DISABLED
 
         End Sub
 #End Region
 
 #Region "Inheritable Declarations"
         Protected Friend IsLoaded As Boolean = False
-        Protected Friend InstrumentPanel As Panel = Nothing
+        'Protected Friend InstrumentPanel As Panel = Nothing
         Protected Friend InstrumentationControl As IndicatorWidget = Nothing
         Protected Friend TextValueElementName As String = "LabelValue"
         Protected Friend ScaleElementName As String = "Scale"
@@ -129,7 +125,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleTextAttr
             End Get
             Set(ByVal value As String)
-                MyClass.TitleLabel.Text = value
+                TitleLabel.Text = value
                 TitleTextAttr = value
             End Set
         End Property
@@ -139,7 +135,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleAlignmentAttr
             End Get
             Set(ByVal value As ContentAlignment)
-                MyClass.TitleLabel.TextAlign = value
+                TitleLabel.TextAlign = value
                 TitleAlignmentAttr = value
             End Set
         End Property
@@ -152,17 +148,17 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Set(ByVal value As Integer)
                 If value >= 0 And value <= Me.Height Then
                     TitleHeightAttr = value
-                    MyClass.RefreshControl()
+                    RefreshControl()
                 End If
             End Set
         End Property
 
         Public Property TitleFont() As Font
             Get
-                Return MyClass.TitleFontAttr
+                Return TitleFontAttr
             End Get
             Set(ByVal value As Font)
-                MyClass.TitleLabel.Font = value
+                TitleLabel.Font = value
                 TitleFontAttr = value
             End Set
         End Property
@@ -172,14 +168,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleForeColorAttr
             End Get
             Set(ByVal value As Color)
-                MyClass.TitleLabel.ForeColor = value
+                TitleLabel.ForeColor = value
                 TitleForeColorAttr = value
             End Set
         End Property
 
         Public Overloads WriteOnly Property Enabled() As Boolean
             Set(ByVal value As Boolean)
-                For Each C As Control In MyClass.Controls
+                For Each C As Control In Controls
                     If TypeOf C Is System.Windows.Forms.Label Then
                         C.Enabled = True
                     Else
@@ -211,22 +207,28 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
 #Region "Inheritable Methods"
 
+
+        Protected Friend Overridable Sub RefreshControl()
+
+        End Sub
+
         ''' <summary>
-        ''' updates the look of the control
+        ''' This function handles resizing of the control contents. Usually a InstrumentPanel on controls that implement it.
         ''' </summary>
-        ''' <remarks>Created by SGM 28/04/2011</remarks>
-        Protected Friend Sub RefreshControl()
+        ''' <param name="contents">The control that should be addapted to fit inside the parent</param>
+        ''' <remarks></remarks>
+        Protected Friend Sub UpdateContentsSize(contents As Control)
             'Try
-            If MyClass.InstrumentPanel IsNot Nothing Then
-                MyClass.InstrumentPanel.Height = Me.Height - MyClass.TitleHeight
+            If contents IsNot Nothing Then
+                contents.Height = Me.ClientSize.Height - TitleHeight
             End If
 
             Me.TitleLabel.Height = Me.TitleHeight
             SetScaleLimits()
 
-            'Catch ex As Exception
-            '    Throw ex
-            'End Try
+            '    'Catch ex As Exception
+            '    '    Throw ex
+            '    'End Try
         End Sub
 
         ''' <summary>
@@ -235,8 +237,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <remarks>Created by SGM 28/04/2011</remarks>
         Protected Friend Sub SetScaleLimits()
             'Try
-            If MyClass.IsLoaded Then
-                Dim myScale As Model.Scale = CType(GetElement(MyClass.InstrumentationControl, MyClass.ScaleElementName), Model.Scale)
+            If IsLoaded Then
+                Dim myScale As Model.Scale = CType(GetElement(InstrumentationControl, ScaleElementName), Model.Scale)
 
                 If myScale IsNot Nothing Then
                     myScale.Minimum = MinLimit
@@ -428,7 +430,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         Protected Friend Sub BSMonitorControlBase_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
             'Try
-            MyClass.IsLoaded = True
+            IsLoaded = True
             'Catch ex As Exception
             '    Throw ex
             'End Try
@@ -436,7 +438,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         Protected Friend Sub BSMonitorControlBase_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
             'Try
-            MyClass.RefreshControl()
+            RefreshControl()
             'Catch ex As Exception
             '    Throw ex
             'End Try

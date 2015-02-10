@@ -1,5 +1,6 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -7,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IWSTestSelectionAuxScreen
+Public Class UiWSTestSelectionAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constants"
@@ -252,7 +253,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' </remarks>
     Private Sub DeleteProfileInformation(ByVal pTestType As String, pTestID As Integer, ByVal pTestProfileID As Integer)
         Try
-            Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
+            Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow) = Nothing
 
             'Search the Test in the proper SelectedTestsDS according its type
             Select Case (pTestType)
@@ -295,7 +296,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteProfileInformation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteProfileInformation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteProfileInformation", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -319,13 +320,14 @@ Public Class IWSTestSelectionAuxScreen
     '''                              at least a Test (whatever Test Type) defined for the selected SampleType (currently the 
     '''                              screen is not opened if there are not Standard Tests, and it is wrong)
     '''              RH 12/03/2012 - When an error happens, execute Return to prevent the execution of the following lines
-    '''              SA 19/06/2012 - Get ISE Tests also when SampleClass is CTRL           
+    '''              SA 19/06/2012 - Get ISE Tests also when SampleClass is CTRL
+    '''              AG 29/08/2014 - BA-1869 customize test selection visibility and order (new parameter TRUE for GetList and GetBySampleType methods)
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Multilanguage Texts for all Screen Controls
             GetScreenLabels(currentLanguage)
@@ -361,17 +363,18 @@ Public Class IWSTestSelectionAuxScreen
             Dim myGlobalDataTO As GlobalDataTO
             Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
 
+            Dim customizedTestSelection As Boolean = True 'AG 01/09/2014 - BA-1869 set TRUE to final code / leave FALSE during develop
             'Get the list of available Standard Tests according the selected SampleClass and SampleType
             Dim myTestsDelegate As New TestsDelegate()
             If (SampleClassAttribute = "BLANK") Then
                 'All Tests have to be loaded, without filtering them by Sample Type
-                myGlobalDataTO = myTestsDelegate.GetList(Nothing)
+                myGlobalDataTO = myTestsDelegate.GetList(Nothing, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
             Else
                 'For CALIBRATORS --> Only Tests using for the SampleType an Experimental Calibrator, or an Alternative one based
                 'in an Experimental, will be loaded
                 'For CONTROLS --> Only Tests having a Control defined for the SampleType will be loaded 
                 'For PATIENTS --> All Tests using the SampleType will be loaded 
-                myGlobalDataTO = myTestsDelegate.GetBySampleType(Nothing, SampleTypeAttribute, SampleClassAttribute)
+                myGlobalDataTO = myTestsDelegate.GetBySampleType(Nothing, SampleTypeAttribute, SampleClassAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
             End If
 
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -384,7 +387,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (SampleClassAttribute = "PATIENT") Then
                         'Get the data for the TreeView
                         Dim myTestProfileDelegate As New TestProfilesDelegate()
-                        myGlobalDataTO = myTestProfileDelegate.GetProfilesBySampleType(Nothing, SampleTypeAttribute)
+                        myGlobalDataTO = myTestProfileDelegate.GetProfilesBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
 
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             'Set value of global variable testProfileList, needed to fill the TreeView of Test Profiles
@@ -423,7 +426,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT") Then
                     Dim myCalcTestDelegate As New CalculatedTestsDelegate
-                    myGlobalDataTO = myCalcTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute)
+                    myGlobalDataTO = myCalcTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myCalcTestsDS As CalculatedTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
@@ -455,7 +458,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT" OrElse SampleClassAttribute = "CTRL") Then
                     Dim myISETestDelegate As New ISETestsDelegate
-                    myGlobalDataTO = myISETestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, (SampleClassAttribute = "CTRL"))
+                    myGlobalDataTO = myISETestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, (SampleClassAttribute = "CTRL"), customizedTestSelection) 'AG 01/09/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myISETestsDS As ISETestsDS = DirectCast(myGlobalDataTO.SetDatos, ISETestsDS)
@@ -487,7 +490,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT") Then
                     Dim myOffSystemTestDelegate As New OffSystemTestsDelegate
-                    myGlobalDataTO = myOffSystemTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute)
+                    myGlobalDataTO = myOffSystemTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 01/09/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myOffSystemTestsDS As OffSystemTestsDS = DirectCast(myGlobalDataTO.SetDatos, OffSystemTestsDS)
@@ -544,7 +547,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.Close()
         End Try
@@ -566,13 +569,13 @@ Public Class IWSTestSelectionAuxScreen
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Warning Icon in Warnings area
@@ -582,7 +585,7 @@ Public Class IWSTestSelectionAuxScreen
                 bsWarningIconPictureBox.SizeMode = PictureBoxSizeMode.StretchImage
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.Close()
         End Try
@@ -785,7 +788,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyTestsLocking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyTestsLocking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".VerifyTestsLocking", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -824,7 +827,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LockTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LockTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LockTestProfile", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -861,7 +864,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next myNode
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SearchNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SearchNode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SearchNode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myTreeNode
@@ -898,7 +901,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1068,11 +1071,13 @@ Public Class IWSTestSelectionAuxScreen
                                 'If the STD Test is linked to other Calculated Tests, verify if they remain selected
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i = 0 To calcTests.Count - 1
+                                        ' ReSharper disable once InconsistentNaming
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
@@ -1091,11 +1096,12 @@ Public Class IWSTestSelectionAuxScreen
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     'Get all different selected Calculated Tests to which the Test is linked
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'Only if the Calculated Test is currently selected, unselect it but without unselect its components
@@ -1199,7 +1205,7 @@ Public Class IWSTestSelectionAuxScreen
                 If (Not maxPatientOTsReached) Then ControlMSGDeleteTests(bFind)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSelectedCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSelectedCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkSelectedCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return selectedTest
@@ -1232,6 +1238,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
     Private Function MarkUnMarkCalculatedTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, _
                                                   Optional ByVal pVerifyComponents As Boolean = True, _
@@ -1483,6 +1490,90 @@ Public Class IWSTestSelectionAuxScreen
                                     lstCalculatedTest.First.CalcTestNames = RebuildStringList(lstCalculatedTest.First.CalcTestNames, myCurrentName.ToString)
                                 End If
                             End If
+
+                            ' XB 02/12/2014 - BA-1867
+                        ElseIf (testInFormula.TestType = "ISE") Then
+                            'Search position and current selection status of the Test in the list of ISE Tests
+                            Dim lstISETest As List(Of SelectedTestsDS.SelectedTestTableRow)
+                            lstISETest = (From b In iseTestList.SelectedTestTable _
+                                         Where b.TestID = Convert.ToInt32(testInFormula.Value) _
+                                        Select b).ToList
+
+                            If (lstISETest.Count = 1) Then
+                                If (pVerifyComponents) Then
+                                    'Only if the selection Status is different from the one that has been set for the Calculated Test...
+                                    If (lstISETest.First.Selected <> selectionStatus) Then
+                                        If (lstISETest.First.OTStatus = "OPEN") Then
+                                            MarkUnMarkISETestCell(lstISETest.First.Row, lstISETest.First.Col, myCurrentID, myCurrentName)
+                                        Else
+                                            'The ISE Test is PENDING... if the Calculated Test was unselected, then remove it 
+                                            'from the list of Calculated Test in which the ISE Tests is included
+                                            If (Not selectionStatus) Then
+                                                lstISETest.First.CalcTestIDs = RebuildStringList(lstISETest.First.CalcTestIDs, myCurrentID.ToString)
+                                                lstISETest.First.CalcTestNames = RebuildStringList(lstISETest.First.CalcTestNames, myCurrentName.ToString)
+                                            End If
+                                        End If
+                                    Else
+                                        'Link the ISE Test to the Calculated informing fields CalcTestIDs and CalcTestNames (when selecting)
+                                        If (selectionStatus) Then
+                                            If (lstISETest.First.CalcTestIDs.Trim = "") Then
+                                                lstISETest.First.CalcTestIDs = myCurrentID.ToString
+                                                lstISETest.First.CalcTestNames = myCurrentName.ToString
+                                            Else
+                                                lstISETest.First.CalcTestIDs &= ", " & myCurrentID.ToString
+                                                lstISETest.First.CalcTestNames &= ", " & myCurrentName.ToString
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    'The component Test remains selected, but the link with the Calculated Test is removed
+                                    lstISETest.First.CalcTestIDs = RebuildStringList(lstISETest.First.CalcTestIDs, myCurrentID.ToString)
+                                    lstISETest.First.CalcTestNames = RebuildStringList(lstISETest.First.CalcTestNames, myCurrentName.ToString)
+                                End If
+                            End If
+
+                        ElseIf (testInFormula.TestType = "OFFS") Then
+                            'Search position and current selection status of the Test in the list of OFFS Tests
+                            Dim lstOFFSTest As List(Of SelectedTestsDS.SelectedTestTableRow)
+                            lstOFFSTest = (From b In offSystemTestList.SelectedTestTable _
+                                           Where b.TestID = Convert.ToInt32(testInFormula.Value) _
+                                           Select b).ToList
+
+                            If (lstOFFSTest.Count = 1) Then
+                                If (pVerifyComponents) Then
+                                    'Only if the selection Status is different from the one that has been set for the Calculated Test...
+                                    If (lstOFFSTest.First.Selected <> selectionStatus) Then
+                                        If (lstOFFSTest.First.OTStatus = "OPEN") Then
+                                            MarkUnMarkOffSystemTestCell(lstOFFSTest.First.Row, lstOFFSTest.First.Col, myCurrentID, myCurrentName)
+                                        Else
+                                            'The OFFS Test is PENDING... if the Calculated Test was unselected, then remove it 
+                                            'from the list of Calculated Test in which the ISE Tests is included
+                                            If (Not selectionStatus) Then
+                                                lstOFFSTest.First.CalcTestIDs = RebuildStringList(lstOFFSTest.First.CalcTestIDs, myCurrentID.ToString)
+                                                lstOFFSTest.First.CalcTestNames = RebuildStringList(lstOFFSTest.First.CalcTestNames, myCurrentName.ToString)
+                                            End If
+                                        End If
+                                    Else
+                                        'Link the OFFS Test to the Calculated informing fields CalcTestIDs and CalcTestNames (when selecting)
+                                        If (selectionStatus) Then
+                                            If (lstOFFSTest.First.CalcTestIDs.Trim = "") Then
+                                                lstOFFSTest.First.CalcTestIDs = myCurrentID.ToString
+                                                lstOFFSTest.First.CalcTestNames = myCurrentName.ToString
+                                            Else
+                                                lstOFFSTest.First.CalcTestIDs &= ", " & myCurrentID.ToString
+                                                lstOFFSTest.First.CalcTestNames &= ", " & myCurrentName.ToString
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    'The component Test remains selected, but the link with the Calculated Test is removed
+                                    lstOFFSTest.First.CalcTestIDs = RebuildStringList(lstOFFSTest.First.CalcTestIDs, myCurrentID.ToString)
+                                    lstOFFSTest.First.CalcTestNames = RebuildStringList(lstOFFSTest.First.CalcTestNames, myCurrentName.ToString)
+                                End If
+                            End If
+                            ' XB 02/12/2014 - BA-1867
+
+
                         End If
                     Next
 
@@ -1542,14 +1633,14 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkCalculatedTestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkCalculatedTestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkCalculatedTestCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return selectedTest
@@ -1574,8 +1665,10 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
-    Private Function MarkUnMarkISETestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
+    Private Function MarkUnMarkISETestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, Optional ByVal pCalcTestID As Integer = 0, _
+                                           Optional ByVal pCalcTestName As String = "") As Boolean
         Dim selectedTest As Boolean = False
         Try
             Dim myTreeNode As New TreeNode()
@@ -1595,54 +1688,85 @@ Public Class IWSTestSelectionAuxScreen
                     'If not selected, then the selected status is set to true                    
                     qSelectedTest.First.Selected = True
                     selectedTest = True
+
+                    ' XB 02/12/2014 - BA-1867
+                    'If the Test is selected due to a Calculated Test was selected, link the CalcTest to it (ID and Name)
+                    If (pCalcTestID <> 0) Then
+                        If (qSelectedTest.First.CalcTestIDs.Trim = "") Then
+                            qSelectedTest.First.CalcTestIDs = pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames = pCalcTestName
+                        Else
+                            qSelectedTest.First.CalcTestIDs &= ", " & pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames &= ", " & pCalcTestName
+                        End If
+                    End If
+                    ' XB 02/12/2014 - BA-1867
                 Else
                     Dim canBeUnselected As Boolean = False
 
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
-                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
-                            Dim myTestID As Integer = -1
-                            Dim myTestType As String = String.Empty
-                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+                            ' XB 02/12/2014 - BA-1867
+                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView, 
+                            'but this process is executed only when the Test is unselected by clicking in it, not when it is unselected
+                            'by unselect the Calculated Test in which Formula the Test is included 
+                            If (pCalcTestID = 0) Then
+                                ' XB 02/12/2014 - BA-1867
+                                'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                                Dim myTestID As Integer = -1
+                                Dim myTestType As String = String.Empty
+                                Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
-                            'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
-                                myTreeNode.Checked = False
+                                'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
+                                'Search the Profile on the TreeView to unchecked it
+                                If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
+                                    myTreeNode.Checked = False
 
-                                'Unselect also all the Tests in the Profile
-                                For Each myNode As TreeNode In myTreeNode.Nodes
-                                    myNode.Checked = myTreeNode.Checked
+                                    'Unselect also all the Tests in the Profile
+                                    For Each myNode As TreeNode In myTreeNode.Nodes
+                                        myNode.Checked = myTreeNode.Checked
 
-                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
-                                    '           the TestType and TestID
-                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
-                                        myTestType = myNode.Name.Split(CChar("|"))(0)
-                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+                                        'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                        '           the TestType and TestID
+                                        If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                            myTestType = myNode.Name.Split(CChar("|"))(0)
+                                            myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
 
-                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
-                                    End If
-                                Next
+                                            DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                        End If
+                                    Next
 
-                                'Search if the Test is also in another Test Profile 
-                                myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (myTreeNode.Name <> String.Empty) Then
-                                    If (myTreeNode.Parent Is Nothing) Then
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                    'Search if the Test is also in another Test Profile 
+                                    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                                    If (myTreeNode.Name <> String.Empty) Then
+                                        If (myTreeNode.Parent Is Nothing) Then
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                        Else
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                        End If
                                     Else
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
-                                    End If
-                                Else
-                                    qSelectedTest.First.TestProfileID = 0
-                                    qSelectedTest.First.TestProfileName = ""
+                                        qSelectedTest.First.TestProfileID = 0
+                                        qSelectedTest.First.TestProfileName = ""
 
-                                    canBeUnselected = True
+                                        canBeUnselected = True
+                                    End If
                                 End If
+
+                                ' XB 02/12/2014 - BA-1867
+                            Else
+                                'Nothing to do, the Test remains selected because is linked to a selected Test Profile...
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
                             End If
+                            ' XB 02/12/2014 - BA-1867
+
+
 
                             'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
                             '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
@@ -1676,9 +1800,75 @@ Public Class IWSTestSelectionAuxScreen
 
                         'Finally, the Test is unselected
                         If (canBeUnselected) Then
+                            ' XB 02/12/2014 - BA-1867
+                            'qSelectedTest.First.Selected = False
+                            'selectedTest = False
+
+                            If (pCalcTestID <> 0) Then
+                                'Test is unselected due to a linked Calculated Test has been unselected
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
+
+                                'If the ISE Test is linked to other Calculated Tests, verify if they remain selected
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i2 = 0 To calcTests.Count - 1
+                                        Dim i = i2
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
+                                            If (Not lstCalPos.First.Selected) Then
+                                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, lstCalPos.First.TestID.ToString)
+                                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, lstCalPos.First.TestName)
+                                            End If
+                                        End If
+                                    Next
+                                End If
+
+                                'El Test can be unselected when it is not linked to another selected Calculated Test
+                                canBeUnselected = (qSelectedTest.First.CalcTestIDs.Trim = "")
+                            Else
+                                'Test is unselected by clicking in it
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    'Get all different selected Calculated Tests to which the Test is linked
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i = 0 To calcTests.Count - 1
+                                        ' ReSharper disable once InconsistentNaming
+                                        Dim aux_i = i
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'Only if the Calculated Test is currently selected, unselect it but without unselect its components
+                                            If (lstCalPos.First.Selected) Then
+                                                MarkUnMarkCalculatedTestCell(lstCalPos.First.Row, lstCalPos.First.Col, False)
+                                            End If
+                                        End If
+                                    Next i
+                                    qSelectedTest.First.CalcTestIDs = ""
+                                    qSelectedTest.First.CalcTestNames = ""
+                                End If
+                            End If
+                        End If
+
+                        'Finally, the Test is unselected
+                        If (canBeUnselected) Then
                             qSelectedTest.First.Selected = False
                             selectedTest = False
+                        Else
+                            'The Test recovers its previous status
+                            qSelectedTest.First.Selected = True
+                            selectedTest = True
                         End If
+                        ' XB 02/12/2014 - BA-1867
                     Else
                         'Only for Controls... if not all Controls needed for Test are included in the WorkSession
                         If (qSelectedTest.First.PartiallySelected) Then
@@ -1758,7 +1948,7 @@ Public Class IWSTestSelectionAuxScreen
                 If (Not maxPatientOTsReached) Then ControlMSGDeleteTests(bFind)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISETestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISETestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkISETestCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return selectedTest
@@ -1779,8 +1969,10 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
-    Private Function MarkUnMarkOffSystemTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
+    Private Function MarkUnMarkOffSystemTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, Optional ByVal pCalcTestID As Integer = 0, _
+                                                 Optional ByVal pCalcTestName As String = "") As Boolean
         Dim selectedTest As Boolean = False
         Try
             Dim myTreeNode As New TreeNode()
@@ -1800,54 +1992,86 @@ Public Class IWSTestSelectionAuxScreen
                     'If not selected, then the selected status is set to true                    
                     qSelectedTest.First.Selected = True
                     selectedTest = True
+
+                    ' XB 02/12/2014 - BA-1867
+                    'If the Test is selected due to a Calculated Test was selected, link the CalcTest to it (ID and Name)
+                    If (pCalcTestID <> 0) Then
+                        If (qSelectedTest.First.CalcTestIDs.Trim = "") Then
+                            qSelectedTest.First.CalcTestIDs = pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames = pCalcTestName
+                        Else
+                            qSelectedTest.First.CalcTestIDs &= ", " & pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames &= ", " & pCalcTestName
+                        End If
+                    End If
+                    ' XB 02/12/2014 - BA-1867
                 Else
                     Dim canBeUnselected As Boolean = False
 
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
-                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
-                            Dim myTestID As Integer = -1
-                            Dim myTestType As String = String.Empty
-                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
-                            'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
-                                myTreeNode.Checked = False
+                            ' XB 02/12/2014 - BA-1867
+                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView, 
+                            'but this process is executed only when the Test is unselected by clicking in it, not when it is unselected
+                            'by unselect the Calculated Test in which Formula the Test is included 
+                            If (pCalcTestID = 0) Then
+                                ' XB 02/12/2014 - BA-1867
+                                'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                                Dim myTestID As Integer = -1
+                                Dim myTestType As String = String.Empty
+                                Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                                'Unselect also all the Tests in the Profile
-                                For Each myNode As TreeNode In myTreeNode.Nodes
-                                    myNode.Checked = myTreeNode.Checked
+                                'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
+                                'Search the Profile on the TreeView to unchecked it
+                                If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
+                                    myTreeNode.Checked = False
 
-                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
-                                    '           the TestType and TestID
-                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
-                                        myTestType = myNode.Name.Split(CChar("|"))(0)
-                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+                                    'Unselect also all the Tests in the Profile
+                                    For Each myNode As TreeNode In myTreeNode.Nodes
+                                        myNode.Checked = myTreeNode.Checked
 
-                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
-                                    End If
-                                Next
+                                        'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                        '           the TestType and TestID
+                                        If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                            myTestType = myNode.Name.Split(CChar("|"))(0)
+                                            myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
 
-                                'Search if the Test is also in another Test Profile 
-                                myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (myTreeNode.Name <> String.Empty) Then
-                                    If (myTreeNode.Parent Is Nothing) Then
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                            DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                        End If
+                                    Next
+
+                                    'Search if the Test is also in another Test Profile 
+                                    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                                    If (myTreeNode.Name <> String.Empty) Then
+                                        If (myTreeNode.Parent Is Nothing) Then
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                        Else
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                        End If
                                     Else
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
-                                    End If
-                                Else
-                                    qSelectedTest.First.TestProfileID = 0
-                                    qSelectedTest.First.TestProfileName = ""
+                                        qSelectedTest.First.TestProfileID = 0
+                                        qSelectedTest.First.TestProfileName = ""
 
-                                    canBeUnselected = True
+                                        canBeUnselected = True
+                                    End If
                                 End If
+
+                                ' XB 02/12/2014 - BA-1867
+                            Else
+                                'Nothing to do, the Test remains selected because is linked to a selected Test Profile...
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
                             End If
+                            ' XB 02/12/2014 - BA-1867
+
+
 
                             'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
                             '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
@@ -1881,9 +2105,75 @@ Public Class IWSTestSelectionAuxScreen
 
                         'Finally, the Test is unselected
                         If (canBeUnselected) Then
+                            ' XB 02/12/2014 - BA-1867
+                            'qSelectedTest.First.Selected = False
+                            'selectedTest = False
+
+                            If (pCalcTestID <> 0) Then
+                                'Test is unselected due to a linked Calculated Test has been unselected
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
+
+                                'If the ISE Test is linked to other Calculated Tests, verify if they remain selected
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
+                                            If (Not lstCalPos.First.Selected) Then
+                                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, lstCalPos.First.TestID.ToString)
+                                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, lstCalPos.First.TestName)
+                                            End If
+                                        End If
+                                    Next i
+                                End If
+
+                                'El Test can be unselected when it is not linked to another selected Calculated Test
+                                canBeUnselected = (qSelectedTest.First.CalcTestIDs.Trim = "")
+                            Else
+                                'Test is unselected by clicking in it
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    'Get all different selected Calculated Tests to which the Test is linked
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'Only if the Calculated Test is currently selected, unselect it but without unselect its components
+                                            If (lstCalPos.First.Selected) Then
+                                                MarkUnMarkCalculatedTestCell(lstCalPos.First.Row, lstCalPos.First.Col, False)
+                                            End If
+                                        End If
+                                    Next
+                                    qSelectedTest.First.CalcTestIDs = ""
+                                    qSelectedTest.First.CalcTestNames = ""
+                                End If
+                            End If
+                        End If
+
+                        'Finally, the Test is unselected
+                        If (canBeUnselected) Then
                             qSelectedTest.First.Selected = False
                             selectedTest = False
+                        Else
+                            'The Test recovers its previous status
+                            qSelectedTest.First.Selected = True
+                            selectedTest = True
                         End If
+                        ' XB 02/12/2014 - BA-1867
+
                     End If
                 End If
 
@@ -1940,7 +2230,7 @@ Public Class IWSTestSelectionAuxScreen
                 If (Not maxPatientOTsReached) Then ControlMSGDeleteTests(bFind)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkOffSystemTestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkOffSystemTestCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkOffSystemTestCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return selectedTest
@@ -1976,7 +2266,7 @@ Public Class IWSTestSelectionAuxScreen
                 bsAcceptButton.Enabled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlMsgMaxNumberReached", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlMsgMaxNumberReached", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ControlMsgMaxNumberReached", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2008,7 +2298,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
             bsTestListDataGridView.Refresh()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlMSGDeleteTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlMSGDeleteTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ControlMSGDeleteTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2034,7 +2324,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowMSGIseReagentsNotEnough", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowMSGIseReagentsNotEnough", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShowMSGIseReagentsNotEnough", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2206,7 +2496,7 @@ Public Class IWSTestSelectionAuxScreen
                 'MarkSelectedProfilesOnTreeView()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillTestListGridView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2360,7 +2650,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkCalcTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkCalcTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillAndMarkCalcTestListGridView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2383,6 +2673,7 @@ Public Class IWSTestSelectionAuxScreen
     '''              XB 27/07/2012 - ISE Tests Disabled by volume not enough functionallity is canceled
     '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              XB 14/01/2015 - Add management when unselect tests for ISE tests included on CALC test - BA-1867
     ''' </remarks>
     Private Sub FillAndMarkISETestListGridView(ByVal pISETestsDS As ISETestsDS)
         Try
@@ -2463,10 +2754,25 @@ Public Class IWSTestSelectionAuxScreen
                                     iseTestROW.OTStatus = selTestRow.OTStatus
                                 End If
 
-                                If (Not selTestRow.IsTestProfileIDNull) Then
-                                    iseTestROW.TestProfileID = selTestRow.TestProfileID
-                                    iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                ' XB - 14/01/2015 - BA-1867
+                                'If (Not selTestRow.IsTestProfileIDNull) Then
+                                '    iseTestROW.TestProfileID = selTestRow.TestProfileID
+                                '    iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                'End If
+
+                                'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
+                                If (SampleClassAttribute = "PATIENT") Then
+                                    If (Not selTestRow.IsTestProfileIDNull) Then
+                                        iseTestROW.TestProfileID = selTestRow.TestProfileID
+                                        iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                    End If
+
+                                    If (Not selTestRow.IsCalcTestIDsNull) Then
+                                        iseTestROW.CalcTestIDs = selTestRow.CalcTestIDs
+                                        iseTestROW.CalcTestNames = selTestRow.CalcTestNames
+                                    End If
                                 End If
+                                ' XB - 14/01/2015 - BA-1867
 
                                 Dim markAsSelected As Boolean = True
                                 If (SampleClassAttribute = "CTRL") Then
@@ -2535,7 +2841,7 @@ Public Class IWSTestSelectionAuxScreen
                 ' XB 27/07/2012
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkISETestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkISETestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillAndMarkISETestListGridView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2549,6 +2855,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Created by:  DL 29/11/2010
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
     '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
+    '''              XB 14/01/2015 - Add management when unselect tests for OFFS tests included on CALC test - BA-1867
     ''' </remarks>
     Private Sub FillAndMarkOffSystemTestListGridView(ByVal pOffSystemTestsDS As OffSystemTestsDS)
         Try
@@ -2625,10 +2932,25 @@ Public Class IWSTestSelectionAuxScreen
                                     offsystemTestROW.OTStatus = selTestRow.OTStatus
                                 End If
 
-                                If (Not selTestRow.IsTestProfileIDNull) Then
-                                    offsystemTestROW.TestProfileID = selTestRow.TestProfileID
-                                    offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                ' XB 14/01/2015 - BA-1867
+                                'If (Not selTestRow.IsTestProfileIDNull) Then
+                                '    offsystemTestROW.TestProfileID = selTestRow.TestProfileID
+                                '    offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                'End If
+
+                                'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
+                                If (SampleClassAttribute = "PATIENT") Then
+                                    If (Not selTestRow.IsTestProfileIDNull) Then
+                                        offsystemTestROW.TestProfileID = selTestRow.TestProfileID
+                                        offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                    End If
+
+                                    If (Not selTestRow.IsCalcTestIDsNull) Then
+                                        offsystemTestROW.CalcTestIDs = selTestRow.CalcTestIDs
+                                        offsystemTestROW.CalcTestNames = selTestRow.CalcTestNames
+                                    End If
                                 End If
+                                ' XB 14/01/2015 - BA-1867
 
                                 If (selTestRow.OTStatus = "OPEN" AndAlso Not selTestRow.LISRequest) Then
                                     'Change the Background Color and the Foreground Color to indicate that this Test is selected
@@ -2657,7 +2979,7 @@ Public Class IWSTestSelectionAuxScreen
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkOffSystemTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillAndMarkOffSystemTestListGridView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillAndMarkOffSystemTestListGridView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2710,7 +3032,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedProfilesOnTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkSelectedProfilesOnTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkSelectedProfilesOnTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2730,6 +3052,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           before add it to the final list of selected Tests. Besides, set value of screen attribute 
     '''                                           IncompleteTestAttribute to TRUE to notify the User that some of the selected Tests were removed 
     '''                                           due to they have an incomplete Calibration programming 
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
     Private Sub AcceptTestSelection()
         Try
@@ -2831,6 +3154,66 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next selectedRow
 
+            ' XB 02/12/2014 - BA-1867
+            'Get the list of ISE Tests that have been selected...
+            Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
+                           Where a.Selected = True OrElse a.PartiallySelected = True _
+                          Select a).ToList()
+
+            'Add all selected ISE Tests to the DataSet to return
+            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
+                'Verify if it has been already included in the list of Selected Tests
+                Dim myTestID As Integer = selectedRow.TestID
+                Dim mySampleType As String = selectedRow.SampleType
+
+                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+                                Where a.TestType = "ISE" _
+                              AndAlso a.SampleType = mySampleType _
+                              AndAlso a.TestID = myTestID _
+                               Select a).ToList()
+
+                If (qSelectedTest.Count = 0) Then
+                    If (mySampleID <> String.Empty) Then
+                        selectedRow.SampleID = mySampleID
+                        selectedRow.SampleIDType = mySampleIDType
+                    End If
+
+                    'Add the ISE Test to the list of Selected Tests
+                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+                End If
+            Next selectedRow
+
+            'Get the list of OffSystem Tests that have been selected...
+            Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
+                                 Where a.Selected = True OrElse a.PartiallySelected = True _
+                                Select a).ToList()
+
+            'Add all selected OffSystem Tests to the DataSet to return
+            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
+                'Verify if it has been already included in the list of Selected Tests
+                Dim myTestID As Integer = selectedRow.TestID
+                Dim mySampleType As String = selectedRow.SampleType
+
+                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+                                Where a.TestType = "OFFS" _
+                              AndAlso a.SampleType = mySampleType _
+                              AndAlso a.TestID = myTestID _
+                               Select a).ToList()
+
+                If (qSelectedTest.Count = 0) Then
+                    If (mySampleID <> String.Empty) Then
+                        selectedRow.SampleID = mySampleID
+                        selectedRow.SampleIDType = mySampleIDType
+                    End If
+
+                    'Add the OffSystem Test to the list of Selected Tests
+                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+                End If
+            Next selectedRow
+            ' XB 02/12/2014 - BA-1867
+
             'Get the list of Calculated Tests that have been selected...
             If (SampleClassAttribute = "PATIENT") Then
                 'Dim qSelCalcTests As List(Of SelectedTestsDS.SelectedTestTableRow)
@@ -2892,69 +3275,71 @@ Public Class IWSTestSelectionAuxScreen
                 Next selCalcTestRow
             End If
 
-            'Get the list of ISE Tests that have been selected...
-            'Dim qSelISETests As New List(Of SelectedTestsDS.SelectedTestTableRow)
-            Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
-            qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
-                           Where a.Selected = True _
-                          Select a).ToList()
+            ' XB 02/12/2014 - BA-1867
+            ''Get the list of ISE Tests that have been selected...
+            ''Dim qSelISETests As New List(Of SelectedTestsDS.SelectedTestTableRow)
+            'Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            'qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
+            '               Where a.Selected = True _
+            '              Select a).ToList()
 
-            'Add all selected ISE Tests to the DataSet to return
-            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
-                'Verify if it has been already included in the list of Selected Tests
-                Dim myTestID As Integer = selectedRow.TestID
-                Dim mySampleType As String = selectedRow.SampleType
+            ''Add all selected ISE Tests to the DataSet to return
+            'For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
+            '    'Verify if it has been already included in the list of Selected Tests
+            '    Dim myTestID As Integer = selectedRow.TestID
+            '    Dim mySampleType As String = selectedRow.SampleType
 
-                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
-                                Where a.TestType = "ISE" _
-                              AndAlso a.SampleType = mySampleType _
-                              AndAlso a.TestID = myTestID _
-                               Select a).ToList()
+            '    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+            '                    Where a.TestType = "ISE" _
+            '                  AndAlso a.SampleType = mySampleType _
+            '                  AndAlso a.TestID = myTestID _
+            '                   Select a).ToList()
 
-                If (qSelectedTest.Count = 0) Then
-                    If (mySampleID <> String.Empty) Then
-                        selectedRow.SampleID = mySampleID
-                        selectedRow.SampleIDType = mySampleIDType
-                    End If
+            '    If (qSelectedTest.Count = 0) Then
+            '        If (mySampleID <> String.Empty) Then
+            '            selectedRow.SampleID = mySampleID
+            '            selectedRow.SampleIDType = mySampleIDType
+            '        End If
 
-                    'Add the ISE Test to the list of Selected Tests
-                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
-                End If
-            Next selectedRow
+            '        'Add the ISE Test to the list of Selected Tests
+            '        ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+            '    End If
+            'Next selectedRow
 
-            'Get the list of OffSystem Tests that have been selected...
-            Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
-            qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
-                                 Where a.Selected = True _
-                                Select a).ToList()
+            ''Get the list of OffSystem Tests that have been selected...
+            'Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            'qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
+            '                     Where a.Selected = True _
+            '                    Select a).ToList()
 
-            'Add all selected OffSystem Tests to the DataSet to return
-            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
-                'Verify if it has been already included in the list of Selected Tests
-                Dim myTestID As Integer = selectedRow.TestID
-                Dim mySampleType As String = selectedRow.SampleType
+            ''Add all selected OffSystem Tests to the DataSet to return
+            'For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
+            '    'Verify if it has been already included in the list of Selected Tests
+            '    Dim myTestID As Integer = selectedRow.TestID
+            '    Dim mySampleType As String = selectedRow.SampleType
 
-                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
-                                Where a.TestType = "OFFS" _
-                              AndAlso a.SampleType = mySampleType _
-                              AndAlso a.TestID = myTestID _
-                               Select a).ToList()
+            '    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+            '                    Where a.TestType = "OFFS" _
+            '                  AndAlso a.SampleType = mySampleType _
+            '                  AndAlso a.TestID = myTestID _
+            '                   Select a).ToList()
 
-                If (qSelectedTest.Count = 0) Then
-                    If (mySampleID <> String.Empty) Then
-                        selectedRow.SampleID = mySampleID
-                        selectedRow.SampleIDType = mySampleIDType
-                    End If
+            '    If (qSelectedTest.Count = 0) Then
+            '        If (mySampleID <> String.Empty) Then
+            '            selectedRow.SampleID = mySampleID
+            '            selectedRow.SampleIDType = mySampleIDType
+            '        End If
 
-                    'Add the OffSystem Test to the list of Selected Tests
-                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
-                End If
-            Next selectedRow
+            '        'Add the OffSystem Test to the list of Selected Tests
+            '        ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+            '    End If
+            'Next selectedRow
+            ' XB 02/12/2014 - BA-1867
 
             'Close the screen
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AcceptTestSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AcceptTestSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AcceptTestSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3010,7 +3395,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyMaxNumberReached", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".VerifyMaxNumberReached", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".VerifyMaxNumberReached", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return maxNumberReached
@@ -3039,7 +3424,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RebuildStringList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RebuildStringList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RebuildStringList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return finalList
@@ -3166,14 +3551,14 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSTDIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSTDIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkSTDIntervals", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3288,7 +3673,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISEIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISEIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkISEIntervals", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3401,7 +3786,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkOffSystemIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkOffSystemIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkOffSystemIntervals", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3530,7 +3915,7 @@ Public Class IWSTestSelectionAuxScreen
                     Next
 
                     If (testWithFactoryValues.Length > 0) Then
-                        Using AuxForm As New IWSTestSelectionWarning()
+                        Using AuxForm As New UiWSTestSelectionWarning()
                             AuxForm.Message = testWithFactoryValues.ToString()
                             AuxForm.ShowDialog()
                         End Using
@@ -3538,7 +3923,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkCALCIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkCALCIntervals", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkCALCIntervals", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3581,7 +3966,7 @@ Public Class IWSTestSelectionAuxScreen
             bsScreenToolTips.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AcceptSelection", pLanguageID))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CancelSelection", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3621,7 +4006,7 @@ Public Class IWSTestSelectionAuxScreen
                 myResult.AppendFormat("● {0}{1}", selectedTest.TestName, vbCrLf)
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateFactoryValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateFactoryValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateFactoryValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult.ToString()
@@ -3702,7 +4087,7 @@ Public Class IWSTestSelectionAuxScreen
             bsLISRequestedButton = Nothing
             '-----------------------------------------------
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3743,7 +4128,7 @@ Public Class IWSTestSelectionAuxScreen
             bsISETestsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSTests_ISETests", pLanguageID) + ":"
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabelsModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3759,8 +4144,8 @@ Public Class IWSTestSelectionAuxScreen
     Private Sub InitializeScreenModel2()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Multilanguage Texts for all Screen Controls
             GetScreenLabelsModel2(currentLanguage)
@@ -3927,7 +4312,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreenModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreenModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreenModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.Close()
         End Try
@@ -4025,7 +4410,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillStandardTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillStandardTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillStandardTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4115,7 +4500,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillISETests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillISETests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillISETests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4184,7 +4569,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTestsBySampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTestsBySampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadTestsBySampleType", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4253,7 +4638,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadISETestsBySampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadISETestsBySampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadISETestsBySampleType", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4321,7 +4706,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSelectedCellModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSelectedCellModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkSelectedCellModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return selectedTest
@@ -4389,7 +4774,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISETestCellModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISETestCellModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkISETestCellModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -4534,7 +4919,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
@@ -4543,7 +4928,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSTDIntervalsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkSTDIntervalsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkSTDIntervalsModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4666,7 +5051,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISEIntervalsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".MarkUnMarkISEIntervalsModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".MarkUnMarkISEIntervalsModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4742,7 +5127,7 @@ Public Class IWSTestSelectionAuxScreen
             Me.Close()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AcceptTestSelectionModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".AcceptTestSelectionModel2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AcceptTestSelectionModel2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4762,7 +5147,7 @@ Public Class IWSTestSelectionAuxScreen
                 bsCancelButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSTestSelectionAuxScreen_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSTestSelectionAuxScreen_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSTestSelectionAuxScreen_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4781,8 +5166,8 @@ Public Class IWSTestSelectionAuxScreen
                 InitializeScreenModel2()
             End If
 
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
 
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
@@ -4793,7 +5178,7 @@ Public Class IWSTestSelectionAuxScreen
             Me.Location = myNewLocation
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSTestSelectionAuxScreen_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSTestSelectionAuxScreen_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSTestSelectionAuxScreen_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4809,8 +5194,8 @@ Public Class IWSTestSelectionAuxScreen
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -4824,7 +5209,7 @@ Public Class IWSTestSelectionAuxScreen
             MyBase.WndProc(m)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4854,7 +5239,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (selectedAction) Then
                         Dim testWithFactoryValues As String = ValidateFactoryValues(e.RowIndex, e.ColumnIndex)
                         If (testWithFactoryValues.Length > 0) Then
-                            Using AuxForm As New IWSTestSelectionWarning()
+                            Using AuxForm As New UiWSTestSelectionWarning()
                                 AuxForm.Message = testWithFactoryValues
                                 AuxForm.ShowDialog()
                             End Using
@@ -4877,7 +5262,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (selectedAction) Then
                         Dim testWithFactoryValues As String = ValidateFactoryValues(e.RowIndex, e.ColumnIndex, SampleTypeAttribute)
                         If (testWithFactoryValues.Length > 0) Then
-                            Using AuxForm As New IWSTestSelectionWarning()
+                            Using AuxForm As New UiWSTestSelectionWarning()
                                 AuxForm.Message = testWithFactoryValues
                                 AuxForm.ShowDialog()
                             End Using
@@ -4888,7 +5273,7 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTestListDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTestListDataGridView_CellClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4935,7 +5320,7 @@ Public Class IWSTestSelectionAuxScreen
                 shiftKeyIsPressedCALC = False 'RH 31/05/2012
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalcTestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCalcTestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCalcTestDataGridView_CellClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4995,7 +5380,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestDataGridView_CellClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5041,7 +5426,7 @@ Public Class IWSTestSelectionAuxScreen
                 MarkUnMarkOffSystemIntervals(e.RowIndex, e.ColumnIndex)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOffSystemTestDataGridView_CellClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsOffSystemTestDataGridView_CellClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5215,14 +5600,14 @@ Public Class IWSTestSelectionAuxScreen
                                 qSelectedTest = (From a In iseTestList.SelectedTestTable _
                                                 Where a.TestKey = myNodeName _
                                                Select a).ToList()
-                                remainSelected = False
+                                remainSelected = (qSelectedTest.First.CalcTestIDs.Trim <> "") ' False
 
                             Case "OFFS"
                                 'Search the Off System Test included in the selected Profile to select it
                                 qSelectedTest = (From a In offSystemTestList.SelectedTestTable _
                                                 Where a.TestKey = myNodeName _
                                                Select a).ToList()
-                                remainSelected = False
+                                remainSelected = (qSelectedTest.First.CalcTestIDs.Trim <> "") ' False
                         End Select
 
                         If (qSelectedTest.Count > 0) Then
@@ -5291,7 +5676,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
@@ -5299,7 +5684,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsProfilesTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsProfilesTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsProfilesTreeView_NodeMouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5325,7 +5710,7 @@ Public Class IWSTestSelectionAuxScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

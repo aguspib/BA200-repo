@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IBackground
+Partial Class UiBackground
     'Inherits BSBaseForm
     Inherits System.Windows.Forms.Form
 
@@ -23,7 +23,7 @@ Partial Class IBackground
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IBackground))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiBackground))
         Me.SuspendLayout()
         '
         'IBackground

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class twksWSBarcodePositionsWithNoRequestsDAO
-        Inherits DAOBase
+          
 
 #Region "Declarations"
         'Comparisons by field BarcodeInfo have to be done in a CASE SENSITIVE way. So this SQL Sentence has to
@@ -113,8 +113,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -158,8 +158,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeleteByExternalPIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeleteByExternalPIDAndSampleType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -203,8 +203,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeletePosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeletePosition", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -263,8 +263,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadByAnalyzerAndWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadByAnalyzerAndWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -315,8 +315,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -378,8 +378,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateCompletedFlagByPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateCompletedFlagByPosition", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -422,8 +422,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateLISStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateLISStatus", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -492,8 +492,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.CompleteByExternalPIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.CompleteByExternalPIDAndSampleType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -554,8 +554,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.CountSampleTypesByBC", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.CountSampleTypesByBC", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -595,8 +595,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeleteCompletedSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.DeleteCompletedSamples", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -644,8 +644,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.GetScannedAndNotInUseElements", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.GetScannedAndNotInUseElements", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -671,11 +671,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT * FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                        '                        " WHERE  BP.LISStatus = 'ASKING' " & vbCrLf & _
+                        '                        " AND    BP.BarcodeInfo NOT IN (SELECT DISTINCT SOT.SpecimenID " & vbCrLf & _
+                        '                                                      " FROM   tparSavedWSOrderTests SOT INNER JOIN tparSavedWS S ON SOT.SavedWSID = S.SavedWSID " & vbCrLf & _
+                        '                                                       " WHERE  S.FromLIMS = 1) " & vbCrLf
+
                         Dim cmdText As String = " SELECT * FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
                                                 " WHERE  BP.LISStatus = 'ASKING' " & vbCrLf & _
-                                                " AND    BP.BarcodeInfo NOT IN (SELECT DISTINCT SOT.SpecimenID " & vbCrLf & _
+                                                " AND    NOT EXISTS (SELECT SOT.SpecimenID " & vbCrLf & _
                                                                               " FROM   tparSavedWSOrderTests SOT INNER JOIN tparSavedWS S ON SOT.SavedWSID = S.SavedWSID " & vbCrLf & _
-                                                                               " WHERE  S.FromLIMS = 1) " & vbCrLf
+                                                                               " WHERE  S.FromLIMS = 1 AND BP.BarcodeInfo = SOT.SpecimenID) " & vbCrLf
 
                         Dim myDataSet As New BarcodePositionsWithNoRequestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -694,8 +701,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadAskingBCNotSentByLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadAskingBCNotSentByLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -768,8 +775,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadDistinctPatientSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ReadDistinctPatientSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -809,8 +816,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ResetRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ResetRotor", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -847,8 +854,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -893,8 +900,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateHQStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateHQStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -942,8 +949,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateMessageIDBySpecimenID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateMessageIDBySpecimenID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -997,8 +1004,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateMessageIDToProcessed", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateMessageIDToProcessed", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1046,8 +1053,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1108,8 +1115,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateStatFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateStatFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1162,8 +1169,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.VerifyScannedSpecimen", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.VerifyScannedSpecimen", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1218,8 +1225,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateCellNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.UpdateCellNumber", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1279,8 +1286,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.Read", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSBarcodePositionsWithNoRequestsDAO.Read", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function

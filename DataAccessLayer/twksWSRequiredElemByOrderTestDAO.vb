@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksWSRequiredElemByOrderTestDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -45,8 +45,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -91,8 +91,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -138,8 +138,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ReadByElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ReadByElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -190,8 +190,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ReadByElementIDAndSampleClass", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ReadByElementIDAndSampleClass", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -258,8 +258,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForCalibrators", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForCalibrators", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -308,8 +308,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForControls", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForControls", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -363,8 +363,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForPatientSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForPatientSamples", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -409,8 +409,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForReagents", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForReagents", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -438,16 +438,27 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE twksWSRequiredElemByOrderTest " & vbCrLf & _
+                    '          " WHERE  ElementID IN (SELECT ElementID " & vbCrLf & _
+                    '                               " FROM   twksWSRequiredElements " & vbCrLf & _
+                    '                               " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "') " & vbCrLf
+
                     cmdText = " DELETE twksWSRequiredElemByOrderTest " & vbCrLf & _
-                              " WHERE  ElementID IN (SELECT ElementID " & vbCrLf & _
+                              " WHERE  EXISTS (SELECT ElementID " & vbCrLf & _
                                                    " FROM   twksWSRequiredElements " & vbCrLf & _
-                                                   " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "') " & vbCrLf
+                                                   " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' AND twksWSRequiredElemByOrderTest.ElementID = ElementID) " & vbCrLf
 
                     If (pDelOnlyOpened) Then
-                        cmdText &= " AND OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
-                                                       " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                       " AND    OT.OrderTestStatus = 'OPEN') " & vbCrLf
+                        'AJG
+                        'cmdText &= " AND OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                        '                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                               " AND    OT.OrderTestStatus = 'OPEN') " & vbCrLf
+                        cmdText &= " AND EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                                " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND    OT.OrderTestStatus = 'OPEN' AND twksWSRequiredElemByOrderTest.OrderTestID = WSOT.OrderTestID) " & vbCrLf
                     End If
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
@@ -460,8 +471,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -522,8 +533,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForSpecialSolutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForSpecialSolutions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -579,8 +590,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForWashingSolutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForWashingSolutions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -636,8 +647,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForAlternativeCalibrators", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForAlternativeCalibrators", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -683,8 +694,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForISEWashingSolutions", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElemByOrderTestDAO.InsertRelationsForISEWashingSolutions", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IBarCodesConfig
+Partial Class UiBarCodesConfig
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -30,7 +30,7 @@ Partial Class IBarCodesConfig
         Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IBarCodesConfig))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiBarCodesConfig))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsReagentsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()

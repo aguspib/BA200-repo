@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgTestProfiles
+Partial Class UiProgTestProfiles
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -19,30 +19,31 @@ Partial Class IProgTestProfiles
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgTestProfiles))
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsProfileNameGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsTestProfileDefinitionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSampleTypesComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsTestSelGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsTestsTypesComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsTestTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsTestsSelectionDoubleList = New Biosystems.Ax00.Controls.UserControls.BSDoubleList
-        Me.bsTestsSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsTestProfilesListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsTestProfileLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsTestProfileListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgTestProfiles))
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsProfileNameGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsTestProfileDefinitionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSampleTypesComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsTestSelGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsTestsTypesComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsTestTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsTestsSelectionDoubleList = New Biosystems.Ax00.Controls.UserControls.BSDoubleList()
+        Me.bsTestsSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsTestProfilesListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsTestProfileLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsTestProfileListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsProfileNameGrpbox.SuspendLayout()
         Me.bsTestSelGrpbox.SuspendLayout()
         CType(Me.bsScreenErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -56,14 +57,14 @@ Partial Class IProgTestProfiles
         Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 4
+        Me.bsPrintButton.TabIndex = 5
         Me.bsPrintButton.UseVisualStyleBackColor = True
         '
         'bsDeleteButton
         '
         Me.bsDeleteButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsDeleteButton.ForeColor = System.Drawing.Color.Black
-        Me.bsDeleteButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsDeleteButton.Location = New System.Drawing.Point(138, 613)
         Me.bsDeleteButton.Name = "bsDeleteButton"
         Me.bsDeleteButton.Size = New System.Drawing.Size(32, 32)
         Me.bsDeleteButton.TabIndex = 3
@@ -73,7 +74,7 @@ Partial Class IProgTestProfiles
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsEditButton.ForeColor = System.Drawing.Color.Black
-        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(101, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 2
@@ -83,7 +84,7 @@ Partial Class IProgTestProfiles
         '
         Me.bsNewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsNewButton.ForeColor = System.Drawing.Color.Black
-        Me.bsNewButton.Location = New System.Drawing.Point(101, 613)
+        Me.bsNewButton.Location = New System.Drawing.Point(64, 613)
         Me.bsNewButton.Name = "bsNewButton"
         Me.bsNewButton.Size = New System.Drawing.Size(32, 32)
         Me.bsNewButton.TabIndex = 1
@@ -310,6 +311,16 @@ Partial Class IProgTestProfiles
         Me.bsTestProfileListGroupBox.TabIndex = 0
         Me.bsTestProfileListGroupBox.TabStop = False
         '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.ForeColor = System.Drawing.Color.Black
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 4
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgTestProfiles
         '
         Me.AcceptButton = Me.bsExitButton
@@ -320,6 +331,7 @@ Partial Class IProgTestProfiles
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.BsCustomOrderButton)
         Me.Controls.Add(Me.bsTestProfileListGroupBox)
         Me.Controls.Add(Me.bsNewButton)
         Me.Controls.Add(Me.bsExitButton)
@@ -334,7 +346,7 @@ Partial Class IProgTestProfiles
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgTestProfiles"
+        Me.Name = "UiProgTestProfiles"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsProfileNameGrpbox.ResumeLayout(False)
@@ -368,5 +380,6 @@ Partial Class IProgTestProfiles
     Friend WithEvents bsTestsTypesComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents bsTestTypeLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsTestProfileListGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 
 End Class

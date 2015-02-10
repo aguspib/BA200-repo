@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksCurveResultsDAO
-        Inherits DAOBase
+          
 
         Public Function FindLastCurveID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
 
@@ -40,8 +40,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataReturn.ErrorCode = "SYSTEM_ERROR"
                 dataReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.FindLastCurveID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.FindLastCurveID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -115,8 +115,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.InsertCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.InsertCurve", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -178,8 +178,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.UpdateCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.UpdateCurve", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -225,8 +225,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ExistsCurveResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ExistsCurveResult", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -278,8 +278,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ReadCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ReadCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -309,10 +309,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE from twksCurveResults " & vbCrLf & _
+                    '                        " WHERE CurveResultsID IN (SELECT DISTINCT CurveResultsID " & vbCrLf & _
+                    '                                                 " FROM   twksResults " & vbCrLf & _
+                    '                                                 " WHERE  OrderTestID = " & pOrderTestID.ToString & ") " & vbCrLf
+
                     Dim cmdText As String = " DELETE from twksCurveResults " & vbCrLf & _
-                                            " WHERE CurveResultsID IN (SELECT DISTINCT CurveResultsID " & vbCrLf & _
-                                                                     " FROM   twksResults " & vbCrLf & _
-                                                                     " WHERE  OrderTestID = " & pOrderTestID.ToString & ") " & vbCrLf
+                                            " WHERE EXISTS (SELECT CurveResultsID " & vbCrLf & _
+                                                           " FROM   twksResults " & vbCrLf & _
+                                                           " WHERE  OrderTestID = " & pOrderTestID.ToString & " AND twksCurveResults.CurveResultsID = CurveResultsID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -325,8 +331,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteResultsByOrderTestId", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteResultsByOrderTestId", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -363,8 +369,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteCurve", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -407,8 +413,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteForNOTCALCCalibrators", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteForNOTCALCCalibrators", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

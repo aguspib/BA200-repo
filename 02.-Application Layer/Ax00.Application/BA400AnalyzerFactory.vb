@@ -21,11 +21,11 @@ Namespace Biosystems.Ax00.App
         ''' <param name="fwVersionAttribute"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity
+        Public Overrides Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerManager
 
-            Dim analyzer As IAnalyzerEntity
+            Dim analyzer As IAnalyzerManager
             Dim baseLine As IBaseLineEntity
-            Dim iseAnalyzer As ISEAnalyzerEntity
+            Dim iseAnalyzer As ISEManager
 
             baseLine = New StaticBaseLineEntity()
             analyzer = New BA400AnalyzerEntity(assemblyName, analyzerModel, baseLine) With {.StartingApplication = startingApplication, _
@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.App
                                                                             .ActiveAnalyzer = analyzerIDAttribute, _
                                                                             .ActiveFwVersion = fwVersionAttribute}
 
-            iseAnalyzer = New ISEAnalyzerEntity(analyzer, analyzerIDAttribute, analyzerModel, False)
+            iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
             analyzer.ISEAnalyzer = iseAnalyzer
 
             LoadAnalyzerConfiguration(analyzer)

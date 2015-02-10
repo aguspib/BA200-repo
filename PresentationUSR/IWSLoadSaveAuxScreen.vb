@@ -1,12 +1,12 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 
-Public Class IWSLoadSaveAuxScreen
+Public Class UiWSLoadSaveAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -96,8 +96,8 @@ Public Class IWSLoadSaveAuxScreen
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -110,7 +110,7 @@ Public Class IWSLoadSaveAuxScreen
 
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WndProc " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -137,7 +137,7 @@ Public Class IWSLoadSaveAuxScreen
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Select Case SourceButtonAttribute
@@ -149,7 +149,7 @@ Public Class IWSLoadSaveAuxScreen
                     End If
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -161,13 +161,13 @@ Public Class IWSLoadSaveAuxScreen
                         LoadWorkSession()
                     End If
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "AcceptSelection " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "AcceptSelection " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".AcceptSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -209,7 +209,7 @@ Public Class IWSLoadSaveAuxScreen
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -233,8 +233,8 @@ Public Class IWSLoadSaveAuxScreen
         Try
 
             'Center the screen regarding its parent
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
                 myLocation = Me.Parent.Location
@@ -242,8 +242,8 @@ Public Class IWSLoadSaveAuxScreen
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -293,7 +293,7 @@ Public Class IWSLoadSaveAuxScreen
                     End If
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & "InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -315,12 +315,12 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             Else
                 Me.Close()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadVirtualRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadVirtualRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -339,20 +339,20 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Before opening WS Preparation Screen, activate button for Reset WS
-                IAx00MainMDI.bsTSResetSessionButton.Enabled = True
+                UiAx00MainMDI.bsTSResetSessionButton.Enabled = True
 
                 'A Saved WS was loaded, open the screen of WS Preparation after inform the needed properties
-                IWSSampleRequest.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                IWSSampleRequest.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
-                IWSSampleRequest.ActiveWSStatus = IAx00MainMDI.ActiveStatus
-                IWSSampleRequest.WSLoadedID = IDProperty
-                IWSSampleRequest.WSLoadedName = NameProperty
+                UiWSSampleRequest.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                UiWSSampleRequest.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
+                UiWSSampleRequest.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
+                UiWSSampleRequest.WSLoadedID = IDProperty
+                UiWSSampleRequest.WSLoadedName = NameProperty
 
-                IAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
+                UiAx00MainMDI.OpenMDIChildForm(UiWSSampleRequest)
             End If
             Me.Close()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadWorkSession", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -372,16 +372,16 @@ Public Class IWSLoadSaveAuxScreen
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & " PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -429,7 +429,7 @@ Public Class IWSLoadSaveAuxScreen
                     End If
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SaveVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SaveVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Me.Enabled = True
@@ -482,7 +482,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         Me.Close()
                     End If
@@ -498,7 +498,7 @@ Public Class IWSLoadSaveAuxScreen
                             'SavedWS was saved; the screen is closed
                             If (Not Me.MdiParent Is Nothing) Then
                                 'Open the WS Monitor form and close this one
-                                IAx00MainMDI.OpenMonitorForm(Me)
+                                UiAx00MainMDI.OpenMonitorForm(Me)
                             Else
                                 Me.Close()
                             End If
@@ -512,7 +512,7 @@ Public Class IWSLoadSaveAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SaveWorkSession " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SaveWorkSession " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveWorkSession", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -545,7 +545,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         'Me.Opacity = 0 'Because the form could be still opening, so avoid the flickering.
                         Application.DoEvents()
@@ -559,7 +559,7 @@ Public Class IWSLoadSaveAuxScreen
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SelectSavedWS " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SelectSavedWS " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SelectSavedWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -600,7 +600,7 @@ Public Class IWSLoadSaveAuxScreen
                 ShowMessage(Me.Name & ".SelectVirtualRotor", result.ErrorCode, result.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".SelectVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".SelectVirtualRotor " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SelectVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -622,7 +622,7 @@ Public Class IWSLoadSaveAuxScreen
                 bsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSLoadSaveAuxScreen_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WSLoadSaveAuxScreen_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WSLoadSaveAuxScreen_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -632,13 +632,13 @@ Public Class IWSLoadSaveAuxScreen
     Private Sub IWSLoadSaveAuxScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         InitializeScreen()
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                         "IWSLoadSaveAuxScreen.IWSLoadSaveAuxScreen_Load", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -678,13 +678,13 @@ Public Class IWSLoadSaveAuxScreen
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 Me.Close()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

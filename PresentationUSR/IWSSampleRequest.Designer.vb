@@ -1,14 +1,15 @@
 ﻿Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.Global
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSSampleRequest
+Partial Class UiWSSampleRequest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
-            CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
             If disposing AndAlso components IsNot Nothing Then
                 components.Dispose()
             End If
@@ -16,7 +17,7 @@ Partial Class IWSSampleRequest
         Finally
             MyBase.Dispose(disposing)
             isClosingFlag = False
-            CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -43,7 +44,7 @@ Partial Class IWSSampleRequest
         Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle14 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle15 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSSampleRequest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSSampleRequest))
         Me.bsLoadWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsSaveWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsOpenRotorButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -55,10 +56,13 @@ Partial Class IWSSampleRequest
         Me.bsAllPatientsCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
         Me.bsDelPatientsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.OtherSamplesTab = New DevExpress.XtraTab.XtraTabPage()
+        Me.bsAllControlsLevel3CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.bsAllControlsLevel2CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.bsAllCalibsCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
         Me.bsControlOrdersDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
         Me.bsBlkCalibDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
-        Me.bsAllCtrlsCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
-        Me.bsAllBlkCalCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.bsAllControlsLevel1CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.bsAllBlanksCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
         Me.bsDelControlsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsDelCalibratorsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsOrderDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
@@ -279,15 +283,51 @@ Partial Class IWSSampleRequest
         Me.OtherSamplesTab.Appearance.Header.Options.UseForeColor = True
         Me.OtherSamplesTab.Appearance.PageClient.BackColor = System.Drawing.Color.Gainsboro
         Me.OtherSamplesTab.Appearance.PageClient.Options.UseBackColor = True
+        Me.OtherSamplesTab.Controls.Add(Me.bsAllControlsLevel3CheckBox)
+        Me.OtherSamplesTab.Controls.Add(Me.bsAllControlsLevel2CheckBox)
+        Me.OtherSamplesTab.Controls.Add(Me.bsAllCalibsCheckBox)
         Me.OtherSamplesTab.Controls.Add(Me.bsControlOrdersDataGridView)
         Me.OtherSamplesTab.Controls.Add(Me.bsBlkCalibDataGridView)
-        Me.OtherSamplesTab.Controls.Add(Me.bsAllCtrlsCheckBox)
-        Me.OtherSamplesTab.Controls.Add(Me.bsAllBlkCalCheckBox)
+        Me.OtherSamplesTab.Controls.Add(Me.bsAllControlsLevel1CheckBox)
+        Me.OtherSamplesTab.Controls.Add(Me.bsAllBlanksCheckBox)
         Me.OtherSamplesTab.Controls.Add(Me.bsDelControlsButton)
         Me.OtherSamplesTab.Controls.Add(Me.bsDelCalibratorsButton)
         Me.OtherSamplesTab.Name = "OtherSamplesTab"
         Me.OtherSamplesTab.Size = New System.Drawing.Size(950, 474)
         Me.OtherSamplesTab.Text = "*Blanks, Calibrators And Controls"
+        '
+        'bsAllControlsLevel3CheckBox
+        '
+        Me.bsAllControlsLevel3CheckBox.AutoSize = True
+        Me.bsAllControlsLevel3CheckBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAllControlsLevel3CheckBox.Location = New System.Drawing.Point(419, 255)
+        Me.bsAllControlsLevel3CheckBox.Name = "bsAllControlsLevel3CheckBox"
+        Me.bsAllControlsLevel3CheckBox.Size = New System.Drawing.Size(79, 17)
+        Me.bsAllControlsLevel3CheckBox.TabIndex = 19
+        Me.bsAllControlsLevel3CheckBox.Text = "Control 3"
+        Me.bsAllControlsLevel3CheckBox.UseVisualStyleBackColor = True
+        '
+        'bsAllControlsLevel2CheckBox
+        '
+        Me.bsAllControlsLevel2CheckBox.AutoSize = True
+        Me.bsAllControlsLevel2CheckBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAllControlsLevel2CheckBox.Location = New System.Drawing.Point(212, 255)
+        Me.bsAllControlsLevel2CheckBox.Name = "bsAllControlsLevel2CheckBox"
+        Me.bsAllControlsLevel2CheckBox.Size = New System.Drawing.Size(79, 17)
+        Me.bsAllControlsLevel2CheckBox.TabIndex = 18
+        Me.bsAllControlsLevel2CheckBox.Text = "Control 2"
+        Me.bsAllControlsLevel2CheckBox.UseVisualStyleBackColor = True
+        '
+        'bsAllCalibsCheckBox
+        '
+        Me.bsAllCalibsCheckBox.AutoSize = True
+        Me.bsAllCalibsCheckBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAllCalibsCheckBox.Location = New System.Drawing.Point(212, 10)
+        Me.bsAllCalibsCheckBox.Name = "bsAllCalibsCheckBox"
+        Me.bsAllCalibsCheckBox.Size = New System.Drawing.Size(89, 17)
+        Me.bsAllCalibsCheckBox.TabIndex = 17
+        Me.bsAllCalibsCheckBox.Text = "Calibrators"
+        Me.bsAllCalibsCheckBox.UseVisualStyleBackColor = True
         '
         'bsControlOrdersDataGridView
         '
@@ -408,27 +448,27 @@ Partial Class IWSSampleRequest
         Me.bsBlkCalibDataGridView.TabIndex = 12
         Me.bsBlkCalibDataGridView.TabToEnter = False
         '
-        'bsAllCtrlsCheckBox
+        'bsAllControlsLevel1CheckBox
         '
-        Me.bsAllCtrlsCheckBox.AutoSize = True
-        Me.bsAllCtrlsCheckBox.ForeColor = System.Drawing.Color.Black
-        Me.bsAllCtrlsCheckBox.Location = New System.Drawing.Point(10, 255)
-        Me.bsAllCtrlsCheckBox.Name = "bsAllCtrlsCheckBox"
-        Me.bsAllCtrlsCheckBox.Size = New System.Drawing.Size(74, 17)
-        Me.bsAllCtrlsCheckBox.TabIndex = 14
-        Me.bsAllCtrlsCheckBox.Text = "Controls"
-        Me.bsAllCtrlsCheckBox.UseVisualStyleBackColor = True
+        Me.bsAllControlsLevel1CheckBox.AutoSize = True
+        Me.bsAllControlsLevel1CheckBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAllControlsLevel1CheckBox.Location = New System.Drawing.Point(10, 255)
+        Me.bsAllControlsLevel1CheckBox.Name = "bsAllControlsLevel1CheckBox"
+        Me.bsAllControlsLevel1CheckBox.Size = New System.Drawing.Size(79, 17)
+        Me.bsAllControlsLevel1CheckBox.TabIndex = 14
+        Me.bsAllControlsLevel1CheckBox.Text = "Control 1"
+        Me.bsAllControlsLevel1CheckBox.UseVisualStyleBackColor = True
         '
-        'bsAllBlkCalCheckBox
+        'bsAllBlanksCheckBox
         '
-        Me.bsAllBlkCalCheckBox.AutoSize = True
-        Me.bsAllBlkCalCheckBox.ForeColor = System.Drawing.Color.Black
-        Me.bsAllBlkCalCheckBox.Location = New System.Drawing.Point(10, 10)
-        Me.bsAllBlkCalCheckBox.Name = "bsAllBlkCalCheckBox"
-        Me.bsAllBlkCalCheckBox.Size = New System.Drawing.Size(140, 17)
-        Me.bsAllBlkCalCheckBox.TabIndex = 11
-        Me.bsAllBlkCalCheckBox.Text = "Blanks / Calibrators"
-        Me.bsAllBlkCalCheckBox.UseVisualStyleBackColor = True
+        Me.bsAllBlanksCheckBox.AutoSize = True
+        Me.bsAllBlanksCheckBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAllBlanksCheckBox.Location = New System.Drawing.Point(10, 10)
+        Me.bsAllBlanksCheckBox.Name = "bsAllBlanksCheckBox"
+        Me.bsAllBlanksCheckBox.Size = New System.Drawing.Size(64, 17)
+        Me.bsAllBlanksCheckBox.TabIndex = 11
+        Me.bsAllBlanksCheckBox.Text = "Blanks"
+        Me.bsAllBlanksCheckBox.UseVisualStyleBackColor = True
         '
         'bsDelControlsButton
         '
@@ -701,7 +741,7 @@ Partial Class IWSSampleRequest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSSampleRequest"
+        Me.Name = "UiWSSampleRequest"
         Me.ShowInTaskbar = False
         Me.Text = "WS_Preparation"
         CType(Me.bsSampleClassesTabControl, System.ComponentModel.ISupportInitialize).EndInit()
@@ -747,8 +787,8 @@ Partial Class IWSSampleRequest
     Friend WithEvents bsLIMSErrorsButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents bsAllPatientsCheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
-    Friend WithEvents bsAllBlkCalCheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
-    Friend WithEvents bsAllCtrlsCheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
+    Friend WithEvents bsAllBlanksCheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
+    Friend WithEvents bsAllControlsLevel1CheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
     Friend WithEvents bsBlkCalibDataGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
     Friend WithEvents bsControlOrdersDataGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
     Friend WithEvents bsPatientOrdersDataGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
@@ -756,4 +796,7 @@ Partial Class IWSSampleRequest
     Friend WithEvents bsScanningButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsBarcodeWarningButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsErrorProvider1 As Biosystems.Ax00.Controls.UserControls.BSErrorProvider
+    Friend WithEvents bsAllCalibsCheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
+    Friend WithEvents bsAllControlsLevel3CheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
+    Friend WithEvents bsAllControlsLevel2CheckBox As Biosystems.Ax00.Controls.UserControls.BSCheckbox
 End Class

@@ -4,7 +4,6 @@ Imports System.Drawing
 Imports System.Diagnostics
 Imports System.Globalization
 Imports System.Windows.Forms
-Imports System.Collections.Generic
 Imports System.ComponentModel
 #End Region
 
@@ -280,7 +279,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             If preferredHeight < editingControlBounds.Height Then
                 Select Case cellStyle.Alignment
                     Case DataGridViewContentAlignment.MiddleLeft, DataGridViewContentAlignment.MiddleCenter, DataGridViewContentAlignment.MiddleRight
-                        editingControlBounds.Y += (editingControlBounds.Height - preferredHeight) / 2
+                        editingControlBounds.Y += CInt((editingControlBounds.Height - preferredHeight) / 2)
                         Exit Select
                     Case DataGridViewContentAlignment.BottomLeft, DataGridViewContentAlignment.BottomCenter, DataGridViewContentAlignment.BottomRight
                         editingControlBounds.Y += editingControlBounds.Height - preferredHeight

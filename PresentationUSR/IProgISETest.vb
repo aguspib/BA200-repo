@@ -1,5 +1,6 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -9,7 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 'Imports Biosystems.Ax00.Types.AllowedTestsDS
 
-Public Class IProgISETest
+Public Class UiProgISETest
 
 
 #Region "Attributes"
@@ -127,11 +128,60 @@ Public Class IProgISETest
             LoadSampleTypesList()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindISETestData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindISETestData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BindISETestData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return inUse
     End Function
+
+
+
+    ''' <summary>
+    ''' Binds ISE Test Samples data to the corresponding screen fields.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 30/07/2014 - #1865
+    ''' </remarks>
+    Private Sub BindISETestSamplesData(ByVal pTestID As Integer, ByVal pSampleType As String)
+
+        Try
+            'For the selected ISE TestID/SampleType get data of field TestLongName, Decimals, SlopeFactorA2 and SlopeFactorB2
+            'from global DataSet SelectedISETestSamplesDS (loaded in function LoadSampleTypesList).
+            Dim qTestSamples As List(Of ISETestSamplesDS.tparISETestSamplesRow)
+
+            qTestSamples = (From a In SelectedISETestSamplesDS.tparISETestSamples _
+                            Where String.Compare(a.SampleType, pSampleType, False) = 0 _
+                            AndAlso a.ISETestID = pTestID _
+                            Select a).ToList()
+
+            If Not qTestSamples.First().IsTestLongNameNull Then
+                bsReportNameTextBox.Text = qTestSamples.First().TestLongName
+            Else
+                bsReportNameTextBox.ResetText()
+            End If
+
+            bsDecimalsUpDown.Text = qTestSamples.First().Decimals.ToString()
+
+            ' SlopeFactorA2 and SlopeFactorB2
+            If qTestSamples.First().IsSlopeFactorA2Null Then
+                bsSlopeA2UpDown.Value = 0
+                bsSlopeA2UpDown.ResetText()
+            Else
+                bsSlopeA2UpDown.Text = CType(qTestSamples.First().SlopeFactorA2, Decimal).ToString()
+            End If
+
+            If qTestSamples.First().IsSlopeFactorB2Null Then
+                bsSlopeB2UpDown.Value = 0
+                bsSlopeB2UpDown.ResetText()
+            Else
+                bsSlopeB2UpDown.Text = CType(qTestSamples.First().SlopeFactorB2, Decimal).ToString()
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestSamplesData " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 
     ''' <summary>
     ''' Execute the cancelling of a ISE Test edition
@@ -177,6 +227,8 @@ Public Class IProgISETest
                     'Load screen fields with all data of the selected ISE Test 
                     Dim inUseISETest As Boolean = BindISETestData()
 
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
+
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                     'Get the Reference Ranges defined for the ISE Test and shown them
@@ -195,7 +247,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelISETestEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CancelISETestEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CancelISETestEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -215,7 +267,7 @@ Public Class IProgISETest
             OriginalSelectedIndex = -1
             OriginalISETestName = ""
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CleanGlobalValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -235,7 +287,7 @@ Public Class IProgISETest
     '            EditModeScreenStatus()
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditISETestByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditISETestByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".EditISETestByButtonClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -298,7 +350,7 @@ Public Class IProgISETest
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditISETestByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditISETestByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".EditISETestByDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -354,6 +406,8 @@ Public Class IProgISETest
                         SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     End If
 
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
+
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                     'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -372,7 +426,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EnableEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -387,11 +441,25 @@ Public Class IProgISETest
         Try
             'Area of ISE Test List
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+
+            ' WE 29/07/2014 - #1865 
+            bsFullNameTextbox.Enabled = True
+            bsFullNameTextbox.BackColor = Color.White
+            ' WE 29/07/2014 - #1865 - End
 
             bsShortNameTextbox.Enabled = True
             bsShortNameTextbox.BackColor = Color.White
 
             bsAvailableISETestCheckBox.Enabled = False
+
+            ' WE 30/07/2014 - #1865 
+            bsReportNameTextBox.Enabled = True
+            bsReportNameTextBox.BackColor = Color.White
+
+            bsDecimalsUpDown.Enabled = True
+            bsDecimalsUpDown.BackColor = Color.White
+            ' WE 30/07/2014 - #1865 - End
 
             bsSaveButton.Enabled = True
             bsCancelButton.Enabled = True
@@ -400,8 +468,15 @@ Public Class IProgISETest
 
             bsQCPanel.Enabled = True
 
+            ' WE 01/08/2014 - #1865
+            bsSlopeA2UpDown.Enabled = True
+            bsSlopeA2UpDown.BackColor = Color.White
+            bsSlopeB2UpDown.Enabled = True
+            bsSlopeB2UpDown.BackColor = Color.White
+            ' WE 01/08/2014 - #1865 - End
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -431,7 +506,7 @@ Public Class IProgISETest
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 If bsFullNameTextbox.Enabled Then
@@ -442,7 +517,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -469,7 +544,7 @@ Public Class IProgISETest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAgeUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAgeUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetAgeUnits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
         End Try
@@ -498,7 +573,7 @@ Public Class IProgISETest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetDetailedRangesSubTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetDetailedRangesSubTypes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetDetailedRangesSubTypes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Return Nothing
         End Try
@@ -526,7 +601,7 @@ Public Class IProgISETest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetGenders", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetGenders", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetGenders", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
         End Try
@@ -553,7 +628,7 @@ Public Class IProgISETest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetLimits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myFieldLimitsDS
@@ -582,7 +657,7 @@ Public Class IProgISETest
                 Return Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "GetMessages ", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "GetMessages ", EventLogEntryType.Error, False)
             ShowMessage(Me.Name & ".GetMessages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return Nothing
         End Try
@@ -609,7 +684,7 @@ Public Class IProgISETest
             If (qTestSamples.Count = 1) Then actRangeType = qTestSamples(0)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRangeTypeForSampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRangeTypeForSampleType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetRangeTypeForSampleType", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return actRangeType
@@ -635,7 +710,7 @@ Public Class IProgISETest
                 ShowMessage(Me.Name & ".GetRefRanges", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetRefRanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -644,7 +719,16 @@ Public Class IProgISETest
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SG 20/10/2010
+    ''' Created by:  SG 20/10/2010
+    ''' Modified by: RH 05/06/2012 - Get labels for Quality Control Tab
+    '''              WE 30/07/2014 - BA-1865 ==> Get labels for new controls ReportName and Decimals 
+    '''              WE 01/08/2014 - BA-1865 ==> Get labels for Slope Function control in Options Tab
+    '''              AG 05/09/2014 - BA-1869 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of ISE Tests (Custom Order Button)
+    '''              SA 17/11/2014 - BA-2125 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of ISE Tests (Custom Order Button) - previous change was not really done; code 
+    '''                                          was commented and the label was not the correct one. Commented code to get ToolTip for Print 
+    '''                                          Button due to it is not visible.
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -653,37 +737,30 @@ Public Class IProgISETest
             'For Labels, CheckBox, RadioButtons.....
             bsISETestLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ISETests_Definition", currentLanguage)
             bsISETestListLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ISETests_List", currentLanguage)
-
             bsFullNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Name", currentLanguage) + ":"
             bsNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ShortName", currentLanguage) + ":"
             bsUnitLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", currentLanguage) + ":"
-            bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":" 'AG 21/10/2010
-            bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)  'AG 21/10/2010
+            bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":"
+            bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)
+            bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"
+            bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"
 
-            DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage)
-
-            'For Tooltips
-            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-
-            'For BSTestRefRanges
+            'Details tab
+            DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_Options", currentLanguage)
+            bsSlopeFunctionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SlopeFunction", currentLanguage) + ":"
+            bsReferenceRangesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage) + ":"
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", currentLanguage)
             bsTestRefRanges.TextForNormalityLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Normality", currentLanguage) & ":"
             bsTestRefRanges.TextForMinValueLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MinValue", currentLanguage)
             bsTestRefRanges.TextForMaxValueLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MaxValue", currentLanguage)
-
             bsTestRefRanges.TextForDetailedRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DetailedReferenceRange", currentLanguage)
             bsTestRefRanges.TextForGenderColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", currentLanguage)
             bsTestRefRanges.TextForAgeColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", currentLanguage)
             bsTestRefRanges.TextForFromColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_From", currentLanguage)
             bsTestRefRanges.TextForToColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_To", currentLanguage)
-
             bsTestRefRanges.ToolTipForDetailDeleteButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DelReferenceRange", currentLanguage)
 
-            'RH 05/06/2012
+            'Quality Control Tab
             QCTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_QualityControl", currentLanguage)
             QCValuesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Quality_Control_Values", currentLanguage)
             QCActiveCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_QCActive", currentLanguage)
@@ -700,10 +777,16 @@ Public Class IProgISETest
             ControlsSelectionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ControlSelection", currentLanguage)
             AddControlLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CREATE_NEW_CONTROLS", currentLanguage)
             CUMULATE_QCRESULTS_Label = GetMessageText(GlobalEnumerates.Messages.CUMULATE_QCRESULTS.ToString(), currentLanguage)
-            'RH 05/06/2012 END
 
+            'For Tooltips
+            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TEST_SORTING_SELECTION", currentLanguage))
+            'bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -744,7 +827,7 @@ Public Class IProgISETest
             LoadISETestList()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeISETestList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeISETestList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeISETestList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -771,7 +854,7 @@ Public Class IProgISETest
             bsTestRefRanges.LoadFrameworkData(myAllFieldLimitsDS, myGendersMasterDataDS, myAgeUnitsMasterDataDS, _
                                               myDetailedRangeSubTypesDS, myAllMessagesDS, SystemInfoManager.OSDecimalSeparator)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeReferenceRangesControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeReferenceRangesControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeReferenceRangesControl", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -793,7 +876,8 @@ Public Class IProgISETest
                 End If
 
                 bsEditButton.Enabled = False
-                '                bsPrintButton.Enabled = False dl 11/05/2012
+                bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                'bsPrintButton.Enabled = False dl 11/05/2012
             End If
 
             'Area of ISE Test Definition
@@ -816,6 +900,17 @@ Public Class IProgISETest
             bsAvailableISETestCheckBox.CheckState = CheckState.Unchecked
             bsAvailableISETestCheckBox.Enabled = False
 
+            ' WE 31/07/2014 - #1865
+            bsReportNameTextBox.Text = ""
+            bsReportNameTextBox.Enabled = False
+            bsReportNameTextBox.BackColor = SystemColors.MenuBar
+
+            bsDecimalsUpDown.Enabled = False
+            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
+
+            SetISETestControlsLimits()
+            ' WE 31/07/2014 - #1865 - End
+
             'Area of Reference Ranges
             InitializeReferenceRangesControl()
             bsTestRefRanges.isEditing = False
@@ -831,6 +926,9 @@ Public Class IProgISETest
             'RH 05/06/2012
             InitializeQCTab()
 
+            ' WE 01/08/2014 - #1865
+            InitializeOptionsTab()
+
             InitializeReferenceRangesControl()
             bsTestRefRanges.isEditing = False
             'RH 05/06/2012 END
@@ -839,7 +937,7 @@ Public Class IProgISETest
             If (pInitializeListView) Then bsEditButton.Focus()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitialModeScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitialModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -858,11 +956,11 @@ Public Class IProgISETest
 
             'Get the Icon defined for ISE Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TISE_SYS")
-            If Not String.Equals(notInUseIcon, String.Empty) Then myIcons.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & notInUseIcon, True))
+            If Not String.Equals(notInUseIcon, String.Empty) Then myIcons.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
 
             'Get the Icon defined for ISE Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSETISE")
-            If Not String.Equals(inUseIcon, String.Empty) Then myIcons.Images.Add("INUSETISE", Image.FromFile(MyBase.IconsPath & inUseIcon, True))
+            If Not String.Equals(inUseIcon, String.Empty) Then myIcons.Images.Add("INUSETISE", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
 
             'Assign the Icons to the ISE Tests List View
             bsISETestListView.Items.Clear()
@@ -952,7 +1050,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadISETestList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadISETestList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadISETestList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -985,7 +1083,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadMeasureUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadMeasureUnits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadMeasureUnits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1042,7 +1140,7 @@ Public Class IProgISETest
                 bsTestRefRanges.ClearData()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRefRangesData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRefRangesData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadRefRangesData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1093,7 +1191,7 @@ Public Class IProgISETest
                 ShowMessage(Me.Name & ".LoadSampleTypesList", myGlobalDataTo.ErrorCode, myGlobalDataTo.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSampleTypesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1128,18 +1226,25 @@ Public Class IProgISETest
                     End If
 
                     'In Edit Mode, loading values are compared against current values
+                    ' WE 29/07/2014 - #1865 - Added <Name> field.
                     If (bsISETestListView.SelectedIndices(0) = OriginalSelectedIndex) Then
-                        pendingToSaveChanges = (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(3).Text, False) <> 0) Or _
+                        pendingToSaveChanges = (String.Compare(bsFullNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(2).Text, False) <> 0) Or _
+                                               (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(3).Text, False) <> 0) Or _
                                                (String.Compare(bsAvailableISETestCheckBox.Checked.ToString, bsISETestListView.SelectedItems(0).SubItems(6).Text, False) <> 0)
                     Else
-                        pendingToSaveChanges = (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(3).Text, False) <> 0) Or _
+                        pendingToSaveChanges = (String.Compare(bsFullNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(2).Text, False) <> 0) Or _
+                                               (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(3).Text, False) <> 0) Or _
                                                (bsAvailableISETestCheckBox.Checked.ToString <> bsISETestListView.Items(OriginalSelectedIndex).SubItems(6).Text)
                     End If
+                End If
+
+                If (Not pendingToSaveChanges) Then
+                    pendingToSaveChanges = (Not ValidateSavingConditions())
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PendingChangesVerification", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1166,43 +1271,47 @@ Public Class IProgISETest
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsPrintButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
+
+            'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
+            auxIconName = GetIconName("ORDER_TESTS")
+            If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
-            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Reference Ranges Buttons
             'DELETE DETAILED RANGE Button
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RH 05/06/2012
             auxIconName = GetIconName("ADD")
-            If Not String.Equals(auxIconName, String.Empty) Then AddControls.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then AddControls.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then DeleteControlButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then DeleteControlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RH 05/06/2012 END
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1214,6 +1323,8 @@ Public Class IProgISETest
     ''' <param name="pSampleTypeChanged" > TRUE when change sample type in edition mode, FALSE otherwise</param>
     ''' <remarks>
     ''' Modified by: RH 05/06/2012
+    '''              WE 29/08/2014 - Bug fix that clears error indicator whenever user switches to other SampleType
+    '''                              or ISE Test during edition of SlopeFactor fields.
     ''' </remarks>
     Private Sub QueryISETest(ByVal pSampleTypeChanged As Boolean)
         Dim setScreenToQuery As Boolean = False
@@ -1228,6 +1339,9 @@ Public Class IProgISETest
                 If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = DialogResult.Yes) Then
                     SelectedTestRefRangesDS.Clear()
                     setScreenToQuery = True
+                    ' WE 29/08/2014 - Bug fix that clears error indicator whenever user switches to other SampleType
+                    ' or ISE Test during edition of SlopeFactor fields.
+                    BsErrorProvider1.Clear()
                 Else
                     If (OriginalSelectedIndex <> -1) Then
                         bsISETestListView.SelectedItems.Clear() 'AG 26/10/2010 - Clear selection
@@ -1257,6 +1371,8 @@ Public Class IProgISETest
                     SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 End If
 
+                BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
+
                 BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                 'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -1281,7 +1397,7 @@ Public Class IProgISETest
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryISETest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryISETest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryISETest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1303,7 +1419,7 @@ Public Class IProgISETest
             '        QueryISETest(False)
             'End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryISETestByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryISETestByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryISETestByMoveUpDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1317,7 +1433,8 @@ Public Class IProgISETest
     Private Sub QueryModeScreenStatus()
         Try
             bsEditButton.Enabled = True
-            '            bsPrintButton.Enabled = True dl 11/05/2012
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+            'bsPrintButton.Enabled = True dl 11/05/2012
 
             bsFullNameTextbox.Enabled = False
             bsFullNameTextbox.BackColor = SystemColors.MenuBar
@@ -1333,6 +1450,14 @@ Public Class IProgISETest
 
             bsAvailableISETestCheckBox.Enabled = False
 
+            ' WE 30/07/2014 - #1865
+            bsReportNameTextBox.Enabled = False
+            bsReportNameTextBox.BackColor = SystemColors.MenuBar
+
+            bsDecimalsUpDown.Enabled = False
+            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
+            ' WE 30/07/2014 - #1865 - End
+
             bsVolumeUpDown.Enabled = False
             bsVolumeUpDown.BackColor = SystemColors.MenuBar
 
@@ -1346,8 +1471,15 @@ Public Class IProgISETest
 
             bsQCPanel.Enabled = False
 
+            ' WE 01/08/2014 - #1865
+            bsSlopeA2UpDown.Enabled = False
+            bsSlopeA2UpDown.BackColor = SystemColors.MenuBar
+            bsSlopeB2UpDown.Enabled = False
+            bsSlopeB2UpDown.BackColor = SystemColors.MenuBar
+            ' WE 01/08/2014 - #1865 - End
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1365,8 +1497,10 @@ Public Class IProgISETest
 
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1409,7 +1543,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -1425,6 +1559,7 @@ Public Class IProgISETest
     ''' Modified by: SA 10/11/2010 - When SAVE function return an error, shown it. Change to function that
     '''                              return a Boolean value indicating if the Save was executed without errors 
     '''              SA 12/01/2011 - Changes due to new implementation of Reference Ranges Control 
+    '''              SA 17/09/2014 - BA-1926 ==> When field ReportName is empty, set NULL value for it in the DataSet
     ''' </remarks>
     Private Function SaveISETestChanges() As Boolean
         Dim changesSaved As Boolean = False
@@ -1539,6 +1674,31 @@ Public Class IProgISETest
                             'RH 11/06/2012
                             .QCActive = QCActiveCheckBox.Checked
 
+                            ' WE 31/07/2014 - #1865
+                            If (Not String.IsNullOrEmpty(bsReportNameTextBox.Text)) Then
+                                .TestLongName = bsReportNameTextBox.Text.Trim
+                            Else
+                                .SetTestLongNameNull()
+                            End If
+
+                            .Decimals = CByte(bsDecimalsUpDown.Value)
+
+                            'TR 29/03/2010 Add the slope factor to save.
+                            If Not String.IsNullOrEmpty(bsSlopeA2UpDown.Text) Then
+                                .SlopeFactorA2 = CType(bsSlopeA2UpDown.Value, Single)
+                            Else
+                                'TR 21/06/2010
+                                .SetSlopeFactorA2Null()
+                            End If
+
+                            If Not String.IsNullOrEmpty(bsSlopeB2UpDown.Text) Then
+                                .SlopeFactorB2 = CType(bsSlopeB2UpDown.Value, Single)
+                            Else
+                                'TR 21/06/2010
+                                .SetSlopeFactorB2Null()
+                            End If
+                            ' WE 31/07/2014 - #1865 - End
+
                             If Not String.IsNullOrEmpty(QCReplicNumberNumeric.Text) Then
                                 .ControlReplicates = CInt(QCReplicNumberNumeric.Value)
                             Else
@@ -1597,7 +1757,7 @@ Public Class IProgISETest
                 'SelectedTestRefRangesDS.Clear()
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 'Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1608,7 +1768,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1623,7 +1783,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1657,7 +1817,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveISETestChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveISETestChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveISETestChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -1679,8 +1839,8 @@ Public Class IProgISETest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -1709,7 +1869,7 @@ Public Class IProgISETest
             ResetBorder()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1730,7 +1890,7 @@ Public Class IProgISETest
             End If
             Return True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateRefRanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateRefRanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Return False
         End Try
@@ -1745,6 +1905,8 @@ Public Class IProgISETest
     '''              SA 13/01/2010 - Verify also if the informed ShortName is unique
     '''              RH 08/06/2012 - Added validation of data in QCTab by calling function ValidateErrorOnQCTab
     '''              SA 21/06/2012 - Set global variable ValidationError = True when there is at least a wrong value in the screen fields
+    '''              WE 29/07/2014 - Added validation for Name field.
+    '''              WE 26/08/2014 - Introduction of Form-level validation for SlopeFactor A2/B2 likewise in IProgTest.
     '''             
     ''' </remarks>
     Private Function ValidateSavingConditions() As Boolean
@@ -1753,11 +1915,13 @@ Public Class IProgISETest
             Dim setFocusTo As Integer = -1
 
             BsErrorProvider1.Clear()
-            'If (bsFullNameTextbox.TextLength = 0) Then
-            '    'Validate the Long Name is not empty otherwise inform the missing data
-            '    bsScreenErrorProvider.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-            '    setFocusTo = 0
-            'End If
+            ' WE 29/07/2014 - #1865
+            If (bsFullNameTextbox.TextLength = 0) Then
+                'Validate the Long Name is not empty otherwise inform the missing data
+                BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                setFocusTo = 0
+            End If
+            ' WE 29/07/2014 - #1865 - End.
 
             If (bsShortNameTextbox.TextLength = 0) Then
                 'Validate the Short Name is not empty otherwise inform the missing data
@@ -1780,6 +1944,23 @@ Public Class IProgISETest
                 If (setFocusTo = -1) Then setFocusTo = 4
             End If
 
+            ' WE 26/08/2014 - #1865 - Validation of SlopeFactors A2/B2.
+            If Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Value = 0 Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+                If (setFocusTo = -1) Then setFocusTo = 5
+
+            ElseIf Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeB2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeB2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+                If (setFocusTo = -1) Then setFocusTo = 6
+
+                'AG 07/07/2010 - If B informed then A is required
+            ElseIf Not bsSlopeB2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                If (setFocusTo = -1) Then setFocusTo = 5
+
+            End If
+            ' WE 26/08/2014 - #1865 - End.
+
             'Select the proper field to put the focus
             If (setFocusTo >= 0) Then
                 fieldsOK = False
@@ -1796,8 +1977,33 @@ Public Class IProgISETest
                         bsISETestTabControl.SelectedTab = DetailsTabPage
                     Case 4
                         bsISETestTabControl.SelectedTab = QCTabPage
+                    Case 5
+                        bsISETestTabControl.SelectedTab = DetailsTabPage
+                        bsSlopeA2UpDown.Focus()
+                    Case 6
+                        bsISETestTabControl.SelectedTab = DetailsTabPage
+                        bsSlopeB2UpDown.Focus()
                 End Select
             Else
+                'All mandatory fields have been completed, verify that the Full Name is unique.
+                ' WE 29/07/2014 - #1865
+                Dim resultDataName As GlobalDataTO
+                Dim myISETestDelegateName As New ISETestsDelegate
+
+                resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "LNAME", SelectedISETestID)
+                If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
+                    Dim myISETestsDSname As ISETestsDS
+                    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
+
+                    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
+                        fieldsOK = False
+
+                        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
+                        bsFullNameTextbox.Focus()
+                    End If
+                End If
+                ' WE 29/07/2014 - #1865 - End.
+
                 'All mandatory fields are informed, verify the informed ShortName is unique
                 Dim resultData As GlobalDataTO
                 Dim myISETestDelegate As New ISETestsDelegate
@@ -1819,7 +2025,7 @@ Public Class IProgISETest
             ValidationError = (Not fieldsOK)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateSavingConditions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return fieldsOK
@@ -1840,15 +2046,17 @@ Public Class IProgISETest
 
                 Case "OPERATOR"
                     bsEditButton.Enabled = False
-                    '                    bsPrintButton.Enabled = False dl 11/05/2012
+                    bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+                    'bsPrintButton.Enabled = False dl 11/05/2012
                     Exit Select
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
 
 #End Region
 
@@ -1894,7 +2102,7 @@ Public Class IProgISETest
             bsQCPanel.Enabled = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "PrepareQCTab " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "PrepareQCTab " & Name, EventLogEntryType.Error, _
                               GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2035,7 +2243,7 @@ Public Class IProgISETest
             UsedControlsGridView.Columns.Add(TestTypeCol)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " PrepareUsedControlsGrid " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " PrepareUsedControlsGrid " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2093,7 +2301,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SetQCLimits " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SetQCLimits " & Name, EventLogEntryType.Error, _
                                                  GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2122,7 +2330,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))") 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -2164,7 +2372,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " GetAllQCControls " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " GetAllQCControls " & Name, EventLogEntryType.Error, _
                                                       GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2191,7 +2399,7 @@ Public Class IProgISETest
                 myControlsDS = DirectCast(myGlobalDataTO.SetDatos, ControlsDS)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " GetQCControlsInfo " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " GetQCControlsInfo " & Name, EventLogEntryType.Error, _
                                                       GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2324,7 +2532,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestQCData " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestQCData " & Name, EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
@@ -2404,7 +2612,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " CalculatedTarget " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " CalculatedTarget " & Name, EventLogEntryType.Error, _
                                                                            GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2439,6 +2647,7 @@ Public Class IProgISETest
             QCReplicNumberNumeric.Enabled = pEnable
             QCRejectionCriteria.Enabled = pEnable
 
+            ' Six-Sigma Values Group Box is not used at this moment. Therefore its Visibility property is set to True at design-time.
             'SixSigmaValuesGroupBox.Enabled = pEnable
             QCErrorAllowable.Enabled = pEnable
             BsButton1.Enabled = pEnable
@@ -2450,7 +2659,7 @@ Public Class IProgISETest
             QCMinNumSeries.Enabled = pEnable
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ActivateQCControlsByQCActive " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ActivateQCControlsByQCActive " & Name, EventLogEntryType.Error, _
                                                         GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2490,7 +2699,7 @@ Public Class IProgISETest
                     "WESTGARD_10X").First().SelectedRule = x10CheckBox.Checked
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " UpdateTestSampleMultiRules " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " UpdateTestSampleMultiRules " & Name, EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2549,7 +2758,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ValidateErrorOnQCTab " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ValidateErrorOnQCTab " & Name, EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2631,7 +2840,7 @@ Public Class IProgISETest
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ValidateQCUsedControls " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ValidateQCUsedControls " & Name, EventLogEntryType.Error, _
                                                                    GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2660,7 +2869,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ControlExist " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " ControlExist " & Name, EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2688,7 +2897,7 @@ Public Class IProgISETest
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " CountActiveControl " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " CountActiveControl " & Name, EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2719,7 +2928,7 @@ Public Class IProgISETest
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " RecalculateAllTarget " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " RecalculateAllTarget " & Name, EventLogEntryType.Error, _
                                                                    GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2779,7 +2988,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " DeleteSelectedControl " & Name, EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " DeleteSelectedControl " & Name, EventLogEntryType.Error, _
                                                                   GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
@@ -2840,7 +3049,7 @@ Public Class IProgISETest
                 End If
 
                 If myDependenciesElementsDS.DependenciesElements.Count > 0 Then
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.ShowDialog()
 
@@ -2851,7 +3060,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))") 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message + " ((" + ex.HResult.ToString + "))")
             dialogResultToReturn = Windows.Forms.DialogResult.No
         End Try
@@ -2903,7 +3112,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetLimitValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetLimitValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetLimitValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2935,12 +3144,124 @@ Public Class IProgISETest
             Return decimalsNumber
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetDecimals ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetDecimals ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetDecimals", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
         Return decimalsNumber
     End Function
+
+    ''' <summary>
+    ''' Set the limits and step increments for all Numeric UpDown controls on the main part of the form.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 31/07/2014 - #1865
+    ''' </remarks>
+    Private Sub SetISETestControlsLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            '** FIELDS IN MAIN PART OF SCREEN (ABOVE TAB CONTROL PART) ** '
+            'Decimals
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.CTEST_NUM_DECIMALS)
+            If (myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0) Then
+                bsDecimalsUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsDecimalsUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsDecimalsUpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If (Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull) Then
+                    bsDecimalsUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetISETestControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Setup the limits and step increments of all Numeric UpDown controls on the Options tab page. 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 01/08/2014 - #1865 
+    ''' </remarks>
+    Private Sub SetDetailsControlLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            '** FIELDS IN OPTIONS TAB ** '
+            'Slope Factor A2
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.SLOPE_FACTOR_A2)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsSlopeA2UpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsSlopeA2UpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsSlopeA2UpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull Then
+                    bsSlopeA2UpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+            'Slope Factor B2
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.SLOPE_FACTOR_B2)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsSlopeB2UpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsSlopeB2UpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsSlopeB2UpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull Then
+                    SlopeBUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetDetailsControlLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Initializes Options tab controls.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 01/08/2014 - #1865 
+    ''' </remarks>
+    Private Sub InitializeOptionsTab()
+
+        Try
+            bsSlopeA2UpDown.Enabled = False
+            bsSlopeA2UpDown.BackColor = SystemColors.MenuBar
+            bsSlopeB2UpDown.Enabled = False
+            bsSlopeB2UpDown.BackColor = SystemColors.MenuBar
+
+            SetDetailsControlLimits()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeOptionsTab " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Set up Decimals Number
+    ''' </summary>
+    ''' <param name="pDecimals"></param>
+    ''' <remarks>Created by: WE 25/08/2014 - #1865
+    ''' </remarks>
+    Private Sub SetupDecimalsNumber(ByVal pDecimals As Integer)
+        Try
+            Me.UsedControlsGridView.Refresh()
+
+            Me.bsTestRefRanges.RefNumDecimals = pDecimals
+
+            RecalculateAllTarget()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetupDecimalsNumber ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 
 #End Region
 
@@ -2959,7 +3280,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateRefRangesSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3063,7 +3384,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " editingGridComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " editingGridComboBox_SelectionChangeCommitted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3120,7 +3441,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3169,7 +3490,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3208,7 +3529,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CheckCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CheckCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3233,7 +3554,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellLeave ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellLeave ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3251,7 +3572,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_RowValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_RowValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3275,7 +3596,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellContentClick ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellContentClick ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3286,25 +3607,49 @@ Public Class IProgISETest
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Modified by: WE 25/08/2014 - #1865
+    ''' </remarks>
     Private Sub UsedControlsGridView_CellFormatting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellFormattingEventArgs) Handles UsedControlsGridView.CellFormatting
         Try
             If e.ColumnIndex = 4 OrElse e.ColumnIndex = 5 OrElse e.ColumnIndex = 6 Then
                 If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
-                    e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals())
+                    'e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals())
+                    e.Value = CSng(e.Value).ToString("F" & bsDecimalsUpDown.Value)
                 End If
             ElseIf e.ColumnIndex = 7 Then
                 If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
-                    e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals() + 1)
+                    'e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals() + 1)
+                    e.Value = CSng(e.Value).ToString("F" & (CInt(bsDecimalsUpDown.Value) + 1))
                 End If
             End If
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellFormatting ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellFormatting ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+
+        ' Example code from IProgTest
+        'Try
+        '    If e.ColumnIndex = 4 OrElse e.ColumnIndex = 5 OrElse e.ColumnIndex = 6 Then
+        '        If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
+        '            e.Value = DirectCast(e.Value, Single).ToString("F" & DecimalsUpDown.Value)
+        '        End If
+        '    ElseIf e.ColumnIndex = 7 Then
+        '        If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
+        '            'TR 10/05/2011  -Show the decimals allowed + 1 
+        '            e.Value = DirectCast(e.Value, Single).ToString("F" & (CInt(DecimalsUpDown.Value) + 1))
+        '        End If
+        '    End If
+        'Catch ex As Exception
+        '    'Write error SYSTEM_ERROR in the Application Log & show error message
+        '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellFormatting ", _
+        '                                    EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        'End Try
+
     End Sub
 
     Private Sub QCActiveCheckBox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCActiveCheckBox.CheckedChanged
@@ -3341,7 +3686,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " QCActiveCheckBox_CheckedChanged ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " QCActiveCheckBox_CheckedChanged ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
 
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -3365,7 +3710,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ManualRadioButton_CheckedChanged ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ManualRadioButton_CheckedChanged ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3387,7 +3732,7 @@ Public Class IProgISETest
 
     '    Catch ex As Exception
     '        'Write error SYSTEM_ERROR in the Application Log & show error message
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " StaticRadioButton_CheckedChanged ", _
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " StaticRadioButton_CheckedChanged ", _
     '                                        EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
@@ -3415,7 +3760,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " QCRejectionCriteria_ValueChanged ", _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " QCRejectionCriteria_ValueChanged ", _
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3423,48 +3768,90 @@ Public Class IProgISETest
 
     Private Sub QCReplicNumberNumeric_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCReplicNumberNumeric.Validating
         Try
-            BsErrorProvider1.Clear()
 
-            If QCReplicNumberNumeric.Text = "" Then
-                BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
-                QCReplicNumberNumeric.Focus()
+            'myTextBox = CType(sender, TextBox)
+
+            'If (myTextBox.TextLength > 0) Then
+            '    If (bsScreenErrorProvider.GetError(myTextBox) <> "") Then
+            '        bsScreenErrorProvider.SetError(myTextBox, String.Empty)
+            '    End If
+            'End If
+
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCReplicNumberNumeric.Text = "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCReplicNumberNumeric.Text <> "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If QCReplicNumberNumeric.Text = "" Then
+            '    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    'QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
+            '    'QCReplicNumberNumeric.Focus()
+            'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCReplicNumberNumeric_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCReplicNumberNumeric_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
     Private Sub QCRejectionCriteria_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCRejectionCriteria.Validating
         Try
-            BsErrorProvider1.Clear()
-
-            If QCRejectionCriteria.Text = "" Then
-                BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
-                QCRejectionCriteria.Focus()
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCRejectionCriteria.Text = "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCRejectionCriteria.Text <> "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If QCRejectionCriteria.Text = "" Then
+            '    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
+            '    QCRejectionCriteria.Focus()
+            'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCRejectionCriteria_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCRejectionCriteria_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
     Private Sub QCMinNumSeries_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCMinNumSeries.Validating
         Try
-            BsErrorProvider1.Clear()
-
-            If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
-                BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCMinNumSeries.Value = QCMinNumSeries.Minimum
-                QCMinNumSeries.Focus()
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text <> "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+            '    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    QCMinNumSeries.Value = QCMinNumSeries.Minimum
+            '    QCMinNumSeries.Focus()
+            'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCMinNumSeries_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCMinNumSeries_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -3481,7 +3868,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCActiveCheckBox_EnabledChanged " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCActiveCheckBox_EnabledChanged " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3499,7 +3886,7 @@ Public Class IProgISETest
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " StaticRadioButton_EnabledChanged " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " StaticRadioButton_EnabledChanged " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -3507,7 +3894,7 @@ Public Class IProgISETest
     Private Sub AddControls_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddControls.Click
         Try
             'Open controls Programming
-            Using myProgControls As New IProgControls
+            Using myProgControls As New UiProgControls
                 myProgControls.AnalyzerID = AnalyzerIDAttribute
                 myProgControls.WorkSessionID = WorkSessionIDAttribute
                 myProgControls.SourceScreen = GlbSourceScreen.TEST_QCTAB.ToString
@@ -3530,7 +3917,7 @@ Public Class IProgISETest
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " AddControls_Click ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " AddControls_Click ", EventLogEntryType.Error, _
                                                         GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3550,7 +3937,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_KeyDown ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_KeyDown ", EventLogEntryType.Error, _
                                                        GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -3576,11 +3963,202 @@ Public Class IProgISETest
 
     '    Catch ex As Exception
     '        'Write error SYSTEM_ERROR in the Application Log & show error message
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UsedControlsGridView_CellValidating ", EventLogEntryType.Error, _
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UsedControlsGridView_CellValidating ", EventLogEntryType.Error, _
     '                                                    GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
+
+
+
+
+    ''' <summary>
+    ''' Handler for NumericUpDown controls allowing numbers with decimals.
+    ''' Only numbers and the decimal separator are allowed.
+    ''' </summary>
+    ''' <remarks>
+    '''    Created by: WE 01/08/2014 - #1865. Same as used in IProgTest.
+    '''    Modified:   SA 09/11/2012 - Implementation changed
+    '''                TR 09/10/2013 - Bug #1315 allow too introduce  (-)minus on SlopeFactor A  B. 
+    '''                                to allow negative values introduce by key press.
+    ''' </remarks>
+    Private Sub RealNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs) Handles bsSlopeA2UpDown.KeyPress, bsSlopeB2UpDown.KeyPress
+
+        Try
+            If (e.KeyChar = CChar("") OrElse e.KeyChar = ChrW(Keys.Back)) Then
+                e.Handled = False
+            Else
+                Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
+                If (e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",")) Then
+                    e.KeyChar = CChar(myDecimalSeparator)
+
+                    If (CType(sender, BSNumericUpDown).Text.Contains(".") Or CType(sender, BSNumericUpDown).Text.Contains(",")) Then
+                        e.Handled = True
+                    Else
+                        e.Handled = False
+                    End If
+                Else
+                    'TR 09/10/2013 -BUG #1315 -Validate if slope controls to allow the -
+                    If (CType(sender, BSNumericUpDown).Name = "bsSlopeA2UpDown" OrElse CType(sender, BSNumericUpDown).Name = "bsSlopeB2UpDown") Then
+                        'Validate if it's a numeric value and not the - character used to indicate negative values.
+                        If (Not IsNumeric(e.KeyChar) AndAlso Not e.KeyChar = "-") Then
+                            e.Handled = True
+                        ElseIf e.KeyChar = "-" Then
+                            'Allow only one -Simbol on control
+                            If CType(sender, BSNumericUpDown).Text.Contains("-") Then
+                                e.Handled = True
+                            End If
+                        End If
+                        'TR 09/10/2013 -BUG #1315 -END.
+                    Else
+                        If (Not IsNumeric(e.KeyChar)) Then
+                            e.Handled = True
+                        End If
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RealNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".RealNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' To avoid entered following characters in the Numeric Up/Down allowing only integer numbers greater than zero:
+    '''   ** Minus sign
+    '''   ** Dot, Apostrophe or Comma as decimal point
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 25/08/2014 - #1865. Same as used in IProgTest.
+    ''' Modified by: SA 09/11/2012
+    ''' </remarks>
+    Private Sub IntegerNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs) Handles bsDecimalsUpDown.KeyPress
+
+        Try
+            If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".IntegerNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Generic event handler to capture the NumericUpDown content deletion
+    ''' </summary>
+    ''' <remarks>
+    '''     Created by:  WE 01/08/2014 - #1865. Same as used in IProgTest.
+    '''     Modified by: SG 18/06/2010
+    ''' </remarks>
+    Private Sub NumericUpDown_KeyUp(sender As Object, e As KeyEventArgs) Handles bsSlopeA2UpDown.KeyUp, bsSlopeB2UpDown.KeyUp
+
+        Try
+            Dim miNumericUpDown As NumericUpDown = CType(sender, NumericUpDown)
+
+            If miNumericUpDown.Text <> "" Then
+
+            Else
+                miNumericUpDown.Value = miNumericUpDown.Minimum
+                miNumericUpDown.ResetText()
+            End If
+
+            If EditionMode Then
+                ChangesMade = True
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "NumericUpDown_KeyUp " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".NumericUpDown_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 25/08/2014 - #1865. Based on same concept as used in IProgTest.
+    ''' Modified by: AG 09/07/2010
+    '''              SA 09/11/2012 - Changes due to an error was raised when trying to convert to INT a "big" number that 
+    '''                              was entered in the numeric UpDown
+    ''' </remarks>
+    Private Sub bsDecimalsUpDown_Validated(sender As Object, e As EventArgs) Handles bsDecimalsUpDown.Validated
+
+        Try
+            Dim decimalsNumber As Integer = 0
+            Dim myDecimalNum As String = bsDecimalsUpDown.Text.ToString
+
+            If (myDecimalNum = String.Empty) Then
+                decimalsNumber = CInt(bsDecimalsUpDown.Minimum)
+            Else
+                If (myDecimalNum.Length = bsDecimalsUpDown.Maximum.ToString.Length) Then
+                    decimalsNumber = CInt(bsDecimalsUpDown.Text)
+                    decimalsNumber = CInt(IIf(decimalsNumber < bsDecimalsUpDown.Minimum, bsDecimalsUpDown.Minimum, decimalsNumber))
+                    decimalsNumber = CInt(IIf(decimalsNumber > bsDecimalsUpDown.Maximum, bsDecimalsUpDown.Maximum, decimalsNumber))
+                Else
+                    decimalsNumber = CInt(bsDecimalsUpDown.Maximum)
+                End If
+            End If
+
+            bsDecimalsUpDown.Text = decimalsNumber.ToString
+            SetupDecimalsNumber(decimalsNumber)
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsDecimalsUpDown_Validated " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".bsDecimalsUpDown_Validated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 26/08/2014 - #1865. Based on same concept as used in IProgTest. Extended with 3rd check as used by form-level validation and
+    '''                              included control activation in first 2 cases. This event handler method may only be used in conjunction with field
+    '''                              SlopeFactorA2 to avoid situation in which user will never be able to set both fields (SlopeFactorA2 and SlopeFactorB2)
+    '''                              to empty value again.
+    ''' </remarks>
+    Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating
+
+        Try
+            BsErrorProvider1.Clear()
+            ValidationError = False
+            If Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Value = 0 Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+                ValidationError = True
+                bsSlopeA2UpDown.Select()
+            ElseIf Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeB2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeB2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+                ValidationError = True
+                bsSlopeB2UpDown.Select()
+            ElseIf Not bsSlopeB2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                ValidationError = True
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SlopeUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Activate the ChangesMade variable whenever the value of the corresponding control is changed.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>WE 27/08/2014 - #1865. Generic event handler method that triggers ChangesMade whenever the value of a control is changed.
+    '''                          Only used for new fields for which ChangesMade can not be handled properly by PendingChangesVerification.</remarks>
+    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged,
+                                                                              bsDecimalsUpDown.ValueChanged,
+                                                                              bsSlopeB2UpDown.ValueChanged,
+                                                                              bsSlopeA2UpDown.ValueChanged,
+                                                                              QCReplicNumberNumeric.ValueChanged,
+                                                                              QCMinNumSeries.ValueChanged
+        If EditionMode Then
+            ChangesMade = True
+        End If
+    End Sub
+
 
 #End Region
 
@@ -3611,7 +4189,7 @@ Public Class IProgISETest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgISETest_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgISETest_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgISETest_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3625,13 +4203,13 @@ Public Class IProgISETest
     Private Sub ProgISETest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()
             ScreenStatusByUserLevel() 'TR 23/04/2012
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ISETestForm_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ISETestForm_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ISETestForm_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3660,7 +4238,7 @@ Public Class IProgISETest
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3688,7 +4266,7 @@ Public Class IProgISETest
             End Select
             bsISETestListView.Sort()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestListView_ColumnClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3711,7 +4289,7 @@ Public Class IProgISETest
             e.NewWidth = bsISETestListView.Columns(e.ColumnIndex).Width
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3739,12 +4317,13 @@ Public Class IProgISETest
             Else
                 InitialModeScreenStatus(False)
                 bsEditButton.Enabled = False
+                bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3762,7 +4341,7 @@ Public Class IProgISETest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsISETestListView_PreviewKeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsISETestListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3787,8 +4366,8 @@ Public Class IProgISETest
     ''' Created by: RH 13/06/2012
     ''' </remarks>    
     Private Sub bsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveButton.Click
-        If Not SaveChanges(False) Then
-            CancelISETestEdition()
+        If SaveChanges(False) Then
+            '  CancelISETestEdition()
         End If
     End Sub
 
@@ -3802,7 +4381,7 @@ Public Class IProgISETest
         Try
             CancelISETestEdition()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3814,7 +4393,7 @@ Public Class IProgISETest
         Try
             ExitScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3880,7 +4459,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSampleTypeComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3893,7 +4472,8 @@ Public Class IProgISETest
     ''' Modified by: SA SA 12/01/2011 - Changes due to new implementation of Reference Ranges Control 
     ''' </remarks>
     Private Sub bsTextbox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsFullNameTextbox.TextChanged, _
-                                                                                                   bsShortNameTextbox.TextChanged
+                                                                                                   bsShortNameTextbox.TextChanged, ReportsNameTextBox.TextChanged
+        ' WE 30/07/2014 - #1865 - Added ReportsNameTextBox.
         Try
             Dim myTextBox As New TextBox
             myTextBox = CType(sender, TextBox)
@@ -3902,7 +4482,7 @@ Public Class IProgISETest
                 If Not String.Equals(BsErrorProvider1.GetError(myTextBox), String.Empty) Then BsErrorProvider1.SetError(myTextBox, String.Empty)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTextbox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3919,7 +4499,7 @@ Public Class IProgISETest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsUnitComboBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsUnitComboBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsUnitComboBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3941,10 +4521,28 @@ Public Class IProgISETest
         '// si después del mensaje quieres dejar la celda en su estado original
         '// realizas la siguiente asignación
         e.Cancel = False
+    End Sub
 
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles bsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New UiSortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "ISE"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 #End Region
-
-
 
 End Class

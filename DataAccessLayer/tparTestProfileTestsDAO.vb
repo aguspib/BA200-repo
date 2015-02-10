@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tparTestProfileTestsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -70,24 +70,27 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Read the TestProfiles in which the specified Test is included
+        ''' Read the TestProfiles in which the specified Test (STD,ISE,OFFS,CALC)) is included.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleTpe">Sample Type code. Optional parameter.</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC). Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfileTestsDS with the list
-        '''          of Test Profiles in which the Test is included</returns>
+        '''          of Test Profiles in which the Test is included.</returns>
         ''' <remarks>
         ''' Created by:  TR 18/05/2010
         ''' Modified by: SA 18/10/2010 - Changed the SQL to use this function only for STANDARD TESTS
         '''              TR 25/11/2010 - Added optional parameters pSampleType and pTestType (with default value STD)
         '''              SA 04/01/2011 - For OFF-SYSTEM Tests, verify the TestProfile has the same SampleType defined for the the Test
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                      Optional ByVal pSampleTpe As String = "", Optional ByVal pTestType As String = "STD") As GlobalDataTO
@@ -131,8 +134,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestProfileID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestProfileID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -187,8 +190,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestIDSpecial", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestIDSpecial", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -226,19 +229,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Delete the specified Standard Test from all Test Profiles in which it is included. When a SampleType is informed, 
-        ''' it means that the Standard Test have to be deleted only of all the Test Profiles defined for this SampleType.
+        ''' Delete the specified Test (Standard, ISE, Off-System or Calculated Test) from all Test Profiles in which it is included.
+        ''' When a SampleType is informed, it means that the Test only has to be deleted from all the Test Profiles defined for this SampleType.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Standard Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code. Optional parameter</param>
+        ''' <param name="pTestType">Test Type Code (STD,ISE,OFFS,CALC). Optional parameter</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  TR
@@ -246,6 +250,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              not needed; call to DeleteEmptyProfiles moved to the Delegate.
         '''                              Function moved here from tparTestProfiles
         '''              SA 18/10/2010 - Changed the SQL to use this function only for STANDARD TESTS
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
         ''' </remarks>
         Public Function DeleteByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                  ByVal pTestID As Integer, _
@@ -269,9 +274,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "DELETE FROM tparTestProfileTests " & vbCrLf
                         cmdText &= "WHERE  TestID = " & pTestID & vbCrLf
                         cmdText &= "  AND  TestType = '" & pTestType & "'" & vbCrLf
-                        cmdText &= "  AND  TestProfileID IN (SELECT TP.TestProfileID " & vbCrLf
-                        cmdText &= "                         FROM   tparTestProfiles TP " & vbCrLf
-                        cmdText &= "                         WHERE  TP.SampleType = '" & pSampleType.Trim & "')"
+                        'AJG
+                        'cmdText &= "  AND  TestProfileID IN (SELECT TP.TestProfileID " & vbCrLf
+                        cmdText &= "  AND  EXISTS (SELECT TP.TestProfileID " & vbCrLf
+                        cmdText &= "              FROM   tparTestProfiles TP " & vbCrLf
+                        cmdText &= "              WHERE  TP.SampleType = '" & pSampleType.Trim & "' AND tparTestProfileTests.TestProfileID = TP.TestProfileID)"
                     End If
 
                     Dim dbCmd As New SqlClient.SqlCommand
@@ -286,8 +293,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -333,8 +340,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -382,8 +389,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.GetTestTypes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.GetTestTypes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -405,6 +412,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              DL 26/11/2010 - Get also Off-System Tests
         '''              TR 09/03/2011 - Add the FactoryCalib row on the Standard Test
         '''              DL 22/07/2013 - Filter by Sample type. Bug#1181
+        '''              AG 01/09/2014 - BA-1869 Add the Available row
         ''' </remarks>
         Public Function ReadByTestProfileID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pTestProfileID As Integer) As GlobalDataTO
@@ -419,26 +427,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
 
                         'DL 22/07/2013
-                        cmdText &= "    SELECT TPT.TestProfileID, TPT.TestType, TPT.TestID, T.TestName, T.TestPosition, T.PreloadedTest, 1 AS TestTypePosition, TS.FactoryCalib " & vbCrLf
+                        cmdText &= "    SELECT TPT.TestProfileID, TPT.TestType, TPT.TestID, T.TestName, T.TestPosition, T.PreloadedTest, 1 AS TestTypePosition, TS.FactoryCalib, T.Available " & vbCrLf
                         cmdText &= "      FROM tparTestProfileTests TPT INNER JOIN tparTests T ON TPT.TesTID = T.TestID " & vbCrLf
                         cmdText &= "                                INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf
                         cmdText &= "                                INNER JOIN tparTestProfiles TP ON TPT.TestProfileID = TP.TestProfileID and tp.SampleType = ts.SampleType  " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'STD' " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 2 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 2 AS TestTypePosition, 0 as FactoryCalib, CT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparCalculatedTests CT ON TPT.TesTID = CT.CalcTestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'CALC' " & vbCrLf
                         cmdText &= "      AND CT.EnableStatus = 1 " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 3 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 3 AS TestTypePosition, 0 as FactoryCalib, IT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparISETests IT ON TPT.TesTID = IT.ISETestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'ISE' " & vbCrLf
                         cmdText &= "      AND IT.Enabled = 1 " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 4 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 4 AS TestTypePosition, 0 as FactoryCalib, OT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparOffSystemTests OT ON TPT.TesTID = OT.OffSystemTestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'OFFS' " & vbCrLf
@@ -492,8 +500,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestProfileID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadByTestProfileID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -516,6 +524,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              DL 26/11/2010 - Get also Off-System Tests
         '''              TR 09/03/2011 - Add the FactoryCalib row on the Standard Test
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        '''              AG 01/09/2014 - BA-1869 Add the Available row
         ''' </remarks>
         Public Function ReadTestsNotInProfile(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, _
                                               Optional ByVal pTestProfileID As Integer = 0) As GlobalDataTO
@@ -530,58 +539,86 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
 
                         'Get STANDARD Tests
-                        cmdText = " SELECT 'STD' AS TestType, T.TestID, T.TestName, T.TestPosition, T.PreloadedTest, TS.FactoryCalib " & _
+                        cmdText = " SELECT 'STD' AS TestType, T.TestID, T.TestName, T.TestPosition, T.PreloadedTest, TS.FactoryCalib, T.Available  " & _
                                   " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & _
                                   " WHERE  UPPER(TS.SampleType) = UPPER(N'" & pSampleType & "') "
                         '" WHERE  UPPER(TS.SampleType) = '" & pSampleType.ToUpper & "' "
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND T.TestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            'AJG
+                            'cmdText &= " AND T.TestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                " AND    TestType = 'STD') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
                                                             " WHERE  TestProfileID = " & pTestProfileID & _
-                                                            " AND    TestType = 'STD') "
+                                                            " AND    TestType = 'STD' AND T.TestID = TestID) "
                         End If
 
                         'Get CALCULATED Tests
+                        'AJG
+                        'cmdText &= " UNION " & _
+                        '           " SELECT 'CALC' AS TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
+                        '                  " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, CT.Available  " & _
+                        '           " FROM   tparCalculatedTests CT " & _
+                        '           " WHERE ((CT.UniqueSampleType = 1 AND UPPER(CT.SampleType) = UPPER(N'" & pSampleType & "')) " & _
+                        '           " OR     (CT.UniqueSampleType = 0 AND CT.CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & _
+                        '                                                                 " WHERE  ValueType = 'TEST' " & _
+                        '                                                                 " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "')))) " & _
+                        '           " AND    CT.EnableStatus = 1 "
+
                         cmdText &= " UNION " & _
                                    " SELECT 'CALC' AS TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
-                                          " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, CT.Available  " & _
                                    " FROM   tparCalculatedTests CT " & _
                                    " WHERE ((CT.UniqueSampleType = 1 AND UPPER(CT.SampleType) = UPPER(N'" & pSampleType & "')) " & _
-                                   " OR     (CT.UniqueSampleType = 0 AND CT.CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & _
-                                                                                         " WHERE  ValueType = 'TEST' " & _
-                                                                                         " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "')))) " & _
+                                   " OR     (CT.UniqueSampleType = 0 AND EXISTS (SELECT CalcTestID FROM tparFormulas " & _
+                                                                                " WHERE  ValueType = 'TEST' " & _
+                                                                                " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "') " & _
+                                                                                " AND CT.CalcTestID = CalcTestID))) " & _
                                    " AND    CT.EnableStatus = 1 "
 
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND CT.CalcTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
-                                                                  " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                  " AND    TestType = 'CALC') "
+                            'AJG
+                            'cmdText &= " AND CT.CalcTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                      " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                      " AND    TestType = 'CALC') "
+
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
+                                                        " WHERE  TestProfileID = " & pTestProfileID & _
+                                                        " AND    TestType = 'CALC' AND CT.CalcTestID = TestID) "
                         End If
 
                         'Get ISE Tests
                         cmdText &= " UNION " & _
                                    " SELECT 'ISE' AS TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  " & _
-                                          " IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, IT.Available  " & _
                                    " FROM   tparISETests IT INNER JOIN tparISETestSamples ITS ON IT.ISETestID = ITS.ISETestID " & _
                                    " WHERE  UPPER(ITS.SampleType) = UPPER(N'" & pSampleType & "') " & _
                                    " AND    IT.Enabled = 1 "
 
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND IT.ISETestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
-                                                                " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                " AND    TestType = 'ISE') "
+                            'AJG
+                            'cmdText &= " AND IT.ISETestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                    " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                    " AND    TestType = 'ISE') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
+                                                        " WHERE  TestProfileID = " & pTestProfileID & _
+                                                        " AND    TestType = 'ISE' AND IT.ISETestID = TestID) "
                         End If
 
                         'Get OFF-SYSTEM Tests
                         cmdText &= " UNION " & _
                                    " SELECT 'OFFS' AS TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName,  " & _
-                                          " OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, OT.Available  " & _
                                    " FROM   tparOffSystemTests OT INNER JOIN tparOffSystemTestSamples OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & _
                                    " WHERE  UPPER(OTS.SampleType) = UPPER(N'" & pSampleType & "') " '& _
                         
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND OT.OffSystemTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            'cmdText &= " AND OT.OffSystemTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                          " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                          " AND    TestType = 'OFFS') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
                                                                       " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                      " AND    TestType = 'OFFS') "
+                                                                      " AND    TestType = 'OFFS' AND OT.OffSystemTestID = TestID) "
                         End If
 
                         cmdText &= " ORDER BY TestType, TestPosition "
@@ -603,8 +640,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadTestsNotInProfile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.ReadTestsNotInProfile", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -681,8 +718,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.GetTestProfilesForReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestProfileTestsDAO.GetTestProfilesForReport", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

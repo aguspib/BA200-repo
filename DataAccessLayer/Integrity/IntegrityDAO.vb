@@ -2,7 +2,7 @@
 Imports Biosystems.Ax00.Global.DAL
 
 Public Class IntegrityDAO
-    Inherits DAOBase
+      
 
     ''' <summary>
     ''' Executes scripts in a Applic server.

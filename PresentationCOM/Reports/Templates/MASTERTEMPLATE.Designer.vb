@@ -24,8 +24,8 @@ Partial Public Class MASTERTEMPLATE
         Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
         Me.PageHeader = New DevExpress.XtraReports.UI.PageHeaderBand()
         Me.PageFooter = New DevExpress.XtraReports.UI.PageFooterBand()
-        Me.XrPageInfo1 = New DevExpress.XtraReports.UI.XRPageInfo()
         Me.XrReportDate1 = New DevExpress.XtraReports.UI.XRPageInfo()
+        Me.XrPageInfo1 = New DevExpress.XtraReports.UI.XRPageInfo()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
         '
         'Detail
@@ -63,23 +63,11 @@ Partial Public Class MASTERTEMPLATE
         Me.PageFooter.HeightF = 99.99998!
         Me.PageFooter.Name = "PageFooter"
         '
-        'XrPageInfo1
-        '
-        Me.XrPageInfo1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrPageInfo1.LocationFloat = New DevExpress.Utils.PointFloat(609.7501!, 84.99998!)
-        Me.XrPageInfo1.Name = "XrPageInfo1"
-        Me.XrPageInfo1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrPageInfo1.SizeF = New System.Drawing.SizeF(91.24988!, 15.0!)
-        Me.XrPageInfo1.StylePriority.UseFont = False
-        Me.XrPageInfo1.StylePriority.UseTextAlignment = False
-        Me.XrPageInfo1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomRight
-        Me.XrPageInfo1.Visible = False
-        '
         'XrReportDate1
         '
         Me.XrReportDate1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrReportDate1.Format = "{0:dd/MM/yyyy HH:mm}"
-        Me.XrReportDate1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 84.99998!)
+        Me.XrReportDate1.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 0.0!)
         Me.XrReportDate1.Name = "XrReportDate1"
         Me.XrReportDate1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrReportDate1.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime
@@ -89,13 +77,25 @@ Partial Public Class MASTERTEMPLATE
         Me.XrReportDate1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrReportDate1.Visible = False
         '
+        'XrPageInfo1
+        '
+        Me.XrPageInfo1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.XrPageInfo1.LocationFloat = New DevExpress.Utils.PointFloat(609.7501!, 80.0!)
+        Me.XrPageInfo1.Name = "XrPageInfo1"
+        Me.XrPageInfo1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
+        Me.XrPageInfo1.SizeF = New System.Drawing.SizeF(91.24988!, 15.0!)
+        Me.XrPageInfo1.StylePriority.UseFont = False
+        Me.XrPageInfo1.StylePriority.UseTextAlignment = False
+        Me.XrPageInfo1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomRight
+        Me.XrPageInfo1.Visible = False
+        '
         'MASTERTEMPLATE
         '
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.PageHeader, Me.PageFooter})
         Me.DesignerOptions.ShowDesignerHints = False
         Me.DesignerOptions.ShowExportWarnings = False
         Me.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(50, 50, 59, 25)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4

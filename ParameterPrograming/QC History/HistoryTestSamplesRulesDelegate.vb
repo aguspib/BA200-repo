@@ -1,13 +1,11 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.BL
-
     Public Class HistoryTestSamplesRulesDelegate
 
 #Region "Public Methods"
@@ -49,8 +47,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -102,8 +100,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.InsertFromTestSampleMultiRules", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.InsertFromTestSampleMultiRules", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -137,8 +135,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.ReadByQCTestSampleID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.ReadByQCTestSampleID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -146,57 +144,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 #End Region
 
-#Region "TO DELETE - OLD FUNCTIONS"
-        '''' <summary>
-        '''' When the selected Multirules are changed for a Test/SampleType in Tests Programming Screen, they are also inserted in 
-        '''' the correspondent table in QC Module
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pTestID">Test Identifier</param>
-        '''' <param name="pSampleType">Sample Type Code</param>
-        '''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC Module</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by: TR 11/05/2011
-        '''' </remarks>
-        'Public Function InsertFromTestSampleMultiRulesOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
-        '                                                  ByVal pQCTestSampleID As Integer) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError) AndAlso (Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myHistoryTestSamplesRulesDAO As New tqcHistoryTestSamplesRulesDAO
-        '                myGlobalDataTO = myHistoryTestSamplesRulesDAO.InsertFromTestSampleMultiRulesOLD(dbConnection, pTestID, pSampleType, pQCTestSampleID)
-
-        '                If (Not myGlobalDataTO.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Rollback is executed
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HistoryTestSamplesRulesDelegate.InsertFromTestSampleMultiRules", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
-#End Region
     End Class
 End Namespace
 

@@ -75,6 +75,7 @@
               <xs:element name="ExternalQC" msprop:Generator_ColumnVarNameInTable="columnExternalQC" msprop:Generator_ColumnPropNameInRow="ExternalQC" msprop:Generator_ColumnPropNameInTable="ExternalQCColumn" msprop:Generator_UserColumnName="ExternalQC" type="xs:boolean" minOccurs="0" />
               <xs:element name="LockedByLIS" msprop:Generator_ColumnVarNameInTable="columnLockedByLIS" msprop:Generator_ColumnPropNameInRow="LockedByLIS" msprop:Generator_ColumnPropNameInTable="LockedByLISColumn" msprop:Generator_UserColumnName="LockedByLIS" type="xs:boolean" minOccurs="0" />
               <xs:element name="CtrlsSendingGroup" msprop:Generator_ColumnVarNameInTable="columnCtrlsSendingGroup" msprop:Generator_ColumnPropNameInRow="CtrlsSendingGroup" msprop:Generator_ColumnPropNameInTable="CtrlsSendingGroupColumn" msprop:Generator_UserColumnName="CtrlsSendingGroup" type="xs:int" minOccurs="0" />
+              <xs:element name="LISMappingError" msprop:Generator_ColumnVarNameInTable="columnLISMappingError" msprop:Generator_ColumnPropNameInRow="LISMappingError" msprop:Generator_ColumnPropNameInTable="LISMappingErrorColumn" msprop:Generator_UserColumnName="LISMappingError" type="xs:boolean" default="false" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

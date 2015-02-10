@@ -9,7 +9,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksOrderTestsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -28,6 +28,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              in the parameter DS, use the current logged User and the current date
         '''              TR 06/08/2011 - Do not declare variables inside loops 
         '''              SA 26/03/2013 - When fields LISRequest and/or ExternalQC have NULL as value in the entry DS, insert them as FALSE
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewOrderTests As OrderTestsDS) As GlobalDataTO
             Dim dataToReturn As New GlobalDataTO
@@ -48,7 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'SQL Sentence to insert the new Order Test
                         cmdText = " INSERT INTO twksOrderTests(OrderID, TestType, TestID, SampleType, OrderTestStatus, TubeType, AnalyzerID, " & _
                                                              " TestProfileID, ExportDateTime, ReplicatesNumber, PreviousOrderTestID, AlternativeOrderTestID, " & _
-                                                             " ControlID, CreationOrder, LISRequest, ExternalQC, TS_User, TS_DateTime) " & _
+                                                             " ControlID, CreationOrder, LISRequest, ExternalQC, TS_User, TS_DateTime, Selected) " & _
                                   " VALUES('" & pNewOrderTests.twksOrderTests(i).OrderID & "', " & _
                                          " '" & pNewOrderTests.twksOrderTests(i).TestType & "', " & _
                                                 pNewOrderTests.twksOrderTests(i).TestID & ", " & _
@@ -122,15 +123,22 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'Audit fields 
                         If (pNewOrderTests.twksOrderTests(i).IsTS_UserNull) Then
-                            Dim myGlobalBase As New GlobalBase
-                            cmdText &= " N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
+                            'Dim myGlobalbase As New GlobalBase
+                            cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                         Else
                             cmdText &= " N'" & pNewOrderTests.twksOrderTests(i).TS_User.Replace("'", "''") & "', "
                         End If
                         If (pNewOrderTests.twksOrderTests(i).IsTS_DateTimeNull) Then
-                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', "
                         Else
-                            cmdText += " '" & pNewOrderTests.twksOrderTests(i).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText += " '" & pNewOrderTests.twksOrderTests(i).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        End If
+
+                        ' XB 27/08/2014 - BT #1868
+                        If (pNewOrderTests.twksOrderTests(i).IsSelectedNull) Then
+                            cmdText &= " 0) "
+                        Else
+                            cmdText &= IIf(pNewOrderTests.twksOrderTests(i).Selected, 1, 0).ToString & ") "
                         End If
 
                         'Execute the SQL Sentence
@@ -166,8 +174,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -200,8 +208,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -224,10 +232,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " DELETE twksOrderTests " & vbCrLf & _
+                    '                        " WHERE  OrderTestStatus = 'OPEN' " & vbCrLf & _
+                    '                        " AND    OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests) " & vbCrLf & _
+                    '                        " AND    OrderID IN (SELECT OrderID FROM twksOrders WHERE  SampleClass = '" & pSampleClass & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksOrderTests " & vbCrLf & _
                                             " WHERE  OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                            " AND    OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests) " & vbCrLf & _
-                                            " AND    OrderID IN (SELECT OrderID FROM twksOrders WHERE  SampleClass = '" & pSampleClass & "') " & vbCrLf
+                                            " AND    NOT EXISTS (SELECT OrderTestID FROM twksWSOrderTests WHERE twksOrderTests.OrderTestID = OrderTestID) " & vbCrLf & _
+                                            " AND    EXISTS (SELECT OrderID FROM twksOrders WHERE  SampleClass = '" & pSampleClass & "' AND twksOrderTests.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -239,8 +252,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteOpenOrderTestsBySampleClass", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteOpenOrderTestsBySampleClass", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -288,8 +301,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -314,6 +327,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 31/01/2012 - Use the Using clause to manage the SQL Commands defined in the function
         '''              SA 26/03/2013 - When fields LISRequest and ExternalQC are informed in the entry DS, update the corresponding value. 
         '''                              When value is NULL, do not change the current value.
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestsDS As OrderTestsDS) As GlobalDataTO
             Dim cmdText As New StringBuilder()
@@ -405,8 +419,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         cmdText.Append(", TS_User = ")
                         If (orderTestRow.IsTS_UserNull) Then
-                            Dim myGlobalBase As New GlobalBase
-                            cmdText.AppendFormat("N'{0}'", myGlobalBase.GetSessionInfo().UserName().Replace("'", "''"))
+                            'Dim myGlobalbase As New GlobalBase
+                            cmdText.AppendFormat("N'{0}'", GlobalBase.GetSessionInfo().UserName().Replace("'", "''"))
                         Else
                             cmdText.AppendFormat("N'{0}'", orderTestRow.TS_User.Replace("'", "''"))
                         End If
@@ -416,6 +430,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText.AppendFormat("'{0}'", Now.ToString("yyyyMMdd HH:mm:ss"))
                         Else
                             cmdText.AppendFormat("'{0}'", orderTestRow.TS_DateTime.ToString("yyyyMMdd HH:mm:ss"))
+                        End If
+
+                        ' XB 27/08/2014 - BT #1868
+                        If (Not orderTestRow.IsSelectedNull) Then
+                            cmdText.Append(", Selected = ")
+                            cmdText.AppendFormat("{0}", IIf(orderTestRow.Selected, 1, 0).ToString)
                         End If
 
                         cmdText.Append(" WHERE  OrderTestID = ")
@@ -449,8 +469,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -488,8 +508,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateAlternativeOTByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateAlternativeOTByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -526,8 +546,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateLISRequestByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateLISRequestByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -560,13 +580,23 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksOrderTests " & vbCrLf & _
+                    '                        " SET    OrderTestStatus = '" & pNewStatus.Trim & "', " & vbCrLf & _
+                    '                               " TS_User = N'" & pLoggedUser.Trim & "', " & vbCrLf & _
+                    '                               " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                    '                                               " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                               " AND    OpenOTFlag = 0) " & vbCrLf & _
+                    '                        " AND    OrderTestStatus = '" & pPreviousStatus.Trim & "' " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksOrderTests " & vbCrLf & _
                                             " SET    OrderTestStatus = '" & pNewStatus.Trim & "', " & vbCrLf & _
                                                    " TS_User = N'" & pLoggedUser.Trim & "', " & vbCrLf & _
                                                    " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                            " WHERE  EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                   " AND    OpenOTFlag = 0) " & vbCrLf & _
+                                                                   " AND    OpenOTFlag = 0 AND twksOrderTests.OrderTestID = OrderTestID) " & vbCrLf & _
                                             " AND    OrderTestStatus = '" & pPreviousStatus.Trim & "' " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
@@ -579,8 +609,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateStatus", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -618,8 +648,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateStatusByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateStatusByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -644,15 +674,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                                                            " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                                                            " INNER JOIN tparTestCalibrators TC ON OT.TestID = TC.TestID AND OT.SampleType = TC.SampleType " & vbCrLf & _
+                    '                                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                               " AND    OT.TestType        = 'STD' " & vbCrLf & _
+                    '                                               " AND    O.SampleClass      = 'CALIB' " & vbCrLf & _
+                    '                                               " AND    TC.CalibratorID    = " & pCalibratorID.ToString & ") "
+
                     Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                                                " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                                                                " INNER JOIN tparTestCalibrators TC ON OT.TestID = TC.TestID AND OT.SampleType = TC.SampleType " & vbCrLf & _
-                                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                   " AND    OT.TestType        = 'STD' " & vbCrLf & _
-                                                                   " AND    O.SampleClass      = 'CALIB' " & vbCrLf & _
-                                                                   " AND    TC.CalibratorID    = " & pCalibratorID.ToString & ") "
+                                            " WHERE  EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                                            " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                                                         " INNER JOIN tparTestCalibrators TC ON OT.TestID = TC.TestID AND OT.SampleType = TC.SampleType " & vbCrLf & _
+                                                            " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                            " AND    OT.TestType        = 'STD' " & vbCrLf & _
+                                                            " AND    O.SampleClass      = 'CALIB' " & vbCrLf & _
+                                                            " AND    TC.CalibratorID    = " & pCalibratorID.ToString & " AND twksOrderTests.OrderTestID = WSOT.OrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -664,8 +705,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByCalibrator", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -692,14 +733,23 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                                                            " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                               " AND    OT.TestType        = 'STD' " & vbCrLf & _
+                    '                                               " AND    O.SampleClass      = 'CTRL' " & vbCrLf & _
+                    '                                               " AND    OT.ControlID       = " & pControlID.ToString & ") "
+
                     Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                                                " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                   " AND    OT.TestType        = 'STD' " & vbCrLf & _
-                                                                   " AND    O.SampleClass      = 'CTRL' " & vbCrLf & _
-                                                                   " AND    OT.ControlID       = " & pControlID.ToString & ") "
+                                            " WHERE  EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                                            " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                            " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                            " AND    OT.TestType        = 'STD' " & vbCrLf & _
+                                                            " AND    O.SampleClass      = 'CTRL' " & vbCrLf & _
+                                                            " AND    OT.ControlID       = " & pControlID.ToString & " AND twksOrderTests.OrderTestID = WSOT.OrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -711,8 +761,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByControl", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -739,8 +789,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                                                            " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                               " AND    O.SampleClass      = 'PATIENT' " & vbCrLf & _
+                    '                                               " AND   (O.PatientID IS NOT NULL AND O.PatientID = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
+                    '                                               " OR    (O.OrderID   IS NOT NULL AND O.OrderID   = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
+                    '                                               " OR    (O.SampleID  IS NOT NULL AND O.SampleID  = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
+                    '                                               " AND    OT.SampleType = '" & pSampleType & "') "
+
                     Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                            " WHERE  EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
                                                                    " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                                                 " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                    " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
@@ -748,7 +810,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                    " AND   (O.PatientID IS NOT NULL AND O.PatientID = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
                                                                    " OR    (O.OrderID   IS NOT NULL AND O.OrderID   = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
                                                                    " OR    (O.SampleID  IS NOT NULL AND O.SampleID  = N'" & pPatientID.Replace("'", "''") & "') " & vbCrLf & _
-                                                                   " AND    OT.SampleType = '" & pSampleType & "') "
+                                                                   " AND    OT.SampleType = '" & pSampleType & "' AND twksOrderTests.OrderTestID = WSOT.OrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -760,8 +822,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByPatient", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeByPatient", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -787,15 +849,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                                                            " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                                                            " INNER JOIN tparTests T ON OT.TestID = T.TestID " & vbCrLf & _
+                    '                                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                               " AND    O.SampleClass      = 'BLANK' " & vbCrLf & _
+                    '                                               " AND    OT.TestType        = 'STD' " & vbCrLf & _
+                    '                                               " AND    T.BlankMode        = '" & pSpecSolution & "') "
+
                     Dim cmdText As String = " UPDATE twksOrderTests SET TubeType = '" & pNewTubeType & "' " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                            " WHERE  EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
                                                                    " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                                                 " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                                                 " INNER JOIN tparTests T ON OT.TestID = T.TestID " & vbCrLf & _
                                                                    " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                    " AND    O.SampleClass      = 'BLANK' " & vbCrLf & _
                                                                    " AND    OT.TestType        = 'STD' " & vbCrLf & _
-                                                                   " AND    T.BlankMode        = '" & pSpecSolution & "') "
+                                                                   " AND    T.BlankMode        = '" & pSpecSolution & "' AND twksOrderTests.OrderTestID = WSOT.OrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -807,8 +880,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeBySpecialSolution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateTubeTypeBySpecialSolution", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -848,8 +921,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -926,8 +999,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CountBlankOrCalibDependencies", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CountBlankOrCalibDependencies", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -990,8 +1063,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CountByOrderTestStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CountByOrderTestStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1027,8 +1100,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteByOrderID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteByOrderID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1069,8 +1142,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteNotInList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.DeleteNotInList", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1130,8 +1203,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetAlternativeSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetAlternativeSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1163,6 +1236,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 04/04/2013 - Added new optional parameter to indicate if OPEN Blanks and Calibrators have to be returned as SELECTED.
         '''                              Optional parameter with TRUE as default value. Changed the subQuery for OPEN OrderTests to return them
         '''                              selected or not according value of this new parameter  
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BT #1868
         ''' </remarks>
         Public Function GetBlankCalibOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                 Optional ByVal pReturnOpenAsSelected As Boolean = True) As GlobalDataTO
@@ -1174,10 +1248,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+
+                        ' XB 28/08/2014 - this value is not used from this moment - BT #1868
+                        'Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
 
                         'Get Open Blanks and Calibrators linked to the informed WorkSession
-                        Dim cmdText As String = " SELECT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, " & vbCrLf & _
+                        Dim cmdText As String = " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, " & vbCrLf & _
                                                        " OT.TubeType,  OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates, " & vbCrLf & _
                                                        " 1 AS NewCheck,  OT.PreviousOrderTestID, OT.OrderTestStatus AS OTStatus, " & vbCrLf & _
                                                        " OT.CreationOrder, WSOT.ToSendFlag, T.BlankMode " & vbCrLf & _
@@ -1192,7 +1268,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '... and get In Process Blanks and Calibrators linked to the informed WorkSession
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT 1 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, " & vbCrLf & _
                                           " OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 1 AS NewCheck, " & vbCrLf & _
                                           " OT.PreviousOrderTestID, 'INPROCESS' AS OTStatus, OT.CreationOrder, WSOT.ToSendFlag, T.BlankMode " & vbCrLf & _
                                    " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
@@ -1224,8 +1300,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlankCalibOrderTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlankCalibOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1263,11 +1339,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    T.BlankMode  <> 'REAGENT' " & vbCrLf
 
                         If (Not String.IsNullOrEmpty(pWorkSessionID)) Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & _
+                            '                                  " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & _
+                            '                                  " AND    OpenOTFlag    = 0 " & _
+                            '                                  " AND    ToSendFlag    = 1) "
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & _
                                        " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & _
                                                               " AND    OpenOTFlag    = 0 " & _
-                                                              " AND    ToSendFlag    = 1) "
+                                                              " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) "
                         Else
                             cmdText &= " AND  OT.OrderTestID IN (" & pOrderTestsList & ") "
                         End If
@@ -1289,8 +1371,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlanksData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlanksData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1335,11 +1417,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    OT.TestType   = 'STD' " & vbCrLf
 
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                  " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                            '                                  " AND    ToSendFlag    = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND    OpenOTFlag    = 0 " & vbCrLf & _
-                                                              " AND    ToSendFlag    = 1) " & vbCrLf
+                                                              " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -1361,8 +1449,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetCalibrationData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetCalibrationData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1390,6 +1478,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 18/06/2012 - Changed the query to get the Test Name from the proper table depending on the TestType: for 
         '''                              Standard Tests, field TestName in tparTests, but for ISE Tests, field Name in tparISETests 
         '''              TR 12/03/2013 - Changed the query to get also field LISRequest from twksOrderTests table
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BA #1868
+        '''              XB 01/09/2014 - Get also the new field ControlLevel from tparControls table - BA #1868
         ''' </remarks>
         Public Function GetControlOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1401,27 +1491,52 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get Open Controls linked to the informed WorkSession
-                        Dim cmdText As String = " SELECT 0 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                        'AJG
+                        'Dim cmdText As String = " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                        '                              " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
+                        '                                    " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
+                        '                               " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, OT.OrderTestStatus AS OTStatus, C.ControlID, " & vbCrLf & _
+                        '                               " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
+                        '                        " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                                 " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
+                        '                        " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' AND OpenOTFlag = 1) " & vbCrLf & _
+                        '                        " AND O.SampleClass = 'CTRL' " & vbCrLf
+                        Dim cmdText As String = " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
                                                       " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                             " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                                        " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, OT.OrderTestStatus AS OTStatus, C.ControlID, " & vbCrLf & _
-                                                       " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder " & vbCrLf & _
+                                                       " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
                                                 " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                          " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
-                                                " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                                          " WHERE WorkSessionID = '" & pWorkSessionID & "' AND OpenOTFlag = 1) " & vbCrLf & _
+                                                " WHERE EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                               " WHERE WorkSessionID = '" & pWorkSessionID & "' AND OpenOTFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                                 " AND O.SampleClass = 'CTRL' " & vbCrLf
                         '... and get In Process Controls linked to the informed WorkSession
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                        '                 " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
+                        '                       " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
+                        '                  " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 'INPROCESS' AS OTStatus, C.ControlID, " & vbCrLf & _
+                        '                  " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
+                        '           " FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                  " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
+                        '           " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' AND   OpenOTFlag = 0) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'CTRL'" & vbCrLf & _
+                        '           " ORDER BY OT.CreationOrder " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT 1 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                                   " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
                                          " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                           " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 'INPROCESS' AS OTStatus, C.ControlID, " & vbCrLf & _
-                                          " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder " & vbCrLf & _
+                                          " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
                                    " FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                           " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
-                                   " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                            " WHERE WorkSessionID = '" & pWorkSessionID & "' AND   OpenOTFlag = 0) " & vbCrLf & _
+                                   " WHERE EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' AND   OpenOTFlag = 0 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'CTRL'" & vbCrLf & _
                                    " ORDER BY OT.CreationOrder " & vbCrLf
 
@@ -1442,8 +1557,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetControlOrderTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetControlOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1493,10 +1608,10 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         If (pWorkSessionID.Trim <> "") Then
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND    OpenOTFlag    = 0 " & vbCrLf & _
-                                                              " AND    ToSendFlag    = 1) " & vbCrLf
+                                                              " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND  OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -1518,8 +1633,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetControlData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetControlData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1583,8 +1698,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetElementByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetElementByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1609,9 +1724,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Dim cmdText As String = " SELECT * FROM twksOrderTests " & vbCrLf & _
+                        '                        " WHERE  OrderTestID IN (SELECT OrderTestID from twksWSRequiredElemByOrderTest " & vbCrLf & _
+                        '                                               " WHERE ElementID = " & pElementID.ToString() & ") " & vbCrLf & _
+                        '                        " AND    OrderTestStatus <> 'CLOSED' "
+
                         Dim cmdText As String = " SELECT * FROM twksOrderTests " & vbCrLf & _
-                                                " WHERE  OrderTestID IN (SELECT OrderTestID from twksWSRequiredElemByOrderTest " & vbCrLf & _
-                                                                       " WHERE ElementID = " & pElementID.ToString() & ") " & vbCrLf & _
+                                                " WHERE  EXISTS (SELECT OrderTestID from twksWSRequiredElemByOrderTest " & vbCrLf & _
+                                                                " WHERE ElementID = " & pElementID.ToString() & " AND twksOrderTests.OrderTestID = OrderTestID) " & vbCrLf & _
                                                 " AND    OrderTestStatus <> 'CLOSED' "
 
                         Dim myOrderTestsDS As New OrderTestsDS
@@ -1631,8 +1751,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetNotClosedOrderTestByElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetNotClosedOrderTestByElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1684,8 +1804,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrdersOKByUser", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrdersOKByUser", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1736,8 +1856,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestByOrderIDAndTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestByOrderIDAndTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1787,8 +1907,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestByTestAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestByTestAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1843,8 +1963,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestInfoByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestInfoByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1865,9 +1985,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  AG 08/05/2013
         ''' Modified by: SA 09/05/2013 - Added parameters to inform TestType and TestID and filter the query also by these values 
+        ''' Modified by: AG 18/09/2014 - BA-1869 change pTestID to an optional parameter
         ''' </remarks>
         Public Function GetOrderTestsByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pTestType As String, _
-                                                   ByVal pTestID As Integer) As GlobalDataTO
+                                                   Optional ByVal pTestID As Integer = -1) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1879,8 +2000,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT OT.OrderTestID " & vbCrLf & _
                                                 " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    OT.TestType        = '" & pTestType.Trim & "' " & vbCrLf & _
-                                                " AND    OT.TestID          = " & pTestID
+                                                " AND    OT.TestType        = '" & pTestType.Trim & "' " & vbCrLf
+
+                        'AG 18/09/2014 - BA-1869 add TestID clause only when informed
+                        If pTestID > 0 Then
+                            cmdText &= " AND    OT.TestID          = " & pTestID
+                        End If
 
                         Dim myDataSet As New OrderTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1892,15 +2017,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.SetDatos = myDataSet
                         resultData.HasError = False
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1926,6 +2051,25 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         'PATIENTS
                         'Get information for STD Tests
+                        'AJG
+                        'Dim cmdText As String = " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
+                        '                        "       (CASE WHEN O.PatientID IS NOT NULL THEN 'DB' ELSE 'MAN' END) AS SampleIDType, " & vbCrLf & _
+                        '                        "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, OT.CreationOrder, " & vbCrLf & _
+                        '                        "       T.TestName, NULL AS CalcTestFormula, OT.ControlID, " & vbCrLf & _
+                        '                        "       OT.OrderTestID, OTL.AwosID , OTL.ESOrderID , OTL.ESPatientID , OTL.LISOrderID , OTL.LISPatientID , OTL.RerunNumber , OTL.SpecimenID , " & vbCrLf & _
+                        '                        "       O.OrderID, OT.LISRequest, OT.OrderTestStatus AS OTStatus, OT.ExternalQC " & vbCrLf & _
+                        '                        " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID  " & vbCrLf & _
+                        '                        "                           INNER JOIN tparTests AS T ON OT.TestID = T.TestID  " & vbCrLf & _
+                        '                        "                           LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID   " & vbCrLf & _
+                        '                        " WHERE OT.TestType = 'STD'  " & vbCrLf & _
+                        '                        " AND   OT.LISRequest = 1 " & vbCrLf & _
+                        '                        " AND   O.SampleClass IN ('PATIENT') " & vbCrLf & _
+                        '                        " AND   ((OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1)) " & vbCrLf & _
+                        '                        " OR " & vbCrLf & _
+                        '                        " (OrderTestStatus = 'CLOSED' AND OT.OrderTestID IN (SELECT OCT.OrderTestID  " & vbCrLf & _
+                        '                        "   FROM   twksOrderCalculatedTests OCT INNER JOIN twksOrderTests OT ON OCT.CalcOrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '                        "  WHERE  OT.OrderTestStatus <> 'CLOSED'))) "
+
                         Dim cmdText As String = " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
                                                 "       (CASE WHEN O.PatientID IS NOT NULL THEN 'DB' ELSE 'MAN' END) AS SampleIDType, " & vbCrLf & _
                                                 "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, OT.CreationOrder, " & vbCrLf & _
@@ -1938,13 +2082,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE OT.TestType = 'STD'  " & vbCrLf & _
                                                 " AND   OT.LISRequest = 1 " & vbCrLf & _
                                                 " AND   O.SampleClass IN ('PATIENT') " & vbCrLf & _
-                                                " AND   ((OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1)) " & vbCrLf & _
+                                                " AND   ((OT.OrderTestStatus <> 'CLOSED' AND NOT EXISTS (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1 AND OT.OrderTestID = OrderTestID)) " & vbCrLf & _
                                                 " OR " & vbCrLf & _
-                                                " (OrderTestStatus = 'CLOSED' AND OT.OrderTestID IN (SELECT OCT.OrderTestID  " & vbCrLf & _
+                                                " (OrderTestStatus = 'CLOSED' AND EXISTS (SELECT OCT.OrderTestID  " & vbCrLf & _
                                                 "   FROM   twksOrderCalculatedTests OCT INNER JOIN twksOrderTests OT ON OCT.CalcOrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                "  WHERE  OT.OrderTestStatus <> 'CLOSED'))) "
+                                                "  WHERE  OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID = OCT.OrderTestID))) "
 
                         '...get also for ISE Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '            " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
+                        '            "       (CASE WHEN O.PatientID IS NOT NULL THEN 'DB' ELSE 'MAN' END) AS SampleIDType, " & vbCrLf & _
+                        '            "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, OT.CreationOrder, " & vbCrLf & _
+                        '            "       IT.[Name] AS TestName,  NULL AS CalcTestFormula, OT.ControlID, " & vbCrLf & _
+                        '            "       OT.OrderTestID, OTL.AwosID , OTL.ESOrderID , OTL.ESPatientID , OTL.LISOrderID , OTL.LISPatientID , OTL.RerunNumber , OTL.SpecimenID , " & vbCrLf & _
+                        '            "       O.OrderID, OT.LISRequest, OT.OrderTestStatus AS OTStatus, OT.ExternalQC " & vbCrLf & _
+                        '            " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID  " & vbCrLf & _
+                        '            "                           INNER JOIN tparISETests AS IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                        '            "                           INNER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID " & vbCrLf & _
+                        '            " WHERE OT.TestType = 'ISE'  " & vbCrLf & _
+                        '            " AND   OT.LISRequest = 1" & vbCrLf & _
+                        '            " AND   O.SampleClass IN ('PATIENT') " & vbCrLf & _
+                        '            " AND   OT.OrderTestStatus <> 'CLOSED' " & vbCrLf & _
+                        '            " AND   OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+
                         cmdText &= " UNION " & vbCrLf & _
                                     " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
                                     "       (CASE WHEN O.PatientID IS NOT NULL THEN 'DB' ELSE 'MAN' END) AS SampleIDType, " & vbCrLf & _
@@ -1959,7 +2120,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                     " AND   OT.LISRequest = 1" & vbCrLf & _
                                     " AND   O.SampleClass IN ('PATIENT') " & vbCrLf & _
                                     " AND   OT.OrderTestStatus <> 'CLOSED' " & vbCrLf & _
-                                    " AND   OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+                                    " AND   NOT EXISTS (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1 AND OT.OrderTestID = OrderTestID) "
 
                         '...get also for Calculated Tests
                         cmdText &= " UNION " & vbCrLf & _
@@ -2002,6 +2163,20 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'CONTROLS 
                         'Get information for STD Tests
+                        'AJG
+                        'cmdText = " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag,  " & vbCrLf & _
+                        '"       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, " & vbCrLf & _
+                        '"       T.TestName, NULL AS CalcTestFormula, " & vbCrLf & _
+                        '"       OTL.AwosID, OTL.SpecimenID, OTL.ESOrderID, OTL.LISOrderID, OTL.ESPatientID, OTL.LISPatientID,  " & vbCrLf & _
+                        '"       OT.LISRequest, OT.ExternalQC " & vbCrLf & _
+                        '" FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID  " & vbCrLf & _
+                        '"                           INNER JOIN tparTests AS T ON OT.TestID = T.TestID  " & vbCrLf & _
+                        '"                           INNER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID   " & vbCrLf & _
+                        '" WHERE OT.TestType = 'STD'  " & vbCrLf & _
+                        '" AND   OT.LISRequest = 1 " & vbCrLf & _
+                        '" AND   O.SampleClass IN ('CTRL') " & vbCrLf & _
+                        '" AND   OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+
                         cmdText = " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag,  " & vbCrLf & _
                         "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, " & vbCrLf & _
                         "       T.TestName, NULL AS CalcTestFormula, " & vbCrLf & _
@@ -2013,9 +2188,24 @@ Namespace Biosystems.Ax00.DAL.DAO
                         " WHERE OT.TestType = 'STD'  " & vbCrLf & _
                         " AND   OT.LISRequest = 1 " & vbCrLf & _
                         " AND   O.SampleClass IN ('CTRL') " & vbCrLf & _
-                        " AND   OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+                        " AND   OT.OrderTestStatus <> 'CLOSED' AND NOT EXISTS (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1 AND OT.OrderTestID = OrderTestID) "
 
                         '...get also for ISE Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '            " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
+                        '            "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, " & vbCrLf & _
+                        '            "       IT.[Name] AS TestName,  NULL AS CalcTestFormula, " & vbCrLf & _
+                        '            "       OTL.AwosID, OTL.SpecimenID, OTL.ESOrderID, OTL.LISOrderID, OTL.ESPatientID, OTL.LISPatientID,  " & vbCrLf & _
+                        '            "       OT.LISRequest, OT.ExternalQC " & vbCrLf & _
+                        '            " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID  " & vbCrLf & _
+                        '            "                           INNER JOIN tparISETests AS IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                        '            "                           INNER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID " & vbCrLf & _
+                        '            " WHERE OT.TestType = 'ISE'  " & vbCrLf & _
+                        '            " AND   OT.LISRequest = 1" & vbCrLf & _
+                        '            " AND   O.SampleClass IN ('CTRL') " & vbCrLf & _
+                        '            " AND   OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+
                         cmdText &= " UNION " & vbCrLf & _
                                     " SELECT DISTINCT O.SampleClass AS SampleClass, (CASE WHEN O.PatientID IS NOT NULL THEN O.PatientID ELSE O.SampleID END) AS SampleID, O.StatFlag, " & vbCrLf & _
                                     "       OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.ReplicatesNumber as NumReplicates, " & vbCrLf & _
@@ -2028,7 +2218,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                     " WHERE OT.TestType = 'ISE'  " & vbCrLf & _
                                     " AND   OT.LISRequest = 1" & vbCrLf & _
                                     " AND   O.SampleClass IN ('CTRL') " & vbCrLf & _
-                                    " AND   OT.OrderTestStatus <> 'CLOSED' AND OT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1) "
+                                    " AND   OT.OrderTestStatus <> 'CLOSED' AND NOT EXISTS (SELECT OrderTestID FROM twksWSExecutions WHERE LockedByLIS = 1 AND OT.OrderTestID = OrderTestID) "
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
@@ -2046,8 +2236,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsForLISReset", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsForLISReset", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2097,8 +2287,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsToChangeAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOrderTestsToChangeAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2148,8 +2338,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOTPatientData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetOTPatientData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2191,6 +2381,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 01/04/2014 - Changed all subqueries to filter by RerunNumber = 1 all LEFT OUTER JOINs over table twksOrderTestsLISInfo, 
         '''                              to prevent Order Tests with Reruns requested by LIS are returned as many times as requested LIS Rerun they have 
         '''                              (error detected when testing changes due to BT #1564)
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table when value of entry parameter pReturnOpenAsSelected is True - BT #1868
         '''</remarks>
         Public Function GetPatientOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                              Optional ByVal pReturnOpenAsSelected As Boolean = True) As GlobalDataTO
@@ -2201,9 +2392,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+
+                        ' XB 27/08/2014 - BT #1868
+                        'Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+                        Dim selectedValue As String = "0"
+                        If pReturnOpenAsSelected Then
+                            selectedValue = "OT.Selected"
+                        End If
 
                         'Get Open Patient Samples linked to the informed WorkSession for Standard Tests
+                        'AJG
+                        'Dim cmdText As String = " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                               " OT.OrderTestID, OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                               " OT.OrderTestStatus AS OTStatus, OT.TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                               " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '                         " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                                   " INNER JOIN tparTests AS T ON OT.TestID = T.TestID " & vbCrLf & _
+                        '                                                   " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
+                        '                                                   " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '                         " WHERE OT.TestType = 'STD' " & vbCrLf & _
+                        '                         " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                                  " AND   OpenOTFlag = 1) " & vbCrLf & _
+                        '                         " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         Dim cmdText As String = " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                                        " OT.OrderTestID, OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                                        " OT.OrderTestStatus AS OTStatus, OT.TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
@@ -2213,12 +2425,28 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                            " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
                                                                            " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
                                                  " WHERE OT.TestType = 'STD' " & vbCrLf & _
-                                                 " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                                          " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                          " AND   OpenOTFlag = 1) " & vbCrLf & _
+                                                 " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                                " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                                " AND   OpenOTFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                                  " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '...get also Open Patient Samples linked to the informed WorkSession for Calculated Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, CT.CalcTestLongName AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest," & vbCrLf & _
+                        '                  " OT.OrderTestStatus AS OTStatus, OT.TestProfileID, TP.TestProfileName, '=' + CT.FormulaText AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM   twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                       " INNER JOIN tparCalculatedTests AS CT ON OT.TestID = CT.CalcTestID " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'CALC' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                     " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                     " AND OpenOTFlag = 1) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
                                    " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, CT.CalcTestLongName AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest," & vbCrLf & _
@@ -2229,12 +2457,28 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID " & vbCrLf & _
                                                                " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'CALC' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                              " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                             " AND OpenOTFlag = 1) " & vbCrLf & _
+                                                             " AND OpenOTFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '...get also Open Patient Samples linked to the informed WorkSession for ISE Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, IT.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                  " OT.OrderTestStatus AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM   twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                       " INNER JOIN tparISETests AS IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'ISE' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                    " AND OpenOTFlag = 1) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
                                    " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, IT.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
@@ -2245,14 +2489,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
                                                                " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'ISE' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                            " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                            " AND OpenOTFlag = 1) " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                  " AND OpenOTFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '... get also In Process Patient Samples linked to the informed WorkSession for Standard Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                  " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                     " INNER JOIN tparTests AS T ON OT.TestID = T.TestID " & vbCrLf & _
+                        '                                     " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
+                        '                                     " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'STD' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                    " AND   OpenOTFlag = 0) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2261,14 +2521,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                              " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
                                                              " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'STD' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                             " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                            " AND   OpenOTFlag = 0) " & vbCrLf & _
+                                                            " AND   OpenOTFlag = 0 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '... get also In Process Patient Samples linked to the informed WorkSession for Calculated Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, CT.CalcTestLongName AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                  " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, '=' + CT.FormulaText AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                     " INNER JOIN tparCalculatedTests AS CT ON OT.TestID = CT.CalcTestID " & vbCrLf & _
+                        '                                     " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID " & vbCrLf & _
+                        '                                     " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID  AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'CALC' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                    " AND   OpenOTFlag = 0) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, CT.CalcTestLongName AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, '=' + CT.FormulaText AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2277,14 +2553,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                              " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID " & vbCrLf & _
                                                              " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID  AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'CALC' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                            " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                            " AND   OpenOTFlag = 0) " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                  " AND   OpenOTFlag = 0 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '...get also In Process Patient Samples linked to the informed WorkSession for ISE Tests
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, IT.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                  " OT.OrderTestStatus AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM   twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                       " INNER JOIN tparISETests AS IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'ISE' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                    " AND OpenOTFlag = 0) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, IT.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " OT.OrderTestStatus AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2293,14 +2585,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
                                                                " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'ISE' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                            " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                            " AND OpenOTFlag = 0) " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                  " AND OpenOTFlag = 0 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '...finally, get all Patient Samples linked to the informed WorkSession for Off-System Tests as unselected and Open
+                        'AJG
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                        '                  " OT.OrderTestID, OT.TestType, OT.TestID, OST.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
+                        '                  " 'OPEN' AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
+                        '                  " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
+                        '           " FROM   twksOrderTests AS OT INNER JOIN twksOrders AS O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                       " INNER JOIN tparOffSystemTests AS OST ON OT.TestID = OST.OfFSystemTestID " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
+                        '                                       " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID  AND OTL.RerunNumber = 1 " & vbCrLf & _
+                        '           " WHERE OT.TestType = 'OFFS' " & vbCrLf & _
+                        '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                                    " AND OpenOTFlag = 1) " & vbCrLf & _
+                        '           " AND   O.SampleClass = 'PATIENT' " & vbCrLf
+
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 0 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, OST.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'OPEN' AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2309,9 +2617,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                " LEFT OUTER JOIN tparTestProfiles AS TP ON OT.TestProfileID = TP.TestProfileID AND OT.SampleType = TP.SampleType " & vbCrLf & _
                                                                " LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OT.OrderTestID = OTL.OrderTestID  AND OTL.RerunNumber = 1 " & vbCrLf & _
                                    " WHERE OT.TestType = 'OFFS' " & vbCrLf & _
-                                   " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                            " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                            " AND OpenOTFlag = 1) " & vbCrLf & _
+                                   " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                  " AND OpenOTFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf & _
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         cmdText &= " ORDER BY OT.CreationOrder " & vbCrLf
@@ -2333,8 +2641,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetPatientOrderTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetPatientOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2388,8 +2696,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetPatientSamplesCreationOrder", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetPatientSamplesCreationOrder", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2439,12 +2747,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                               " AND OT.SampleType = TV.SampleType " & vbCrLf
 
                         If (pWorkSessionID <> "") Then
+                            'AJG
+                            'cmdText &= " WHERE OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND   OT.TestType = 'STD' " & vbCrLf & _
+                            '           " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                    " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                    " AND    OpenOTFlag = 0 " & vbCrLf & _
+                            '                                    " AND    ToSendFlag = 1) " & vbCrLf
                             cmdText &= " WHERE OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
                                        " AND   OT.TestType = 'STD' " & vbCrLf & _
-                                       " AND   OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND   EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                                 " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                 " AND    OpenOTFlag = 0 " & vbCrLf & _
-                                                                " AND    ToSendFlag = 1) " & vbCrLf
+                                                                " AND    ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " WHERE  OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf & _
                                        " AND   OT.TestType = 'STD' " & vbCrLf
@@ -2467,8 +2782,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetReagentsByTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetReagentsByTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2516,8 +2831,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetampleTypeForAlternativeOT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestDAO.GetampleTypeForAlternativeOT", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2579,8 +2894,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesByPatient", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesByPatient", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2621,11 +2936,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    OT.TestType = 'ISE' " & vbCrLf
 
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                  " AND    OpenOTFlag = 0 " & vbCrLf & _
+                            '                                  " AND    ToSendFlag = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND    OpenOTFlag = 0 " & vbCrLf & _
-                                                              " AND    ToSendFlag = 1) " & vbCrLf
+                                                              " AND    ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -2641,11 +2962,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND    OT.TestType = 'ISE' " & vbCrLf
 
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                  " AND    OpenOTFlag = 0 " & vbCrLf & _
+                            '                                  " AND    ToSendFlag = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND    OpenOTFlag = 0 " & vbCrLf & _
-                                                              " AND    ToSendFlag = 1) " & vbCrLf
+                                                              " AND    ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -2668,8 +2995,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesTubesISE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesTubesISE", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2715,11 +3042,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdWSConditions As String = ""
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdWSConditions = " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '                  " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                         " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                         " AND    OpenOTFlag = 0 " & vbCrLf & _
+                            '                                         " AND    ToSendFlag = 1) " & vbCrLf
                             cmdWSConditions = " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                              " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                              " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                                      " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                      " AND    OpenOTFlag = 0 " & vbCrLf & _
-                                                                     " AND    ToSendFlag = 1) " & vbCrLf
+                                                                     " AND    ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdWSConditions = " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -2789,8 +3122,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesTubesSTD", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSampleTypesTubesSTD", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2840,11 +3173,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND   T.BlankMode   = '" & pSpecialSolutionCode.Trim & "' " & vbCrLf     '--> BlankMode Codes are the same as SpecialSolution Codes
 
                         If (pWorkSessionID <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                  " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                            '                                  " AND    ToSendFlag    = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND    OpenOTFlag    = 0 " & vbCrLf & _
-                                                              " AND    ToSendFlag    = 1) " & vbCrLf
+                                                              " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -2872,8 +3211,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSpecialSolutionVolumeForBlanks", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetSpecialSolutionVolumeForBlanks", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2934,8 +3273,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.IsThereAnyTestByType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.IsThereAnyTestByType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2989,8 +3328,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ReadBlankOrCalibByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ReadBlankOrCalibByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3029,8 +3368,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  AlternativeOrderTestID = " & pOrderTestID & vbCrLf & _
                                                 " AND    TestType               = 'STD' " & vbCrLf
 
-                        If (pWorkSessionID <> String.Empty) Then cmdText &= " AND OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                                                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+                        'AJG
+                        'If (pWorkSessionID <> String.Empty) Then cmdText &= " AND OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                        '                                                                            " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+
+                        If (pWorkSessionID <> String.Empty) Then cmdText &= " AND NOT EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                                                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' AND twksOrderTests.OrderTestID = OrderTestID) " & vbCrLf
                         cmdText &= " ORDER BY SampleType " & vbCrLf
 
                         Dim alternativeOTestsDS As New OrderTestsDS
@@ -3050,8 +3393,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestDAO.ReadByAlternativeOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestDAO.ReadByAlternativeOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3098,8 +3441,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ReadByStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ReadByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3123,9 +3466,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " DELETE twksOrderTests " & vbCrLf & _
+                    '                        " WHERE OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests) " & vbCrLf & _
+                    '                        " AND   OrderTestID NOT IN (SELECT OrderTestID FROM twksResults) "
+
                     Dim cmdText As String = " DELETE twksOrderTests " & vbCrLf & _
-                                            " WHERE OrderTestID NOT IN (SELECT OrderTestID FROM twksWSOrderTests) " & vbCrLf & _
-                                            " AND   OrderTestID NOT IN (SELECT OrderTestID FROM twksResults) "
+                                            " WHERE NOT EXISTS (SELECT OrderTestID FROM twksWSOrderTests WHERE twksOrderTests.OrderTestID = OrderTestID) " & vbCrLf & _
+                                            " AND   NOT EXISTS (SELECT OrderTestID FROM twksResults WHERE twksOrderTests.OrderTestID = OrderTestID) "
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -3137,8 +3484,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -3193,8 +3540,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.RestartIdentity", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.RestartIdentity", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -3239,11 +3586,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    TS.PredilutionMode = 'INST' " & vbCrLf 
 
                         If (pWorkSessionID <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                            '                                  " AND   OpenOTFlag = 0 " & vbCrLf & _
+                            '                                  " AND   ToSendFlag = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                               " AND   OpenOTFlag = 0 " & vbCrLf & _
-                                                              " AND   ToSendFlag = 1) " & vbCrLf
+                                                              " AND   ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -3265,8 +3618,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.VerifyAutomaticDilutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.VerifyAutomaticDilutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3385,8 +3738,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         '                'Audit fields 
         '                If (pNewOrderTests.twksOrderTests(i).IsTS_UserNull) Then
-        '                    Dim myGlobalBase As New GlobalBase
-        '                    cmdText &= " N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
+        '                    'Dim myGlobalbase As New GlobalBase
+        '                    cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
         '                Else
         '                    cmdText &= " N'" & pNewOrderTests.twksOrderTests(i).TS_User.Replace("'", "''") & "', "
         '                End If
@@ -3429,8 +3782,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        dataToReturn.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CreateNEW", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.CreateNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return dataToReturn
         'End Function
@@ -3516,8 +3869,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlankCalibOrderTestsNEW", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetBlankCalibOrderTestsNEW", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3559,8 +3912,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateCalibrationFactor", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateCalibrationFactor", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -3621,8 +3974,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateCreationOrderForOpenLISOTs", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.UpdateCreationOrderForOpenLISOTs", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -3681,8 +4034,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderTestsDAO.GetTestID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

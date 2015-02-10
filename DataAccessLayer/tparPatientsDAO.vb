@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class tparPatientsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 
@@ -74,8 +74,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (pPatientDetails.tparPatients(0).IsTS_UserNull) Then
                         'Get the logged User
-                        Dim currentSession As New GlobalBase
-                        cmdText &= " N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        'Dim currentSession As New GlobalBase
+                        cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         cmdText &= " N'" & pPatientDetails.tparPatients(0).TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -106,8 +106,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -145,8 +145,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -192,8 +192,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -298,8 +298,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadAllWithFilters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadAllWithFilters", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -348,8 +348,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadByExternalPID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadByExternalPID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -424,8 +424,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     End If
 
                     If (pPatientDetails.tparPatients(0).IsTS_UserNull) Then
-                        Dim currentSession As New GlobalBase
-                        cmdText &= " TS_User = N'" & currentSession.GetSessionInfo().UserName.Trim.ToString & "', "
+                        'Dim currentSession As New GlobalBase
+                        cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Trim.ToString & "', "
                     Else
                         cmdText &= " TS_User = N'" & pPatientDetails.tparPatients(0).TS_User.ToString.Replace("'", "''") & "', "
                     End If
@@ -449,8 +449,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -489,8 +489,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateByPatientID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateByPatientID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -505,7 +505,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pSelectedPatients">List of selected Patient IDs. Optional parameter; when it is not informed, it means all 
         '''                                 existing Patients have to be included in the report</param>
         ''' <remarks>
-        ''' Created by: RH 02/12/2011
+        ''' Created by:  RH 02/12/2011
+        ''' Modified by: SA 15/09/2014 - BA-1921 ==> For each PatientID added to the list of Patients to search using the IN Clause, call function
+        '''                                          Replace to avoid exception when the PatientID contains single quotes
         ''' </remarks>
         Public Function GetPatientsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAppLang As String, _
                                              Optional ByVal pSelectedPatients As List(Of String) = Nothing) As GlobalDataTO
@@ -522,7 +524,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (Not pSelectedPatients Is Nothing AndAlso pSelectedPatients.Count > 0) Then
                             Dim patientsList As New StringBuilder()
                             For Each p As String In pSelectedPatients
-                                patientsList.AppendFormat("N'{0}', ", p)
+                                patientsList.AppendFormat("N'{0}', ", p.Trim.Replace("'", "''"))
                             Next
 
                             mySelectedPatients = String.Format(" WHERE P.PatientID IN ({0})", patientsList.ToString().Substring(0, patientsList.Length - 2))
@@ -553,8 +555,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.GetPatientsForReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.GetPatientsForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -589,23 +591,43 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparPatients " & vbCrLf & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                        '          " WHERE  PatientID IN (SELECT WSOT.PatientID " & vbCrLf & _
+                        '                               " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                               " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                               " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                        '                               " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf
                         cmdText = " UPDATE tparPatients " & vbCrLf & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                                  " WHERE  PatientID IN (SELECT WSOT.PatientID " & vbCrLf & _
+                                  " WHERE  EXISTS (SELECT WSOT.PatientID " & vbCrLf & _
                                                        " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
                                                        " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                        " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                                        " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
-                                                       " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf
+                                                       " AND    WSOT.PatientID IS NOT NULL AND tparPatients.PatientID = WSOT.PatientID) " & vbCrLf
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparPatients " & vbCrLf & _
+                        '          " SET    InUse = 0 " & vbCrLf & _
+                        '          " WHERE  PatientID NOT IN (SELECT WSOT.PatientID " & vbCrLf & _
+                        '                                   " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                   " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                   " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                        '                                   " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf & _
+                        '          " AND    InUse = 1 " & vbCrLf
+
                         cmdText = " UPDATE tparPatients " & vbCrLf & _
                                   " SET    InUse = 0 " & vbCrLf & _
-                                  " WHERE  PatientID NOT IN (SELECT WSOT.PatientID " & vbCrLf & _
-                                                           " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
-                                                           " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                           " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                           " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
-                                                           " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf & _
+                                  " WHERE  NOT EXISTS (SELECT WSOT.PatientID " & vbCrLf & _
+                                                      " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                      " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                      " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                                                      " AND    WSOT.PatientID IS NOT NULL AND tparPatients.PatientID = WSOT.PatientID) " & vbCrLf & _
                                   " AND    InUse = 1 " & vbCrLf
                     End If
 
@@ -619,8 +641,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -712,8 +734,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.DecryptDataAfterRSAT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.DecryptDataAfterRSAT", EventLogEntryType.Error, False)
             Finally
                 If (Not dbConnection Is Nothing AndAlso openDBConn) Then dbConnection.Close()
             End Try
@@ -749,8 +771,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.EncryptDataForRSAT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.EncryptDataForRSAT", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -794,8 +816,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadAllForRSAT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.ReadAllForRSAT", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -848,8 +870,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateByPatientID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.UpdateByPatientID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -908,8 +930,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tparPatientsDAO.GetLastLIMSSequence", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tparPatientsDAO.GetLastLIMSSequence", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

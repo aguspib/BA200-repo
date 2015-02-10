@@ -1,15 +1,15 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IProgCalibrator
+Public Class UiProgCalibrator
 
 #Region "Attributes"
     Private AnalyzerIDAttribute As String
@@ -202,8 +202,8 @@ Public Class IProgCalibrator
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim myGlobalBase As New GlobalBase
-            currentLanguage = myGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim myGlobalbase As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'LocalCurLanguage = currentLanguage
 
@@ -230,7 +230,7 @@ Public Class IProgCalibrator
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -272,7 +272,7 @@ Public Class IProgCalibrator
             YaxisLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AxisY", pLanguageID) + ":"
             CalibrationValuesCurveLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Values", pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -295,62 +295,62 @@ Public Class IProgCalibrator
             'NEW Calibrator
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                AddCalibButon.Image = Image.FromFile(iconPath & auxIconName)
+                AddCalibButon.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(AddCalibButon, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
             End If
 
             'EDIT Calibrator and EDIT Calibrator Values
             auxIconName = GetIconName("EDIT")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                EditCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
 
-                EditCalTestSampleButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalTestSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalTestSampleButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             End If
 
             'DELETE Calibrators
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteCalbButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteCalbButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(DeleteCalbButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'PRINT Calibrators Report
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'SAVE Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("SAVE")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                SaveCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCalib", pLanguageID))
 
-                SaveTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                SaveTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCurve", pLanguageID))
             End If
 
             'CANCEL Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("UNDO")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                CancelCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                CancelCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
 
-                CancelTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                CancelTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
             End If
 
             'CLOSE SCREEN
             auxIconName = GetIconName("CANCEL")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -416,7 +416,7 @@ Public Class IProgCalibrator
             CalibratorListGrid.Columns("SpecialCalib").Width = 0
             CalibratorListGrid.Columns("SpecialCalib").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareCalibratorList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareCalibratorList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareCalibratorList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -443,7 +443,7 @@ Public Class IProgCalibrator
 
             CalibratorListGrid.DataSource = LocalCalibratorDS.tparCalibrators
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCalibratorList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -475,7 +475,7 @@ Public Class IProgCalibrator
                 ExpDatePickUpCombo.ResetText()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalibratorsControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalibratorsControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BindCalibratorsControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -499,7 +499,7 @@ Public Class IProgCalibrator
             'Where a.CalibratorName.Trim.ToUpper = pCalibratorName.Trim.ToUpper _
             myResult = (myCalibratorList.Count > 0)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorExist ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorExist ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibratorExist ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -533,7 +533,7 @@ Public Class IProgCalibrator
             myCalibratorRow.IsNew = True
             myCalibratorDS.tparCalibrators.AddtparCalibratorsRow(myCalibratorRow)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateNewCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateNewCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CreateNewCalibrator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myCalibratorDS
@@ -564,7 +564,7 @@ Public Class IProgCalibrator
             myCalibratorRow.IsNew = False
             myCalibratorDS.tparCalibrators.AddtparCalibratorsRow(myCalibratorRow)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdatedCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdatedCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdatedCalibrator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myCalibratorDS
@@ -718,7 +718,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveCalibratorInfo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myOperationResult
@@ -771,7 +771,7 @@ Public Class IProgCalibrator
 
             myResults = (Not myGlobalDataTO.HasError)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveCalibratorChanges ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResults
@@ -892,7 +892,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".DeleteCalibrator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobalDataTO
@@ -1022,7 +1022,7 @@ Public Class IProgCalibrator
 
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetScreenStatus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetScreenStatus ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1067,7 +1067,7 @@ Public Class IProgCalibrator
             CalibNumberUpDown.BackColor = BackColor
             CalibNumberUpDown.ForeColor = LetColor
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableCalibratorInfoGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableCalibratorInfoGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EnableDisableCalibratorInfoGroupBox ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1137,7 +1137,7 @@ Public Class IProgCalibrator
             If (Not myResultGlobalTO.HasError) Then
                 'Show the screen of Affected Elements
                 If (myDependenciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.AdditionalElements = True
                         myAffectedElementsWarning.ElementsAffectedMessageDetail = "MSG_UPDATE_CONCENTRATION"
@@ -1151,7 +1151,7 @@ Public Class IProgCalibrator
                 ShowMessage(Me.Name & ".GetAffectedTestConcentration ", myResultGlobalTO.ErrorCode, myResultGlobalTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAffectedTestConcentration ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetAffectedTestConcentration ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetAffectedTestConcentration ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -1220,7 +1220,7 @@ Public Class IProgCalibrator
                 YAxisCombo.BackColor = BackColor
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableCalibCurveInfoGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableCalibCurveInfoGroupBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EnableDisableCalibCurveInfoGroupBox ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1264,7 +1264,7 @@ Public Class IProgCalibrator
             SaveTestSampleCalValue.Enabled = pState
             CancelTestSampleCalValue.Enabled = pState
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableTestSampleCalibFrame ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EnableDisableTestSampleCalibFrame ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EnableDisableTestSampleCalibFrame ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1332,7 +1332,7 @@ Public Class IProgCalibrator
 
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetScreenStatusTABTestSampleCalib ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetScreenStatusTABTestSampleCalib ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1413,7 +1413,7 @@ Public Class IProgCalibrator
             CalibTestSampleListGrid.Columns("SpecialTest").DataPropertyName = "SpecialTest"
             CalibTestSampleListGrid.Columns("SpecialTest").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareCalibratorTestSampleList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareCalibratorTestSampleList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareCalibratorTestSampleList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1478,7 +1478,7 @@ Public Class IProgCalibrator
             ConcentrationGridView.Columns("TestCalibratorID").DataPropertyName = "TestCalibratorID"
             ConcentrationGridView.Columns("TestCalibratorID").Visible = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConcentrationGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConcentrationGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareConcentrationGridView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1595,7 +1595,7 @@ Public Class IProgCalibrator
             'LocalTestDS.tparTests.DefaultView.Sort = "EnableStatus, CalibratorID, TestName"
             'CalibTestSampleListGrid.DataSource = LocalTestDS.tparTests.DefaultView
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorTestSampleList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorTestSampleList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCalibratorTestSampleList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1627,7 +1627,7 @@ Public Class IProgCalibrator
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetTestSampleStatusIcon ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetTestSampleStatusIcon ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetTestSampleStatusIcon ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1657,7 +1657,7 @@ Public Class IProgCalibrator
             CalibratorListCombo.ValueMember = "CalibratorID"
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorListCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorListCombo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCalibratorListCombo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1718,7 +1718,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCurveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCurveControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCurveControls ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1809,7 +1809,7 @@ Public Class IProgCalibrator
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalTestSampleCurveValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalTestSampleCurveValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BindCalTestSampleCurveValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1917,7 +1917,7 @@ Public Class IProgCalibrator
                 ShowMessage(Me.Name & ".BindConcentrationValuesList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorCode, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindConcentrationValuesList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindConcentrationValuesList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BindConcentrationValuesList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1983,7 +1983,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalibratorValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BindCalibratorValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BindCalibratorValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2032,7 +2032,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorData ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorData ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2080,7 +2080,7 @@ Public Class IProgCalibrator
             Next
 
             If myDependenciesElementsDS.DependenciesElements.Count > 0 Then
-                Using myAffectedElementsWarning As New IWarningAfectedElements()
+                Using myAffectedElementsWarning As New UiWarningAfectedElements()
                     myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                     myAffectedElementsWarning.AdditionalElements = True
                     'TODO: change message to a new one.
@@ -2095,7 +2095,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorTestSampleDependencies ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorTestSampleDependencies ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2177,7 +2177,7 @@ Public Class IProgCalibrator
 
                     Next
 
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.AdditionalElements = True
 
@@ -2190,7 +2190,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateDependecies ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateDependecies ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myAffectedElementsResults
@@ -2255,7 +2255,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PrepareNewCalibratorValuesForTestSample ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PrepareNewCalibratorValuesForTestSample ", EventLogEntryType.Error, _
                                                                 GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2287,7 +2287,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetLocalCalibratorInfo ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetLocalCalibratorInfo ", EventLogEntryType.Error, _
                                                                 GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2321,7 +2321,7 @@ Public Class IProgCalibrator
             'End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CleanCurveValue ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CleanCurveValue ", EventLogEntryType.Error, _
                                                                 GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2342,7 +2342,7 @@ Public Class IProgCalibrator
             myResult = ValidateCalibratorCurveValuesHasError() OrElse _
                        ValidateErrorConcValuesDescOrderGrid()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidaterCalibCurveAndConcValuesHasError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidaterCalibCurveAndConcValuesHasError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidaterCalibCurveAndConcValuesHasError ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2418,7 +2418,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorCurveValuesHasError ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorCurveValuesHasError ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2432,6 +2432,8 @@ Public Class IProgCalibrator
     ''' <remarks>
     ''' Created by:  TR 18/02/2011
     ''' Modified by: TR 09/10/2011 - Changed all convert to INT by convert to DOUBLE
+    '''              WE 26/01/2015 - BA-2047: Solved bug in which the program flow could enter the save process when the
+    '''                              Theoretical Concentration entered by the user was rounded to 0 (zero).
     ''' </remarks>
     Private Function ValidateErrorConcValuesDescOrderGrid() As Boolean
         Dim myResult As Boolean = False
@@ -2444,7 +2446,8 @@ Public Class IProgCalibrator
                     'Validate the Theorical Concentration is informed for the row and also that it is numeric
                     If (Not ConcentrationRow.Cells("TheoricalConcentration").Value Is DBNull.Value AndAlso _
                         IsNumeric(ConcentrationRow.Cells("TheoricalConcentration").Value.ToString())) Then
-                        If (CDbl(ConcentrationRow.Cells("TheoricalConcentration").Value) <= 0) Then
+                        ' WE 26/01/2015 (BA-2047) - added check to prevent entering the save process when the Theoretical Conc. value is rounded to 0 (zero).
+                        If (CDbl(ConcentrationRow.Cells("TheoricalConcentration").Value) <= 0) OrElse CDbl(ConcentrationRow.Cells("TheoricalConcentration").FormattedValue) = 0 Then
                             myResult = True
                             Exit For
                         End If
@@ -2471,7 +2474,7 @@ Public Class IProgCalibrator
                 ConcentrationGridView.Refresh()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateConcentrationsValuesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateConcentrationsValuesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateConcentrationsValuesGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2622,7 +2625,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             myResult = False
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveTestSampleCalibratorValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveTestSampleCalibratorValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveTestSampleCalibratorValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -2650,7 +2653,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PendingTestSampleCalibData ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PendingTestSampleCalibData ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2673,7 +2676,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " TestSampleWithDisabelStatus ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " TestSampleWithDisabelStatus ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2757,7 +2760,7 @@ Public Class IProgCalibrator
                 SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.EditMode)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetRecivedTestSample ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetRecivedTestSample ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetRecivedTestSample ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2785,7 +2788,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorFactoryValues ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ValidateCalibratorFactoryValues ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2837,7 +2840,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ChangeMade ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ChangeMade ", EventLogEntryType.Error, _
                                                                 GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2848,16 +2851,16 @@ Public Class IProgCalibrator
 
         Try
             'TR 23/04/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 23/04/2012 -END
 
             ''DL 28/07/2011
             If IsTestParamWinAttribute Then
                 Me.StartPosition = FormStartPosition.Manual
 
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
@@ -2872,7 +2875,7 @@ Public Class IProgCalibrator
                 CalibTestSampleListGrid.Focus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IProgCalibrator_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IProgCalibrator_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IProgCalibrator_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2890,8 +2893,8 @@ Public Class IProgCalibrator
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If IsTestParamWinAttribute Then
 
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top
@@ -2903,7 +2906,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " WndProc ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " WndProc ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2938,7 +2941,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExitButton_Click", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExitButton_Click", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2991,7 +2994,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "CalibratorListGrid_RowEnter ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "CalibratorListGrid_RowEnter ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3020,7 +3023,7 @@ Public Class IProgCalibrator
             CalibratorNameTextBox.Focus()
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "AddCalibButon_Click ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "AddCalibButon_Click ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3078,7 +3081,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "CancelCalibButton_Click ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "CancelCalibButton_Click ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3111,7 +3114,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorListGrid_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorListGrid_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3129,7 +3132,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorNameTextBox_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorNameTextBox_Validating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3159,7 +3162,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " EditCalibButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " EditCalibButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3177,7 +3180,7 @@ Public Class IProgCalibrator
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorListGrid_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CalibratorListGrid_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3205,7 +3208,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SaveCalibButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SaveCalibButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3260,7 +3263,7 @@ Public Class IProgCalibrator
                 SpecialTestEditionScreenEnable()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ProgCalibrator_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ProgCalibrator_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3293,7 +3296,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_KeyUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibTestSampleListGrid_KeyUp ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3326,7 +3329,7 @@ Public Class IProgCalibrator
                 'CalibTestSampleListGrid.Refresh()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleList_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleList_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibTestSampleList_RowEnter ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3343,7 +3346,7 @@ Public Class IProgCalibrator
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibTestSampleListGrid_CellPainting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3361,7 +3364,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditCalTestSampleButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditCalTestSampleButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditCalTestSampleButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3385,7 +3388,7 @@ Public Class IProgCalibrator
             Next CalRow
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_EnabledChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibTestSampleListGrid_EnabledChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3419,7 +3422,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellPainting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConcentrationGridView_CellPainting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3446,7 +3449,7 @@ Public Class IProgCalibrator
                 Next r
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UnselectTestsSampleTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UnselectTestsSampleTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UnselectTestsSampleTypes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3459,7 +3462,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConcentrationGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3604,7 +3607,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConcentrationGridView_CellLeave ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
@@ -3634,7 +3637,7 @@ Public Class IProgCalibrator
                 RemoveHandler e.Control.KeyPress, AddressOf CheckNumericCell
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConcentrationGridView_EditingControlShowing ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3685,7 +3688,7 @@ Public Class IProgCalibrator
             '    End If
             'End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CheckNumericCell ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3758,7 +3761,7 @@ Public Class IProgCalibrator
             'RH 11/05/2012 END
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibratorTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibratorTabControl_Selecting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3803,7 +3806,7 @@ Public Class IProgCalibrator
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3821,7 +3824,7 @@ Public Class IProgCalibrator
                                      CInt(CalibTestSampleListGrid.Rows(e.RowIndex).Cells("CalibratorID").Value))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CalibTestSampleListGrid_CellClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CalibTestSampleListGrid_CellClick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3847,7 +3850,7 @@ Public Class IProgCalibrator
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3953,7 +3956,7 @@ Public Class IProgCalibrator
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CancelTestSampleCalValue_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CancelTestSampleCalValue_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4054,7 +4057,7 @@ Public Class IProgCalibrator
                 SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveTestSampleCalValue_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveTestSampleCalValue_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveTestSampleCalValue_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4072,7 +4075,7 @@ Public Class IProgCalibrator
         Try
             If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IntegerNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4111,12 +4114,12 @@ Public Class IProgCalibrator
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
             'RH 21/12/2011 END
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CloseForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CloseForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4136,7 +4139,7 @@ Public Class IProgCalibrator
                 ConcentrationGridView.Enabled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SpecialTestEditionScreenEnable ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SpecialTestEditionScreenEnable ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SpecialTestEditionScreenEnable ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4172,7 +4175,7 @@ Public Class IProgCalibrator
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4192,7 +4195,7 @@ Public Class IProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConcentrationGridView_CellValidating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

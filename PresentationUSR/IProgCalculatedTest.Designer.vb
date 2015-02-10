@@ -1,6 +1,6 @@
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgCalculatedTest
+Partial Class UiProgCalculatedTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -20,7 +20,7 @@ Partial Class IProgCalculatedTest
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgCalculatedTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgCalculatedTest))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -55,6 +55,7 @@ Partial Class IProgCalculatedTest
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsCalcTestListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsCalTestDefGroupBox.SuspendLayout()
         Me.CalculatedTestTabControl.SuspendLayout()
         Me.FormulaTabPage.SuspendLayout()
@@ -108,10 +109,10 @@ Partial Class IProgCalculatedTest
         '
         Me.bsPrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsPrintButton.Enabled = False
-        Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
+        Me.bsPrintButton.Location = New System.Drawing.Point(249, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 17
+        Me.bsPrintButton.TabIndex = 18
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
@@ -231,6 +232,7 @@ Partial Class IProgCalculatedTest
         Me.bsCalTestFormula.ClearFormulaToolTip = ""
         Me.bsCalTestFormula.DecimalSeparator = Nothing
         Me.bsCalTestFormula.DelFormulaMemberToolTip = ""
+        Me.bsCalTestFormula.FactoryValueCaption = ""
         Me.bsCalTestFormula.FactoryValueMessage = ""
         Me.bsCalTestFormula.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsCalTestFormula.ForeColor = System.Drawing.Color.Black
@@ -240,8 +242,8 @@ Partial Class IProgCalculatedTest
         Me.bsCalTestFormula.SampleTypeTitle = "Sample Type:"
         Me.bsCalTestFormula.SelectedSampleType = ""
         Me.bsCalTestFormula.Size = New System.Drawing.Size(681, 364)
-        Me.bsCalTestFormula.StandardTestsTitle = "Standard Tests:"
         Me.bsCalTestFormula.TabIndex = 0
+        Me.bsCalTestFormula.TestsTitle = "Tests:"
         Me.bsCalTestFormula.WarningImage = ""
         '
         'RefRangesTabPage
@@ -470,6 +472,15 @@ Partial Class IProgCalculatedTest
         Me.bsCalcTestListGroupBox.TabIndex = 39
         Me.bsCalcTestListGroupBox.TabStop = False
         '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(212, 613)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 17
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgCalculatedTest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -480,6 +491,7 @@ Partial Class IProgCalculatedTest
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.BsCustomOrderButton)
         Me.Controls.Add(Me.bsCalcTestListGroupBox)
         Me.Controls.Add(Me.bsExitButton)
         Me.Controls.Add(Me.bsNewButton)
@@ -493,7 +505,7 @@ Partial Class IProgCalculatedTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgCalculatedTest"
+        Me.Name = "UiProgCalculatedTest"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsCalTestDefGroupBox.ResumeLayout(False)
@@ -546,4 +558,5 @@ Partial Class IProgCalculatedTest
     Friend WithEvents bsRefRangesPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsFormulaPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsTestRefRanges As BSReferenceRanges
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

@@ -1,5 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
@@ -13,7 +14,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.App
 
-Public Class IWSSampleRequest
+Public Class UiWSSampleRequest
 
 #Region "Declarations"
     'Global variable for all Blank, Calibrator, Control and Patient Order Tests shown in the different grids
@@ -28,12 +29,30 @@ Public Class IWSSampleRequest
     Private isHeaderControlCheckBoxClicked As Boolean
     Private isHeaderPatientCheckBoxClicked As Boolean
 
-    Private totalBlkCalCheckBoxes As Integer
-    Private totalControlCheckBoxes As Integer
+    ' XB 26/08/2014 - BA #1868
+    'Private totalBlkCalCheckBoxes As Integer
+    Private totalBlankCheckBoxes As Integer
+    Private totalCalibCheckBoxes As Integer
+
+    ' XB 01/09/2014 - BA #1868
+    'Private totalControlCheckBoxes As Integer
+    Private totalControlLevel1CheckBoxes As Integer
+    Private totalControlLevel2CheckBoxes As Integer
+    Private totalControlLevel3CheckBoxes As Integer
+
     Private totalPatientCheckBoxes As Integer
 
-    Private totalBlkCalCheckedCheckBoxes As Integer
-    Private totalControlCheckedCheckBoxes As Integer
+    ' XB 26/08/2014 - BA #1868
+    'Private totalBlkCalCheckedCheckBoxes As Integer
+    Private totalBlankCheckedCheckBoxes As Integer
+    Private totalCalibCheckedCheckBoxes As Integer
+
+    ' XB 01/09/2014 - BA #1868
+    'Private totalControlCheckedCheckBoxes As Integer
+    Private totalControlLevel1CheckedCheckBoxes As Integer
+    Private totalControlLevel2CheckedCheckBoxes As Integer
+    Private totalControlLevel3CheckedCheckBoxes As Integer
+
     Private totalPatientCheckedCheckBoxes As Integer
 
     'Global variables to control the event SelectValueChange in ComboBox columns in DataGrids, and the SampleID edition in Patients grid
@@ -234,7 +253,7 @@ Public Class IWSSampleRequest
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Cursor = Cursors.WaitCursor
@@ -258,13 +277,13 @@ Public Class IWSSampleRequest
             Cursor = Cursors.Default
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Execute Import (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Execute Import (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.ExecuteImportFromLIMSProcess", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExecuteImportFromLIMSProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExecuteImportFromLIMSProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExecuteImportFromLIMSProcess", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -293,8 +312,8 @@ Public Class IWSSampleRequest
             If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then '#REFACTORING
                 ScreenWorkingProcess = False 'Process finished
                 Me.Enabled = True
-                IAx00MainMDI.EnableButtonAndMenus(True)
-                IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                 Cursor = Cursors.Default
                 RefreshDoneField = True
             End If
@@ -305,7 +324,7 @@ Public Class IWSSampleRequest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -365,7 +384,7 @@ Public Class IWSSampleRequest
             End If
 
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(False)
+            UiAx00MainMDI.EnableButtonAndMenus(False)
 
             Dim continueSaving As Boolean = False
             Dim openRotorScreen As Boolean = False
@@ -417,7 +436,7 @@ Public Class IWSSampleRequest
 
                 If (ErrorOnSavingWS = String.Empty) Then
                     openRotorScreen = True
-                    IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                    UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                 End If
 
             Else
@@ -441,29 +460,29 @@ Public Class IWSSampleRequest
                 Me.Enabled = False
 
                 'Update global variables in the main MDI Form
-                IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
 
                 ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                 ExitingScreen()
-                IAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
                 Application.DoEvents()
 
                 'Open the RotorPositions form and close this one
-                IAx00MainMDI.OpenRotorPositionsForm(Me)
+                UiAx00MainMDI.OpenRotorPositionsForm(Me)
 
             End If
 
-            IAx00MainMDI.SetStatusRotorPosOptions(True)
+            UiAx00MainMDI.SetStatusRotorPosOptions(True)
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWSWithPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWSWithPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveWSWithPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
     End Sub
 #End Region
@@ -490,7 +509,7 @@ Public Class IWSSampleRequest
             bsBlkCalibDataGridView.Columns("ABSDateTime").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             bsBlkCalibDataGridView.Columns("FactorValue").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyStylesToSpecialGridColumns", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyStylesToSpecialGridColumns", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplyStylesToSpecialGridColumns", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -533,7 +552,7 @@ Public Class IWSSampleRequest
             'Verify availability of controls related with grid of Patient Samples
             CheckAddRemovePatientsRows()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindDSToGrids", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BindDSToGrids", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BindDSToGrids", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -592,7 +611,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BlkCalibOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BlkCalibOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BlkCalibOrderTestsClickRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -720,7 +739,7 @@ Public Class IWSSampleRequest
             sampleIDsSent = Nothing
             lstWSPatientsDS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculateAllAutonumeric", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculateAllAutonumeric", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalculateAllAutonumeric", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -746,7 +765,7 @@ Public Class IWSSampleRequest
             If (lstWSPatientsDS.Count > 0) Then maxValue = lstWSPatientsDS.First.SampleID
             lstWSPatientsDS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculateAutonumeric", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculateAutonumeric", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalculateAutonumeric", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return maxValue
@@ -781,7 +800,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlankCalibratorNewCheckColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlankCalibratorNewCheckColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeBlankCalibratorNewCheckColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -800,6 +819,7 @@ Public Class IWSSampleRequest
     '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
     '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
     '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    '''              XB 26/08/2014 - remove parameter on the call RowBlkCalCheckBoxClick function - BT #1868
     ''' </remarks>
     Private Sub ChangeBlankCalibratorSelectedColumn()
         Try
@@ -819,7 +839,7 @@ Public Class IWSSampleRequest
                         End If
 
                         'Verify if the CheckBox for select/unselect all Blanks and Calibrators have to be checked
-                        RowBlkCalCheckBoxClick(Nothing)
+                        RowBlkCalCheckBoxClick()
                     Else
                         Dim myVerification As Boolean = False
                         If (bsBlkCalibDataGridView.CurrentRow.Cells("PreviousOrderTestID").Value.ToString = "") Then
@@ -887,7 +907,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlankCalibratorSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlankCalibratorSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeBlankCalibratorSelectedColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -935,7 +955,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCalibratorTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeCalibratorTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeCalibratorTubeTypeColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -947,6 +967,7 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 13/04/2010 - Code moved from the event
+    ''' Modified by: XB 26/08/2014 - remove parameter on the call RowBlkCalCheckBoxClick function - BT #1868
     ''' </remarks>
     Private Sub ChangeBlkCalibSelectedState()
         Try
@@ -955,11 +976,11 @@ Public Class IWSSampleRequest
                 bsBlkCalibDataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit)
 
                 If (bsBlkCalibDataGridView.CurrentCell.OwningColumn.Name = "Selected") Then
-                    RowBlkCalCheckBoxClick(Nothing)
+                    RowBlkCalCheckBoxClick()
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlkCalibSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeBlkCalibSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeBlkCalibSelectedState", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -998,7 +1019,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlNumReplicatesColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlNumReplicatesColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlNumReplicatesColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1032,7 +1053,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlSelectedColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1056,7 +1077,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlSelectedState", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlSelectedState", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1094,7 +1115,7 @@ Public Class IWSSampleRequest
                 bsAcceptButton.Enabled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlsStatusByProgressBar", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlsStatusByProgressBar", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlsStatusByProgressBar", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1128,7 +1149,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeControlTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeControlTubeTypeColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1176,7 +1197,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientNumReplicatesColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientNumReplicatesColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePatientNumReplicatesColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1199,8 +1220,8 @@ Public Class IWSSampleRequest
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode.
     '''              TR 11/03/2013 - Execute function only when OTStatus = OPEN AndAlso LISRequest = FALSE
-    '''                              In the first LINQ, change filter OTStatus <> OPEN by the following one
-    '''                              (OTStatus <> OPEN OrElse LISRequest = TRUE)   
+    '''                              In the first LINQ, change filter (OTStatus different of OPEN) by the following one
+    '''                              (OTStatus different of OPEN OrElse LISRequest = TRUE)   
     ''' </remarks>
     Private Sub ChangePatientOrderPriority()
         Try
@@ -1292,7 +1313,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientOrderPriority", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientOrderPriority", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePatientOrderPriority", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1481,7 +1502,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientSampleIDColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientSampleIDColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePatientSampleIDColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1567,7 +1588,7 @@ Public Class IWSSampleRequest
             RefreshGrids()
             ChangesMadeAttribute = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientSelectedColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePatientSelectedColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1626,7 +1647,7 @@ Public Class IWSSampleRequest
                 ChangesMadeAttribute = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangePatientTubeTypeColumn", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangePatientTubeTypeColumn", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1638,40 +1659,68 @@ Public Class IWSSampleRequest
     ''' Created by:  GDS
     ''' Modified by: DL 09/03/2010
     '''              SA 17/03/2010 - CheckBox for select/unselect all Blank and Calibrators is only for those with Status OPEN                              
+    '''              XB 26/08/2014 - changes to control availability of both Check Boxes - BT #1868
     ''' </remarks>
     Private Sub CheckAddRemoveBlkCalRows()
         Try
             If (Not isHeaderBlkCalCheckBoxClicked) Then
                 'Check how many OPEN Blanks and Calibrators are currently in the grid of Blank and Calibrator Order Tests
                 Dim lstWSOpenDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+
+                ' Blanks
                 lstWSOpenDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                              Where a.OTStatus = "OPEN" _
-                             Select a).ToList()
-                totalBlkCalCheckBoxes = lstWSOpenDS.Count
+                               Where a.SampleClass = "BLANK" _
+                               AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+                totalBlankCheckBoxes = lstWSOpenDS.Count
+
+                ' Calibrators
+                lstWSOpenDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                               Where a.SampleClass = "CALIB" _
+                               AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+                totalCalibCheckBoxes = lstWSOpenDS.Count
+
 
                 'Check how many of the opened Blanks and Calibrators are currently selected
                 Dim lstWSSelectedDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+
+                ' Blanks
                 lstWSSelectedDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                  Where a.OTStatus = "OPEN" _
+                               Where a.SampleClass = "BLANK" _
+                               AndAlso a.OTStatus = "OPEN" _
                                 AndAlso a.Selected = True _
                                  Select a).ToList()
-                totalBlkCalCheckedCheckBoxes = lstWSSelectedDS.Count
+                totalBlankCheckedCheckBoxes = lstWSSelectedDS.Count
+
+                ' Calibrators
+                lstWSSelectedDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                               Where a.SampleClass = "CALIB" _
+                               AndAlso a.OTStatus = "OPEN" _
+                                AndAlso a.Selected = True _
+                                 Select a).ToList()
+                totalCalibCheckedCheckBoxes = lstWSSelectedDS.Count
 
                 'Delete button is enabled only if there is at least a Blank or Calibrator with status OPEN
-                bsDelCalibratorsButton.Enabled = (lstWSOpenDS.Count > 0)
+                bsDelCalibratorsButton.Enabled = (totalBlankCheckBoxes + totalCalibCheckBoxes > 0)
 
-                'Control for Check/Uncheck all Blanks and Calibrators is enabled only when there is at least a Blank or Calibrator with status OPEN
-                bsAllBlkCalCheckBox.Enabled = (lstWSOpenDS.Count > 0)
+                'Control for Check/Uncheck all Blanks is enabled only when there is at least a Blank with status OPEN
+                bsAllBlanksCheckBox.Enabled = (totalBlankCheckBoxes > 0)
+                'Control for Check/Uncheck all Calibrators is enabled only when there is at least a Calibrator with status OPEN
+                bsAllCalibsCheckBox.Enabled = (totalCalibCheckBoxes > 0)
 
-                '...additionally, it is Checked when all Blanks and Calibrators with Status OPEN are selected
-                bsAllBlkCalCheckBox.Checked = (lstWSOpenDS.Count > 0) AndAlso _
-                                              (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes)
+                '...additionally, it is Checked when all Blanks with Status OPEN are selected
+                bsAllBlanksCheckBox.Checked = (totalBlankCheckBoxes > 0) AndAlso _
+                                              (totalBlankCheckedCheckBoxes = totalBlankCheckBoxes)
+                '...additionally, it is Checked when all Calibrators with Status OPEN are selected
+                bsAllCalibsCheckBox.Checked = (totalCalibCheckBoxes > 0) AndAlso _
+                                              (totalCalibCheckedCheckBoxes = totalCalibCheckBoxes)
 
                 lstWSOpenDS = Nothing
                 lstWSSelectedDS = Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemoveBlkCalRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemoveBlkCalRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckAddRemoveBlkCalRows", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1684,35 +1733,79 @@ Public Class IWSSampleRequest
     ''' Modified by: DL 09/03/2010
     '''              SA 17/03/2010 - CheckBox for select/unselect all Controls is only for those with Status OPEN      
     '''              TR 12/03/2013 - Add filter a.LISRequest = False  on lsWSOpenDS to disable Delete button on OT Requested by LIS.     
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub CheckAddRemoveControlsRows()
         Try
+            'Check how many OPEN Controls of Level 1 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 1 _
+                          Select a).ToList()
+            totalControlLevel1CheckBoxes = lstWSOpenControlsLevel1DS.Count
+            'Check how many OPEN Controls of Level 2 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 2 _
+                          Select a).ToList()
+            totalControlLevel2CheckBoxes = lstWSOpenControlsLevel2DS.Count
+            'Check how many OPEN Controls of Level 3 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 3 _
+                          Select a).ToList()
+            totalControlLevel3CheckBoxes = lstWSOpenControlsLevel3DS.Count
+
+            'Check how many of the opened Controls of Level 1 are currently selected
+            Dim lstWSSelectedControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 1 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel1CheckedCheckBoxes = lstWSSelectedControlsLevel1DS.Count
+            'Check how many of the opened Controls of Level 2 are currently selected
+            Dim lstWSSelectedControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 2 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel2CheckedCheckBoxes = lstWSSelectedControlsLevel2DS.Count
+            'Check how many of the opened Controls of Level 3 are currently selected
+            Dim lstWSSelectedControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 3 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel3CheckedCheckBoxes = lstWSSelectedControlsLevel3DS.Count
+
+
+
+            'Control for Check/Uncheck all Controls (level 1) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel1CheckBox.Enabled = (lstWSOpenControlsLevel1DS.Count > 0)
+            'Control for Check/Uncheck all Controls (level 2) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel2checkBox.Enabled = (lstWSOpenControlsLevel2DS.Count > 0)
+            'Control for Check/Uncheck all Controls (level 3) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel3CheckBox.Enabled = (lstWSOpenControlsLevel3DS.Count > 0)
+
+            '...additionally, it is Checked when all Controls of Level 1 with Status OPEN are selected
+            bsAllControlsLevel1CheckBox.Checked = (lstWSOpenControlsLevel1DS.Count > 0) AndAlso _
+                                         (totalControlLevel1CheckedCheckBoxes = totalControlLevel1CheckBoxes)
+            '...additionally, it is Checked when all Controls of Level 2 with Status OPEN are selected
+            bsAllControlsLevel2CheckBox.Checked = (lstWSOpenControlsLevel2DS.Count > 0) AndAlso _
+                                         (totalControlLevel2CheckedCheckBoxes = totalControlLevel2CheckBoxes)
+            '...additionally, it is Checked when all Controls of Level 3 with Status OPEN are selected
+            bsAllControlsLevel3CheckBox.Checked = (lstWSOpenControlsLevel3DS.Count > 0) AndAlso _
+                                         (totalControlLevel3CheckedCheckBoxes = totalControlLevel3CheckBoxes)
+
+
             'Check how many OPEN Controls are currently in the grid of Control Order Tests
             Dim lstWSOpenDS As List(Of WorkSessionResultDS.ControlsRow)
-            lstWSOpenDS = (From a In myWorkSessionResultDS.Controls _
-                          Where a.OTStatus = "OPEN" _
-                          Select a).ToList()
-            totalControlCheckBoxes = lstWSOpenDS.Count
-
-            'Check how many of the opened Controls are currently selected
-            Dim lstWSSelectedDS As List(Of WorkSessionResultDS.ControlsRow)
-            lstWSSelectedDS = (From a In myWorkSessionResultDS.Controls _
-                              Where a.OTStatus = "OPEN" _
-                            AndAlso a.Selected = True _
-                             Select a).ToList()
-            totalControlCheckedCheckBoxes = lstWSSelectedDS.Count
-
-
-
-            'Control for Check/Uncheck all Controls is enabled only when there is at least a Control with status OPEN
-            bsAllCtrlsCheckBox.Enabled = (lstWSOpenDS.Count > 0)
-
-            '...additionally, it is Checked when all Controls with Status OPEN are selected
-            bsAllCtrlsCheckBox.Checked = (lstWSOpenDS.Count > 0) AndAlso _
-                                         (totalControlCheckedCheckBoxes = totalControlCheckBoxes)
-
-
-            'Check how many OPEN Controls are currently in the grid of Control Order Tests
             lstWSOpenDS = (From a In myWorkSessionResultDS.Controls _
                           Where a.OTStatus = "OPEN" _
                           AndAlso a.LISRequest = False
@@ -1720,10 +1813,14 @@ Public Class IWSSampleRequest
             'Delete button is enabled only if there is at least a Control with status OPEN
             bsDelControlsButton.Enabled = (lstWSOpenDS.Count > 0)
 
-            lstWSOpenDS = Nothing
-            lstWSSelectedDS = Nothing
+            lstWSOpenControlsLevel1DS = Nothing
+            lstWSOpenControlsLevel2DS = Nothing
+            lstWSOpenControlsLevel3DS = Nothing
+            lstWSSelectedControlsLevel1DS = Nothing
+            lstWSSelectedControlsLevel2DS = Nothing
+            lstWSSelectedControlsLevel3DS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemoveControlsRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemoveControlsRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckAddRemoveControlsRows", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1777,7 +1874,7 @@ Public Class IWSSampleRequest
             lstWSOpenDS = Nothing
             lstWSSelectedDS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemovePatientsRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemovePatientsRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckAddRemovePatientsRows", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1812,25 +1909,135 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckNumericCell ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
+    ' XB 26/08/2014 - Comment function ClickAllBlkCalibCheckBox, it will not be used anymore - BT #1868
+    ' ''' <summary>
+    ' ''' Manage the check/uncheck of all selectable rows in the grid of Blanks and Calibrators
+    ' ''' For event bsAllBlkCalCheckBox_MouseClick
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  SA 12/04/2010 - Code moved from the event; changes to fix errors
+    ' ''' Modified by: SA 15/04/2010 - When a Calibrator used as alternative for different SampleTypes is unselected, verify that there are
+    ' '''                              not Patient or Control Order Tests requested for any of the requested Sample Types
+    ' '''              SA 09/11/2012 - When function VerifyUnselectedOrderTest is called to validate if there are Patient or Control Order Tests 
+    ' '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
+    ' '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
+    ' '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    ' ''' </remarks>
+    'Private Sub ClickAllBlkCalibCheckBox()
+    '    Try
+    '        Dim numLocked As Integer = 0
+    '        isHeaderBlkCalCheckBoxClicked = True
+
+    '        'Empty the collection of selected rows in the grid of Blank and Calibrators
+    '        bsBlkCalibDataGridView.ClearSelection()
+
+    '        Dim checkedValue As Boolean = bsAllBlanksCheckBox.Checked
+    '        Dim myOrderTestsDelegate As New OrderTestsDelegate
+
+    '        'Get all Calibrators that can be selected/unselected
+    '        Dim lstWSOpenCalibratorsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+    '        lstWSOpenCalibratorsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+    '                                 Where a.SampleClass = "CALIB" _
+    '                               AndAlso a.OTStatus = "OPEN" _
+    '                                Select a).ToList()
+
+    '        Dim verifyUnCheck As Boolean
+    '        For Each openCalibRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenCalibratorsDS
+    '            verifyUnCheck = True
+    '            If (Not checkedValue) Then
+    '                'Verify if the Calibrator can be unselected: there are not selected Patient and/or Control Order Tests using it
+    '                verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openCalibRow.SampleClass.ToString, openCalibRow.TestType.ToString, _
+    '                                                                               CInt(openCalibRow.TestID), openCalibRow.SampleType.ToString, _
+    '                                                                               myWorkSessionResultDS)
+    '            End If
+
+    '            If (verifyUnCheck) Then
+    '                If (Not checkedValue) Then
+    '                    If (openCalibRow.RequestedSampleTypes <> openCalibRow.SampleType) Then
+    '                        'Verify also if there are not selected Patient and/or Control Order Tests using any of the requested Sample Types
+    '                        Dim additionalSampleTypes() As String = Split(openCalibRow.RequestedSampleTypes.Trim)
+
+    '                        For Each reqSampleType As String In additionalSampleTypes
+    '                            verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openCalibRow.SampleClass.ToString, openCalibRow.TestType.ToString, _
+    '                                                                                           CInt(openCalibRow.TestID), reqSampleType.ToString, _
+    '                                                                                           myWorkSessionResultDS, openCalibRow.SampleType)
+    '                            If (Not verifyUnCheck) Then Exit For
+    '                        Next
+    '                    End If
+    '                End If
+
+    '                If (verifyUnCheck) Then
+    '                    openCalibRow.Selected = checkedValue
+    '                    If (Not openCalibRow.IsPreviousOrderTestIDNull) Then openCalibRow.NewCheck = checkedValue
+    '                Else
+    '                    If (Not checkedValue) Then numLocked += 1
+    '                End If
+    '            Else
+    '                If (Not checkedValue) Then numLocked += 1
+    '            End If
+    '        Next
+    '        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+    '        lstWSOpenCalibratorsDS = Nothing
+
+    '        'Get all Blanks that can be selected/unselected
+    '        Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+    '        lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+    '                            Where a.SampleClass = "BLANK" _
+    '                          AndAlso a.OTStatus = "OPEN" _
+    '                           Select a).ToList()
+
+    '        For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
+    '            verifyUnCheck = True
+    '            If (Not checkedValue) Then
+    '                'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
+    '                verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
+    '                                                                               CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
+    '                                                                               myWorkSessionResultDS)
+    '            End If
+
+    '            If (verifyUnCheck) Then
+    '                openBlankRow.Selected = checkedValue
+    '                If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
+    '            Else
+    '                If (Not checkedValue) Then numLocked += 1
+    '            End If
+    '        Next
+    '        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+    '        lstWSOpenBlanksDS = Nothing
+
+    '        bsBlkCalibDataGridView.RefreshEdit()
+    '        totalBlkCalCheckedCheckBoxes = If(checkedValue, totalBlkCalCheckBoxes, 0)
+
+    '        'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
+    '        If (Not checkedValue) AndAlso (numLocked = bsBlkCalibDataGridView.Rows.Count) Then
+    '            bsAllBlanksCheckBox.Checked = True
+    '        End If
+
+    '        'Verify if OpenRotor button can be enabled
+    '        OpenRotorButtonEnabled()
+
+    '        isHeaderBlkCalCheckBoxClicked = False
+    '        ChangesMadeAttribute = True
+    '    Catch ex As Exception
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlkCalibCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".ClickAllBlkCalibCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    '    End Try
+    'End Sub
+
+
     ''' <summary>
-    ''' Manage the check/uncheck of all selectable rows in the grid of Blanks and Calibrators
-    ''' For event bsAllBlkCalCheckBox_MouseClick
+    ''' Manage the check/uncheck of all selectable rows in the grid just for the Blanks
+    ''' For event bsAllBlanksCheckBox_MouseClick
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  SA 12/04/2010 - Code moved from the event; changes to fix errors
-    ''' Modified by: SA 15/04/2010 - When a Calibrator used as alternative for different SampleTypes is unselected, verify that there are
-    '''                              not Patient or Control Order Tests requested for any of the requested Sample Types
-    '''              SA 09/11/2012 - When function VerifyUnselectedOrderTest is called to validate if there are Patient or Control Order Tests 
-    '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
-    '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
-    '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    ''' Created by:  XB 26/08/2014 - from older function ClickAllBlkCalCheckBox with the code for SampleClass BLANKS extracted - BT #1868
     ''' </remarks>
-    Private Sub ClickAllBlkCalibCheckBox()
+    Private Sub ClickAllBlanksCheckBox()
         Try
             Dim numLocked As Integer = 0
             isHeaderBlkCalCheckBoxClicked = True
@@ -1838,7 +2045,75 @@ Public Class IWSSampleRequest
             'Empty the collection of selected rows in the grid of Blank and Calibrators
             bsBlkCalibDataGridView.ClearSelection()
 
-            Dim checkedValue As Boolean = bsAllBlkCalCheckBox.Checked
+            Dim checkedValue As Boolean = bsAllBlanksCheckBox.Checked
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+
+            Dim verifyUnCheck As Boolean
+
+            'Get all Blanks that can be selected/unselected
+            Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+            lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                                Where a.SampleClass = "BLANK" _
+                              AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+
+            Dim OpenBlanksNum As Integer = lstWSOpenBlanksDS.Count
+
+            For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
+                verifyUnCheck = True
+                If (Not checkedValue) Then
+                    'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
+                    verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
+                                                                                   CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
+                                                                                   myWorkSessionResultDS)
+                End If
+
+                If (verifyUnCheck) Then
+                    openBlankRow.Selected = checkedValue
+                    If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
+                Else
+                    If (Not checkedValue) Then numLocked += 1
+                End If
+            Next
+            myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+            lstWSOpenBlanksDS = Nothing
+
+            bsBlkCalibDataGridView.RefreshEdit()
+            totalBlankCheckedCheckBoxes = If(checkedValue, totalBlankCheckBoxes, 0)
+
+            'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
+            If (Not checkedValue) AndAlso (numLocked = OpenBlanksNum) Then
+                bsAllBlanksCheckBox.Checked = True
+            End If
+
+            'Verify if OpenRotor button can be enabled
+            OpenRotorButtonEnabled()
+
+            isHeaderBlkCalCheckBoxClicked = False
+            ChangesMadeAttribute = True
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlanksCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ClickAllBlanksCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Manage the check/uncheck of all selectable rows in the grid just for the Calibrators
+    ''' For event bsAllCalibsCheckBox_MouseClick
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  XB 26/08/2014 - from older function ClickAllBlkCalCheckBox with the code for SampleClass CALIBS extracted - BT #1868
+    ''' </remarks>
+    Private Sub ClickAllCalibsCheckBox()
+        Try
+            Dim numLocked As Integer = 0
+            isHeaderBlkCalCheckBoxClicked = True
+
+            'Empty the collection of selected rows in the grid of Blank and Calibrators
+            bsBlkCalibDataGridView.ClearSelection()
+
+            Dim checkedValue As Boolean = bsAllCalibsCheckBox.Checked
             Dim myOrderTestsDelegate As New OrderTestsDelegate
 
             'Get all Calibrators that can be selected/unselected
@@ -1847,6 +2122,8 @@ Public Class IWSSampleRequest
                                      Where a.SampleClass = "CALIB" _
                                    AndAlso a.OTStatus = "OPEN" _
                                     Select a).ToList()
+
+            Dim OpenCalibsNum As Integer = lstWSOpenCalibratorsDS.Count
 
             Dim verifyUnCheck As Boolean
             For Each openCalibRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenCalibratorsDS
@@ -1886,38 +2163,43 @@ Public Class IWSSampleRequest
             myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
             lstWSOpenCalibratorsDS = Nothing
 
-            'Get all Blanks that can be selected/unselected
-            Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
-            lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                Where a.SampleClass = "BLANK" _
-                              AndAlso a.OTStatus = "OPEN" _
-                               Select a).ToList()
 
-            For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
-                verifyUnCheck = True
-                If (Not checkedValue) Then
-                    'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
-                    verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
-                                                                                   CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
-                                                                                   myWorkSessionResultDS)
-                End If
+            'Get all different TestID and Sample Type for all selected Calibrators in order to search all needed Blanks
+            Dim listOfDifElem As List(Of String)
+            listOfDifElem = (From a In myWorkSessionResultDS.BlankCalibrators _
+                            Where a.SampleClass = "CALIB" _
+                            AndAlso a.OTStatus = "OPEN" _
+                            Select String.Format("{0}|{1}|{2}|{3}", a.TestType, a.TestID, a.SampleType, a.Selected) Distinct).ToList()
 
-                If (verifyUnCheck) Then
-                    openBlankRow.Selected = checkedValue
-                    If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
-                Else
-                    If (Not checkedValue) Then numLocked += 1
+            For Each difElement As String In listOfDifElem
+                Dim elements As String() = difElement.Split(CChar("|"))
+                myOrderTestsDelegate.SelectAllNeededOrderTests("CALIB", elements(0), CInt(elements(1)), elements(2), myWorkSessionResultDS)
+
+                If Not checkedValue Then
+                    Dim lstWSBlankDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+                    lstWSBlankDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                                   Where a.SampleClass = "BLANK" _
+                                 AndAlso a.TestType = elements(0) _
+                                 AndAlso a.TestID = CInt(elements(1)) _
+                                 AndAlso a.SampleType = elements(2) _
+                                 AndAlso (a.IsPreviousOrderTestIDNull OrElse a.PreviousOrderTestID.ToString = "") _
+                                  Select a).ToList()
+
+                    If (lstWSBlankDS.Count = 1) Then
+                        lstWSBlankDS(0).Selected = CType(elements(3), Boolean)
+                        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+                    End If
                 End If
             Next
-            myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
-            lstWSOpenBlanksDS = Nothing
+            listOfDifElem = Nothing
+
 
             bsBlkCalibDataGridView.RefreshEdit()
-            totalBlkCalCheckedCheckBoxes = If(checkedValue, totalBlkCalCheckBoxes, 0)
+            totalCalibCheckedCheckBoxes = If(checkedValue, totalCalibCheckBoxes, 0)
 
             'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
-            If (Not checkedValue) AndAlso (numLocked = bsBlkCalibDataGridView.Rows.Count) Then
-                bsAllBlkCalCheckBox.Checked = True
+            If (Not checkedValue) AndAlso (numLocked = OpenCalibsNum) Then
+                bsAllCalibsCheckBox.Checked = True
             End If
 
             'Verify if OpenRotor button can be enabled
@@ -1925,9 +2207,11 @@ Public Class IWSSampleRequest
 
             isHeaderBlkCalCheckBoxClicked = False
             ChangesMadeAttribute = True
+
+            RowBlkCalCheckBoxClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlkCalibCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ClickAllBlkCalibCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllCalibsCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ClickAllCalibsCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1940,20 +2224,31 @@ Public Class IWSSampleRequest
     ''' Modified by: SA 28/04/2010 - Changed the way of calling function SelectAllNeededOrderTests: execute it for 
     '''                              each different TestType, TestID and SampleType instead of for each row in the 
     '''                              grid (due to long time execution when the grid is loaded with lot of rows)
+    '''              XB 01/09/2014 - Add new behaviour for the the Controls selection/unselection by Level - BA #1868
     ''' </remarks>
-    Private Sub ClickAllControlCheckBox()
+    Private Sub ClickAllControlCheckBox(ByVal pControlLevel As Integer)
         Try
             isHeaderControlCheckBoxClicked = True
 
             'Empty the collection of selected rows in the grid of Controls
             bsControlOrdersDataGridView.ClearSelection()
-            Dim checkedValue As Boolean = bsAllCtrlsCheckBox.Checked
+
+            Dim checkedValue As Boolean
+            Select Case pControlLevel
+                Case 1
+                    checkedValue = bsAllControlsLevel1CheckBox.Checked
+                Case 2
+                    checkedValue = bsAllControlsLevel2CheckBox.Checked
+                Case 3
+                    checkedValue = bsAllControlsLevel3CheckBox.Checked
+            End Select
 
             'Get all Controls that can be selected/unselected
             Dim lstWSOpenControlsDS As List(Of WorkSessionResultDS.ControlsRow)
             lstWSOpenControlsDS = (From a In myWorkSessionResultDS.Controls _
                                   Where a.SampleClass = "CTRL" _
                                 AndAlso a.OTStatus = "OPEN" _
+                                AndAlso a.ControlLevel = pControlLevel _
                                  Select a).ToList()
 
             For Each controlRow As WorkSessionResultDS.ControlsRow In lstWSOpenControlsDS
@@ -1962,23 +2257,35 @@ Public Class IWSSampleRequest
             myWorkSessionResultDS.Controls.AcceptChanges()
             lstWSOpenControlsDS = Nothing
 
-            If (checkedValue) Then
-                Dim listOfDifElem As List(Of String)
-                listOfDifElem = (From a In myWorkSessionResultDS.Controls _
-                                Where a.SampleClass = "CTRL" _
-                              AndAlso a.OTStatus = "OPEN" _
-                               Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
+            Dim listOfDifElem As List(Of String)
+            listOfDifElem = (From a In myWorkSessionResultDS.Controls _
+                            Where a.SampleClass = "CTRL" _
+                          AndAlso a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = pControlLevel _
+                           Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
 
-                Dim myOrderTestsDelegate As New OrderTestsDelegate
-                For Each difElement As String In listOfDifElem
-                    Dim elements As String() = difElement.Split(CChar("|"))
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+            For Each difElement As String In listOfDifElem
+                Dim elements As String() = difElement.Split(CChar("|"))
+                If checkedValue Then
                     myOrderTestsDelegate.SelectAllNeededOrderTests("CTRL", elements(0), CInt(elements(1)), elements(2), myWorkSessionResultDS)
-                Next
-                listOfDifElem = Nothing
-            End If
+                Else
+                    'Unselect the Calibrator and Blank if it is possible
+                    UnselectBlkCalibrator(elements(0), elements(2), CInt(elements(1)))
+                End If
+            Next
+            listOfDifElem = Nothing
 
             bsControlOrdersDataGridView.RefreshEdit()
-            totalControlCheckedCheckBoxes = If(checkedValue, totalControlCheckedCheckBoxes, 0)
+
+            Select Case pControlLevel
+                Case 1
+                    totalControlLevel1CheckedCheckBoxes = If(checkedValue, totalControlLevel1CheckedCheckBoxes, 0)
+                Case 2
+                    totalControlLevel2CheckedCheckBoxes = If(checkedValue, totalControlLevel2CheckedCheckBoxes, 0)
+                Case 3
+                    totalControlLevel3CheckedCheckBoxes = If(checkedValue, totalControlLevel3CheckedCheckBoxes, 0)
+            End Select
 
             'Verify if OpenRotor button can be enabled
             OpenRotorButtonEnabled()
@@ -1986,7 +2293,7 @@ Public Class IWSSampleRequest
             isHeaderControlCheckBoxClicked = False
             ChangesMadeAttribute = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllControlCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllControlCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ClickAllControlCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2072,7 +2379,7 @@ Public Class IWSSampleRequest
             isHeaderPatientCheckBoxClicked = False
             ChangesMadeAttribute = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllPatientCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllPatientCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ClickAllPatientCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2126,7 +2433,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ControlOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ControlOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ControlOrderTestsClickRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2279,7 +2586,7 @@ Public Class IWSSampleRequest
             End If
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteBlankCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteBlankCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteBlankCalibrators", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2356,7 +2663,7 @@ Public Class IWSSampleRequest
             End If
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2390,7 +2697,7 @@ Public Class IWSSampleRequest
             If (ShowMessage(bsPrepareWSLabel.Text, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString, , Me) = Windows.Forms.DialogResult.Yes) Then
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Cursor = Cursors.WaitCursor
@@ -2463,13 +2770,13 @@ Public Class IWSSampleRequest
                 Cursor = Cursors.Default
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("IWSampleRequest Delete Patient Request(Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("IWSampleRequest Delete Patient Request(Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IWSampleRequest.DeletePatients", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             End If
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeletePatients", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeletePatients", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeletePatients", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2492,7 +2799,7 @@ Public Class IWSSampleRequest
             bsSampleTypeComboBox.BackColor = SystemColors.MenuBar
             bsSearchTestsButton.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisableFieldsForAbortedWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisableFieldsForAbortedWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DisableFieldsForAbortedWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2519,7 +2826,7 @@ Public Class IWSSampleRequest
             newMaxOrderTestsRow.CurrentRowsNumValue = bsPatientOrdersDataGridView.Rows.Count
             pMaxOrderTestsDS.MaxOrderTestsValues.Rows.Add(newMaxOrderTestsRow)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillMaxOrderTestValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillMaxOrderTestValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillMaxOrderTestValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2578,7 +2885,7 @@ Public Class IWSSampleRequest
             Next
             lstWSPatientDS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillSelectedTestsForDifPriority", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillSelectedTestsForDifPriority", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillSelectedTestsForDifPriority", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2660,7 +2967,7 @@ Public Class IWSSampleRequest
         Catch ex As Exception
             openTestSelection = False
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillSelectedTestsForPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillSelectedTestsForPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillSelectedTestsForPatient", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return openTestSelection
@@ -2702,7 +3009,7 @@ Public Class IWSSampleRequest
                 ShowMessage(Name & ".GetNumReplicatesLimits", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetNumReplicatesLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetNumReplicatesLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetNumReplicatesLimits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return resultData
@@ -2741,7 +3048,7 @@ Public Class IWSSampleRequest
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetSampleTubeTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetSampleTubeTypes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
         Return myGlobalDataTO
     End Function
@@ -2754,6 +3061,8 @@ Public Class IWSSampleRequest
     ''' Created by:  PG 07/10/2010
     ''' Modified by: SA 18/01/2010 - Get multilanguage text for tooltip of new button to opening the auxiliary 
     '''                              screen to add results for requested Off-System Tests
+    '''              XB 26/08/2014 - Use Multilanguage resource LBL_Blanks instead of LBL_WSPrep_AllBlanksCalibs - BT #1868
+    '''              XB 01/09/2014 - Use Multilanguage resource LBL_WSPrep_Control instead of LBL_Controls for the 3 control checkboxes - BT #1868
     ''' </remarks>
     Private Sub GetScreenLabels(ByVal pLanguageID As String)
         Try
@@ -2771,8 +3080,14 @@ Public Class IWSSampleRequest
             bsSampleTypeLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", pLanguageID) + ":"
             bsPrepareWSLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_WSPreparation", pLanguageID)
 
-            bsAllBlkCalCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_AllBlanksCalibs", pLanguageID)
-            bsAllCtrlsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Controls", pLanguageID)
+            ' XB 26/08/2014 - BT #1868
+            bsAllBlanksCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Blanks", pLanguageID)
+            bsAllCalibsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Calibrators", pLanguageID)
+            ' XB 01/09/2014 - BT #1868
+            bsAllControlsLevel1CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 1"
+            bsAllControlsLevel2CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 2"
+            bsAllControlsLevel3CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 3"
+
             bsAllPatientsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_AllPatients", pLanguageID)
             bsStatCheckbox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Stat", pLanguageID)
             bsSearchTestsButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", pLanguageID) 'JB 01/10/2012 - Resource String unification
@@ -2796,7 +3111,7 @@ Public Class IWSSampleRequest
             bsScreenToolTips.SetToolTip(bsOpenRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_WSPrep_OpenRotorPos", pLanguageID))
             bsScreenToolTips.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2834,7 +3149,7 @@ Public Class IWSSampleRequest
                 bsSampleTypeComboBox.BackColor = Color.White
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForBlankCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForBlankCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".HeaderStatusForBlankCalibrators", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2866,7 +3181,7 @@ Public Class IWSSampleRequest
             bsNumOrdersNumericUpDown.Enabled = False
             bsNumOrdersNumericUpDown.BackColor = SystemColors.MenuBar
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".HeaderStatusForControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2906,7 +3221,7 @@ Public Class IWSSampleRequest
                 bsNumOrdersNumericUpDown.BackColor = SystemColors.MenuBar
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForPatients", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeaderStatusForPatients", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".HeaderStatusForPatients", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3203,7 +3518,7 @@ Public Class IWSSampleRequest
             bsBlkCalibDataGridView.ScrollBars = ScrollBars.Both
             bsBlkCalibDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeBlkCalibGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeBlkCalibGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeBlkCalibGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3221,6 +3536,7 @@ Public Class IWSSampleRequest
     '''                              can be defined also for ISE Tests)
     '''              JC 13/11/2012 - Modified column width
     '''              SA 23/03/2013 - Set to false grid property AutoGenerateColumns to avoid shown new columns added to the source DS for LIS management
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub InitializeControlGrid(ByVal pTubeTypesList As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow), _
                                       ByVal pLanguageID As String)
@@ -3431,8 +3747,16 @@ Public Class IWSSampleRequest
             bsControlOrdersDataGridView.Columns(columnName).DataPropertyName = columnName
             bsControlOrdersDataGridView.Columns(columnName).ReadOnly = True
 
+            'ControlLevel column
+            columnName = "ControlLevel"
+            bsControlOrdersDataGridView.Columns.Add("ControlLevel", "")
+            bsControlOrdersDataGridView.Columns(columnName).Width = 0
+            bsControlOrdersDataGridView.Columns(columnName).Visible = False
+            bsControlOrdersDataGridView.Columns(columnName).DataPropertyName = columnName
+            bsControlOrdersDataGridView.Columns(columnName).ReadOnly = True
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeControlGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeControlGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeControlGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3735,7 +4059,7 @@ Public Class IWSSampleRequest
 
             bsPatientOrdersDataGridView.ScrollBars = ScrollBars.Both
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializePatientGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializePatientGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializePatientGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3774,7 +4098,7 @@ Public Class IWSSampleRequest
                 ShowMessage(Name & ".InitializeSampleClassComboBox", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeSampleClassComboBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeSampleClassComboBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeSampleClassComboBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3809,7 +4133,7 @@ Public Class IWSSampleRequest
                 ShowMessage(Name & ".InitializeSampleTypeComboBox", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeSampleTypeComboBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeSampleTypeComboBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeSampleTypeComboBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3843,7 +4167,7 @@ Public Class IWSSampleRequest
                 End If
             Next iRow
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSamePatientSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSamePatientSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IsTheSamePatientSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return returnData
@@ -3872,7 +4196,7 @@ Public Class IWSSampleRequest
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSameSampleClassSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSameSampleClassSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IsTheSameSampleClassSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return returnData
@@ -3904,7 +4228,7 @@ Public Class IWSSampleRequest
                 End If
             Next iRow
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSameSampleTypeSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTheSameSampleTypeSelection", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".IsTheSameSampleTypeSelection", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return returnData
@@ -3939,7 +4263,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LIMSErrorsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LIMSErrorsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LIMSErrorsButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -3969,7 +4293,7 @@ Public Class IWSSampleRequest
                 ShowMessage(Name & ".LoadNumOrdersLimits", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadNumOrdersLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadNumOrdersLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadNumOrdersLimits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4033,7 +4357,7 @@ Public Class IWSSampleRequest
                     Dim myErrorData As String() = ErrorOnSavingWS.Split(CChar("|"))
                     ErrorOnSavingWS = String.Empty 'Reset the value after using it
 
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
                     Application.DoEvents()
                     Cursor = Cursors.Default
                     ShowMessage(Name & ".LoadSavedWS", myErrorData(0), myErrorData(1), Me)
@@ -4047,11 +4371,11 @@ Public Class IWSSampleRequest
                 WSLoadedNameAttribute = ""
             End If
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSavedWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSavedWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSavedWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default
@@ -4083,7 +4407,7 @@ Public Class IWSSampleRequest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSavedWSOrderTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSavedWSOrderTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".LoadSavedWSOrderTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".LoadSavedWSOrderTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -4192,7 +4516,7 @@ Public Class IWSSampleRequest
             lstSameOTs = Nothing
             lstDistinctElements = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MergePatientOrderTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MergePatientOrderTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".MergePatientOrderTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4214,7 +4538,7 @@ Public Class IWSSampleRequest
             bsOffSystemResultsButton.Enabled = (lstRequestedOFFSystems.Count > 0) AndAlso (WSStatusAttribute <> "ABORTED")
             lstRequestedOFFSystems = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemResultsButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4303,7 +4627,7 @@ Public Class IWSSampleRequest
                 Cursor = Cursors.Default
 
                 'Open the auxiliary screen that allow inform a result for each requested OffSystem Test
-                Dim myAuxOFFSResultsScreen As New IResultsOffSystemsTest
+                Dim myAuxOFFSResultsScreen As New UiResultsOffSystemsTest
                 myAuxOFFSResultsScreen.OffSystemTestsList = myOffSystemTestsResultsDS
 
                 myAuxOFFSResultsScreen.ShowDialog()
@@ -4350,7 +4674,7 @@ Public Class IWSSampleRequest
             lstRequestedOFFSystems = Nothing
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenOffSystemResultsScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenOffSystemResultsScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenOffSystemResultsScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4400,7 +4724,7 @@ Public Class IWSSampleRequest
                 lstrWSSelectedRowsDS = Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenRotorButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenRotorButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenRotorButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4423,7 +4747,7 @@ Public Class IWSSampleRequest
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintBlkCalibratRowsExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintBlkCalibratRowsExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PaintBlkCalibratRowsExists", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4446,7 +4770,7 @@ Public Class IWSSampleRequest
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintControlRowsExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintControlRowsExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PaintControlRowsExists", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4470,7 +4794,7 @@ Public Class IWSSampleRequest
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintPatientRowExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PaintPatientRowExists", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PaintPatientRowExists", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4504,7 +4828,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientIDChangedInTextBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientIDChangedInTextBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PatientIDChangedInTextBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4611,7 +4935,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientOrderTestsClickRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PatientOrderTestsClickRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4685,7 +5009,7 @@ Public Class IWSSampleRequest
                     bsBlkCalibDataGridView.Rows(bsBlkCalibDataGridView.CurrentRow.Index).Selected = False
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_RowPostPaint", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4698,9 +5022,10 @@ Public Class IWSSampleRequest
     ''' Created by:  SA 15/04/2010 - Code moved from the event
     ''' Modified by: SA 19/06/2012 - Validations to set the ReadOnly status of the NumReplicates will depend not only in the 
     '''                              Order Test Status, but also in the TestType; the linq is filtered by TestType
-    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus <> OPEN OrElse LISRequest = TRUE).
-    '''                              Set selected column as ReadOnly when (OTStatus <> OPEN).
-    '''                              Change filter OTStatus <> OPEN in both LINQs by the following one: (OTStatus <> OPEN OrElse LISRequest = TRUE)
+    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus different of OPEN OrElse LISRequest = TRUE).
+    '''                              Set selected column as ReadOnly when (OTStatus different of OPEN).
+    '''                              Change filter OTStatus different of OPEN in both LINQs by the following one: 
+    '''                              (OTStatus different of OPEN OrElse LISRequest = TRUE)
     ''' </remarks>
     Private Sub PostPaintControlRow()
         Try
@@ -4755,7 +5080,7 @@ Public Class IWSSampleRequest
                     bsControlOrdersDataGridView.Rows(bsControlOrdersDataGridView.CurrentRow.Index).Selected = False
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsControlOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsControlOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsControlOrdersDataGridVieww_RowPostPaint", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4774,10 +5099,10 @@ Public Class IWSSampleRequest
     '''              SA 18/01/2011 - Column selected will be always read only for requested Off-System Tests
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode
-    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus <> OPEN OrElse LISRequest = TRUE).
-    '''                            - Set selected column as ReadOnly when (OTStatus <> OPEN OrElse TestType = OFFS)
-    '''                            - Change filter OTStatus <> OPEN in both LINQs by the following one:
-    '''                               (OTStatus <> OPEN OrElse LISRequest = TRUE)  
+    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus different of OPEN OrElse LISRequest = TRUE).
+    '''                            - Set selected column as ReadOnly when (OTStatus different of OPEN OrElse TestType = OFFS)
+    '''                            - Change filter OTStatus different of OPEN in both LINQs by the following one:
+    '''                               (OTStatus different of OPEN OrElse LISRequest = TRUE)  
     ''' </remarks>
     Private Sub PostPaintPatientRow()
         Try
@@ -4847,7 +5172,7 @@ Public Class IWSSampleRequest
                 Case "Right_Click"
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PostPaintPatientRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PostPaintPatientRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PostPaintPatientRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4875,45 +5200,45 @@ Public Class IWSSampleRequest
 
             'LOAD SAVED WS Button
             auxIconName = GetIconName("OPEN")
-            If Not String.Equals(auxIconName, String.Empty) Then bsLoadWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLoadWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE WS Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE Buttons (Patient Samples, Controls, Blanks&Calibrators)
             auxIconName = GetIconName("REMOVE")
             If Not String.Equals(auxIconName, String.Empty) Then
-                bsDelPatientsButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelCalibratorsButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelControlsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDelPatientsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelCalibratorsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelControlsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'OFF SYSTEM TESTS RESULTS Button
             auxIconName = GetIconName("OFFSYSTEMBUT") 'auxIconName = GetIconName("TOFF_SYS")
             If Not String.Equals(auxIconName, String.Empty) Then
-                bsOffSystemResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'POSITIONING Button
             auxIconName = GetIconName("SENDTOPOS")
-            If Not String.Equals(auxIconName, String.Empty) Then bsOpenRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsOpenRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SCANNING SAMPLES Rotor
             auxIconName = GetIconName("BARCODE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsScanningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsScanningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'BARCODE WARNINGS Button
             auxIconName = GetIconName("BCWARNING")
-            If Not String.Equals(auxIconName, String.Empty) Then bsBarcodeWarningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsBarcodeWarningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'IMPORT FROM LIMS Button
             auxIconName = GetIconName("LIMSIMPORT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSImportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SHOW LIMS ERRORS Button
             auxIconName = GetIconName("STUS_WITHERRS") ' "WARNING") dl 23/03/2012
-            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSErrorsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSErrorsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'If the LIS is working with ES, these buttons are not visible
             If (Not LISWithFilesMode) Then
@@ -4924,10 +5249,10 @@ Public Class IWSSampleRequest
 
             'SAVE & EXIT Button
             auxIconName = GetIconName("ACCEPT1")
-            If Not String.Equals(auxIconName, String.Empty) Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -4951,6 +5276,7 @@ Public Class IWSSampleRequest
     '''                              in BarcodePositionsWithNoRequestsDelegate has to be done only when LISWithFilesMode is TRUE
     '''              SA 21/03/2014 - BT #1545 ==> Changes to divide AddWorkSession process in several DB Transactions. When value of global flag 
     '''                                           NEWAddWorkSession is TRUE, call new version of function AddWorkSession 
+    '''              AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub PrepareOrderTestsForWS()
         Dim myGlobalDataTO As GlobalDataTO
@@ -5019,9 +5345,9 @@ Public Class IWSSampleRequest
                 'TR 28/06/2013 -Prepare and send results to LIS.
                 If (Not myGlobalDataTO.HasError) Then
                     If myWSDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
-                        CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".PrepareOrderTestsForWS ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                        IAx00MainMDI.AddResultsIntoQueueToUpload(myWSDelegate.LastExportedResults)
-                        IAx00MainMDI.InvokeUploadResultsLIS(False)
+                        GlobalBase.CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".PrepareOrderTestsForWS ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        UiAx00MainMDI.AddResultsIntoQueueToUpload(myWSDelegate.LastExportedResults)
+                        UiAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
                     End If 'AG 21/02/2014 - #1505
                 End If
                 'TR 28/06/2013 -END.
@@ -5071,7 +5397,7 @@ Public Class IWSSampleRequest
 
         Catch ex As Exception
             SetPropertyThreadSafe("Cursor", Cursors.Default)
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareOrderTestsForWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareOrderTestsForWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".PrepareOrderTestsForWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".PrepareOrderTestsForWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -5144,7 +5470,7 @@ Public Class IWSSampleRequest
             End If
             Return MyBase.ProcessDialogKey(keyData)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessDialogKey", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessDialogKey", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProcessDialogKey", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Function
@@ -5161,7 +5487,7 @@ Public Class IWSSampleRequest
             bsBlkCalibDataGridView.Refresh()
             bsControlOrdersDataGridView.Refresh()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RefreshGrids", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RefreshGrids", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RefreshGrids", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5172,7 +5498,8 @@ Public Class IWSSampleRequest
     ''' <remarks>
     ''' Created by:  TR 04/08/2011
     ''' Modified by: TR 01/08/2012 - Added more elements to release
-    ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+    '''              AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub ReleaseElements()
         Try
@@ -5241,8 +5568,11 @@ Public Class IWSSampleRequest
             bsLIMSErrorsButton = Nothing
             bsScreenToolTips = Nothing
             bsAllPatientsCheckBox = Nothing
-            bsAllBlkCalCheckBox = Nothing
-            bsAllCtrlsCheckBox = Nothing
+            bsAllBlanksCheckBox = Nothing
+            bsAllCalibsCheckBox = Nothing
+            bsAllControlsLevel1CheckBox = Nothing
+            bsAllControlsLevel2CheckBox = Nothing
+            bsAllControlsLevel3CheckBox = Nothing
             bsBlkCalibDataGridView = Nothing
             bsControlOrdersDataGridView = Nothing
             bsPatientOrdersDataGridView = Nothing
@@ -5254,7 +5584,7 @@ Public Class IWSSampleRequest
 
             'GC.Collect()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5264,43 +5594,51 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: DL 09/03/2010
+    '''              XB 26/08/2014 - Remove parameter and the block of code executed when parameter was not Nothing (due to the function is called just once using Nothing) - BT #1868
+    '''                              Get value of cell SampleClass for the current row and divide code according the SampleClass - BT #1868
     ''' </remarks>
-    Private Sub RowBlkCalCheckBoxClick(ByVal pRowCheckBox As DataGridViewCheckBoxCell)
+    Private Sub RowBlkCalCheckBoxClick()
         Try
             ChangesMadeAttribute = True
-            If (Not pRowCheckBox Is Nothing) Then
-                'Modify the global counter
-                If (CBool(pRowCheckBox.Value) AndAlso totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
-                    totalBlkCalCheckedCheckBoxes += 1
 
-                ElseIf (totalBlkCalCheckedCheckBoxes > 0) Then
-                    totalBlkCalCheckedCheckBoxes -= 1
-                End If
+            ' XB 26/08/2014 - BT #1868
+            'If (Not pRowCheckBox Is Nothing) Then
+            '    'Modify the global counter
+            '    If (CBool(pRowCheckBox.Value) AndAlso totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
+            '        totalBlkCalCheckedCheckBoxes += 1
 
-                'Change state of the header CheckBox...
-                If (totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
-                    bsAllBlkCalCheckBox.Checked = False
+            '    ElseIf (totalBlkCalCheckedCheckBoxes > 0) Then
+            '        totalBlkCalCheckedCheckBoxes -= 1
+            '    End If
 
-                ElseIf (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes) Then
-                    bsAllBlkCalCheckBox.Checked = True
-                End If
-            Else
-                'Count the number of selected rows in grid of Blanks and Calibrators
-                Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
-                lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                      Where a.Selected = True _
-                                     Select a).ToList()
+            '    'Change state of the header CheckBox...
+            '    If (totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
+            '        bsAllBlanksCheckBox.Checked = False
 
-                'If all rows are selected, then the CheckBox for select/unselect all Blanks and Calibrators is checked
-                bsAllBlkCalCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsBlkCalibDataGridView.Rows.Count)
-                lstWSSelectedRowsDS = Nothing
-            End If
+            '    ElseIf (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes) Then
+            '        bsAllBlanksCheckBox.Checked = True
+            '    End If
+            'Else
+            ''Count the number of selected rows in grid of Blanks and Calibrators
+            'Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+            'lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+            '                      Where a.Selected = True _
+            '                     Select a).ToList()
+
+
+            ''If all rows are selected, then the CheckBox for select/unselect all Blanks and Calibrators is checked
+            'bsAllBlanksCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsBlkCalibDataGridView.Rows.Count)
+            'lstWSSelectedRowsDS = Nothing
+            'End If
+
+            CheckAddRemoveBlkCalRows()
+            ' XB 26/08/2014 - BT #1868
 
             'Verify if button for Positioning should be enabled
             OpenRotorButtonEnabled()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowBlkCalCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowBlkCalCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RowBlkCalCheckBoxClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5310,42 +5648,110 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: DL 09/03/2010
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub RowControlCheckBoxClick(ByVal pRowCheckBox As DataGridViewCheckBoxCell)
         Try
             ChangesMadeAttribute = True
             If (Not pRowCheckBox Is Nothing) Then
-                'Modify the global counter
-                If (CBool(pRowCheckBox.Value) AndAlso totalControlCheckedCheckBoxes < totalControlCheckBoxes) Then
-                    totalControlCheckedCheckBoxes += 1
+                'Modify the global counter for controls of Level 1
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel1CheckedCheckBoxes < totalControlLevel1CheckBoxes) Then
+                    totalControlLevel1CheckedCheckBoxes += 1
 
-                ElseIf (totalControlCheckedCheckBoxes > 0) Then
-                    totalControlCheckedCheckBoxes -= 1
+                ElseIf (totalControlLevel1CheckedCheckBoxes > 0) Then
+                    totalControlLevel1CheckedCheckBoxes -= 1
+                End If
+                'Modify the global counter for controls of Level 2
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel2CheckedCheckBoxes < totalControlLevel2CheckBoxes) Then
+                    totalControlLevel2CheckedCheckBoxes += 1
+
+                ElseIf (totalControlLevel2CheckedCheckBoxes > 0) Then
+                    totalControlLevel2CheckedCheckBoxes -= 1
+                End If
+                'Modify the global counter for controls of Level 3
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel3CheckedCheckBoxes < totalControlLevel3CheckBoxes) Then
+                    totalControlLevel3CheckedCheckBoxes += 1
+
+                ElseIf (totalControlLevel3CheckedCheckBoxes > 0) Then
+                    totalControlLevel3CheckedCheckBoxes -= 1
                 End If
 
-                'Change state of the header CheckBox...
-                If (totalControlCheckedCheckBoxes < totalControlCheckBoxes) Then
-                    bsAllCtrlsCheckBox.Checked = False
+                'Change state of the header CheckBox for controls of level 1...
+                If (totalControlLevel1CheckedCheckBoxes < totalControlLevel1CheckBoxes) Then
+                    bsAllControlsLevel1CheckBox.Checked = False
 
-                ElseIf (totalControlCheckedCheckBoxes = totalControlCheckBoxes) Then
-                    bsAllCtrlsCheckBox.Checked = True
+                ElseIf (totalControlLevel1CheckedCheckBoxes = totalControlLevel1CheckBoxes) Then
+                    bsAllControlsLevel1CheckBox.Checked = True
+                End If
+                'Change state of the header CheckBox for controls of level 2...
+                If (totalControlLevel2CheckedCheckBoxes < totalControlLevel2CheckBoxes) Then
+                    bsAllControlsLevel2CheckBox.Checked = False
+
+                ElseIf (totalControlLevel2CheckedCheckBoxes = totalControlLevel2CheckBoxes) Then
+                    bsAllControlsLevel2CheckBox.Checked = True
+                End If
+                'Change state of the header CheckBox for controls of level 3...
+                If (totalControlLevel3CheckedCheckBoxes < totalControlLevel3CheckBoxes) Then
+                    bsAllControlsLevel3CheckBox.Checked = False
+
+                ElseIf (totalControlLevel3CheckedCheckBoxes = totalControlLevel3CheckBoxes) Then
+                    bsAllControlsLevel3CheckBox.Checked = True
                 End If
             Else
-                'Count the number of selected rows in grid of Controls
-                Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.ControlsRow)
-                lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.Controls _
-                                      Where a.Selected = True _
-                                     Select a).ToList()
+                'Check how many OPEN Controls of Level 1 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 1 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 1
+                Dim lstWSSelectedControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 1 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 1 is checked
+                bsAllControlsLevel1CheckBox.Checked = (lstWSControlsLevel1DS.Count = lstWSSelectedControlsLevel1DS.Count)
 
-                'If all rows are selected, then the CheckBox for select/unselect all Controls is checked
-                bsAllCtrlsCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsControlOrdersDataGridView.Rows.Count)
-                lstWSSelectedRowsDS = Nothing
+                'Check how many OPEN Controls of Level 2 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 2 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 2
+                Dim lstWSSelectedControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 2 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 2 is checked
+                bsAllControlsLevel2CheckBox.Checked = (lstWSControlsLevel2DS.Count = lstWSSelectedControlsLevel2DS.Count)
+
+                'Check how many OPEN Controls of Level 3 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 3 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 3
+                Dim lstWSSelectedControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 3 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 3 is checked
+                bsAllControlsLevel3CheckBox.Checked = (lstWSControlsLevel3DS.Count = lstWSSelectedControlsLevel3DS.Count)
+
+                lstWSControlsLevel1DS = Nothing
+                lstWSSelectedControlsLevel1DS = Nothing
+                lstWSControlsLevel2DS = Nothing
+                lstWSSelectedControlsLevel2DS = Nothing
+                lstWSControlsLevel3DS = Nothing
+                lstWSSelectedControlsLevel3DS = Nothing
             End If
 
             'Verify if button for Positioning should be enabled
             OpenRotorButtonEnabled()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowControlCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowControlCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RowControlCheckBoxClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5400,7 +5806,7 @@ Public Class IWSSampleRequest
             'Verify if button for Positioning should be enabled
             OpenRotorButtonEnabled()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowPatientCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RowPatientCheckBoxClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RowPatientCheckBoxClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5474,7 +5880,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SampleClassSelectionChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SampleClassSelectionChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SampleClassSelectionChange", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5510,7 +5916,7 @@ Public Class IWSSampleRequest
             'DL 07/05/2013. End
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveLoadWSButtonsEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveLoadWSButtonsEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveLoadWSButtonsEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5525,14 +5931,15 @@ Public Class IWSSampleRequest
     '''              RH  19/10/2010 - Introduced the Using statement               
     '''              DL  27/07/2011 - If a WS was saved, enable button LoadSavedWS
     '''              SA  08/03/2012 - Button LoadSavedWS cannot be always enabled; it is enabled only when WSStatus is EMPTY or OPEN
+    '''              XB  29/08/2014 - Make this method as Public - BT #1868
     ''' </remarks>
-    Private Sub SaveWorkSession()
+    Public Sub SaveWorkSession()
         Try
             Dim mySavedWS As New SavedWSDelegate
             Dim myGlobalDataTo As New GlobalDataTO
 
             'The same Form used to Save Virtual Rotors is reused to manage the saving of WorkSessions
-            Using myWSSelection As New IWSLoadSaveAuxScreen
+            Using myWSSelection As New UiWSLoadSaveAuxScreen
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myWSSelection.ScreenUse = "SAVEDWS"
                 myWSSelection.SourceButton = "SAVE"
@@ -5550,7 +5957,7 @@ Public Class IWSSampleRequest
             End Using
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveWorkSession", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5578,7 +5985,7 @@ Public Class IWSSampleRequest
                 RowPostPaintEnabled = False 'RH 08/05/2012 Bugtracking 544
 
                 Cursor = Cursors.WaitCursor
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
 
                 Dim openOrderTests As Boolean = True
                 If (Not ChangesMadeAttribute) Then
@@ -5648,26 +6055,26 @@ Public Class IWSSampleRequest
 
                     If (ErrorOnSavingWS = String.Empty) Then
                         'Update global variables in the main MDI Form
-                        IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                        UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                         If (Not Tag Is Nothing) Then
                             'A PerformClick() method was executed
                             Close()
                         Else
                             ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                             ExitingScreen()
-                            IAx00MainMDI.EnableButtonAndMenus(True)
+                            UiAx00MainMDI.EnableButtonAndMenus(True)
                             Application.DoEvents()
 
                             'Normal button click
                             'Open the WS Monitor form and close this one
-                            IAx00MainMDI.OpenMonitorForm(Me)
+                            UiAx00MainMDI.OpenMonitorForm(Me)
                         End If
                         'GC.Collect()
                     Else
                         'In case of Error, set Enabled=True for all controls that can be activated
                         ChangeControlsStatusByProgressBar(True)
 
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
                         Application.DoEvents()
 
                         Dim myErrorData As String() = ErrorOnSavingWS.Split(CChar("|"))
@@ -5676,7 +6083,7 @@ Public Class IWSSampleRequest
                         ShowMessage(Name & ".SaveWSWithoutPositioning", myErrorData(0), myErrorData(1), Me)
                     End If
                 Else
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     If (Not Tag Is Nothing) Then
                         'A PerformClick() method was executed
@@ -5684,25 +6091,25 @@ Public Class IWSSampleRequest
                     Else
                         ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                         ExitingScreen()
-                        IAx00MainMDI.EnableButtonAndMenus(True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True)
                         Application.DoEvents()
 
                         'Normal button click
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 End If
-                IAx00MainMDI.SetStatusRotorPosOptions(True)
+                UiAx00MainMDI.SetStatusRotorPosOptions(True)
             Else
                 Close()
             End If
 
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWSWithoutPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveWSWithoutPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
 
             'DL 15/05/2013
             'ShowMessage(Name & ".SaveWSWithoutPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5710,7 +6117,7 @@ Public Class IWSSampleRequest
             'DL 15/05/2013
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
     End Sub
 
@@ -5749,7 +6156,7 @@ Public Class IWSSampleRequest
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScanningBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ScanningBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Me.Name & ".ScanningBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.UIThread(Function() ShowMessage(Name & ".ScanningBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -5783,8 +6190,8 @@ Public Class IWSSampleRequest
         Dim myGlobalDataTO As GlobalDataTO
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'SA-TR 30/05/2012 - Get the WorkSession status
             Dim myWSAnalyzersDelegate As New WSAnalyzersDelegate
@@ -5807,7 +6214,7 @@ Public Class IWSSampleRequest
 
             'Prepare all buttons
             PrepareButtons()
-            IAx00MainMDI.bsTSInfoButton.Enabled = True
+            UiAx00MainMDI.bsTSInfoButton.Enabled = True
 
             'Disable the context menu shown with mouse right-button click in all editable fields
             Dim emptyContextMenu As New ContextMenuStrip
@@ -5912,7 +6319,7 @@ Public Class IWSSampleRequest
             ResetBorder()
             If (bsPatientIDTextBox.Enabled) Then bsPatientIDTextBox.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -5978,7 +6385,7 @@ Public Class IWSSampleRequest
 
                 'Open screen of Patient's Search passing to it the informed PatientID 
                 'RH 19/10/2010 Introduce the Using statement
-                Using myPatientSearchForm As New IProgPatientData()
+                Using myPatientSearchForm As New UiProgPatientData()
                     myPatientSearchForm.EntryMode = "SEARCH"
                     myPatientSearchForm.PatientID = bsPatientIDTextBox.Text
                     myPatientSearchForm.PatientsList = lstPatientExist
@@ -6009,7 +6416,7 @@ Public Class IWSSampleRequest
             validatedSampleID = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchPatient", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6052,7 +6459,7 @@ Public Class IWSSampleRequest
             SaveLoadWSButtonsEnabled()
             'LISImportButtonEnabled()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6089,7 +6496,7 @@ Public Class IWSSampleRequest
             lstWSBlanksDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = "BLANK"
                 myForm.SampleType = ""
                 myForm.SampleTypeName = ""
@@ -6126,7 +6533,7 @@ Public Class IWSSampleRequest
             bsBlkCalibDataGridView.ClearSelection()
         Catch ex As Exception
             Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForBlanks", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForBlanks", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchTestsForBlanks", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default
@@ -6169,7 +6576,7 @@ Public Class IWSSampleRequest
             lstWSCalibDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                 myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6212,7 +6619,7 @@ Public Class IWSSampleRequest
             'No row should appear as selected in the grid of Blanks and Calibrators
             bsBlkCalibDataGridView.ClearSelection()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForCalibrators", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchTestsForCalibrators", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default
@@ -6285,7 +6692,7 @@ Public Class IWSSampleRequest
             lstWSCtrlDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                 myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6326,7 +6733,7 @@ Public Class IWSSampleRequest
             'No row should appear as selected in the grid of Controls
             bsControlOrdersDataGridView.ClearSelection()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForControls", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchTestsForControls", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default()
@@ -6345,6 +6752,7 @@ Public Class IWSSampleRequest
     '''                                           incomplete) and in this case shows a warning message
     '''              SA 20/05/2014 - BT #1633 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
     '''                                           different Tests and belonging to different Patients). This change should have been included in BT #1494
+    '''              XB 02/12/2014 - Add functionality to includes ISE and OFFS into CALC tests - BA-1867
     ''' </remarks>
     Private Sub SearchTestsForPatientSamples()
         Try
@@ -6413,7 +6821,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6469,7 +6877,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6538,7 +6946,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6608,8 +7016,10 @@ Public Class IWSSampleRequest
                     lstWSPatients = (From a In myWorkSessionResultDS.Patients _
                                      Where a.Selected = False _
                                      AndAlso (Not a.IsCalcTestIDNull) _
+                                     AndAlso (Not a.TestType = "OFFS") _
                                      Order By a.SampleID, a.StatFlag _
                                      Select a).ToList
+                    ' XB 02/12/2014 - This query must not contains OFFS tests because these tests are unselected by default and since v3.1.1 could include inside a CALC TEST - BA-1867
 
                     For Each testInFormula As WorkSessionResultDS.PatientsRow In lstWSPatients
                         UnSelectRelatedCalcTest(testInFormula.SampleID, testInFormula.StatFlag, testInFormula.CalcTestID)
@@ -6639,7 +7049,7 @@ Public Class IWSSampleRequest
                 Cursor = Cursors.Default
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForPatientSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchTestsForPatientSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -6679,7 +7089,7 @@ Public Class IWSSampleRequest
                 bsNumOrdersNumericUpDown.BackColor = SystemColors.MenuBar
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetFieldStatusForPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetFieldStatusForPatient", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetFieldStatusForPatient", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6715,7 +7125,7 @@ Public Class IWSSampleRequest
                 End If
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWrapCells", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWrapCells", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetWrapCells", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6729,12 +7139,12 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub ShowLIMSImportErrors()
         Try
-            Using LIMSImportErrorsDialog As New IWSImportLIMSErrors()
+            Using LIMSImportErrorsDialog As New UiWSImportLIMSErrors()
                 LIMSImportErrorsDialog.ListOfImportErrors = myImportErrorsLogDS
                 LIMSImportErrorsDialog.ShowDialog()
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLIMSImportErrors", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLIMSImportErrors", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowLIMSImportErrors", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6797,7 +7207,7 @@ Public Class IWSSampleRequest
                 lstWSBlankDS = Nothing
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UnselectBlkCalibrator", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UnselectBlkCalibrator", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UnselectBlkCalibrator", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6816,16 +7226,19 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub UnSelectRelatedCalcTest(ByVal pSampleID As String, ByVal pStatFlag As Boolean, ByVal pCalcTestIDs As String)
         Try
+            Dim myIndex As Integer = 0
             Dim calcIDs() As String = pCalcTestIDs.Split(CChar(", "))
             Dim lstCalcTest As List(Of WorkSessionResultDS.PatientsRow)
 
             For i As Integer = 0 To calcIDs.Length - 1
+                myIndex = i
+
                 'Search the Calculated Test to unselect it - 
                 lstCalcTest = (From a In myWorkSessionResultDS.Patients _
                               Where a.SampleID.ToUpperInvariant = pSampleID.ToUpperInvariant _
                             AndAlso a.StatFlag = pStatFlag _
                             AndAlso a.TestType = "CALC" _
-                            AndAlso a.TestID = Convert.ToInt32(calcIDs(i)) _
+                            AndAlso a.TestID = Convert.ToInt32(calcIDs(myIndex)) _
                              Select a).ToList()
 
                 If (lstCalcTest.Count = 1) Then
@@ -6839,7 +7252,7 @@ Public Class IWSSampleRequest
             Next
             lstCalcTest = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UnSelectRelatedCalcTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UnSelectRelatedCalcTest", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UnSelectRelatedCalcTest", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6869,7 +7282,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateBCWarningButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateBCWarningButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ValidateBCWarningButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -6920,9 +7333,9 @@ Public Class IWSSampleRequest
                         'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                         If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
                            (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
-                            If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
+                            If (Not UiAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                                 'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
-                                statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
+                                statusScanningButton = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
                             End If
                         End If
                     End If
@@ -6931,7 +7344,7 @@ Public Class IWSSampleRequest
                 bsScanningButton.Enabled = statusScanningButton
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateScanningButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateScanningButtonEnabled ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateScanningButtonEnabled ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7013,7 +7426,7 @@ Public Class IWSSampleRequest
             Next
             lstWSCalibratorsDS = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyChangesInCalibrationFactor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyChangesInCalibrationFactor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".VerifyChangesInCalibrationFactor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myGlobalDataTO
@@ -7080,7 +7493,7 @@ Public Class IWSSampleRequest
             listOfDifElem = Nothing
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Prueba", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Prueba", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Prueba", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7114,7 +7527,7 @@ Public Class IWSSampleRequest
             'Set the Wrap mode of cell AbsValue for multipoint Calibrators having previous results
             SetWrapCells()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_CellValueChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7124,7 +7537,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             BlkCalibOrderTestsCellMouseUp()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsBlkCalibDataGridView_CellMouseUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7134,7 +7547,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             ChangeBlkCalibSelectedState()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsBlkCalibDataGridView_CurrentCellDirtyStateChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7155,7 +7568,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return 'Bug #1102
             PostPaintBlkCalibratorRow()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsBlkCalibDataGridView_RowPostPaint", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7165,7 +7578,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             CheckAddRemoveBlkCalRows()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsBlkCalibDataGridView_RowsAdded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7186,7 +7599,7 @@ Public Class IWSSampleRequest
                 If bsDelCalibratorsButton.Enabled Then bsDelCalibratorsButton_Click(Nothing, Nothing)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsBlkCalibDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsBlkCalibDataGridView_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7211,7 +7624,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellFormatting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellFormatting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_CellFormatting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7235,7 +7648,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_CellMouseClick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7265,7 +7678,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValidating ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_CellValidating ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7284,7 +7697,7 @@ Public Class IWSSampleRequest
                 bsBlkCalibDataGridView.CurrentRow.Cells("FactorValue").Value = myValue
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValidated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_CellValidated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_CellValidated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7331,17 +7744,35 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsBlkCalibDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsBlkCalibDataGridView_EditingControlShowing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    Private Sub bsAllBlkCalCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllBlkCalCheckBox.MouseClick
+    ' XB 26/08/2014 - rename bsAllBlkCalCheckBox as bsAllBlanksCheckBox - BT #1868
+    Private Sub bsAllBlanksCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllBlanksCheckBox.MouseClick
         Try
-            ClickAllBlkCalibCheckBox()
+            ClickAllBlanksCheckBox()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllBlkCalCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "bsAllBlkCalCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllBlanksCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllBlanksCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' bsAllCalibsCheckBox event click
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by XB 26/08/2014 - BT #1868
+    ''' </remarks>
+    Private Sub bsAllCalibsCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllCalibsCheckBox.MouseClick
+        Try
+            ClickAllCalibsCheckBox()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllCalibsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllCalibsCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -7349,7 +7780,7 @@ Public Class IWSSampleRequest
         Try
             If (bsBlkCalibDataGridView.SelectedRows.Count > 0) Then DeleteBlankCalibrators()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelCalibratorsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelCalibratorsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsDelCalibratorsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7376,7 +7807,7 @@ Public Class IWSSampleRequest
                     ChangeControlSelectedColumn()
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_CellValueChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7386,7 +7817,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             ControlOrderTestsCellMouseUp()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_CellMouseUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7396,7 +7827,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             ChangeControlSelectedState()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_CurrentCellDirtyStateChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7423,7 +7854,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_EditingControlShowing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7444,7 +7875,7 @@ Public Class IWSSampleRequest
                 If bsDelControlsButton.Enabled Then bsDelControlsButton_Click(Nothing, Nothing)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7464,7 +7895,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return 'Bug #1102
             PostPaintControlRow()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_RowPostPaint", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7474,17 +7905,59 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             CheckAddRemoveControlsRows()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsControlOrdersDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsControlOrdersDataGridView_RowsAdded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    Private Sub bsAllCtrlsCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllCtrlsCheckBox.MouseClick
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel1CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel1CheckBox.MouseClick
         Try
-            ClickAllControlCheckBox()
+            ClickAllControlCheckBox(1)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllCtrlsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "bsAllCtrlsCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel1CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel1CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel2CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel2CheckBox.MouseClick
+        Try
+            ClickAllControlCheckBox(2)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel2CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel2CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel3CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel3CheckBox.MouseClick
+        Try
+            ClickAllControlCheckBox(3)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel3CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel3CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -7492,7 +7965,7 @@ Public Class IWSSampleRequest
         Try
             If bsControlOrdersDataGridView.SelectedRows.Count > 0 Then DeleteControls()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelControlsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelControlsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsDelControlsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7513,7 +7986,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_CellMouseDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7542,7 +8015,7 @@ Public Class IWSSampleRequest
                     ChangePatientSelectedColumn()
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_CellValueChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7552,7 +8025,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             PatientOrderTestsCellMouseUp()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CellMouseUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_CellMouseUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7573,7 +8046,7 @@ Public Class IWSSampleRequest
                 If bsDelPatientsButton.Enabled Then bsDelPatientsButton_Click(Nothing, Nothing)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7597,7 +8070,7 @@ Public Class IWSSampleRequest
                     End If
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7607,7 +8080,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             ChangePatientSelectedState()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_CurrentCellDirtyStateChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_CurrentCellDirtyStateChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7667,7 +8140,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientOrdersDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientOrdersDataGridView_EditingControlShowing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPatientOrdersDataGridView_EditingControlShowing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7677,7 +8150,7 @@ Public Class IWSSampleRequest
             If (SavingWS) Then Return
             CheckAddRemovePatientsRows()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_RowsAdded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_RowsAdded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7699,7 +8172,7 @@ Public Class IWSSampleRequest
             PostPaintPatientRow()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsPatientOrdersDataGridView_RowPostPaint", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsPatientOrdersDataGridView_RowPostPaint", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7708,7 +8181,7 @@ Public Class IWSSampleRequest
         Try
             ClickAllPatientCheckBox()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllPatientsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllPatientsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsAllPatientsCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7717,7 +8190,7 @@ Public Class IWSSampleRequest
         Try
             If (bsPatientOrdersDataGridView.SelectedRows.Count > 0) Then DeletePatients()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelPatientsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsDelPatientsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "bsDelPatientsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7732,7 +8205,7 @@ Public Class IWSSampleRequest
         Try
             SearchTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSearchTests_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSearchTests_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSearchTests_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7745,7 +8218,7 @@ Public Class IWSSampleRequest
         Try
             SearchPatient()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientSearchButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientSearchButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPatientSearchButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7757,7 +8230,7 @@ Public Class IWSSampleRequest
         Try
             SaveWorkSession()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveWSButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveWSButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSaveWSButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7771,7 +8244,7 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub bsLoadWSButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLoadWSButton.Click
         Try
-            Using myWSSelection As New IWSLoadSaveAuxScreen
+            Using myWSSelection As New UiWSLoadSaveAuxScreen
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myWSSelection.ScreenUse = "SAVEDWS"
                 myWSSelection.SourceButton = "LOAD"
@@ -7784,7 +8257,7 @@ Public Class IWSSampleRequest
                 End If
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLoadWSButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLoadWSButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsLoadWSButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7796,7 +8269,7 @@ Public Class IWSSampleRequest
         Try
             OpenOffSystemResultsScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemResultsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOffSystemResultsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsOffSystemResultsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7815,8 +8288,8 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
-            CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
+            GlobalBase.CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
             If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
                 If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE) Then
@@ -7825,17 +8298,17 @@ Public Class IWSSampleRequest
                        (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         Cursor = Cursors.WaitCursor
 
-                        IAx00MainMDI.DisabledMdiForms = Me
-                        IAx00MainMDI.EnableButtonAndMenus(False)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(False)
-                        IAx00MainMDI.ShowStatus(Messages.BARCODE_READING)
-                        IAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
+                        UiAx00MainMDI.DisabledMdiForms = Me
+                        UiAx00MainMDI.EnableButtonAndMenus(False)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(False)
+                        UiAx00MainMDI.ShowStatus(Messages.BARCODE_READING)
+                        UiAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
 
                         'Disable the screen while the scanning is executed
                         Me.Enabled = False
                         ScreenWorkingProcess = True
 
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         'Dim prevMessage As String = IAx00MainMDI.bsAnalyzerStatus.Text
                         Application.DoEvents()
 
@@ -7843,14 +8316,14 @@ Public Class IWSSampleRequest
                         workingThread.Start()
 
                         While ScreenWorkingProcess
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                         End While
                         workingThread = Nothing
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
-                        IAx00MainMDI.ShowStatus(Messages._NONE)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                        UiAx00MainMDI.ShowStatus(Messages._NONE)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
 
                         'If there are incomplete Patient Samples, enable button BCWarnings
                         ValidateBCWarningButtonEnabled()
@@ -7859,12 +8332,12 @@ Public Class IWSSampleRequest
             End If
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsScanningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            IAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
+            UiAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
 
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
             Cursor = Cursors.Default
         End Try
 
@@ -7892,7 +8365,7 @@ Public Class IWSSampleRequest
                                                                                           myWorkSessionResultDS, False)
                 If (Not resultData.HasError) Then
                     'Open the auxiliary screen for Incomplete Patient Samples
-                    Using myForm As New IWSIncompleteSamplesAuxScreen()
+                    Using myForm As New UiWSIncompleteSamplesAuxScreen()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WSStatusAttribute
@@ -7910,7 +8383,7 @@ Public Class IWSSampleRequest
                     End Using
 
                     'Update global variables in the main MDI Form
-                    IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                    UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                 Else
                     'Error updating the CompletedFlag; shown it
                     ShowMessage(Me.Name & ".bsBarcodeWarningButton_Click", resultData.ErrorCode, resultData.ErrorMessage, Me)
@@ -7925,7 +8398,7 @@ Public Class IWSSampleRequest
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsBarcodeWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsBarcodeWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsBarcodeWarningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7938,7 +8411,7 @@ Public Class IWSSampleRequest
         Try
             ExecuteImportFromLIMSProcess()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLIMSImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLIMSImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsLIMSImportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7950,7 +8423,7 @@ Public Class IWSSampleRequest
         Try
             ShowLIMSImportErrors()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLIMSErrorsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsLIMSErrorsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsLIMSErrorsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7969,18 +8442,18 @@ Public Class IWSSampleRequest
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             IsOpenRotor = True
             SaveWSWithPositioning()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Send to Position And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Send to Position And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.bsOpenRotor_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOpenRotor_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsOpenRotor_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsOpenRotor_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -7999,18 +8472,18 @@ Public Class IWSSampleRequest
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             SaveWSWithoutPositioning()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Save Without POS WS And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Save Without POS WS And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.bsExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8024,7 +8497,7 @@ Public Class IWSSampleRequest
     '    Try
     '        ReleaseElements()
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".WS_Preparation_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub
@@ -8033,17 +8506,17 @@ Public Class IWSSampleRequest
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             ScreenLoad()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.WS_Preparation_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".WS_Preparation_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8059,7 +8532,7 @@ Public Class IWSSampleRequest
         Try
             If (e.KeyCode = Keys.Escape) Then bsAcceptButton.PerformClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".WS_Preparation_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8091,7 +8564,7 @@ Public Class IWSSampleRequest
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".WS_Preparation_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8109,7 +8582,7 @@ Public Class IWSSampleRequest
         Try
             If (e.KeyChar = CChar("#")) Then e.Handled = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".WS_Preparation_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8121,7 +8594,7 @@ Public Class IWSSampleRequest
         Try
             SampleClassSelectionChange()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleClassComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleClassComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSampleClassComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8130,7 +8603,7 @@ Public Class IWSSampleRequest
         Try
             PatientIDChangedInTextBox()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientIDTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPatientIDTextBox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPatientIDTextBox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8150,7 +8623,7 @@ Public Class IWSSampleRequest
             End If
             bsSampleClassComboBox_SelectionChangeCommitted(sender, e)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleClassesTabControl_Selected", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleClassesTabControl_Selected", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSampleClassesTabControl_Selected", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8167,7 +8640,7 @@ Public Class IWSSampleRequest
         Try
             If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNumOrdersNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNumOrdersNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsNumOrdersNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8184,7 +8657,7 @@ Public Class IWSSampleRequest
                 e.Handled = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".editingGridUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".editingGridUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".editingGridUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8201,7 +8674,7 @@ Public Class IWSSampleRequest
         Try
             bsLIMSImportButton.Enabled = (IO.File.Exists(importFile))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LIMSImportButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LIMSImportButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LIMSImportButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8266,7 +8739,7 @@ Public Class IWSSampleRequest
             End If
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadWorkSession", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8326,7 +8799,7 @@ Public Class IWSSampleRequest
                 ShowMessage(Name & ".UpdateRelatedIncompletedSamples", resultData.ErrorCode, resultData.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateRelatedIncompletedSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateRelatedIncompletedSamples", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UpdateRelatedIncompletedSamples", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -8342,8 +8815,8 @@ Public Class IWSSampleRequest
     '    bsBlkCalibDataGridView.DataSource = Nothing
 
     '    'Get the current Language from the current Application Session
-    '    Dim currentLanguageGlobal As New GlobalBase
-    '    Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+    '    'Dim currentLanguageGlobal As New GlobalBase
+    '    Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
     '    'Get the list of Sample Tube Types (for the ComboBox column of TubeType in all the grids)
     '    Dim myGlobalDataTO As New GlobalDataTO
@@ -8384,6 +8857,5 @@ Public Class IWSSampleRequest
     '    SavingWS = False
     'End Sub
 #End Region
-
 
 End Class

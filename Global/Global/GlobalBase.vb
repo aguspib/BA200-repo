@@ -4,7 +4,7 @@ Option Strict On
 Imports Biosystems.Ax00.Global.TO
 Imports System.Reflection
 Imports System.IO
-Imports System.Configuration
+Imports System.Text
 
 
 Namespace Biosystems.Ax00.Global
@@ -14,7 +14,7 @@ Namespace Biosystems.Ax00.Global
     ''' GlobalBase Clase, to add all the general funtionality create here.
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class GlobalBase
+    Public MustInherit Class GlobalBase
 
         Private SynapseNumberOfDaysAttribute As Integer
 
@@ -46,14 +46,14 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         'SG 09/11/10 - SERVICE SOFTWARE
-        Public ReadOnly Property FactoryXmlFwScripts() As String
+        Public Shared ReadOnly Property FactoryXmlFwScripts() As String
             Get
                 Return My.Settings.FactoryXmlFwScripts
             End Get
         End Property
 
         'SG 09/11/10 - SERVICE SOFTWARE
-        Public ReadOnly Property XmlFwScriptsWhileDecrypting() As String
+        Public Shared ReadOnly Property XmlFwScriptsWhileDecrypting() As String
             Get
                 Return My.Settings.XmlFwScriptsDecrypting
             End Get
@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.Global
         'End Property
 
         'PG 25/11/10 - SERVICE SOFTWARE
-        Public ReadOnly Property XmlFwScriptsTempFile() As String
+        Public Shared ReadOnly Property XmlFwScriptsTempFile() As String
             Get
                 Return My.Settings.XmlFwScriptsTempFile
             End Get
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         'SG 28/10/10 - SERVICE SOFTWARE
-        Public ReadOnly Property ServiceInfoDocsPath() As String
+        Public Shared ReadOnly Property ServiceInfoDocsPath() As String
             Get
                 Return My.Settings.ServiceInfoDocsPath
             End Get
@@ -119,7 +119,7 @@ Namespace Biosystems.Ax00.Global
         '    End Set
         'End Property
 
-        Public ReadOnly Property ServicePath() As String
+        Public Shared ReadOnly Property ServicePath() As String
             Get
 #If DEBUG Then
                 Return AppPath
@@ -131,7 +131,7 @@ Namespace Biosystems.Ax00.Global
 
         'SA 15/05/2014 - BT #1617 ==> New property to return the full path for the exe file of UserSW. A new Global Setting with the name
         '                             of the exe file has been also created (named as UserSwExeName)
-        Public ReadOnly Property UserSwExeFullPath() As String
+        Public Shared ReadOnly Property UserSwExeFullPath() As String
             Get
                 Dim myFullPath As String = Path.GetFullPath(My.Settings.UserSwExeName)
 
@@ -164,7 +164,7 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         ' XBC 03/12/2010 - Common folders (User & Service)
-        Public ReadOnly Property DataBaseConnection() As String
+        Public Shared ReadOnly Property DataBaseConnection() As String
             Get
                 Return My.Settings.BiosystemsConnDev
             End Get
@@ -375,7 +375,7 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         'XBC 18/05/11 - SERVICE SOFTWARE
-        Public ReadOnly Property ScalesDinamicRange() As Integer
+        Public Shared ReadOnly Property ScalesDinamicRange() As Integer
             Get
                 Return My.Settings.ScalesDinamicRange
             End Get
@@ -401,7 +401,7 @@ Namespace Biosystems.Ax00.Global
         'End Property
         ' XBC 05/06/2012
 
-        Protected Friend Property IsSystemLogFull() As Boolean
+        Protected Friend Shared Property IsSystemLogFull() As Boolean
             Get
                 Return My.Settings.IsSystemLogFull
             End Get
@@ -544,143 +544,28 @@ Namespace Biosystems.Ax00.Global
         End Property
 
 
-        Public Property SynapseNumberOfDays() As Integer
+        'Public Property SynapseNumberOfDays() As Integer
+        '    Get
+        '        Return SynapseNumberOfDaysAttribute
+        '    End Get
+        '    Set(value As Integer)
+        '        SynapseNumberOfDaysAttribute = value
+        '    End Set
+        'End Property
+
+        'SA 20/10/2014
+        'BA-1944: Read new setting for the name of the XML file containing all changes made in CUSTOMER DB for the Update Version Process
+        Shared ReadOnly Property UpdateVersionProcessLogFileName() As String
             Get
-                Return SynapseNumberOfDaysAttribute
+                Return My.Settings.UpdateVersionProcessLogFileName
             End Get
-            Set(value As Integer)
-                SynapseNumberOfDaysAttribute = value
-            End Set
         End Property
-
-
-
-#Region "NOT USED - Get from Database"
-
-        'Shared ReadOnly Property InvalidPortsList() As String
-        '    Get
-        '        Return My.Settings.InvalidPortsList
-        '    End Get
-        'End Property
-
-        '''' <summary>
-        '''' There are 3 ISE mode SimpleMode,DebugMode1,DebugMode2
-        '''' </summary>
-        '''' <value></value>
-        '''' <returns></returns>
-        '''' <remarks>CREATED BY: TR</remarks>
-        'Shared ReadOnly Property ISEMode() As String
-        '    Get
-        '        Return My.Settings.ISEMode
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property VolumePredilution() As Single
-        '    Get
-        '        Return My.Settings.VolumePredilution
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property LIMSExportFilePath() As String
-        '    Get
-        '        Return My.Settings.LIMSExportFilePath
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property LIMSImportMemoPath() As String
-        '    Get
-        '        Return My.Settings.LIMSImportMemoPath
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property LIMSImportFilePath() As String
-
-
-
-
-
 
         Shared ReadOnly Property WriteToSystemLog() As Boolean
             Get
                 Return My.Settings.WriteToSystemLog
             End Get
         End Property
-
-        'Shared ReadOnly Property SATReportDir() As String
-        '    Get
-        '        Return My.Settings.SATReportDir
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property SATReportPrefix() As String
-        '    Get
-        '        Return My.Settings.SATReportPrefix
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property RestorePointDir() As String
-        '    Get
-        '        Return My.Settings.RestorePointDir
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property RestorePointPrefix() As String
-        '    Get
-        '        Return My.Settings.RestorePointPrefix
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property SystemBackUpDir() As String
-        '    Get
-        '        Return My.Settings.SystemBackupDir
-        '    End Get
-        'End Property
-
-
-        'Shared ReadOnly Property SystemBackUpPrefix() As String
-        '    Get
-        '        Return My.Settings.SystemBackupPrefix
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property HistoryBackUpDir() As String
-        '    Get
-        '        Return My.Settings.HistoryBackupDir
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property HistoryBackUpPrefix() As String
-        '    Get
-        '        Return My.Settings.HistoryBackupPrefix
-        '    End Get
-        'End Property
-
-
-        'Shared ReadOnly Property USBRegistryKey() As String
-        '    Get
-        '        Return My.Settings.USBRegistryKey
-        '    End Get
-        'End Property
-
-
-        'Shared ReadOnly Property EmailRecipient() As String
-        '    Get
-        '        Return My.Settings.EmailRecipient
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property EmailSubject() As String
-        '    Get
-        '        Return My.Settings.EmailSubject
-        '    End Get
-        'End Property
-
-        'Shared ReadOnly Property EmailBody() As String
-        '    Get
-        '        Return My.Settings.EmailBody
-        '    End Get
-        'End Property
-#End Region
 
 #End Region
 
@@ -697,10 +582,10 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: SG 29/08/2011 - Added exceptions management
         ''' Modified by: SG 18/02/2013 - Added Database Update Version log
         ''' </remarks>
-        Public Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, ByVal InformSystem As Boolean)
+        Public Shared Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, ByVal InformSystem As Boolean)
 
             Dim MyApplicationLogTO As New ApplicationLogTO
-            Dim MyApplicationLogManager As New ApplicationLogManager
+            'Dim MyApplicationLogManager As New ApplicationLogManager
 
             Try
                 'Fill the ApplicationLogTO with the information to insert in the Log'
@@ -709,57 +594,70 @@ Namespace Biosystems.Ax00.Global
                 MyApplicationLogTO.LogModule = LogModule
                 MyApplicationLogTO.LogType = LogType
 
-
-                'Insert information in the Log
-                MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-
-
-                'If Not GlobalConstants.AnalyzerIsRunningFlag Then
-                '    'MyApplicationLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-                'Else
-                '    'MyApplicationLogManager.InsertInfoInLOG(MyApplicationLogTO)
-                '    MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-                'End If
-
+                ApplicationLogManager.InsertLog(MyApplicationLogTO)
 
             Catch ex As Exception
-                'consists of trying first to solve an eventual error because of missing End Of File
-                'If (TypeOf ex Is Xml.XmlException) Then
-                '    Dim myGlobal As GlobalDataTO
-
-                '    myGlobal = MyApplicationLogManager.BackupWrongLogXmlFile()
-                '    If (Not myGlobal.HasError) Then
-                '        Dim MyExceptionAppLogTO As New ApplicationLogTO
-
-                '        MyExceptionAppLogTO.LogDate = DateTime.Now
-                '        MyExceptionAppLogTO.LogMessage = "The previous Xml Log file was wrong. A new one has been just created and the old one was saved and zipped "
-                '        MyExceptionAppLogTO.LogModule = "ApplicationLogManager"
-                '        MyExceptionAppLogTO.LogType = System.Diagnostics.EventLogEntryType.Error
-
-                '        'Insert the Exception in the LOG and also the initial error
-                '        Dim MyTempLogManager As New ApplicationLogManager
-                '        'MyTempLogManager.InsertLog(MyExceptionAppLogTO, True)
-                '        MyTempLogManager.InsertLog(MyExceptionAppLogTO)
-                '        MyTempLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    Else
-                '        'If the backup of the XML file failed, create a new one and write the exception and the initial error in the Log
-                '        Dim MyExceptionAppLogTO As New ApplicationLogTO
-
-                '        MyExceptionAppLogTO.LogDate = DateTime.Now
-                '        MyExceptionAppLogTO.LogMessage = "The previous Xml Log file was wrong and it was no possible to recover it. A new one has been just created"
-                '        MyExceptionAppLogTO.LogModule = "ApplicationLogManager"
-                '        MyExceptionAppLogTO.LogType = System.Diagnostics.EventLogEntryType.Error
-
-                '        Dim MyTempLogManager As New ApplicationLogManager(True)
-                '        MyTempLogManager.InsertLog(MyExceptionAppLogTO, True)
-                '        MyTempLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    End If
-                'Else
-                ''Throw ex
-                'Throw 'RH 02/12/2011 Remove ex 'AG 11/06/2012 - comment this line, when Access Denied error can cause not treat some instructions
-                'End If
             End Try
+        End Sub
+
+        ''' <summary>
+        ''' This function is used to create log activity for a runtime exception
+        ''' </summary>
+        ''' <param name="ex">A execption to be notified into the application log</param>
+        ''' <remarks>Use this function to add exception to the application log when possible.</remarks>
+        Public Shared Sub CreateLogActivity(ex As Exception)
+
+            ' ReSharper disable once InconsistentNaming
+            Const MAXIMUM_INNER_EXCEPTION_LEVELS = 10
+
+            Try
+                If ex IsNot Nothing AndAlso ex.TargetSite IsNot Nothing Then
+                    Dim exceptionIterator = ex, exceptionDesc As New StringBuilder, count = 0
+
+                    '1.- We iterate the exception and all innerException data (up to 10 levels) to build a detailed explanation of the unhanled exception:
+                    While exceptionIterator IsNot Nothing And count < MAXIMUM_INNER_EXCEPTION_LEVELS
+                        exceptionDesc.Append(exceptionIterator.Message & " ((" & exceptionIterator.HResult & "))")
+                        exceptionIterator = exceptionIterator.InnerException
+                        If exceptionIterator IsNot Nothing Then
+                            exceptionIterator = exceptionIterator.InnerException
+                            If exceptionIterator IsNot Nothing Then
+                                exceptionDesc.Append("Additional inner exception found: ")
+                            End If
+                        End If
+                        count += 1    'Cross reference prevention
+                    End While
+
+                    '2.- We append the call stack information, with delimiters (to make it a bit easier to read)
+                    exceptionDesc.Append(vbCr & vbCr & "CallStack:" & vbCr)
+                    exceptionDesc.Append(ex.StackTrace)
+                    exceptionDesc.Append(vbCr & "end of CallStack" & vbCr & vbCr)
+
+                    '2.- We inspect the exception origin by inspecing the target of main exception 
+                    Dim sourceOfException = ex.Source &
+                        ex.TargetSite.DeclaringType.ToString & "." &
+                        ex.TargetSite.Name
+
+                    Dim exceptionCompleteMessage = exceptionDesc.ToString
+
+                    GlobalBase.CreateLogActivity(exceptionCompleteMessage, sourceOfException, EventLogEntryType.Error, False)
+
+                Else
+                    GlobalBase.CreateLogActivity(
+                        "An Unhandled Exception has been occurred, but exception data is missing ",
+                        Environment.StackTrace, EventLogEntryType.Error, False)
+                End If
+
+#If config = "Debug" Then
+            Catch ex2 As Exception
+                MsgBox("The application has been unable to report an exception. This means the log system is failing too at some point." & vbCr & vbCr & "Happy debugging!", MsgBoxStyle.Critical, "Something went wrong")
+#Else
+                Catch
+#End If
+
+            End Try
+
+
+
         End Sub
 
         ''' <summary>
@@ -768,7 +666,7 @@ Namespace Biosystems.Ax00.Global
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetSessionInfo() As ApplicationInfoSessionTO
+        Public Shared Function GetSessionInfo() As ApplicationInfoSessionTO
             'Declare application session Object 
             Dim MyApplicationInfoSession As New ApplicationInfoSessionTO
             Try
@@ -777,7 +675,7 @@ Namespace Biosystems.Ax00.Global
                 End If
 
             Catch ex As Exception
-                CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
             End Try
 
             Return MyApplicationInfoSession
@@ -792,7 +690,7 @@ Namespace Biosystems.Ax00.Global
         ''' Created to replace current calls to CreateLogActivity
         ''' PENDING: in some cases the TargetSite.Name is not the method name. Not used yet 
         ''' </remarks>
-        Public Sub ShowExceptionDetails(ByVal pException As Exception)
+        Public Shared Sub ShowExceptionDetails(ByVal pException As Exception)
             'Try
             Dim errDoc As String = ""
             Dim errLine As String = ""
@@ -808,7 +706,7 @@ Namespace Biosystems.Ax00.Global
             End If
 
             'Write error in the Application Log
-            CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
+            GlobalBase.CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
                               errDoc & "." & errMethod & ": " & errLine, _
                               EventLogEntryType.Error, False)
             'Catch ex As Exception

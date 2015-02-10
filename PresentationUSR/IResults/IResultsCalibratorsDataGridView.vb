@@ -1,34 +1,15 @@
 ﻿Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
-
-Imports System.Text
-Imports System.ComponentModel
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraPrintingLinks
-Imports DevExpress.XtraEditors
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
-Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
-Imports DevExpress.XtraEditors.Controls
-Imports DevExpress.Utils
-Imports System.Runtime.InteropServices
+'AG 26/07/2010
 
 
-Partial Class IResults
+Partial Class UiResults
 
     Dim CollapseColumnCalibrators As New bsDataGridViewCollapseColumn
 
@@ -215,7 +196,7 @@ Partial Class IResults
             bsCalibratorsDataGridView.RowTemplate.Height = 22
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeCalibratorsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " InitializeCalibratorsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -243,7 +224,7 @@ Partial Class IResults
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineCalibratorsSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " DefineCalibratorsSortedColumns ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -702,7 +683,7 @@ Partial Class IResults
             'MessageBox.Show("UpdateCalibratorsDataGrid Elapsed Time: " & ElapsedTime.ToStringWithDecimals(0))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateCalibratorsDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateCalibratorsDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -757,6 +738,7 @@ Partial Class IResults
             Dim MaxRerunNumber As Integer = calibAvgResults.Count
 
             For RerunNumber As Integer = 1 To MaxRerunNumber
+                Dim auxRerunNumber = RerunNumber
                 Dim IsAverageDone As New Dictionary(Of Integer, Boolean)
 
                 Dim itempoint As Integer = TheoreticalConcList.Count + 1
@@ -769,7 +751,7 @@ Partial Class IResults
                                      Where row.OrderTestID = pOrderTestID _
                                      AndAlso row.TheoricalConcentration = myTheoreticalConc _
                                      AndAlso row.MultiPointNumber = itempoint _
-                                     AndAlso row.RerunNumber = RerunNumber _
+                                     AndAlso row.RerunNumber = auxRerunNumber _
                                      Select row).ToList()
 
                     'END AG 08/08/2010
@@ -912,7 +894,7 @@ Partial Class IResults
             pMaxRows = i 'AG 18/07/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCalibratorsMuliItemDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UpdateCalibratorsMuliItemDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try

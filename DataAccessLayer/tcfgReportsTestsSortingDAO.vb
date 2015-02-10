@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports System.Text
 
 Public Class tcfgReportsTestsSortingDAO
-    Inherits DAOBase
+      
 
 #Region "Other Methods"
     ''' <summary>
@@ -15,16 +15,20 @@ Public Class tcfgReportsTestsSortingDAO
     ''' Default sorting is the following one:
     ''' 1- Standard Tests:
     '''    a) Preloaded Test
-    '''    b) UserTest
+    '''    b) User Test
     ''' 2- Calculated Tests
     ''' 3- ISE Test
-    ''' 4- OFF Systems Test
+    ''' 4- OFF-Systems Test
+    '''    a) Preloaded Test
+    '''    b) User Test
+    ''' Note: this method does not return the list of Tests in the sorting order as specified above!
     ''' </summary>
     ''' <param name="pDBConnection">Open DB Connection</param>
     ''' <returns>GlobalDataTO containing a typed DataSet ReportsTestsSortingDS with all Tests sorted according
     '''          the default criteria</returns>
     ''' <remarks>
     ''' Created by: TR 25/11/2011
+    ''' Modified by: WE 25/11/2014 - RQ00035C (BA-1867): Change in query string due to new field 'PreloadedOffSystemTest' and note added to Summary.
     ''' </remarks>
     Public Function GetDefaultSortedTestList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
         Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -47,7 +51,7 @@ Public Class tcfgReportsTestsSortingDAO
                                             " FROM   tparISETests " & vbCrLf & _
                                             " UNION " & vbCrLf & _
                                             " SELECT 'OFFS' AS TestType, OffSystemTestID AS TestID, ShortName AS TestName, " & vbCrLf & _
-                                            "        OffSystemTestID AS TestPosition, 0 AS PreloadedTest " & vbCrLf & _
+                                            "        OffSystemTestID AS TestPosition, PreloadedOffSystemTest AS PreloadedTest " & vbCrLf & _
                                             " FROM   tparOffSystemTests " & vbCrLf
 
                     Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
@@ -65,8 +69,8 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetDefaultSortedTestList", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetDefaultSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -96,7 +100,7 @@ Public Class tcfgReportsTestsSortingDAO
                                             " WHERE  RTS.TestType = 'STD' " & vbCrLf & _
                                             " UNION " & vbCrLf & _
                                             " SELECT RTS.TestType, RTS.TestID, RTS.TestPosition, CT.CalcTestName AS TestName, " & vbCrLf & _
-                                                   " CT.PreloadedCalculatedTest AS PreloadedTes " & vbCrLf & _
+                                                   " CT.PreloadedCalculatedTest AS PreloadedTest " & vbCrLf & _
                                             " FROM   tcfgReportsTestsSorting RTS INNER JOIN tparCalculatedTests CT ON RTS.TestID = CT.CalcTestID " & vbCrLf & _
                                             " WHERE  RTS.TestType = 'CALC' " & vbCrLf & _
                                             " UNION " & vbCrLf & _
@@ -124,8 +128,8 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetSortedTestList", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -150,7 +154,7 @@ Public Class tcfgReportsTestsSortingDAO
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
-                Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 Dim cmdText As New StringBuilder
 
                 For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pReportsTestsSortingDS.tcfgReportsTestsSorting.Rows
@@ -174,8 +178,8 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTestPosition", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTestPosition", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function

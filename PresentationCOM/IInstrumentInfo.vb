@@ -6,7 +6,7 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 05/06/2012
 Imports Biosystems.Ax00.App
 
-Public NotInheritable Class IInstrumentInfo
+Public NotInheritable Class UiInstrumentInfo
     Inherits BSBaseForm
 
 #Region "Declarations"
@@ -32,7 +32,7 @@ Public NotInheritable Class IInstrumentInfo
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IInstrumentInfo_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IInstrumentInfo_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IInstrumentInfo_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -55,15 +55,15 @@ Public NotInheritable Class IInstrumentInfo
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim LanguageIDGlobal As New GlobalBase
-            LanguageID = LanguageIDGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim LanguageIDGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()
             LoadImageLogo()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IInstrumentInfo_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IInstrumentInfo_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IInstrumentInfo_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -106,7 +106,7 @@ Public NotInheritable Class IInstrumentInfo
             ' XBC 05/06/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -123,10 +123,10 @@ Public NotInheritable Class IInstrumentInfo
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("INFO")
-            If (auxIconName <> "") Then LogoPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then LogoPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadImageLogo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadImageLogo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadImageLogo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -143,13 +143,13 @@ Public NotInheritable Class IInstrumentInfo
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then OKButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then OKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             bsScreenToolTips.SetToolTip(OKButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", LanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

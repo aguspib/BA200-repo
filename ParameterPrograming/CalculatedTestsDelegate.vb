@@ -1,7 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Configuration
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.DAL
@@ -27,6 +26,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 16/12/2010 - Added parameter for the DS containing the Reference Ranges. Call function SaveReferenceRanges
         '''                              to save the Reference Ranges for the Calculated Test
         '''              SA 14/01/2011 - Removed validation of duplicated Name or ShortName; it is done from the screen now
+        '''              AG 01/09/2014 - BA-1869 when new CALC test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTest As CalculatedTestsDS, ByVal pFormulaValues As FormulasDS, _
                             ByVal pRefRanges As TestRefRangesDS) As GlobalDataTO
@@ -40,34 +40,46 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Insert the new Calculated Test 
                         Dim calTestToAdd As New tparCalculatedTestsDAO
-                        resultData = calTestToAdd.Create(dbConnection, pCalcTest)
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            'Get the generated CalcTestID from the dataset returned 
-                            Dim generatedID As Integer = -1
-                            generatedID = DirectCast(resultData.SetDatos, CalculatedTestsDS).tparCalculatedTests(0).CalcTestID
+                        'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
+                        resultData = calTestToAdd.GetLastCustomPosition(dbConnection)
+                        If Not resultData.HasError Then
+                            If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
+                                pCalcTest.tparCalculatedTests(0).CustomPosition = 1
+                            Else
+                                pCalcTest.tparCalculatedTests(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1
+                            End If
+                            'AG 01/09/2014 - BA-1869
 
-                            'Set value of Calculated Test ID in the dataset containing the Formula Values
-                            For i As Integer = 0 To pFormulaValues.tparFormulas.Rows.Count - 1
-                                pFormulaValues.tparFormulas(i).CalcTestID = generatedID
-                            Next i
+                            resultData = calTestToAdd.Create(dbConnection, pCalcTest)
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                'Get the generated CalcTestID from the dataset returned 
+                                Dim generatedID As Integer = -1
+                                generatedID = DirectCast(resultData.SetDatos, CalculatedTestsDS).tparCalculatedTests(0).CalcTestID
 
-                            'Set value of Calculated Test ID in the dataset containing the Reference Ranges
-                            For i As Integer = 0 To pRefRanges.tparTestRefRanges.Rows.Count - 1
-                                pRefRanges.tparTestRefRanges(i).TestID = generatedID
-                            Next
+                                'Set value of Calculated Test ID in the dataset containing the Formula Values
+                                For i As Integer = 0 To pFormulaValues.tparFormulas.Rows.Count - 1
+                                    pFormulaValues.tparFormulas(i).CalcTestID = generatedID
+                                Next i
 
-                            'Insert the Formula Values
-                            Dim testFormulaToAdd As New FormulasDelegate
-                            resultData = testFormulaToAdd.AddFormula(dbConnection, pFormulaValues, True)
+                                'Set value of Calculated Test ID in the dataset containing the Reference Ranges
+                                For i As Integer = 0 To pRefRanges.tparTestRefRanges.Rows.Count - 1
+                                    pRefRanges.tparTestRefRanges(i).TestID = generatedID
+                                Next
 
-                            If (Not resultData.HasError) Then
-                                'Finally, insert the Reference Ranges
-                                If (pRefRanges.tparTestRefRanges.Rows.Count > 0) Then
-                                    resultData = SaveReferenceRanges(dbConnection, pRefRanges)
+                                'Insert the Formula Values
+                                Dim testFormulaToAdd As New FormulasDelegate
+                                resultData = testFormulaToAdd.AddFormula(dbConnection, pFormulaValues, True)
+
+                                If (Not resultData.HasError) Then
+                                    'Finally, insert the Reference Ranges
+                                    If (pRefRanges.tparTestRefRanges.Rows.Count > 0) Then
+                                        resultData = SaveReferenceRanges(dbConnection, pRefRanges)
+                                    End If
                                 End If
                             End If
-                        End If
+
+                        End If 'AG 01/09/2014 - BA-1869
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -90,8 +102,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Add", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -99,11 +111,21 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all the specified Calculated Tests (Test Definition, Formula and Reference Ranges) 
+        ''' Delete all the specified Calculated Tests (Test Definition, Formula and Reference Ranges).
+        ''' Additionally, it deletes all related Calculated Tests that contain these specified Calculated Tests in their formulas.
+        ''' Detailled functionality:
+        ''' *Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+        '''    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+        '''    2. Remove the Calculated Test from all Test Profiles in which it is included.
+        '''    3. Delete Reference Ranges for the affected Calculated Test.
+        '''    4. Delete the elements of the Formula of the affected Calculated Test.
+        '''    5. Delete the affected Calculated Test.
+        '''    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+        ''' *Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTests">Typed DataSet CalculatedTestsDS with the list of Calculated Tests to delete</param>        
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <returns>GlobalDataTO containing a CalculatedTestsDS with all Calculated Tests also deleted due to the removed one was part of their Formulas</returns>
         ''' <remarks>
         ''' Modified by: SA 22/06/2010 - Changed function logic to allow deletion of several Calculated Tests. Removed 
         '''                              Concurrency Error control. After deleting a Calculated Test, set EnableStatus=False
@@ -119,6 +141,9 @@ Namespace Biosystems.Ax00.BL
         '''                              in Historic Module, then it is also marked as closed
         '''              XB 18/02/2013 - Fix the use of parameter pTestType which is not used in this function nowadays (BugsTracking #1136)
         '''              AG 10/05/2013 - Mark as deleted test if this test form part of a LIS saved worksession
+        '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Return the CalculatedTestsDS containing all Calculated Tests also deleted
+        '''                                                            due to the removed one was part of their Formulas
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary description.
         ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTests As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -138,7 +163,7 @@ Namespace Biosystems.Ax00.BL
 
                         For Each calculatedTest As CalculatedTestsDS.tparCalculatedTestsRow In pCalcTests.tparCalculatedTests.Rows
                             'Search if the Calculated Test is included in the Formula of another Calculated Test
-                            resultData = GetRelatedCalculatedTest(dbConnection, calculatedTest.CalcTestID)
+                            resultData = GetRelatedCalculatedTest(dbConnection, calculatedTest.CalcTestID, "CALC") 'AG 04/09/2014 - BA-1869 add new parameter TESTType
                             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                                 myTempCalcTestDS = DirectCast(resultData.SetDatos, CalculatedTestsDS)
 
@@ -205,6 +230,9 @@ Namespace Biosystems.Ax00.BL
                         Next
 
                         If (Not resultData.HasError) Then
+                            'Return the CalculatedTestsDS containing the Calculated Test indirectly affected...
+                            resultData.SetDatos = myTempCalcTestDS
+
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
                         Else
@@ -222,8 +250,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -231,14 +259,15 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all Calculated Tests in which the informed Test Identifier (it can be the ID of an Standard or a Calculated Test) is 
-        ''' included in their Formula
+        ''' Delete all Calculated Tests in which the informed Test Identifier (it can be the ID of a Standard, ISE, Off-System or Calculated Test) is 
+        ''' included in their Formula. Additionally, it deletes all related Calculated Tests that contain these affected Calculated Tests in their formulas.
+        ''' Also it performs some Calculated Test related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Optional parameter. When informed, it indicates the Test will be searched in the defined Formulas 
         '''                           linked to the specified SampleType</param>
-        ''' <param name="pTestType">Optional parameter. It indicates if the informed ID corresponds to an Standard Test or to a Calculated Test</param>
+        ''' <param name="pTestType">Optional parameter. The informed ID corresponds to a Standard, ISE, Off-system or Calculated Test (STD,ISE,OFFS,CALC).</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  DL 17/05/2010
@@ -246,6 +275,7 @@ Namespace Biosystems.Ax00.BL
         '''                              instead of disabling
         '''              SA 13/09/2012 - Instead of calling functions GetCalcTest and Delete for each Calculated Test in which the informed 
         '''                              TestType/TestID/SampleType is included, load all the IDs in a CalculatedTestsDS and finally call Delete function
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
         ''' </remarks>
         Public Function DeleteCalculatedTestbyTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                      Optional ByVal pSampleType As String = "", Optional ByVal pTestType As String = "STD") _
@@ -258,8 +288,8 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Search on the Formula table if there are any record with the informed TestType/TestID/SampleType and return 
-                        'the ID of all Calculated Tests in which the informed TestType/TestID/SampleType is included
+                        ' Search in the Formula table if there is/are any record(s) with the informed TestType/TestID/SampleType and return 
+                        ' the ID of all Calculated Tests in which the informed TestType/TestID/SampleType is included.
                         Dim myFormulaDelegate As New FormulasDelegate
                         myGlobalDataTO = myFormulaDelegate.ReadFormulaByTestID(dbConnection, pTestID, pSampleType, pTestType)
 
@@ -288,7 +318,7 @@ Namespace Biosystems.Ax00.BL
                             Next
 
                             If (tempCalcTestDS.tparCalculatedTests.Rows.Count > 0) Then
-                                'Delete all affected Calculated Tests
+                                ' If there is at least 1 affected Calculated Test => Delete all affected Calculated Tests and perform related actions.
                                 myGlobalDataTO = Delete(dbConnection, tempCalcTestDS)
                             End If
                         End If
@@ -311,8 +341,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.DeleteCalculatedTestbyTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.DeleteCalculatedTestbyTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -348,8 +378,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ExistsCalcTestName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ExistsCalcTestName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -364,13 +394,21 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one</param>
         ''' <param name="pCalTestID">Calculated Test Identifier. It is an optional parameter informed
         '''                          only in case of updation</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
-        '''          name; otherwise, False</returns>
+        ''' <param name="pReturnBoolean">Flag indicating the type of value to return inside the GlobalDataTO. When TRUE (default value),
+        '''                              the function returns True/False; when FALSE, the function returns the obtained CalculatedTestsDS</param>
+        ''' <returns>If pReturnBoolean = TRUE ==> GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
+        '''                                       name; otherwise, False
+        '''          If pReturnBoolean = FALSE ==> GlobalDataTO containing the obtained CalculatedTestsDS</returns>
         ''' <remarks>
-        ''' Created by:  SA 14/01/2011
+        ''' Created by:
+        ''' Modified by: SA 26/10/2010 - Added N preffix for multilanguage when comparing by fields CalcTestName or CalcTestLongName
+        '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added new optional parameter pReturnBoolean with default value TRUE.
+        '''                                                            When its value is FALSE, instead of return True/False, the function
+        '''                                                            will return the obtained CalculatedTestsDS inside the GlobalDataTO
         ''' </remarks>
         Public Function ExistsCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalTestName As String, _
-                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0) As GlobalDataTO
+                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0, _
+                                             Optional ByVal pReturnBoolean As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -380,7 +418,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim calTestToUpdate As New tparCalculatedTestsDAO
-                        resultData = calTestToUpdate.ExistsCalculatedTest(dbConnection, pCalTestName, pNameToSearch, pCalTestID)
+                        resultData = calTestToUpdate.ExistsCalculatedTest(dbConnection, pCalTestName, pNameToSearch, pCalTestID, pReturnBoolean)
                     End If
                 End If
             Catch ex As Exception
@@ -389,8 +427,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ExistsCalcTestName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ExistsCalcTestName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -398,18 +436,19 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get list of standard/calculated Tests that can be included in the Formula defined for a Calculated Test
+        ''' Get list of Standard/ISE/Off-System Tests or Calculated Tests that can be included in the Formula defined for a Calculated Test.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestType">Optional parameter. When informed, it allows get only the Tests of the specified type</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests that can be used in the 
-        '''          Formula of a Calculated Test</returns>
+        ''' <param name="pTestType">Only selects Tests of type <pTestType></pTestType>. Allowed values are: (STD, ISE, OFFS, STD_ISE_OFFS, CALC)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests of the specified type that can be used in the 
+        '''          Formula of a Calculated Test.</returns>
         ''' <remarks>
         ''' Modified by: SA 22/06/2010 - Some errors fixed. Changed the way of getting the Test Icons. Unify functions 
         '''                              GetAllowedTestList, GetAllowedCalcList and GetAllowedStandardTestList: the three functions
         '''                              do the same and only GetAllowedCalcList was used
+        '''              WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Public Function GetAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTestType As String = "") As GlobalDataTO
+        Public Function GetAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -429,12 +468,15 @@ Namespace Biosystems.Ax00.BL
                             Dim systemTestsIconPath As String = String.Empty
                             Dim userTestsIconPath As String = String.Empty
                             Dim calcTestsIconPath As String = String.Empty
+                            Dim ISETestsIconPath As String = String.Empty
+                            Dim offSystemTestsIconPath As String = String.Empty
 
                             Dim resultDS As New PreloadedMasterDataDS
                             Dim myPreloadedMDDelegate As New PreloadedMasterDataDelegate
 
-                            If (pTestType = String.Empty OrElse pTestType = "STD") Then
-                                'Get the Icons needed for Standard Tests (Biosystems Tests)
+                            If (pTestType = "STD" OrElse pTestType = "STD_ISE_OFFS") Then
+                                ' (1) Get Icons for Standard Tests.
+                                ' 1.1 - Get the Icons needed for Standard Tests (Biosystems Tests)
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TESTICON")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
@@ -443,7 +485,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
                                 End If
 
-                                'Get the Icons needed for Standard Tests (User defined Tests)
+                                ' 1.2 - Get the Icons needed for Standard Tests (User defined Tests)
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "USERTEST")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
@@ -453,13 +495,39 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             End If
 
-                            If (pTestType = "" Or pTestType = "CALC") Then
-                                'Get the Icons needed for Calculated Tests
+                            If (pTestType = "CALC") Then
+                                ' (2) Get the Icon needed for Calculated Tests.
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TCALC")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
                                     If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
                                         calcTestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    End If
+                                End If
+                            End If
+
+                            ' Get the icon path for ISE {GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS = "TISE_SYS"}.
+                            If (pTestType = "ISE" Or pTestType = "STD_ISE_OFFS") Then
+                                ' (3) Get Icon for ISE Tests.
+                                ' There are only Factory-defined ISE Tests.
+                                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TISE_SYS")
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+                                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        ISETestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    End If
+                                End If
+                            End If
+
+                            ' Get the icon path for Off-System {GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS = "TOFF_SYS"}.
+                            If (pTestType = "OFFS" Or pTestType = "STD_ISE_OFFS") Then
+                                ' (4) Get Icon for Off-System Tests.
+                                ' Assumption: there is no separation between Factory and User-defined Off-System Tests icon.
+                                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TOFF_SYS")
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+                                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        offSystemTestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
                                     End If
                                 End If
                             End If
@@ -476,6 +544,14 @@ Namespace Biosystems.Ax00.BL
                                         End If
                                     ElseIf (allowedTestRow.TestTypeCode = "CALC") Then
                                         allowedTestRow.IconPath = calcTestsIconPath
+
+                                    ElseIf (allowedTestRow.TestTypeCode = "ISE") Then
+                                        allowedTestRow.IconPath = ISETestsIconPath
+
+                                    ElseIf (allowedTestRow.TestTypeCode = "OFFS") Then
+                                        ' Assumption: there is no separation between Factory and User-defined Off-System Tests icon.
+                                        allowedTestRow.IconPath = offSystemTestsIconPath
+
                                     End If
                                     allowedTestRow.EndEdit()
                                 Next
@@ -491,13 +567,69 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetAllowedTestList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetAllowedTestList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
+
+        ' ''' <summary>
+        ' ''' Look up the Icon path for a specific Test from the Preloaded Masterdata table.
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pTestType">Only selects Tests of type <pTestType></pTestType>. Allowed values are: (STD, ISE, OFFS, STD_ISE_OFFS, CALC)</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests of the specified type that can be used in the 
+        ' '''          Formula of a Calculated Test.</returns>
+        ' ''' <remarks>
+        ' ''' Modified by: WE 10/11/2014 - RQ00035C (BA-1867).
+        ' ''' </remarks>
+        'Private Function GetIconPath(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Dim resultDS As New PreloadedMasterDataDS
+        '    Dim myPreloadedMDDelegate As New PreloadedMasterDataDelegate
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+
+        '                ' Get the Icon path for the specific Tests.
+        '                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TESTICON")
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+        '                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+        '                        resultData.SetDatos = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+        '                    End If
+        '                End If
+
+        '            End If
+        '        End If
+
+        '    Catch ex As Exception
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
+
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetAllowedTestList", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+
+        '    Return resultData
+
+        'End Function
+
+
+
+
 
         ''' <summary>
         ''' Get the list of all defined Calculated Tests using the specified SampleType (or having at least
@@ -505,10 +637,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the CalculatedTests using
         '''          the specified SampleType</returns>
-        ''' <remarks></remarks>
-        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        ''' <remarks>
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
+        ''' </remarks>
+        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -518,7 +653,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.ReadBySampleType(dbConnection, pSampleType)
+                        resultData = myCalculatedTests.ReadBySampleType(dbConnection, pSampleType, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 use new parameter
                     End If
                 End If
             Catch ex As Exception
@@ -527,8 +662,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -539,13 +674,18 @@ Namespace Biosystems.Ax00.BL
         ''' Get data of the specified Calculated Test
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified
-        '''          Calculated Test</returns>
+        ''' <param name="pID">Unique Calculated Test Identifier (CalcTestID or BiosystemsID)</param>
+        ''' <param name="pSearchByBiosystemsID">When TRUE, the search is executed by field BiosystemsID instead of by field CalcTestID.
+        '''                                     Optional parameter with FALSE as default value</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified Calculated Test</returns>
         ''' <remarks>
         ''' Created by:  SA 07/05/2010
+        ''' Modified by: SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added optional parameter pSearchByBiosystemsID to allow search the
+        '''                                                            Calculated Test by BiosystemsID instead of by CalcTestID 
+        '''                                                            (needed in UpdateVersion process)
         ''' </remarks>
-        Public Function GetCalcTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        Public Function GetCalcTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pID As Integer, _
+                                    Optional ByVal pSearchByBiosystemsID As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -555,7 +695,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.Read(dbConnection, pCalcTestID)
+                        resultData = myCalculatedTests.Read(dbConnection, pID, pSearchByBiosystemsID)
                     End If
                 End If
             Catch ex As Exception
@@ -564,8 +704,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetCalcTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetCalcTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -611,8 +751,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -624,11 +764,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTestID">Identifier of the Calculated Test to search in formulas</param>
+        ''' <param name="pTestType">Type type</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with the list of related Calculated Tests</returns>
         ''' <remarks>
         ''' Created by:  TR 25/11/2010
+        ''' AG 04/09/2014 - BA-1869 add parameter testtype
         ''' </remarks>
-        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, ByVal pTestType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -638,7 +780,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.GetRelatedCalculatedTest(dbConnection, pCalcTestID)
+                        resultData = myCalculatedTests.GetRelatedCalculatedTest(dbConnection, pCalcTestID, pTestType)
                     End If
                 End If
             Catch ex As Exception
@@ -647,8 +789,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetRelatedCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetRelatedCalculatedTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -844,8 +986,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Modify", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.Modify", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -853,15 +995,16 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' When the long name of an Standard or Calculated Test is modified and it is included in the Formula of another Calculated Tests, value of
-        ''' field FormulaText for these Calculated Tests has to be rebuilt and update in both, Parameters Programming and Historic tables
+        ''' When the long name of a Standard, ISE, Off-System or Calculated Test is modified and it is included in the Formula of another Calculated Tests, value of
+        ''' field FormulaText for these Calculated Tests has to be rebuilt and updated in both, Parameters Programming and Historic tables.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestType">Test Type Code: STD or CALC</param>
-        ''' <param name="pTestID">Identifier of an STD or CALC Test</param>
+        ''' <param name="pTestType">Test Type Code: STD, ISE, OFFS or CALC</param>
+        ''' <param name="pTestID">Identifier of an STD, ISE, OFFS or CALC Test</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 20/09/2012
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary and Parameters description with ISE and Off-System as possible input value for parameter pTestType.
         ''' </remarks>
         Public Function UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String, ByVal pTestID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -888,7 +1031,7 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                     myComponentsDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
 
-                                    'Buid the FormulaText 
+                                    'Build the FormulaText 
                                     newFormulaText = String.Empty
                                     For Each formulaItem As FormulasDS.tparFormulasRow In myComponentsDS.tparFormulas.Rows
                                         If (formulaItem.ValueType = "TEST") Then
@@ -935,8 +1078,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateFormulaText", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateFormulaText", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -989,8 +1132,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1035,8 +1178,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1174,8 +1317,8 @@ Namespace Biosystems.Ax00.BL
                 myResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResult.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
             End Try
             Return myResult
         End Function
@@ -1282,8 +1425,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ValidatedDependenciesOnUpdate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ValidatedDependenciesOnUpdate", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1328,12 +1471,199 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Gets all CALC tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparCalculatedTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "CalculatedTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for CALC tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) _
+                                           As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparCalculatedTestsDAO
+                        myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Update CALCTEST available in cascade depending their components (all components available -> CalcTest available // else CalcTest NOT available
+                        Dim calcTestConfiguredAsNotAvailableList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        calcTestConfiguredAsNotAvailableList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.Available = False Select a).ToList
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = Me.UpdateAvailableCascadeByComponents(dbConnection, calcTestConfiguredAsNotAvailableList)
+                        End If
+                        calcTestConfiguredAsNotAvailableList = Nothing
+
+                        'Update PROFILE available in cascade depending their components (all components available -> Profile available // else Profile NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myTestProfileDlg As New TestProfilesDelegate
+                            myGlobalDataTO = myTestProfileDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
+
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return (myGlobalDataTO)
+        End Function
+
+
+        ''' <summary>
+        ''' Update calcTest Available value depending his components: All Available -- calcTest available (*) // Some NOT available -- calcTest not available
+        ''' (* Exception those calcTest that user has configured as not Available - included in parameter pExceptions)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExceptions"></param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 17/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateAvailableCascadeByComponents(ByVal pDBConnection As SqlClient.SqlConnection, Optional pExceptions As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow) = Nothing) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparCalculatedTestsDAO
+                        myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+
+                        'Special code AVAILABLE = FALSE: CALCTEST have 1 recursive level so we need call twice this method
+                        'For example:
+                        '1st STEP UREA-UV not avaiable affects ... BUN but not affects BUN/CREATININE because when query was executed the BUN was available
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+                        End If
+
+                        If Not myGlobalDataTO.HasError Then
+
+                            'Exceptions treatment
+                            Dim exceptCalcTestID As String = String.Empty
+                            If Not pExceptions Is Nothing AndAlso pExceptions.Count > 0 Then
+                                For Each row As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pExceptions
+                                    If exceptCalcTestID = String.Empty Then
+                                        exceptCalcTestID = row.TestID.ToString
+                                    Else
+                                        exceptCalcTestID &= ", " & row.TestID.ToString
+                                    End If
+                                Next
+                            End If
+                            myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True, exceptCalcTestID)
+
+                            'Special code AVAILABLE = TRUE: CALCTEST have 1 recursive level so we need call twice this method
+                            'For example:
+                            '1st STEP ALBUMIN not avaiable affects ... GLOBULIN & ALBUMIN/GLOBULIN
+                            '2on STEP ALBUMIN avaiable affects ... GLOBULIN but ALBUMIN/GLOBULIN continues not available because when query was executed the GLOBULIN was not available
+                            If Not myGlobalDataTO.HasError Then
+                                myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True, exceptCalcTestID)
+                            End If
+                        End If
+
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateAvailableCascadeByComponents", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return (myGlobalDataTO)
         End Function
 
 #End Region
@@ -1394,8 +1724,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_CloseCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_CloseCalculatedTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1467,8 +1797,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_UpdateByCalcTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_UpdateByCalcTestID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1477,8 +1807,8 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' If the text of the formula of a Calculated Test has been changed due to the long name of an Standard or Calculated Test included in the formula
-        ''' has been changed, if the Calculated Test exists in Historic Module, the FormulaText field is updated also for it
+        ''' If the text of the formula of a Calculated Test has been changed due to the long name of a Standard, ISE, Off-System or Calculated Test included in the formula
+        ''' has been changed, if the Calculated Test exists in Historic Module, the FormulaText field is updated also for it.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
@@ -1488,6 +1818,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 20/09/2012 - Method has been placed here instead of in class HisCalculatedTestDelegate due to it is not possible to call functions in
         '''                              History project from Parameters Programming project (circular references are not allowed). Functions in DAO 
         '''                              Class for table thisCalculatedTests are called
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary description with ISE and Off-System as possible sources for changing its name.
         ''' </remarks>
         Private Function HIST_UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, ByVal pNewFormulaText As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1529,8 +1860,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_UpdateFormulaText", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.HIST_UpdateFormulaText", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1599,8 +1930,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.SaveCalcTestRefRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.SaveCalcTestRefRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1632,7 +1963,7 @@ Namespace Biosystems.Ax00.BL
                         Dim updatedCalcRefRangesDS As New TestRefRangesDS
                         Dim deletedCalcRefRangesDS As New TestRefRangesDS
 
-                        Dim myGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
                         Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
 
                         'CREATE: Get all added Reference Ranges
@@ -1642,7 +1973,7 @@ Namespace Biosystems.Ax00.BL
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -1657,7 +1988,7 @@ Namespace Biosystems.Ax00.BL
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -1694,8 +2025,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

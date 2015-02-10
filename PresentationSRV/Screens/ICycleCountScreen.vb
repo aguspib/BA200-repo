@@ -4,17 +4,15 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.Configuration
+
 Imports Biosystems.Ax00.App
 
 
-Public Class ICycleCountScreen
+Public Class UiCycleCountScreen
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'PENDING
@@ -165,7 +163,7 @@ Public Class ICycleCountScreen
             MyClass.PrepareUIScreen()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
@@ -217,7 +215,7 @@ Public Class ICycleCountScreen
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SelectAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SelectAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SelectAll", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -248,7 +246,7 @@ Public Class ICycleCountScreen
                 .InfoPanel.InfoExpandButton = Me.BsInfoExpandButton
             End With
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -277,7 +275,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -293,7 +291,7 @@ Public Class ICycleCountScreen
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             MyClass.SetButtonImage(BsExitButton, "CANCEL")
             MyClass.SetButtonImage(BsWriteButton, "SAVEALL", 24, 24)
@@ -301,12 +299,12 @@ Public Class ICycleCountScreen
             'Info Button
             auxIconName = GetIconName("RIGHT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -405,7 +403,7 @@ Public Class ICycleCountScreen
             Me.bsCyclesDataGridView.EditMode = DataGridViewEditMode.EditOnEnter
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " InitializeExperimentalsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeExperimentalsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -428,7 +426,7 @@ Public Class ICycleCountScreen
             res = myMLRD.GetResourceText(Nothing, "LBL_SRV_" & pItemID, pLanguageID)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetCountTypeName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetCountTypeName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetCountTypeName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -440,26 +438,31 @@ Public Class ICycleCountScreen
     ''' <summary>
     ''' Manages screen loading operation
     ''' </summary>
-    ''' <remarks>Created: SGM 26/07/2011
-    ''' Modified by:      IT 23/10/2014 - REFACTORING (BA-2016)
-    ''' </remarks>
+    ''' <remarks>Created: SGM 26/07/2011</remarks>
     Private Sub LoadScreen()
 
         Dim myGlobal As New GlobalDataTO
 
         Try
             MyClass.IsLocallySaved = False
+
             MyClass.CurrentScreenMode = ScreenModes.INITIATING
+
             MyClass.PrepareButtons()
             MyClass.GetScreenLabels()
+
             Me.BsSelectAllCheckbox.Text = MyClass.mySelectAllCaption
+
             MyClass.InitializeCyclesGrid()
             MyClass.mySendFwScriptDelegate = New SendFwScriptsDelegate() '#REFACTORING
             'MyClass.CurrentCyclesData = CyclesDS
+
             MyClass.CurrentScreenMode = ScreenModes.INITIATED
 
+
+
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -499,7 +502,7 @@ Public Class ICycleCountScreen
             If myGlobal.HasError Then MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExitScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -573,7 +576,7 @@ Public Class ICycleCountScreen
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadCyclesGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadCyclesGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadCyclesGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -619,7 +622,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PaintCheckedRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PaintCheckedRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PaintCheckedRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -669,7 +672,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIPrepareScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -699,7 +702,7 @@ Public Class ICycleCountScreen
             Me.BsExitButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -730,7 +733,7 @@ Public Class ICycleCountScreen
             Me.BsExitButton.Enabled = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -764,7 +767,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoading", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -799,7 +802,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoaded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
@@ -832,7 +835,7 @@ Public Class ICycleCountScreen
             Me.bsCyclesDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIModifying", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -866,7 +869,7 @@ Public Class ICycleCountScreen
             'Me.WaitProgressBar.StartWaiting()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIWriting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIWriting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIWriting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -895,7 +898,7 @@ Public Class ICycleCountScreen
             Me.Cursor = Cursors.Default
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIOnError", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -944,7 +947,7 @@ Public Class ICycleCountScreen
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadCyclesFromAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadCyclesFromAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadCyclesFromAnalyzer", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1000,7 +1003,7 @@ Public Class ICycleCountScreen
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WriteCyclesToAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WriteCyclesToAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WriteCyclesToAnalyzer", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1048,7 +1051,7 @@ Public Class ICycleCountScreen
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CollectCycleCountToUpdate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CollectCycleCountToUpdate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CollectCycleCountToUpdate", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1404,7 +1407,7 @@ Public Class ICycleCountScreen
             MyClass.myScreenDelegate.CurrentCyclesCountItemsDT.AcceptChanges()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateLoadCyclesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateLoadCyclesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulateLoadCyclesGrid ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1442,7 +1445,7 @@ Public Class ICycleCountScreen
             'Next
             'Me.WaitingProgressBar.Visible = False
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateWaiting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulateWaiting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulateWaiting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Me.BsWaitProgressBar.Visible = False
             'Me.WaitProgressBar.StopWaiting()
@@ -1482,7 +1485,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1496,7 +1499,7 @@ Public Class ICycleCountScreen
     Private Sub ICycleCountScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Dim myglobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
 
         Try
             'screen delegate SGM 20/01/2012
@@ -1509,8 +1512,8 @@ Public Class ICycleCountScreen
             End If
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             'AnalyzerId
             MyClass.myScreenDelegate.AnalyzerId = MyBase.myServiceMDI.ActiveAnalyzer
@@ -1523,7 +1526,7 @@ Public Class ICycleCountScreen
             '
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ICycleCountScreen_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ICycleCountScreen_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ICycleCountScreen_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
             '
@@ -1555,7 +1558,7 @@ Public Class ICycleCountScreen
             If myGlobal.HasError Then MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ICycleCountScreen_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ICycleCountScreen_Shown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ICycleCountScreen_Shown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1578,7 +1581,7 @@ Public Class ICycleCountScreen
                 BsExitButton.PerformClick()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1596,7 +1599,7 @@ Public Class ICycleCountScreen
         Try
             myGlobal = MyClass.WriteCyclesToAnalyzer
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " BsWriteButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " BsWriteButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsWriteButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1614,7 +1617,7 @@ Public Class ICycleCountScreen
             MyClass.ExitScreen()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1632,7 +1635,7 @@ Public Class ICycleCountScreen
                 IsInfoExpanded = CBool(myGlobal.SetDatos)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsInfoExpandButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsInfoExpandButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsInfoExpandButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1664,7 +1667,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsSelectAllCheckbox_CheckedChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSelectAllCheckbox_CheckedChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSelectAllCheckbox_CheckedChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
             MyClass.IsCheckingAll = False
@@ -1704,7 +1707,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellEnter", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellEnter", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsCyclesDataGridView_CellEnter", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1742,7 +1745,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellLeave", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellLeave", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsCyclesDataGridView_CellLeave", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1792,7 +1795,7 @@ Public Class ICycleCountScreen
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellValidating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellValidating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsCyclesDataGridView_CellValidating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1835,7 +1838,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsCyclesDataGridView_CellValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsCyclesDataGridView_CellValueChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1864,7 +1867,7 @@ Public Class ICycleCountScreen
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " bsCyclesDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsCyclesDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1900,7 +1903,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1961,7 +1964,7 @@ Public Class ICycleCountScreen
             If myGlobal.HasError Then MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1983,7 +1986,7 @@ Public Class ICycleCountScreen
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2002,7 +2005,7 @@ Public Class ICycleCountScreen
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

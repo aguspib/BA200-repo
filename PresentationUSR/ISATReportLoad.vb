@@ -1,5 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports System.IO
 'Imports System.Configuration
@@ -16,7 +17,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
 Imports Biosystems.Ax00.App
 
-Public Class ISATReportLoad
+Public Class UiSATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"
@@ -91,24 +92,24 @@ Public Class ISATReportLoad
             'OK Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsOKButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL AcceptButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 11/01/2011 -Path Button.
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                bsBrowseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsBrowseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -142,7 +143,7 @@ Public Class ISATReportLoad
             bsScreenToolTips.SetToolTip(bsBrowseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Select", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -160,7 +161,7 @@ Public Class ISATReportLoad
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -210,11 +211,11 @@ Public Class ISATReportLoad
                         SATThread.Start()
 
                         While Me.CreatingRestorePoint 'RH 16/11/2010
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                             Threading.Thread.Sleep(100)
                         End While
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
                         SATThread.Join()
 
@@ -225,7 +226,7 @@ Public Class ISATReportLoad
                                 'RH 07/02/2012 Return from the Function.
                                 'Avoid the execution of the next code lines.
                                 'Log the error
-                                CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
+                                GlobalBase.CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
                                                   Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, _
                                                   GetApplicationInfoSession().ActivateSystemLog)
 
@@ -253,7 +254,7 @@ Public Class ISATReportLoad
                     End If
                     'RH 12/11/2010 tempFolder
 
-                    myGlobal = myUtil.ExtractFromZip(RestorePointPath, tempFolder)
+                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
 
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
@@ -268,11 +269,11 @@ Public Class ISATReportLoad
                             RestoreThread.Start()
 
                             While Me.RestoringDB 'RH 16/11/2010
-                                IAx00MainMDI.InitializeMarqueeProgreesBar()
+                                UiAx00MainMDI.InitializeMarqueeProgreesBar()
                                 Application.DoEvents()
                                 Threading.Thread.Sleep(100)
                             End While
-                            IAx00MainMDI.StopMarqueeProgressBar()
+                            UiAx00MainMDI.StopMarqueeProgressBar()
 
                             RestoreThread.Join()
 
@@ -290,11 +291,11 @@ Public Class ISATReportLoad
                                     UpdateThread.Start()
 
                                     While Me.UpdatingDB 'RH 16/11/2010
-                                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                                         Application.DoEvents()
                                         Threading.Thread.Sleep(100)
                                     End While
-                                    IAx00MainMDI.StopMarqueeProgressBar()
+                                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                                     UpdateThread.Join()
 
@@ -316,7 +317,7 @@ Public Class ISATReportLoad
                                 myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
                                 'AG 11/06/2014 #1661
 
-                                IAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
+                                UiAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
                             End If
                         Else
                             If Me.RestorePointMode Then
@@ -335,7 +336,7 @@ Public Class ISATReportLoad
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
@@ -397,7 +398,7 @@ Public Class ISATReportLoad
             Else
                 myErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
             End If
-            CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -459,7 +460,7 @@ Public Class ISATReportLoad
 
         Catch ex As Exception
             Dim myErrorMessage As String = ex.Message + " ((" + ex.HResult.ToString + "))" & " - " & ex.InnerException.InnerException.Message
-            CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -492,7 +493,7 @@ Public Class ISATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         Finally
@@ -513,12 +514,12 @@ Public Class ISATReportLoad
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim mySATUtil As New SATReportUtilities
 
             'obtain the APP version
             Dim myAppVersion As String
-            myGlobal = myUtil.GetSoftwareVersion()
+            myGlobal = Utilities.GetSoftwareVersion()
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
@@ -565,7 +566,7 @@ Public Class ISATReportLoad
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         End Try
@@ -600,8 +601,8 @@ Public Class ISATReportLoad
                     'DL 02/07/2012. End 
 
                     ' XBC 04/07/2012
-                    IAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
-                    IAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
+                    UiAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
+                    UiAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
                     ' XBC 04/07/2012
                 End If
             End If
@@ -632,7 +633,7 @@ Public Class ISATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -665,8 +666,8 @@ Public Class ISATReportLoad
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -751,7 +752,7 @@ Public Class ISATReportLoad
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -832,7 +833,7 @@ Public Class ISATReportLoad
             bsScreenToolTips.SetToolTip(bsSelectedTextBox, bsSelectedTextBox.Text)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BrowseButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -861,13 +862,13 @@ Public Class ISATReportLoad
             bsCancelButton.Enabled = False
             bsBrowseButton.Enabled = False
             'IAx00MainMDI.EnableMenusBar(False)
-            IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+            UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
             'Dim myZipExtension As String = ConfigurationManager.AppSettings("ZIPExtension").ToString
 
             'TR 25/01/2011 -Replace by corresponding value on global base.
             Dim myZipExtension As String = GlobalBase.ZIPExtension
 
-            IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+            UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
             Dim myGlobal As GlobalDataTO
 
@@ -890,11 +891,11 @@ Public Class ISATReportLoad
 
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays) '#REFACTORING
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    myGlobal = ApplicationLogManager.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays) '#REFACTORING
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
-                        myGlobal = myLogAcciones.DeleteAll()
+                        myGlobal = ApplicationLogManager.DeleteAll()
                     Else
                         'DL 31/05/2013
                         'The Reset process will continue even if errors in ExportLogToXML
@@ -958,8 +959,8 @@ Public Class ISATReportLoad
                     End If
 
                     'Get the registry information 
-                    Dim myUtilities As New Utilities
-                    myGlobal = myUtilities.GetLISTraceLevel()
+                    'Dim Utilities As New Utilities
+                    myGlobal = Utilities.GetLISTraceLevel()
                     If Not myGlobal.HasError Then
                         RegistryLISTraceValue = myGlobal.SetDatos.ToString()
                     End If
@@ -969,7 +970,7 @@ Public Class ISATReportLoad
                         'Save the registry value on the DB.
                         myGlobal = myUserSettingsDelegate.Update(Nothing, UserSettingsEnum.LIS_TRACE_LEVEL.ToString(), RegistryLISTraceValue)
                         'Inform on the application log the change and the previous value.
-                        CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
                     End If
                 End If
                 'TR 24/05/2013 -END.
@@ -978,11 +979,11 @@ Public Class ISATReportLoad
                 Cursor = Cursors.WaitCursor
                 If Not (mdiESWrapperCopy.Status.ToUpperInvariant = LISStatus.released.ToString.ToUpperInvariant) Then
                     'Release the LIS manager object
-                    IAx00MainMDI.InvokeReleaseLIS(False)
-                    IAx00MainMDI.InvokeReleaseFromConfigSettings = True
+                    UiAx00MainMDI.InvokeReleaseLIS(False)
+                    UiAx00MainMDI.InvokeReleaseFromConfigSettings = True
                 Else
                     ' Re-create Channel with new change settings
-                    IAx00MainMDI.InvokeCreateLISChannel()
+                    UiAx00MainMDI.InvokeCreateLISChannel()
                 End If
                 Cursor = Cursors.Default
                 ' XB 07/05/2013
@@ -1004,8 +1005,8 @@ Public Class ISATReportLoad
                 'RH 07/02/2012 Insert a REPORTSAT_LOADED_WARN alarm in DB
                 Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                 myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                        GlobalEnumerates.Alarms.REPORTSATLOADED_WARN.ToString(), IAx00MainMDI.ActiveAnalyzer, _
-                        DateTime.Now, 1, IAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
+                        GlobalEnumerates.Alarms.REPORTSATLOADED_WARN.ToString(), UiAx00MainMDI.ActiveAnalyzer, _
+                        DateTime.Now, 1, UiAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
 
                 Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                 myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
@@ -1020,24 +1021,24 @@ Public Class ISATReportLoad
 
             'RH 07/02/2012
             'Open the WS Monitor form and close this one
-            IAx00MainMDI.OpenMonitorForm(Me)
+            UiAx00MainMDI.OpenMonitorForm(Me)
 
             '' XBC 26/06/2012
             'IAx00MainMDI.Connect()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".bsOKButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
             'IAx00MainMDI.EnableMenusBar(True) 'TR 02/08/2011
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
+            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
 
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
-            CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
+            GlobalBase.CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
                                        EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
         End Try
@@ -1060,9 +1061,9 @@ Public Class ISATReportLoad
 
             If Not myGlobalDataTO.HasError Then
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
-                Dim currentSession As New GlobalBase
+                'Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
-                myApplicationInfoSessionTO = currentSession.GetSessionInfo()
+                myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.
                 If Not myApplicationInfoSessionTO.ApplicationLanguage = newLanguageID Then
                     'Initialize session information.
@@ -1085,13 +1086,13 @@ Public Class ISATReportLoad
                     MultilanguageResourcesDelegate.SetCurrentLanguage(newLanguageID)
 
                     'Set the new language to the MDI form to reload menus in new language.
-                    IAx00MainMDI.CurrentLanguage = newLanguageID
+                    UiAx00MainMDI.CurrentLanguage = newLanguageID
                 End If
 
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".LoadRSATConfig", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -1118,11 +1119,11 @@ Public Class ISATReportLoad
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1142,7 +1143,7 @@ Public Class ISATReportLoad
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSATDirListBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

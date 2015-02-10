@@ -1,21 +1,15 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.InfoAnalyzer
-Imports System.Timers
-Imports System.Data
 Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerEntity
+    Partial Public Class AnalyzerManager
 
 #Region "Instructions to send Flow"
 
@@ -60,8 +54,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.RecoveryResultsAndStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RecoveryResultsAndStatus", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -76,11 +70,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 27/08/2012</remarks>
+        ''' <remarks>
+        ''' Created by:  AG 27/08/2012
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings</remarks>
         Private Function ProcessANSPRDReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 '''''''
@@ -88,14 +85,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 '''''''
                 ' Get the preparation identifier ID) field (parameter index 3)
                 Dim recoveryMode As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    recoveryMode = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    recoveryMode = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 'AG 04/12/2013 - BT #1397 protection because when recovery is started in pause mode Softw has to send
@@ -153,8 +150,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPRDReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPRDReceived", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -194,8 +191,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessResultsRecoveryInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessResultsRecoveryInstructions", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -277,8 +274,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.MarkContaminatedWellsAfterRecoveryResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkContaminatedWellsAfterRecoveryResults", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -333,8 +330,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSTINInstructionReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSTINInstructionReceived", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -347,23 +344,27 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pInstructionReceived"></param>
         ''' <returns>GlobalDataTo with data as List (of PrepWithProblemTO))</returns>
-        ''' <remarks>AG 19/09/2012</remarks>
+        ''' <remarks>
+        ''' Created by:  AG 19/09/2012
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
+        ''' </remarks>
         Private Function DecodeANSTINInstruction(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim dataToReturn As New List(Of PrepWithProblemTO)
 
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 '1) Get the number of preparations with problems ID) field (parameter index 3)
                 Dim valueN As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        valueN = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                        valueN = CInt(myInstParamTO.ParameterValue)
                     Else
                         myGlobal.HasError = True
                     End If
@@ -513,12 +514,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             '3.1) Get the preparationID with problems field (parameter index 4)
                             Dim prepID As Integer = 0
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4 + index * loopOffset)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + index * loopOffset)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                                    prepID = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                                    prepID = CInt(myInstParamTO.ParameterValue)
                                 Else
                                     Exit For
                                 End If
@@ -528,12 +529,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             '3.2) Get the error code field (parameter index 5)
                             Dim errorCode As Long = 0
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5 + index * loopOffset)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + index * loopOffset)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                                    errorCode = DirectCast(CLng(myInstParamTO.ParameterValue), Long)
+                                    errorCode = CLng(myInstParamTO.ParameterValue)
                                 Else
                                     Exit For
                                 End If
@@ -648,8 +649,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.DecodeANSTINInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.DecodeANSTINInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -701,8 +702,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessLevelDetectionDuringRecover", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessLevelDetectionDuringRecover", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -754,8 +755,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessClotDetectionDuringRecover", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessClotDetectionDuringRecover", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -804,8 +805,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessArmCollisionDuringRecover", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessArmCollisionDuringRecover", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal

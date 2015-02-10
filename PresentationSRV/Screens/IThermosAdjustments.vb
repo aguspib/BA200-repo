@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.App
 'Imports DevExpress.XtraCharts
 'Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IThermosAdjustments
+Public Class UiThermosAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Enumerations"
@@ -112,7 +112,7 @@ Public Class IThermosAdjustments
 
     '        Try
     '            Dim myGlobal As New GlobalDataTO
-    '            Dim myUtil As New Utilities
+    '            'Dim myUtil As New Utilities.
     '            Dim auxIconName As String = String.Empty
     '            Dim iconPath As String = MyBase.IconsPath
     '            Dim myAuxButtonImage As Image
@@ -120,7 +120,7 @@ Public Class IThermosAdjustments
     '            If value Then
     '                auxIconName = GetIconName("REDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -129,7 +129,7 @@ Public Class IThermosAdjustments
     '            Else
     '                auxIconName = GetIconName("UNDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -164,7 +164,7 @@ Public Class IThermosAdjustments
 
             Try
                 Dim myGlobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim auxIconName As String = String.Empty
                 Dim iconPath As String = MyBase.IconsPath
                 Dim myRotorCondImage As Image
@@ -178,9 +178,9 @@ Public Class IThermosAdjustments
 
                     If System.IO.File.Exists(iconPath & auxIconName) Then
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myRotorCondImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -191,20 +191,20 @@ Public Class IThermosAdjustments
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_TestStop")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
                 Else
                     MyBase.myServiceMDI.SEND_INFO_START()
 
                     auxIconName = GetIconName("ADJUSTMENT")
                     If System.IO.File.Exists(iconPath & auxIconName) Then
-                        myRotorCondImage = Image.FromFile(iconPath & auxIconName)
+                        myRotorCondImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     Else
                         myRotorCondImage = Nothing
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_Conditionate")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
 
                 End If
 
@@ -516,7 +516,7 @@ Public Class IThermosAdjustments
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
@@ -565,7 +565,7 @@ Public Class IThermosAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -592,7 +592,7 @@ Public Class IThermosAdjustments
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -617,7 +617,7 @@ Public Class IThermosAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -660,7 +660,7 @@ Public Class IThermosAdjustments
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -736,7 +736,7 @@ Public Class IThermosAdjustments
             Me.PageInitialized = True
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Initializations ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -761,7 +761,7 @@ Public Class IThermosAdjustments
             'myScreenDelegate.ReactionsRotorMeasuredTempDone = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeRotorReationsTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeRotorReationsTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeRotorReationsTemps ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -792,12 +792,12 @@ Public Class IThermosAdjustments
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -884,7 +884,7 @@ Public Class IThermosAdjustments
             GetScreenTooltip()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -900,28 +900,28 @@ Public Class IThermosAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1UndoMeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
             'MyBase.bsScreenToolTips.SetToolTip(Tab2AuxButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_ToParking", currentLanguage)) SGM 01/12/2011
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
 
             ' XBC 20/04/2012
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -987,7 +987,7 @@ Public Class IThermosAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisableAll ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1013,7 +1013,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -1075,7 +1075,7 @@ Public Class IThermosAdjustments
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -1097,30 +1097,30 @@ Public Class IThermosAdjustments
             'dl 20/04/2012
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+                Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsUpDownWSButton1.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton2.Image = Image.FromFile(iconPath & auxIconName)
+                BsUpDownWSButton1.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton2.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'dl 20/04/2012
 
@@ -1144,28 +1144,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''MEASUREMENT TEMP Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1MeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1MeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1MeasureButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''CANCEL MEASUREMENT Button
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1UndoMeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1UndoMeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1UndoMeasureButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1177,28 +1177,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''MEASUREMENT TEMP Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2MeasureButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''AUX TO PARKING/TO WASHING Button SGM 01/12/2011
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab2AuxButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab2AuxButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
@@ -1210,14 +1210,14 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1227,19 +1227,19 @@ Public Class IThermosAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1351,7 +1351,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1397,7 +1397,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1506,7 +1506,7 @@ Public Class IThermosAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -1525,7 +1525,7 @@ Public Class IThermosAdjustments
             Me.Cursor = Cursors.WaitCursor
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1620,7 +1620,7 @@ Public Class IThermosAdjustments
             'End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".NeedlesArmsTempering ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".NeedlesArmsTempering ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".NeedlesArmsTempering ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1628,10 +1628,13 @@ Public Class IThermosAdjustments
     ''' <summary>
     ''' Prepare GUI for Tested Mode
     ''' </summary>
-    ''' <remarks>Created by XBC 17/06/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 17/06/2011
+    ''' Modified by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub PrepareTestedMode()
         Dim myGlobal As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Me.BsSaveButton.Enabled = False
 
@@ -1911,7 +1914,8 @@ Public Class IThermosAdjustments
                                                 ' instruction for Washing Station DOWN
                                                 If Not MyBase.SimulationMode Then
                                                     If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
-                                                        myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                                                        'myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                                                        myScreenDelegate.SendNEW_ROTOR(ThermosAdjustmentsDelegate.OPERATIONS.CONDITIONING_MANUAL_DOWN)
                                                     End If
                                                 End If
 
@@ -2253,7 +2257,7 @@ Public Class IThermosAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             'Finally
             '    Me.Cursor = Cursors.Default
@@ -2271,7 +2275,7 @@ Public Class IThermosAdjustments
             Me.Cursor = Cursors.WaitCursor
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSavingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2294,7 +2298,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSavedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -2320,7 +2324,7 @@ Public Class IThermosAdjustments
             ' XBC 23/10/2012
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -2343,7 +2347,7 @@ Public Class IThermosAdjustments
             MyBase.ActivateMDIMenusButtons(False)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareParkingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2366,7 +2370,7 @@ Public Class IThermosAdjustments
             MyBase.DisplayMessage("")
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareParkedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareParkedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2411,7 +2415,7 @@ Public Class IThermosAdjustments
             End Select
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".EnableTemperatureInputTextBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".EnableTemperatureInputTextBox ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".EnableTemperatureInputTextBox ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2473,7 +2477,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".NextEditionTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".NextEditionTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".NextEditionTemp ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2487,7 +2491,7 @@ Public Class IThermosAdjustments
     Private Sub ValidateToCalulatePHOTOMETRYMeanTemps()
         Dim myResultData As New GlobalDataTO
         Try
-            Dim myUtilities As New Utilities
+            'Dim Utilities As New Utilities
             Dim AllTempsFilled As Boolean = True
 
             ' 1st validation
@@ -2557,7 +2561,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2567,7 +2571,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2577,7 +2581,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2587,7 +2591,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2604,13 +2608,13 @@ Public Class IThermosAdjustments
                 '    AllTempsFilled = False
                 'ElseIf CSng(Me.Tab1TextBoxTemp4.Text) = 0 Then
                 '    AllTempsFilled = False
-                If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
+                If Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
                     AllTempsFilled = False
 
 
@@ -2669,14 +2673,14 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulatePHOTOMETRYMeanTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulatePHOTOMETRYMeanTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateToCalulatePHOTOMETRYMeanTemps ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub ValidateToCalulateNEEDLESTemp()
         Dim myResultData As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim NewCorrection As Single
             Dim ProposalCorrection As Single
@@ -2684,7 +2688,7 @@ Public Class IThermosAdjustments
             If IsNumeric(Me.Tab2TextBoxTemp.Text) Then
                 ' XBC 18/11/2011 - correction singles
                 'MeasuredTemp = CSng(Me.Tab2TextBoxTemp.Text)
-                MeasuredTemp = myUtilities.FormatToSingle(Me.Tab2TextBoxTemp.Text)
+                MeasuredTemp = Utilities.FormatToSingle(Me.Tab2TextBoxTemp.Text)
 
                 myScreenDelegate.ReagentMeasuredTemp = MeasuredTemp
 
@@ -2723,14 +2727,14 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulateNEEDLESTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulateNEEDLESTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateToCalulateNEEDLESTemp ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub ValidateToCalulateHEATERTemp()
         Dim myResultData As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim NewCorrection As Single
             Dim ProposalCorrection As Single
@@ -2738,7 +2742,7 @@ Public Class IThermosAdjustments
             If IsNumeric(Me.Tab3TextBoxTemp.Text) Then
                 ' XBC 18/11/2011 - correction singles
                 'MeasuredTemp = CSng(Me.Tab3TextBoxTemp.Text)
-                MeasuredTemp = myUtilities.FormatToSingle(Me.Tab3TextBoxTemp.Text)
+                MeasuredTemp = Utilities.FormatToSingle(Me.Tab3TextBoxTemp.Text)
 
                 myScreenDelegate.HeaterMeasuredTemp = MeasuredTemp
 
@@ -2774,7 +2778,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulateHEATERTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateToCalulateHEATERTemp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateToCalulateHEATERTemp ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2790,7 +2794,7 @@ Public Class IThermosAdjustments
     '        MyBase.DisplayMessage("")
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".CancelWizardEditionTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelWizardEditionTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".CancelWizardEditionTemps ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -2802,13 +2806,13 @@ Public Class IThermosAdjustments
             ' Pending on future requirements
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExitScreen ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub PopulateEditionValues()
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim value As String
             With Me.EditedValue
@@ -2817,7 +2821,7 @@ Public Class IThermosAdjustments
                     ' XBC 18/11/2011 - correction singles
                     'value = value.Replace(",", MyClass.myDecimalSeparator.ToString)
                     '.SetPointCurrentValue = CSng(value)
-                    .SetPointCurrentValue = myUtilities.FormatToSingle(value)
+                    .SetPointCurrentValue = Utilities.FormatToSingle(value)
                 Else
                     .SetPointCurrentValue = 0
                 End If
@@ -2827,7 +2831,7 @@ Public Class IThermosAdjustments
                     ' XBC 18/11/2011 - correction singles
                     'value = value.Replace(",", MyClass.myDecimalSeparator.ToString)
                     '.TargetValue = CSng(value)
-                    .TargetValue = myUtilities.FormatToSingle(value)
+                    .TargetValue = Utilities.FormatToSingle(value)
                 Else
                     .TargetValue = 0
                 End If
@@ -2837,7 +2841,7 @@ Public Class IThermosAdjustments
             GetLimitValues()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateEditionValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateEditionValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PopulateEditionValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2859,7 +2863,7 @@ Public Class IThermosAdjustments
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -2874,7 +2878,7 @@ Public Class IThermosAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".HomesDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HomesDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
         Return myGlobal
     End Function
@@ -2945,7 +2949,7 @@ Public Class IThermosAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateReportsOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateReportsOutput ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
         Return myGlobal
     End Function
@@ -2953,7 +2957,10 @@ Public Class IThermosAdjustments
     ''' <summary>
     ''' Load Adjustments High Level Instruction to move Washing Station
     ''' </summary>
-    ''' <remarks>Created by XBC 20/04/2012</remarks>
+    ''' <remarks>
+    ''' Created by XBC 20/04/2012
+    ''' Modified by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub SendWASH_STATION_CTRL()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -2977,7 +2984,8 @@ Public Class IThermosAdjustments
                     Else
                         ' Manage instruction for Washing Station UP/DOWN
                         If myScreenDelegate.IsWashingStationUp Then
-                            myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.DOWN)
+                            'myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.DOWN)
+                            myScreenDelegate.SendNEW_ROTOR(ThermosAdjustmentsDelegate.OPERATIONS.WASHING_STATION_DOWN)
                         Else
                             myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.UP)
                         End If
@@ -2987,7 +2995,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SendWASH_STATION_CTRL", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3018,7 +3026,7 @@ Public Class IThermosAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         MyClass.SelectedAdjustmentsDS.AcceptChanges()
@@ -3045,7 +3053,7 @@ Public Class IThermosAdjustments
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Me.TemporalAdjustmentsDS.AcceptChanges()
@@ -3078,7 +3086,7 @@ Public Class IThermosAdjustments
             End With
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -3127,7 +3135,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadGlobalAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3175,7 +3183,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3205,7 +3213,7 @@ Public Class IThermosAdjustments
 
         Catch ex As Exception
             MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return resultData
@@ -3241,18 +3249,18 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub ThermosAdjustments2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3265,7 +3273,7 @@ Public Class IThermosAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             MyClass.GetScreenLabels()
@@ -3312,7 +3320,7 @@ Public Class IThermosAdjustments
             'Me.Tab1ConditioningButton.Focus()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3337,7 +3345,7 @@ Public Class IThermosAdjustments
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabPagesControl_Selected", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsTabPagesControl_Selected ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3406,7 +3414,7 @@ Public Class IThermosAdjustments
             PrepareLoadedMode()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTabControl_Selecting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTabControl_Selecting ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3420,14 +3428,14 @@ Public Class IThermosAdjustments
             Me.ExitScreen()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExitButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub BsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsSaveButton.Click
         Dim myGlobal As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.EditingRotorTemperatures Then
                 Exit Sub
@@ -3451,28 +3459,28 @@ Public Class IThermosAdjustments
                             If IsNumeric(Me.Tab1CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab1CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT1
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_REAGENT1
                             If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                             If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_WS_HEATER
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_WS_HEATER
                             If IsNumeric(Me.Tab3CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab3CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
                             End If
                     End Select
 
@@ -3581,7 +3589,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3598,7 +3606,7 @@ Public Class IThermosAdjustments
             Me.ProgressBar1.Value += 1
             Me.ProgressBar1.Refresh()
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CurrentOperationTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CurrentOperationTimer.Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CurrentOperationTimer.Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3682,7 +3690,7 @@ Public Class IThermosAdjustments
 
             End Select
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ProcessDialogKey ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ProcessDialogKey ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ProcessDialogKey ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
@@ -4004,7 +4012,7 @@ Public Class IThermosAdjustments
 
         Catch ex As Exception
             MyClass.myScreenDelegate.CurrentOperation = ThermosAdjustmentsDelegate.OPERATIONS._NONE
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1ConditioningButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4084,7 +4092,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1MeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1MeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1MeasureButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4093,7 +4101,7 @@ Public Class IThermosAdjustments
     '    Try
     '        Me.CancelWizardEditionTemps()
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1UndoMeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1UndoMeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1UndoMeasureButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4141,7 +4149,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1AdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4154,7 +4162,7 @@ Public Class IThermosAdjustments
             Me.TempBoxEditing = 1
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp1_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4166,7 +4174,7 @@ Public Class IThermosAdjustments
             Me.TempBoxEditing = 2
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp2_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp2_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp2_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4178,7 +4186,7 @@ Public Class IThermosAdjustments
             Me.TempBoxEditing = 3
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp3_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp3_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp3_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4190,7 +4198,7 @@ Public Class IThermosAdjustments
             Me.TempBoxEditing = 4
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp4_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4201,7 +4209,7 @@ Public Class IThermosAdjustments
                 ValidateToCalulatePHOTOMETRYMeanTemps()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp4_KeyPress ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4214,14 +4222,14 @@ Public Class IThermosAdjustments
             ValidateToCalulatePHOTOMETRYMeanTemps()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTempX_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTempX_LostFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTempX_LostFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
     ' XBC 29/11/2011
 
     Private Sub Tab1TextBoxTemp1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp1.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4231,7 +4239,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(0) = CSng(Me.Tab1TextBoxTemp1.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(0) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text)
+                        myScreenDelegate.ProbeWellsTemps(0) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4241,13 +4249,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp1_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp1_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp1_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab1TextBoxTemp2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp2.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4257,7 +4265,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(1) = CSng(Me.Tab1TextBoxTemp2.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(1) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text)
+                        myScreenDelegate.ProbeWellsTemps(1) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4267,13 +4275,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp2_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp2_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp2_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab1TextBoxTemp3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp3.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4283,7 +4291,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(2) = CSng(Me.Tab1TextBoxTemp3.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(2) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text)
+                        myScreenDelegate.ProbeWellsTemps(2) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4293,13 +4301,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp3_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp3_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp3_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab1TextBoxTemp4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp4.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4309,7 +4317,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(3) = CSng(Me.Tab1TextBoxTemp4.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(3) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text)
+                        myScreenDelegate.ProbeWellsTemps(3) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4319,7 +4327,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp4_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1TextBoxTemp4_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4338,7 +4346,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp5_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp5_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1TextBoxTemp5_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4356,7 +4364,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp6_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp6_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1TextBoxTemp6_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4374,7 +4382,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp7_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp7_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1TextBoxTemp7_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4392,7 +4400,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp8_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1TextBoxTemp8_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1TextBoxTemp8_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4404,7 +4412,7 @@ Public Class IThermosAdjustments
     '        End If
 
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".Tab1CorrectionTextBox_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4416,13 +4424,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1CorrectionTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab1CorrectionTextBox_StatusChanged()
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
 
             If Me.Tab1CorrectionTextBox.Text.Length = 0 Then
@@ -4432,7 +4440,7 @@ Public Class IThermosAdjustments
                 If IsNumeric(Me.Tab1CorrectionTextBox.Text) Then
                     ' XBC 18/11/2011 - correction singles
                     'Me.EditedValue.NewCorrection = CSng(Me.Tab1CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                    Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
+                    Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
                 End If
 
                 ' XBC 18/10/2011 - Canceled
@@ -4450,7 +4458,7 @@ Public Class IThermosAdjustments
             Me.EditingHeaterCorrection = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_StatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab1CorrectionTextBox_StatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab1CorrectionTextBox_StatusChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4461,7 +4469,7 @@ Public Class IThermosAdjustments
             Me.SendWASH_STATION_CTRL()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton2_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton2_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsUpDownWSButton2_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4492,7 +4500,7 @@ Public Class IThermosAdjustments
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "TextBox_KeyPress " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, "TextBox_KeyPress " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".TextBox_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -4538,7 +4546,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2RadioButtonR1_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2RadioButtonR1_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2RadioButtonR1_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4582,7 +4590,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2RadioButtonR2_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2RadioButtonR2_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2RadioButtonR2_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4693,7 +4701,7 @@ Public Class IThermosAdjustments
 
         Catch ex As Exception
             MyClass.myScreenDelegate.CurrentOperation = ThermosAdjustmentsDelegate.OPERATIONS._NONE
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2ConditioningButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4748,7 +4756,7 @@ Public Class IThermosAdjustments
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2MeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2MeasureButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2MeasureButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4792,7 +4800,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2AdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4821,7 +4829,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2TextBoxTemp_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2TextBoxTemp_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2TextBoxTemp_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4833,13 +4841,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2CorrectionTextBox_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2CorrectionTextBox_KeyPress ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2CorrectionTextBox_KeyPress ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab2CorrectionTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab2CorrectionTextBox.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4852,7 +4860,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'Me.EditedValue.NewCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                        Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                     End If
 
                     'If myScreenDelegate.ReagentNeedleMeasuredTempDone Then
@@ -4870,7 +4878,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab2CorrectionTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4887,7 +4895,7 @@ Public Class IThermosAdjustments
             Me.BsInfoNeedlesXPSViewer.RefreshPage()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".IThermosAdjustments_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".IThermosAdjustments_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".IThermosAdjustments_Shown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4932,7 +4940,7 @@ Public Class IThermosAdjustments
 
     '        End If
     '    Catch ex As Exception
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2AuxButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab2AuxButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".Tab2AuxButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -4954,7 +4962,7 @@ Public Class IThermosAdjustments
 
     '        End If
     '    Catch ex As Exception
-    '        mybase.CreateLogActivity(ex.Message, Me.Name & ".WaitProgressBar_IsTimeForWaitElapsed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WaitProgressBar_IsTimeForWaitElapsed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        mybase.ShowMessage(Me.Name & ".WaitProgressBar_IsTimeForWaitElapsed ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -5029,7 +5037,7 @@ Public Class IThermosAdjustments
 
         Catch ex As Exception
             MyClass.myScreenDelegate.CurrentOperation = ThermosAdjustmentsDelegate.OPERATIONS._NONE
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3ConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab3ConditioningButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5073,7 +5081,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab3AdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -5103,13 +5111,13 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3TextBoxTemp_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3TextBoxTemp_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab3TextBoxTemp_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub Tab3CorrectionTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab3CorrectionTextBox.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -5120,7 +5128,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab3CorrectionTextBox.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'Me.EditedValue.NewCorrection = CSng(Me.Tab3CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
+                        Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
                     End If
 
                     'If myScreenDelegate.HeaterConditioningDone Then
@@ -5138,7 +5146,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Tab3CorrectionTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".Tab3CorrectionTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5149,7 +5157,7 @@ Public Class IThermosAdjustments
             Me.SendWASH_STATION_CTRL()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton1_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsUpDownWSButton1_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsUpDownWSButton1_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5173,7 +5181,7 @@ Public Class IThermosAdjustments
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5194,7 +5202,7 @@ Public Class IThermosAdjustments
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SimulationTimer_Tick ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

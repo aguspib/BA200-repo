@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class twksResultAlarmsDAO
-        Inherits DAOBase
+        '  
 
 #Region "CRUD Methods"
 
@@ -55,8 +55,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -111,8 +111,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Add", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Add", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -155,8 +155,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteAll", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -179,9 +179,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM twksResultAlarms " & _
+                    '          " WHERE  OrderTestID NOT IN (SELECT OrderTestID " & _
+                    '                                     " FROM twksWSOrderTests) "
+
                     cmdText = " DELETE FROM twksResultAlarms " & _
-                              " WHERE  OrderTestID NOT IN (SELECT OrderTestID " & _
-                                                         " FROM twksWSOrderTests) "
+                              " WHERE  NOT EXISTS (SELECT OrderTestID " & _
+                                                         " FROM twksWSOrderTests WHERE twksResultAlarms.OrderTestID = OrderTestID) "
 
                     Dim cmd As New SqlCommand
                     cmd = New SqlCommand
@@ -196,8 +201,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -220,9 +225,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM twksResultAlarms " & _
+                    '          " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & _
+                    '                                 " WHERE OrderID = '" & pOrderID & "') "
+
                     cmdText = " DELETE FROM twksResultAlarms " & _
-                              " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & _
-                                                     " WHERE OrderID = '" & pOrderID & "') "
+                              " WHERE  EXISTS (SELECT OrderTestID FROM twksOrderTests " & _
+                                                     " WHERE OrderID = '" & pOrderID & "' AND twksResultAlarms.OrderTestID = OrderTestID) "
 
                     Dim dbCmd As New SqlCommand
                     dbCmd.Connection = pDBConnection
@@ -235,8 +245,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteResultAlarmsByOrderID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteResultAlarmsByOrderID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -273,8 +283,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteResultAlarmsByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.DeleteResultAlarmsByOrderTestID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -319,8 +329,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

@@ -3,8 +3,6 @@ Option Explicit On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.App
 
@@ -41,20 +39,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIDAttr As String
         Private IsWashingStationUpAttr As Boolean = False
 #End Region
 
 #Region "Properties"
-        Public Property AnalyzerId() As String
-            Get
-                Return MyClass.AnalyzerIDAttr
-            End Get
-            Set(ByVal value As String)
-                MyClass.AnalyzerIDAttr = value
-            End Set
-        End Property
-
         Public Property IsWashingStationUp() As Boolean
             Get
                 Return MyClass.IsWashingStationUpAttr
@@ -77,7 +65,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <param name="pData">data received</param>
         ''' <remarks>Created by XBC 06/05/2011</remarks>
         Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles Me.ReceivedLastFwScriptEvent
-            Dim myGlobal As New GlobalDataTO
+            'Dim myGlobal As New GlobalDataTO
             Try
                 'manage special operations according to the screen characteristics
                 If pResponse = RESPONSE_TYPES.TIMEOUT Or _
@@ -123,8 +111,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -144,8 +132,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -155,7 +143,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public Function SendNEW_ROTOR() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myParams As New List(Of String)
+            'Dim myParams As New List(Of String)
             Try
 
                 CurrentOperation = OPERATIONS.NEW_ROTOR
@@ -167,8 +155,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -189,8 +177,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -224,8 +212,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        MyClass.RecommendationsList.Add(pRecommendationID)
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
         '    End Try
         'End Sub
 

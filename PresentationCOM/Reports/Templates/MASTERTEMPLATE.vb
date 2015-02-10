@@ -1,4 +1,5 @@
 Imports System.ComponentModel.Design
+Imports DevExpress.Charts.Native
 Imports DevExpress.XtraReports.UI
 
 Public Class MASTERTEMPLATE
@@ -10,11 +11,10 @@ Public Class MASTERTEMPLATE
             designer.Verbs.RemoveAt(1)
             designer.Verbs.RemoveAt(0)
 
-            designer.ActionLists.RemoveAt(4)
-            designer.ActionLists.RemoveAt(3)
-            designer.ActionLists.RemoveAt(2)
-            designer.ActionLists.RemoveAt(1)
-            designer.ActionLists.RemoveAt(0)
+            Dim numAct As Integer = designer.ActionLists.Count - 1
+            For i = numAct To 0 Step -1
+                designer.ActionLists.RemoveAt(i)
+            Next
 
             ' Obtain the TopMargin band and remove it from the report. 
             'Dim band As Band = Bands.GetBandByType(GetType(TopMarginBand))
@@ -36,7 +36,7 @@ Public Class MASTERTEMPLATE
 
 
 
-    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterControlPropertiesEventArgs) Handles Me.FilterControlProperties
+    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterComponentPropertiesEventArgs) Handles Me.FilterComponentProperties
 
         Try
             If e.Properties.Count > 0 Then

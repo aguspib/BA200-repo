@@ -25,7 +25,7 @@ Namespace Biosystems.Ax00.App
         ''' <param name="fwVersionAttribute"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity Implements IAnalyzerFactory.CreateAnalyzer
+        Public MustOverride Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerManager Implements IAnalyzerFactory.CreateAnalyzer
 
         ''' <summary>
         ''' 
@@ -34,7 +34,7 @@ Namespace Biosystems.Ax00.App
         ''' <param name="analyzerModel"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Sub LoadAnalyzerConfiguration(analyzer As IAnalyzerEntity)
+        Public Sub LoadAnalyzerConfiguration(analyzer As IAnalyzerManager)
 
             Dim myGlobal As New GlobalDataTO
             Dim myParametersDS As New ParametersDS

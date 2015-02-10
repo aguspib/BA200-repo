@@ -45,22 +45,22 @@ Partial Public Class AutomaticPatientsReport
         Me.XrTableCell2 = New DevExpress.XtraReports.UI.XRTableCell()
         Me.XrTableRow1 = New DevExpress.XtraReports.UI.XRTableRow()
         Me.XrTable1 = New DevExpress.XtraReports.UI.XRTable()
-        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand()
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
         CType(Me.ResultsDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XrTable1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
         '
         'Detail
         '
-        Me.Detail.HeightF = 1.041667!
+        Me.Detail.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTable1})
+        Me.Detail.HeightF = 25.0!
+        Me.Detail.KeepTogether = True
         Me.Detail.Name = "Detail"
         Me.Detail.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.Detail.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'TopMargin
         '
-        Me.TopMargin.HeightF = 59.0!
+        Me.TopMargin.HeightF = 96.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -95,7 +95,7 @@ Partial Public Class AutomaticPatientsReport
         'XrPanel2
         '
         Me.XrPanel2.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
-        Me.XrPanel2.BorderWidth = 1
+        Me.XrPanel2.BorderWidth = 1.0!
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelTest, Me.XrLabelRemarks, Me.XrLabelUnit, Me.XrLabelRefranges, Me.XrLabelConc, Me.XrLabelType, Me.XrLabelPatientID, Me.XrLabelDate})
         Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 45.62499!)
         Me.XrPanel2.Name = "XrPanel2"
@@ -332,7 +332,7 @@ Partial Public Class AutomaticPatientsReport
         'XrTableCell2
         '
         Me.XrTableCell2.CanGrow = False
-        Me.XrTableCell2.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleDetails.PatientID")})
+        Me.XrTableCell2.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleDetails.FullID")})
         Me.XrTableCell2.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrTableCell2.Name = "XrTableCell2"
         Me.XrTableCell2.StylePriority.UseFont = False
@@ -350,37 +350,23 @@ Partial Public Class AutomaticPatientsReport
         'XrTable1
         '
         Me.XrTable1.Font = New System.Drawing.Font("Times New Roman", 9.75!)
-        Me.XrTable1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
+        Me.XrTable1.LocationFloat = New DevExpress.Utils.PointFloat(0.0001192093!, 0.0!)
         Me.XrTable1.Name = "XrTable1"
         Me.XrTable1.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRow1})
         Me.XrTable1.SizeF = New System.Drawing.SizeF(708.9999!, 25.0!)
         Me.XrTable1.StylePriority.UseFont = False
         '
-        'Detail1
-        '
-        Me.Detail1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTable1})
-        Me.Detail1.HeightF = 25.0!
-        Me.Detail1.Name = "Detail1"
-        '
-        'DetailReport
-        '
-        Me.DetailReport.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail1})
-        Me.DetailReport.DataMember = "ReportSampleDetails"
-        Me.DetailReport.DataSource = Me.ResultsDS1
-        Me.DetailReport.Level = 0
-        Me.DetailReport.Name = "DetailReport"
-        '
         'AutomaticPatientsReport
         '
-        Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
+        Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1})
         Me.DataMember = "ReportSampleDetails"
         Me.DataSource = Me.ResultsDS1
         Me.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Italic)
-        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 96, 25)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
-        Me.Version = "10.2"
+        Me.Version = "14.2"
         CType(Me.ResultsDS1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.XrTable1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me, System.ComponentModel.ISupportInitialize).EndInit()
@@ -412,6 +398,4 @@ Partial Public Class AutomaticPatientsReport
     Friend WithEvents XrTableCell2 As DevExpress.XtraReports.UI.XRTableCell
     Friend WithEvents XrTableRow1 As DevExpress.XtraReports.UI.XRTableRow
     Friend WithEvents XrTable1 As DevExpress.XtraReports.UI.XRTable
-    Friend WithEvents Detail1 As DevExpress.XtraReports.UI.DetailBand
-    Friend WithEvents DetailReport As DevExpress.XtraReports.UI.DetailReportBand
 End Class

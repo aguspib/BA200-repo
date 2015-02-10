@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IDemoMode
+Partial Class UiDemoMode
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class IDemoMode
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IDemoMode))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiDemoMode))
         Me.BsDemoModeInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.BsInfoXPSViewer = New BsXPSViewer
         Me.BsDemoModeInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
@@ -281,7 +281,7 @@ Partial Class IDemoMode
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IDemoMode"
+        Me.Name = "UiDemoMode"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "DemoMode"
         Me.BsDemoModeInfoPanel.ResumeLayout(False)

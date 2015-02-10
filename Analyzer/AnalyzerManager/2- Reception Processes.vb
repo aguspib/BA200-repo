@@ -8,6 +8,9 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports System.Data
+Imports System.Data.SqlClient
+'Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports System.Threading    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
 Imports System.Windows.Forms
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
 Imports Biosystems.Ax00.CommunicationsSwFw
@@ -15,8 +18,8 @@ Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerEntity
-        Implements IAnalyzerEntity
+    Partial Public Class AnalyzerManager
+        Implements IAnalyzerManager
 
 #Region "Private Reception Methods"
 
@@ -32,33 +35,44 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
         ''' Creation: AG 16/04/2010
-        ''' Modified by: RH 30/06/2010
-        '''              AnalyzerIsReady depends on myRequestValue.
-        '''              Change "If myRequestValue = 1" by "If AnalyzerIsReady"
-        ''' AG 20/06/2012 - after connection establishment Sw has to wait until analyzer becomes ready to receive new instructions (Action = Ready)
-        ''' AG 19/11/2013 - call the method to process the last ANSPHR instruction received also in pause mode while barcode is scanning
-        ''' AG 28/11/2013 - #1397 changes into connection process in running (they are required for the recovery results in pause mode: after 1st STATUS after connection call STATE + POLLSN)
-        ''' AG 06/02/2014 - Fix issues numbers #1484
-        ''' XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
-        ''' AG 15/04/2014 - #1594 paused in v300
+        ''' Modified by: RH 30/06/2010 - AnalyzerIsReady depends on myRequestValue.
+        '''                            - Change "If myRequestValue = 1" by "If AnalyzerIsReady"
+        '''              AG 20/06/2012 - after connection establishment Sw has to wait until analyzer becomes ready to receive new instructions (Action = Ready)
+        '''              AG 19/11/2013 - call the method to process the last ANSPHR instruction received also in pause mode while barcode is scanning
+        '''              AG 28/11/2013 - #1397 changes into connection process in running (they are required for the recovery results in pause mode: after 1st STATUS after connection call STATE + POLLSN)
+        '''              AG 06/02/2014 - Fix issues numbers #1484
+        '''              XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
+        '''              AG 15/04/2014 - #1594 paused in v300
+        '''              XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
+        '''              XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''              XB 06/11/2014 - Implement Comms Timeout for RUNNING instruction - BA-1872
         ''' </remarks>
         Private Function ProcessStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
+
+                ' XB 30/09/2014 - BA-1872
+                If ISECMDLost Or RUNNINGLost Then
+                    'Deactivate waiting time control
+                    Debug.Print("Deactivate waiting time control ...")
+                    numRepetitionsSTATE = 0
+                    InitializeTimerSTATEControl(WAITING_TIME_OFF)
+                End If
+                ' XB 30/09/2014 - BA-1872
 
                 ' Get Status field (parameter index 3)
 
                 ' AG+XBC 24/05/2012
                 'Dim myStatusValue As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
-                Dim myStatusValue As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
+                Dim myStatusValue As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
                 ' AG+XBC 24/05/2012
 
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -66,24 +80,24 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myStatusValue = DirectCast(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.AnalyzerManagerStatus)
-                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And myStatusValue = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                    myStatusValue = DirectCast(CInt(myInstParamTO.ParameterValue), AnalyzerManagerStatus)
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And myStatusValue = AnalyzerManagerStatus.STANDBY Then
                         ExecuteSpecialBusinessOnAnalyzerStatusChanges(Nothing, myStatusValue) 'AG 29/06/2011
                     End If
 
-                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then GlobalConstants.AnalyzerIsRunningFlag = True Else GlobalConstants.AnalyzerIsRunningFlag = False 'AG + DL 24/01/2012
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then GlobalConstants.AnalyzerIsRunningFlag = True Else GlobalConstants.AnalyzerIsRunningFlag = False 'AG + DL 24/01/2012
 
                     'AnalyzerStatusAttribute = myStatusValue 'AG 01/06/2010 - Inform the class attribute value
                     If AnalyzerStatusAttribute <> myStatusValue Then
                         AnalyzerStatusAttribute = myStatusValue 'AG 01/06/2010 - Inform the class attribute value
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ANALYZER_STATUS_CHANGED, 1, True) 'Prepare UI refresh event when analyzer status changes
+                        UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_STATUS_CHANGED, 1, True) 'Prepare UI refresh event when analyzer status changes
                     End If
 
                 End If
 
                 ' Get Action field (parameter index 4)
-                Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                Dim myActionValue As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.NO_ACTION
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -91,31 +105,31 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myActionValue = DirectCast(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.AnalyzerManagerAx00Actions)
+                    myActionValue = DirectCast(CInt(myInstParamTO.ParameterValue), AnalyzerManagerAx00Actions)
                     AnalyzerCurrentActionAttribute = myActionValue 'AG 01/06/2010 - Inform the class attribute value
 
                     'Evaluate the Action code value (in all analyzer status)
-                    If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.SOUND_DONE Then 'AG 26/10/2011 - Sound Alarm
+                    If myActionValue = AnalyzerManagerAx00Actions.SOUND_DONE Then 'AG 26/10/2011 - Sound Alarm
                         'Change the status of AnalyzerIsRingingAttribute (TRUE --> FALSE, FALSE --> TRUE)
                         'Except when connection ... always FALSE in this case
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
                             AnalyzerIsRingingAttribute = False
                         Else
                             AnalyzerIsRingingAttribute = Not AnalyzerIsRingingAttribute
                         End If
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ANALYZER_SOUND_CHANGED, CSng(IIf(AnalyzerIsRingingAttribute, 1, 0)), True)
+                        UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_SOUND_CHANGED, CSng(IIf(AnalyzerIsRingingAttribute, 1, 0)), True)
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then 'AG 05/12/2011 - Remember the ENDRUN instruction has been sent and do not send it again
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.END_RUN_START Then 'AG 05/12/2011 - Remember the ENDRUN instruction has been sent and do not send it again
                         endRunAlreadySentFlagAttribute = True
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_END Then
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.END_RUN_END Then
                         endRunAlreadySentFlagAttribute = False
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START Then 'AG 16/12/2011 - Remember the ABORT instruction has been sent and do not send it again
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.ABORT_START Then 'AG 16/12/2011 - Remember the ABORT instruction has been sent and do not send it again
                         abortAlreadySentFlagAttribute = True
                         endRunAlreadySentFlagAttribute = True 'AG 10/12/2012
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_END Then
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.ABORT_END Then
                         PauseAlreadySentFlagAttribute = False ' XB 15/10/2013 - BT #1318
 
                         'PAUSED (comment these 2 lines) - AG 20/03/2014 - #1547 do not reset these flags here, do it once the StanBy instruction is sent and accepted!!!
@@ -123,19 +137,19 @@ Namespace Biosystems.Ax00.Core.Entities
                         endRunAlreadySentFlagAttribute = False 'AG 10/12/2012
 
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_START Then ' XB 15/10/2013 - Remember the PAUSE instruction has been sent and do not send it again - BT #1318
-                        If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString), "", False) <> 0 Then 'TR 21/10/2013 -Bug #1339
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.PAUSE_START Then ' XB 15/10/2013 - Remember the PAUSE instruction has been sent and do not send it again - BT #1318
+                        If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "", False) <> 0 Then 'TR 21/10/2013 -Bug #1339
                             PauseAlreadySentFlagAttribute = True
                         End If
 
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_END Then ' XB 15/10/2013 - BT #1318
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.PAUSE_END Then ' XB 15/10/2013 - BT #1318
                         PauseAlreadySentFlagAttribute = False
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START Then
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START Then
                         recoverAlreadySentFlagAttribute = True
 
-                    ElseIf myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_END Then
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_END Then
                         recoverAlreadySentFlagAttribute = False
                         myGlobal = RemoveErrorCodeAlarms(Nothing, myActionValue)
 
@@ -147,29 +161,19 @@ Namespace Biosystems.Ax00.Core.Entities
                             'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'SGM 10/05/2011 - 1 True, 0 False
                         End If
 
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished
+                        UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished
 
                     End If
-
-
-                    'SGM 7/06/2012 ISE Start Timeout Managing
-                    If myActionValue = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                        'If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
-                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
-                        ISEAnalyzer.StopInstructionStartedTimer()
-                        'End If
-                    End If
-                    'SGM 7/06/2012
 
                     ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
-                        If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.COMMAND_START Or _
-                           myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.COMMAND_END Then
+                        If myActionValue = AnalyzerManagerAx00Actions.COMMAND_START Or _
+                           myActionValue = AnalyzerManagerAx00Actions.COMMAND_END Then
 
-                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                            MyClass.ClearStartTaskQueueToSend()
+                            InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                            ClearStartTaskQueueToSend()
 
                         End If
 
@@ -180,7 +184,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'AG 25/10/2010 - Get Time field (parameter index 5)
                 Dim myExpectedTime As Integer = WAITING_TIME_OFF 'If no request .... get the estimated time and activate the waiting timer
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -199,7 +203,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' Get Well field (parameter index 7)
                 Dim myWellValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -215,7 +219,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' Get Request field (parameter index 8)
                 Dim myRequestValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -230,16 +234,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'AG 25/10/2010 - Depending the status and action use Request or not
                 useRequestFlag = False
-                If myStatusValue = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                If myStatusValue = AnalyzerManagerStatus.RUNNING Then
                     'AG 16/04/2014 - #1594 add SOUND DONE to the action codes that will use R in order to evaluate if analyzer is ready or not!! - paused in v300
                     'AnalyzerIsReadyAttribute = (myRequestValue = 1) '1 Ax00 is ready to work, 0 Ax00 is busy (for use only in RUNNING mode)
-                    If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.TEST_PREPARATION_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.PREDILUTED_TEST_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.ISE_TEST_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.SKIP_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.WASHING_RUN_END Or _
-                       myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.LOADADJ_END Then
+                    If myActionValue = AnalyzerManagerAx00Actions.START_INSTRUCTION_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.TEST_PREPARATION_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.PREDILUTED_TEST_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.ISE_TEST_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.SKIP_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.WASHING_RUN_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.LOADADJ_END Then
 
                         useRequestFlag = True
                     End If
@@ -260,7 +264,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'AG 03/09/2012 - If connection analyzer always ready to receive new instructions
-                If AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE Then
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
                     AnalyzerIsReadyAttribute = True
                 End If
                 'AG 03/09/2012
@@ -269,10 +273,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT
 
                     'AG 13/02/2012 - In Running activate always the waiting time
-                ElseIf AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     'AG 21/03/2012 - exception when the abort instruction has started. In this case take into account the TIME received
                     'myExpectedTime = WAITING_TIME_DEFAULT
-                    If myActionValue <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START Then
+                    If myActionValue <> AnalyzerManagerAx00Actions.ABORT_START Then
                         myExpectedTime = WAITING_TIME_DEFAULT
                     End If
                     'AG 21/03/2012 /'AG 13/02/2012/
@@ -284,7 +288,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' Get Error field (parameter index 9)
                 Dim errorValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -297,15 +301,177 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
 
-                ''AG 16/01/2015 BA-2170 NEXT CODE MUST be commented!! Activate it only for simulate an analyzer with some persistent error code
-                'If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso errorValue = 0 Then
-                '    errorValue = 302 'Problem with the fridge
-                'End If
-                ''AG 16/01/2015
+                ' XB 26/09/2014 - BA-1872
+                If errorValue <> 61 Then
+                    If ISECMDLost Then
+                        ISECMDLost = False
+
+                        If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                            sendingRepetitions = True
+                            numRepetitionsTimeout += 1
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                waitingStartTaskTimer.Enabled = False
+                                sendingRepetitions = False
+
+                                ' Activates Alarm begin
+                                Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                Dim alarmStatus As Boolean = False
+                                Dim myAlarmList As New List(Of Alarms)
+                                Dim myAlarmStatusList As New List(Of Boolean)
+
+                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmStatus = True
+                                ISEAnalyzer.IsTimeOut = True
+
+                                PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                If myAlarmList.Count > 0 Then
+                                    ' Note that this alarm is common on User and Service !
+                                    myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                End If
+                                ' Activates Alarm end
+
+                                RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                            Else
+                                ' Instruction has not started by Fw, so is need to send it again
+                                GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                myGlobal = SendStartTaskinQueue()
+                            End If
+                        End If
+
+                    End If
+
+                    If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
+                        'ISE_Manager.StopInstructionStartedTimer()
+
+                        ' Update the interval of the Timer with the expected time received from the Analyzer
+                        If myExpectedTimeRaw <= 0 Then
+                            If Not SetTimeISEOffsetFirstTime Then
+                                SetTimeISEOffsetFirstTime = True
+                                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
+                                InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                            End If
+                        Else
+                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                            InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                        End If
+                    End If
+
+                End If
+                ' XB 26/09/2014 - BA-1872
+
+                ' XB 06/11/2014 - BA-1872
+                If RUNNINGLost Then
+                    RUNNINGLost = False
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                        If (mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) = "INPROCESS") AndAlso _
+                             (mySessionFlags(AnalyzerManagerFlags.EnterRunning.ToString) = "INI") Then
+                            myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
+                            AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END
+                        End If
+                    End If
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_END Then
+                        sendingRepetitions = True
+                        numRepetitionsTimeout += 1
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                            GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            waitingStartTaskTimer.Enabled = False
+                            sendingRepetitions = False
+
+                            ' Activates Alarm begin
+                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                            Dim alarmStatus As Boolean = False
+                            Dim myAlarmList As New List(Of Alarms)
+                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                            alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                            alarmStatus = True
+                            ISEAnalyzer.IsTimeOut = True
+
+                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                            If myAlarmList.Count > 0 Then
+                                ' Note that this alarm is common on User and Service !
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+                            ' Activates Alarm end
+
+                            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                            'Update internal flags. Basically used by the running normal business
+                            If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                'Update analyzer session flags into DataBase
+                                If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                    myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                End If
+                            End If
+
+                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                        Else
+                            ' Instruction has not started by Fw, so is need to send it again
+                            GlobalBase.CreateLogActivity("Repeat RUNNING Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = SendStartTaskinQueue()
+                        End If
+                    End If
+
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_START Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    ' Update the interval of the Timer with the expected time received from the Analyzer
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
+                    InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                    StartingRunningFirstTime = True
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Or _
+                   AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                    If StartingRunningFirstTime Then
+                        StartingRunningFirstTime = False
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
+                        RUNNINGLost = False
+                        sendingRepetitions = False
+                        InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                        ClearStartTaskQueueToSend()
+
+                        ' Deactivates Alarm begin - BA-1872
+                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim alarmStatus As Boolean = False
+                        Dim myAlarmList As New List(Of Alarms)
+                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                        alarmStatus = False
+
+                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+
+                        'Finally call manage all alarms detected (new or solved)
+                        If myAlarmList.Count > 0 Then
+                            If GlobalBase.IsServiceAssembly Then
+                                ' Not Apply
+                            Else
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+
+                        End If
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
+                    End If
+                End If
+                ' XB 06/11/2014 - BA-1872
+
 
                 'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 Dim ISEAvailableValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -324,9 +490,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
-                    MyClass.IsInstructionRejected = False
-                    MyClass.IsRecoverFailed = False 'SGM 07/11/2012
-                    MyClass.IsInstructionAborted = False 'SGM 19/11/2012
+                    IsInstructionRejected = False
+                    IsRecoverFailed = False 'SGM 07/11/2012
+                    IsInstructionAborted = False 'SGM 19/11/2012
                 End If
 
                 If errorValue <> 0 Then
@@ -350,7 +516,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'Debug.Print(" ERROR 99 Received !")
 
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.ALR)
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
                             '' XB 30/04/2014 - PENDING TO IMPLEMENT !!!!!!!!!!!! + REMEMBER COMMENT THE PREVIOUS LINE !!! - Task #1615
 
                             'Dim updateISEConsumptionFlag As Boolean = False
@@ -379,11 +545,11 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else 'If single error code then treat it!!
 
                             'Translation method
-                            Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
+                            Dim myAlarmsReceivedList As New List(Of Alarms)
                             Dim myAlarmsStatusList As New List(Of Boolean)
                             Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
 
-                            Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+                            Dim myAlarms As New List(Of Alarms)
                             Dim myErrorCode As New List(Of Integer)
                             ' XBC 16/10/2012
                             Dim myFwCodeErrorReceivedList As New List(Of String)
@@ -397,24 +563,93 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If GlobalBase.IsServiceAssembly Then
                                 If Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
-                                    MyClass.IsServiceRotorMissingInformed = False
+                                    IsServiceRotorMissingInformed = False
                                 End If
                             End If
 
                             'SGM 02/07/2012
                             If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
-                                If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
-                                    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
 
-                                    'SGM 18/09/2012
-                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                    If GlobalBase.IsServiceAssembly Then
-                                        ISEAnalyzer.IsISESwitchON = False
+                                ' XB 26/09/2014 - BA-1872
+                                If ISEAnalyzer IsNot Nothing Then
+                                    If Not ISEAnalyzer.IsISEModuleInstalled Then
+                                        ' If ISE module isn't Installed remove the ISE Timeout Alarm
+                                        Debug.Print("ISE Module NOT installed !")
+                                        myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+
+                                        If GlobalBase.IsServiceAssembly Then
+                                            ' Only Sw Service
+                                            If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                                myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                                                ISEAnalyzer.IsISESwitchON = False
+                                            End If
+
+                                        End If
+                                    Else
+
+                                        sendingRepetitions = True
+                                        numRepetitionsTimeout += 1
+                                        'Dim myLogAcciones As New ApplicationLogManager()
+                                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                            GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                            waitingStartTaskTimer.Enabled = False
+                                            sendingRepetitions = False
+
+                                            ' Activates Alarm begin
+                                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                            Dim alarmStatus As Boolean = False
+                                            Dim myAlarmList As New List(Of Alarms)
+                                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                                            alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                            alarmStatus = True
+                                            ISEAnalyzer.IsTimeOut = True
+
+                                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                            If myAlarmList.Count > 0 Then
+                                                ' Note that this alarm is common on User and Service !
+                                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            End If
+                                            ' Activates Alarm end
+
+                                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                        Else
+                                            If myStartTaskInstructionsQueue.Count > 0 Then
+                                                Debug.Print("Deactivate waiting time control (2) ...")
+                                                numRepetitionsSTATE = 0
+                                                InitializeTimerSTATEControl(WAITING_TIME_OFF)
+
+                                                GlobalBase.CreateLogActivity("Waiting because error 61 [" & WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                                Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
+                                                While myDateTime > DateTime.Now
+                                                    ' spending time ...
+                                                End While
+                                                GlobalBase.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+
+                                                ' Instruction has not started by Fw, so is need to send it again
+                                                GlobalBase.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                                myGlobal = SendStartTaskinQueue()
+                                            End If
+
+                                        End If
+
                                     End If
-
                                 End If
-                                myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+
+                                'If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                '    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+
+                                '    'SGM 18/09/2012
+                                '    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                '    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                                '    If GlobalBase.IsServiceAssembly Then
+                                '        ISE_Manager.IsISESwitchON = False
+                                '    End If
+
+                                'End If
+                                'myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                                ' XB 26/09/2014 - BA-1872
+
                             End If
                             'end SGM 02/07/2012
 
@@ -465,7 +700,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else 'if not new alarms sure the ansinfo instruction is activated
                                 'AG 31/08/2012 - condition incomplete. When Analyzer is enter in running sw has not to sent the INFO STR instruction 
                                 'If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
+                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
 
                                     ' XB 03/04/2014
                                     Dim updateISEConsumptionFlag As Boolean = False
@@ -480,10 +715,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                     'AG 12/04/2012 - New Fw disables info when analyzer leaves running, so Sw has to activate info when standby end
-                                    If Not updateISEConsumptionFlag AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) <> "INPROCESS" Then
+                                    If Not updateISEConsumptionFlag AndAlso mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) <> "INPROCESS" Then
                                         ' XB 03/04/2014
 
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
                                         'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
                                         If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
 
@@ -547,16 +782,16 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Do business depending the requestvalue, action value, status value, alarms value,....
                 '-------------------------------------------------------------------------------------                
                 'If action say us CONNECTION_ESTABLISHMENT update internal flags
-                If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE Then
+                If myActionValue = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
 
                     'force to STANDBY_END when connection stablished SGM 14/11/2011
                     'If myApplicationName.ToUpper.Contains("SERVICE") Then SGM 22/10/2012
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly AndAlso errorValue = 0 Then
-                        MyClass.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
-                        RaiseEvent ReceptionEvent(CInt(GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE).ToString, True, myUI_RefreshEvent, myUI_RefreshDS, True)
-                        If Not MyClass.IsFwUpdateInProcess Then MyClass.InfoRefreshFirstTime = True 'SGM 16/11/2012
+                        InstructionTypeReceived = AnalyzerManagerSwActionList.STATUS_RECEIVED
+                        RaiseEvent ReceptionEvent(CInt(AnalyzerManagerAx00Actions.CONNECTION_DONE).ToString, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                        If Not IsFwUpdateInProcess Then InfoRefreshFirstTime = True 'SGM 16/11/2012
                     End If
 
                     'When successfully inform the connection results
@@ -573,17 +808,17 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 29/06/2011 - comment this IF (AG 03/11/2010)
                     'If AnalyzerIsReadyAttribute = True Then
                     Select Case myStatusValue
-                        Case GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
+                        Case AnalyzerManagerStatus.SLEEPING
                             'AG 20/06/2012
                             'myGlobal = Me.ManageSleepStatus(myActionValue)
                             Dim resetFlags As Boolean = True
-                            If Not mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
-                               Not AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (STANDBY)
+                            If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
+                               Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (STANDBY)
                                 myGlobal = Me.ManageSleepStatus(myActionValue)
                             End If
 
                             If myActionValue = AnalyzerManagerAx00Actions.STANDBY_START OrElse myActionValue = AnalyzerManagerAx00Actions.SLEEP_END _
-                            OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" Then
+                            OrElse mySessionFlags(AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" Then
                                 resetFlags = False
                             End If
 
@@ -595,13 +830,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             'AG 20/06/2012
 
-                        Case GlobalEnumerates.AnalyzerManagerStatus.STANDBY
-                            If Not mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
-                               Not AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (STANDBY)
+                        Case AnalyzerManagerStatus.STANDBY
+                            If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
+                               Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (STANDBY)
                                 myGlobal = Me.ManageStandByStatus(myActionValue, myWellValue)
                             End If
 
-                        Case GlobalEnumerates.AnalyzerManagerStatus.RUNNING
+                        Case AnalyzerManagerStatus.RUNNING
                             'PAUSED (uncomment these 4 lines) AG 20/03/2014 - #1547 Once the Standby instruction has been accepted reset these two flags
                             'If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START Then
                             '    abortAlreadySentFlagAttribute = False
@@ -609,8 +844,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             'End If
                             'AG 20/03/2014 - #1547
 
-                            If Not mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
-                               Not AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (RUNNING)
+                            If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
+                               Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (RUNNING)
                                 myGlobal = Me.ManageRunningStatus(myActionValue, myWellValue)
 
                                 If myRequestValue = 1 Then StartTime = Now 'AG 28/06/2012 - time estimation
@@ -623,28 +858,28 @@ Namespace Biosystems.Ax00.Core.Entities
                     '                (status = RUNNING) Sound OFF + no more changes (until spec how to know the analyzerID)
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
                     'IF clause (priority 1)
-                    If AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONNECTION_DONE AndAlso _
-                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                    If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE AndAlso _
+                        mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
 
                         'AG 20/06/2012 - Different connect business when analyzer status <> Running and when is running
-                        If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                        If AnalyzerStatusAttribute <> AnalyzerManagerStatus.RUNNING Then
                             ' XBC 02/08/2012 - initialize ReportSATonRUNNING
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
 
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status (and waits unitl analyzer becomes ready)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status (and waits unitl analyzer becomes ready)
                         Else
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
 
                             ' XBC 02/08/2012 - when Connecting on RUNNING Session we must ask for Serial Number (POLLSN) 
                             'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True) 'Send SOUND OFF instruction
 
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
                             endRunAlreadySentFlagAttribute = True 'AG 25/09/2012 - When resultsrecover process starts the Fw implements an automatic END, so add protection in order Sw do not sent this instruction again
 
                             'AG 28/11/2013 - BT #1397 (in running Sw has to know if analyzer is in normal or paused running before call POLLSN so we has to send STATE instruction)
                             'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Send STATE instruction
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Send STATE instruction
 
                             ' XBC 02/08/2012 
 
@@ -656,25 +891,25 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         'IF clause (priority 2)
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
-                           mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" Then
+                    ElseIf mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
+                           mySessionFlags(AnalyzerManagerFlags.WaitForAnalyzerReady.ToString) = "INI" Then
 
                         'SGM 21/06/2012 - Protection!! INFO will be activated later, on POLLFW answer reception
                         If myStatusValue = AnalyzerManagerStatus.STANDBY Then
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
-                            System.Threading.Thread.Sleep(1000)
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
+                            Thread.Sleep(1000)
                         End If
 
                         'AG 14/09/2012 - Final code apply Fw >= 0.7.1
                         'AG 21/06/2012 - Leave commented until new Fw returns action = 0 when ready (now it remembers the last action process)
-                        If AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
+                        If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.NO_ACTION Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
 
                             'Continue with the connection process instructions flow
                             ' XBC 05/06/2012 - include POLLFW request before READADJ
                             'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, GlobalEnumerates.Ax00Adjustsments.ALL)
                             If myStatusValue <> AnalyzerManagerStatus.RUNNING Then
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLFW, True, Nothing, GlobalEnumerates.POLL_IDs.CPU)
+                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.POLLFW, True, Nothing, POLL_IDs.CPU)
                             End If
                             ' XBC 05/06/2012
 
@@ -690,24 +925,24 @@ Namespace Biosystems.Ax00.Core.Entities
                         'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLFW, True, Nothing, GlobalEnumerates.POLL_IDs.CPU)
                         'AG 21/06/2012
 
-                    ElseIf AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.CONFIG_DONE AndAlso _
-                            mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                    ElseIf AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONFIG_DONE AndAlso _
+                            mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
                         'Send SOUND OFF instruction
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True)
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDSOUND, True)
                         If Not myGlobal.HasError AndAlso ConnectedAttribute Then
                             SetAnalyzerNotReady()
                         End If
 
-                    ElseIf AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.SOUND_DONE AndAlso _
-                            mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
-                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'Inform connection finished OK
+                    ElseIf AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.SOUND_DONE AndAlso _
+                            mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
+                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'Inform connection finished OK
 
                         'AG 04/09/2012 - when recovery results finished, Sw call the processConnection method for execute the full connection
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
+                        If mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
                             AppLayer.RecoveryResultsInPause = False 'AG 28/11/2013 - BT #1397
-                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
+                            UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
                             ManageStandByStatus(AnalyzerManagerAx00Actions.STANDBY_END, CurrentWellAttribute) 'Call this method with this action code to update ISE consumption if needed
 
                             'AG 17/09/2012 - Activate final code for v052. Temporally commented for setup 051
@@ -722,7 +957,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'AG 25/09/2012 - Once the connection process after recovery results has finished. If analyzer is freeze then send the SOUND ON
                             'We have to do it now because the normal connection finishes is when action SOUND_DONE is received
                             If analyzerFREEZEFlagAttribute Then
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
+                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
                                 If Not myGlobal.HasError AndAlso ConnectedAttribute Then
                                     SetAnalyzerNotReady()
                                 End If
@@ -735,7 +970,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not myGlobal.HasError Then
                             Dim adjustValue As String = ""
                             Dim iseInstalledFlag As Boolean = False
-                            adjustValue = ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.ISEINS)
+                            adjustValue = ReadAdjustValue(Ax00Adjustsments.ISEINS)
                             If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
                                 iseInstalledFlag = CType(adjustValue, Boolean)
                                 If Not iseInstalledFlag Then
@@ -750,7 +985,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             AnalyzerIsInfoActivatedAttribute = 0
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
                         End If
                         'AG 29/03/2012
 
@@ -758,9 +993,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         myGlobal = ManageInterruptedProcess(Nothing) 'AG 20/06/2012 - Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
 
                         'AG 28/11/2013 - BT #1397
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso Not runningConnectionPollSnSent AndAlso _
-                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
+                    ElseIf mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso Not runningConnectionPollSnSent AndAlso _
+                        mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
                         'AG 28/11/2013
 
                     End If
@@ -775,7 +1010,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
 
-                If myStatusValue = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                If myStatusValue = AnalyzerManagerStatus.SLEEPING Then
 
                     ' XBC 24/05/2012
                     If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.IsISEModuleInstalled Then
@@ -788,7 +1023,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If IsShutDownRequested Then
                         ConnectedAttribute = False
                         InfoRefreshFirstTime = True
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'SGM 10/05/2011 - 1 True, 0 False
+                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'SGM 10/05/2011 - 1 True, 0 False
                     End If
                 End If
 
@@ -865,8 +1100,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     processingLastANSPHRInstructionFlag = True
                                     wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
                                 Else
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
                                 End If
                                 'AG 02/06/2014 - #1644
                             End If
@@ -877,8 +1112,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Treat STATUS received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Treat STATUS received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
                 End If
                 'AG 28/06/2012
 
@@ -887,8 +1122,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -945,8 +1180,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 'processingLastANSPHRInstructionFlag = True
                 'wellBaseLineWorker.RunWorkerAsync(pInstructionReceived)
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity("Treat ANSPHR received. Launch parallel trheat: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Information, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity("Treat ANSPHR received. Launch parallel trheat: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Information, False)
 
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
@@ -961,8 +1196,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     '    wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
                     'End If
 
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Treat ANSPHR (Add to buffer) received. Buffer items: " & bufferANSPHRReceived.Count.ToString & ". Time: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Treat ANSPHR (Add to buffer) received. Buffer items: " & bufferANSPHRReceived.Count.ToString & ". Time: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Information, False)
                 End SyncLock
 
                 'AG 28/06/2012
@@ -971,8 +1206,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -993,7 +1228,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ProcessBaseLineReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Dim myGlobalDataTO As New GlobalDataTO
 
 
@@ -1002,7 +1237,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
                 If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Business
 
@@ -1015,7 +1250,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim query As New List(Of InstructionParameterTO)
                         'Const myRowIndex As Integer = 0
                         Dim myOffset As Integer = -1
-                        Dim myUtility As New Utilities()
+                        'Dim Utilities As New Utilities()
                         Dim nextBaseLineID As Integer = 0
                         Dim myInstructionType As String = ""
                         Dim myWell As Integer = 0
@@ -1023,11 +1258,11 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim baseLineWithAdjust As Boolean = False
 
                         'AG 03/01/2011 - Get the instruction type value. to set the offset.
-                        myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 2)
+                        myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
 
                         If Not myGlobalDataTO.HasError Then
                             myInstructionType = DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue
-                            If myInstructionType = GlobalEnumerates.AppLayerInstrucionReception.ANSBLD.ToString Then baseLineWithAdjust = True
+                            If myInstructionType = AppLayerInstrucionReception.ANSBLD.ToString Then baseLineWithAdjust = True
                         Else
                             Exit Try
                         End If
@@ -1072,11 +1307,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myBaseLineRow.WellUsed = myWell
                                 myBaseLineRow.WorkSessionID = Me.WorkSessionIDAttribute
                                 myBaseLineRow.AnalyzerID = Me.AnalyzerIDAttribute
-                                myBaseLineRow.Type = GlobalEnumerates.BaseLineType.STATIC.ToString 'AG 28/10/2014 BA-2057
+                                myBaseLineRow.Type = BaseLineType.STATIC.ToString 'AG 28/10/2014 BA-2057
                                 myBaseLineRow.DateTime = DateTime.Now
 
                                 'Get the Wavelenght
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     myBaseLineRow.Wavelength = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
                                 Else
@@ -1084,7 +1319,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'MainLine
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1094,7 +1329,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'RefLight
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1104,7 +1339,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'MainDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1114,7 +1349,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'RefDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1124,7 +1359,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'IT
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.IT = CType(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -1134,7 +1369,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Exit For
                                 End If
                                 'DAC
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.DAC = CType(DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -1169,8 +1404,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR  ... now 
                                     'we have to calculate his status = TRUE or FALSE
                                     Dim alarmStatus As Boolean = False 'By default no alarm
-                                    Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                                    myAlarm = CType(myGlobalDataTO.SetDatos, GlobalEnumerates.Alarms)
+                                    Dim myAlarm As Alarms = GlobalEnumerates.Alarms.NONE
+                                    myAlarm = CType(myGlobalDataTO.SetDatos, Alarms)
                                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then
                                         'AG 27/11/2014 BA-2144
                                         'alarmStatus = True
@@ -1199,7 +1434,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                                     End If
 
-                                    Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+                                    Dim AlarmList As New List(Of Alarms)
                                     Dim AlarmStatusList As New List(Of Boolean)
 
                                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then
@@ -1230,18 +1465,18 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                                             If (validALIGHTAttribute) Then
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "END")
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "END")
                                             Else
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "CANCELED")
                                             End If
 
-                                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                                            If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
                                                 ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
 
-                                            ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
+                                            ElseIf mySessionFlags(AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
 
-                                            ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
+                                            ElseIf mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                                                 RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2143
                                             End If
 
@@ -1267,8 +1502,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBaseLineReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBaseLineReceived", EventLogEntryType.Error, False)
             End Try
 
             'We have used Exit Try so we have to sure the connection becomes properly closed here
@@ -1293,10 +1528,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInstructionReceived"></param>
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
-        ''' Creation: AG 14/03/2011
+        ''' Created by:  AG 14/03/2011
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
         ''' </remarks>
         Private Function ProcessHwAlarmDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -1308,18 +1545,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 '    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
 
                 '    If (Not dbConnection Is Nothing) Then
-                Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmsReceivedList As New List(Of Alarms)
                 Dim myAlarmsStatusList As New List(Of Boolean)
                 Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
 
                 '1- Read the different instruction fields (implement in the same way as we do for instance at ProcessStatusReceived)
                 '   and fill the internal alarm & alarm status lists using the method PrepareLocalAlarmList 
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 ' Get error number field
                 Dim errorNumber As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1327,17 +1564,17 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    errorNumber = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    errorNumber = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 Dim errorCode As Integer = 0
                 'Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                 'Dim alarmStatus As Boolean = False
-                Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarms As New List(Of Alarms)
                 Dim myErrorCode As New List(Of Integer)
 
                 For i As Integer = 1 To errorNumber
-                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3 + i)
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3 + i)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Else
@@ -1345,7 +1582,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        errorCode = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                        errorCode = CInt(myInstParamTO.ParameterValue)
 
                         'SGM 16/10/2012 - Ommit these alarms in order to avoid endless loop
                         'E:20 (INST_REJECTED_ERR)
@@ -1397,7 +1634,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     If Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
-                        MyClass.IsServiceRotorMissingInformed = False
+                        IsServiceRotorMissingInformed = False
                     End If
                 End If
                 'end SGM 09/11/2012
@@ -1407,7 +1644,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim errorCodeID As String = ""
                 'AG 04/12/2014 BA-2236
 
-                For Each alarmID As GlobalEnumerates.Alarms In myAlarms
+                For Each alarmID As Alarms In myAlarms
                     'AG 04/12/2014 BA-2236 - Method 
                     'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
                     errorCodeID = ""
@@ -1463,8 +1700,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwAlarmDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwAlarmDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             'We have used Exit Try so we have to sure the connection becomes properly closed here
@@ -1510,10 +1747,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
@@ -1522,7 +1759,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '*******************************************************'
                 'Get Instruction field (parameter index 2)
                 Dim myInst As String = String.Empty
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 2)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1532,7 +1769,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get Preparation Identifier field (ID, parameter index 3)
                 Dim myPrepID As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1544,7 +1781,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get Well Number field (W, parameter index 4)
                 Dim myWell As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1556,7 +1793,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get Well Status field (S, parameter index 5)
                 Dim myWellStatus As String = ""
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1566,7 +1803,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get Bottle Position  field (P, parameter index 6)
                 Dim myBottlePos As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1578,7 +1815,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get Level Control field (L, parameter index 7)
                 Dim myLevelControl As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1590,11 +1827,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Dim myClotStatus As String = ""
                 Dim myRotorName As String = "REAGENTS"
-                If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then
+                If (myInst = AppLayerInstrucionReception.ANSBM1.ToString) Then
                     myRotorName = "SAMPLES"
 
                     'Get Clot Status field (C, parameter index 8)
-                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Else
@@ -1621,30 +1858,30 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Prepare UIRefresh Dataset (NEW_WELLSTATUS_RECEIVED) for refresh screen when needed
                 If (Not myGlobal.HasError AndAlso myPrepID > 0) Then
                     Dim reactionsDS As ReactionsRotorDS = DirectCast(myGlobal.SetDatos, ReactionsRotorDS)
-                    uiRefreshMyGlobal = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, reactionsDS, True)
+                    uiRefreshMyGlobal = PrepareUIRefreshEventNum3(dbConnection, UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, reactionsDS, True)
                 End If
 
                 'Prepare internal variables for Alarms Management
                 Dim alarmStatusList As New List(Of Boolean)
                 Dim alarmAdditionalInfoList As New List(Of String)
-                Dim alarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim alarmList As New List(Of Alarms)
 
                 Dim reagentNumberWithNoVolume As Integer = 0 'NOTE: 0=Sample, 1=Reagent1, 2=Reagent2
-                Dim alarmLevelDetectionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                Dim alarmCollisionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmLevelDetectionEnum As Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmCollisionEnum As Alarms = GlobalEnumerates.Alarms.NONE
 
                 Select Case (myInst)
-                    Case GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString
+                    Case AppLayerInstrucionReception.ANSBR1.ToString
                         alarmLevelDetectionEnum = GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN
                         alarmCollisionEnum = GlobalEnumerates.Alarms.R1_COLLISION_WARN
                         reagentNumberWithNoVolume = 1
 
-                    Case GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString
+                    Case AppLayerInstrucionReception.ANSBR2.ToString
                         alarmLevelDetectionEnum = GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN
                         alarmCollisionEnum = GlobalEnumerates.Alarms.R2_COLLISION_WARN
                         reagentNumberWithNoVolume = 2
 
-                    Case GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString
+                    Case AppLayerInstrucionReception.ANSBM1.ToString
                         alarmLevelDetectionEnum = GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
                         alarmCollisionEnum = GlobalEnumerates.Alarms.S_COLLISION_WARN
                         reagentNumberWithNoVolume = 0
@@ -1652,7 +1889,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End Select
 
                 'BT #1385 ==> Decrement the Number of Tests using the Position for Sample or Reagent2 or Arm R2 Washing
-                If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString OrElse myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString) Then
+                If (myInst = AppLayerInstrucionReception.ANSBM1.ToString OrElse myInst = AppLayerInstrucionReception.ANSBR2.ToString) Then
                     Dim inProcessDlg As New WSRotorPositionsInProcessDelegate
                     myGlobal = inProcessDlg.DecrementInProcessTestsNumber(dbConnection, AnalyzerIDAttribute, myRotorName, myBottlePos)
                 End If
@@ -1685,9 +1922,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim realVolume As Single = 0
 
                 'If Reagent1 or WashingSolution or Predilution or Sample or ISE or Reagent2 dispensed
-                If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R1.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.WS.ToString Or _
-                    myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.PD.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.S1.ToString Or _
-                    myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.DI.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R2.ToString) Then
+                If (myWellStatus = Ax00ArmWellStatusValues.R1.ToString Or myWellStatus = Ax00ArmWellStatusValues.WS.ToString Or _
+                    myWellStatus = Ax00ArmWellStatusValues.PD.ToString Or myWellStatus = Ax00ArmWellStatusValues.S1.ToString Or _
+                    myWellStatus = Ax00ArmWellStatusValues.DI.ToString Or myWellStatus = Ax00ArmWellStatusValues.R2.ToString) Then
                     'Calculate the remaining Bottle Volume
                     Dim changesInPosition As Boolean = False
                     realVolume = 60
@@ -1700,7 +1937,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'BT #1443 - Calculate the new Position Status according the value of the Level Control returned by the Analyzer
                         Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
-                                                                                     Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
+                                                                                     Where a.LimitID = FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
                                                                                     Select a).ToList
                         If (limitList.Count > 0) Then
                             Debug.Print("=====================================")
@@ -1777,68 +2014,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         'NOTE: Is required implement similar business for SAMPLES or not? By now do not implement it
                     End If
 
-                    '(OK) Using myLevelControl if volume is lower than a security volume then change STATUS to "FEW" in order to indicate few volume (twksWSRotorContentByPosition table)
-                    '(OK)If volume is lower than a critical volume then set STATUS to "DEPLETED" (twksWSRotorContentByPosition table)
-
-                    ''TR 28/09/2012 - Validate if BottleStatus is LOCKED to set it as new Position Status
-                    'Dim limitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
-                    'If (myBottleStatus = "LOCKED") Then
-                    '    newPositionStatus = myBottleStatus
-
-                    '    'TR 02/10/2012 - Add the Alarm of Bottle blocked due to an invalid refill was detected only if the previous Position Status was not LOCKED
-                    '    If (initialRotorPositionStatus <> "LOCKED") Then
-                    '        Dim myExecution As Integer = 0
-                    '        Dim addInfoInvalidRefill As String = String.Empty
-
-                    '        myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, ActiveWorkSession, ActiveAnalyzer)
-                    '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '            Dim lockedBottleExecDS As ExecutionsDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
-
-                    '            If (lockedBottleExecDS.twksWSExecutions.Rows.Count > 0) AndAlso (Not lockedBottleExecDS.twksWSExecutions(0).IsExecutionIDNull) Then
-                    '                myExecution = lockedBottleExecDS.twksWSExecutions(0).ExecutionID
-                    '            End If
-                    '            'lockedExecutionsDS.Clear() 'AG 07/02/2012 this line can not be here because the LP case neededs it!! (AG 02/02/2012 - clear the dataset. The executions that must be informed to be locked are calculated later)
-                    '        End If
-
-                    '        myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, ActiveAnalyzer, ActiveWorkSession, myExecution, myBottlePos, _
-                    '                                                  GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
-                    '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '            addInfoInvalidRefill = CType(myGlobal.SetDatos, String)
-                    '        End If
-
-                    '        PrepareLocalAlarmList(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False) 'Inform about the bottle locked. 
-                    '        'AG + TR 01/10/2012 -END
-                    '    End If
-                    'Else
-                    '    If myRotorName = "REAGENTS" Then 'For reagents
-                    '        'Read the parameter REAGENT_BOTTLE_STEP_LIMIT in tfmwFieldLimits
-                    '        limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
-                    '                     Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
-                    '                     Select a).ToList
-
-                    '        If limitList.Count > 0 Then
-                    '            If myLevelControl = 0 Then
-                    '                newPositionStatus = "DEPLETED" 'AG 22/02/2012
-
-                    '            ElseIf myLevelControl < CInt(limitList(0).MinValue) Then
-                    '                'AG 22/02/2012 - commented until calculation real volume formula is confirmed
-                    '                'newPositionStatus = "DEPLETED"
-                    '                newPositionStatus = "FEW"
-
-                    '            ElseIf myLevelControl < CInt(limitList(0).MaxValue) Then
-                    '                newPositionStatus = "FEW"
-                    '            Else 'ElseIf myPrepID > 0 Then 'AG 27/02/2012 (do not use myPrepID >0 because the washings returns myPrepID = 0) 
-                    '                newPositionStatus = "INUSE"
-                    '            End If
-                    '        End If
-
-                    '        'Else
-                    '        'NOTE: Is required implement similar business for SAMPLES or not? By now, NOT NECESSARY FOR SAMPLES ROTOR
-                    '    End If
-                    '    limitList = Nothing 'AG 02/08/2012 - free memory
-
-                    'End If
-
                     If (Not myGlobal.HasError AndAlso (newPositionStatus <> String.Empty OrElse changesInPosition)) Then 'AG 05/12/2011 - Add changesInPosition (by now december 2011 only for REAGENTS ROTOR)
                         myGlobal = rcp_del.UpdateByRotorTypeAndCellNumber(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myRotorName, _
                                                                           myBottlePos, newPositionStatus, realVolume, testLeft, False, False)
@@ -1861,7 +2036,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If (newElementStatus = "POS") Then newElementStatus = "NOPOS"
                                     Else
                                         'Special business for Reagent2 (MTEST) -> For v2
-                                        If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString) Then
+                                        If (myInst = AppLayerInstrucionReception.ANSBR2.ToString) Then
                                             'Be carefull: Only one instruction can be sent at a time
                                             'Special case: R2 current bottle R2 volume lower critical volume but exists other R2 bottles ... Sw has to inform Fw for use the new bottle from now
                                         End If
@@ -1874,7 +2049,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Only when there has been a change in the Position Status
                     If (newPositionStatus <> String.Empty) Then
                         'Prepare UIRefresh Dataset (NEW_ROTORPOSITION_STATUS) for refresh screen when needed
-                        uiRefreshMyGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, myRotorName, myBottlePos, newPositionStatus, _
+                        uiRefreshMyGlobal = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.ROTORPOSITION_CHANGED, myRotorName, myBottlePos, newPositionStatus, _
                                                                       newElementStatus, realVolume, testLeft, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                     End If
                     'limitList = Nothing 'AG 24/10/2013
@@ -1892,7 +2067,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim reEvaluateNextToSend As Boolean = False
 
                 'If level detection fail has been detected or volume detected but bottle exhausted and no move volume available -> call the  volume missing process
-                If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString OrElse myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LP.ToString OrElse _
+                If (myWellStatus = Ax00ArmWellStatusValues.LD.ToString OrElse myWellStatus = Ax00ArmWellStatusValues.LP.ToString OrElse _
                     Not moreVolumeAvailable) Then
                     'AG 28/02/2012 - The Level Control is used only to mark the bottle as DEPLETED (remove condition ... OrElse myLevelControl = 0)
                     'It is possible that the Fw detects but informs L:0 (It cannot descend more)
@@ -1910,7 +2085,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Level detection fails (no Bottle or Sample Tube volume) in Reagents or Samples Rotors 
                     '(or <only for Bottles in Reagents Rotor> when detection was OK but Tests Left calculation says there are no more volume for other test preparations)
 
-                    If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString Or Not moreVolumeAvailable) Then 'AG 02/02/2012
+                    If (myWellStatus = Ax00ArmWellStatusValues.LD.ToString Or Not moreVolumeAvailable) Then 'AG 02/02/2012
                         lockedExecutionsDS.Clear() 'AG 07/02/2012 Clear the DS. The executions that must be informed to be locked are calculated later
 
                         'The volume missing alarms are only generated when each position becomes DEPLETED (initial position status <> 'DEPLETED' but current status = 'DEPLETED')
@@ -1925,9 +2100,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'XBC 17/07/2012 - Estimated ISE Consumption by Firmware
                             'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
-                            If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then
+                            If (myInst = AppLayerInstrucionReception.ANSBM1.ToString) Then
                                 'Dim myLogAccionesTmp As New ApplicationLogManager()    ' TO COMMENT !!!
-                                'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                                 myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
@@ -1935,12 +2110,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
                                         Dim myExecutionType As String = myExecutionsDS.twksWSExecutions(0).ExecutionType
-                                        'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                        'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                                         If (myExecutionType = "PREP_ISE") Then
                                             If (Not ISEAnalyzer Is Nothing) Then
                                                 ISEAnalyzer.PurgeAbyFirmware += 1
-                                                'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - PurgeA [" & ISEAnalyzer.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                                'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - PurgeA [" & ISEAnalyzer.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                             End If
                                         End If
                                     End If
@@ -1968,7 +2143,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'More readable code for v052 
                             'myGlobal = exec_delg.ProcessVolumeMissing(dbConnection, myPrepID, myRotorName, myBottlePos, Not moreVolumeAvailable, ActiveWorkSession, ActiveAnalyzer)
                             Dim prepPerformedOKFlag As Boolean = False
-                            If (myWellStatus <> GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString AndAlso myWellStatus <> GlobalEnumerates.Ax00ArmWellStatusValues.LP.ToString) Then
+                            If (myWellStatus <> Ax00ArmWellStatusValues.LD.ToString AndAlso myWellStatus <> Ax00ArmWellStatusValues.LP.ToString) Then
                                 prepPerformedOKFlag = True 'Means preparation performed OK but no more volume for other test preparations
                             End If
 
@@ -2009,14 +2184,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             'TR 28/09/2012 - Implement the variable myBottleStatus instead of DEPLETED.
-                            uiRefreshMyGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, myRotorName, _
+                            uiRefreshMyGlobal = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.ROTORPOSITION_CHANGED, myRotorName, _
                                                                           myBottlePos, myBottleStatus, newElementStatus, 0, 0, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                             'TR 28/09/2012 - END
                             'AG 23/01/2012
 
                             'AG 04/06/2014 - #1653 Check if WRUN could not be completed and remove the last WRUN (for wash reagents) sent because it was not performed
                             '(Apply only for ANSBR1 + prepID =0 + status = LD)
-                            If myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString AndAlso myPrepID = 0 AndAlso myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString Then
+                            If myInst = AppLayerInstrucionReception.ANSBR1.ToString AndAlso myPrepID = 0 AndAlso myWellStatus = Ax00ArmWellStatusValues.LD.ToString Then
                                 Dim wrunSentLinq As List(Of AnalyzerManagerDS.sentPreparationsRow) = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                                                                                    Where a.ReagentWashFlag = True _
                                                                                                    Select a).ToList
@@ -2045,8 +2220,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             ''IMPORTANT NOTE: This code AG 01/10/2012 must be commented or redesigned once the MTEST instruction will be developped
 
                             'When LD but previous condition If initialRotorPositionStatus <> "DEPLETED" is FALSE execute this code:
-                        ElseIf (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString OrElse myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) _
-                                AndAlso myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString Then
+                        ElseIf (myInst = AppLayerInstrucionReception.ANSBR2.ToString OrElse myInst = AppLayerInstrucionReception.ANSBM1.ToString) _
+                                AndAlso myWellStatus = Ax00ArmWellStatusValues.LD.ToString Then
 
                             'When no more volume available (no more bottles with volume) set the flag moreVolumeAvailable = False
                             myGlobal = rcp_del.SearchOtherPosition(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, myRotorName, myBottlePos)
@@ -2067,7 +2242,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     myGlobal = exec_delg.UpdateStatusByExecutionID(dbConnection, "PENDING", execRow.ExecutionID, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                                     'Prepare UIRefresh Dataset (EXECUTION_STATUS) for refresh screen when needed
                                                     If Not myGlobal.HasError Then
-                                                        uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, execRow.ExecutionID, 0, Nothing, False)
+                                                        uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, execRow.ExecutionID, 0, Nothing, False)
                                                     End If
                                                 End If
                                             Next
@@ -2081,7 +2256,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         'Level detection fails (no diluted sample) in reactions rotors
-                    ElseIf (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LP.ToString()) Then
+                    ElseIf (myWellStatus = Ax00ArmWellStatusValues.LP.ToString()) Then
                         'Mark the execution (PTEST instruction) as locked
                         'myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, ActiveWorkSession, ActiveAnalyzer)
                         'If Not myGlobal.HasError Then
@@ -2104,17 +2279,17 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'AG 07/06/2012 - Bottle or tube empty but no executions locked (exists more volume in other positions or wash the last execution)
                     '                Despite that the software has to inform about the depleted position
-                ElseIf (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R1.ToString OrElse myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.S1.ToString _
-                        OrElse myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R2.ToString) AndAlso myLevelControl = 0 Then
+                ElseIf (myWellStatus = Ax00ArmWellStatusValues.R1.ToString OrElse myWellStatus = Ax00ArmWellStatusValues.S1.ToString _
+                        OrElse myWellStatus = Ax00ArmWellStatusValues.R2.ToString) AndAlso myLevelControl = 0 Then
                     'AG 13/07/2012 
                     'The volume missing alarms are only generated when each position becomes DEPLETED (initial position status <> 'DEPLETED' but current status = 'DEPLETED')
                     'If analyzer is bad adjusted Fw can send several instructions for the same position with S:R1 or S or R2 amd LevelControl=0. Sw not has to duplicate bottle depleted alarm!!!
                     If (initialRotorPositionStatus <> "DEPLETED") Then
                         'XBC 17/07/2012 - Estimated ISE Consumption by Firmware
                         'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
-                        If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then
+                        If (myInst = AppLayerInstrucionReception.ANSBM1.ToString) Then
                             'Dim myLogAccionesTmp As New ApplicationLogManager()    ' TO COMMENT !!!
-                            'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                            'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                             Dim myExecutionsDS As New ExecutionsDS
                             Dim myExecutionType As String
@@ -2124,11 +2299,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
                                     myExecutionType = myExecutionsDS.twksWSExecutions(0).TestType
 
-                                    'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                    'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                     If myExecutionType = "PREP_ISE" Then
                                         If Not ISEAnalyzer Is Nothing Then
                                             ISEAnalyzer.PurgeAbyFirmware += 1
-                                            'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - PurgeA [" & ISEAnalyzer.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                            'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - PurgeA [" & ISEAnalyzer.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                         End If
                                     End If
                                 End If
@@ -2160,7 +2335,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'AG 20/07/2012 when the samples arm goes to photometric rotor to get diluted sample and dispense it into another well in photometric rotor
                     '                new FW has to return PS instead of S1, in this way until L:0 Sw knows the position value not applies to the samples rotor
-                ElseIf myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.PS.ToString AndAlso myLevelControl = 0 Then
+                ElseIf myWellStatus = Ax00ArmWellStatusValues.PS.ToString AndAlso myLevelControl = 0 Then
                     'Nothing to do
 
                 End If
@@ -2169,7 +2344,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '(2.4) COLLISION DETECTED (ALL ARMS)'
                 '***********************************'
                 Dim collisionAffectedExecutionsDS As New ExecutionsDS
-                If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.KO.ToString) Then
+                If (myWellStatus = Ax00ArmWellStatusValues.KO.ToString) Then
                     'Implement business using the variables: myWellStatus, myPrepID,...
                     'If not already read it ... read the execution related to the status arm now
                     If (myExecutionID = -1) Then
@@ -2190,7 +2365,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'AG 08/03/2012 - Prepare UIRefresh Dataset (EXECUTION_STATUS, ROTORPOSITION_CHANGED) for refresh screen when needed
                             If Not myGlobal.HasError Then
-                                myGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, execRow.ExecutionID, 0, Nothing, False)
+                                myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, execRow.ExecutionID, 0, Nothing, False)
                             End If
 
                             'Update rotor position status (SAMPLES: PENDING, INPROCESS, FINISHED)
@@ -2199,7 +2374,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not myGlobal.HasError Then
                                     rcp_DS = CType(myGlobal.SetDatos, WSRotorContentByPositionDS)
                                     For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In rcp_DS.twksWSRotorContentByPosition.Rows
-                                        myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", row.CellNumber, _
+                                        myGlobal = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", row.CellNumber, _
                                                                              row.Status, "", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                                         'AG 09/03/2012 - do not inform about ElementStatus (old code: '... row.Status, "POS", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")'
 
@@ -2225,11 +2400,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 '*********************************************'
                 '(2.5) CLOT DETECTED (ONLY FOR SAMPLES ROTOR) '
                 '*********************************************'
-                Dim alarmClotDetectionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmClotDetectionEnum As Alarms = GlobalEnumerates.Alarms.NONE
                 Dim clotAffectedExecutionsDS As New ExecutionsDS
                 'AG 27/10/2011 - NOTE when required save CLOT alarm always but when CLOT detection is disabled do not treat it in ManageAlarms
                 'If Not clotDetectionDisabled Then 'Treat field clot status only when clot detection is enabled
-                If (myRotorName = "SAMPLES" AndAlso myClotStatus <> GlobalEnumerates.Ax00ArmClotDetectionValues.OK.ToString) Then
+                If (myRotorName = "SAMPLES" AndAlso myClotStatus <> Ax00ArmClotDetectionValues.OK.ToString) Then
                     If (Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)) Then 'Ignore ANSBM clot warnings if clot system err alarm exists 
                         'Implement business using the variables: myWellStatus, myPrepID, myClotStatus,...
                         'If not already read it ... read the execution related to the status arm now
@@ -2258,9 +2433,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             myGlobal = exec_delg.UpdateClotValue(dbConnection, clotAffectedExecutionsDS)
                         End If
 
-                        If (myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.BS.ToString) Then 'Blocked system 
+                        If (myClotStatus = Ax00ArmClotDetectionValues.BS.ToString) Then 'Blocked system 
                             alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
-                        ElseIf (myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.CD.ToString Or myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.CP.ToString) Then 'Clot Detected or Clot possible
+                        ElseIf (myClotStatus = Ax00ArmClotDetectionValues.CD.ToString Or myClotStatus = Ax00ArmClotDetectionValues.CP.ToString) Then 'Clot Detected or Clot possible
                             alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_WARN
                         End If
                     End If
@@ -2295,47 +2470,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     If lockedExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
                         Dim alarmPrepLockedDS As New WSAnalyzerAlarmsDS  'AG 19/04/2011 - New DS with all preparation locked due this instruction
                         Dim i As Integer = 2 'AG 16/02/2012 - The prep_locked_warn starts with AlarmItem = 2 not 1 '1
-
-                        'AG 18/06/2012 - Alarms tab show only one record "Some replicate has been locked due to volume missing"
-                        'For Each item As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions.Rows
-                        '    Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
-                        '    alarmRow = alarmPrepLockedDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
-                        '    With alarmRow
-                        '        .AlarmID = GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString
-                        '        .AnalyzerID = AnalyzerIDAttribute
-                        '        .AlarmDateTime = Now
-                        '        If WorkSessionIDAttribute <> "" Then
-                        '            .WorkSessionID = WorkSessionIDAttribute
-                        '        Else
-                        '            .SetWorkSessionIDNull()
-                        '        End If
-                        '        .AlarmStatus = True
-                        '        .AlarmItem = i
-
-                        '        'Create DATA with information of the locked execution (sample class, sampleid, test name, replicates,...)
-                        '        myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, item.AnalyzerID, item.WorkSessionID, _
-                        '                                                  item.ExecutionID, myBottlePos, _
-                        '                                                  GlobalEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
-
-                        '        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                        '            .AdditionalInfo = CType(myGlobal.SetDatos, String)
-                        '        Else
-                        '            .SetAdditionalInfoNull()
-                        '        End If
-
-                        '        .EndEdit()
-                        '    End With
-                        '    alarmPrepLockedDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-                        '    i = i + 1
-
-                        '    'AG 24/01/2012 - Prepare UIRefresh DS for WS status
-                        '    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, item.ExecutionID, 0, Nothing, False)
-
-                        '    'AG 26/01/2012 - Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                        '    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
-
-                        'Next
-
                         Dim distinctOTlocked As List(Of Integer) = (From a As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions _
                                                                   Select a.OrderTestID Distinct).ToList
                         Dim firstExecutionLockedByOT As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -2374,11 +2508,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'WS Status refresh updates only the OrderTest affected, so we have to generate 1 uiRefreshrow for every ordertest affected
                                 'AG 24/01/2012 - Prepare UIRefresh DS for WS status
-                                uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, firstExecutionLockedByOT.First.ExecutionID, 0, Nothing, False)
+                                uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, firstExecutionLockedByOT.First.ExecutionID, 0, Nothing, False)
 
                                 If i = 2 Then 'Alarms tab reload always all alarms, only inform the first 
                                     'AG 26/01/2012 - Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                                    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
+                                    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
                                 End If
 
                                 i = i + 1
@@ -2428,7 +2562,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
                         If i = 1 Then 'Alarms tab reload always all alarms, only inform the first 
-                            uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
+                            uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
                         End If
 
                         i = i + 1
@@ -2514,35 +2648,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 'AG 08/06/2012
 
-                '   End If 'AG 29/06/2012 - Running Cycles lost - Solution!
-                'End If'AG 29/06/2012 - Running Cycles lost - Solution!
-
                 'Debug.Print("AnalyzerManager.ProcessArmStatusRecived (" & myInst.ToString & "):" & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("Treat ARM STATUS Received (" & myInst.ToString & "): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Treat ARM STATUS Received (" & myInst.ToString & "): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Information, False)
                 'AG 11/06/2012 - time estimation
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(String.Format("Message: {0} InnerException: {1}", ex.Message, ex.InnerException.Message), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(String.Format("Message: {0} InnerException: {1}", ex.Message, ex.InnerException.Message), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Error, False)
             End Try
-
-            'AG 29/06/2012 - Running Cycles lost - Solution!
-            ''We have used Exit Try so we have to sure the connection becomes properly closed here
-            'If (Not dbConnection Is Nothing) Then
-            '    If (Not myGlobal.HasError) Then
-            '        'When the Database Connection was opened locally, then the Commit is executed
-            '        DAOBase.CommitTransaction(dbConnection)
-            '    Else
-            '        'When the Database Connection was opened locally, then the Rollback is executed
-            '        DAOBase.RollbackTransaction(dbConnection)
-            '    End If
-            '    dbConnection.Close()
-            'End If
 
             Return myGlobal
         End Function
@@ -2554,10 +2672,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by  AG  07/04/2011
-        ''' Modified by XB 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
-        '''             XB 30/01/2013 - Add Trace log information about malfunctions on temperature values (Bugs tracking #1122)
-        '''             IT 19/12/2014 - BA-2143
+        ''' Created by:  AG 07/04/2011
+        ''' Modified by: XB 29/01/2013 - Changed IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+        '''              XB 30/01/2013 - Added Trace log information about malfunctions on temperature values (Bugs tracking #1122)
+        '''              SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
+        '''              IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ProcessInformationStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -2569,9 +2689,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
 
 
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim mySensors As New Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single) 'Local structure
+                Dim mySensors As New Dictionary(Of AnalyzerSensors, Single) 'Local structure
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -2581,7 +2701,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get General cover (parameter index 3)
                 Dim myIntValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2589,13 +2709,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_GENERAL, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.COVER_GENERAL, CSng(myIntValue))
                 End If
 
 
                 'Get Photometrics (Reaccions) cover (parameter index 4)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2603,13 +2723,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_REACTIONS, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.COVER_REACTIONS, CSng(myIntValue))
                 End If
 
 
                 'Get Reagents (Fridge) cover (parameter index 5)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2617,13 +2737,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_FRIDGE, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.COVER_FRIDGE, CSng(myIntValue))
                 End If
 
 
                 'Get Samples cover (parameter index 6)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2631,13 +2751,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_SAMPLES, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.COVER_SAMPLES, CSng(myIntValue))
                 End If
 
 
                 'Get System liquid sensor (parameter index 7)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2645,13 +2765,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.WATER_DEPOSIT, CSng(myIntValue))
                 End If
 
 
                 'Get Waste sensor (parameter index 8)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2659,13 +2779,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.WASTE_DEPOSIT, CSng(myIntValue))
                 End If
 
 
                 'Get Weight sensors (wash solution & high contamination waste) (parameter index 9, 10)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2673,11 +2793,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
                 End If
 
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2685,14 +2805,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE, CSng(myIntValue))
                 End If
 
 
                 'Get Temperature Reactions
                 Dim mySingleValue As Single = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2702,15 +2822,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If IsNumeric(myInstParamTO.ParameterValue) Then    
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS, mySingleValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.TEMPERATURE_REACTIONS, mySingleValue)
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
                 End If
 
                 'Get Temperature fridge
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2720,15 +2840,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE, mySingleValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.TEMPERATURE_FRIDGE, mySingleValue)
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
                 End If
 
                 'Get Temperature Washing station heater
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 14)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2738,15 +2858,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION, mySingleValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.TEMPERATURE_WASHINGSTATION, mySingleValue)
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
                 End If
 
                 'Get Temperature R1 probe
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 15)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 15)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2756,15 +2876,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1, mySingleValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.TEMPERATURE_R1, mySingleValue)
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
                 End If
 
                 'Get Temperature R2 probe
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 16)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 16)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2774,15 +2894,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2, mySingleValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.TEMPERATURE_R2, mySingleValue)
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
                 End If
 
                 'Get Fridge status (parameter index 12)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2790,12 +2910,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                    mySensors.Add(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS, CSng(myIntValue))
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
+                    mySensors.Add(AnalyzerSensors.FRIDGE_STATUS, CSng(myIntValue))
                 End If
 
                 'Get ISE status (parameter index 17)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 17)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 17)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2808,13 +2928,13 @@ Namespace Biosystems.Ax00.Core.Entities
                     ' Nothing to do
                 Else
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                        mySensors.Add(GlobalEnumerates.AnalyzerSensors.ISE_STATUS, CSng(myIntValue))
+                        myIntValue = CInt(myInstParamTO.ParameterValue)
+                        mySensors.Add(AnalyzerSensors.ISE_STATUS, CSng(myIntValue))
 
                         ''SGM 17/02/2012 ISE Module is switched On
                         If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.IsISEModuleInstalled Then
                             If Not ISEAnalyzer.IsISEInitiatedOK OrElse Not ISEAnalyzer.IsISEInitializationDone Then
-                                If MyClass.AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
 
                                     If myIntValue > 0 Then
 
@@ -2852,9 +2972,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ElseIf Not ISEAnalyzer.IsISEInitiating And Not ISEAnalyzer.IsLongTermDeactivation Then
 
                                             'The ISE Module is switched On but its required that user connects from Utilities (Pending to implement)
-                                            Dim myAlarmListTmp As New List(Of GlobalEnumerates.Alarms)
+                                            Dim myAlarmListTmp As New List(Of Alarms)
                                             Dim myAlarmStatusListTmp As New List(Of Boolean)
-                                            Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                            Dim myAlarmList As New List(Of Alarms)
                                             Dim myAlarmStatusList As New List(Of Boolean)
 
                                             If Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
@@ -2888,9 +3008,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Else
                                         ISEAnalyzer.IsISESwitchON = False
                                         If Not ISEAlreadyStarted Then
-                                            MyClass.RefreshISEAlarms()
+                                            RefreshISEAlarms()
                                         End If
-                                        'If MyClass.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                        'If Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
                                         '    ISEAlreadyStarted = True
                                         'End If
 
@@ -2899,7 +3019,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                             If GlobalBase.IsServiceAssembly Then
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED, 1, True)
+                                                UpdateSensorValuesAttribute(AnalyzerSensors.ISE_CONNECTION_FINISHED, 1, True)
                                             End If
                                         End If
                                         'SGM 09/11/2012
@@ -2931,8 +3051,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     'Debug.Print("AnalyzerManager.ProcessInformationStatusReceived: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Treat ANSINF received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Treat ANSINF received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -2940,137 +3060,137 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
 
-
-
-
         ''' <summary>
         ''' SW has received and ANSCBR instruction 
         ''' </summary>
-        ''' <param name="pInstructionReceived"></param>
-        ''' <param name="pRotorType" >Input = "" , Output inform the rotor type read by the barcode reader</param>
-        ''' <returns></returns>
+        ''' <param name="pInstructionReceived">List of objects InstructionParameterTO containing all values in the ANSCBR Instruction
+        '''                                    received from analyzer</param>
+        ''' <param name="pRotorType">By Reference (output) parameter. It is received empty and returned with the Rotor Type read by the Barcode Reader</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 22/06/2011 
         ''' Modified by: SA 11/06/2013 - When load the WSRotorContentByPositionDS that has to be passed as parameter when calling function ManageBarcodeInstruction
         '''                              in BarcodeWSDelegate, inform field WSStatus with value of WorkSessionStatusAttribute (needed to update the WS Status from 
         '''                              OPEN to PENDING when the WS Required Elements are created after scanning the Samples Rotor -> new functionality added for
         '''                              LIS with ES)
+        '''              SA 18/12/2014 - BA-1999 ==> In the call to function PrepareUIRefreshEventNum2, if RotorType is REAGENTS, inform value of parameters for 
+        '''                                          RealValue and RemainingTestsNumber when these fields are informed for the position in the DS returned by 
+        '''                                          function ManageBarcodeInstruction. Additionally, when function GetItemByParameterIndex returns an Integer value, 
+        '''                                          the way of get the returned value has been changed: instead of use DirectCast(CInt(value), Integer) - This has 
+        '''                                          not sense!, use CType(value, Integer). Replaced all String.Compare by comparisons using = 
         ''' </remarks>
         Private Function ProcessCodeBarInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef pRotorType As String) As GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'InitializeTimerControl(WAITING_TIME_OFF) 'AG 13/02/2012 - the waiting timer is disabled on every reception process ('AG 18/07/2011)
-
                 myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-
-                If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
-
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         'AG 11/10/2011 - Check if the pInstructionReceived parameters are correct or not
                         Dim auxStr() As String = InstructionReceivedAttribute.Split(CChar(";"))
                         Dim parameterSeparatorsNumber As Integer = auxStr.Length - 1
-                        If pInstructionReceived.Count <> parameterSeparatorsNumber Then
+
+                        If (pInstructionReceived.Count <> parameterSeparatorsNumber) Then
                             'There is some ';' character inside data. The instruction InstructionReceivedAttribute requires a new decode with additional business
 
                             'Get the samples barcode full total size configured
-                            Dim settingsDlg As New UserSettingsDelegate
                             Dim sampleBarcodeFullTotal As Integer
-                            myGlobal = settingsDlg.GetCurrentValueBySettingID(dbConnection, GlobalEnumerates.UserSettingsEnum.BARCODE_FULL_TOTAL.ToString())
-                            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                sampleBarcodeFullTotal = CType(myGlobal.SetDatos, Integer)
-                            End If
+                            Dim settingsDlg As New UserSettingsDelegate
 
-                            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                            myGlobal = settingsDlg.GetCurrentValueBySettingID(dbConnection, UserSettingsEnum.BARCODE_FULL_TOTAL.ToString())
+                            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                sampleBarcodeFullTotal = CType(myGlobal.SetDatos, Integer)
+
                                 Dim myLax00 As New LAX00Interpreter
-                                myGlobal = myLax00.ReadWithAdditionalBusiness(InstructionReceivedAttribute, GlobalEnumerates.AppLayerInstrucionReception.ANSCBR, sampleBarcodeFullTotal)
-                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                    Dim myParameterTOList As New List(Of ParametersTO)
-                                    myParameterTOList = CType(myGlobal.SetDatos, List(Of ParametersTO))
+                                myGlobal = myLax00.ReadWithAdditionalBusiness(InstructionReceivedAttribute, AppLayerInstrucionReception.ANSCBR, _
+                                                                              sampleBarcodeFullTotal)
+                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                    Dim myParameterTOList As List(Of ParametersTO) = CType(myGlobal.SetDatos, List(Of ParametersTO))
 
                                     Dim myInstruction As New Instructions
                                     myGlobal = myInstruction.GenerateReception(myParameterTOList)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         pInstructionReceived = DirectCast(myGlobal.SetDatos, List(Of InstructionParameterTO))
                                     End If
                                 End If
                             End If
-
                         End If
                         'AG 11/10/2011
 
-                        Dim myUtilities As New Utilities
-                        Dim myInstParamTO As New InstructionParameterTO
                         Dim errorFlag As Boolean = True
+                        'Dim Utilities As New Utilities
+                        Dim myInstParamTO As New InstructionParameterTO
 
                         'Get Reader selector (parameter index 3)
                         Dim rotorSelected As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                rotorSelected = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                rotorSelected = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
 
-                        ' Get status (parameter index 4)
+                        'Get Status (parameter index 4)
                         Dim barCodeStatus As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                barCodeStatus = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                                'Debug.Print("STATUS : " & barCodeStatus.ToString)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                barCodeStatus = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
 
-                        ' Get number of reads (parameter index 5)
+                        'Get Number of Reads (parameter index 5)
                         Dim readsNumber As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                readsNumber = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                readsNumber = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
                         Select Case barCodeStatus
-                            Case GlobalEnumerates.Ax00AnsCodeBarStatus.CONFIG_DONE
+                            Case Ax00AnsCodeBarStatus.CONFIG_DONE
                                 'Configuration done OK
                                 ' XBC 13/02/2012 - CODEBR Configuration instruction
                                 'If myApplicationName.ToUpper.Contains("SERVICE") Then
                                 'Service Sw
                                 'TODO business
-
                                 'Else
                                 'User Sw
                                 'If connection process in process then sent the general config instruction
@@ -3078,76 +3198,67 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Read the general configuration and sent the CONFIG instruction
                                 'The analyzer answers with a Status instruction action = config done
-
-                                If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES Then
-                                    ' When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
+                                If (rotorSelected = Ax00CodeBarReader.SAMPLES) Then
+                                    'When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
                                     Dim BarCodeDS As New AnalyzerManagerDS
                                     Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
+
                                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                                     With rowBarCode
                                         .RotorType = "REAGENTS"
-                                        .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
+                                        .Action = Ax00CodeBarAction.CONFIG
                                         .Position = 0
                                     End With
                                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                                     BarCodeDS.AcceptChanges()
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
 
-                                ElseIf rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then
+                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
 
-                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                    If GlobalBase.IsServiceAssembly Then
-                                        'Service Sw
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                                ElseIf (rotorSelected = Ax00CodeBarReader.REAGENTS) Then
+                                    'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                    If (GlobalBase.IsServiceAssembly) Then
+                                        'Service SW
+                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
                                     Else
                                         'User Sw
-                                        ' When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
-                                        If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) = 0 Then
-                                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
-                                        ElseIf String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS", False) = 0 Then
-                                            'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
-                                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
-                                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075
+                                        'When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
+                                        If (mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS") Then
+                                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+
+                                        ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                                            'UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                                            'myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+                                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075                                        
                                         End If
                                     End If
-
                                 End If
 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    'Service Sw
-                                    ' Nothing by now
+                                'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                If (GlobalBase.IsServiceAssembly) Then
+                                    'Service Sw - Nothing by now
                                 Else
                                     'User Sw
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+                                    If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
                                         'AG + TR 03/02/2014 - BT #1490 (if change barcode config in sleep the action button becomes disable)
-                                        ''SA + AG 11/12/2012 Not integrated in v1.0.0 
-                                        ''If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES Then 'After configurate SAMPLES barcode the SW configures automatically the REAGENTS barcode 
+                                        'SA + AG 11/12/2012 - Not integrated in v1.0.0 
+                                        'If (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES) Then 'After configurate SAMPLES barcode the SW configures automatically the REAGENTS barcode 
                                         'SetAnalyzerNotReady()
-                                        ''End If
-                                        ''SA + AG 11/12/2012 
+                                        'End If
+                                        'SA + AG 11/12/2012 
 
-                                        'Leave analyzer ready only in sleeping mode and after received reagents rotor
-                                        If Not (AnalyzerStatusAttribute = AnalyzerManagerStatus.SLEEPING AndAlso rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS) Then
+                                        'Leave Analyzer ready only in sleeping mode and after received reagents rotor
+                                        If Not (AnalyzerStatusAttribute = AnalyzerManagerStatus.SLEEPING AndAlso rotorSelected = Ax00CodeBarReader.REAGENTS) Then
                                             SetAnalyzerNotReady()
                                         End If
                                         'AG + TR 03/02/2014
                                     End If
                                 End If
 
-                                'End If
-                                'End If
-                                ' XBC 13/02/2012 - CODEBR Configuration instruction
-
-
-
-                            Case GlobalEnumerates.Ax00AnsCodeBarStatus.CODEBAR_ERROR
+                                'XBC 13/02/2012 - CODEBR Configuration instruction
+                            Case Ax00AnsCodeBarStatus.CODEBAR_ERROR
                                 'Code bar reader error
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
+                                If (GlobalBase.IsServiceAssembly) Then
                                     'Service Sw
                                     'TODO business
                                     'Else
@@ -3156,145 +3267,147 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
 
-                            Case GlobalEnumerates.Ax00AnsCodeBarStatus.FULL_ROTOR_DONE, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.SINGLE_POS_DONE, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ANSWER, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ENDED
-                                ' XBC 28/03/2012 - Add Answers TEST_MODE_ANSWER, TEST_MODE_ENDED
+                            Case Ax00AnsCodeBarStatus.FULL_ROTOR_DONE, _
+                                 Ax00AnsCodeBarStatus.SINGLE_POS_DONE, _
+                                 Ax00AnsCodeBarStatus.TEST_MODE_ANSWER, _
+                                 Ax00AnsCodeBarStatus.TEST_MODE_ENDED
+                                'XBC 28/03/2012 - Add Answers TEST_MODE_ANSWER, TEST_MODE_ENDED
                                 'Code bar readings results ... save them into twksRotorContentByPosition table
                                 Dim barCodeDS As New WSRotorContentByPositionDS
                                 Dim row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
+
                                 Const offset As Integer = 3
-
                                 For itera As Integer = 0 To readsNumber - 1
-                                    '''''''''
-                                    'Get Data FIELDS
-                                    ' Get number of reads (parameter index 6)
+                                    'Get Number of Reads (parameter index 6)
                                     Dim readPosition As Integer = 0
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                                        If IsNumeric(myInstParamTO.ParameterValue) Then
-                                            readPosition = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                                            'Debug.Print("READ POS : " & readPosition.ToString)
+
+                                        If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                            readPosition = CType(myInstParamTO.ParameterValue, Integer)
                                             errorFlag = False
                                         End If
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    ' Get diagnostics (parameter index 7)
+                                    'Get diagnostics (parameter index 7)
                                     Dim diagnostics As Integer = 0
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                                        If IsNumeric(myInstParamTO.ParameterValue) Then
-                                            diagnostics = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                                        If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                            diagnostics = CType(myInstParamTO.ParameterValue, Integer)
                                             errorFlag = False
                                         End If
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    ' Get value (parameter index 8)
-                                    Dim value As String = ""
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    'Get value (parameter index 8)
+                                    Dim value As String = String.Empty
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+
                                         value = myInstParamTO.ParameterValue
                                         errorFlag = False
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    '''''''''
                                     'Add into dataset
                                     row = barCodeDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                     row.AnalyzerID = AnalyzerIDAttribute
                                     row.WorkSessionID = WorkSessionIDAttribute
-                                    row.WSStatus = WorkSessionStatusAttribute  'SA 11/06/2013: Inform status of the active WorkSession
+                                    row.WSStatus = WorkSessionStatusAttribute   'SA 11/06/2013: Inform status of the active WorkSession
                                     row.CellNumber = readPosition
-                                    If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then
+
+                                    If (rotorSelected = Ax00CodeBarReader.REAGENTS) Then
                                         row.RotorType = "REAGENTS"
                                     Else
                                         row.RotorType = "SAMPLES"
                                     End If
-                                    pRotorType = row.RotorType 'Inform the byRef parameter!!
+                                    pRotorType = row.RotorType    'Inform the byRef parameter!!
 
                                     row.SetBarCodeInfoNull()
                                     row.SetBarcodeStatusNull()
                                     row.SetScannedPositionNull()
+
                                     Select Case diagnostics
-                                        Case GlobalEnumerates.Ax00AnsCodeBarDiagnosis.OK
+                                        Case Ax00AnsCodeBarDiagnosis.OK
                                             row.BarcodeStatus = "OK"
                                             row.BarCodeInfo = value
                                             row.ScannedPosition = True
 
-                                        Case GlobalEnumerates.Ax00AnsCodeBarDiagnosis.NO_READ
+                                        Case Ax00AnsCodeBarDiagnosis.NO_READ
                                             row.SetBarCodeInfoNull()
                                             row.BarcodeStatus = "EMPTY"
                                             row.SetScannedPositionNull()
 
-                                        Case GlobalEnumerates.Ax00AnsCodeBarDiagnosis.BAD_CODE
+                                        Case Ax00AnsCodeBarDiagnosis.BAD_CODE
                                             row.BarcodeStatus = "ERROR"
                                             row.ScannedPosition = True
-                                            'row.BarCodeInfo = "" 'Clear the wrong barcode contents (use "" due in DAO this is the condition to set to NULL)
                                             row.BarCodeInfo = value 'Save the barcode read value
-
                                     End Select
                                     barCodeDS.twksWSRotorContentByPosition.AddtwksWSRotorContentByPositionRow(row)
-
                                 Next
                                 barCodeDS.AcceptChanges()
 
                                 Dim myRotorType As String = "SAMPLES"
-                                Dim myCellNumber As Integer = -1    ' XBC 16/12/2011
-                                Dim myStatus As String = ""
-                                Dim myElementStatus As String = ""
-                                Dim myBarcodeInfo As String = ""
-                                Dim myBarcodeStatus As String = ""
-                                Dim myScannedPosition As Boolean = Nothing
+                                Dim myStatus As String = String.Empty
+                                Dim myTubeType As String = String.Empty
+                                Dim myBarcodeInfo As String = String.Empty
+                                Dim myTubeContent As String = String.Empty
+                                Dim myElementStatus As String = String.Empty
+                                Dim myBarcodeStatus As String = String.Empty
+
                                 Dim myElementId As Integer = -1
+                                Dim myTestsLeft As Integer = -1
+                                Dim myRealVolume As Single = -1
+                                Dim myCellNumber As Integer = -1    'XBC 16/12/2011
                                 Dim myMultiTubeNumber As Integer = -1
-                                Dim myTubeType As String = ""
-                                Dim myTubeContent As String = ""
+                                Dim myScannedPosition As Boolean = Nothing
 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    'Service Sw management
+                                'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                If (GlobalBase.IsServiceAssembly) Then
+                                    'Service SW management
 
-                                    ' XBC 16/12/2011
-                                    'Inform all fields but RealVolume and TestLeft
+                                    'XBC 16/12/2011
                                     For Each row In barCodeDS.twksWSRotorContentByPosition.Rows
+                                        If (row.IsRotorTypeNull) Then myRotorType = String.Empty Else myRotorType = row.RotorType
+                                        If (row.IsCellNumberNull) Then myCellNumber = -1 Else myCellNumber = row.CellNumber
+                                        If (row.IsStatusNull) Then myStatus = String.Empty Else myStatus = row.Status
+                                        If (row.IsElementStatusNull) Then myElementStatus = String.Empty Else myElementStatus = row.ElementStatus
+                                        If (row.IsBarCodeInfoNull) Then myBarcodeInfo = String.Empty Else myBarcodeInfo = row.BarCodeInfo
+                                        If (row.IsBarcodeStatusNull) Then myBarcodeStatus = String.Empty Else myBarcodeStatus = row.BarcodeStatus
+                                        If (row.IsScannedPositionNull) Then myScannedPosition = Nothing Else myScannedPosition = row.ScannedPosition
+                                        If (row.IsElementIDNull) Then myElementId = -1 Else myElementId = row.ElementID
+                                        If (row.IsMultiTubeNumberNull) Then myMultiTubeNumber = -1 Else myMultiTubeNumber = row.MultiTubeNumber
+                                        If (row.IsTubeTypeNull) Then myTubeType = String.Empty Else myTubeType = row.TubeType
+                                        If (row.IsTubeContentNull) Then myTubeContent = String.Empty Else myTubeContent = row.TubeContent
 
-                                        If row.IsRotorTypeNull Then myRotorType = "" Else myRotorType = row.RotorType
-                                        If row.IsCellNumberNull Then myCellNumber = -1 Else myCellNumber = row.CellNumber
-                                        If row.IsStatusNull Then myStatus = "" Else myStatus = row.Status
-                                        If row.IsElementStatusNull Then myElementStatus = "" Else myElementStatus = row.ElementStatus
-                                        If row.IsBarCodeInfoNull Then myBarcodeInfo = "" Else myBarcodeInfo = row.BarCodeInfo
-                                        If row.IsBarcodeStatusNull Then myBarcodeStatus = "" Else myBarcodeStatus = row.BarcodeStatus
-                                        If row.IsScannedPositionNull Then myScannedPosition = Nothing Else myScannedPosition = row.ScannedPosition
-                                        If row.IsElementIDNull Then myElementId = -1 Else myElementId = row.ElementID
-                                        If row.IsMultiTubeNumberNull Then myMultiTubeNumber = -1 Else myMultiTubeNumber = row.MultiTubeNumber
-                                        If row.IsTubeTypeNull Then myTubeType = "" Else myTubeType = row.TubeType
-                                        If row.IsTubeContentNull Then myTubeContent = "" Else myTubeContent = row.TubeContent
-
-                                        myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ, _
-                                                                            myRotorType, myCellNumber, myStatus, myElementStatus, _
-                                                                            -1, -1, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, _
-                                                                            myScannedPosition, myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
+                                        'Inform all fields but RealVolume and TestLeft (SERVICE SW requires only RotorType, CellNumber and BarcodeInfo,
+                                        'but the rest of fields are informed because the function PrepareUIRefreshEventNum2 needs them)
+                                        myGlobal = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.BARCODE_POSITION_READ, _
+                                                                             myRotorType, myCellNumber, myStatus, myElementStatus, -1, -1, _
+                                                                             myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, myScannedPosition, myElementId, _
+                                                                             myMultiTubeNumber, myTubeType, myTubeContent)
                                     Next
-                                    ' XBC 16/12/2011
-
+                                    'XBC 16/12/2011
                                 Else
-                                    'User Sw management
+                                    'User SW management
                                     'AG temporally uncommented 'Initial instruction testings
                                     'Update twksWSRotorContentByPosition barcode & barcode status
                                     'If barCodeDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
@@ -3305,80 +3418,68 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'AG temporally commented when uncoment previous code
                                     Dim bcWSDelegate As New BarcodeWSDelegate
-                                    'Dim myRotorType As String = "SAMPLES"
-                                    If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then myRotorType = "REAGENTS"
-                                    myGlobal = bcWSDelegate.ManageBarcodeInstruction(dbConnection, barCodeDS, myRotorType)
+                                    If (rotorSelected = Ax00CodeBarReader.REAGENTS) Then myRotorType = "REAGENTS"
 
                                     'Generate the UIRefresh DataSET (only for the positions read)
-                                    If Not myGlobal.HasError Then
-                                        Dim currentRotorTypeContentDS As New WSRotorContentByPositionDS
-                                        Dim linqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
-                                        currentRotorTypeContentDS = CType(myGlobal.SetDatos, WSRotorContentByPositionDS) 'The current whole rotor (by rotortype)
-
-                                        'Dim myStatus As String = ""
-                                        'Dim myElementStatus As String = ""
-                                        'Dim myBarcodeInfo As String = ""
-                                        'Dim myBarcodeStatus As String = ""
-                                        'Dim myScannedPosition As Boolean = Nothing
-                                        'Dim myElementId As Integer = -1
-                                        'Dim myMultiTubeNumber As Integer = -1
-                                        'Dim myTubeType As String = ""
-                                        'Dim myTubeContent As String = ""
+                                    myGlobal = bcWSDelegate.ManageBarcodeInstruction(dbConnection, barCodeDS, myRotorType)
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                        Dim currentRotorTypeContentDS As WSRotorContentByPositionDS = DirectCast(myGlobal.SetDatos, WSRotorContentByPositionDS) 'The current whole rotor (by rotortype)
 
                                         'The UIRefresh event has only the rotor positions read by barcode
+                                        Dim linqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                         For Each row In barCodeDS.twksWSRotorContentByPosition.Rows
-                                            linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow _
-                                                       In currentRotorTypeContentDS.twksWSRotorContentByPosition _
-                                                       Where String.Compare(a.RotorType, row.RotorType, False) = 0 And a.CellNumber = row.CellNumber _
-                                                       Select a).ToList
+                                            linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In currentRotorTypeContentDS.twksWSRotorContentByPosition _
+                                                      Where a.RotorType = row.RotorType AndAlso a.CellNumber = row.CellNumber _
+                                                     Select a).ToList
 
+                                            If (linqRes.Count > 0) Then
+                                                If (linqRes(0).IsStatusNull) Then myStatus = String.Empty Else myStatus = linqRes(0).Status
+                                                If (linqRes(0).IsElementStatusNull) Then myElementStatus = String.Empty Else myElementStatus = linqRes(0).ElementStatus
+                                                If (linqRes(0).IsBarCodeInfoNull) Then myBarcodeInfo = String.Empty Else myBarcodeInfo = linqRes(0).BarCodeInfo
+                                                If (linqRes(0).IsBarcodeStatusNull) Then myBarcodeStatus = String.Empty Else myBarcodeStatus = linqRes(0).BarcodeStatus
+                                                If (linqRes(0).IsScannedPositionNull) Then myScannedPosition = Nothing Else myScannedPosition = linqRes(0).ScannedPosition
+                                                If (linqRes(0).IsElementIDNull) Then myElementId = -1 Else myElementId = linqRes(0).ElementID
+                                                If (linqRes(0).IsMultiTubeNumberNull) Then myMultiTubeNumber = -1 Else myMultiTubeNumber = linqRes(0).MultiTubeNumber
+                                                If (linqRes(0).IsTubeTypeNull) Then myTubeType = String.Empty Else myTubeType = linqRes(0).TubeType
+                                                If (linqRes(0).IsTubeContentNull) Then myTubeContent = String.Empty Else myTubeContent = linqRes(0).TubeContent
 
-                                            If linqRes.Count > 0 Then
-                                                If linqRes(0).IsStatusNull Then myStatus = "" Else myStatus = linqRes(0).Status
-                                                If linqRes(0).IsElementStatusNull Then myElementStatus = "" Else myElementStatus = linqRes(0).ElementStatus
-                                                If linqRes(0).IsBarCodeInfoNull Then myBarcodeInfo = "" Else myBarcodeInfo = linqRes(0).BarCodeInfo
-                                                If linqRes(0).IsBarcodeStatusNull Then myBarcodeStatus = "" Else myBarcodeStatus = linqRes(0).BarcodeStatus
-                                                If linqRes(0).IsScannedPositionNull Then myScannedPosition = Nothing Else myScannedPosition = linqRes(0).ScannedPosition
-                                                If linqRes(0).IsElementIDNull Then myElementId = -1 Else myElementId = linqRes(0).ElementID
-                                                If linqRes(0).IsMultiTubeNumberNull Then myMultiTubeNumber = -1 Else myMultiTubeNumber = linqRes(0).MultiTubeNumber
-                                                If linqRes(0).IsTubeTypeNull Then myTubeType = "" Else myTubeType = linqRes(0).TubeType
-                                                If linqRes(0).IsTubeContentNull Then myTubeContent = "" Else myTubeContent = linqRes(0).TubeContent
+                                                'BA-1999: For Positions in Reagents Rotor, keep values of RealVolume and RemainingTestsNumber when they are informed
+                                                myTestsLeft = -1
+                                                myRealVolume = -1
+                                                If (myRotorType = "REAGENTS") Then
+                                                    If (Not linqRes(0).IsRealVolumeNull) Then myRealVolume = linqRes(0).RealVolume
+                                                    If (Not linqRes(0).IsRemainingTestsNumberNull) Then myTestsLeft = linqRes(0).RemainingTestsNumber
+                                                End If
 
-                                                'Inform all fields but RealVolume and TestLeft
-                                                myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ, _
+                                                'Inform all fields, including RealVolume and TestLeft when they are informed for the Rotor Position
+                                                myGlobal = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.BARCODE_POSITION_READ, _
                                                                                      linqRes(0).RotorType, linqRes(0).CellNumber, myStatus, myElementStatus, _
-                                                                                      -1, -1, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, _
-                                                                                      myScannedPosition, myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
+                                                                                     myRealVolume, myTestsLeft, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, myScannedPosition, _
+                                                                                     myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
                                             End If
-                                            If myGlobal.HasError Then Exit For
+                                            If (myGlobal.HasError) Then Exit For
                                         Next
-                                        linqRes = Nothing 'AG 02/08/2012 - free memory
+                                        linqRes = Nothing
                                     End If
-                                    'AG temporally commented
-
-                                End If 'If myApplicationName.ToUpper.Contains("SERVICE") Then
-
+                                    'AG temporally commented when uncoment previous code
+                                End If
                         End Select
 
                         'XB + AG 05/03/2012 - Update analyzer session flags into DataBase
-                        If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                        If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
                             Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                             myGlobal = myFlagsDelg.Update(dbConnection, myAnalyzerFlagsDS)
                         End If
-
                     End If
                 End If
-
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessCodeBarInstructionReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessCodeBarInstructionReceived", EventLogEntryType.Error, False)
             End Try
-
 
             'We have used Exit Try so we have to sure the connection becomes properly closed here
             If (Not dbConnection Is Nothing) Then
@@ -3391,10 +3492,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 dbConnection.Close()
             End If
-
             Return myGlobal
         End Function
-
 
         ''' <summary>
         ''' The last sent preparation has been accepted by Analyzer
@@ -3411,18 +3510,18 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              SA 10/07/2012 - Inform SampleClass = "" when calling function GetAffectedISEExecutions in ExecutionsDelegate
         '''              AG 18/11/2013 - Increment the number of tests using the positions for sample and reagent2
         ''' </remarks>
-        Private Function MarkPreparationAccepted(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function MarkPreparationAccepted(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 Dim myExecutionsDS As New ExecutionsDS
-                Dim affectedExecutions As New ExecutionsDS
+                'Dim affectedExecutions As New ExecutionsDS
                 Dim exeDelegate As New ExecutionsDelegate
 
                 'If the Preparation to sent is an ISE one, get all affected Executions (all ISE Tests requested for the same 
                 'Patient/Control and Sample Type 
-                If (AppLayer.LastInstructionTypeSent = GlobalEnumerates.AppLayerEventList.SEND_ISE_PREPARATION) Then
+                If (AppLayer.LastInstructionTypeSent = AppLayerEventList.SEND_ISE_PREPARATION) Then
                     myGlobal = exeDelegate.GetAffectedISEExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, AppLayer.LastExecutionIDSent, "", True)
 
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
@@ -3434,7 +3533,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Begin TRANSACTION to create the new PreparationID and update all affected Executions
                     myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                        dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+                        dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                         If (Not dbConnection Is Nothing) Then
                             Dim myNextPreparationID As Integer
                             Dim myPreparationDS As New WSPreparationsDS
@@ -3468,7 +3567,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             If (Not myGlobal.HasError) Then
-                                If (AppLayer.LastInstructionTypeSent = GlobalEnumerates.AppLayerEventList.SEND_ISE_PREPARATION) Then
+                                If (AppLayer.LastInstructionTypeSent = AppLayerEventList.SEND_ISE_PREPARATION) Then
                                     'Update fields ExecutionStatus and PreparationID for all Executions returned when called function GetAffectedISEExecutions
                                     For Each affectedExecution As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
                                         affectedExecution.BeginEdit()
@@ -3515,7 +3614,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (Not myGlobal.HasError) Then
                     'Notify to the application interfase the Status of some Executions has changed
                     For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                        myGlobal = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
+                        myGlobal = PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
                         If myGlobal.HasError Then Exit For
                     Next
                 End If
@@ -3529,7 +3628,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim rotorPosDS As WSRotorContentByPositionDS = DirectCast(myGlobal.SetDatos, WSRotorContentByPositionDS)
 
                         For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In rotorPosDS.twksWSRotorContentByPosition.Rows
-                            myGlobal = PrepareUIRefreshEventNum2(Nothing, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", row.CellNumber, _
+                            myGlobal = PrepareUIRefreshEventNum2(Nothing, UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", row.CellNumber, _
                                                                  row.Status, "", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                             If (myGlobal.HasError) Then Exit For
                         Next
@@ -3546,11 +3645,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.MarkPreparationAccepted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkPreparationAccepted", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3686,8 +3785,8 @@ Namespace Biosystems.Ax00.Core.Entities
             '    myGlobal.ErrorCode = "SYSTEM_ERROR"
             '    myGlobal.ErrorMessage = ex.Message
 
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.MarkPreparationAccepted", EventLogEntryType.Error, False)
+            '    'Dim myLogAcciones As New ApplicationLogManager()
+            '    GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkPreparationAccepted", EventLogEntryType.Error, False)
             'End Try
 
             ''We have used Exit Try so we have to sure the connection becomes properly closed here
@@ -3711,13 +3810,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 07/06/2011
         ''' AG 18/11/2013 - Increment the number of tests using the positions for arm reagent2 washings
         ''' </remarks>
-        Public Function MarkWashWellContaminationRunningAccepted(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.MarkWashWellContaminationRunningAccepted
+        Public Function MarkWashWellContaminationRunningAccepted(ByVal pDBConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.MarkWashWellContaminationRunningAccepted
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myReactionsDS As New ReactionsRotorDS
                         Dim newRow As ReactionsRotorDS.twksWSReactionsRotorRow
@@ -3764,11 +3863,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.MarkWashWellContaminationRunningAccepted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkWashWellContaminationRunningAccepted", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3791,8 +3890,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End SyncLock
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.AddIntoLastExportedResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddIntoLastExportedResults", EventLogEntryType.Error, False)
 
             End Try
         End Sub
@@ -3879,8 +3978,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSFBLDReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSFBLDReceived", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -3895,7 +3994,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
         ''' IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Public Function ProcessFlightReadAction() As Boolean Implements IAnalyzerEntity.ProcessFlightReadAction
+        Public Function ProcessFlightReadAction() As Boolean Implements IAnalyzerManager.ProcessFlightReadAction
 
             Dim validResults As Boolean = True
             Dim myGlobal As New GlobalDataTO
@@ -3943,8 +4042,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
                         myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
                     End If
                 End If
             End If
@@ -4064,7 +4163,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  AG 27/11/2014 - BA-2066
         ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Public Sub ResetBaseLineFailuresCounters() Implements IAnalyzerEntity.ResetBaseLineFailuresCounters
+        Public Sub ResetBaseLineFailuresCounters() Implements IAnalyzerManager.ResetBaseLineFailuresCounters
             baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
             dynamicbaselineInitializationFailuresAttribute = 0 'Reset FLIGHT failures counter
         End Sub
@@ -4082,7 +4181,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
         ''' </remarks>
-        Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) Implements IAnalyzerEntity.ValidateWarmUpProcess
+        Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) Implements IAnalyzerManager.ValidateWarmUpProcess
 
             Dim myGlobal As New GlobalDataTO
 
@@ -4315,16 +4414,16 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 14/03/2011 - add NEW_ALARMS_RECEIVED case 
         ''' AG 22/05/2014 - #1637 Reorder code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEvent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
+        Private Function PrepareUIRefreshEvent(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
                                                ByVal pExecutionID As Integer, ByVal pReadingNumber As Integer, _
                                                ByVal pAlarmID As String, ByVal pAlarmStatus As Boolean) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
@@ -4345,7 +4444,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
                         Select Case pUI_EventType
                             'Case (execution sent), (execution calculated)
-                            Case GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED
+                            Case UI_RefreshEvents.EXECUTION_STATUS, UI_RefreshEvents.RESULTS_CALCULATED
                                 If Not myglobal.HasError And Not myglobal.SetDatos Is Nothing Then
                                     'Import new rows into the general class DataSet
                                     If local_DS.ExecutionStatusChanged.Rows.Count > 0 Then
@@ -4362,7 +4461,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'Case (new result instruction has been received)
-                            Case GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED
+                            Case UI_RefreshEvents.READINGS_RECEIVED
                                 Dim myNewReadRow As UIRefreshDS.ReceivedReadingsRow
                                 SyncLock myUI_RefreshDS.ReceivedReadings 'AG 22/05/2014 - #1637 Use exclusive lock over myUI_RefreshDS variables
                                     myNewReadRow = myUI_RefreshDS.ReceivedReadings.NewReceivedReadingsRow
@@ -4379,7 +4478,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End SyncLock
 
                                 'Case (new alarms instruction has been received)
-                            Case GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED
+                            Case UI_RefreshEvents.ALARMS_RECEIVED
                                 Dim myNewAlarmRow As UIRefreshDS.ReceivedAlarmsRow
                                 SyncLock myUI_RefreshDS.ReceivedAlarms 'AG 22/05/2014 - #1637 Use exclusive lock over myUI_RefreshDS variables
                                     myNewAlarmRow = myUI_RefreshDS.ReceivedAlarms.NewReceivedAlarmsRow
@@ -4405,11 +4504,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEvent", EventLogEntryType.Error, False)
                 'Finally
 
             End Try
@@ -4449,14 +4548,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 22/09/2011 - add case BARCODE_POSITION_READ
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventNum2(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
+        Private Function PrepareUIRefreshEventNum2(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
                                                ByVal pRotorType As String, ByVal pCellNumber As Integer, ByVal pStatus As String, ByVal pElementStatus As String, _
                                                ByVal pRealVolume As Single, ByVal pTestsLeft As Integer, ByVal pBarCodeInfo As String, ByVal pBarCodeStatus As String, _
-                                               ByVal pSensorId As GlobalEnumerates.AnalyzerSensors, ByVal pSensorValue As Single, _
+                                               ByVal pSensorId As AnalyzerSensors, ByVal pSensorValue As Single, _
                                                ByVal pScannedPosition As Boolean, ByVal pElementID As Integer, ByVal pMultiTubeNumber As Integer, _
                                                ByVal pTubeType As String, ByVal pTubeContent As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
@@ -4464,7 +4563,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Select Case pUI_EventType
                     'Case (some rotor positions status, volume, ... has changed)
-                    Case GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ
+                    Case UI_RefreshEvents.ROTORPOSITION_CHANGED, UI_RefreshEvents.BARCODE_POSITION_READ
                         Dim myNewRotorPositionRow As UIRefreshDS.RotorPositionsChangedRow
                         'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
                         SyncLock myUI_RefreshDS.RotorPositionsChanged
@@ -4492,7 +4591,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             myUI_RefreshDS.RotorPositionsChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
                         End SyncLock
 
-                    Case GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED
+                    Case UI_RefreshEvents.SENSORVALUE_CHANGED
                         'This case prepare DS 
                         'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -4536,11 +4635,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum2", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -4561,10 +4660,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 03/06/2011 - add case REACTIONS_WELL_STATUS_CHANGED (use new method signature)
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventNum3(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
+        Private Function PrepareUIRefreshEventNum3(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
                                                ByVal pReactionsRotorWellDS As ReactionsRotorDS, ByVal pMainThreadIsUsedFlag As Boolean) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'AG 03/07/2012 - Running Cycles lost - Solution!
@@ -4642,11 +4741,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum3", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum3", EventLogEntryType.Error, False)
                 'Finally
 
             End Try
@@ -4669,10 +4768,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks> Created ??
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventNum4(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
+        Private Function PrepareUIRefreshEventNum4(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
                                                ByVal pAnalyzerID As String, ByVal pWS As String, ByVal pOrderList As List(Of String)) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'If (Not dbConnection Is Nothing) Then
@@ -4702,11 +4801,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum4", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum4", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -4737,8 +4836,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ClearRefreshDataSets", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ClearRefreshDataSets", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -4755,10 +4854,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  TR 03/01/2010
         ''' Modified by: SA 12/06/2014 - BT #1660 ==> Replaced call to function ProcessISETESTResults in ISEReception class, for its new 
         '''                                           version (ProcessISETESTResultsNEW) 
+        '''               XB 30/09/2014 - Implement Start Task Timeout for ISE commands - Remove too restrictive limitations because timeouts - BA-1872
+        '''               XB 19/11/2014 - Emplace the kind of errors derived of BA-1614 inside the management of timeouts and automatic instructions repetitions - BA-1872
+        '''               XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
         ''' </remarks>
-        Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO Implements IAnalyzerEntity.ProcessRecivedISEResult
+        Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO Implements IAnalyzerManager.ProcessRecivedISEResult
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'AG 03/07/2012 - Running Cycles lost - Solution!
@@ -4780,7 +4882,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'SGM 08/03/11 Get from SWParameters table
                 Dim myISEMode As String = "SimpleMode"
                 Dim myParams As New SwParametersDelegate
-                myGlobalDataTO = myParams.ReadTextValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.ISE_MODE.ToString, Nothing)
+                myGlobalDataTO = myParams.ReadTextValueByParameterName(dbConnection, SwParameters.ISE_MODE.ToString, Nothing)
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                     myISEMode = CStr(myGlobalDataTO.SetDatos)
                 Else
@@ -4788,7 +4890,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'XBC 20/01/2012
-                Dim myISEResultsDelegate As New ISEReceptionEntity(Me)
+                Dim myISEResultsDelegate As New ISEReception(Me)
                 'XBC 20/01/2012
                 'SGM 10/01/2012 choose method depending on instruction type sent (ISECMD or ISETEST)
 
@@ -4797,14 +4899,14 @@ Namespace Biosystems.Ax00.Core.Entities
                     ISEAnalyzer.LastISEResult = New ISEResultTO
 
                     'ISECMD answer
-                    Dim myCurrentProcedure As ISEAnalyzerEntity.ISEProcedures = ISEAnalyzer.CurrentProcedure
+                    Dim myCurrentProcedure As ISEManager.ISEProcedures = ISEAnalyzer.CurrentProcedure
                     myGlobalDataTO = myISEResultsDelegate.ProcessISECMDResults(myISEResult, AnalyzerIDAttribute, ISEAnalyzer.IsBiosystemsValidationMode)
                     If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                         ISEAnalyzer.LastISEResult = CType(myGlobalDataTO.SetDatos, ISEResultTO)
                         'SGM 17/02/2012 ISE Communications Ok
                         If ISEAnalyzer IsNot Nothing Then
                             If ISEAnalyzer.IsCommErrorDetected Then
-                                ISEAnalyzer.IsISECommsOk = False
+                                'ISEAnalyzer.IsISECommsOk = False       ' XB 30/09/2014 - BA-1872
                                 ISEAnalyzer.IsCommErrorDetected = False
                             Else
                                 ISEAnalyzer.IsISECommsOk = True
@@ -4824,13 +4926,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             If ISEAnalyzer.LastISEResult.IsCancelError Then
                                 Select Case ISEAnalyzer.LastISEResult.Errors(0).ErrorCycle
                                     Case ISEErrorTO.ErrorCycles.Calibration, ISEErrorTO.ErrorCycles.PumpCalibration, ISEErrorTO.ErrorCycles.BubbleDetCalibration
-                                        MyClass.ActivateAnalyzerISEAlarms(ISEAnalyzer.LastISEResult)
+                                        Me.ActivateAnalyzerISEAlarms(ISEAnalyzer.LastISEResult)
                                 End Select
                             ElseIf ISEAnalyzer.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL Then
                                 If ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                     For Each E As ISEErrorTO In ISEAnalyzer.LastISEResult.Errors
-                                        If myCurrentProcedure = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes Then
-                                            MyClass.BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                                        If myCurrentProcedure = ISEManager.ISEProcedures.CalibrateElectrodes Then
+                                            Me.BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                         End If
                                     Next
                                 End If
@@ -4842,7 +4944,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'AG 12/01/2012 - Prepare UI Refresh
-                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED, 1, True)
+                    UpdateSensorValuesAttribute(AnalyzerSensors.ISECMD_ANSWER_RECEIVED, 1, True)
 
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -4856,21 +4958,21 @@ Namespace Biosystems.Ax00.Core.Entities
                             If Not ISEAnalyzer.LastISEResult.IsCancelError Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "END")
                             Else
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "CANCELED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "CANCELED")
                             End If
 
-                        ElseIf String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString), "INI") Then
+                        ElseIf String.Equals(mySessionFlags(AnalyzerManagerFlags.ISEPumpCalib.ToString), "INI") Then
                             If Not ISEAnalyzer.LastISEResult.IsCancelError Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "END")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "END")
                             Else
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "CANCELED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "CANCELED")
                             End If
 
-                        ElseIf String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB.ToString), "INI") Then
+                        ElseIf String.Equals(mySessionFlags(AnalyzerManagerFlags.ISECalibAB.ToString), "INI") Then
                             If Not ISEAnalyzer.LastISEResult.IsCancelError Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "END")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "END")
                             Else
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "CANCELED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "CANCELED")
                             End If
 
                             'The ISE consumption flag is updated in OnISEProcedureFinished event handler
@@ -4902,23 +5004,23 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If ISEAnalyzer.LastISEResult.IsCancelError Then
                             'Mark ise auto conditioning process as finished
-                            If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess.ToString), "INPROCESS") Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
+                            If String.Equals(mySessionFlags(AnalyzerManagerFlags.ISEConditioningProcess.ToString), "INPROCESS") Then
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
                             End If
 
                             'Cases
                             '1) Performing ISE utilities: Inform about the error
                             '2) Performing ISE auto conditioning process: Abort it
-                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_WARNINGS, 1, True)
-                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due ISE conditioning warnings
+                            UpdateSensorValuesAttribute(AnalyzerSensors.ISE_WARNINGS, 1, True)
+                            UpdateSensorValuesAttribute(AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished due ISE conditioning warnings
 
                         Else
                             'Cases
                             '1) Performing ISE utilities: Nothing
                             '2) Performing ISE auto conditioning process: Call PerformAutoIseconditioning
-                            If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess.ToString), "INPROCESS") Then
-                                If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB.ToString), "END") Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
+                            If String.Equals(mySessionFlags(AnalyzerManagerFlags.ISEConditioningProcess.ToString), "INPROCESS") Then
+                                If String.Equals(mySessionFlags(AnalyzerManagerFlags.ISECalibAB.ToString), "END") Then
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
                                 End If
                                 myGlobalDataTO = PerformAutoIseConditioning(dbConnection)
                             End If
@@ -4946,7 +5048,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myExecDS As New ExecutionsDS
                         myExecDS = CType(myGlobalDataTO.SetDatos, ExecutionsDS)
                         For Each ex_row As ExecutionsDS.twksWSExecutionsRow In myExecDS.twksWSExecutions.Rows
-                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED, ex_row.ExecutionID, 0, Nothing, False)
+                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.RESULTS_CALCULATED, ex_row.ExecutionID, 0, Nothing, False)
 
                             'AG 02/12/2011 - UIRefresh sample rotor position status
                             'Get the ordertestStatus for the Execution
@@ -4963,7 +5065,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim rotorPosDS As New WSRotorContentByPositionDS
                                     rotorPosDS = CType(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
                                     For Each rcp_row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In rotorPosDS.twksWSRotorContentByPosition.Rows
-                                        myGlobalDataTO = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", rcp_row.CellNumber, _
+                                        myGlobalDataTO = PrepareUIRefreshEventNum2(dbConnection, UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", rcp_row.CellNumber, _
                                                                              rcp_row.Status, "", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                                         'AG 09/03/2012 - do not inform about ElementStatus (old code: '... rcp_row.Status, "POS", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")'
 
@@ -5012,7 +5114,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '3rd: Prepare data for generate user interface refresh event
                                     If Not myGlobalDataTO.HasError Then
                                         For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
+                                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
                                             If myGlobalDataTO.HasError Then Exit For
                                         Next
                                     End If
@@ -5031,7 +5133,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '3rd: Prepare data for generate user interface refresh event
                                     If Not myGlobalDataTO.HasError Then
                                         For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
+                                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
                                             If myGlobalDataTO.HasError Then Exit For
                                         Next
                                     End If
@@ -5051,13 +5153,70 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' XBC 21/03/2012   
                 ' Check Alarms
-                Dim myAlarmListTmp As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmListTmp As New List(Of Alarms)
                 Dim myAlarmStatusListTmp As New List(Of Boolean)
-                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobalDataTO = ISEAnalyzer.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
+                myGlobalDataTO = ISEAnalyzer.CheckAlarms(Me.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobalDataTO.HasError Then
+
+                    ' Deactivates Alarm begin - BA-1872
+                    Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                    Dim alarmStatus As Boolean = False
+
+                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    alarmStatus = False
+                    ISEAnalyzer.IsTimeOut = False
+
+                    ' XB 21/01/2015 - BA-1873
+                    If Me.ISEAnalyzer.IsISEModuleInstalled And Me.ISEAnalyzer.IsISEModuleReady Then
+                        ' Check if ISE Electrodes calibration is required
+                        Dim ElectrodesCalibrationRequired As Boolean = False
+                        myGlobalDataTO = Me.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            ElectrodesCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        If ElectrodesCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Pumps calibration is required
+                        Dim PumpsCalibrationRequired As Boolean = False
+                        myGlobalDataTO = Me.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            PumpsCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        If PumpsCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Clean is required
+                        Dim CleanRequired As Boolean = False
+                        myGlobalDataTO = Me.ISEAnalyzer.CheckCleanIsNeeded
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            CleanRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        If CleanRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+                    End If
+                    ' XB 21/01/2015 - BA-1873
+
+                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                    ' Deactivates Alarm end - BA-1872
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
@@ -5077,18 +5236,34 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                     End If
+
+                    ' XB 06/11/2014 - BA-1872
+                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
                 End If
                 ' XBC 21/03/2012
 
                 'End If'AG 03/07/2012 - Running Cycles lost - Solution!
+
+
+                ' XB 19/11/2014 - BA-1872
+                If ISEAnalyzer.FirmwareErrDetected Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_FAST.ToString & "] seconds")
+                    Me.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                Else
+                    ISECMDLost = False
+                    Me.sendingRepetitions = False
+                    Me.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    Me.ClearStartTaskQueueToSend()
+                End If
+                ' XB 19/11/2014 - BA-1872
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessRecivedISEResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessRecivedISEResult", EventLogEntryType.Error, False)
             End Try
 
             'AG 29/11/2011 - This method does not follow the standard and not receive a pDbConnection as parameter so we have to close the connection properly here
@@ -5116,25 +5291,25 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  AG 19/0/2012
         ''' Modified by XB+AG 16/10/2013 - Leave pause running mode - BT #1333
         ''' </remarks>
-        Private Function PerformAutoIseConditioning(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function PerformAutoIseConditioning(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(AnalyzerManagerFlags.ISEConditioningProcess.ToString) = "INPROCESS" Then
                             Dim myScreenIseCmdTo As New ISECommandTO
                             'Dim myIseManager As New ISEManager
 
                             '   Required: Clean + Pump Calib + Calib A + B
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString) = "" Then 'Start process sending Ise clean
+                            If mySessionFlags(AnalyzerManagerFlags.ISEClean.ToString) = "" Then 'Start process sending Ise clean
                                 'Send ISECMD clean
-                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, GlobalEnumerates.ISEModes.Cleaning_Cycle, GlobalEnumerates.ISECommands.CLEAN)
+                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, ISEModes.Cleaning_Cycle, ISECommands.CLEAN)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     myScreenIseCmdTo = CType(resultData.SetDatos, ISECommandTO)
                                 End If
@@ -5145,14 +5320,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'If not comms errors update flags
                                     If Not resultData.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "INI")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "INI")
                                         SetAnalyzerNotReady()
                                     End If
                                 End If
 
-                            ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString) = "END" AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString) <> "END" Then 'When ISEClean finish send pump calib
+                            ElseIf mySessionFlags(AnalyzerManagerFlags.ISEClean.ToString) = "END" AndAlso mySessionFlags(AnalyzerManagerFlags.ISEPumpCalib.ToString) <> "END" Then 'When ISEClean finish send pump calib
                                 'Send ISECMD pump calib
-                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, GlobalEnumerates.ISEModes.Pump_Calibration, GlobalEnumerates.ISECommands.PUMP_CAL)
+                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, ISEModes.Pump_Calibration, ISECommands.PUMP_CAL)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     myScreenIseCmdTo = CType(resultData.SetDatos, ISECommandTO)
                                 End If
@@ -5162,14 +5337,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, myScreenIseCmdTo)
 
                                     If Not resultData.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "INI")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "INI")
                                         SetAnalyzerNotReady()
                                     End If
                                 End If
 
-                            ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString) = "END" AndAlso String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString), "END", False) = 0 Then
+                            ElseIf mySessionFlags(AnalyzerManagerFlags.ISEClean.ToString) = "END" AndAlso String.Compare(mySessionFlags(AnalyzerManagerFlags.ISEPumpCalib.ToString), "END", False) = 0 Then
                                 'Send ISECMD calib AB
-                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, GlobalEnumerates.ISEModes.Low_Level_Control, GlobalEnumerates.ISECommands.CALB)
+                                resultData = ISEAnalyzer.PrepareDataToSend(dbConnection, myApplicationName.ToUpper, AnalyzerIDAttribute, WorkSessionIDAttribute, ISEModes.Low_Level_Control, ISECommands.CALB)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     myScreenIseCmdTo = CType(resultData.SetDatos, ISECommandTO)
                                 End If
@@ -5179,7 +5354,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, myScreenIseCmdTo)
 
                                     If Not resultData.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "INI")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "INI")
                                         SetAnalyzerNotReady()
                                     End If
                                 End If
@@ -5187,20 +5362,20 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
 
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess.ToString) = "CLOSED" Then
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.ISEConditioningProcess.ToString) = "CLOSED" Then
                             '   Not required: Running
 
                             ' XB+AG 16/10/2013 - BT #1333
                             'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "INPROCESS") 'AG 31/08/2012
                             'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'Send go to RUNNING
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "INPROCESS") 'AG 31/08/2012
-                                resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'Send go to RUNNING
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "INPROCESS") 'AG 31/08/2012
+                                resultData = ManageAnalyzer(AnalyzerManagerSwActionList.RUNNING, True) 'Send go to RUNNING
                             ElseIf AllowScanInRunning Then
                                 'AG 12/11/2013 - Call manage analyer instead of applayer
                                 'resultData = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartRunning, "INI") 'AG 19/11/2012 - task #1396-e
-                                resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True, Nothing)
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartRunning, "INI") 'AG 19/11/2012 - task #1396-e
+                                resultData = ManageAnalyzer(AnalyzerManagerSwActionList.START, True, Nothing)
                             End If
                             ' XB+AG 16/10/2013 - BT #1333
 
@@ -5208,7 +5383,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 endRunAlreadySentFlagAttribute = False
                                 abortAlreadySentFlagAttribute = False
                                 PauseAlreadySentFlagAttribute = False ' XB 15/10/2013 - BT #1318
-                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished (running instruction has been sent)
+                                UpdateSensorValuesAttribute(AnalyzerSensors.BEFORE_ENTER_RUNNING, 1, True) 'Process finished (running instruction has been sent)
 
                                 'Set WorkSession Status to INPROCESS
                                 Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
@@ -5240,11 +5415,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PerformAutoIseConditioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PerformAutoIseConditioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5274,19 +5449,19 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Select Case ISEAnalyzer.CurrentProcedure
 
-                        Case ISEAnalyzerEntity.ISEProcedures.Test
+                        Case ISEManager.ISEProcedures.Test
                             If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then      ' #1614
                                 If ISEAnalyzer.CurrentCommandTO.TestType = ISECycles.URINE1 Then
                                     ISEAnalyzer.CurrentCommandTO = New ISECommandTO(ISECycles.URINE2)
                                 End If
                             End If
 
-                        Case ISEAnalyzerEntity.ISEProcedures.SingleReadCommand
+                        Case ISEManager.ISEProcedures.SingleReadCommand
                             'If ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_0_DALLAS Then
                             '    myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
                             'End If
 
-                        Case ISEAnalyzerEntity.ISEProcedures.GeneralCheckings
+                        Case ISEManager.ISEProcedures.GeneralCheckings
                             If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
                                 Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
 
@@ -5320,7 +5495,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '        End Select
                             '    End If
 
-                        Case ISEAnalyzerEntity.ISEProcedures.ActivateReagentsPack
+                        Case ISEManager.ISEProcedures.ActivateReagentsPack
                             If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
                                 Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
 
@@ -5397,7 +5572,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End Select
                             End If
 
-                        Case ISEAnalyzerEntity.ISEProcedures.CheckReagentsPack
+                        Case ISEManager.ISEProcedures.CheckReagentsPack
                             If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
                                 Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
 
@@ -5408,21 +5583,21 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End Select
                             End If
 
-                        Case ISEAnalyzerEntity.ISEProcedures.CheckCleanPackInstalled
+                        Case ISEManager.ISEProcedures.CheckCleanPackInstalled
                             Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                                 Case ISECommands.PURGEA
                                     myGlobal = ISEAnalyzer.PrepareDataToSend_PURGEB
 
                             End Select
 
-                        Case ISEAnalyzerEntity.ISEProcedures.Clean 'PDT to optimization
+                        Case ISEManager.ISEProcedures.Clean 'PDT to optimization
                             'Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                             '    Case ISECommands.CLEAN
                             '        myGlobal = ISEAnalyzer.PrepareDataToSend_CALB
 
                             'End Select
 
-                        Case ISEAnalyzerEntity.ISEProcedures.MaintenanceExit
+                        Case ISEManager.ISEProcedures.MaintenanceExit
                             Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                                 Case ISECommands.PURGEA
                                     myGlobal = ISEAnalyzer.PrepareDataToSend_PURGEB
@@ -5431,7 +5606,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                             ' XBC 04/04/2012
-                        Case ISEAnalyzerEntity.ISEProcedures.WriteConsumption
+                        Case ISEManager.ISEProcedures.WriteConsumption
                             Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                                 Case ISECommands.WRITE_CALA_CONSUMPTION
                                     If ISEAnalyzer.IsCalBUpdateRequired Then 'update calB consumption
@@ -5450,7 +5625,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             End Select
 
-                        Case ISEAnalyzerEntity.ISEProcedures.PrimeAndCalibration
+                        Case ISEManager.ISEProcedures.PrimeAndCalibration
                             Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                                 Case ISECommands.PRIME_CALB
                                     myGlobal = ISEAnalyzer.PrepareDataToSend_PRIME_CALA
@@ -5459,7 +5634,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myGlobal = ISEAnalyzer.PrepareDataToSend_CALB
                             End Select
 
-                        Case ISEAnalyzerEntity.ISEProcedures.PrimeX2AndCalibration 'SGM 11/06/2012
+                        Case ISEManager.ISEProcedures.PrimeX2AndCalibration 'SGM 11/06/2012
                             Static PrimeCount As Integer = 0
                             Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
                                 Case ISECommands.PRIME_CALB
@@ -5488,8 +5663,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
 
                         ' XBC 23/03/2012
-                        If ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.ActivateReagentsPack And _
-                           ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.WriteConsumption Then
+                        If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.ActivateReagentsPack And _
+                           ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.WriteConsumption Then
                             myGlobal = ISEAnalyzer.SendISECommand()
                         End If
                         ' XBC 23/03/2012
@@ -5497,7 +5672,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Special case for cheking before installing ISE Module
-                ElseIf ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.ActivateModule Then
+                ElseIf ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.ActivateModule Then
                     If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
                         Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
 
@@ -5520,10 +5695,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.ProcessISEManagerProcedures", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ProcessISEManagerProcedures", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5532,17 +5707,66 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Refreshes ISE alarms
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 07/06/2012</remarks>
-        Public Function RefreshISEAlarms() As GlobalDataTO Implements IAnalyzerEntity.RefreshISEAlarms
+        ''' <remarks>
+        ''' Created by SGM 07/06/2012
+        ''' Modified by XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
+        ''' </remarks>
+        Public Function RefreshISEAlarms() As GlobalDataTO Implements IAnalyzerManager.RefreshISEAlarms
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myAlarmListTmp As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmListTmp As New List(Of Alarms)
                 Dim myAlarmStatusListTmp As New List(Of Boolean)
-                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 myGlobal = ISEAnalyzer.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobal.HasError Then
+
+                    ' XB 21/01/2015 - BA-1873
+                    If Me.ISEAnalyzer.IsISEModuleInstalled And Me.ISEAnalyzer.IsISEModuleReady Then
+                        ' Check if ISE Electrodes calibration is required
+                        Dim ElectrodesCalibrationRequired As Boolean = False
+                        myGlobal = Me.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        If ElectrodesCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Pumps calibration is required
+                        Dim PumpsCalibrationRequired As Boolean = False
+                        myGlobal = Me.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        If PumpsCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Clean is required
+                        Dim CleanRequired As Boolean = False
+                        myGlobal = Me.ISEAnalyzer.CheckCleanIsNeeded
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            CleanRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        If CleanRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+                    End If
+                    ' XB 21/01/2015 - BA-1873
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
@@ -5565,10 +5789,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.RefreshISEAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEManager.RefreshISEAlarms", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -5579,11 +5803,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pISEResult"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 25/07/2012</remarks>
-        Public Function ActivateAnalyzerISEAlarms(ByVal pISEResult As ISEResultTO) As GlobalDataTO Implements IAnalyzerEntity.ActivateAnalyzerISEAlarms
+        ''' <remarks>
+        ''' Created by SGM 25/07/2012
+        ''' Modified by XB 08/09/2014 - Use ISE new FormatAffected method in ISEManager layer instead of the old method in ISEErrorTO - BA-1902
+        ''' </remarks>
+        Public Function ActivateAnalyzerISEAlarms(ByVal pISEResult As ISEResultTO) As GlobalDataTO Implements IAnalyzerManager.ActivateAnalyzerISEAlarms
 
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             'Return myGlobal 'QUITAR
 
@@ -5592,14 +5819,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 If pISEResult.Errors.Count > 0 Then
 
                     'Prepare internal variables for alarms management
-                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                    Dim myAlarmList As New List(Of Alarms)
                     Dim myAlarmStatusList As New List(Of Boolean)
                     Dim myAlarmDescriptions As New List(Of String)
 
 
                     Dim myAlarmOrigin As String = "" 'origin
 
-                    Dim myAlarmID As GlobalEnumerates.Alarms 'Identifier
+                    Dim myAlarmID As Alarms 'Identifier
 
                     If pISEResult.IsCancelError Then
 
@@ -5662,7 +5889,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim myResultAlarm As Integer = -1
                                 If E.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None Then
                                     myResultAlarm = CInt(E.ResultErrorCode)
-                                    Dim myAffected As String = ISEErrorTO.FormatAffected(E.Affected)
+
+                                    ' XB 08/09/2014 - BA-1902
+                                    'Dim myAffected As String = ISEErrorTO.FormatAffected(E.Affected)
+                                    Dim myAffected As String = ISEManager.FormatAffected(E.Affected)
+                                    ' XB 08/09/2014 - BA-1902
+
                                     myAdditionalInfo &= GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR & myAlarmOrigin & ":R" & myResultAlarm.ToString & ": (" + myAffected + ")"
                                 End If
 
@@ -5707,8 +5939,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.ActivateAnalyzerISEAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.ActivateAnalyzerISEAlarms", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -5724,7 +5956,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by SGM 02/08/2012
         ''' Modified by XB 20/05/2014 - Fix BT #1629
         ''' </remarks>
-        Public Function BlockISEPreparationByElectrode(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISEResult As ISEResultTO, ByVal pWorkSessionId As String, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerEntity.BlockISEPreparationByElectrode
+        Public Function BlockISEPreparationByElectrode(ByVal pDBConnection As SqlConnection, ByVal pISEResult As ISEResultTO, ByVal pWorkSessionId As String, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerManager.BlockISEPreparationByElectrode
             Dim myGlobalDataTO As New GlobalDataTO
             Try
 
@@ -5763,7 +5995,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If Not myGlobalDataTO.HasError Then
                             For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                myGlobalDataTO = PrepareUIRefreshEvent(pDBConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
+                                myGlobalDataTO = PrepareUIRefreshEvent(pDBConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
                                 If myGlobalDataTO.HasError Then Exit For
                             Next
                         End If
@@ -5775,8 +6007,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEReception.BlockISEPreparationByElectrode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ISEReception.BlockISEPreparationByElectrode", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
 
@@ -5795,7 +6027,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  AG 14/03/2011
         ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Public Sub SetAnalyzerNotReady() Implements IAnalyzerEntity.SetAnalyzerNotReady
+        Public Sub SetAnalyzerNotReady() Implements IAnalyzerManager.SetAnalyzerNotReady
             If AnalyzerIsReadyAttribute Then
                 AnalyzerIsReadyAttribute = False
                 'Me.InitializeTimerControl(WAITING_TIME_DEFAULT) 'AG 18/07/2011 - commment this line
@@ -5803,15 +6035,15 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
 
-        Private Function ReadBarCodeRotorSettingEnabled(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSetting As String) As Boolean
+        Private Function ReadBarCodeRotorSettingEnabled(ByVal pDBConnection As SqlConnection, ByVal pSetting As String) As Boolean
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim returnedFlag As Boolean = False
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         'If reagents barcode enabled send read FULL barcode reagents rotor
@@ -5833,11 +6065,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ReadBarCodeRotorSettingEnabled", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadBarCodeRotorSettingEnabled", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -6026,8 +6258,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        End If '(2)
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecutionUntil28112011", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecutionUntil28112011", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -6112,8 +6344,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecutionOLD", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecutionOLD", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

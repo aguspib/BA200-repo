@@ -3,11 +3,14 @@ Option Strict On
 
 Imports Microsoft.Win32
 Imports System.IO.Ports
+Imports System.Management
+Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Types 'AG 17/01/2011
-Imports Biosystems.Ax00.BL 'SGM 08/03/11
+Imports Biosystems.Ax00.BL
+Imports Timer = System.Timers.Timer 'SGM 08/03/11
 'Imports Biosystems.Ax00.DAL.DAO 'SGM 21/09/2011
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -26,7 +29,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private FlagRetry As Boolean
 
         ''// Timer para el Control de los tiempos previstos/máximos para el envío/ejecución de las Tramas
-        Private TimerControl As New System.Timers.Timer()
+        Private TimerControl As New Timer()
 
         '// flag para la identificación de errores en los tiempos/intentos de envío/ejecución de las Tramas
         Private ReadOnly FlagERROR As Boolean
@@ -282,8 +285,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '' XBC 08/11/2010 - SERVICE SOFTWARE
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.New", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.New", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -318,16 +321,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ''Track SGM
                 'Dim myTrackTime As Double = DateTime.Now.Subtract(Link.ResponseTrack).TotalMilliseconds
-                'Dim myLogAcciones2 As New ApplicationLogManager()
-                'myLogAcciones2.CreateLogActivity("LinkLayer -- AppLayer " & myTrackTime.ToStringWithDecimals(0), "ApplicationLayer.OnActivateProtocolEvent", EventLogEntryType.Information, False)
+                ''Dim myLogAcciones2 As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity("LinkLayer -- AppLayer " & myTrackTime.ToStringWithDecimals(0), "ApplicationLayer.OnActivateProtocolEvent", EventLogEntryType.Information, False)
                 ''end Track
 
                 'NOTES: 2on parameter is Sw entry information (nothing in case RECEIVE), 3rd parameter is Fw entry information
                 Me.ActivateProtocol(pEvent, Nothing, in_datos)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.OnActivateProtocolEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.OnActivateProtocolEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -360,8 +363,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.Start", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Start", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -389,8 +392,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SynchronizeComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SynchronizeComm", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -446,7 +449,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     If myPortsList.Count > 0 Then 'AG 13/07/2010
                         'Order detected ports
-                        myPortsList = (From a In myPortsList Select a Order By a).ToList()
+                        Dim auxPortsList = myPortsList
+                        myPortsList = (From a In auxPortsList Select a Order By a).ToList()
                         'search last conected port.
                         'If ConfigurationManager.AppSettings("LastPortConnected").ToString() <> "" Then
                         'TR 25/01/2011 -Replace by corresponding value on global base.
@@ -472,7 +476,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager() 'AG 28/10/2011
+                'Dim myLogAcciones As New ApplicationLogManager() 'AG 28/10/2011
                 If myPortsList.Count > 0 Then
                     For Each myPort As String In myPortsList
                         'currentPort = CType(myPort.Remove(0, 3), Integer)
@@ -494,8 +498,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If Link.Config(bauds & ",N,8,1") Then
                                     Dim connectionString As String = ""
                                     ConnectionData = GenerateConnectionInstructionInBytes(connectionString)
-                                    'Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("Try connect [" & connectionString & "]", "ApplicationLayer.Open", EventLogEntryType.Information, False)
+                                    ''Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("Try connect [" & connectionString & "]", "ApplicationLayer.Open", EventLogEntryType.Information, False)
 
                                     If Link.StartComm(ConnectionData) Then
                                         myResult = True
@@ -512,12 +516,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         End If
 
                                         'AG 28/10/2011 - new log trace.
-                                        myLogAcciones.CreateLogActivity("Communication establishment using port: " & myPort & ". Connection Mode: " & ConnectionMode, _
+                                        GlobalBase.CreateLogActivity("Communication establishment using port: " & myPort & ". Connection Mode: " & ConnectionMode, _
                                                                         "ApplicationLayer.Open", EventLogEntryType.Information, False)
                                         Exit For
                                     Else
                                         'AG 28/10/2011 - new log trace.
-                                        myLogAcciones.CreateLogActivity("Communication FAILED using port: " & myPort & ". Connection Mode: " & ConnectionMode, _
+                                        GlobalBase.CreateLogActivity("Communication FAILED using port: " & myPort & ". Connection Mode: " & ConnectionMode, _
                                                                         "ApplicationLayer.Open", EventLogEntryType.Information, False)
                                         Exit While
                                     End If
@@ -536,7 +540,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ''AG 28/10/2011
                 'If Not myResult Then
-                '    myLogAcciones.CreateLogActivity("Communication establishment FAILED", "ApplicationLayer.Open", EventLogEntryType.Information, False)
+                '    GlobalBase.CreateLogActivity("Communication establishment FAILED", "ApplicationLayer.Open", EventLogEntryType.Information, False)
                 'End If
                 ''AG 28/10/2011
                 myPortsList = Nothing 'AG 02/08/2012 - free memory
@@ -546,8 +550,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.Open", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Open", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -582,8 +586,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ReadRegistredPorts", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ReadRegistredPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -609,8 +613,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.Terminate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Terminate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -629,8 +633,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.StopComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.StopComm", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -650,8 +654,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.StartComm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.StartComm", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -704,7 +708,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Is needed in order the application continues working
-                        System.Windows.Forms.Application.DoEvents()
+                        Application.DoEvents()
                     Loop
                 End If
 
@@ -721,8 +725,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendData", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -742,8 +746,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 pPortsList = myResult
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SetFirtsPosLastConnectedPort", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SetFirtsPosLastConnectedPort", EventLogEntryType.Error, False)
                 Throw ex
             End Try
         End Sub
@@ -761,7 +765,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 'Object to save the port list.
-                Dim myPortsList As New List(Of Management.ManagementObject)
                 'Get the list of invalid ports name from AppConfig.
                 'Dim InvalidPortsName As String = ConfigurationManager.AppSettings("InvalidPortsList").ToString()
                 'TR 25/01/2011 -Replace by corresponding value on global base.
@@ -779,38 +782,40 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim validPortList As New List(Of String)
 
-                Dim qPort As New List(Of Management.ManagementObject)
+                'Dim qPort As New List(Of Management.ManagementObject)
                 'search the post modem and virtual ports
-                Dim InternalDev As Management.ManagementObjectSearcher = _
-                  New Management.ManagementObjectSearcher("SELECT * FROM Win32_POTSModem")
+                Dim InternalDev As ManagementObjectSearcher = _
+                  New ManagementObjectSearcher("SELECT * FROM Win32_POTSModem")
 
                 If InternalDev.Get.Count > 0 Then
                     'Go throught the list of devices.
-                    For Each myManagObj As Management.ManagementObject In InternalDev.Get
+                    For Each myManagObj As ManagementObject In InternalDev.Get
                         'add the device to the invalid ports name list.
                         InvalidPortsName &= "," & myManagObj.Properties.Item("DeviceType").Value.ToString()
                     Next
                 End If
-                InternalDev = New Management.ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity")
+                InternalDev = New ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity")
                 If InternalDev.Get.Count > 0 Then
                     'go throught the list of devices.
-                    For Each myManagObj As Management.ManagementObject In InternalDev.Get
+                    For Each myManagObj As ManagementObject In InternalDev.Get
                         'validate the device with the list of ports.
                         For Each myPort As String In pPorts
-                            If myManagObj.Properties.Item("Name").Value.ToString().Contains(myPort) Then
 
-                                For Each myInvalidPortName As String In InvalidPortsName.Split(CChar(","))
-                                    'validate if the Device contains the name of one of the invalid port name.
-                                    If Not myManagObj.Properties.Item("DeviceID").Value.ToString().Contains(myInvalidPortName) Then
-                                        'TR 21/02/2012 -Validate the port is not added on the list
-                                        If validPortList.Where(Function(a) String.Compare(a, myPort, False) = 0).Count = 0 Then
-                                            'add into the valid port list.
-                                            validPortList.Add(myPort)
-                                            Exit For
+                            If (Not myManagObj.Properties.Item("Name").Value Is Nothing) Then 'IT 10/10/2014: BA-2000
+                                If myManagObj.Properties.Item("Name").Value.ToString().Contains(myPort) Then
+                                    For Each myInvalidPortName As String In InvalidPortsName.Split(CChar(","))
+                                        'validate if the Device contains the name of one of the invalid port name.
+                                        If Not myManagObj.Properties.Item("DeviceID").Value.ToString().Contains(myInvalidPortName) Then
+                                            'TR 21/02/2012 -Validate the port is not added on the list
+                                            If validPortList.Where(Function(a) String.Compare(a, myPort, False) = 0).Count = 0 Then
+                                                'add into the valid port list.
+                                                validPortList.Add(myPort)
+                                                Exit For
+                                            End If
+                                            'TR 21/02/2012 -END.
                                         End If
-                                        'TR 21/02/2012 -END.
-                                    End If
-                                Next
+                                    Next
+                                End If
                             End If
                         Next
                     Next
@@ -823,8 +828,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -836,8 +841,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'TimerControl.Interval = pInterval * 1000
                 'TimerControl.Enabled = True
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.InitializeTimerControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.InitializeTimerControl", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -876,8 +881,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myPortIndex += 1
                 Next
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SetUSBPort", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SetUSBPort", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -891,7 +896,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Sub SortPortList(ByRef PortsList As List(Of String))
             Try
                 Dim myHT As New Hashtable()
-                Dim qPortList As New List(Of String)
+                'Dim qPortList As New List(Of String)
                 Dim qObjList As New List(Of Object)
                 For Each myPort As String In PortsList
                     myHT.Add(GetPortNumbert(myPort), myPort)
@@ -908,8 +913,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 qObjList = Nothing 'AG 02/08/2012 - free memory
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SortPortList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SortPortList", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -978,8 +983,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchOnRegistryKey", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchOnRegistryKey", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -1023,8 +1028,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTo.HasError = True
                 myGlobalDataTo.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ValidateUSBPort", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ValidateUSBPort", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTo
         End Function
@@ -1069,8 +1074,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.Open", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Open", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1088,8 +1093,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetPortNumbert", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetPortNumbert", EventLogEntryType.Error, False)
                 Throw ex
             End Try
 
@@ -1129,8 +1134,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobalDataTO.HasError = True
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
         '        myGlobalDataTO.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.Connect", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Connect", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -1180,8 +1185,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobalDataTO.HasError = True
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
         '        myGlobalDataTO.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ManageConnection", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ManageConnection", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -1481,12 +1486,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'AG 04/10/2011 - Log all received instruction but the ANSINF who is logged only when generates new alarms (true, false)
                             ''AG 19/04/2011 - Log all received instructions in the same way as we log all send instructions (SendGenericalInstructions - XBC 08/11/2010)
-                            'Dim myLogAcciones As New ApplicationLogManager()
-                            'myLogAcciones.CreateLogActivity("Received Instruction [" & pFwEntry.ToString & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
+                            ''Dim myLogAcciones As New ApplicationLogManager()
+                            'GlobalBase.CreateLogActivity("Received Instruction [" & pFwEntry.ToString & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
 
                             If Not pFwEntry.Contains(GlobalEnumerates.AppLayerInstrucionReception.ANSINF.ToString) Then
-                                Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity("Received Instruction [" & pFwEntry.ToString & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
+                                'Dim myLogAcciones As New ApplicationLogManager()
+                                GlobalBase.CreateLogActivity("Received Instruction [" & pFwEntry.ToString & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
                             End If
                             'AG 04/10/2011
 
@@ -1540,7 +1545,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'SGM 05/07/2011
                     Case GlobalEnumerates.AppLayerEventList.UPDATE_FIRMWARE
-                        Dim queryMode() As Byte
+                        Dim queryMode() As Byte = Nothing
                         If Not pSwEntry Is Nothing Then
                             queryMode = CType(pSwEntry, Byte())
                         End If
@@ -1604,8 +1609,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ActivateProtocol", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ActivateProtocol", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1626,8 +1631,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ReadFwScriptData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ReadFwScriptData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1641,15 +1646,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
 
-                myGlobal.SetDatos = MyClass.myFwAdjustmentsDS
+                myGlobal.SetDatos = myFwAdjustmentsDS
 
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1662,7 +1667,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 If pAdjustmentsDS IsNot Nothing Then
-                    MyClass.myFwAdjustmentsDS = pAdjustmentsDS
+                    myFwAdjustmentsDS = pAdjustmentsDS
                     myGlobal.SetDatos = pAdjustmentsDS
                 End If
 
@@ -1670,8 +1675,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateFwAdjustmentsDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1685,15 +1690,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
 
-                myGlobal.SetDatos = MyClass.myISEInformationDS
+                myGlobal.SetDatos = myISEInformationDS
 
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ReadISEInfoDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ReadISEInfoDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1706,7 +1711,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 If pISEInfoDS IsNot Nothing Then
-                    MyClass.myISEInformationDS = pISEInfoDS
+                    myISEInformationDS = pISEInfoDS
                     myGlobal.SetDatos = pISEInfoDS
                 End If
 
@@ -1714,8 +1719,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateISEInfoDS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateISEInfoDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1753,8 +1758,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateSensorsData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.UpdateSensorsData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -1786,8 +1791,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.LoadAbsorbanceData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.LoadAbsorbanceData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -1808,8 +1813,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetAbsorbanceScanData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetAbsorbanceScanData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -1829,8 +1834,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ResetAbsorbanceScanData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ResetAbsorbanceScanData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -1857,8 +1862,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.LoadAppFwScriptsData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.LoadAppFwScriptsData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1879,9 +1884,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal = myAdjustmentsDelegate.ReadAdjustmentsFromDB(Nothing, pAnalyzerID)
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
 
-                    MyClass.myFwAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
+                    myFwAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
 
-                    With MyClass.myFwAdjustmentsDS
+                    With myFwAdjustmentsDS
                         .AnalyzerModel = "Simulated Analyzer"
                         .FirmwareVersion = "Simulated Firmware"
                         .ReadedDatetime = Nothing
@@ -1890,9 +1895,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ''SGM 21/09/2011
                     ''Get from file next
                     'Dim myData As String = ""
-                    'Dim myGlobalbase As New GlobalBase
+                    ''Dim myGlobalbase As New GlobalBase
                     'Dim objReader As System.IO.StreamReader
-                    'Dim path As String = System.Windows.Forms.Application.StartupPath & myGlobalbase.FwAdjustmentsFile
+                    'Dim path As String = System.Windows.Forms.Application.StartupPath & GlobalBase.FwAdjustmentsFile
                     'objReader = New System.IO.StreamReader(path)
                     'myData = objReader.ReadToEnd()
                     'objReader.Close()
@@ -1904,8 +1909,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myData As String = My.Resources.AdjustmentsMasterData
 
 
-                        Dim myFileAdjustmentsDS As SRVAdjustmentsDS
-                        Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(MyClass.myFwAdjustmentsDS)
+                        Dim myFileAdjustmentsDS As SRVAdjustmentsDS = Nothing
+                        Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(myFwAdjustmentsDS)
                         myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(myData, "Simulated Analyzer", "Simulated Firmware")
 
                         If myGlobal.SetDatos IsNot Nothing And Not myGlobal.HasError Then
@@ -1914,28 +1919,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'if any of the adjustments in DB is empty fill with the existing in file
                         Dim isChanged As Boolean = False
-                        If MyClass.myFwAdjustmentsDS IsNot Nothing Then
+                        If myFwAdjustmentsDS IsNot Nothing Then
                             If myFileAdjustmentsDS IsNot Nothing Then
-                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
+                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
                                     If D.Value.Trim.Length = 0 Then
                                         For Each F As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFileAdjustmentsDS.srv_tfmwAdjustments.Rows
                                             If String.Compare(F.CodeFw.ToUpper.Trim, D.CodeFw.ToUpper.Trim, False) = 0 Then
-                                                MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
+                                                myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
                                                 D.Value = F.Value.Trim
-                                                MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
-                                                MyClass.myFwAdjustmentsDS.AcceptChanges()
+                                                myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
+                                                myFwAdjustmentsDS.AcceptChanges()
                                                 isChanged = True
                                                 Exit For
                                             End If
                                         Next
                                     End If
                                 Next D
-                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
+                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
                                     If D.Value.Trim.Length = 0 Then
-                                        MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
+                                        myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
                                         D.Value = "0"
-                                        MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
-                                        MyClass.myFwAdjustmentsDS.AcceptChanges()
+                                        myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
+                                        myFwAdjustmentsDS.AcceptChanges()
                                         isChanged = True
                                     End If
                                 Next
@@ -1962,8 +1967,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.LoadFwAdjustments", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.LoadFwAdjustments", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1985,8 +1990,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ReadPhotometryData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ReadPhotometryData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2009,8 +2014,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SetPhotometryData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SetPhotometryData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2040,8 +2045,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.LoadFwSensors", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.LoadFwSensors", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -2062,8 +2067,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetGlobalSensorsMasterData", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetGlobalSensorsMasterData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -2086,8 +2091,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetMonitorItemValuebyCodeFw", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetMonitorItemValuebyCodeFw", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -2112,8 +2117,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.HasError = True
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GetSensorDataById", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetSensorDataById", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -2155,8 +2160,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ReadStressModeData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ReadStressModeData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2179,8 +2184,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SetStressModeData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SetStressModeData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2235,13 +2240,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '                myWSExecutionDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
                 '                'Go throug each related executioin and  Set the ExecutionStatus to LOCKED.
 
-                '                Dim myLogAcciones As New ApplicationLogManager()
+                '                'Dim myLogAcciones As New ApplicationLogManager()
 
                 '                For Each myWSExec As ExecutionsDS.twksWSExecutionsRow In myWSExecutionDS.twksWSExecutions.Rows
                 '                    myWSExec.BeginEdit()
                 '                    myWSExec.ExecutionStatus = "LOCKED"
                 '                    myWSExec.EndEdit()
-                '                    myLogAcciones.CreateLogActivity("Instruction with empty fields. Sw locks execution: " & myWSExec.ExecutionID.ToString, "Instructions.GenerateISEPreparation", EventLogEntryType.Information, False) 'AG 30/05/2012
+                '                    GlobalBase.CreateLogActivity("Instruction with empty fields. Sw locks execution: " & myWSExec.ExecutionID.ToString, "Instructions.GenerateISEPreparation", EventLogEntryType.Information, False) 'AG 30/05/2012
                 '                Next
                 '                'Update Status on Database.
                 '                myGlobal = myExecutionDelegate.UpdateStatus(Nothing, myWSExecutionDS)
@@ -2299,8 +2304,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendNextPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendNextPreparation", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2335,9 +2340,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' Get the instruction type value (always in parameter index = 2)
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParameterTO As New InstructionParameterTO
-                myGlobal = myUtilities.GetItemByParameterIndex(myIndexedParameters, 2)
+                myGlobal = Utilities.GetItemByParameterIndex(myIndexedParameters, 2)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParameterTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2345,7 +2350,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'SGM Track 
-                MyClass.ResponseTrack = DateTime.Now 'SGM 03/07/2012 just for debugging timing improvement
+                ResponseTrack = DateTime.Now 'SGM 03/07/2012 just for debugging timing improvement
                 'end Track
 
                 Select Case myInstParameterTO.Parameter
@@ -2595,8 +2600,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.ProcessResponse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ProcessResponse", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2653,8 +2658,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendShortInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendShortInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2695,16 +2700,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 pConnectionString = myInstructionToSend
 
                 'FINALLY: Convert string to byte
-                Dim myUtilities As New Utilities
-                myGlobal = myUtilities.ConvertStringToAscii(myInstructionToSend, True)
+                'Dim myUtilities As New Utilities
+                myGlobal = Utilities.ConvertStringToAscii(myInstructionToSend, True)
 
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.GenerateConnectionInstructionInBytes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GenerateConnectionInstructionInBytes", EventLogEntryType.Error, False)
 
             End Try
 
@@ -2764,8 +2769,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendBaseLineWithoutAdjustmentInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendBaseLineWithoutAdjustmentInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         '    Return myGlobal
@@ -2794,12 +2799,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'END instruction time
                     If myInstructionsList IsNot Nothing AndAlso myInstructionsList.Count > 0 Then
                         Dim myENDInstruction As InstructionTO = myInstructionsList(myInstructionsList.Count - 1)
-                        MyClass.EndInstructionTime = myENDInstruction.Timer
+                        EndInstructionTime = myENDInstruction.Timer
                     End If
 
                 Else
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Error COMMAND Instruction", "ApplicationLayer.SendCOMMANDInstruction", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Error COMMAND Instruction", "ApplicationLayer.SendCOMMANDInstruction", EventLogEntryType.Error, False)
                     Exit Try
                 End If
 
@@ -2827,8 +2832,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendCOMMANDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendCOMMANDInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2879,8 +2884,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendCOMMANDInstructionTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendCOMMANDInstructionTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2935,8 +2940,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendRunningWashInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendRunningWashInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2985,8 +2990,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendStandByWashInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendStandByWashInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3035,8 +3040,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendALIGHTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendALIGHTInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3085,8 +3090,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendINFOInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendINFOInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3136,8 +3141,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendWSCTRLInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendWSCTRLInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3192,8 +3197,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendCodeBarInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendCodeBarInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3258,8 +3263,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendALIGHTInstruction overload 2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendALIGHTInstruction overload 2", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3324,8 +3329,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendBLIGHTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendBLIGHTInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3393,8 +3398,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendFLIGHTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendFLIGHTInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3444,8 +3449,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendREADADJInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendREADADJInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3495,8 +3500,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendISECMDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendISECMDInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3548,8 +3553,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLRDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLRDInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3590,12 +3595,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFWAction.ActionType = GlobalEnumerates.FwUpdateActions.SendRepository Then
                     'blocks must be passed directly as byte array in order to avoid data loss in conversion
 
-                    Dim myUtilities As New Utilities
+                    'Dim myUtilities As New Utilities
                     Dim myCommand As String = "A400;FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
-                    myGlobal = myUtilities.ConvertStringToAscii(myCommand, True)
+                    myGlobal = Utilities.ConvertStringToAscii(myCommand, True)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         Dim myCommandInBytes() As Byte = CType(myGlobal.SetDatos, Byte())
-                        Dim myFinalByte As Byte = Asc(CChar(";"))
+                        Dim myFinalByte As Byte = CByte(Asc(CChar(";")))
 
                         Dim myFinalInstruction(myCommandInBytes.Length + pFWAction.DataBlockSize) As Byte
                         Dim i As Integer = 0
@@ -3631,8 +3636,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendFWUTILInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendFWUTILInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3688,8 +3693,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendFWUTILInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendFWUTILInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         '    Return myGlobal
@@ -3740,8 +3745,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendLOADADJInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendLOADADJInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3790,8 +3795,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendRESETInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendRESETInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3840,8 +3845,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendLOADFACTORYADJInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendLOADFACTORYADJInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3890,8 +3895,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendUPDATEFWInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendUPDATEFWInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -3940,8 +3945,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendTANKSTESTInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendTANKSTESTInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4001,8 +4006,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendSDMODEInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendSDMODEInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4051,8 +4056,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendSDPOLLInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendSDPOLLInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4101,8 +4106,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLFWInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLFWInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4151,8 +4156,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLHInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLHInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4201,8 +4206,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendENABLEEVENTSInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendENABLEEVENTSInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4251,8 +4256,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendDISABLEEVENTSInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendDISABLEEVENTSInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4301,8 +4306,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendREADCYCLESInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendREADCYCLESInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4351,8 +4356,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendWRITECYCLESInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendWRITECYCLESInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4405,8 +4410,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendSOUNDInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendSOUNDInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4457,8 +4462,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendCONFIGInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendCONFIGInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4526,15 +4531,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 End If
 
-               
+
 
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendUTILInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendUTILInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4592,8 +4597,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendUTILInstruction", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendUTILInstruction", EventLogEntryType.Error, False)
 
         '    End Try
         '    Return myGlobal
@@ -4642,8 +4647,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLSNInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendPOLLSNInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4667,9 +4672,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 lastInstructionSentAttribute = pInstruction     'AG 20/10/2010
 
                 'FIRST: Convert string to byte in order to send
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim bytesToSend() As Byte
-                myGlobal = myUtilities.ConvertStringToAscii(pInstruction, True)
+                myGlobal = Utilities.ConvertStringToAscii(pInstruction, True)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     bytesToSend = DirectCast(myGlobal.SetDatos, Byte())
                 Else
@@ -4678,8 +4683,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 If Not pWithoutLog Then
                     ' XBC 08/11/2010
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Send Instruction [" & pInstruction.ToString & "]", "ApplicationLayer.SendGenericalInstructions", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Send Instruction [" & pInstruction.ToString & "]", "ApplicationLayer.SendGenericalInstructions", EventLogEntryType.Information, False)
                     ' XBC 08/11/2010
                 End If
 
@@ -4697,8 +4702,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendGenericalInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendGenericalInstructions", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4734,8 +4739,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendGenericalInstructionsBytes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendGenericalInstructionsBytes", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -4776,8 +4781,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.TransformToStringInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.TransformToStringInstruction", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal

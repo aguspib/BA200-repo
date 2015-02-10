@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class twksOrderCalculatedTestsDAO
-        Inherits DAOBase
+        '  
 
 #Region "CRUD"
         ''' <summary>
@@ -53,8 +53,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -78,9 +78,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " DELETE twksOrderCalculatedTests " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                    '                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksOrderCalculatedTests " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                                   " WHERE  WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                            " WHERE  WorkSessionID = '" & pWorkSessionID & "' AND twksOrderCalculatedTests.OrderTestID = OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -92,8 +96,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.DeleteByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.DeleteByWorkSession", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -129,8 +133,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.DeleteByCalOrderTestId", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.DeleteByCalOrderTestId", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -164,9 +168,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "           FROM twksOrderCalculatedTests OCT INNER JOIN twksOrderTests OT ON OCT.CalcOrderTestID = OT.OrderTestID " & vbCrLf
                         cmdText &= "                                             INNER JOIN tparCalculatedTests CT ON OT.TestID = CT.CalcTestID " & vbCrLf
                         cmdText &= "                                             LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OCT.CalcOrderTestID = OTL.OrderTestID" & vbCrLf
-                        cmdText &= "          WHERE OCT.OrderTestID IN (SELECT OrderTestID " & vbCrLf
-                        cmdText &= "                                      FROM twksWSOrderTests " & vbCrLf
-                        cmdText &= "                                     WHERE WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+                        'AJG
+                        'cmdText &= "          WHERE OCT.OrderTestID IN (SELECT OrderTestID " & vbCrLf
+                        cmdText &= "          WHERE EXISTS (SELECT OrderTestID " & vbCrLf
+                        cmdText &= "                        FROM twksWSOrderTests " & vbCrLf
+                        cmdText &= "                        WHERE WorkSessionID = '" & pWorkSessionID & "' AND OCT.OrderTestID = OrderTestID) " & vbCrLf
                         cmdText &= "            AND OT.TestType = 'CALC' " & vbCrLf
                         cmdText &= "ORDER BY OCT.OrderTestID "
 
@@ -187,8 +193,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.ReadByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.ReadByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -235,8 +241,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetOTInfoByCalcOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetOTInfoByCalcOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -308,8 +314,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetOrderTestIDByCalcOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetOrderTestIDByCalcOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -355,8 +361,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderCalculatedTestsDAO.GetByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -370,6 +376,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>
         ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' AG 13/10/2014 - BA-2006 also return CalcOrderTestID
         ''' </remarks>
         Public Function GetOrderTestsFormPartOfCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -384,7 +391,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
 
-                        cmdText = " SELECT OCT.OrderTestID ,CT.CalcTestID , ct.PrintExpTests  " & vbCrLf
+                        cmdText = " SELECT OCT.OrderTestID, OCT.CalcOrderTestID ,CT.CalcTestID , ct.PrintExpTests  " & vbCrLf
                         cmdText &= " FROM   twksOrderTests OT INNER JOIN tparCalculatedTests CT ON OT.TestID = CT.CalcTestID " & vbCrLf
                         cmdText &= " INNER JOIN twksOrderCalculatedTests OCT ON OT.OrderTestID = OCT.CalcOrderTestID  " & vbCrLf
                         cmdText &= " WHERE  OT.TestType = 'CALC'  " & vbCrLf
@@ -408,8 +415,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksOrderCalculatedTestsDAO.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksOrderCalculatedTestsDAO.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

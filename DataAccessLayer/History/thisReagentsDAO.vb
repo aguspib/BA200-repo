@@ -2,16 +2,14 @@
 Option Strict On
 
 Imports System.Text
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports System.Data.SqlClient
 
 
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class thisReagentsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 
@@ -49,8 +47,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.CloseReagent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.CloseReagent", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -97,8 +95,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -119,10 +117,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM thisReagents " & vbCrLf & _
+                    '                        " WHERE  ClosedReagent = 1 " & vbCrLf & _
+                    '                        " AND    HistReagentID NOT IN (SELECT HistReagent1ID FROM thisTestSamples) " & vbCrLf & _
+                    '                        " AND    HistReagentID NOT IN (SELECT HistReagent2ID FROM thisTestSamples) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM thisReagents " & vbCrLf & _
                                             " WHERE  ClosedReagent = 1 " & vbCrLf & _
-                                            " AND    HistReagentID NOT IN (SELECT HistReagent1ID FROM thisTestSamples) " & vbCrLf & _
-                                            " AND    HistReagentID NOT IN (SELECT HistReagent2ID FROM thisTestSamples) " & vbCrLf
+                                            " AND NOT EXISTS (SELECT HistReagent1ID FROM thisTestSamples WHERE thisReagents.HistReagentID = HistReagent1ID) " & vbCrLf & _
+                                            " AND NOT EXISTS (SELECT HistReagent2ID FROM thisTestSamples WHERE thisReagents.HistReagentID = HistReagent2ID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -134,8 +138,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -180,8 +184,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.ReadByReagentID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.ReadByReagentID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -1,5 +1,7 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCGraphs
+﻿Imports DevExpress.Utils
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class UiQCGraphs
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -30,7 +32,7 @@ Partial Class IQCGraphs
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCGraphs))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCGraphs))
         Me.bsToolTipController = New DevExpress.Utils.ToolTipController(Me.components)
         Me.bsWarningLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsGraphicalResultLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -189,7 +191,7 @@ Partial Class IQCGraphs
         Me.bsQCResultChartControl.Name = "bsQCResultChartControl"
         Me.bsQCResultChartControl.PaletteName = "Nature Colors"
         Me.bsQCResultChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series(-1) {}
-        SideBySideBarSeriesLabel1.LineVisible = True
+        SideBySideBarSeriesLabel1.LineVisibility = DefaultBoolean.True
         Me.bsQCResultChartControl.SeriesTemplate.Label = SideBySideBarSeriesLabel1
         Me.bsQCResultChartControl.Size = New System.Drawing.Size(616, 377)
         Me.bsQCResultChartControl.TabIndex = 4
@@ -648,7 +650,7 @@ Partial Class IQCGraphs
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCGraphs"
+        Me.Name = "UiQCGraphs"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

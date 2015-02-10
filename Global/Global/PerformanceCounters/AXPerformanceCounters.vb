@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms
+﻿
 Imports System.IO
 Imports System.Text
 
@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.Global
 
             Dim value As Single = 0
             Dim myOthers As New List(Of SystemCounter)
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 Dim location As String = Environment.GetCommandLineArgs()(0)
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.Global
                 If Not myTemp.Key Is Nothing Then myTxt.Append("BA400 = " & myTemp.Value.ToString("N0") & " / ")
                 If Not limitExceededFlag AndAlso CSng((myTemp.Value) / convertToMegaBytes) > maxAppMemoryUsage Then
                     limitExceededFlag = True 'AG 24/02/2014 - #1520 - Check if max limit is exceeded for the BA400 memory usage counter
-                    myLogAcciones.CreateLogActivity("Performance message: Memory BA400 > MAX_APP_MEMORYUSAGE", "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False) 'AG 27/02/2014 - add trace
+                    GlobalBase.CreateLogActivity("Performance message: Memory BA400 > MAX_APP_MEMORYUSAGE", "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False) 'AG 27/02/2014 - add trace
                 End If
 
 
@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.Global
                 If Not myTemp.Key Is Nothing Then myTxt.Append("sqlservr = " & myTemp.Value.ToString("N0") & " / ")
                 If Not limitExceededFlag AndAlso CSng((myTemp.Value) / convertToMegaBytes) > maxSQLMemoryUsage Then
                     limitExceededFlag = True 'AG 24/02/2014 - #1520 - Check if max limit is exceeded for the SQL memory usage counter
-                    myLogAcciones.CreateLogActivity("Performance message: Memory SQLserv > MAX_SQL_MEMORYUSAGE", "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False) 'AG 27/02/2014 - add trace
+                    GlobalBase.CreateLogActivity("Performance message: Memory SQLserv > MAX_SQL_MEMORYUSAGE", "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False) 'AG 27/02/2014 - add trace
                 End If
 
 
@@ -107,7 +107,7 @@ Namespace Biosystems.Ax00.Global
                 'If Not limitExceededFlag AndAlso CSng((myTemp.Value) / convertToMegaBytes) > maxSQLMemoryUsage Then limitExceededFlag = True 'AG 24/02/2014 - #1520 - Check if max limit is exceeded for the SQL memroy usage counter
 
 
-                myLogAcciones.CreateLogActivity(myTxt.ToString(), "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity(myTxt.ToString(), "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False)
 
                 'Performance counters:
                 'myOthers.Add(New SystemCounter(SystemCounter.CountersType.Available_MBytes, myProcessName)) 'Available memory
@@ -150,10 +150,10 @@ Namespace Biosystems.Ax00.Global
                         myTxt.Append(counter.Name & ": NoInfo" & " / ") 'myTxt.Append(counter.Name & ": Error" & " / ")
                     End If
                 Next
-                myLogAcciones.CreateLogActivity(myTxt.ToString(), "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity(myTxt.ToString(), "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Information, False)
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AXPerformanceCounters.GetAllCounters", EventLogEntryType.Error, False)
             End Try
 
         End Sub

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IHisBlankCalibResults
+Partial Class UiHisBlankCalibResults
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -41,6 +41,7 @@ Partial Class IHisBlankCalibResults
         Me.CalibratorGridView = New DevExpress.XtraGrid.Views.Grid.GridView()
         Me.xtraBlanksGrid = New DevExpress.XtraGrid.GridControl()
         Me.BlankGridView = New DevExpress.XtraGrid.Views.Grid.GridView()
+        Me.printButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.searchGroup.SuspendLayout()
         Me.historyGroup.SuspendLayout()
         CType(Me.xtraCalibratorsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -120,6 +121,7 @@ Partial Class IHisBlankCalibResults
         Me.testNameTextBox.IsNumeric = False
         Me.testNameTextBox.Location = New System.Drawing.Point(338, 62)
         Me.testNameTextBox.Mandatory = False
+        Me.testNameTextBox.MaxLength = 16
         Me.testNameTextBox.Name = "testNameTextBox"
         Me.testNameTextBox.Size = New System.Drawing.Size(170, 21)
         Me.testNameTextBox.TabIndex = 4
@@ -466,6 +468,15 @@ Partial Class IHisBlankCalibResults
         Me.BlankGridView.OptionsView.ShowGroupPanel = False
         Me.BlankGridView.PaintStyleName = "WindowsXP"
         '
+        'printButton
+        '
+        Me.printButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.printButton.Location = New System.Drawing.Point(21, 614)
+        Me.printButton.Name = "printButton"
+        Me.printButton.Size = New System.Drawing.Size(32, 32)
+        Me.printButton.TabIndex = 28
+        Me.printButton.UseVisualStyleBackColor = True
+        '
         'IHisBlankCalibResults
         '
         Me.AcceptButton = Me.exitButton
@@ -477,6 +488,7 @@ Partial Class IHisBlankCalibResults
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.printButton)
         Me.Controls.Add(Me.searchGroup)
         Me.Controls.Add(Me.historyGroup)
         Me.Controls.Add(Me.exitButton)
@@ -485,9 +497,9 @@ Partial Class IHisBlankCalibResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IHisBlankCalibResults"
+        Me.Name = "UiHisBlankCalibResults"
         Me.ShowInTaskbar = False
-        Me.Text = "IHisBlankCalibResults"
+        Me.Text = "UiHisBlankCalibResults"
         Me.searchGroup.ResumeLayout(False)
         Me.searchGroup.PerformLayout()
         Me.historyGroup.ResumeLayout(False)
@@ -517,4 +529,5 @@ Partial Class IHisBlankCalibResults
     Friend WithEvents BsCalibsGridLabel1 As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
+    Friend WithEvents printButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

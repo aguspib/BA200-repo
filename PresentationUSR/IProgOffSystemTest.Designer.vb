@@ -1,6 +1,6 @@
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgOffSystemTest
+Partial Class UiProgOffSystemTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -20,44 +20,45 @@ Partial Class IProgOffSystemTest
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgOffSystemTest))
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsOffSystemTestListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsOffSystemTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.bsTestDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsDefaultValueUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.bsDefaultValueLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDefaultValueComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsResultTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsResultTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsOffSystemTabControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
-        Me.RefRangesTabPage = New System.Windows.Forms.TabPage
-        Me.bsRefRangesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsTestRefRanges = New BSReferenceRanges
-        Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.bsDecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsUnitComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsUnitLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsShortNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsOffSystemTestDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsCalcTestListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsCalTestDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel3 = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgOffSystemTest))
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsOffSystemTestListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsOffSystemTestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.bsTestDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsDefaultValueUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsDefaultValueLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDefaultValueComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsResultTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsResultTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsOffSystemTabControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
+        Me.RefRangesTabPage = New System.Windows.Forms.TabPage()
+        Me.bsRefRangesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsTestRefRanges = New BSReferenceRanges()
+        Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsDecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsUnitComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsUnitLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsShortNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsOffSystemTestDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsCalcTestListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsCalTestDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel3 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsTestDetailsGroupBox.SuspendLayout()
         CType(Me.bsDefaultValueUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsOffSystemTabControl.SuspendLayout()
@@ -109,10 +110,10 @@ Partial Class IProgOffSystemTest
         '
         Me.bsPrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsPrintButton.Enabled = False
-        Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
+        Me.bsPrintButton.Location = New System.Drawing.Point(249, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 17
+        Me.bsPrintButton.TabIndex = 18
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
@@ -496,6 +497,15 @@ Partial Class IProgOffSystemTest
         Me.BsLabel3.Title = False
         Me.BsLabel3.Visible = False
         '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(212, 613)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 17
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgOffSystemTest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -506,6 +516,7 @@ Partial Class IProgOffSystemTest
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(970, 685)
+        Me.Controls.Add(Me.BsCustomOrderButton)
         Me.Controls.Add(Me.bsCalcTestListGroupBox)
         Me.Controls.Add(Me.bsExitButton)
         Me.Controls.Add(Me.bsNewButton)
@@ -519,7 +530,7 @@ Partial Class IProgOffSystemTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgOffSystemTest"
+        Me.Name = "UiProgOffSystemTest"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestDetailsGroupBox.ResumeLayout(False)
@@ -571,4 +582,5 @@ Partial Class IProgOffSystemTest
     Friend WithEvents BsLabel3 As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsRefRangesPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsTestRefRanges As BSReferenceRanges
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

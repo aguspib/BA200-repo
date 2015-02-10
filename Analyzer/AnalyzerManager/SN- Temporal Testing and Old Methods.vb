@@ -1,22 +1,16 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
-Imports System.Timers
 Imports System.Data
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports System.IO
 Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerEntity
+    Partial Public Class AnalyzerManager
 
 #Region "Temporally testing Methods"
 
@@ -29,7 +23,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 03/05/2010
         ''' </remarks>
-        Public Function SimulateInstructionReception(ByVal pInstructionReceived As String, Optional ByVal pReturnData As Object = Nothing) As GlobalDataTO Implements IAnalyzerEntity.SimulateInstructionReception
+        Public Function SimulateInstructionReception(ByVal pInstructionReceived As String, Optional ByVal pReturnData As Object = Nothing) As GlobalDataTO Implements IAnalyzerManager.SimulateInstructionReception
             Dim myGlobal As New GlobalDataTO
             Try
 
@@ -40,8 +34,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateInstructionReception", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateInstructionReception", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -53,7 +47,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pNextWell ">entre 1 y 120</param>
         ''' <returns></returns>
         ''' <remarks>Created by AG,RH 27/06/2012</remarks>
-        Public Function SimulateSendNext(ByVal pNextWell As Integer) As GlobalDataTO Implements IAnalyzerEntity.SimulateSendNext
+        Public Function SimulateSendNext(ByVal pNextWell As Integer) As GlobalDataTO Implements IAnalyzerManager.SimulateSendNext
             Dim myGlobal As GlobalDataTO
 
             Try
@@ -66,8 +60,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateSendNext", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateSendNext", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -82,7 +76,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 03/05/2012
         ''' </remarks>
-        Public Function SimulateAlarmsManagement(ByVal pAlarmList As List(Of GlobalEnumerates.Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IAnalyzerEntity.SimulateAlarmsManagement
+        Public Function SimulateAlarmsManagement(ByVal pAlarmList As List(Of GlobalEnumerates.Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IAnalyzerManager.SimulateAlarmsManagement
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim finalAlarmList As New List(Of GlobalEnumerates.Alarms)
@@ -108,13 +102,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateAlarmsManagement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateAlarmsManagement", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
 
-        Public Function SimulateRequestAdjustmentsFromAnalyzer(ByVal pPath As String) As GlobalDataTO Implements IAnalyzerEntity.SimulateRequestAdjustmentsFromAnalyzer
+        Public Function SimulateRequestAdjustmentsFromAnalyzer(ByVal pPath As String) As GlobalDataTO Implements IAnalyzerManager.SimulateRequestAdjustmentsFromAnalyzer
             Dim myGlobal As New GlobalDataTO
             Try
                 'PENDING 
@@ -122,10 +116,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'SIMULATE
                 Dim myData As String = ""
-                Dim myGlobalbase As New GlobalBase
-                Dim objReader As System.IO.StreamReader
+                ''Dim myGlobalbase As New GlobalBase
+                Dim objReader As StreamReader
                 Dim path As String = pPath
-                objReader = New System.IO.StreamReader(path)
+                objReader = New StreamReader(path)
                 myData = objReader.ReadToEnd()
                 objReader.Close()
 
@@ -151,21 +145,21 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
-        Public Function ProcessArmCollisionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerEntity.ProcessArmCollisionDuringRecoverBuss
+        Public Function ProcessArmCollisionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerManager.ProcessArmCollisionDuringRecoverBuss
             Dim myGlobal As New GlobalDataTO
             myGlobal = ProcessArmCollisionDuringRecover(pPrepWithKO)
 
             Return myGlobal
         End Function
 
-        Public Function ProcessClotDetectionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerEntity.ProcessClotDetectionDuringRecoverBuss
+        Public Function ProcessClotDetectionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerManager.ProcessClotDetectionDuringRecoverBuss
             Dim myGlobal As New GlobalDataTO
             myGlobal = ProcessClotDetectionDuringRecover(pPrepWithKO)
 
             Return myGlobal
         End Function
 
-        Public Function ProcessLevelDetectionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerEntity.ProcessLevelDetectionDuringRecoverBuss
+        Public Function ProcessLevelDetectionDuringRecoverBuss(ByVal pPrepWithKO As PrepWithProblemTO) As GlobalDataTO Implements IAnalyzerManager.ProcessLevelDetectionDuringRecoverBuss
             Dim myGlobal As New GlobalDataTO
             myGlobal = ProcessLevelDetectionDuringRecover(pPrepWithKO)
 
@@ -418,8 +412,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -505,8 +499,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -634,8 +628,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ' ''        myGlobal.ErrorCode = "SYSTEM_ERROR"
         ' ''        myGlobal.ErrorMessage = ex.Message
 
-        ' ''        Dim myLogAcciones As New ApplicationLogManager()
-        ' ''        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
+        ' ''        'Dim myLogAcciones As New ApplicationLogManager()
+        ' ''        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
         ' ''    End Try
         ' ''    Return myGlobal
         ' ''End Function
@@ -698,7 +692,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '                    'myPreparationID = CInt((From a In pInstructionReceived Where a.ParameterIndex = (4 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                    'Read the preparation ID (parameter index = 4 + 5*i)
         '                    'TR 25/05/2010 implement the method to get a value through the index.
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (4 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (4 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myPreparationID = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
@@ -733,7 +727,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '                        'myWellUsed = CInt((From a In pInstructionReceived Where a.ParameterIndex = (8 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                        'Read the well used (parameter index 8) & inform it and the base line too
         '                        'TR 25/05/2010 implement the method to get a value through the index.
-        '                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (8 + (iteration - 1) * myOffset))
+        '                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (8 + (iteration - 1) * myOffset))
         '                        If Not myGlobal.HasError Then
         '                            myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                        Else : Exit For
@@ -784,7 +778,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '                    'AG 19/05/2010 - IF Reading number > than READING1.CYCLES.min --- reactioncomplete = TRUE
         '                    'myReadingRow.ReadingNumber = CInt((From a In pInstructionReceived Where a.ParameterIndex = (5 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                    'TR 25/05/2010 implement the method to get a value through the index.
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (5 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (5 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.ReadingNumber = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
@@ -802,14 +796,14 @@ Namespace Biosystems.Ax00.Core.Entities
         '                    'Counts
         '                    'TR 25/05/2010 implement the method to get a value through the index.
         '                    'myReadingRow.MainCounts = CInt((From a In pInstructionReceived Where a.ParameterIndex = (6 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (6 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (6 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.MainCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
         '                    End If
 
         '                    'myReadingRow.RefCounts = CInt((From a In pInstructionReceived Where a.ParameterIndex = (7 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (7 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (7 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.RefCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
@@ -898,8 +892,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobal
         'End Function
@@ -973,8 +967,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwAdjustmentsReceived", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwAdjustmentsReceived", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -1059,8 +1053,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwSensorsReceived", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwSensorsReceived", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -1383,8 +1377,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessSERVICEInformationStatusReceived", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessSERVICEInformationStatusReceived", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal

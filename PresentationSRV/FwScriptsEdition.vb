@@ -50,19 +50,19 @@ Public Class FwScriptsEdition
 
 #Region "Properties"
 
-    Private ReadOnly Property SimulationMode() As Boolean
-        Get
-            If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
-                SimulationModeAttr = True ' Simulation mode
-            ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
-                SimulationModeAttr = False ' Developer mode
-            Else
-                SimulationModeAttr = False ' Real mode
-            End If
-
-            Return SimulationModeAttr
-        End Get
-    End Property
+    'already implemented in base class. Inheritance is your friend!
+    'Private ReadOnly Property SimulationMode() As Boolean
+    '    Get
+    '        If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
+    '            SimulationModeAttr = True ' Simulation mode
+    '        ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
+    '            SimulationModeAttr = False ' Developer mode
+    '        Else
+    '            SimulationModeAttr = False ' Real mode
+    '        End If
+    '        Return SimulationModeAttr
+    '    End Get
+    'End Property
 
     Private Property CurrentScreenMode() As ScreenModes
         Get
@@ -258,7 +258,7 @@ Public Class FwScriptsEdition
             'MyClass.CurrentScreenMode = MyClass.PreviousScreenModeBeforeTesting
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionFwScriptEvent ", _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionFwScriptEvent ", _
                                      EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
 
@@ -294,7 +294,7 @@ Public Class FwScriptsEdition
             myResultData.SetDatos = dataSessionTO.UserName
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetCurrentAuthorID", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetCurrentAuthorID", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetCurrentAuthorID", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myResultData
@@ -336,7 +336,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertGridToScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertGridToScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertGridToScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -376,7 +376,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -393,66 +393,23 @@ Public Class FwScriptsEdition
             'SCREEN Image
             auxIconName = GetIconName("GRID")   ' SCREEN PDT !!! i totes les icones !!!
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("SCREEN", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("SCREEN", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             Me.BsScreenActionsTreeView.ImageList = BStreeScreenIcons
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTreeViewImages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Loads resized the button images
-    ''' </summary>
-    ''' <param name="pButton"></param>
-    ''' <param name="pImageName"></param>
-    ''' <param name="pWidth"></param>
-    ''' <param name="pHeight"></param>
-    ''' <remarks></remarks>
-    Private Sub SetButtonImage(ByVal pButton As Button, ByVal pImageName As String, _
-                              Optional ByVal pWidth As Integer = 28, _
-                              Optional ByVal pHeight As Integer = 28)
-
-        Dim auxIconName As String = ""
-        Dim iconPath As String = MyBase.IconsPath
-        Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
-
-        Try
-
-            Dim myButtonImage As Image
-
-            auxIconName = GetIconName(pImageName)
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
-
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
-                If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                    myButtonImage = CType(myGlobal.SetDatos, Bitmap)
-                Else
-                    myButtonImage = CType(myImage, Bitmap)
-                End If
-
-                pButton.BackgroundImage = myButtonImage
-                pButton.BackgroundImageLayout = ImageLayout.Stretch
-
-            End If
-
-        Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SetButtonImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
     ''' <summary>
     ''' Loads the icons and tooltips used for painting the buttons
     ''' </summary>
@@ -461,7 +418,7 @@ Public Class FwScriptsEdition
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             Dim auxIconName As String = ""
@@ -469,55 +426,55 @@ Public Class FwScriptsEdition
 
 
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then BsCheckButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCheckButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VOLUME")
-            If (auxIconName <> "") Then BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                BsRemoveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsUnTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsRemoveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUnTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsSaveAllButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsSaveAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("EDIT")
-            If (auxIconName <> "") Then BsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("FACTORY")
-            If (auxIconName <> "") Then BsRestoreButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsRestoreButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("IMPORTSCRIPT")
-            If (auxIconName <> "") Then BsImportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("EXPORTSCRIPT")
-            If (auxIconName <> "") Then BsExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("UNDO")
-            If (auxIconName <> "") Then BsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("OPEN")
-            If (auxIconName <> "") Then BsImportAllButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("ADD")
-            If (auxIconName <> "") Then BsAddButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsAddButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CHANGEROTORB")
-            If (auxIconName <> "") Then BsMoveUpButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveUpButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("DECREASEBUT")
-            If (auxIconName <> "") Then BsMoveDownButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("READADJ")
-            If (auxIconName <> "") Then BsExportAllToFileButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportAllToFileButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MyClass.SetButtonImage(BsCheckButton, "ACCEPT1")
             'MyClass.SetButtonImage(BsTestButton, "VOLUME")
@@ -540,7 +497,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -567,26 +524,26 @@ Public Class FwScriptsEdition
             BsActionScriptLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_SCRIPT_EDIT_ActionScript", LanguageID)
             BsInstructionsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_SCRIPT_EDIT_Instructions", LanguageID)
 
-            bsScreenToolTips.SetToolTip(BsCheckButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Check", LanguageID))
-            bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Test", LanguageID))
-            bsScreenToolTips.SetToolTip(BsRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Restore", LanguageID))
-            bsScreenToolTips.SetToolTip(BsImportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Import", LanguageID))
-            bsScreenToolTips.SetToolTip(BsExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Export", LanguageID))
-            bsScreenToolTips.SetToolTip(BsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", LanguageID))
-            bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", LanguageID))
-            bsScreenToolTips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", LanguageID))
-            bsScreenToolTips.SetToolTip(BsAddButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", LanguageID))
-            bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", LanguageID))
-            bsScreenToolTips.SetToolTip(BsMoveDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveDown", LanguageID))
-            bsScreenToolTips.SetToolTip(BsMoveUpButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveUp", LanguageID))
-            bsScreenToolTips.SetToolTip(BsImportAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_ImportAll", LanguageID))
-            bsScreenToolTips.SetToolTip(BsRemoveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", LanguageID))
-            bsScreenToolTips.SetToolTip(BsSaveAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_SaveAll", LanguageID))
+            ScreenTooltips.SetToolTip(BsCheckButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Check", LanguageID))
+            ScreenTooltips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Test", LanguageID))
+            ScreenTooltips.SetToolTip(BsRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Restore", LanguageID))
+            ScreenTooltips.SetToolTip(BsImportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Import", LanguageID))
+            ScreenTooltips.SetToolTip(BsExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Export", LanguageID))
+            ScreenTooltips.SetToolTip(BsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", LanguageID))
+            ScreenTooltips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", LanguageID))
+            ScreenTooltips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", LanguageID))
+            ScreenTooltips.SetToolTip(BsAddButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", LanguageID))
+            ScreenTooltips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", LanguageID))
+            ScreenTooltips.SetToolTip(BsMoveDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveDown", LanguageID))
+            ScreenTooltips.SetToolTip(BsMoveUpButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveUp", LanguageID))
+            ScreenTooltips.SetToolTip(BsImportAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_ImportAll", LanguageID))
+            ScreenTooltips.SetToolTip(BsRemoveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", LanguageID))
+            ScreenTooltips.SetToolTip(BsSaveAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_SaveAll", LanguageID))
 
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -699,7 +656,7 @@ Public Class FwScriptsEdition
             bsInstructionsListDataGridView.EditMode = DataGridViewEditMode.EditOnEnter
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInstructionsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInstructionsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeInstructionsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -737,7 +694,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzersCombo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzersCombo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FillAnalyzersCombo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -827,7 +784,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreensTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreensTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadScreensTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -871,7 +828,7 @@ Public Class FwScriptsEdition
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetFwScriptRelatedNodes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myNodes
@@ -906,7 +863,7 @@ Public Class FwScriptsEdition
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedScreenNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedScreenNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetFwScriptRelatedScreenNodes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myNodes
@@ -938,7 +895,7 @@ Public Class FwScriptsEdition
                 End If
             Next
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileEditing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileEditing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TreeviewWhileEditing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -967,7 +924,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileReading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileReading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TreeviewWhileReading", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1031,7 +988,7 @@ Public Class FwScriptsEdition
 
             End Select
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIPrepareScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1075,7 +1032,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1121,7 +1078,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1166,7 +1123,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoading", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1237,7 +1194,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoaded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1325,7 +1282,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIModifying", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1399,7 +1356,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModified", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModified", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIModified", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1453,7 +1410,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGridChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGridChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIGridChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1498,7 +1455,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILocalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILocalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILocalSaving", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1543,7 +1500,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIAllImporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1589,7 +1546,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptChecking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptChecking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptChecking", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1634,7 +1591,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptTesting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptTesting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptTesting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1679,7 +1636,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptImporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1724,7 +1681,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptExporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptExporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptExporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1769,7 +1726,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGlobalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGlobalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & "UIGlobalSaving", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1814,7 +1771,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllRestoring", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllRestoring", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIAllRestoring", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1863,7 +1820,7 @@ Public Class FwScriptsEdition
             Me.Cursor = Cursors.Default
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIOnError", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1917,7 +1874,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowActionFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowActionFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowActionFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1952,7 +1909,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowFwScriptInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowFwScriptInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowFwScriptInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2014,7 +1971,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             If Not myGlobal.HasError Then
@@ -2076,7 +2033,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExportCurrentFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2155,7 +2112,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ImportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ImportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ImportCurrentFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2170,7 +2127,7 @@ Public Class FwScriptsEdition
     Private Function CheckGrid(Optional ByVal pShowMessage As Boolean = False) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim CopyOfSelectedScript As FwScriptTO
+        Dim CopyOfSelectedScript As FwScriptTO = Nothing
         Dim SyntaxOK As Boolean = True
         Dim SequenceOK As Boolean = True
         Dim myPreviousScreenMode As ScreenModes = MyClass.CurrentScreenMode
@@ -2245,7 +2202,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
 
@@ -2320,7 +2277,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSyntax", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSyntax", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGridSyntax", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2365,7 +2322,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSequence", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSequence", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGridSequence", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2429,7 +2386,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisplayGridResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisplayGridResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisplayGridResults", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2566,7 +2523,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateGridCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return myGlobal
         End Try
@@ -2614,7 +2571,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateGridCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2651,7 +2608,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateCellsEditionChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateCellsEditionChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateCellsEditionChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2776,7 +2733,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TestInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TestInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -2824,7 +2781,7 @@ Public Class FwScriptsEdition
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
             dialogResultToReturn = Windows.Forms.DialogResult.No
         End Try
@@ -2860,7 +2817,7 @@ Public Class FwScriptsEdition
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingGlobalWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingGlobalWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
             dialogResultToReturn = Windows.Forms.DialogResult.No
         End Try
@@ -2974,7 +2931,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveScriptChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveScriptChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveScriptChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3036,7 +2993,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAllChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAllChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveAllChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3062,7 +3019,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetCellColumnName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetCellColumnName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetCellColumnName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3089,7 +3046,7 @@ Public Class FwScriptsEdition
 
             MyClass.CurrentScreenMode = ScreenModes.GRIDCHANGING
 
-            Dim myCell As DataGridViewCell
+            Dim myCell As DataGridViewCell = Nothing
             If bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
                 myCell = bsInstructionsListDataGridView.SelectedCells(0)
             End If
@@ -3175,7 +3132,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".MoveRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MoveRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".MoveRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3231,7 +3188,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryScripts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryScripts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RestoreFactoryScripts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3266,7 +3223,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_FormClosing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_FormClosing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FormScriptsManager_FormClosing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3285,8 +3242,8 @@ Public Class FwScriptsEdition
     Private Sub FormScriptsManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             Me.Location = New Point(0, 0)
 
@@ -3295,7 +3252,7 @@ Public Class FwScriptsEdition
             ResetBorderSRV()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FormScriptsManager_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3330,7 +3287,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3383,7 +3340,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsImportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
@@ -3421,7 +3378,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCheckButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCheckButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCheckButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3455,7 +3412,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTestButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3474,7 +3431,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsUnTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsUnTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsUnTestButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3496,7 +3453,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3547,7 +3504,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsAddButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAddButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsAddButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3584,7 +3541,7 @@ Public Class FwScriptsEdition
             'Me.SaveAllChanges()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3620,7 +3577,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3635,7 +3592,7 @@ Public Class FwScriptsEdition
             Me.MoveRow(RowMovement.UP)
             'Me.Sort("UP")
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveUpButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveUpButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsMoveUpButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3650,7 +3607,7 @@ Public Class FwScriptsEdition
             Me.MoveRow(RowMovement.DOWN)
             'Me.Sort("DOWN")
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveDownButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveDownButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsMoveDownButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3670,7 +3627,7 @@ Public Class FwScriptsEdition
             MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsRemoveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsRemoveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRemoveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3703,7 +3660,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "ExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "ExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExitButton_Click", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -3735,7 +3692,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsSaveAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsSaveAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveAllButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3771,7 +3728,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsExportAllToFileButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsExportAllToFileButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExportAllToFileButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3792,7 +3749,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_CellValueChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_CellValueChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_CellValueChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -3823,7 +3780,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsRestoreButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsRestoreButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRestoreButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3901,7 +3858,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsImportAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsImportAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsImportAllButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3964,7 +3921,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4023,7 +3980,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4038,7 +3995,7 @@ Public Class FwScriptsEdition
                 MyClass.CurrentScreenMode = ScreenModes.MODIFYING
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4053,7 +4010,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_SelectionChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_SelectionChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_SelectionChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4070,7 +4027,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4110,7 +4067,7 @@ Public Class FwScriptsEdition
             MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenModeAttr = ScreenModes.ON_ERROR
         End Try
@@ -4143,7 +4100,7 @@ Public Class FwScriptsEdition
             If myglobal.HasError Then MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenModeAttr = ScreenModes.ON_ERROR
         End Try
@@ -4178,7 +4135,7 @@ Public Class FwScriptsEdition
                 MyClass.LoadScreensTreeView()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BSAnalyzerCombo_SelectedIndexChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BSAnalyzerCombo_SelectedIndexChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BSAnalyzerCombo_SelectedIndexChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4194,7 +4151,7 @@ Public Class FwScriptsEdition
         Try
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4212,7 +4169,7 @@ Public Class FwScriptsEdition
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4221,212 +4178,212 @@ Public Class FwScriptsEdition
     '************************************************************
 #Region "Not Used"
 
-    ''' <summary>
-    ''' Sorting rows instructions 
-    ''' </summary>
-    ''' <param name="pDirection">(up and down)</param>
-    ''' <remarks>
-    ''' Created by XBC 29/09/2010
-    ''' Modified by XBC 17/11/2010 - add EnableEdition hidden column
-    ''' Modified by XBC 24/11/2010 - Add functionality to Not Editable Instruction
-    ''' </remarks>
-    Private Function Sort(ByVal pDirection As String) As GlobalDataTO
-        Dim myInstruction As InstructionTO = Nothing
-        Dim myInstructionTmp As InstructionTO = Nothing
-        'Dim tableTemp As DataTable = Nothing
-        Dim seleccion As String = ""
-        Dim seleccioOk As Boolean
+    ' ''' <summary>
+    ' ''' Sorting rows instructions 
+    ' ''' </summary>
+    ' ''' <param name="pDirection">(up and down)</param>
+    ' ''' <remarks>
+    ' ''' Created by XBC 29/09/2010
+    ' ''' Modified by XBC 17/11/2010 - add EnableEdition hidden column
+    ' ''' Modified by XBC 24/11/2010 - Add functionality to Not Editable Instruction
+    ' ''' </remarks>
+    'Private Function Sort(ByVal pDirection As String) As GlobalDataTO
+    '    Dim myInstruction As InstructionTO = Nothing
+    '    Dim myInstructionTmp As InstructionTO = Nothing
+    '    'Dim tableTemp As DataTable = Nothing
+    '    Dim seleccion As String = ""
+    '    Dim seleccioOk As Boolean
 
-        Dim myGlobal As New GlobalDataTO
+    '    Dim myGlobal As New GlobalDataTO
 
-        Try
+    '    Try
 
-            If Me.bsInstructionsListDataGridView.SelectedRows.Count > 0 Then
-                If Me.bsInstructionsListDataGridView.SelectedRows(0).IsNewRow Then Exit Function
-            End If
+    '        If Me.bsInstructionsListDataGridView.SelectedRows.Count > 0 Then
+    '            If Me.bsInstructionsListDataGridView.SelectedRows(0).IsNewRow Then Exit Function
+    '        End If
 
-            If Me.bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
-                If Me.bsInstructionsListDataGridView.SelectedCells(0).IsInEditMode Then Exit Function
-            End If
+    '        If Me.bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
+    '            If Me.bsInstructionsListDataGridView.SelectedCells(0).IsInEditMode Then Exit Function
+    '        End If
 
-            If MyClass.CurrentScreenMode = ScreenModes.MODIFYING And Me.bsInstructionsListDataGridView.Rows.Count > 0 Then
+    '        If MyClass.CurrentScreenMode = ScreenModes.MODIFYING And Me.bsInstructionsListDataGridView.Rows.Count > 0 Then
 
-                For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                    For Each cellsort As DataGridViewCell In rdsort2.Cells
-                        If cellsort.Selected Then
-                            rdsort2.Selected = True
-                            seleccion = rdsort2.Cells("InstructionID").Value.ToString
-                            seleccioOk = True
-                            Exit For
-                        End If
-                    Next
-                    If seleccioOk Then Exit For
-                Next
+    '            For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                For Each cellsort As DataGridViewCell In rdsort2.Cells
+    '                    If cellsort.Selected Then
+    '                        rdsort2.Selected = True
+    '                        seleccion = rdsort2.Cells("InstructionID").Value.ToString
+    '                        seleccioOk = True
+    '                        Exit For
+    '                    End If
+    '                Next
+    '                If seleccioOk Then Exit For
+    '            Next
 
-                If Not Me.SelectedFwScript.Instructions Is Nothing Then
-                    Dim myInstructionsAux As New List(Of InstructionTO)
+    '            If Not Me.SelectedFwScript.Instructions Is Nothing Then
+    '                Dim myInstructionsAux As New List(Of InstructionTO)
 
-                    Select Case pDirection
-                        Case "UP"
-                            For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                                If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
-                                    If rsort.Index = 0 Then
-                                        ' if wish to sort to up, first element is already sorted
-                                        Exit Function
-                                    Else
-                                        ' selected
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                        '// adding previous item if exists
-                                        If Not myInstructionTmp Is Nothing Then
-                                            myInstructionsAux.Add(myInstructionTmp)
-                                        End If
-                                    End If
-                                Else
-                                    If rsort.Index + 1 <= Me.bsInstructionsListDataGridView.Rows.Count - 1 AndAlso _
-                                       Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index + 1).Cells(0).Value.ToString) Then
-                                        '//Save previous element to the selected item Temporaly
-                                        myInstructionTmp = New InstructionTO
-                                        myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                    Else
-                                        '// inserting the other items
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                    End If
-                                End If
-                            Next
+    '                Select Case pDirection
+    '                    Case "UP"
+    '                        For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                            If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
+    '                                If rsort.Index = 0 Then
+    '                                    ' if wish to sort to up, first element is already sorted
+    '                                    Exit Function
+    '                                Else
+    '                                    ' selected
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                    '// adding previous item if exists
+    '                                    If Not myInstructionTmp Is Nothing Then
+    '                                        myInstructionsAux.Add(myInstructionTmp)
+    '                                    End If
+    '                                End If
+    '                            Else
+    '                                If rsort.Index + 1 <= Me.bsInstructionsListDataGridView.Rows.Count - 1 AndAlso _
+    '                                   Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index + 1).Cells(0).Value.ToString) Then
+    '                                    '//Save previous element to the selected item Temporaly
+    '                                    myInstructionTmp = New InstructionTO
+    '                                    myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                Else
+    '                                    '// inserting the other items
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                End If
+    '                            End If
+    '                        Next
 
-                            ' New sorted assignation
-                            MyClass.SelectedFwScript.Instructions = myInstructionsAux
-                            myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
+    '                        ' New sorted assignation
+    '                        MyClass.SelectedFwScript.Instructions = myInstructionsAux
+    '                        myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
 
-                        Case "DOWN"
-                            For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                                If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
-                                    If rsort.Index = Me.bsInstructionsListDataGridView.Rows.Count - 1 Then
-                                        ' if wish to sort to down, last element is already sorted
-                                        Exit Function
-                                    Else
-                                        '// Selected
-                                        '// Save selected item Temporaly
-                                        myInstructionTmp = New InstructionTO
-                                        myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                    End If
-                                Else
-                                    If rsort.Index > 0 AndAlso Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index - 1).Cells(0).Value.ToString) Then
-                                        '// adding following selected item
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                        '// adding selected item previously saved
-                                        If Not myInstructionTmp Is Nothing Then
-                                            myInstructionsAux.Add(myInstructionTmp)
-                                        End If
-                                    Else
-                                        '// inserting the other items
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                    End If
-                                End If
-                            Next
+    '                    Case "DOWN"
+    '                        For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                            If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
+    '                                If rsort.Index = Me.bsInstructionsListDataGridView.Rows.Count - 1 Then
+    '                                    ' if wish to sort to down, last element is already sorted
+    '                                    Exit Function
+    '                                Else
+    '                                    '// Selected
+    '                                    '// Save selected item Temporaly
+    '                                    myInstructionTmp = New InstructionTO
+    '                                    myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                End If
+    '                            Else
+    '                                If rsort.Index > 0 AndAlso Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index - 1).Cells(0).Value.ToString) Then
+    '                                    '// adding following selected item
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                    '// adding selected item previously saved
+    '                                    If Not myInstructionTmp Is Nothing Then
+    '                                        myInstructionsAux.Add(myInstructionTmp)
+    '                                    End If
+    '                                Else
+    '                                    '// inserting the other items
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                End If
+    '                            End If
+    '                        Next
 
-                            ' New sorted assignation
-                            MyClass.SelectedFwScript.Instructions = myInstructionsAux
-                            myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
-                    End Select
+    '                        ' New sorted assignation
+    '                        MyClass.SelectedFwScript.Instructions = myInstructionsAux
+    '                        myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
+    '                End Select
 
-                    'uncheck the Syntax OK
-                    Me.SelectedFwScript.SyntaxOK = False
-                    Me.SelectedFwScript.TestedOK = False
-                    For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        R.Cells("SyntaxOK").Value = False
-                        R.Cells("TestedOK").Value = False
-                    Next
+    '                'uncheck the Syntax OK
+    '                Me.SelectedFwScript.SyntaxOK = False
+    '                Me.SelectedFwScript.TestedOK = False
+    '                For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    R.Cells("SyntaxOK").Value = False
+    '                    R.Cells("TestedOK").Value = False
+    '                Next
 
-                    MyClass.CurrentScreenMode = ScreenModes.MODIFIED
+    '                MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
-                End If
-
-
-                '// Ending with sorted item Focused
-                If seleccion.Length > 0 Then
-                    For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        If rdsort2.Cells(0).Value.ToString = seleccion Then
-                            Me.bsInstructionsListDataGridView.CurrentCell = rdsort2.Cells(3)
-                            rdsort2.Selected = True
-                        End If
-                    Next
-                End If
+    '            End If
 
 
-                'SG 10/11/10 Validate changes
-                'myGlobal = MyClass.ValidateEditionChanges()
+    '            '// Ending with sorted item Focused
+    '            If seleccion.Length > 0 Then
+    '                For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    If rdsort2.Cells(0).Value.ToString = seleccion Then
+    '                        Me.bsInstructionsListDataGridView.CurrentCell = rdsort2.Cells(3)
+    '                        rdsort2.Selected = True
+    '                    End If
+    '                Next
+    '            End If
 
-                If Not myGlobal.HasError Then
-                    ' XBC 24/11/2010
-                    For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        If Not CBool(R.Cells("EnableEdition").Value) Then
-                            R.Cells("Sequence").ReadOnly = False
-                            R.Cells("Code").ReadOnly = True
-                            R.Cells("Params").ReadOnly = True
-                            R.Cells("SyntaxOK").ReadOnly = True
-                            R.Cells("TestedOK").ReadOnly = True
-                        End If
-                    Next R
-                    ' XBC 24/11/2010
 
-                    Me.bsInstructionsListDataGridView.Focus()
-                    'END SG 10/11/10
+    '            'SG 10/11/10 Validate changes
+    '            'myGlobal = MyClass.ValidateEditionChanges()
 
-                    MyClass.CurrentScreenMode = ScreenModes.MODIFIED
-                End If
+    '            If Not myGlobal.HasError Then
+    '                ' XBC 24/11/2010
+    '                For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    If Not CBool(R.Cells("EnableEdition").Value) Then
+    '                        R.Cells("Sequence").ReadOnly = False
+    '                        R.Cells("Code").ReadOnly = True
+    '                        R.Cells("Params").ReadOnly = True
+    '                        R.Cells("SyntaxOK").ReadOnly = True
+    '                        R.Cells("TestedOK").ReadOnly = True
+    '                    End If
+    '                Next R
+    '                ' XBC 24/11/2010
 
-            End If
+    '                Me.bsInstructionsListDataGridView.Focus()
+    '                'END SG 10/11/10
 
-        Catch ex As Exception
-            myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".Sort", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
+    '                MyClass.CurrentScreenMode = ScreenModes.MODIFIED
+    '            End If
 
-        Return myGlobal
+    '        End If
 
-    End Function
+    '    Catch ex As Exception
+    '        myGlobal.HasError = True
+    '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+    '        myGlobal.ErrorMessage = ex.Message
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        MyBase.ShowMessage(Me.Name & ".Sort", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+    '    End Try
+
+    '    Return myGlobal
+
+    'End Function
 
 
     ''' <summary>
@@ -4454,7 +4411,7 @@ Public Class FwScriptsEdition
 
             Return returnValue
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SelectionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SelectionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SelectionRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function

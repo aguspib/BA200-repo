@@ -1,5 +1,6 @@
-Option Explicit On
 Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -7,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IProgTestProfiles
+Public Class UiProgTestProfiles
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"
@@ -47,6 +48,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -81,7 +83,7 @@ Public Class IProgTestProfiles
             'Initialize global variables
             CleanGlobalValues()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -112,7 +114,7 @@ Public Class IProgTestProfiles
                 AddModeScreenStatus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddTestProfile", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -163,7 +165,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelTestProfileEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelTestProfileEdition", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CancelTestProfileEdition", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -184,7 +186,7 @@ Public Class IProgTestProfiles
 
             originalSelectedTests = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CleanGlobalValues", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CleanGlobalValues", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -255,7 +257,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteTestProfile", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -273,6 +275,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -293,7 +296,7 @@ Public Class IProgTestProfiles
             'Put Focus in the first enabled field
             bsNameTextBox.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -312,7 +315,7 @@ Public Class IProgTestProfiles
                 EditModeScreenStatus()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditTestProfileByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditTestProfileByButtonClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditTestProfileByButtonClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -363,7 +366,7 @@ Public Class IProgTestProfiles
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditTestProfileByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EditTestProfileByDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EditTestProfileByDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -395,12 +398,12 @@ Public Class IProgTestProfiles
                     Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -431,7 +434,7 @@ Public Class IProgTestProfiles
             'Inform the factory value property 
             bsTestsSelectionDoubleList.FactoryValueMessage = GetMessageText(GlobalEnumerates.Messages.FACTORY_VALUES.ToString(), pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDoubleListLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDoubleListLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetDoubleListLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -462,8 +465,10 @@ Public Class IProgTestProfiles
             bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            'bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID)) 'AG 05/09/2014 - BA-1869
+
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -503,7 +508,7 @@ Public Class IProgTestProfiles
             'Fill ListView with the list of existing Test Profiles
             LoadTestProfilesList()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeTestProfilesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeTestProfilesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeTestProfilesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -527,6 +532,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -559,7 +565,7 @@ Public Class IProgTestProfiles
             'Focus to button Add
             bsNewButton.Focus()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitialModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitialModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitialModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -600,7 +606,7 @@ Public Class IProgTestProfiles
             'Get value of InUse flag
             inUse = CType(bsTestProfilesListView.SelectedItems(0).SubItems(6).Text, Boolean)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfSelectedTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfSelectedTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadDataOfSelectedTestProfile", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return inUse
@@ -634,7 +640,7 @@ Public Class IProgTestProfiles
                 ShowMessage(Name & ".LoadSampleTypeList", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSampleTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSampleTypesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -650,6 +656,7 @@ Public Class IProgTestProfiles
     '''                              according the value selected in the Test Types ComboBox
     ''' Modified by: DL 26/11/2010 - Added case for OffSystem Tests
     '''              TR 09/03/2011 - Insert FactoryCalib as column in the list of Tests and fill it for each Standard Test
+    ''' AG 01/09/2014 - BA-1869 Insert Available as column in the list of Tests and fill it for each Test (std, ise, calc, off)
     ''' </remarks>
     Private Sub LoadSelectableTestsList(ByVal pSampleType As String, Optional ByVal pTestProfileID As Integer = 0)
         Try
@@ -670,6 +677,7 @@ Public Class IProgTestProfiles
                 auxTable.Columns.Add("SecondaryPos", System.Type.GetType("System.Int32"))
                 auxTable.Columns.Add("Icon")
                 auxTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                auxTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Load the list of selectable Tests
                 Dim auxTableRow As DataRow
@@ -694,6 +702,7 @@ Public Class IProgTestProfiles
                     auxTableRow("SecondaryPos") = originalSelectedTests.tparTestProfileTests(i).TestPosition
                     auxTableRow("Icon") = originalSelectedTests.tparTestProfileTests(i).IconPath
                     auxTableRow("FactoryCalib") = CBool(originalSelectedTests.tparTestProfileTests(i)("FactoryCalib").ToString())
+                    auxTableRow("Available") = CBool(originalSelectedTests.tparTestProfileTests(i)("Available").ToString()) 'AG 01/09/2014 - BA-1869
                     auxTable.Rows.Add(auxTableRow)
                 Next
 
@@ -706,7 +715,7 @@ Public Class IProgTestProfiles
                 ShowMessage(Name & ".LoadSelectedTestsList", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSelectableTestsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSelectableTestsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSelectableTestsList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -720,6 +729,7 @@ Public Class IProgTestProfiles
     '''              DL 14/10/2010 - Added column TestType to the DataSet
     '''              DL 26/11/2010 - Added case for OffSystem Tests
     '''              TR 09/03/2011 - Insert FactoryCalib as column in the list of Tests and fill it for each Standard Test
+    ''' AG 01/09/2014 - BA-1869 Insert Available as column in the list of Tests and fill it for each TEST (std, calc, ise, off)
     ''' </remarks>
     Private Sub LoadSelectedTestsList(ByVal pTestProfileID As Integer)
         Try
@@ -740,6 +750,7 @@ Public Class IProgTestProfiles
                 auxTable.Columns.Add("SecondaryPos", System.Type.GetType("System.Int32"))
                 auxTable.Columns.Add("Icon")
                 auxTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                auxTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Load the list of selected Tests
                 Dim auxTableRow As DataRow
@@ -762,6 +773,7 @@ Public Class IProgTestProfiles
                     auxTableRow("SecondaryPos") = originalSelectedTests.tparTestProfileTests(i).TestPosition
                     auxTableRow("Icon") = originalSelectedTests.tparTestProfileTests(i).IconPath
                     auxTableRow("FactoryCalib") = CBool(originalSelectedTests.tparTestProfileTests(i)("FactoryCalib").ToString())
+                    auxTableRow("Available") = CBool(originalSelectedTests.tparTestProfileTests(i)("Available").ToString()) 'AG 01/09/2014 - BA-1869
                     auxTable.Rows.Add(auxTableRow)
                 Next
 
@@ -773,7 +785,7 @@ Public Class IProgTestProfiles
                 ShowMessage(Name & ".LoadSelectedTestsList", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSelectedTestsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSelectedTestsList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSelectedTestsList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -798,10 +810,10 @@ Public Class IProgTestProfiles
             If (selectedTestProfileID = 0) Then
                 'When adding a new Test Profile, gets from the Session the Username of the connected User
                 'and the current datetime
-                Dim currentSession As New GlobalBase()
+                'Dim currentSession As New GlobalBase()
 
                 testProfileRow.SetTestProfilePositionNull() 'Set to null, to get the value from the database.
-                testProfileRow.TS_User = currentSession.GetSessionInfo().UserName
+                testProfileRow.TS_User = GlobalBase.GetSessionInfo().UserName
                 testProfileRow.TS_DateTime = Now
             Else
                 'When editing or deleting an existing Test Profile, to concurrence control, the informed Username and Datetime
@@ -810,9 +822,10 @@ Public Class IProgTestProfiles
                 testProfileRow.TS_User = bsTestProfilesListView.SelectedItems(0).SubItems(4).Text.ToString
                 testProfileRow.TS_DateTime = CDate(bsTestProfilesListView.SelectedItems(0).SubItems(5).Text)
             End If
+
             testProfileData.tparTestProfiles.Rows.Add(testProfileRow)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadTestProfileDS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return testProfileData
@@ -848,7 +861,7 @@ Public Class IProgTestProfiles
                         If (myPreMasterDataDS.tfmwPreloadedMasterData.Rows.Count = 1) Then
                             If (IO.File.Exists(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc)) Then
                                 testProfIcon.Images.Add(myPreMasterDataDS.tfmwPreloadedMasterData(0).ItemID, _
-                                                        Image.FromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
+                                                        ImageUtilities.ImageFromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
                             End If
                         End If
                     End If
@@ -861,7 +874,7 @@ Public Class IProgTestProfiles
                         If (myPreMasterDataDS.tfmwPreloadedMasterData.Rows.Count = 1) Then
                             If (IO.File.Exists(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc)) Then
                                 testProfIcon.Images.Add(myPreMasterDataDS.tfmwPreloadedMasterData(0).ItemID, _
-                                                        Image.FromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
+                                                        ImageUtilities.ImageFromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
                             End If
                         End If
                     End If
@@ -917,7 +930,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfilesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfilesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadTestProfilesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -949,7 +962,7 @@ Public Class IProgTestProfiles
                 ShowMessage(Name & ".LoadTestTypesList", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestTypesList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadTestTypesList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -972,7 +985,7 @@ Public Class IProgTestProfiles
                 testProfileData.tparTestProfiles.Rows.Add(testProfileRow)
             Next
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultiLoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultiLoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".MultiLoadTestProfileDS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return testProfileData
@@ -995,6 +1008,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1031,7 +1045,7 @@ Public Class IProgTestProfiles
             'Initialize global variables
             CleanGlobalValues()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultiSelect", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MultiSelect", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".MultiSelect", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1095,7 +1109,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PendingChangesVerification", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PendingChangesVerification", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return pendingToSaveChanges
@@ -1117,67 +1131,73 @@ Public Class IProgTestProfiles
             'ADD Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+            End If
+
+            'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
+            auxIconName = GetIconName("ORDER_TESTS")
+            If (auxIconName <> "") Then
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'BSDoubleList Buttons
             auxIconName = GetIconName("FORWARDL")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.SelectAllButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.SelectAllButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("BACKWARDL")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.UnselectAllButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.UnselectAllButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("RIGHT")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.SelectChosenButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.SelectChosenButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("LEFT")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.UnselectChosenButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.UnselectChosenButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1199,30 +1219,30 @@ Public Class IProgTestProfiles
 
             auxIconName = GetIconName("TESTICON")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("USERTEST")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TCALC")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TISE_SYS")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TOFF_SYS")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareImageList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myTestTypeImageList
@@ -1242,6 +1262,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = True
             bsDeleteButton.Enabled = True
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1260,7 +1281,7 @@ Public Class IProgTestProfiles
             bsSaveButton.Enabled = False
             bsCancelButton.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QueryModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1307,7 +1328,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryTestProfile", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QueryTestProfile", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1325,7 +1346,7 @@ Public Class IProgTestProfiles
                     QueryTestProfile()
             End Select
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryTestProfilesByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QueryTestProfilesByMoveUpDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QueryTestProfilesByMoveUpDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1344,6 +1365,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1361,7 +1383,7 @@ Public Class IProgTestProfiles
             bsSaveButton.Enabled = False
             bsCancelButton.Enabled = False
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReadOnlyModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReadOnlyModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1372,6 +1394,7 @@ Public Class IProgTestProfiles
     ''' <remarks>
     ''' Modified by: BK 24/12/2009 - Calls to ApplicationLog_ForTESTING were replaced by calls to the generic function ShowMessage
     '''              SG 07/07/2010 - Added ErrorProvider functionality
+    '''              AG 02/09/2014 - BA1869 get also the Available column in order to calculate the profile availability
     ''' </remarks>
     Private Sub SaveChanges()
         Try
@@ -1396,6 +1419,21 @@ Public Class IProgTestProfiles
                         testProfileTestRow.TestProfileID = selectedTestProfileID
                         testProfileTestRow.TestID = CInt(auxTestsList.Tables(0).Rows(i).Item("Code"))
                         testProfileTestRow.TestType = auxTestsList.Tables(0).Rows(i).Item("Type").ToString
+
+                        'AG 02/09/2014 - BA-1869 - If some component not available then the profile is also not available
+                        If Not testProfileData Is Nothing AndAlso testProfileData.tparTestProfiles.Rows.Count > 0 Then
+                            If Not auxTestsList.Tables(0).Rows(i).Item("Available") Is DBNull.Value Then
+                                If testProfileData.tparTestProfiles(0).IsAvailableNull Then
+                                    testProfileData.tparTestProfiles(0).Available = CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) 'Initialize value
+                                ElseIf Not CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) AndAlso testProfileData.tparTestProfiles(0).Available Then
+                                    testProfileData.tparTestProfiles(0).Available = False
+                                End If
+
+                            Else
+                                'Do nothing: Add method will use the default 1 value / Modify method wont modify Available column
+                            End If
+                        End If
+                        'AG 02/09/2014 - BA-1869
 
                         selectedTestsList.tparTestProfileTests.Rows.Add(testProfileTestRow)
                     Next i
@@ -1438,7 +1476,7 @@ Public Class IProgTestProfiles
             Cursor = Cursors.Default
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1453,8 +1491,8 @@ Public Class IProgTestProfiles
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the list of available Sample Types and Test Types
             LoadSampleTypesList()
@@ -1484,7 +1522,7 @@ Public Class IProgTestProfiles
             End If
             ResetBorder()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenLoad", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ScreenLoad", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1525,7 +1563,7 @@ Public Class IProgTestProfiles
                 End If
             End Using
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateTestProfilesPositions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateTestProfilesPositions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UpdateTestProfilesPositions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1555,7 +1593,7 @@ Public Class IProgTestProfiles
                 fieldsOK = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidateSavingConditions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ValidateSavingConditions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return fieldsOK
@@ -1579,7 +1617,7 @@ Public Class IProgTestProfiles
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1609,7 +1647,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestProfiles_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProgTestProfiles_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProgTestProfiles_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1625,15 +1663,15 @@ Public Class IProgTestProfiles
     Private Sub TestProfilesManagement_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestProfilesManagement_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestProfilesManagement_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestProfilesManagement_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1662,13 +1700,14 @@ Public Class IProgTestProfiles
                 Next mySelectedItem
                 MultiSelect()
                 bsEditButton.Enabled = False
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                 bsDeleteButton.Enabled = bEnabled
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestProfilesListView_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1696,7 +1735,7 @@ Public Class IProgTestProfiles
             bsTestProfilesListView.Sort()
             UpdateTestProfilesPositions()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_ColumnClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestProfilesListView_ColumnClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1724,7 +1763,7 @@ Public Class IProgTestProfiles
         Try
             EditTestProfileByDoubleClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_DoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestProfilesListView_DoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1754,12 +1793,13 @@ Public Class IProgTestProfiles
                     MultiSelect()
 
                     bsEditButton.Enabled = False
+                    BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                     bsDeleteButton.Enabled = bEnabled
                 End If
             End If
             ScreenStatusByUserLevel() 'TR 23/04/2012
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestProfilesListView_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1778,7 +1818,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestProfilesListView_PreviewKeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestProfilesListView_PreviewKeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1802,7 +1842,7 @@ Public Class IProgTestProfiles
                 bsTestsSelectionDoubleList.TypeToShow = bsTestsTypesComboBox.SelectedValue.ToString
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleTypesComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSampleTypesComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSampleTypesComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1821,7 +1861,7 @@ Public Class IProgTestProfiles
                 bsTestsSelectionDoubleList.TypeToShow = bsTestsTypesComboBox.SelectedValue.ToString
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestsTypesComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestsTypesComboBox_SelectionChangeCommitted", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTestsTypesComboBox_SelectionChangeCommitted", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1843,7 +1883,7 @@ Public Class IProgTestProfiles
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTextbox_TextChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTextbox_TextChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1859,7 +1899,7 @@ Public Class IProgTestProfiles
         Try
             AddTestProfile()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsNewButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1872,7 +1912,7 @@ Public Class IProgTestProfiles
         Try
             EditTestProfileByButtonClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1885,7 +1925,7 @@ Public Class IProgTestProfiles
         Try
             DeleteTestProfile()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDeleteButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDeleteButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1910,7 +1950,7 @@ Public Class IProgTestProfiles
                 XRManager.ShowTestProfilesReport()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1923,7 +1963,7 @@ Public Class IProgTestProfiles
         Try
             SaveChanges()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1936,7 +1976,7 @@ Public Class IProgTestProfiles
         Try
             CancelTestProfileEdition()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1948,10 +1988,32 @@ Public Class IProgTestProfiles
         Try
             ExitScreen()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Open the customize order and availability for profiles tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New UiSortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "PROFILE"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
 
 End Class

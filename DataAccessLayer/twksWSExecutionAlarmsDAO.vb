@@ -2,13 +2,12 @@
 Option Explicit On
 
 Imports System.Data.SqlClient
-Imports System.Text
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class twksWSExecutionAlarmsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -50,8 +49,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -109,8 +108,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Add", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Add", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -156,8 +155,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -184,10 +183,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksWSExecutionAlarms " & _
+                    '                        " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
+                    '                                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                    '                                               " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
+
                     Dim cmdText As String = " DELETE twksWSExecutionAlarms " & _
-                                            " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
-                                                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
-                                                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
+                                            " WHERE  EXISTS (SELECT ExecutionID FROM twksWSExecutions " & _
+                                                            " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                                                            " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' AND twksWSExecutionAlarms.ExecutionID = ExecutionID)"
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords += dbCmd.ExecuteNonQuery
@@ -205,8 +210,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -251,8 +256,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.DeleteAll", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.DeleteAll", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -308,8 +313,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.ReadAlarmsForAverageResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.ReadAlarmsForAverageResult", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

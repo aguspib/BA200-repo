@@ -1,5 +1,6 @@
 ﻿Option Explicit On
-
+Option Strict On
+Option Infer On
 
 'Imports DevExpress.XtraGrid
 'Imports DevExpress.Data
@@ -9,12 +10,11 @@
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 'Imports System.IO
 
 
 
-Public Class ILegend
+Public Class UiLegend
 
 #Region "Declarations"
 
@@ -105,7 +105,7 @@ Public Class ILegend
             bsSamplesListDataGridView.DataSource = myLegendDS.tfmwLegend
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadLegend ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadLegend ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadLegend ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
             'Finally
@@ -123,13 +123,13 @@ Public Class ILegend
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim imgStream As MemoryStream = New MemoryStream()
             'Dim img As Image
 
-            'img = Image.FromFile("C:\David Luna\LeftClick.png")
+            'img = ImageUtilities.ImageFromFile("C:\David Luna\LeftClick.png")
             'img.Save(imgStream, System.Drawing.Imaging.ImageFormat.Png)
 
             'imgStream.Close()
@@ -138,7 +138,7 @@ Public Class ILegend
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         End Try
@@ -153,7 +153,7 @@ Public Class ILegend
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ILegend_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ILegend_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -167,8 +167,8 @@ Public Class ILegend
         LoadLegend()
 
         'DL 28/07/2011
-        Dim myLocation As Point = IAx00MainMDI.Location ' ParentMDIAttribute '   IAx00MainMDI.Location
-        Dim mySize As Size = IAx00MainMDI.Size
+        Dim myLocation As Point = UiAx00MainMDI.Location ' ParentMDIAttribute '   IAx00MainMDI.Location
+        Dim mySize As Size = UiAx00MainMDI.Size
 
         Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
         'END DL 28/07/2011
@@ -184,14 +184,14 @@ Public Class ILegend
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
 
-            myLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            myLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_LEGEND", myLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -208,8 +208,8 @@ Public Class ILegend
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim myLocation As Point = IAx00MainMDI.Location ' ParentMDIAttribute
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location ' ParentMDIAttribute
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)
@@ -218,7 +218,7 @@ Public Class ILegend
 
             MyBase.WndProc(m)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".WndProc ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".WndProc", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

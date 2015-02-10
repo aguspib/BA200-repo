@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IErrorCodes
+Partial Class UiErrorCodes
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -101,7 +101,7 @@ Partial Class IErrorCodes
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IErrorCodes"
+        Me.Name = "UiErrorCodes"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultLocation
         Me.Text = " "
         Me.bsLanguageSelectionGroupBox.ResumeLayout(False)

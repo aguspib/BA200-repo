@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksWSReadingsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
         ''' <summary>
@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim Cmd As New SqlClient.SqlCommand
+                        'Dim Cmd As New SqlClient.SqlCommand
                         Dim cmdText As String = ""
 
                         cmdText = "SELECT AnalyzerID" & vbCrLf & _
@@ -82,8 +82,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.GetReadingsByExecutionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.GetReadingsByExecutionID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -186,8 +186,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Insert", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Insert", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -274,8 +274,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Update", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -340,8 +340,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.ExistsReading", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.ExistsReading", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -409,8 +409,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.GetByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSBLinesDAO.GetByWorkSession", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -462,8 +462,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -511,8 +511,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -568,8 +568,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.InsertNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.InsertNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -646,7 +646,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText.AppendFormat("N'{0}'", pAnalyzerID.Trim.Replace("'", "''"))
                     cmdText.Append(" AND    WorkSessionID = ")
                     cmdText.AppendFormat("'{0}'", pWorkSessionID.Trim)
-                    cmdText.Append(" AND    ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions WHERE " & filterClause & " )")
+                    'AJG
+                    'cmdText.Append(" AND    ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions WHERE " & filterClause & " )")
+                    cmdText.Append(" AND    EXISTS (SELECT ExecutionID FROM twksWSExecutions WHERE " & filterClause & " AND twksWSReadings.ExecutionID = ExecutionID)")
                     cmdText.Append(vbCrLf)
                     'AG 19/02/2014 - #1514
 
@@ -664,8 +666,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.DeleteReadingsForNotInCourseExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.DeleteReadingsForNotInCourseExecutions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -688,13 +690,22 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksWSReadings " & vbCrLf & _
+                    '                        " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                    '                        " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                        " AND    ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & vbCrLf & _
+                    '                                               " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                    '                                               " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                               " AND    ExecutionStatus = 'LOCKED') " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksWSReadings " & vbCrLf & _
                                             " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                             " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                            " AND    ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & vbCrLf & _
-                                                                   " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                   " AND    ExecutionStatus = 'LOCKED') " & vbCrLf
+                                            " AND    EXISTS (SELECT ExecutionID FROM twksWSExecutions " & vbCrLf & _
+                                                            " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                            " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                            " AND    ExecutionStatus = 'LOCKED' AND twksWSReadings.ExecutionID = ExecutionID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -706,8 +717,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.DeleteReadingsForLockedExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReadingsDAO.DeleteReadingsForLockedExecutions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
