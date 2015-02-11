@@ -1256,18 +1256,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSwEntry"></param>
         ''' <param name="pFwEntry"></param>
         ''' <param name="pFwScriptID">Identifier of the script/action to be sended</param>
-        ''' <param name="pParams">param values to script/action to be sended</param>
+        ''' <param name="pServiceParams">param values to script/action to be sended - IMPORTANT NOTE: Use it only in Service Scripts!!!</param>
         ''' <returns>GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
         ''' Creation    AG 19/04/2010
         ''' Modified by XB 08/11/2010 - SERVICE SOFTWARE - Add optional field pScriptID
         '''             XB 18/11/2010 - SERVICE SOFTWARE - Add optional field pParams
         '''             XB 10/10/2013 - Add PAUSE Instruction - BT #1317
+        '''             AG 09/02/2015 rename pParams to pServiceParams
         ''' </remarks>
         Public Function ActivateProtocol(ByVal pEvent As GlobalEnumerates.AppLayerEventList, Optional ByVal pSwEntry As Object = Nothing, _
                                           Optional ByVal pFwEntry As String = "", _
                                           Optional ByVal pFwScriptID As String = "", _
-                                          Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO
+                                          Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Select Case pEvent
@@ -1340,17 +1341,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'TR 03/03/2011 - The Well information is on the pSwEntry.
                         If IsNumeric(pSwEntry) Then
                             myGlobal = Me.SendALIGHTInstruction(CInt(pSwEntry))
-                        ElseIf Not pParams Is Nothing Then
+                        ElseIf Not pServiceParams Is Nothing Then
                             ' XBC 20/02/2012
-                            myGlobal = Me.SendALIGHTInstruction(pParams)
+                            myGlobal = Me.SendALIGHTInstruction(pServiceParams)
                         End If
                         'TR 03/03/2011 -END.
                         Exit Select
 
                         'IT 29/10/2014 - Send a adjustment of IT and DAC
                     Case GlobalEnumerates.AppLayerEventList.FLIGHT
-                        If Not pParams Is Nothing Then
-                            myGlobal = Me.SendFLIGHTInstruction(pParams)
+                        If Not pSwEntry Is Nothing Then
+                            Dim paramList As New List(Of String)
+                            paramList = DirectCast(pSwEntry, List(Of String))
+                            myGlobal = Me.SendFLIGHTInstruction(paramList)
                         End If
                         Exit Select
 
@@ -1430,11 +1433,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Case GlobalEnumerates.AppLayerEventList.COMMAND
                         ' XBC 20/09/2011
                         If pSwEntry Is Nothing Then
-                            myGlobal = Me.SendCOMMANDInstruction(pFwScriptID, pParams)
+                            myGlobal = Me.SendCOMMANDInstruction(pFwScriptID, pServiceParams)
                         Else
                             Dim pInstructions As New List(Of InstructionTO)
                             pInstructions = DirectCast(pSwEntry, List(Of InstructionTO))
-                            myGlobal = Me.SendCOMMANDInstructionTest(pInstructions, pParams)
+                            myGlobal = Me.SendCOMMANDInstructionTest(pInstructions, pServiceParams)
                         End If
                         ' XBC 20/09/2011
                         Exit Select
@@ -1448,7 +1451,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ' XBC 20/04/2011
                     Case GlobalEnumerates.AppLayerEventList.BLIGHT
-                        myGlobal = Me.SendBLIGHTInstruction(pParams)
+                        myGlobal = Me.SendBLIGHTInstruction(pServiceParams)
                         Exit Select
 
                         ' XBC 18/05/2011
@@ -1458,7 +1461,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ' XBC 23/04/2011
                     Case GlobalEnumerates.AppLayerEventList.SDMODE
-                        myGlobal = Me.SendSDMODEInstruction(pParams)
+                        myGlobal = Me.SendSDMODEInstruction(pServiceParams)
                         Exit Select
 
                         ' XBC 23/04/2011

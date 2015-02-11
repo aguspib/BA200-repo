@@ -194,6 +194,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " FROM   tcfgAnalyzers " & vbCrLf & _
                                                 " WHERE  Generic = '" & pGeneric & "' " & vbCrLf
 
+                        'AG 11/02/2015 BA-2246 compatibility BA200 - BA400 models (Note: By now there are no specification, so this change may be unnecessary when exists especifications)
+                        If pGeneric Then
+                            cmdText &= " ORDER BY Active DESC "
+                        End If
+                        'AG 11/02/2015
+
                         Dim myAnalyzersDS As New AnalyzersDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)

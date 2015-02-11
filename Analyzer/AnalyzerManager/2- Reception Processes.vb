@@ -2922,6 +2922,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
 
+                Dim iseCmdSent As Boolean = False  'AG 06/02/2015 BA-2246
 
                 ' XBC 03/05/2012 - Just for SERVICE, in Stressing mode no check ISE
                 If myApplicationName.ToUpper.Contains("SERVICE") AndAlso IsStressingAttribute Then
@@ -2958,6 +2959,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 If Not ISEAnalyzer.IsISEInitiating Then
                                                     ISEAnalyzer.DoGeneralCheckings()
                                                     ISEAlreadyStarted = True
+                                                    iseCmdSent = True 'AG 06/02/2015 BA-2246
                                                 End If
                                             Else
                                                 'ISEAnalyzer.IsISEInitiatedDone = True
@@ -3041,13 +3043,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                If GlobalBase.IsServiceAssembly Then
-                    ServiceSwAnsInfTreatment(mySensors)
-                Else
-                    UserSwANSINFTreatment(mySensors)
-                End If
+                If Not iseCmdSent Then 'AG 06/02/2015 BA-2246
+                    If GlobalBase.IsServiceAssembly Then
+                        ServiceSwAnsInfTreatment(mySensors)
+                    Else
+                        UserSwANSINFTreatment(mySensors)
+                    End If
 
-                RaiseEvent ReceivedStatusInformationEventHandler() 'BA-2143
+                    'AG 09/02/2015 BA-2246 - raise the event only when ANSINF has been treated and the alarms have been processed!!!
+                    RaiseEvent ReceivedStatusInformationEventHandler() 'BA-2143
+                End If
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     'Debug.Print("AnalyzerManager.ProcessInformationStatusReceived: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
@@ -4279,8 +4284,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If (CheckIfWashingIsPossible()) Then
                                         'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
                                         CurrentInstructionAction = InstructionActions.FlightFilling
-                                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                        Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
+                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                         analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Else
                                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
@@ -4294,8 +4299,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     (CurrentInstructionAction = InstructionActions.None) Then
                                     'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
                                     CurrentInstructionAction = InstructionActions.FlightReading
-                                    Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                    ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                    Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                                    ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                     analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Exit Select
                                 End If
@@ -4306,16 +4311,23 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'AG 27/11/2014 BA-2066
                                     If (CheckIfWashingIsPossible()) Then
                                         If (ProcessFlightReadAction()) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
+
+                                            'AG + IT 10/02/2015 BA-2246 - when MAX tentatives failed set flag DynamicBL_Read = CANCELED
+                                            If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
+                                            End If
+                                            'AG + IT 10/02/2015
+
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
                                             CurrentInstructionAction = InstructionActions.FlightEmptying
-                                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                            Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
+                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                             analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         Else
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = ""
                                             CurrentInstructionAction = InstructionActions.FlightReading
-                                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                            Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                             analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         End If
                                     Else
@@ -4324,6 +4336,20 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
                                     Exit Select
                                 End If
+
+                                'AG 10/02/2015 BA-2246 when DynamicBL_Read canceled --> send EMPTY ROTOR (scenario: comm lost during empty rotor after MAX tentatives failed!! (add orelse DynamicBL_Read = CANCELED)
+                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "CANCELED") AndAlso _
+                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") AndAlso _
+                                    (CurrentInstructionAction = InstructionActions.None) Then
+
+                                    If (CheckIfWashingIsPossible()) Then
+                                        CurrentInstructionAction = InstructionActions.FlightEmptying
+                                        Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
+                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                        analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
+                                    End If
+                                End If
+                                'AG 10/02/2015
 
                             End If
 

@@ -347,286 +347,6 @@ Public Class UiChangeRotor
 
     End Sub
 
-#End Region
-
-#Region "Public Methods"
-
-    ''' <summary>
-    ''' Activate or deactivate control depending the current change rotor process state
-    ''' </summary>
-    ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
-    ''' <remarks>
-    ''' Created by:  AG 29/06/2011
-    ''' Modified by: SA 16/04/2014 - BT #1595 ==> Call to function EnableButtons has been commented to avoid bad enabling of the screen buttons
-    '''                                           during the light adjustment process 
-    '''              IT 23/10/2014 - REFACTORING (BA-2016)
-    '''              IT 19/12/2014 - BA-2143
-    '''              IT 30/01/2015 - BA-2216
-    ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
-        Try
-            RefreshDoneField = False 'RH 28/03/2012
-            If (isClosingFlag) Then Return 'AG 03/08/2012
-
-            'BT #1595 - This call is commented to avoid bad enabling of the screen buttons during the light adjustment process
-            'EnableButtons()     'JBL 07/09/2012 Enable/disable buttons 
-
-            If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED)) Then
-                'If WashStation CTRL has been performed ... activate the label + CONTINUE button
-                Dim sensorValue As Single = 0
-
-                '1st step finish (Wash station UP) >> Now enable control to perform the 2on steps in utility process
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED)
-                If (sensorValue = 1) Then
-                    ScreenWorkingProcess = True
-                    UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
-                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
-
-                    'Not necessary because Fw peforms the action although the reaction cover enabled & open
-                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
-
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
-                    RecoverProcess(True) 'BA-2216
-
-                End If
-
-                '2nd step is finish when valid ALIGHT o not more chances!!
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED)
-                If (sensorValue = 1) Then
-                    'Create a new ReactionsRotor
-                    Dim myGlobal As New GlobalDataTO
-                    Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
-                    myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
-
-                    'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
-                    Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
-                    If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
-                        ScreenWorkingProcess = False 'Process finished
-                        ExistBaseLineInitError = False
-                    Else
-                        ExistBaseLineInitError = True
-                        ScreenWorkingProcess = False
-                    End If
-                    myAlarms = Nothing
-
-                    bsChangeRotortButton.Enabled = True
-                    bsCancelButton.Enabled = True
-
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once updated UI clear sensor
-
-                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, _
-                                                              GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
-                    If (myGlobal.HasError) Then ShowMessage("Warning", myGlobal.ErrorCode)
-                End If
-
-                'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE)
-                If (sensorValue = 1) Then
-                    ScreenWorkingProcess = False 'Process finished
-                    ExistBaseLineInitError = True 'Wrong result
-
-                    bsChangeRotortButton.Enabled = False
-                    bsContinueButton.Enabled = False
-                    bsCancelButton.Enabled = True
-
-                    UiAx00MainMDI.EnableButtonAndMenus(True)
-                    UiAx00MainMDI.SetActionButtonsEnableProperty(True)
-                    Cursor = Cursors.Default
-                End If
-                'AG 15/03/2012
-
-                'IT 19/12/2014 - BA-2143 (INI)
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR)
-                If (sensorValue = 1) Then
-                    bsChangeRotorReadButton.Enabled = True
-                    bsChangeRotorFinalizeButton.Enabled = True
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR) = 0 'Once updated UI clear sensor
-                End If
-                'IT 19/12/2014 - BA-2143 (END)
-
-                'IT 30/01/2015 - BA-2216  (INI)
-                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED)
-                If (sensorValue = 1) Then
-                    RefreshProgressBar()
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED) = 0 'Once updated UI clear sensor
-                End If
-                'IT 30/01/2015 - BA-2216  (END)
-
-                RefreshDoneField = True 'RH 28/03/2012
-            End If
-
-            'AG 12/03/2012 - Reactions rotor missing alarm
-            If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
-                Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
-                linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                            Where a.AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString _
-                          AndAlso a.AlarmStatus = True _
-                           Select a).ToList
-
-                If (linQAlarm.Count > 0) Then
-                    ScreenWorkingProcess = False 'Process finished
-                    ExistBaseLineInitError = True 'Wrong result
-
-                    bsChangeRotortButton.Enabled = True
-                    bsCancelButton.Enabled = True
-                    RefreshDoneField = True 'RH 28/03/2012
-                End If
-                linQAlarm = Nothing
-
-                'AG 02/04/2012 - Raise WashStation is active once the ISE initialization finished
-                If (bsChangeRotortButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
-                    bsChangeRotortButton.Enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
-                Else
-                    bsChangeRotortButton.Enabled = False
-                End If
-                'AG 02/04/2012
-
-                'AG 29/03/2012 - no change rotor is reactions rotor cover enabled and opened (the nothing condition is to avoid create a new MDI instance)
-                'Not necessary because Fw peforms the action although the reaction cover enabled & open
-                If (bsContinueButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
-                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
-                Else
-                    bsContinueButton.Enabled = False
-                End If
-                'AG 29/03/2012
-            End If
-            'AG 12/03/2012
-
-            If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 1) Then bsChangeRotortButton.Enabled = False 'DL 25/09/2012
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".RefreshScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-#End Region
-
-#Region "Events"
-
-    Private Sub bsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelButton.Click
-        AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
-        ExitScreen()
-    End Sub
-
-    Private Sub IChangeRotor_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If (e.KeyCode = Keys.Escape) Then
-            ExitScreen()
-        End If
-    End Sub
-
-    Private Sub IChangeRotor_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        Try
-            InitializeScreen()
-            RecoverProcess() 'IT 30/01/2015 - BA-2216
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".IChangeRotor_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
-    '''              IT 19/12/2014 - BA-2143
-    '''              IT 30/01/2015 - BA-2216
-    ''' </remarks>
-    Private Sub bsChangeRotortButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsChangeRotortButton.Click
-        Try
-            GlobalBase.CreateLogActivity("Btn ChangeRotor", Me.Name & ".bsChangeRotortButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            ChangeRotorStart()
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsChangeRotortButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
-            Cursor = Cursors.Default        'DL 04/04/2012
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
-    '''              IT 19/12/2014 - BA-2143
-    '''              IT 30/01/2015 - BA-2216
-    ''' </remarks>
-    Private Sub bsContinueButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsContinueButton.Click
-        Try
-            GlobalBase.CreateLogActivity("Btn Continue", Me.Name & ".bsContinueButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            ChangeRotorContinue()
-        Catch ex As Exception
-            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
-            Cursor = Cursors.Default        'DL 04/04/2012
-
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsContinueButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks></remarks>
-    Private Sub bsChangeRotorReadButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorReadButton.Click
-        Try
-
-            GlobalBase.CreateLogActivity("Btn Read", Me.Name & ".bsChangeRotorReadButton_Click", EventLogEntryType.Information, False)
-            bsChangeRotorFinalizeButton.Enabled = False
-            bsChangeRotorReadButton.Enabled = False
-            bsChangeRotortButton.Enabled = False
-            AnalyzerController.Instance.ChangeRotorRepeatDynamicBaseLineReadStep()
-
-            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
-            Cursor = Cursors.Default
-
-        Catch ex As Exception
-            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
-            Cursor = Cursors.Default
-
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorReadButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsChangeRotorReadButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks></remarks>
-    Private Sub bsChangeRotorFinalizeButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorFinalizeButton.Click
-        Try
-
-            GlobalBase.CreateLogActivity("Btn Finalize", Me.Name & ".bsChangeRotorFinalizeButton_Click", EventLogEntryType.Information, False)
-
-            If (AnalyzerController.Instance.Analyzer.ExistBottleAlarms) Then
-                ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-            Else
-                bsChangeRotorFinalizeButton.Enabled = False
-                bsChangeRotorReadButton.Enabled = False
-                bsChangeRotortButton.Enabled = False
-                AnalyzerController.Instance.ChangeRotorFinalizeProcess()
-            End If
-
-        Catch ex As Exception
-            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
-            Cursor = Cursors.Default
-
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorFinalizeButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsChangeRotorFinalizeButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
     ''' <summary>
     ''' 
     ''' </summary>
@@ -859,14 +579,169 @@ Public Class UiChangeRotor
 
     End Sub
 
+#End Region
+
+#Region "Public Methods"
+
+    ''' <summary>
+    ''' Activate or deactivate control depending the current change rotor process state
+    ''' </summary>
+    ''' <param name="pRefreshEventType"></param>
+    ''' <param name="pRefreshDS"></param>
+    ''' <remarks>
+    ''' Created by:  AG 29/06/2011
+    ''' Modified by: SA 16/04/2014 - BT #1595 ==> Call to function EnableButtons has been commented to avoid bad enabling of the screen buttons
+    '''                                           during the light adjustment process 
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+        Try
+            RefreshDoneField = False 'RH 28/03/2012
+            If (isClosingFlag) Then Return 'AG 03/08/2012
+
+            'BT #1595 - This call is commented to avoid bad enabling of the screen buttons during the light adjustment process
+            'EnableButtons()     'JBL 07/09/2012 Enable/disable buttons 
+
+            If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED)) Then
+                'If WashStation CTRL has been performed ... activate the label + CONTINUE button
+                Dim sensorValue As Single = 0
+
+                '1st step finish (Wash station UP) >> Now enable control to perform the 2on steps in utility process
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED)
+                If (sensorValue = 1) Then
+                    ScreenWorkingProcess = True
+                    UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
+
+                    'Not necessary because Fw peforms the action although the reaction cover enabled & open
+                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
+                    RecoverProcess(True) 'BA-2216
+
+                End If
+
+                '2nd step is finish when valid ALIGHT o not more chances!!
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED)
+                If (sensorValue = 1) Then
+                    'Create a new ReactionsRotor
+                    Dim myGlobal As New GlobalDataTO
+                    Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
+                    myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
+
+                    'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
+                    Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
+                    If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
+                        ScreenWorkingProcess = False 'Process finished
+                        ExistBaseLineInitError = False
+                    Else
+                        ExistBaseLineInitError = True
+                        ScreenWorkingProcess = False
+                    End If
+                    myAlarms = Nothing
+
+                    bsChangeRotortButton.Enabled = True
+                    bsCancelButton.Enabled = True
+
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once updated UI clear sensor
+
+                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, _
+                                                              GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                    If (myGlobal.HasError) Then ShowMessage("Warning", myGlobal.ErrorCode)
+                End If
+
+                'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE)
+                If (sensorValue = 1) Then
+                    ScreenWorkingProcess = False 'Process finished
+                    ExistBaseLineInitError = True 'Wrong result
+
+                    bsChangeRotortButton.Enabled = False
+                    bsContinueButton.Enabled = False
+                    bsCancelButton.Enabled = True
+
+                    UiAx00MainMDI.EnableButtonAndMenus(True)
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(True)
+                    Cursor = Cursors.Default
+                End If
+                'AG 15/03/2012
+
+                'IT 19/12/2014 - BA-2143 (INI)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR)
+                If (sensorValue = 1) Then
+                    bsChangeRotorReadButton.Enabled = True
+                    bsChangeRotorFinalizeButton.Enabled = True
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR) = 0 'Once updated UI clear sensor
+                End If
+                'IT 19/12/2014 - BA-2143 (END)
+
+                'IT 30/01/2015 - BA-2216  (INI)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED)
+                If (sensorValue = 1) Then
+                    RefreshProgressBar()
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED) = 0 'Once updated UI clear sensor
+                End If
+                'IT 30/01/2015 - BA-2216  (END)
+
+                RefreshDoneField = True 'RH 28/03/2012
+            End If
+
+            'AG 12/03/2012 - Reactions rotor missing alarm
+            If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
+                Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
+                linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
+                            Where a.AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString _
+                          AndAlso a.AlarmStatus = True _
+                           Select a).ToList
+
+                If (linQAlarm.Count > 0) Then
+                    ScreenWorkingProcess = False 'Process finished
+                    ExistBaseLineInitError = True 'Wrong result
+
+                    bsChangeRotortButton.Enabled = True
+                    bsCancelButton.Enabled = True
+                    RefreshDoneField = True 'RH 28/03/2012
+                End If
+                linQAlarm = Nothing
+
+                'AG 02/04/2012 - Raise WashStation is active once the ISE initialization finished
+                If (bsChangeRotortButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
+                    bsChangeRotortButton.Enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
+                Else
+                    bsChangeRotortButton.Enabled = False
+                End If
+                'AG 02/04/2012
+
+                'AG 29/03/2012 - no change rotor is reactions rotor cover enabled and opened (the nothing condition is to avoid create a new MDI instance)
+                'Not necessary because Fw peforms the action although the reaction cover enabled & open
+                If (bsContinueButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
+                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+                Else
+                    bsContinueButton.Enabled = False
+                End If
+                'AG 29/03/2012
+            End If
+            'AG 12/03/2012
+
+            If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 1) Then bsChangeRotortButton.Enabled = False 'DL 25/09/2012
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".RefreshScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
     ''' <summary>
     ''' 
     ''' </summary>
     ''' <param name="continueProcess"></param>
     ''' <remarks>
     ''' Created by: IT 30/01/2015 - BA-2216
+    ''' AG 04/02/2015 BA-2246 define public
     ''' </remarks>
-    Private Sub RecoverProcess(Optional ByVal continueProcess As Boolean = False)
+    Public Sub RecoverProcess(Optional ByVal continueProcess As Boolean = False)
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Or
             (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
@@ -886,6 +761,133 @@ Public Class UiChangeRotor
             End If
         End If
 
+    End Sub
+
+#End Region
+
+#Region "Events"
+
+    Private Sub bsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelButton.Click
+        AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
+        ExitScreen()
+    End Sub
+
+    Private Sub IChangeRotor_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If (e.KeyCode = Keys.Escape) Then
+            ExitScreen()
+        End If
+    End Sub
+
+    Private Sub IChangeRotor_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Try
+            InitializeScreen()
+            RecoverProcess() 'IT 30/01/2015 - BA-2216
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".IChangeRotor_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub bsChangeRotortButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsChangeRotortButton.Click
+        Try
+            GlobalBase.CreateLogActivity("Btn ChangeRotor", Me.Name & ".bsChangeRotortButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            ChangeRotorStart()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsChangeRotortButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            Cursor = Cursors.Default        'DL 04/04/2012
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub bsContinueButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsContinueButton.Click
+        Try
+            GlobalBase.CreateLogActivity("Btn Continue", Me.Name & ".bsContinueButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            ChangeRotorContinue()
+        Catch ex As Exception
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            Cursor = Cursors.Default        'DL 04/04/2012
+
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsContinueButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Private Sub bsChangeRotorReadButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorReadButton.Click
+        Try
+
+            GlobalBase.CreateLogActivity("Btn Read", Me.Name & ".bsChangeRotorReadButton_Click", EventLogEntryType.Information, False)
+            bsChangeRotorFinalizeButton.Enabled = False
+            bsChangeRotorReadButton.Enabled = False
+            bsChangeRotortButton.Enabled = False
+            AnalyzerController.Instance.ChangeRotorRepeatDynamicBaseLineReadStep()
+
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorReadButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsChangeRotorReadButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Private Sub bsChangeRotorFinalizeButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorFinalizeButton.Click
+        Try
+
+            GlobalBase.CreateLogActivity("Btn Finalize", Me.Name & ".bsChangeRotorFinalizeButton_Click", EventLogEntryType.Information, False)
+
+            If (AnalyzerController.Instance.Analyzer.ExistBottleAlarms) Then
+                ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
+            Else
+                bsChangeRotorFinalizeButton.Enabled = False
+                bsChangeRotorReadButton.Enabled = False
+                bsChangeRotortButton.Enabled = False
+                AnalyzerController.Instance.ChangeRotorFinalizeProcess()
+            End If
+
+        Catch ex As Exception
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorFinalizeButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsChangeRotorFinalizeButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
     End Sub
 
 #End Region

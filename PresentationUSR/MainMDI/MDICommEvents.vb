@@ -2137,9 +2137,9 @@ Partial Public Class UiAx00MainMDI
             lnqRes = Nothing
 
             'IT 30/01/2015 - BA-2216 - INI
-            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES) = 1 Then
-                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES) = 0
-                RecoverProcesses()
+            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_INTERRUPTED_PROCESSES) = 1 Then
+                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_INTERRUPTED_PROCESSES) = 0
+                RecoverInterruptedProcesses()
             End If
             'IT 30/01/2015 - BA-2216 - END
 

@@ -2451,7 +2451,7 @@ Namespace Biosystems.Ax00.Global
             WASHSTATION_CTRL_PERFORMED 'Washing station is up. Requires clear value (=0) after his treatment
             NEW_ROTOR_PERFORMED 'Change rotor process is finished. Requires clear value (=0) after his treatment
             DYNAMIC_BASELINE_ERROR 'Indicate if dynamic baseline has errors (BA-2143)
-            RECOVERING_PROCESSES 'NEWROTORprocess 'BA-2216
+            RECOVERING_INTERRUPTED_PROCESSES 'NEWROTORprocess 'BA-2216
             NEW_ROTOR_PROCESS_STATUS_CHANGED 'INPROCESS to PAUSED and PAUSED to INPROCESS 'BA-2216
 
             'Enter Running process

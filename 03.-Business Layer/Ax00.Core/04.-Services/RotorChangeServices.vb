@@ -84,7 +84,7 @@ Namespace Biosystems.Ax00.Core.Services
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, "CANCELED")
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "CANCELED")
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "") 'AG + IT 10/02/2015 BA-2246 apply same rules in Change Rotor and in StartInstr
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
                     Return False
                 Else
@@ -177,6 +177,7 @@ Namespace Biosystems.Ax00.Core.Services
         Public Function RecoverProcess() As Boolean
             Try
                 _isInRecovering = True
+                '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
 
                 Dim nextStep As RotorChangeStepsEnum
                 nextStep = GetNextStep()
@@ -499,7 +500,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.CurrentInstructionAction = InstructionActions.FlightEmptying
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, myParams, String.Empty, Nothing)
             _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
             _forceEmptyAndFinalize = False
 
@@ -513,7 +514,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.CurrentInstructionAction = InstructionActions.FlightReading
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, myParams, String.Empty, Nothing)
             _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
 
             _dynamicBaseLineValid = False
@@ -528,7 +529,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.CurrentInstructionAction = InstructionActions.FlightFilling
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+            _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, myParams, String.Empty, Nothing)
             _analyzer.SetAnalyzerNotReady()
 
         End Sub

@@ -2040,6 +2040,9 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!! (Start instrument process)
         '''                                           use the new RotorChangeServices (Change rotor process)
         '''              IT 30/01/2015 - BA-2216
+        '''              AG 06/01/2015 - BA-2246 (2on TESTING wup and nrotor) - add condition: orelse subprocess not started
+        '''                                                                                    - only in subprocess which previous subprocess is set to END using a instruction different than STATUS
+        '''                                                                   - Do not call ValidateWUPProcess for those steps that requires liquid level verification (they will be called after ANSINF reception)
         ''' </remarks>
         Private Function ManageInterruptedProcess(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2074,7 +2077,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                             'AG 20/01/2015 BA-2216
                         End If
 
@@ -2084,7 +2087,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                         End If
 
                     ElseIf mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
@@ -2092,29 +2095,30 @@ Namespace Biosystems.Ax00.Core.Entities
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                         End If
 
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                        'AG 06/02/2015 BA-2246 previous step is set to END using instruction <> STATUS. Add also case new step flag = ""
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "" Then
                         '3.	Re-send FLIGHT instruction in mode fill
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                         End If
                     ElseIf mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
                         '3.	Re-send FLIGHT instruction in mode read
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Read, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                         End If
                     ElseIf mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
                         '3.	Re-send FLIGHT instruction in mode empty
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Empty, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
                         End If
                     End If
 
@@ -2154,14 +2158,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             autoIseConditFlag = True
                         End If
 
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.ISEPumpCalib.ToString) = "INI" Then
+                        'AG 06/02/2015 BA-2246 previous step is set to END using instruction <> STATUS. Add also case new step flag = ""
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString) = "INI" OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString) = "" Then
                         '2.	Set flag ISEPumpCalib to "". Requires analyzer status STANDBYcmd
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "")
                             autoIseConditFlag = True
                         End If
 
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.ISECalibAB.ToString) = "INI" Then
+                        'AG 06/02/2015 BA-2246 previous step is set to END using instruction <> STATUS. Add also case new step flag = ""
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB.ToString) = "INI" OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB.ToString) = "" Then
                         '3.	Set flag ISECalibAB to "". Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "")
@@ -2190,7 +2196,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     '4. DynamicBL_Read  = 'INI'
                     '5. DynamicBL_Empty = 'INI'
 
-                    UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERING_PROCESSES, 1, True) 'IT 30/01/2015 - BA-2216
+                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERING_INTERRUPTED_PROCESSES, 1, True) 'IT 30/01/2015 - BA-2216
 
                     'Recover in course
                 ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
@@ -2491,14 +2497,14 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Sub StoreStartTaskinQueue(ByVal pAction As AnalyzerManagerSwActionList, _
                                           ByVal pSwAdditionalParameters As Object, _
                                           ByVal pFwScriptID As String, _
-                                          ByVal pParams As List(Of String))
+                                          ByVal pServiceParams As List(Of String))
             Try
                 MyClass.ClearStartTaskQueueToSend()
 
                 MyClass.myStartTaskInstructionsQueue.Add(pAction)
                 MyClass.myStartTaskParamsQueue.Add(pSwAdditionalParameters)
                 MyClass.myStartTaskFwScriptIDsQueue.Add(pFwScriptID)
-                MyClass.myStartTaskFwScriptParamsQueue.Add(pParams)
+                MyClass.myStartTaskFwScriptParamsQueue.Add(pServiceParams)
 
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()

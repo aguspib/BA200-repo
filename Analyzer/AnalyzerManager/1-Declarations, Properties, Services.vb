@@ -2332,7 +2332,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSendingEvent"></param>
         ''' <param name="pInstructionReceived">Optional parameter, only informed when Software receives instructions</param>
         ''' <param name="pFwScriptID">Identifier of the script/action to be sended</param>
-        ''' <param name="pParams">param values to script/action to be sended</param>
+        ''' <param name="pServiceParams">param values to script/action to be sended - IMPORTANT NOTE: Use it only in Service Scripts!!!</param>
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
         ''' Creation AG 16/04/2010
@@ -2350,12 +2350,13 @@ Namespace Biosystems.Ax00.Core.Entities
         '''          XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
         '''          XB 06/11/2014 - Implement Start Task Timeout for RUNNING instruction - BA-1872
         '''          AG 11/12/2014 BA-2170 Analyzer does not becomes ready when receives an ANSFBLD instruction. This is an exception to the general rule!!
+        '''          AG 09/02/2015 rename pParams to pServiceParams
         ''' </remarks>
         Public Function ManageAnalyzer(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                        Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
                                        Optional ByVal pSwAdditionalParameters As Object = Nothing, _
                                        Optional ByVal pFwScriptID As String = "", _
-                                       Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerManager.ManageAnalyzer
+                                       Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerManager.ManageAnalyzer
 
             Dim myGlobal As New GlobalDataTO
 
@@ -2509,7 +2510,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     numRepetitionsTimeout = 0
                                 End If
                                 InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                                StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                 ' XB 06/11/2014 - BA-1872
 
                                 myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RUNNING)
@@ -2742,9 +2743,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If IsNumeric(pSwAdditionalParameters) Then
                                         nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
                                         myGlobal = Me.SendAdjustLightInstruction(nextWell)
-                                    ElseIf Not pParams Is Nothing Then
+                                    ElseIf Not pServiceParams Is Nothing Then
                                         ' XBC 20/02/2012
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ALIGHT, Nothing, "", "", pParams)
+                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ALIGHT, Nothing, "", "", pServiceParams)
                                     End If
                                 End If
                                 Exit Select
@@ -2753,8 +2754,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'IT 29/10/2014: BA-2061
                             Case AnalyzerManagerSwActionList.ADJUST_FLIGHT
                                 If ConnectedAttribute Then
-                                    If Not pParams Is Nothing Then
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, Nothing, String.Empty, String.Empty, pParams)
+                                    If Not pSwAdditionalParameters Is Nothing Then
+                                        Dim myParams As New List(Of String)
+                                        myParams = DirectCast(pSwAdditionalParameters, List(Of String))
+                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, myParams, String.Empty, String.Empty, Nothing)
                                     End If
                                 End If
                                 Exit Select
@@ -2967,7 +2970,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 numRepetitionsTimeout = 0
                                             End If
                                             InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                                            StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                            StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                             ' XB 26/09/2014 - BA-1872
 
                                             myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myISECommand)
@@ -3025,8 +3028,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XBC 08/11/2010  
                             Case AnalyzerManagerSwActionList.COMMAND
 
-
-                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pParams)
+                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pServiceParams)
 
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -3037,7 +3039,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             numRepetitionsTimeout = 0
                                         End If
                                         InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
-                                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                     End If
                                     ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                                 End If
@@ -3088,7 +3090,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XBC 20/04/2011
                             Case AnalyzerManagerSwActionList.ADJUST_BLIGHT
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BLIGHT, Nothing, "", "", pParams)
+                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BLIGHT, Nothing, "", "", pServiceParams)
                                 End If
                                 Exit Select
 
@@ -3106,7 +3108,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XBC 23/05/2011
                             Case AnalyzerManagerSwActionList.SDMODE
                                 If ConnectedAttribute Then
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SDMODE, Nothing, "", "", pParams)
+                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SDMODE, Nothing, "", "", pServiceParams)
                                 End If
                                 Exit Select
 
@@ -3785,7 +3787,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             ' XBC 24/10/2011
 
-                        Else 'User TimeOut treatment
+                        Else 'UserSw TimeOut treatment
                             'AG 14/10/2011 -check if instruction has been successfully sent
                             If pSendingEvent Then
                                 If myGlobal.HasError OrElse Not ConnectedAttribute Then
@@ -3803,6 +3805,14 @@ Namespace Biosystems.Ax00.Core.Entities
                             If ConnectedAttribute Then
                                 InstructionSentAttribute = AppLayer.InstructionSent
                                 InstructionReceivedAttribute = ""
+
+                                'AG 04/02/2015 BA-2246 - When software sends a instruction, the analyzer does not accept more until it sends the response
+                                If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+                                    (pAction <> AnalyzerManagerSwActionList.INFO AndAlso pAction <> AnalyzerManagerSwActionList.CONNECT) Then
+                                    SetAnalyzerNotReady()
+                                End If
+                                'AG 04/02/2015 BA-2246
+
                             End If
                             'AG 27/03/2012
 
@@ -3951,13 +3961,15 @@ Namespace Biosystems.Ax00.Core.Entities
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
-                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
-                        InstructionTypeReceived = AnalyzerManagerSwActionList.NONE
+                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, 0, True) 'Prepare UI refresh event when Connected changes
+                        InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.NONE
                         ' Set Waiting Timer Current Instruction OFF
                         ClearQueueToSend()
-                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.NO_THREADS.ToString)
+                        RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.NO_THREADS.ToString)
                     End If
                     'SGM 17/11/2011
+
+
                 End If
 
             Catch ex As Exception
@@ -4400,6 +4412,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Modified by XB 06/09/2012 - Add new parameter pConnectionCompleted
         '''             XB 06/11/2014 - ISE Timeout management - BA-1872
+        '''             AG 06/02/2015 BA-2246 update CurrentInstructionAction = none in order to achieve recover an interrupted process (dynamic base line)</remarks>
         ''' </remarks>
         Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.ProcessUSBCableDisconnection
             Dim myGlobal As New GlobalDataTO
@@ -4481,6 +4494,9 @@ Namespace Biosystems.Ax00.Core.Entities
                     myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
                 'AG 09/09/2013
+
+                'AG 06/02/2015 BA-2246
+                CurrentInstructionAction = InstructionActions.None 'In order to resend last instruction
 
             Catch ex As Exception
                 myGlobal.HasError = True
