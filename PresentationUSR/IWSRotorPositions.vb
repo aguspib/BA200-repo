@@ -8002,8 +8002,9 @@ Public Class UiWSRotorPositions
                         isInfoAreaAllowed = isRotorDragDropAllowed 'RH 26/09/2011 Forces to enable the info area.
                         ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myRingNumber, myCellNumber)
 
+                        'AG 12/02/2015 BA-2258 fix issue after integrate BA200 - BA400 branches: Rows.Count > 0)
                         'RH 10/10/2011 Execute this line after ShowPositionInfoArea(), because Enabled Status of some controls depends on its contents
-                        If (mySelectedElementInfo.twksWSRotorContentByPosition(0).Status <> "FREE") Then
+                        If (mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition(0).Status <> "FREE") Then
                             SetInfoAreaEnabledStatus(myRotorTypeForm, True)
                         End If
 
@@ -8031,8 +8032,10 @@ Public Class UiWSRotorPositions
                                     'Set the function value to canchange variable.
                                     CanChange = VerifyActionsAllowedInSampleRotor(mySelectedElementInfo, False)
                                 End If
+
+                                'AG 12/02/2015 BA-2258 fix issue after integrate BA200 - BA400 branches: Rows.Count > 0)
                                 'TR 08/11/2013 -BT #1358 END
-                            ElseIf (myRotorTypeForm = "REAGENTS") Then
+                            ElseIf (myRotorTypeForm = "REAGENTS") AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then
                                 currentBottleSize = CType(bsBottleSizeComboBox.SelectedValue, String)
                                 'TR 15/11/2013 - BT #1358(2) -Verify for Reagents rotorIf (analyzerInPAUSE) Then call new function 
                                 '                             VerifyActionsAllowedInReagentsRotor and assign the return value to variable 
@@ -8050,40 +8053,44 @@ Public Class UiWSRotorPositions
                                 End If
                             End If
 
-                            If (CanChange) Then 'RH 10/10/2011
-                                Dim SelectedElement As Integer = 0
-                                If (Not mySelectedElementInfo Is Nothing) Then SelectedElement = mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count
+                            'AG 12/02/2015 BA-2258 fix issue after integrate BA200 - BA400 branches: Rows.Count > 0)
+                            If (mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then
+                                If (CanChange) Then 'RH 10/10/2011
+                                    Dim SelectedElement As Integer = 0
+                                    If (Not mySelectedElementInfo Is Nothing) Then SelectedElement = mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count
 
-                                'TR 14/01/2010 - Get the next Bottle/Tube size and validate the result before changing the Bottle/Tube
-                                Dim myNextBottleSize As String = GetNextBottleSize(myRotorTypeForm, myRingNumber, currentBottleSize)
-                                If (myNextBottleSize <> "") Then
-                                    ChangeBottleSize(myRingNumber, myCellNumber, myNextBottleSize)
+                                    'TR 14/01/2010 - Get the next Bottle/Tube size and validate the result before changing the Bottle/Tube
+                                    Dim myNextBottleSize As String = GetNextBottleSize(myRotorTypeForm, myRingNumber, currentBottleSize)
+                                    If (myNextBottleSize <> "") Then
+                                        ChangeBottleSize(myRingNumber, myCellNumber, myNextBottleSize)
+                                    End If
+
+                                    'TR 09/03/2012 - Get the new information into my SelectedElement
+                                    mySelectedElementInfo = GetLocalPositionInfo(myRingNumber, myCellNumber, False)
+
+                                    'Validate if element status is Pos then Update the status for the same element id to POS
+                                    If (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "POS") Then
+                                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
+                                    ElseIf (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "INCOMPLETE") Then
+                                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
+                                    End If
+                                    'TR 09/03/2012 -END 
+
+                                    'Refresh the position information area
+                                    ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myRingNumber, myCellNumber)
+                                    'END TR 05/01/2010
+
+                                    If (SelectedElement = 1) Then
+                                        MarkSelectedPosition(myRingNumber, myCellNumber, True)
+                                    End If
+                                Else
+                                    'TR 11/11/2013 -BT #1358 Show message only if reagent rotor.
+                                    If myRotorTypeForm = "REAGENTS" Then
+                                        ShowMessage("AX00", GlobalEnumerates.Messages.BOTTLE_CHANGE_NOT_ALLOWED.ToString()) 'RH 10/10/2011
+                                    End If
                                 End If
+                            End If 'AG 12/02/2015 BA-2258
 
-                                'TR 09/03/2012 - Get the new information into my SelectedElement
-                                mySelectedElementInfo = GetLocalPositionInfo(myRingNumber, myCellNumber, False)
-
-                                'Validate if element status is Pos then Update the status for the same element id to POS
-                                If (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "POS") Then
-                                    SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
-                                ElseIf (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "INCOMPLETE") Then
-                                    SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
-                                End If
-                                'TR 09/03/2012 -END 
-
-                                'Refresh the position information area
-                                ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myRingNumber, myCellNumber)
-                                'END TR 05/01/2010
-
-                                If (SelectedElement = 1) Then
-                                    MarkSelectedPosition(myRingNumber, myCellNumber, True)
-                                End If
-                            Else
-                                'TR 11/11/2013 -BT #1358 Show message only if reagent rotor.
-                                If myRotorTypeForm = "REAGENTS" Then
-                                    ShowMessage("AX00", GlobalEnumerates.Messages.BOTTLE_CHANGE_NOT_ALLOWED.ToString()) 'RH 10/10/2011
-                                End If
-                            End If
                         End If
                     End If
 
