@@ -13,6 +13,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices 'WIN32
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Entities
+Imports System.ComponentModel
 
 Public Class UiISEUtilities
 
@@ -61,6 +62,8 @@ Public Class UiISEUtilities
     Private IsSwitchOffInformed As Boolean = False 'SGM 02/07/2012
 
     Private IsInstallGroupNodeActive As Boolean = False ' XBC 27/07/2012
+    'AJG
+    Private WithEvents myBkwISE_CMD As BackgroundWorker = Nothing
 #End Region
 
 #Region "Win32"
@@ -96,6 +99,9 @@ Public Class UiISEUtilities
         Me.SimulationMode = pSimulationMode
         InitializeComponent()
 
+        'AJG
+        myBkwISE_CMD = New BackgroundWorker()
+        myBkwISE_CMD.WorkerSupportsCancellation = True
     End Sub
 #End Region
 
@@ -448,6 +454,24 @@ Public Class UiISEUtilities
             MyBase.ShowMessage(Me.Name & ".ManageReceptionEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
     End Function
+
+    'AJG
+    Private Sub Bkw_ISE_CMD_DoWork(ByVal sender As Object, ByVal e As DoWorkEventArgs) Handles myBkwISE_CMD.DoWork
+        Try
+            If (CType(e.Argument, Integer) = 1) Then
+                SendISEInstruction()
+            ElseIf (CType(e.Argument, Integer) = 2) Then
+                SendISEAction()
+            End If
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub Bkw_ISE_CMD_WorkCompleted(ByVal sender As Object, ByVal e As RunWorkerCompletedEventArgs) Handles myBkwISE_CMD.RunWorkerCompleted
+
+    End Sub
+
 #End Region
 
 #Region "Public Methods"
@@ -1091,13 +1115,16 @@ Public Class UiISEUtilities
                 PrepareTestedMode()
                 Me.Cursor = Cursors.Default
             Else
+                'AJG
+                'Dim workingThread As New Threading.Thread(AddressOf SendISEInstruction) 'AddressOf do not allow call method with parameters so use a screen variable
+                'workingThread.Start()
+                'While ScreenWorkingProcess
+                '    Application.DoEvents()
+                'End While
+                'workingThread = Nothing
 
-                Dim workingThread As New Threading.Thread(AddressOf SendISEInstruction) 'AddressOf do not allow call method with parameters so use a screen variable
-                workingThread.Start()
-                While ScreenWorkingProcess
-                    Application.DoEvents()
-                End While
-                workingThread = Nothing
+                myBkwISE_CMD.RunWorkerAsync(1)
+
             End If
 
 
@@ -1400,12 +1427,16 @@ Public Class UiISEUtilities
                     PrepareTestedMode()
                 Else
                     Application.DoEvents()
-                    Dim workingThread As New Threading.Thread(AddressOf SendISEAction) 'AddressOf do not allow call method with parameters so use a screen variable
-                    workingThread.Start()
-                    While ScreenWorkingProcess
-                        Application.DoEvents()
-                    End While
-                    workingThread = Nothing
+                    'AJG
+                    'Dim workingThread As New Threading.Thread(AddressOf SendISEAction) 'AddressOf do not allow call method with parameters so use a screen variable
+                    'workingThread.Start()
+                    'While ScreenWorkingProcess
+                    '    Application.DoEvents()
+                    'End While
+                    'workingThread = Nothing
+
+                    myBkwISE_CMD.RunWorkerAsync(2)
+
                 End If
             End If
 
