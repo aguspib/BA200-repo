@@ -579,6 +579,24 @@ Public Class UiChangeRotor
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  IT 13/02/2015 - BA-2266
+    ''' </remarks>
+    Private Sub WashstationControlPerformed()
+        ScreenWorkingProcess = True
+        UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
+        UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
+
+        'Not necessary because Fw peforms the action although the reaction cover enabled & open
+        bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+
+        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
+    End Sub
+
+
 #End Region
 
 #Region "Public Methods"
@@ -595,6 +613,7 @@ Public Class UiChangeRotor
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 19/12/2014 - BA-2143
     '''              IT 30/01/2015 - BA-2216
+    '''              IT 13/02/2015 - BA-2266
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
@@ -611,16 +630,7 @@ Public Class UiChangeRotor
                 '1st step finish (Wash station UP) >> Now enable control to perform the 2on steps in utility process
                 sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED)
                 If (sensorValue = 1) Then
-                    ScreenWorkingProcess = True
-                    UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
-                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
-
-                    'Not necessary because Fw peforms the action although the reaction cover enabled & open
-                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
-
-                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
-                    RecoverProcess(True) 'BA-2216
-
+                    WashstationControlPerformed()
                 End If
 
                 '2nd step is finish when valid ALIGHT o not more chances!!
@@ -736,29 +746,23 @@ Public Class UiChangeRotor
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <param name="continueProcess"></param>
     ''' <remarks>
-    ''' Created by: IT 30/01/2015 - BA-2216
-    ''' AG 04/02/2015 BA-2246 define public
+    ''' Created by:  IT 30/01/2015 - BA-2216
+    ''' Modified by: AG 04/02/2015 - BA-2246 define public
+    '''              IT 13/02/2015 - BA-2266
     ''' </remarks>
-    Public Sub RecoverProcess(Optional ByVal continueProcess As Boolean = False)
+    Public Sub RecoverProcess()
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Or
             (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
 
-            If (Not continueProcess) Then
-                _recoverProcess = True
-                ChangeRotorStart()
-            Else
-
-                If (_recoverProcess) Then
-                    If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) <> "") Then
-                        ChangeRotorContinue()
-                    End If
-                    _recoverProcess = False
-                End If
-
+            _recoverProcess = True
+            ChangeRotorStart()
+            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) <> "") Then
+                WashstationControlPerformed()
+                ChangeRotorContinue()
             End If
+
         End If
 
     End Sub
@@ -781,7 +785,6 @@ Public Class UiChangeRotor
     Private Sub IChangeRotor_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             InitializeScreen()
-            RecoverProcess() 'IT 30/01/2015 - BA-2216
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IChangeRotor_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

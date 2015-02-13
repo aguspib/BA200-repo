@@ -7765,22 +7765,35 @@ Partial Public Class UiAx00MainMDI
                 'AG 04/02/2015 BA-2246 ERROR2
                 'CloseActiveMdiChild()
                 'OpenMDIChildForm(IChangeRotor)
-                Dim changeRotorScreenTreated As Boolean = False
+                'Dim changeRotorScreenTreated As Boolean = False
+                'If Not ActiveMdiChild Is Nothing Then
+                '    '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
+                '    If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                '        Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
+                '        CurrentMdiChild.RecoverProcess()
+                '        changeRotorScreenTreated = True
+                '    End If
+                'End If
+
+                'If Not changeRotorScreenTreated Then 'If the rotor change screen has not been treated ... open it
+                '    CloseActiveMdiChild()
+                '    OpenMDIChildForm(UiChangeRotor)
+                'End If
+                'AG 04/02/2015 BA-2246 ERROR2
+
                 If Not ActiveMdiChild Is Nothing Then
-                    '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
+
+                    If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                        CloseActiveMdiChild()
+                        OpenMDIChildForm(UiChangeRotor)
+                    End If
+
                     If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
                         Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
                         CurrentMdiChild.RecoverProcess()
-                        changeRotorScreenTreated = True
                     End If
-                End If
 
-                If Not changeRotorScreenTreated Then 'If the rotor change screen has not been treated ... open it
-                    CloseActiveMdiChild()
-                    OpenMDIChildForm(UiChangeRotor)
                 End If
-                'AG 04/02/2015 BA-2246 ERROR2
-
             End If
         End If
 

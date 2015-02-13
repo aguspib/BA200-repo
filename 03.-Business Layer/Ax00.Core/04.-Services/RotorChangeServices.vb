@@ -719,6 +719,7 @@ Namespace Biosystems.Ax00.Core.Services
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
             _analyzer.DynamicBaselineInitializationFailures = 0
+            _analyzer.CurrentInstructionAction = InstructionActions.None
 
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
@@ -752,10 +753,10 @@ Namespace Biosystems.Ax00.Core.Services
 
             Initialize()
 
-            _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
-
             'NEWROTORprocess in INPROCESS status
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "INI") Then
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "") Then
+                _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "INI") Then
                 '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "INI") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "") 'Re-send Washing
