@@ -4412,7 +4412,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Modified by XB 06/09/2012 - Add new parameter pConnectionCompleted
         '''             XB 06/11/2014 - ISE Timeout management - BA-1872
-        '''             AG 06/02/2015 BA-2246 update CurrentInstructionAction = none in order to achieve recover an interrupted process (dynamic base line)</remarks>
+        '''             AG 06/02/2015 BA-2246 update CurrentInstructionAction = none in order to achieve recover an interrupted process (dynamic base line)
         ''' </remarks>
         Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO Implements IAnalyzerManager.ProcessUSBCableDisconnection
             Dim myGlobal As New GlobalDataTO
