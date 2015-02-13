@@ -100,6 +100,12 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
@@ -1409,6 +1415,7 @@
     <None Include="BarCodesDS.xss">
       <DependentUpon>BarCodesDS.xsd</DependentUpon>
     </None>
+    <None Include="BioSystems.pfx" />
     <None Include="CalculatedTestsDS.xsc">
       <DependentUpon>CalculatedTestsDS.xsd</DependentUpon>
     </None>
