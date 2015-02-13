@@ -7755,6 +7755,7 @@ Partial Public Class UiAx00MainMDI
     ''' </summary>
     ''' <remarks>
     ''' Modified by:  IT 30/01/2015 - BA-2216
+    '''               IT 13/02/2015 - BA-2266
     ''' </remarks>
     Private Sub RecoverInterruptedProcesses()
 
@@ -7763,24 +7764,6 @@ Partial Public Class UiAx00MainMDI
                 AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
 
                 'AG 04/02/2015 BA-2246 ERROR2
-                'CloseActiveMdiChild()
-                'OpenMDIChildForm(IChangeRotor)
-                'Dim changeRotorScreenTreated As Boolean = False
-                'If Not ActiveMdiChild Is Nothing Then
-                '    '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                '    If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                '        Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
-                '        CurrentMdiChild.RecoverProcess()
-                '        changeRotorScreenTreated = True
-                '    End If
-                'End If
-
-                'If Not changeRotorScreenTreated Then 'If the rotor change screen has not been treated ... open it
-                '    CloseActiveMdiChild()
-                '    OpenMDIChildForm(UiChangeRotor)
-                'End If
-                'AG 04/02/2015 BA-2246 ERROR2
-
                 If Not ActiveMdiChild Is Nothing Then
 
                     If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
@@ -7794,6 +7777,8 @@ Partial Public Class UiAx00MainMDI
                     End If
 
                 End If
+                'AG 04/02/2015 BA-2246 ERROR2
+
             End If
         End If
 
