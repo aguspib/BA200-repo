@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
+Imports System.Threading.Tasks
 
 Namespace Biosystems.Ax00.BL
 
@@ -7318,182 +7319,340 @@ Namespace Biosystems.Ax00.BL
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
 
+                                'Get all executions for BLANKS included in the WorkSession
+                                Dim myBlankExecutionsDS As New ExecutionsDS
+                                'Get all executions for CALIBRATORS included in the WorkSession
+                                Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
+                                'Get all executions for CONTROLS included in the WorkSession
+                                Dim myControlExecutionsDS As ExecutionsDS = Nothing
+                                'Get all executions for PATIENT SAMPLES included in the WorkSession
+                                Dim myPatientExecutionsDS As ExecutionsDS = Nothing
+
                                 If (allOrderTestsDS.OrderTestsForExecutionsTable.Rows.Count > 0) Then
-                                    'Get all executions for BLANKS included in the WorkSession
-                                    Dim myBlankExecutionsDS As New ExecutionsDS
                                     resultData = CreateBlankExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                         myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                        Dim myOrderTestID As Integer = -1
-                                        Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                        For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-                                            If (rowBlank.OrderTestID <> myOrderTestID) Then
-                                                myOrderTestID = rowBlank.OrderTestID
-                                                'Search information for the Blank
-                                                blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                            Where a.OrderTestID = myOrderTestID _
-                                                           Select a).ToList()
-                                            End If
-
-                                            '...and complete fields for the Blank
-                                            If (blankInfo.Count = 1) Then
-                                                rowBlank.BeginEdit()
-                                                rowBlank.TestID = blankInfo(0).TestID
-                                                rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
-                                                rowBlank.ReagentID = blankInfo(0).ReagentID
-                                                rowBlank.OrderID = blankInfo(0).OrderID
-                                                rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
-                                                rowBlank.EndEdit()
-                                            End If
-                                        Next
-                                        myBlankExecutionsDS.AcceptChanges()
-                                        blankInfo = Nothing 'AG 19/02/2014 - #1514
+                                    End If
+                                    resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                    End If
+                                    resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                    End If
+                                    resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
                                     End If
 
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    'AJG CODIGO COMENTADO
+                                    '    Dim myOrderTestID As Integer = -1
+                                    '    Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
-                                    'Get all executions for CALIBRATORS included in the WorkSession
-                                    Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
+                                    '    For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
+                                    '        If (rowBlank.OrderTestID <> myOrderTestID) Then
+                                    '            myOrderTestID = rowBlank.OrderTestID
+                                    '            'Search information for the Blank
+                                    '            blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    '                        Where a.OrderTestID = myOrderTestID _
+                                    '                       Select a).ToList()
+                                    '        End If
 
-                                    If (Not resultData.HasError) Then
-                                        resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                    '        '...and complete fields for the Blank
+                                    '        If (blankInfo.Count = 1) Then
+                                    '            rowBlank.BeginEdit()
+                                    '            rowBlank.TestID = blankInfo(0).TestID
+                                    '            rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
+                                    '            rowBlank.ReagentID = blankInfo(0).ReagentID
+                                    '            rowBlank.OrderID = blankInfo(0).OrderID
+                                    '            rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
+                                    '            rowBlank.EndEdit()
+                                    '        End If
+                                    '    Next
+                                    '    myBlankExecutionsDS.AcceptChanges()
+                                    '    blankInfo = Nothing 'AG 19/02/2014 - #1514
+                                    'End If
 
-                                            Dim myOrderTestID As Integer = -1
-                                            Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    'GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    '                                "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                    'StartTime = Now
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-                                            For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-                                                'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                If (rowCalib.OrderTestID <> myOrderTestID) Then
-                                                    myOrderTestID = rowCalib.OrderTestID
-                                                    'Search information for the Calibrator
-                                                    calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                Where a.OrderTestID = myOrderTestID _
-                                                               Select a).ToList()
-                                                End If
+                                    'If (Not resultData.HasError) Then
+                                    '    resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '        myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                                                '...and complete fields for the Calibrator
-                                                If (calibInfo.Count = 1) Then
-                                                    rowCalib.BeginEdit()
-                                                    rowCalib.TestID = calibInfo(0).TestID
-                                                    rowCalib.SampleType = calibInfo(0).SampleType
-                                                    rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
-                                                    rowCalib.ReagentID = calibInfo(0).ReagentID
-                                                    rowCalib.OrderID = calibInfo(0).OrderID
-                                                    rowCalib.ElementID = calibInfo(0).ElementID
-                                                    rowCalib.EndEdit()
-                                                End If
-                                            Next
-                                            myCalibratorExecutionsDS.AcceptChanges()
-                                            calibInfo = Nothing 'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
+                                    '        Dim myOrderTestID As Integer = -1
+                                    '        Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    '        For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
+                                    '            'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    '            If (rowCalib.OrderTestID <> myOrderTestID) Then
+                                    '                myOrderTestID = rowCalib.OrderTestID
+                                    '                'Search information for the Calibrator
+                                    '                calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    '                            Where a.OrderTestID = myOrderTestID _
+                                    '                           Select a).ToList()
+                                    '            End If
 
-                                    'Get all executions for CONTROLS included in the WorkSession
-                                    Dim myControlExecutionsDS As ExecutionsDS = Nothing
+                                    '            '...and complete fields for the Calibrator
+                                    '            If (calibInfo.Count = 1) Then
+                                    '                rowCalib.BeginEdit()
+                                    '                rowCalib.TestID = calibInfo(0).TestID
+                                    '                rowCalib.SampleType = calibInfo(0).SampleType
+                                    '                rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
+                                    '                rowCalib.ReagentID = calibInfo(0).ReagentID
+                                    '                rowCalib.OrderID = calibInfo(0).OrderID
+                                    '                rowCalib.ElementID = calibInfo(0).ElementID
+                                    '                rowCalib.EndEdit()
+                                    '            End If
+                                    '        Next
+                                    '        myCalibratorExecutionsDS.AcceptChanges()
+                                    '        calibInfo = Nothing 'AG 19/02/2014 - #1514
+                                    '    End If
+                                    'End If
 
-                                    If (Not resultData.HasError) Then
-                                        resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    'GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    '                                "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                    'StartTime = Now
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-                                            Dim myOrderTestID As Integer = -1
-                                            Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+                                    'If (Not resultData.HasError) Then
+                                    '    resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '        myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                                            For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-                                                'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                If (rowControl.OrderTestID <> myOrderTestID) Then
-                                                    myOrderTestID = rowControl.OrderTestID
-                                                    'Search information for the Control
-                                                    controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                  Where a.OrderTestID = myOrderTestID _
-                                                                 Select a).ToList()
-                                                End If
+                                    '        Dim myOrderTestID As Integer = -1
+                                    '        Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
-                                                '...and complete fields for the Control (more than one record is possible when several
-                                                'controls are used for the TestType/Test/Sample Type)
-                                                If (controlInfo.Count >= 1) Then
-                                                    rowControl.BeginEdit()
-                                                    rowControl.TestID = controlInfo(0).TestID
-                                                    rowControl.SampleType = controlInfo(0).SampleType
-                                                    rowControl.ReadingCycle = controlInfo(0).ReadingCycle
-                                                    rowControl.ReagentID = controlInfo(0).ReagentID
-                                                    rowControl.OrderID = controlInfo(0).OrderID
-                                                    rowControl.ElementID = controlInfo(0).ElementID
+                                    '        For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
+                                    '            'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    '            If (rowControl.OrderTestID <> myOrderTestID) Then
+                                    '                myOrderTestID = rowControl.OrderTestID
+                                    '                'Search information for the Control
+                                    '                controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    '                              Where a.OrderTestID = myOrderTestID _
+                                    '                             Select a).ToList()
+                                    '            End If
 
-                                                    If orderTestLockedByLISList.Contains(rowControl.OrderTestID) Then rowControl.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                                    rowControl.EndEdit()
-                                                End If
-                                            Next
-                                            controlInfo = Nothing 'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
+                                    '            '...and complete fields for the Control (more than one record is possible when several
+                                    '            'controls are used for the TestType/Test/Sample Type)
+                                    '            If (controlInfo.Count >= 1) Then
+                                    '                rowControl.BeginEdit()
+                                    '                rowControl.TestID = controlInfo(0).TestID
+                                    '                rowControl.SampleType = controlInfo(0).SampleType
+                                    '                rowControl.ReadingCycle = controlInfo(0).ReadingCycle
+                                    '                rowControl.ReagentID = controlInfo(0).ReagentID
+                                    '                rowControl.OrderID = controlInfo(0).OrderID
+                                    '                rowControl.ElementID = controlInfo(0).ElementID
 
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    '                If orderTestLockedByLISList.Contains(rowControl.OrderTestID) Then rowControl.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+                                    '                rowControl.EndEdit()
+                                    '            End If
+                                    '        Next
+                                    '        controlInfo = Nothing 'AG 19/02/2014 - #1514
+                                    '    End If
+                                    'End If
 
-                                    'Get all executions for PATIENT SAMPLES included in the WorkSession
-                                    Dim myPatientExecutionsDS As ExecutionsDS = Nothing
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    'GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    '                                "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                    'StartTime = Now
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-                                    If (Not resultData.HasError) Then
-                                        resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                    ''Get all executions for PATIENT SAMPLES included in the WorkSession
+                                    'If (Not resultData.HasError) Then
+                                    '    resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+                                    '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    '        myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                                            Dim myOrderTestID As Integer = -1
-                                            Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+                                    '        Dim myOrderTestID As Integer = -1
+                                    '        Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
-                                            For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-                                                'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                If (rowPatient.OrderTestID <> myOrderTestID) Then
-                                                    myOrderTestID = rowPatient.OrderTestID
+                                    '        For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
+                                    '            'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    '            If (rowPatient.OrderTestID <> myOrderTestID) Then
+                                    '                myOrderTestID = rowPatient.OrderTestID
 
-                                                    'Search information for the Patient Sample
-                                                    patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                  Where a.OrderTestID = myOrderTestID _
-                                                                 Select a).ToList()
-                                                End If
+                                    '                'Search information for the Patient Sample
+                                    '                patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    '                              Where a.OrderTestID = myOrderTestID _
+                                    '                             Select a).ToList()
+                                    '            End If
 
-                                                '...and complete fields for the Patient Sample
-                                                If (patientInfo.Count = 1) Then
-                                                    rowPatient.BeginEdit()
-                                                    rowPatient.TestID = patientInfo(0).TestID
-                                                    rowPatient.SampleType = patientInfo(0).SampleType
-                                                    rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
-                                                    rowPatient.ReagentID = patientInfo(0).ReagentID
-                                                    rowPatient.OrderID = patientInfo(0).OrderID
+                                    '            '...and complete fields for the Patient Sample
+                                    '            If (patientInfo.Count = 1) Then
+                                    '                rowPatient.BeginEdit()
+                                    '                rowPatient.TestID = patientInfo(0).TestID
+                                    '                rowPatient.SampleType = patientInfo(0).SampleType
+                                    '                rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
+                                    '                rowPatient.ReagentID = patientInfo(0).ReagentID
+                                    '                rowPatient.OrderID = patientInfo(0).OrderID
 
-                                                    'AG 27/04/2012 Activate this line again (RH 08/03/2012 Remove this line)
-                                                    rowPatient.ElementID = patientInfo(0).CreationOrder 'Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
-                                                    If orderTestLockedByLISList.Contains(rowPatient.OrderTestID) Then rowPatient.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                                    rowPatient.EndEdit()
-                                                End If
-                                            Next
-                                            patientInfo = Nothing 'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
+                                    '                'AG 27/04/2012 Activate this line again (RH 08/03/2012 Remove this line)
+                                    '                rowPatient.ElementID = patientInfo(0).CreationOrder 'Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
+                                    '                If orderTestLockedByLISList.Contains(rowPatient.OrderTestID) Then rowPatient.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+                                    '                rowPatient.EndEdit()
+                                    '            End If
+                                    '        Next
+                                    '        patientInfo = Nothing 'AG 19/02/2014 - #1514
+                                    '    End If
+                                    'End If
 
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                                    'GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    '                                "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                    'StartTime = Now
+                                    ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+                                    Dim listTask As New List(Of Task)
+
+                                    listTask.Add(Task.Factory.StartNew(Sub()
+                                                                           Dim myOrderTestID As Integer = -1
+                                                                           Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+
+                                                                           For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
+                                                                               If (rowBlank.OrderTestID <> myOrderTestID) Then
+                                                                                   myOrderTestID = rowBlank.OrderTestID
+                                                                                   'Search information for the Blank
+                                                                                   blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                               Where a.OrderTestID = myOrderTestID _
+                                                                                              Select a).ToList()
+                                                                               End If
+
+                                                                               '...and complete fields for the Blank
+                                                                               If (blankInfo.Count = 1) Then
+                                                                                   rowBlank.BeginEdit()
+                                                                                   rowBlank.TestID = blankInfo(0).TestID
+                                                                                   rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
+                                                                                   rowBlank.ReagentID = blankInfo(0).ReagentID
+                                                                                   rowBlank.OrderID = blankInfo(0).OrderID
+                                                                                   rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
+                                                                                   rowBlank.EndEdit()
+                                                                               End If
+                                                                           Next
+                                                                           myBlankExecutionsDS.AcceptChanges()
+                                                                           blankInfo = Nothing 'AG 19/02/2014 - #1514
+                                                                           'End If
+                                                                           GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                                                       End Sub))
+
+
+                                    listTask.Add(Task.Factory.StartNew(Sub()
+                                                                           Dim myOrderTestID As Integer = -1
+                                                                           Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+
+                                                                           For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
+                                                                               'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                                                               If (rowCalib.OrderTestID <> myOrderTestID) Then
+                                                                                   myOrderTestID = rowCalib.OrderTestID
+                                                                                   'Search information for the Calibrator
+                                                                                   calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                               Where a.OrderTestID = myOrderTestID _
+                                                                                              Select a).ToList()
+                                                                               End If
+
+                                                                               '...and complete fields for the Calibrator
+                                                                               If (calibInfo.Count = 1) Then
+                                                                                   rowCalib.BeginEdit()
+                                                                                   rowCalib.TestID = calibInfo(0).TestID
+                                                                                   rowCalib.SampleType = calibInfo(0).SampleType
+                                                                                   rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
+                                                                                   rowCalib.ReagentID = calibInfo(0).ReagentID
+                                                                                   rowCalib.OrderID = calibInfo(0).OrderID
+                                                                                   rowCalib.ElementID = calibInfo(0).ElementID
+                                                                                   rowCalib.EndEdit()
+                                                                               End If
+                                                                           Next
+                                                                           'myCalibratorExecutionsDS.AcceptChanges()
+                                                                           calibInfo = Nothing 'AG 19/02/2014 - #1514
+                                                                           'End If
+                                                                           GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                                                       End Sub))
+
+
+                                    listTask.Add(Task.Factory.StartNew(Sub()
+                                                                           Dim myOrderTestID As Integer = -1
+                                                                           Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+
+                                                                           For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
+                                                                               'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                                                               If (rowControl.OrderTestID <> myOrderTestID) Then
+                                                                                   myOrderTestID = rowControl.OrderTestID
+                                                                                   'Search information for the Control
+                                                                                   controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                                 Where a.OrderTestID = myOrderTestID _
+                                                                                                Select a).ToList()
+                                                                               End If
+
+                                                                               '...and complete fields for the Control (more than one record is possible when several
+                                                                               'controls are used for the TestType/Test/Sample Type)
+                                                                               If (controlInfo.Count >= 1) Then
+                                                                                   rowControl.BeginEdit()
+                                                                                   rowControl.TestID = controlInfo(0).TestID
+                                                                                   rowControl.SampleType = controlInfo(0).SampleType
+                                                                                   rowControl.ReadingCycle = controlInfo(0).ReadingCycle
+                                                                                   rowControl.ReagentID = controlInfo(0).ReagentID
+                                                                                   rowControl.OrderID = controlInfo(0).OrderID
+                                                                                   rowControl.ElementID = controlInfo(0).ElementID
+
+                                                                                   If orderTestLockedByLISList.Contains(rowControl.OrderTestID) Then rowControl.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+                                                                                   rowControl.EndEdit()
+                                                                               End If
+                                                                           Next
+                                                                           controlInfo = Nothing 'AG 19/02/2014 - #1514
+                                                                           'End If
+                                                                           GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                                                       End Sub))
+
+
+                                    listTask.Add(Task.Factory.StartNew(Sub()
+                                                                           Dim myOrderTestID As Integer = -1
+                                                                           Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+
+                                                                           For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
+                                                                               'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                                                               If (rowPatient.OrderTestID <> myOrderTestID) Then
+                                                                                   myOrderTestID = rowPatient.OrderTestID
+
+                                                                                   'Search information for the Patient Sample
+                                                                                   patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                                 Where a.OrderTestID = myOrderTestID _
+                                                                                                Select a).ToList()
+                                                                               End If
+
+                                                                               '...and complete fields for the Patient Sample
+                                                                               If (patientInfo.Count = 1) Then
+                                                                                   rowPatient.BeginEdit()
+                                                                                   rowPatient.TestID = patientInfo(0).TestID
+                                                                                   rowPatient.SampleType = patientInfo(0).SampleType
+                                                                                   rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
+                                                                                   rowPatient.ReagentID = patientInfo(0).ReagentID
+                                                                                   rowPatient.OrderID = patientInfo(0).OrderID
+
+                                                                                   'AG 27/04/2012 Activate this line again (RH 08/03/2012 Remove this line)
+                                                                                   rowPatient.ElementID = patientInfo(0).CreationOrder 'Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
+                                                                                   If orderTestLockedByLISList.Contains(rowPatient.OrderTestID) Then rowPatient.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+                                                                                   rowPatient.EndEdit()
+                                                                               End If
+                                                                           Next
+                                                                           patientInfo = Nothing 'AG 19/02/2014 - #1514
+                                                                           'End If
+                                                                           GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                                                       End Sub))
+
+
+                                    Task.WaitAll(listTask.ToArray())
+
+                                    listTask.Clear()
 
                                     If (Not resultData.HasError) Then
                                         'Search all locked BLANKS to lock also all Calibrators, Control and Patient Samples
@@ -7503,51 +7662,109 @@ Namespace Biosystems.Ax00.BL
                                                           Where a.ExecutionStatus = "LOCKED" _
                                                          Select a.TestID Distinct).ToList()
 
-                                        Dim myTestID As Integer
+                                        'AJG
+                                        'Dim myTestID As Integer
                                         Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
                                         Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
                                         Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
 
-                                        For Each lockedBlank In lstLockedBlanks
-                                            myTestID = lockedBlank
-                                            '...LOCK the correspondent Calibrators
-                                            lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                              Where a.TestID = myTestID _
-                                                            AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                             Select a).ToList()
+                                        listTask.Add(task.Factory.StartNew(Sub()
+                                                                               For Each lockedBlank In lstLockedBlanks
+                                                                                   Dim myOwnTestId = lockedBlank
+                                                                                   '...LOCK the correspondent Calibrators
+                                                                                   lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
+                                                                                                     Where a.TestID = myOwnTestId _
+                                                                                                   AndAlso a.ExecutionStatus <> "LOCKED" _
+                                                                                                    Select a).ToList()
 
-                                            For Each lockedCalib In lstLockedCalibs
-                                                lockedCalib.BeginEdit()
-                                                lockedCalib.ExecutionStatus = "LOCKED"
-                                                lockedCalib.EndEdit()
-                                            Next
+                                                                                   For Each lockedCalib In lstLockedCalibs
+                                                                                       lockedCalib.BeginEdit()
+                                                                                       lockedCalib.ExecutionStatus = "LOCKED"
+                                                                                       lockedCalib.EndEdit()
+                                                                                   Next
+                                                                               Next
+                                                                           End Sub))
 
-                                            '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                            lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                              Where a.ExecutionType = "PREP_STD" _
-                                                            AndAlso a.TestID = myTestID _
-                                                            AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                             Select a).ToList()
+                                        listTask.Add(task.Factory.StartNew(Sub()
+                                                                               For Each lockedBlank In lstLockedBlanks
+                                                                                   Dim myOwnTestId = lockedBlank
+                                                                                   '...LOCK the correspondent Controls - Apply only to STD Preparations
+                                                                                   lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                                                                     Where a.ExecutionType = "PREP_STD" _
+                                                                                                   AndAlso a.TestID = myOwnTestId _
+                                                                                                   AndAlso a.ExecutionStatus <> "LOCKED" _
+                                                                                                    Select a).ToList()
 
-                                            For Each lockedCtrl In lstLockedCtrls
-                                                lockedCtrl.BeginEdit()
-                                                lockedCtrl.ExecutionStatus = "LOCKED"
-                                                lockedCtrl.EndEdit()
-                                            Next
+                                                                                   For Each lockedCtrl In lstLockedCtrls
+                                                                                       lockedCtrl.BeginEdit()
+                                                                                       lockedCtrl.ExecutionStatus = "LOCKED"
+                                                                                       lockedCtrl.EndEdit()
+                                                                                   Next
+                                                                               Next
+                                                                           End Sub))
 
-                                            '...LOCK the correspondent Patients
-                                            lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                                Where a.ExecutionType = "PREP_STD" _
-                                                              AndAlso a.TestID = myTestID _
-                                                              AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                               Select a).ToList()
+                                        listTask.Add(task.Factory.StartNew(Sub()
+                                                                               For Each lockedBlank In lstLockedBlanks
+                                                                                   Dim myOwnTestId = lockedBlank
+                                                                                   '...LOCK the correspondent Patients
+                                                                                   lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
+                                                                                                       Where a.ExecutionType = "PREP_STD" _
+                                                                                                     AndAlso a.TestID = myOwnTestId _
+                                                                                                     AndAlso a.ExecutionStatus <> "LOCKED" _
+                                                                                                      Select a).ToList()
 
-                                            For Each lockedPatient In lstLockedPatients
-                                                lockedPatient.BeginEdit()
-                                                lockedPatient.ExecutionStatus = "LOCKED"
-                                                lockedPatient.EndEdit()
-                                            Next
-                                        Next
+                                                                                   For Each lockedPatient In lstLockedPatients
+                                                                                       lockedPatient.BeginEdit()
+                                                                                       lockedPatient.ExecutionStatus = "LOCKED"
+                                                                                       lockedPatient.EndEdit()
+                                                                                   Next
+                                                                               Next
+                                                                           End Sub))
+
+                                        'AJG Parallelized version above
+                                        'For Each lockedBlank In lstLockedBlanks
+                                        '    myTestID = lockedBlank
+                                        '    '...LOCK the correspondent Calibrators
+                                        '    lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
+                                        '                      Where a.TestID = myTestID _
+                                        '                    AndAlso a.ExecutionStatus <> "LOCKED" _
+                                        '                     Select a).ToList()
+
+                                        '    For Each lockedCalib In lstLockedCalibs
+                                        '        lockedCalib.BeginEdit()
+                                        '        lockedCalib.ExecutionStatus = "LOCKED"
+                                        '        lockedCalib.EndEdit()
+                                        '    Next
+
+                                        '    '...LOCK the correspondent Controls - Apply only to STD Preparations
+                                        '    lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                        '                      Where a.ExecutionType = "PREP_STD" _
+                                        '                    AndAlso a.TestID = myTestID _
+                                        '                    AndAlso a.ExecutionStatus <> "LOCKED" _
+                                        '                     Select a).ToList()
+
+                                        '    For Each lockedCtrl In lstLockedCtrls
+                                        '        lockedCtrl.BeginEdit()
+                                        '        lockedCtrl.ExecutionStatus = "LOCKED"
+                                        '        lockedCtrl.EndEdit()
+                                        '    Next
+
+                                        '    '...LOCK the correspondent Patients
+                                        '    lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
+                                        '                        Where a.ExecutionType = "PREP_STD" _
+                                        '                      AndAlso a.TestID = myTestID _
+                                        '                      AndAlso a.ExecutionStatus <> "LOCKED" _
+                                        '                       Select a).ToList()
+
+                                        '    For Each lockedPatient In lstLockedPatients
+                                        '        lockedPatient.BeginEdit()
+                                        '        lockedPatient.ExecutionStatus = "LOCKED"
+                                        '        lockedPatient.EndEdit()
+                                        '    Next
+                                        'Next
+
+                                        task.WaitAll(listTask.ToArray())
+                                        listTask.Clear()
 
                                         myCalibratorExecutionsDS.AcceptChanges()
                                         myControlExecutionsDS.AcceptChanges()
@@ -7582,52 +7799,100 @@ Namespace Biosystems.Ax00.BL
                                         Dim lstLockedCtrls As New List(Of ExecutionsDS.twksWSExecutionsRow)
                                         Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
 
-                                        For Each lockedCalib In lstLockedCalibs
-                                            If (myOrderTestID <> lockedCalib.OrderTestID) Then
-                                                'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
-                                                myOrderTestID = lockedCalib.OrderTestID
-                                                lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                   Where a.SampleClass = "CALIB" _
-                                                                 AndAlso Not a.IsAlternativeOrderTestIDNull _
-                                                                 AndAlso a.AlternativeOrderTestID = myOrderTestID _
-                                                                  Select a.SampleType Distinct).ToList
+                                        'AJG Changed for the parallelized below
+                                        'For Each lockedCalib In lstLockedCalibs
+                                        '    If (myOrderTestID <> lockedCalib.OrderTestID) Then
+                                        '        'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
+                                        '        myOrderTestID = lockedCalib.OrderTestID
+                                        '        lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                        '                           Where a.SampleClass = "CALIB" _
+                                        '                         AndAlso Not a.IsAlternativeOrderTestIDNull _
+                                        '                         AndAlso a.AlternativeOrderTestID = myOrderTestID _
+                                        '                          Select a.SampleType Distinct).ToList
 
-                                                For i As Integer = 0 To (lstAlternativeST.Count)
-                                                    myTestID = lockedCalib.TestID
-                                                    mySampleType = lockedCalib.SampleType
+                                        '        For i As Integer = 0 To (lstAlternativeST.Count)
+                                        '            myTestID = lockedCalib.TestID
+                                        '            mySampleType = lockedCalib.SampleType
 
-                                                    If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
+                                        '            If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
 
-                                                    '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                                    lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                                      Where a.ExecutionType = "PREP_STD" _
-                                                                    AndAlso a.TestID = myTestID _
-                                                                    AndAlso a.SampleType = mySampleType _
-                                                                    AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                     Select a).ToList()
+                                        '            '...LOCK the correspondent Controls - Apply only to STD Preparations
+                                        '            lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                        '                              Where a.ExecutionType = "PREP_STD" _
+                                        '                            AndAlso a.TestID = myTestID _
+                                        '                            AndAlso a.SampleType = mySampleType _
+                                        '                            AndAlso a.ExecutionStatus <> "LOCKED" _
+                                        '                             Select a).ToList()
 
-                                                    For Each lockedCtrl In lstLockedCtrls
-                                                        lockedCtrl.BeginEdit()
-                                                        lockedCtrl.ExecutionStatus = "LOCKED"
-                                                        lockedCtrl.EndEdit()
-                                                    Next
+                                        '            For Each lockedCtrl In lstLockedCtrls
+                                        '                lockedCtrl.BeginEdit()
+                                        '                lockedCtrl.ExecutionStatus = "LOCKED"
+                                        '                lockedCtrl.EndEdit()
+                                        '            Next
 
-                                                    '...LOCK the correspondent Patients.
-                                                    lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                                        Where a.ExecutionType = "PREP_STD" _
-                                                                      AndAlso a.TestID = myTestID _
-                                                                      AndAlso a.SampleType = mySampleType _
-                                                                      AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                       Select a).ToList()
+                                        '            '...LOCK the correspondent Patients.
+                                        '            lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
+                                        '                                Where a.ExecutionType = "PREP_STD" _
+                                        '                              AndAlso a.TestID = myTestID _
+                                        '                              AndAlso a.SampleType = mySampleType _
+                                        '                              AndAlso a.ExecutionStatus <> "LOCKED" _
+                                        '                               Select a).ToList()
 
-                                                    For Each lockedPatient In lstLockedPatients
-                                                        lockedPatient.BeginEdit()
-                                                        lockedPatient.ExecutionStatus = "LOCKED"
-                                                        lockedPatient.EndEdit()
-                                                    Next
-                                                Next
-                                            End If
-                                        Next
+                                        '            For Each lockedPatient In lstLockedPatients
+                                        '                lockedPatient.BeginEdit()
+                                        '                lockedPatient.ExecutionStatus = "LOCKED"
+                                        '                lockedPatient.EndEdit()
+                                        '            Next
+                                        '        Next
+                                        '    End If
+                                        'Next
+
+                                        Parallel.ForEach(lstLockedCalibs, Sub(lockedCalib)
+                                                                              If (myOrderTestID <> lockedCalib.OrderTestID) Then
+                                                                                  'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
+                                                                                  myOrderTestID = lockedCalib.OrderTestID
+                                                                                  lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                                     Where a.SampleClass = "CALIB" _
+                                                                                                   AndAlso Not a.IsAlternativeOrderTestIDNull _
+                                                                                                   AndAlso a.AlternativeOrderTestID = myOrderTestID _
+                                                                                                    Select a.SampleType Distinct).ToList
+
+                                                                                  For i As Integer = 0 To (lstAlternativeST.Count)
+                                                                                      myTestID = lockedCalib.TestID
+                                                                                      mySampleType = lockedCalib.SampleType
+
+                                                                                      If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
+
+                                                                                      '...LOCK the correspondent Controls - Apply only to STD Preparations
+                                                                                      lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                                                                        Where a.ExecutionType = "PREP_STD" _
+                                                                                                      AndAlso a.TestID = myTestID _
+                                                                                                      AndAlso a.SampleType = mySampleType _
+                                                                                                      AndAlso a.ExecutionStatus <> "LOCKED" _
+                                                                                                       Select a).ToList()
+
+                                                                                      Parallel.ForEach(lstLockedCtrls, Sub(lockedCtrl)
+                                                                                                                           lockedCtrl.BeginEdit()
+                                                                                                                           lockedCtrl.ExecutionStatus = "LOCKED"
+                                                                                                                           lockedCtrl.EndEdit()
+                                                                                                                       End Sub)
+
+                                                                                      '...LOCK the correspondent Patients.
+                                                                                      lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
+                                                                                                          Where a.ExecutionType = "PREP_STD" _
+                                                                                                        AndAlso a.TestID = myTestID _
+                                                                                                        AndAlso a.SampleType = mySampleType _
+                                                                                                        AndAlso a.ExecutionStatus <> "LOCKED" _
+                                                                                                         Select a).ToList()
+
+                                                                                      Parallel.ForEach(lstLockedPatients, Sub(lockedPatient)
+                                                                                                                              lockedPatient.BeginEdit()
+                                                                                                                              lockedPatient.ExecutionStatus = "LOCKED"
+                                                                                                                              lockedPatient.EndEdit()
+                                                                                                                          End Sub)
+                                                                                  Next
+                                                                              End If
+                                                                          End Sub)
 
                                         myControlExecutionsDS.AcceptChanges()
                                         myPatientExecutionsDS.AcceptChanges()
@@ -7686,41 +7951,79 @@ Namespace Biosystems.Ax00.BL
                                                                    OrElse (a.SampleClass = "CTRL" AndAlso a.SampleType = mySampleType)) _
                                                                    Select a Order By a.SampleClass).ToList()
 
-                                                For Each blkCalibCtrlRow In lstBlkCalibCtrls
-                                                    myOrderTestID = blkCalibCtrlRow.OrderTestID
-                                                    If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
-                                                        myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
-                                                    End If
+                                                'AJG Parallelized code below
+                                                'For Each blkCalibCtrlRow In lstBlkCalibCtrls
+                                                '    myOrderTestID = blkCalibCtrlRow.OrderTestID
+                                                '    If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
+                                                '        myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
+                                                '    End If
 
-                                                    'Search the OrderTestID to update the StatFlag
-                                                    If (blkCalibCtrlRow.SampleClass = "BLANK") Then
-                                                        lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-                                                                    Where a.OrderTestID = myOrderTestID _
-                                                                   Select a).ToList()
+                                                '    'Search the OrderTestID to update the StatFlag
+                                                '    If (blkCalibCtrlRow.SampleClass = "BLANK") Then
+                                                '        lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
+                                                '                    Where a.OrderTestID = myOrderTestID _
+                                                '                   Select a).ToList()
 
-                                                        For Each blank In lstBlanks
-                                                            blank.StatFlag = True
-                                                        Next
-                                                    ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
-                                                        'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                        lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                                    Where a.OrderTestID = myOrderTestID _
-                                                                   Select a).ToList()
+                                                '        For Each blank In lstBlanks
+                                                '            blank.StatFlag = True
+                                                '        Next
+                                                '    ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
+                                                '        'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                                '        lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
+                                                '                    Where a.OrderTestID = myOrderTestID _
+                                                '                   Select a).ToList()
 
-                                                        For Each calibrator In lstCalibs
-                                                            calibrator.StatFlag = True
-                                                        Next
-                                                    ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
-                                                        'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                        lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                                    Where a.OrderTestID = myOrderTestID _
-                                                                   Select a).ToList()
+                                                '        For Each calibrator In lstCalibs
+                                                '            calibrator.StatFlag = True
+                                                '        Next
+                                                '    ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
+                                                '        'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                                '        lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                '                    Where a.OrderTestID = myOrderTestID _
+                                                '                   Select a).ToList()
 
-                                                        For Each control In lstCtrls
-                                                            control.StatFlag = True
-                                                        Next
-                                                    End If
-                                                Next
+                                                '        For Each control In lstCtrls
+                                                '            control.StatFlag = True
+                                                '        Next
+                                                '    End If
+                                                'Next
+
+                                                Parallel.ForEach(lstBlkCalibCtrls, Sub(blkCalibCtrlRow)
+                                                                                       myOrderTestID = blkCalibCtrlRow.OrderTestID
+                                                                                       If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
+                                                                                           myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
+                                                                                       End If
+
+                                                                                       'Search the OrderTestID to update the StatFlag
+                                                                                       If (blkCalibCtrlRow.SampleClass = "BLANK") Then
+                                                                                           lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
+                                                                                                       Where a.OrderTestID = myOrderTestID _
+                                                                                                      Select a).ToList()
+
+                                                                                           For Each blank In lstBlanks
+                                                                                               blank.StatFlag = True
+                                                                                           Next
+                                                                                       ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
+                                                                                           'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                                                                           lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
+                                                                                                       Where a.OrderTestID = myOrderTestID _
+                                                                                                      Select a).ToList()
+
+                                                                                           For Each calibrator In lstCalibs
+                                                                                               calibrator.StatFlag = True
+                                                                                           Next
+                                                                                       ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
+                                                                                           'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                                                                           lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                                                                       Where a.OrderTestID = myOrderTestID _
+                                                                                                      Select a).ToList()
+
+                                                                                           For Each control In lstCtrls
+                                                                                               control.StatFlag = True
+                                                                                           Next
+                                                                                       End If
+                                                                                   End Sub)
+
                                                 myBlankExecutionsDS.AcceptChanges()
                                                 myCalibratorExecutionsDS.AcceptChanges()
                                                 myControlExecutionsDS.AcceptChanges()

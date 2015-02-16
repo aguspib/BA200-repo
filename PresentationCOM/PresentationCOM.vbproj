@@ -114,6 +114,12 @@
     <Prefer32Bit>false</Prefer32Bit>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevExpress.BonusSkins.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Charts.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -336,6 +342,7 @@
     <Compile Include="Reports\Test\XtraSubReportControls.Designer.vb">
       <DependentUpon>XtraSubReportControls.vb</DependentUpon>
     </Compile>
+    <None Include="BioSystems.pfx" />
     <None Include="Reports\Test\XtraSubReportControls.vb">
       <SubType>Component</SubType>
     </None>

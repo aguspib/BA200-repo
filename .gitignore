@@ -151,7 +151,7 @@ ClientBin/
 *~
 *.dbmdl
 *.dbproj.schemaview
-*.pfx
+# *.pfx	--> We can share the strong name file, we're not at the Pentagon
 *.publishsettings
 node_modules/
 
