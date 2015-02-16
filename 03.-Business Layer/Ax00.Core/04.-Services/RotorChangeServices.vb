@@ -746,7 +746,9 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <summary>
         ''' Set the flags into a stable value for repeat last action and recover the process
         ''' </summary>
-        ''' <remarks>AG 20/01/2015 BA-2216</remarks>
+        ''' <remarks>Created by:  AG 20/01/2015 BA-2216
+        '''          Modified by: IT 16/02/2015 BA-2266
+        '''  </remarks>
         Private Sub InitializeRecover()
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -754,9 +756,9 @@ Namespace Biosystems.Ax00.Core.Services
             Initialize()
 
             'NEWROTORprocess in INPROCESS status
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "") Then
-                _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
-            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "INI") Then
+            'If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "") Then
+            '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "INI") Then
                 '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "INI") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "") 'Re-send Washing

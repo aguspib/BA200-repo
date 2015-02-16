@@ -230,6 +230,7 @@ Partial Class UiChangeRotor
         '
         Me.bsContinueButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.bsContinueButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsContinueButton.Enabled = False
         Me.bsContinueButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsContinueButton.Location = New System.Drawing.Point(348, 91)
         Me.bsContinueButton.Name = "bsContinueButton"
@@ -275,11 +276,10 @@ Partial Class UiChangeRotor
         Me.BsBorderedPanel1.Size = New System.Drawing.Size(416, 274)
         Me.BsBorderedPanel1.TabIndex = 33
         '
-        'IChangeRotor
+        'UiChangeRotor
         '
         Me.AcceptButton = Me.bsCancelButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.ForeColor = System.Drawing.Color.Black
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True

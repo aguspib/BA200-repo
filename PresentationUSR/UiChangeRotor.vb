@@ -591,9 +591,44 @@ Public Class UiChangeRotor
         UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
 
         'Not necessary because Fw peforms the action although the reaction cover enabled & open
-        bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
+            bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+        End If
+    End Sub
 
-        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  IT 13/02/2015 - BA-2266
+    ''' </remarks>
+    Private Sub NewRotorPerformed()
+
+        'Create a new ReactionsRotor
+        Dim myGlobal As New GlobalDataTO
+        Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
+        myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
+
+        'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
+        Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
+        If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
+            ScreenWorkingProcess = False 'Process finished
+            ExistBaseLineInitError = False
+        Else
+            ExistBaseLineInitError = True
+            ScreenWorkingProcess = False
+        End If
+        myAlarms = Nothing
+
+        bsChangeRotortButton.Enabled = True
+        bsCancelButton.Enabled = True
+
+        'AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once updated UI clear sensor
+
+        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, _
+                                                  GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+        If (myGlobal.HasError) Then ShowMessage("Warning", myGlobal.ErrorCode)
+
     End Sub
 
 
@@ -630,36 +665,15 @@ Public Class UiChangeRotor
                 '1st step finish (Wash station UP) >> Now enable control to perform the 2on steps in utility process
                 sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED)
                 If (sensorValue = 1) Then
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
                     WashstationControlPerformed()
                 End If
 
                 '2nd step is finish when valid ALIGHT o not more chances!!
                 sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED)
                 If (sensorValue = 1) Then
-                    'Create a new ReactionsRotor
-                    Dim myGlobal As New GlobalDataTO
-                    Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
-                    myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
-
-                    'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
-                    Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
-                    If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
-                        ScreenWorkingProcess = False 'Process finished
-                        ExistBaseLineInitError = False
-                    Else
-                        ExistBaseLineInitError = True
-                        ScreenWorkingProcess = False
-                    End If
-                    myAlarms = Nothing
-
-                    bsChangeRotortButton.Enabled = True
-                    bsCancelButton.Enabled = True
-
                     AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once updated UI clear sensor
-
-                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, _
-                                                              GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
-                    If (myGlobal.HasError) Then ShowMessage("Warning", myGlobal.ErrorCode)
+                    NewRotorPerformed()
                 End If
 
                 'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
@@ -758,8 +772,8 @@ Public Class UiChangeRotor
 
             _recoverProcess = True
             ChangeRotorStart()
+            WashstationControlPerformed()
             If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) <> "") Then
-                WashstationControlPerformed()
                 ChangeRotorContinue()
             End If
 
