@@ -624,6 +624,7 @@ Public Class UiChangeRotor
         bsCancelButton.Enabled = True
 
         'AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once updated UI clear sensor
+        _recoverProcess = False
 
         myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, _
                                                   GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
