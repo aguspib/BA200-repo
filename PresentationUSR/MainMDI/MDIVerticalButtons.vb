@@ -640,6 +640,7 @@ Partial Public Class UiAx00MainMDI
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 01/12/2014 - BA-2075
     '''              IT 30/01/2015 - BA-2216
+    '''              IT 17/02/2015 - BA-2266
     ''' </remarks>
     Private Sub ApplyRulesForStandBy(ByVal myAx00Ready As Boolean, ByVal myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal myAx00Status As GlobalEnumerates.AnalyzerManagerStatus)
         Try
@@ -1050,19 +1051,22 @@ Partial Public Class UiAx00MainMDI
                                 CurrentMdiChild.bsScanningButton.Enabled = bcButtonStatus
                             End If
 
+                            'IT 17/02/2015 - BA-2266 (INI)
                             'AG 22/02/2012 - Update button in change rotor utility
-                        ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                            Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
-                            If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
-                                bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
-                                'AG 28/03/2012
-                                'CurrentMdiChild.bsChangeRotortButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
-                                If Not bsTSChangeBottlesConfirm.Enabled Then
-                                    CurrentMdiChild.bsChangeRotortButton.Enabled = ActivateButtonWithAlarms(ActionButton.CHANGE_REACTIONS_ROTOR)
-                                End If
+                        'ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                        '    Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
+                        '    If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
+                        '        bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
+                        '        'AG 28/03/2012
+                        '        'CurrentMdiChild.bsChangeRotortButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
+                        '        If Not bsTSChangeBottlesConfirm.Enabled Then
+                        '            CurrentMdiChild.bsChangeRotortButton.Enabled = ActivateButtonWithAlarms(ActionButton.CHANGE_REACTIONS_ROTOR)
+                        '            'CurrentMdiChild.bsChangeRotortButton.Enabled = False
+                        '        End If
 
-                            End If
-                            'AG 22/02/2012
+                        '    End If
+                        '    'AG 22/02/2012
+                            'IT 17/02/2015 - BA-2266 (END)
 
                         End If
                     End If
