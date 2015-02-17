@@ -995,8 +995,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'Else
                                 '    .AdditionalInfo = pVolumeMissingAdditionalInfo
                                 'End If
-                                .SetAdditionalInfoNull()
-                                If Not pAdditionalInfoList Is Nothing AndAlso Not String.Equals(pAdditionalInfoList(index), String.Empty) Then
+                                .SetAdditionalInfoNull() 'MI: Added count>0 to condition, and item null, as strings can be null to prevent bug being generated
+                                If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
+                                    pAdditionalInfoList(index) IsNot Nothing AndAlso
+                                    String.Equals(pAdditionalInfoList(index), String.Empty) Then
                                     .AdditionalInfo = pAdditionalInfoList(index)
                                 End If
                                 'AG 25/07/2012
@@ -1127,7 +1129,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
 
                 'Finally
                 '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
