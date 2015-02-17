@@ -589,11 +589,7 @@ Public Class UiChangeRotor
         ScreenWorkingProcess = True
         UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
         UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
-
-        'Not necessary because Fw peforms the action although the reaction cover enabled & open
-        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
-            bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
-        End If
+        ManageVisibilityChangeRotorButton() 'IT 17/02/2015 - BA-2266
     End Sub
 
     ''' <summary>
@@ -632,6 +628,26 @@ Public Class UiChangeRotor
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 17/02/2015 - BA-2266
+    ''' </remarks>
+    Private Sub ManageVisibilityChangeRotorButton()
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Or
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
+
+            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
+                Dim enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+                If (enabled <> bsContinueButton.Enabled) Then
+                    bsContinueButton.Enabled = enabled
+                End If
+            End If
+        End If
+
+    End Sub
 
 #End Region
 
@@ -739,18 +755,24 @@ Public Class UiChangeRotor
                 End If
                 'AG 02/04/2012
 
+                'IT 17/02/2015 - BA-2266 (INI)
                 'AG 29/03/2012 - no change rotor is reactions rotor cover enabled and opened (the nothing condition is to avoid create a new MDI instance)
                 'Not necessary because Fw peforms the action although the reaction cover enabled & open
-                If (bsContinueButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
-                    bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
-                Else
-                    bsContinueButton.Enabled = False
-                End If
+                'If (bsContinueButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
+                '    'bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+                '    bsContinueButton.Enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
+                'Else
+                '    bsContinueButton.Enabled = False
+                'End If
                 'AG 29/03/2012
+                'IT 17/02/2015 - BA-2266 (END)
+
             End If
             'AG 12/03/2012
 
             If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 1) Then bsChangeRotortButton.Enabled = False 'DL 25/09/2012
+
+            ManageVisibilityChangeRotorButton() 'BA-2266
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".RefreshScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
