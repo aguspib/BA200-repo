@@ -7793,11 +7793,12 @@ Namespace Biosystems.Ax00.BL
                                                          Select a Order By a.OrderTestID).ToList()
 
                                         Dim myOrderTestID As Integer = -1
-                                        Dim lstAlternativeST As List(Of String)
-                                        Dim myTestID As Integer
-                                        Dim mySampleType As String
-                                        Dim lstLockedCtrls As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
+                                        'AJG
+                                        'Dim lstAlternativeST As List(Of String)
+                                        'Dim myTestID As Integer
+                                        'Dim mySampleType As String
+                                        'Dim lstLockedCtrls As New List(Of ExecutionsDS.twksWSExecutionsRow)
+                                        'Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
 
                                         'AJG Changed for the parallelized below
                                         'For Each lockedCalib In lstLockedCalibs
@@ -7851,20 +7852,20 @@ Namespace Biosystems.Ax00.BL
                                                                               If (myOrderTestID <> lockedCalib.OrderTestID) Then
                                                                                   'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
                                                                                   myOrderTestID = lockedCalib.OrderTestID
-                                                                                  lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                                                                  Dim lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
                                                                                                      Where a.SampleClass = "CALIB" _
                                                                                                    AndAlso Not a.IsAlternativeOrderTestIDNull _
                                                                                                    AndAlso a.AlternativeOrderTestID = myOrderTestID _
                                                                                                     Select a.SampleType Distinct).ToList
 
                                                                                   For i As Integer = 0 To (lstAlternativeST.Count)
-                                                                                      myTestID = lockedCalib.TestID
-                                                                                      mySampleType = lockedCalib.SampleType
+                                                                                      Dim myTestID = lockedCalib.TestID
+                                                                                      Dim mySampleType = lockedCalib.SampleType
 
                                                                                       If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
 
                                                                                       '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                                                                      lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                                                      Dim lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
                                                                                                         Where a.ExecutionType = "PREP_STD" _
                                                                                                       AndAlso a.TestID = myTestID _
                                                                                                       AndAlso a.SampleType = mySampleType _
@@ -7878,7 +7879,7 @@ Namespace Biosystems.Ax00.BL
                                                                                                                        End Sub)
 
                                                                                       '...LOCK the correspondent Patients.
-                                                                                      lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
+                                                                                      Dim lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
                                                                                                           Where a.ExecutionType = "PREP_STD" _
                                                                                                         AndAlso a.TestID = myTestID _
                                                                                                         AndAlso a.SampleType = mySampleType _
@@ -7899,9 +7900,10 @@ Namespace Biosystems.Ax00.BL
 
                                         'AG 19/02/2014 - #1514
                                         lstLockedCalibs = Nothing
-                                        lstAlternativeST = Nothing
-                                        lstLockedCtrls = Nothing
-                                        lstLockedPatients = Nothing
+                                        'AJG
+                                        'lstAlternativeST = Nothing
+                                        'lstLockedCtrls = Nothing
+                                        'lstLockedPatients = Nothing
                                         'AG 19/02/2014 - #1514
                                     End If
 
@@ -7926,11 +7928,13 @@ Namespace Biosystems.Ax00.BL
                                             Dim myTestID As Integer
                                             Dim myTestType As String
                                             Dim mySampleType As String
-                                            Dim myOrderTestID As Integer
-                                            Dim lstBlanks As List(Of ExecutionsDS.twksWSExecutionsRow)
+                                            'AJG
+                                            'Dim myOrderTestID As Integer
+                                            'Dim lstBlanks As List(Of ExecutionsDS.twksWSExecutionsRow)
                                             Dim lstBlkCalibCtrls As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                            Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                            Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                            'AJG
+                                            'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                                            'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
 
                                             'SA 19/06/2012 - Filter linq also by TestType
                                             For Each statPatient In lstSTATS
@@ -7989,14 +7993,14 @@ Namespace Biosystems.Ax00.BL
                                                 'Next
 
                                                 Parallel.ForEach(lstBlkCalibCtrls, Sub(blkCalibCtrlRow)
-                                                                                       myOrderTestID = blkCalibCtrlRow.OrderTestID
+                                                                                       Dim myOrderTestID = blkCalibCtrlRow.OrderTestID
                                                                                        If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
                                                                                            myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
                                                                                        End If
 
                                                                                        'Search the OrderTestID to update the StatFlag
                                                                                        If (blkCalibCtrlRow.SampleClass = "BLANK") Then
-                                                                                           lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
+                                                                                           Dim lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
                                                                                                        Where a.OrderTestID = myOrderTestID _
                                                                                                       Select a).ToList()
 
@@ -8005,7 +8009,7 @@ Namespace Biosystems.Ax00.BL
                                                                                            Next
                                                                                        ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
                                                                                            'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                                                           lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
+                                                                                           Dim lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
                                                                                                        Where a.OrderTestID = myOrderTestID _
                                                                                                       Select a).ToList()
 
@@ -8014,7 +8018,7 @@ Namespace Biosystems.Ax00.BL
                                                                                            Next
                                                                                        ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
                                                                                            'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                                                           lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
+                                                                                           Dim lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
                                                                                                        Where a.OrderTestID = myOrderTestID _
                                                                                                       Select a).ToList()
 
@@ -8031,10 +8035,12 @@ Namespace Biosystems.Ax00.BL
 
                                             'AG 19/02/2014 - #1514
                                             lstSTATS = Nothing
-                                            lstBlanks = Nothing
+                                            'AJG
+                                            'lstBlanks = Nothing
                                             lstBlkCalibCtrls = Nothing
-                                            lstCalibs = Nothing
-                                            lstCtrls = Nothing
+                                            'AJG
+                                            'lstCalibs = Nothing
+                                            'lstCtrls = Nothing
                                             'AG 19/02/2014 - #1514
                                         End If
                                     End If
