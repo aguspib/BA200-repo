@@ -763,7 +763,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTo (ReactionsRotorDS)</returns>
         ''' <remarks>AG 08/06/2011
         ''' AG 24/11/2011 - add columns TestID, WashingSolutionR1, WashingSolutionR2
-        ''' AG 18/02/2015 - BA-2285 - add new status DX (dynamically rejected)
+        ''' AG 18/02/2015 - BA-2285 - New status DX (dynamically rejected). Generate it when pType = DYNAMIC. Do not remove never when pType = STATIC
         ''' </remarks>
         Public Function InitializeNewRotorTurnWellStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                      ByVal pAnalyzerID As String, ByVal pWellNumber As Integer, ByVal pRejectedWells As String, _
@@ -846,6 +846,13 @@ Namespace Biosystems.Ax00.BL
                                                     If Not auxDS.twksWSReactionsRotor(0).IsTestIDNull Then .TestID = auxDS.twksWSReactionsRotor(0).TestID
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR1Null Then .WashingSolutionR1 = auxDS.twksWSReactionsRotor(0).WashingSolutionR1
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR2Null Then .WashingSolutionR2 = auxDS.twksWSReactionsRotor(0).WashingSolutionR2
+
+                                                    'AG 18/02/2015 BA-2285 the wells rejected by the dynamic base line cannot change their status until new dynamic base line is performed
+                                                    If pType = GlobalEnumerates.BaseLineType.STATIC AndAlso Not auxDS.twksWSReactionsRotor.First.IsWellStatusNull AndAlso auxDS.twksWSReactionsRotor.First.WellStatus = "DX" Then
+                                                        .WellStatus = "DX"
+                                                        .RejectedFlag = True
+                                                    End If
+                                                    'AG 18/02/2015
                                                 End If
                                             End If
                                         End If
