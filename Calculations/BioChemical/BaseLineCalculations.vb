@@ -630,6 +630,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' AG 02/05/2011 Creation
         ''' AG 14/11/2014 BA-2065 add parameter pType
+        ''' AG 18/02/2015 BA-2285 inform parameter pType when call method InitializeNewRotorTurnWellStatus
         ''' </remarks>
         Public Function ControlWellBaseLine(ByVal pDBConnection As SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
@@ -797,7 +798,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If myListOfRejectedWells.Contains(myWellUsed) Then rejectedWells = " " & myWellUsed & " "
                             If myListOfRejectedWells.Contains(myWellUsed) Or wellBL.rejected Then rejectedWells = " " & myWellUsed & " "
                             resultData = reactionsDelg.InitializeNewRotorTurnWellStatus(dbConnection, WorkSessionID, AnalyzerID, myWellUsed, rejectedWells, _
-                                                                                        True, MAX_REACTROTOR_WELLS, WASHSTATION_BLW_LIMIT_MIN, WASHSTATION_BLW_LIMIT_MAX)
+                                                                                        True, MAX_REACTROTOR_WELLS, WASHSTATION_BLW_LIMIT_MIN, WASHSTATION_BLW_LIMIT_MAX, pType)
 
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                 newReactionsWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
@@ -836,7 +837,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If Not resultData.HasError Then
                                         'if rejected mark status as Rejected (X) and RejectedFlag = True
                                         resultData = reactionsDelg.InitializeNewRotorTurnWellStatus(dbConnection, WorkSessionID, AnalyzerID, myWellUsed, rejectedWells, _
-                                                                                                    False, MAX_REACTROTOR_WELLS, WASHSTATION_BLW_LIMIT_MIN, WASHSTATION_BLW_LIMIT_MAX)
+                                                                                                    False, MAX_REACTROTOR_WELLS, WASHSTATION_BLW_LIMIT_MIN, WASHSTATION_BLW_LIMIT_MAX, pType)
 
                                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                             Dim auxReactionsWellDS As New ReactionsRotorDS

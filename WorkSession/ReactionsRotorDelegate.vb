@@ -759,13 +759,17 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pReactionRotorMaxWells" ></param>
         ''' <param name="pWashStationInputWellOffset" ></param>
         ''' <param name="pWashStationOutputWellOffset" ></param>
+        ''' <param name="pType"></param>
         ''' <returns>GlobalDataTo (ReactionsRotorDS)</returns>
         ''' <remarks>AG 08/06/2011
-        ''' AG 24/11/2011 - add columns TestID, WashingSolutionR1, WashingSolutionR2</remarks>
+        ''' AG 24/11/2011 - add columns TestID, WashingSolutionR1, WashingSolutionR2
+        ''' AG 18/02/2015 - BA-2285 - add new status DX (dynamically rejected)
+        ''' </remarks>
         Public Function InitializeNewRotorTurnWellStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                      ByVal pAnalyzerID As String, ByVal pWellNumber As Integer, ByVal pRejectedWells As String, _
                                      ByVal pInitializeBLWWell As Boolean, ByVal pReactionRotorMaxWells As Integer, _
-                                     ByVal pWashStationOutputWellOffset As Integer, ByVal pWashStationInputWellOffset As Integer) As GlobalDataTO
+                                     ByVal pWashStationOutputWellOffset As Integer, ByVal pWashStationInputWellOffset As Integer, _
+                                     ByVal pType As GlobalEnumerates.BaseLineType) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -822,6 +826,7 @@ Namespace Biosystems.Ax00.BL
                                             .RejectedFlag = False
                                         Else
                                             .WellStatus = "X" 'Well status: Rejected
+                                            If pType = GlobalEnumerates.BaseLineType.DYNAMIC Then .WellStatus = "DX" 'AG 18/02/2015 - New status: Dynamically rejected
 
                                             'Temporally comment the true code and not reject never
                                             .RejectedFlag = True
@@ -921,12 +926,14 @@ Namespace Biosystems.Ax00.BL
                                             myReactionsDS.twksWSReactionsRotor.ImportRow(myRow)
                                             myReactionsDS.AcceptChanges()
                                             resultData = myDAO.UpdateMAXRotorTurnRecord(dbConnection, updateDS)
+
+                                            listWashRequired = Nothing
                                         End If
                                     End If
                                 End If
 
 
-                            Else 'Records due the new ANSPHR instruction received has been already saved and now we are treating the base line parameters
+                            Else 'Records were created previously when the ANSPHR instruction was received. But NOW we are treating these results (when well rejections parameter FIFO becomes completed)
 
                                 'CASE: Update the RejectedWells after the initialization phase has finished
                                 If Not resultData.HasError Then
@@ -938,6 +945,17 @@ Namespace Biosystems.Ax00.BL
                                             ReDim rejectedWellList(0)
                                             rejectedWellList(0) = pRejectedWells
                                         End If
+
+                                        'AG 18/02/2015 BA-2285 - Read the current status for the reactions rotor
+                                        Dim auxDS As New ReactionsRotorDS
+                                        Dim linqResults As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
+                                        If pType = GlobalEnumerates.BaseLineType.DYNAMIC AndAlso rejectedWellList.Length > 0 Then
+                                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID)
+                                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                auxDS = CType(resultData.SetDatos, ReactionsRotorDS)
+                                            End If
+                                        End If
+                                        'AG 18/02/2015
 
                                         myReactionsDS.Clear()
                                         For i As Integer = 0 To rejectedWellList.Length - 1
@@ -951,6 +969,16 @@ Namespace Biosystems.Ax00.BL
                                                 .SetExecutionIDNull()
                                                 .WellStatus = "X" 'Well status: Rejected
 
+                                                'AG 18/02/2014 BA-2285 - If previous status of this well was DX (dynamically rejected) do not change it!!!
+                                                If pType = GlobalEnumerates.BaseLineType.DYNAMIC AndAlso Not auxDS Is Nothing AndAlso auxDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                                                    linqResults = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In auxDS.twksWSReactionsRotor _
+                                                                   Where a.WellNumber = .WellNumber Select a).ToList
+                                                    If linqResults.Count > 0 AndAlso Not linqResults.First.IsWellStatusNull AndAlso linqResults.First.WellStatus = "DX" Then
+                                                        .WellStatus = "DX" 'Well status must remain to: Dynamically Rejected
+                                                    End If
+                                                End If
+                                                'AG 18/02/2015
+
                                                 'Temporally comment the true code and not reject never
                                                 .RejectedFlag = True
                                                 '.RejectedFlag = False
@@ -962,9 +990,10 @@ Namespace Biosystems.Ax00.BL
                                         If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
                                             resultData = myDAO.UpdateMAXRotorTurnRecord(dbConnection, myReactionsDS)
                                         End If
+                                        linqResults = Nothing 'AG 18/02/2015 BA-2285
                                     End If
                                 End If
-                            End If
+                                End If
                         End If
 
                         If (Not resultData.HasError) Then
