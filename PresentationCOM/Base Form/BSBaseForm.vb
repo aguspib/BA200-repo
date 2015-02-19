@@ -953,7 +953,7 @@ Public Class BSBaseForm
     ''' Created by:  RH 15/12/2010
     ''' </remarks>
     Public Sub ResetBorder()
-        Application.DoEvents()
+        'Application.DoEvents()
         Me.ControlBox = False
         Me.MinimizeBox = False
         Me.MaximizeBox = False

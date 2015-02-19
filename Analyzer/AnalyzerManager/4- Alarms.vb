@@ -995,7 +995,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'Else
                                 '    .AdditionalInfo = pVolumeMissingAdditionalInfo
                                 'End If
-                                .SetAdditionalInfoNull() 'MI: Added count>0 to condition, and item null, as strings can be null to prevent bug being generated
+                                .SetAdditionalInfoNull() 'MI: Added count > index to condition, and item null, as strings can be null to prevent bug being generated
                                 If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
                                     pAdditionalInfoList(index) IsNot Nothing AndAlso
                                     String.Equals(pAdditionalInfoList(index), String.Empty) Then
