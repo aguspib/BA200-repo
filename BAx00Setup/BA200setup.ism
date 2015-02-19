@@ -358,6 +358,7 @@
 		<row><td>BSCSharpControl_Library.dll1</td><td>{7581964F-9CF2-4344-AAAC-01BA3A94B561}</td><td>USER_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSControl_Library.dll</td><td>{96B2BCD3-F0DD-4DFE-84AC-450C03C7FBBC}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSControl_Library.dll1</td><td>{0BACBB7A-0A7D-44EB-BA85-63CE94DF21B3}</td><td>USER_SW</td><td>8</td><td/><td>bscontrol_library.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>BioSystemsSetupScript.exe</td><td>{CCFAD373-CD61-43F4-9782-51AB70BBEB3C}</td><td>SETUPSCRIPTS</td><td>8</td><td/><td>biosystemssetupscript.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Biosystems.Ax00.App.dll</td><td>{8BA1EB3C-8B03-4E34-A3B2-C3685D09A8DB}</td><td>SERVICE_SW</td><td>8</td><td/><td>biosystems.ax00.app.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Biosystems.Ax00.App.dll1</td><td>{32A91D2F-BCF3-4047-B3B4-73961EBFAE5E}</td><td>USER_SW</td><td>8</td><td/><td>biosystems.ax00.app.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Biosystems.Ax00.Core.dll</td><td>{2A4E3467-2EB9-431D-B5FF-27B44986CB73}</td><td>SERVICE_SW</td><td>8</td><td/><td>biosystems.ax00.core.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -430,13 +431,23 @@
 		<row><td>ICSharpCode.SharpZipLib.dll1</td><td>{FD542342-E717-4B42-A6E2-9BA15E2231F5}</td><td>USER_SW</td><td>8</td><td/><td>icsharpcode.sharpziplib.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>InfoAnalyzer.dll</td><td>{8E2980FB-F606-4B38-BFA4-77A14AD52FC5}</td><td>SERVICE_SW</td><td>8</td><td/><td>infoanalyzer.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>InfoAnalyzer.dll1</td><td>{5BDB83B8-FF9F-447A-BD35-BAC842CF54C8}</td><td>USER_SW</td><td>8</td><td/><td>infoanalyzer.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>InstallShieldFix.exe</td><td>{FE5D0530-4175-4C08-8480-AC6DAA27C26D}</td><td>SETUPSCRIPTS</td><td>8</td><td/><td>installshieldfix.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.AcroPDFLib.dll</td><td>{5C1F68CB-65BA-479C-B16E-59B66A3AF657}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll</td><td>{E4F047D8-6742-4389-AAD7-C6D5207182E4}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.communicationsax00.d</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll1</td><td>{2D282F91-6C72-4E53-A312-49B8593A1B04}</td><td>USER_SW</td><td>8</td><td/><td>interop.communicationsax00.d1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.WMPLib.dll</td><td>{722DF06C-F577-4B25-8366-BD67D1C6BFD9}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.wmplib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LIS.dll</td><td>{4E74697E-EE5A-48CB-B247-817F31E0590B}</td><td>USER_SW</td><td>8</td><td/><td>lis.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>MPR.dll</td><td>{11BBFA7C-2FD2-46DD-88BE-B486BEA40E6A}</td><td>CORE</td><td>8</td><td/><td>mpr.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>{6EF3F074-B7BB-4981-BC52-DDB6A339367C}</td><td>SERVICE_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>{1C8390A7-B101-4EF7-8DD8-DAF773E540AA}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationASTM1394Module.dll</td><td>{D80280C0-14AD-461F-883C-B10E027D8C0F}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationastm1394modu</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationCDFModule.dll</td><td>{9B4BBE2C-A283-4290-8DEB-908A784E834E}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationcdfmodule.dl</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationCoreModule.dll</td><td>{EBC2B187-5FF3-42B2-B761-EBB6219D6AF4}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationcoremodule.d</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationHL7Module.dll</td><td>{238A4170-265F-46D0-BCC0-7CAACD93365C}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationhl7module.dl</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationMessageEventModule.dll</td><td>{AADED20B-0CC1-40D1-B75C-F2BE34409867}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationmessageevent</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteCommunicationPOCT1AModule.dll</td><td>{0F63F822-3221-4C4C-A241-892793B35965}</td><td>CORE</td><td>8</td><td/><td>ntecommunicationpoct1amodule</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteTraceEventModule.dll</td><td>{249114EC-009C-4D9C-972E-ABD866633F75}</td><td>CORE</td><td>8</td><td/><td>ntetraceeventmodule.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NteTraceSubscriberOSEventLogModule.dll</td><td>{6DB45657-E5CE-4DA3-88C5-7E2492AFB52B}</td><td>CORE</td><td>8</td><td/><td>ntetracesubscriberoseventlog</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ParameterPrograming.dll</td><td>{23DABC52-B858-41D9-8204-9CD31680B499}</td><td>SERVICE_SW</td><td>8</td><td/><td>parameterprograming.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ParameterPrograming.dll1</td><td>{4396CEF4-D174-4BC1-B73C-BB7C43C55BF2}</td><td>USER_SW</td><td>8</td><td/><td>parameterprograming.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>PerpetuumSoft.Framework.Export.dll</td><td>{97741574-F3B4-41F8-BE19-7A90138BD518}</td><td>SERVICE_SW</td><td>8</td><td/><td>perpetuumsoft.framework.expo</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -466,6 +477,14 @@
 		<row><td>ServiceSw_Update_Task</td><td>{42E094F1-9390-49D5-A21E-A1CA627E4E0C}</td><td>TASK</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ServiceSw_Update_bak</td><td>{8D2B1435-007E-4A5E-B74C-5562A812BE16}</td><td>BAK</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ServiceSw_XMLFiles</td><td>{B141D9EC-3F83-4EA5-BD16-40478F53E572}</td><td>XMLFILES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetScripts2</td><td>{1E36E18C-3433-4AC3-AB30-078DDDDB6C73}</td><td>SETUPSCRIPTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts</td><td>{26AACCC9-3328-4353-A0C5-1384BDE2DCB2}</td><td>SETUPSCRIPTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data</td><td>{5BB32EB2-63B9-43FD-8707-8CECBDB5DA94}</td><td>DATA1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data_EsEngine</td><td>{7D14E3EB-0DC0-44DE-936D-33EB81BC98AC}</td><td>ES_ENGINE</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td><td>{B53C448F-4543-49AD-9985-9964BC4F27A4}</td><td>COMMON_FILES_FOLDER</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td><td>{76AD0CB6-07B6-444B-B69D-67A09A7AD05E}</td><td>SYSTELAB</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td><td>{3BC16445-0E31-4DB4-8E91-B281624BB257}</td><td>SYNAPSE</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td>{A658ED12-7D52-4EFE-B2A6-E487A30C6D72}</td><td>CORE</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UpdateVersion.dll</td><td>{497E6F3F-599B-48BB-BD7D-7127933C385C}</td><td>SERVICE_SW</td><td>8</td><td/><td>updateversion.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UpdateVersion.dll1</td><td>{912CC9DC-0D4B-4B43-9B62-1BBDB5F3931E}</td><td>USER_SW</td><td>8</td><td/><td>updateversion.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UserSw_Adjustments</td><td>{37A44F93-D916-4F56-B7C3-FB5CDFECA011}</td><td>ADJUSTMENTS1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -480,6 +499,8 @@
 		<row><td>UserSw_Update_Task</td><td>{2588F4A0-5837-4230-932B-6A2371FB58E2}</td><td>TASK1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UserSw_Update_bak</td><td>{E2CDBEB7-C340-4DE5-9085-4A8B0FC1D32C}</td><td>BAK1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UserSw_XmlFiles</td><td>{8DCD110D-7951-43D8-929B-B4A719768FA8}</td><td>XMLFILES1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>VERSION.dll</td><td>{89AFD0D0-5026-4FEE-81F3-8529D5D5CFEA}</td><td>CORE</td><td>8</td><td/><td>version.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>WININET.dll</td><td>{309410FE-980D-473E-85BC-F6D7C8F92597}</td><td>CORE</td><td>8</td><td/><td>wininet.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>WorkSession.dll</td><td>{6FBB6978-9675-4DD0-8C3D-81F4E85381F5}</td><td>SERVICE_SW</td><td>8</td><td/><td>worksession.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>WorkSession.dll1</td><td>{40BCDD33-A36B-464C-9041-15933BC87166}</td><td>USER_SW</td><td>8</td><td/><td>worksession.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
@@ -1207,8 +1228,14 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>COMMON_FILES_FOLDER</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td></row>
+		<row><td>DATA1</td><td>SetupScripts_Data</td></row>
+		<row><td>ES_ENGINE</td><td>SetupScripts_Data_EsEngine</td></row>
 		<row><td>REPORTS</td><td>ServiceSw_Reports</td></row>
 		<row><td>REPORTS1</td><td>UserSw_Reports</td></row>
+		<row><td>SETUPSCRIPTS</td><td>SetupScripts</td></row>
+		<row><td>SYNAPSE</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td></row>
+		<row><td>SYSTELAB</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td></row>
 		<row><td>UPDATE</td><td>ServiceSw_Update</td></row>
 		<row><td>UPDATE1</td><td>UserSw_Update</td></row>
 	</table>
@@ -1227,6 +1254,7 @@
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
+		<row><td>Run_Install_Script</td><td>18</td><td>installshieldfix.exe</td><td/><td/><td/></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>ShowMsiLog</td><td>226</td><td>SystemFolder</td><td>[SystemFolder]notepad.exe "[MsiLogFileLocation]"</td><td/><td>Shows Property-driven MSI Log</td></row>
@@ -1298,13 +1326,17 @@
 		<row><td>BA4001</td><td>ProgramFilesFolder</td><td>BA200</td><td/><td>0</td><td/></row>
 		<row><td>BAK</td><td>UPDATE</td><td>bak</td><td/><td>0</td><td/></row>
 		<row><td>BAK1</td><td>UPDATE1</td><td>bak</td><td/><td>0</td><td/></row>
+		<row><td>COMMON_FILES_FOLDER</td><td>ES_ENGINE</td><td>COMMON~1|Common Files Folder</td><td/><td>0</td><td/></row>
+		<row><td>CORE</td><td>SYNAPSE</td><td>Core</td><td/><td>0</td><td/></row>
 		<row><td>CommonAppDataFolder</td><td>TARGETDIR</td><td>.:Common~1|CommonAppData</td><td/><td>0</td><td/></row>
 		<row><td>CommonFiles64Folder</td><td>TARGETDIR</td><td>.:Common64</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DATA</td><td>USER_SW</td><td>Data</td><td/><td>0</td><td/></row>
+		<row><td>DATA1</td><td>SETUPSCRIPTS</td><td>Data</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EMBEDDED</td><td>IMAGES</td><td>Embedded</td><td/><td>0</td><td/></row>
 		<row><td>EMBEDDED1</td><td>IMAGES1</td><td>Embedded</td><td/><td>0</td><td/></row>
+		<row><td>ES_ENGINE</td><td>DATA1</td><td>ESENGI~1|Es Engine</td><td/><td>0</td><td/></row>
 		<row><td>FIRMWARE</td><td>INSTALLDIR</td><td>Firmware</td><td/><td>0</td><td/></row>
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
@@ -1328,8 +1360,11 @@
 		<row><td>REPORTS</td><td>SERVICE_SW</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>REPORTS1</td><td>USER_SW</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SERVICE_SW</td><td>INSTALLDIR</td><td>SERVIC~1|Service Sw</td><td/><td>0</td><td/></row>
+		<row><td>SETUPSCRIPTS</td><td>INSTALLDIR</td><td>SETUPS~1|SetupScripts</td><td/><td>0</td><td/></row>
 		<row><td>SRV_FACTORY</td><td>SRV_FWSCRIPTS</td><td>Factory</td><td/><td>0</td><td/></row>
 		<row><td>SRV_FWSCRIPTS</td><td>SERVICE_SW</td><td>FWSCRI~1|FwScripts</td><td/><td>0</td><td/></row>
+		<row><td>SYNAPSE</td><td>SYSTELAB</td><td>Synapse</td><td/><td>0</td><td/></row>
+		<row><td>SYSTELAB</td><td>COMMON_FILES_FOLDER</td><td>Systelab</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -2044,6 +2079,7 @@
 		<row><td>BA200</td><td/><td>##IDS_FEATURE_DISPLAY_NAME1##</td><td/><td>0</td><td>1</td><td>INSTALLDIR</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>Firmware</td><td>BA200</td><td>##ID_STRING3##</td><td/><td>0</td><td>1</td><td>FIRMWARE</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>Service_Sw</td><td>BA200</td><td>##ID_STRING5##</td><td/><td>0</td><td>1</td><td>SERVICE_SW</td><td>16</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts</td><td>BA200</td><td>##ID_STRING24##</td><td/><td>0</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
 		<row><td>Usb_Drivers</td><td>BA200</td><td>##ID_STRING4##</td><td/><td>0</td><td>1</td><td>USB_DRIVERS</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>User_Sw</td><td>BA200</td><td>##ID_STRING6##</td><td/><td>0</td><td>1</td><td>USER_SW</td><td>16</td><td/><td/><td/><td/></row>
 	</table>
@@ -2051,6 +2087,27 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>BA200</td><td>BioSystemsSetupScript.exe</td></row>
+		<row><td>BA200</td><td>InstallShieldFix.exe</td></row>
+		<row><td>BA200</td><td>MPR.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationASTM1394Module.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationCDFModule.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationCoreModule.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationHL7Module.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationMessageEventModule.dll</td></row>
+		<row><td>BA200</td><td>NteCommunicationPOCT1AModule.dll</td></row>
+		<row><td>BA200</td><td>NteTraceEventModule.dll</td></row>
+		<row><td>BA200</td><td>NteTraceSubscriberOSEventLogModule.dll</td></row>
+		<row><td>BA200</td><td>SetScripts2</td></row>
+		<row><td>BA200</td><td>SetupScripts</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data_EsEngine</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td></row>
+		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td></row>
+		<row><td>BA200</td><td>VERSION.dll</td></row>
+		<row><td>BA200</td><td>WININET.dll</td></row>
 		<row><td>Firmware</td><td>FwBA200v013</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
@@ -2296,6 +2353,8 @@
 		<row><td>biosystems.ax00.app.dll1</td><td>Biosystems.Ax00.App.dll1</td><td>BIOSYS~1.DLL|Biosystems.Ax00.App.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Biosystems.Ax00.App.dll</td><td>1</td><td/></row>
 		<row><td>biosystems.ax00.core.dll</td><td>Biosystems.Ax00.Core.dll</td><td>BIOSYS~1.DLL|Biosystems.Ax00.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Biosystems.Ax00.Core.dll</td><td>1</td><td/></row>
 		<row><td>biosystems.ax00.core.dll1</td><td>Biosystems.Ax00.Core.dll1</td><td>BIOSYS~1.DLL|Biosystems.Ax00.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Biosystems.Ax00.Core.dll</td><td>1</td><td/></row>
+		<row><td>biosystemssetupscript.exe</td><td>BioSystemsSetupScript.exe</td><td>BIOSYS~1.EXE|BioSystemsSetupScript.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\BioSystemsSetupScript.exe</td><td>1</td><td/></row>
+		<row><td>biosystemssetupscript.exe.co</td><td>SetScripts2</td><td>BIOSYS~1.CON|BioSystemsSetupScript.exe.config</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\BioSystemsSetupScript.exe.config</td><td>1</td><td/></row>
 		<row><td>blank.png</td><td>ServiceSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Blank.png</td><td>1</td><td/></row>
 		<row><td>blank.png1</td><td>UserSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Blank.png</td><td>1</td><td/></row>
 		<row><td>bluecircle.png</td><td>ServiceSw_Images</td><td>BLUECI~1.PNG|BlueCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BlueCircle.png</td><td>1</td><td/></row>
@@ -2666,6 +2725,9 @@
 		<row><td>info.png1</td><td>UserSw_Images</td><td>Info.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Info.png</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll</td><td>InfoAnalyzer.dll</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll1</td><td>InfoAnalyzer.dll1</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
+		<row><td>installcustomaction_udctraci</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td>INSTAL~1.JS|InstallCustomAction_UDCTracing_COMPlusApp.js</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\InstallCustomAction_UDCTracing_COMPlusApp.js</td><td>1</td><td/></row>
+		<row><td>installshieldfix.exe</td><td>InstallShieldFix.exe</td><td>INSTAL~1.EXE|InstallShieldFix.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\InstallShieldFix.exe</td><td>1</td><td/></row>
+		<row><td>installshieldfix.exe.config</td><td>SetScripts2</td><td>INSTAL~1.CON|InstallShieldFix.exe.config</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\InstallShieldFix.exe.config</td><td>1</td><td/></row>
 		<row><td>interop.acropdflib.dll</td><td>Interop.AcroPDFLib.dll</td><td>INTERO~1.DLL|Interop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\Interop.AcroPDFLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d</td><td>Interop.CommunicationsAx00.dll</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d1</td><td>Interop.CommunicationsAx00.dll1</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
@@ -2811,12 +2873,21 @@
 		<row><td>mon_leg_yellow.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_YELLOW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_YELLOW.png</td><td>1</td><td/></row>
 		<row><td>motorpumpsvalves_eng.xps</td><td>ServiceSw_InfoDocs</td><td>MOTORP~1.XPS|MotorPumpsValves_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\MotorPumpsValves_ENG.xps</td><td>1</td><td/></row>
 		<row><td>motorpumpsvalves_spa.xps</td><td>ServiceSw_InfoDocs</td><td>MOTORP~1.XPS|MotorPumpsValves_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\MotorPumpsValves_SPA.xps</td><td>1</td><td/></row>
+		<row><td>mpr.dll</td><td>MPR.dll</td><td>MPR.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\MPR.dll</td><td>1</td><td/></row>
 		<row><td>needlestermo_eng.xps</td><td>ServiceSw_InfoDocs</td><td>NEEDLE~1.XPS|NeedlesTermo_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\NeedlesTermo_ENG.xps</td><td>1</td><td/></row>
 		<row><td>needlestermo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>NEEDLE~1.XPS|NeedlesTermo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\NeedlesTermo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>new.png</td><td>ServiceSw_Images</td><td>New.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\New.png</td><td>1</td><td/></row>
 		<row><td>new.png1</td><td>UserSw_Images</td><td>New.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\New.png</td><td>1</td><td/></row>
 		<row><td>no_inuse.png</td><td>ServiceSw_Images</td><td>NO_INUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\NO_INUSE.png</td><td>1</td><td/></row>
 		<row><td>no_inuse.png1</td><td>UserSw_Images</td><td>NO_INUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\NO_INUSE.png</td><td>1</td><td/></row>
+		<row><td>ntecommunicationastm1394modu</td><td>NteCommunicationASTM1394Module.dll</td><td>NTECOM~1.DLL|NteCommunicationASTM1394Module.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationASTM1394Module.dll</td><td>1</td><td/></row>
+		<row><td>ntecommunicationcdfmodule.dl</td><td>NteCommunicationCDFModule.dll</td><td>NTECOM~1.DLL|NteCommunicationCDFModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationCDFModule.dll</td><td>1</td><td/></row>
+		<row><td>ntecommunicationcoremodule.d</td><td>NteCommunicationCoreModule.dll</td><td>NTECOM~1.DLL|NteCommunicationCoreModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationCoreModule.dll</td><td>1</td><td/></row>
+		<row><td>ntecommunicationhl7module.dl</td><td>NteCommunicationHL7Module.dll</td><td>NTECOM~1.DLL|NteCommunicationHL7Module.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationHL7Module.dll</td><td>1</td><td/></row>
+		<row><td>ntecommunicationmessageevent</td><td>NteCommunicationMessageEventModule.dll</td><td>NTECOM~1.DLL|NteCommunicationMessageEventModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationMessageEventModule.dll</td><td>1</td><td/></row>
+		<row><td>ntecommunicationpoct1amodule</td><td>NteCommunicationPOCT1AModule.dll</td><td>NTECOM~1.DLL|NteCommunicationPOCT1AModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationPOCT1AModule.dll</td><td>1</td><td/></row>
+		<row><td>ntetraceeventmodule.dll</td><td>NteTraceEventModule.dll</td><td>NTETRA~1.DLL|NteTraceEventModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteTraceEventModule.dll</td><td>1</td><td/></row>
+		<row><td>ntetracesubscriberoseventlog</td><td>NteTraceSubscriberOSEventLogModule.dll</td><td>NTETRA~1.DLL|NteTraceSubscriberOSEventLogModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteTraceSubscriberOSEventLogModule.dll</td><td>1</td><td/></row>
 		<row><td>offstest.png</td><td>ServiceSw_Images</td><td>OFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OFFSTest.png</td><td>1</td><td/></row>
 		<row><td>offstest.png1</td><td>UserSw_Images</td><td>OFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\OFFSTest.png</td><td>1</td><td/></row>
 		<row><td>offstestbutton.png</td><td>ServiceSw_Images</td><td>OFFSTE~1.PNG|OFFSTestButton.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OFFSTestButton.png</td><td>1</td><td/></row>
@@ -2999,6 +3070,7 @@
 		<row><td>uncheck.png1</td><td>UserSw_Images</td><td>Uncheck.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Uncheck.png</td><td>1</td><td/></row>
 		<row><td>undo.png</td><td>ServiceSw_Images</td><td>Undo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Undo.png</td><td>1</td><td/></row>
 		<row><td>undo.png1</td><td>UserSw_Images</td><td>Undo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Undo.png</td><td>1</td><td/></row>
+		<row><td>uninstallcustomaction_udctra</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td>UNINST~1.JS|UninstallCustomAction_UDCTracing_COMPlusApp.js</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\UninstallCustomAction_UDCTracing_COMPlusApp.js</td><td>1</td><td/></row>
 		<row><td>up.png</td><td>ServiceSw_Images</td><td>Up.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Up.png</td><td>1</td><td/></row>
 		<row><td>up.png1</td><td>UserSw_Images</td><td>Up.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Up.png</td><td>1</td><td/></row>
 		<row><td>updatefw.png</td><td>ServiceSw_Images</td><td>UpdateFw.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\UpdateFw.png</td><td>1</td><td/></row>
@@ -3011,6 +3083,7 @@
 		<row><td>usersplash.png1</td><td>UserSw_Images_Embedded</td><td>USERSP~1.PNG|UserSplash.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\UserSplash.png</td><td>1</td><td/></row>
 		<row><td>usertest.png</td><td>ServiceSw_Images</td><td>UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\UserTest.png</td><td>1</td><td/></row>
 		<row><td>usertest.png1</td><td>UserSw_Images</td><td>UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\UserTest.png</td><td>1</td><td/></row>
+		<row><td>version.dll</td><td>VERSION.dll</td><td>VERSION.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\VERSION.dll</td><td>1</td><td/></row>
 		<row><td>violetcircle.png</td><td>ServiceSw_Images</td><td>VIOLET~1.PNG|VioletCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\VioletCircle.png</td><td>1</td><td/></row>
 		<row><td>violetcircle.png1</td><td>UserSw_Images</td><td>VIOLET~1.PNG|VioletCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\VioletCircle.png</td><td>1</td><td/></row>
 		<row><td>volume.png</td><td>ServiceSw_Images</td><td>Volume.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Volume.png</td><td>1</td><td/></row>
@@ -3033,6 +3106,7 @@
 		<row><td>washstationtermo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>WASHST~1.XPS|WashStationTermo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\WashStationTermo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>westgardcum.png</td><td>ServiceSw_Images</td><td>WESTGA~1.PNG|WestgardCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WestgardCum.png</td><td>1</td><td/></row>
 		<row><td>westgardcum.png1</td><td>UserSw_Images</td><td>WESTGA~1.PNG|WestgardCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WestgardCum.png</td><td>1</td><td/></row>
+		<row><td>wininet.dll</td><td>WININET.dll</td><td>WININET.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\WININET.dll</td><td>1</td><td/></row>
 		<row><td>worksession.dll</td><td>WorkSession.dll</td><td>WORKSE~1.DLL|WorkSession.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\WorkSession.dll</td><td>1</td><td/></row>
 		<row><td>worksession.dll1</td><td>WorkSession.dll1</td><td>WORKSE~1.DLL|WorkSession.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\WorkSession.dll</td><td>1</td><td/></row>
 		<row><td>xtraverticalbar.png</td><td>ServiceSw_Images</td><td>XTRAVE~1.PNG|XtraVerticalBar.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\XtraVerticalBar.png</td><td>1</td><td/></row>
@@ -3315,6 +3389,7 @@
 		<row><td>BSCSharpControl_Library.dll1</td><td/><td/><td>_AB54945A_BBB1_4A1B_BF1F_D15EE58F562C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSControl_Library.dll</td><td/><td/><td>_FCF0AA95_4E28_4D4C_B7D8_B2D3DB049B1B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSControl_Library.dll1</td><td/><td/><td>_43D0D458_53DE_4FF0_9836_52EB661E4370_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>BioSystemsSetupScript.exe</td><td/><td/><td>_7F86179A_CA15_46EA_ABC4_DBD0610E9428_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Biosystems.Ax00.App.dll</td><td/><td/><td>_287E633B_F589_4C5A_9B4B_07376542D0FC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Biosystems.Ax00.App.dll1</td><td/><td/><td>_72163C7E_95B6_490C_8D85_02FF8BB27964_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Biosystems.Ax00.Core.dll</td><td/><td/><td>_16059220_6A20_4BCB_B578_1697E16DDFEE_FILTER</td><td/><td/><td/><td/></row>
@@ -3387,13 +3462,23 @@
 		<row><td>ICSharpCode.SharpZipLib.dll1</td><td/><td/><td>_D456E828_7486_4857_B879_E5237480E99E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>InfoAnalyzer.dll</td><td/><td/><td>_FCC9A81B_A579_4BBC_A509_456127ABD811_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>InfoAnalyzer.dll1</td><td/><td/><td>_D8B6E7A2_C612_452A_A619_92B491410773_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>InstallShieldFix.exe</td><td/><td/><td>_87D34FF2_CD75_4010_985D_920B0ED472FF_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.AcroPDFLib.dll</td><td/><td/><td>_EAA2BA51_BEB3_451C_B61D_9AF64C269B20_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.CommunicationsAx00.dll</td><td/><td/><td>_B5ADBDAE_14B6_41F9_B7BB_5F9E30184AD8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.CommunicationsAx00.dll1</td><td/><td/><td>_FF6EA7B3_A543_4E7E_A4B2_44AEBE3B0538_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.WMPLib.dll</td><td/><td/><td>_726DB9D7_67C2_4755_903D_9113A100C1EB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LIS.dll</td><td/><td/><td>_F6F49CED_8E91_4835_9AE2_9EED0CF67B11_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>MPR.dll</td><td/><td/><td>_464B8147_0918_4703_BBD0_5F4551C7EB0D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td/><td/><td>_623B6113_8882_4E94_971F_6D89678EF8B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td/><td/><td>_035EE1DD_D3DF_451F_9C8A_64A438A50593_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationASTM1394Module.dll</td><td/><td/><td>_E4692161_A135_4200_9103_B482169A2FFB_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationCDFModule.dll</td><td/><td/><td>_8D5CB912_7655_4BE5_9A1E_8D96792669CE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationCoreModule.dll</td><td/><td/><td>_095E890C_D2F0_4251_9E04_B6F63AB3D52B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationHL7Module.dll</td><td/><td/><td>_F37A438E_8202_4ACD_9917_05224471E566_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationMessageEventModule.dll</td><td/><td/><td>_90D806E8_2D59_4B06_A5B0_DEABE3FB5773_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteCommunicationPOCT1AModule.dll</td><td/><td/><td>_64AF3FF9_8DD0_4B1C_9545_454F02A0A5AC_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteTraceEventModule.dll</td><td/><td/><td>_D9F2E540_1F9C_4123_AF4B_B2EFA061D3AF_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NteTraceSubscriberOSEventLogModule.dll</td><td/><td/><td>_8BCB4F00_AE6C_4E42_87BF_F179C37CA81E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ParameterPrograming.dll</td><td/><td/><td>_0686D5DE_957C_4126_8ED8_69681B60E180_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ParameterPrograming.dll1</td><td/><td/><td>_F35CA21D_8C5E_4B83_A92F_D2C689EECC9F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>PerpetuumSoft.Framework.Export.dll</td><td/><td/><td>_2A35D639_0960_48DC_8DAE_DD18FAE189E3_FILTER</td><td/><td/><td/><td/></row>
@@ -3423,6 +3508,14 @@
 		<row><td>ServiceSw_Update_Task</td><td/><td/><td>_79A5AFA7_16BD_4501_9EB6_912F3C0A9F58_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ServiceSw_Update_bak</td><td/><td/><td>_E0CD752E_EA29_4F00_98DA_94B20EADB07F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ServiceSw_XMLFiles</td><td/><td/><td>_0AB58E40_5C40_49C8_AFFB_BD8CFE4651CB_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetScripts2</td><td/><td/><td>_CD4246C3_215C_4272_8A58_45DD5582A7D8_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts</td><td/><td/><td>_034F734F_6B40_4E77_8DA7_D5BE41605281_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data</td><td/><td/><td>_8A8AFD0B_39BD_4D4E_B229_1D7E6254F71C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data_EsEngine</td><td/><td/><td>_97859FB0_75DC_43FA_95A0_A999CE85F0CD_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td><td/><td/><td>_74198D84_61AD_474F_B5EA_B472FCB0CCF0_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td><td/><td/><td>_47678C23_FB82_49A6_8A84_5732BC0FFB55_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td><td/><td/><td>_00134ACA_CB25_49D2_8A7B_6D2060A2707D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td/><td/><td>_AC0C4470_50F6_4AB6_AF0E_141C0C3CC8B5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UpdateVersion.dll</td><td/><td/><td>_BD8285ED_D82E_47DC_956A_A7E66677F4A1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UpdateVersion.dll1</td><td/><td/><td>_50DFD280_46AA_40A0_B6EF_46960239ECE7_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UserSw_Adjustments</td><td/><td/><td>_9FC82641_BE4C_48F5_8D56_6C3533791762_FILTER</td><td/><td/><td/><td/></row>
@@ -3437,6 +3530,8 @@
 		<row><td>UserSw_Update_Task</td><td/><td/><td>_8DEC7530_78FA_4DD9_8A75_7495BACCBF24_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UserSw_Update_bak</td><td/><td/><td>_56CC8664_E167_406F_AEC0_37F56A42958B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UserSw_XmlFiles</td><td/><td/><td>_36FF8DF0_2491_48EE_9C47_4A2E8665475B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>VERSION.dll</td><td/><td/><td>_C37C4970_A946_45CE_A938_8B5C9883904D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>WININET.dll</td><td/><td/><td>_E6A24A33_5D86_48CE_A5A2_0324AA0475FD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>WorkSession.dll</td><td/><td/><td>_9BFB4812_9153_4857_B494_EBE02DD2206F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>WorkSession.dll1</td><td/><td/><td>_49B7199C_371F_46AE_827C_031DBBF7EBD3_FILTER</td><td/><td/><td/><td/></row>
 	</table>
@@ -5323,6 +5418,8 @@
 		<row><td>ID_STRING22</td><td>1034</td><td>NEWSHO~1|NewShortcut4</td><td>0</td><td/><td>765594477</td></row>
 		<row><td>ID_STRING23</td><td>1033</td><td>BA200 User</td><td>0</td><td/><td>765631373</td></row>
 		<row><td>ID_STRING23</td><td>1034</td><td>BA200 User</td><td>0</td><td/><td>765631373</td></row>
+		<row><td>ID_STRING24</td><td>1033</td><td>NewFeature1</td><td>0</td><td/><td>-1725743474</td></row>
+		<row><td>ID_STRING24</td><td>1034</td><td>NewFeature1</td><td>0</td><td/><td>-1725743474</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Firmware</td><td>0</td><td/><td>-576700303</td></row>
 		<row><td>ID_STRING3</td><td>1034</td><td>NewFeature1</td><td>0</td><td/><td>-576698287</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>USB Drivers</td><td>0</td><td/><td>-576712335</td></row>
@@ -5541,6 +5638,7 @@
 		<row><td>RemoveRegistryValues</td><td/><td>2600</td><td>RemoveRegistryValues</td><td/></row>
 		<row><td>RemoveShortcuts</td><td/><td>3200</td><td>RemoveShortcuts</td><td/></row>
 		<row><td>ResolveSource</td><td>Not Installed</td><td>850</td><td>ResolveSource</td><td/></row>
+		<row><td>Run_Install_Script</td><td>NOT Installed OR MaintenanceMode="Modify"</td><td>6651</td><td/><td/></row>
 		<row><td>ScheduleReboot</td><td>ISSCHEDULEREBOOT</td><td>6410</td><td>ScheduleReboot</td><td/></row>
 		<row><td>SelfRegModules</td><td/><td>5600</td><td>SelfRegModules</td><td/></row>
 		<row><td>SelfUnregModules</td><td/><td>2200</td><td>SelfUnregModules</td><td/></row>
