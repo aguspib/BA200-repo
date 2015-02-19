@@ -759,13 +759,17 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pReactionRotorMaxWells" ></param>
         ''' <param name="pWashStationInputWellOffset" ></param>
         ''' <param name="pWashStationOutputWellOffset" ></param>
+        ''' <param name="pType"></param>
         ''' <returns>GlobalDataTo (ReactionsRotorDS)</returns>
         ''' <remarks>AG 08/06/2011
-        ''' AG 24/11/2011 - add columns TestID, WashingSolutionR1, WashingSolutionR2</remarks>
+        ''' AG 24/11/2011 - add columns TestID, WashingSolutionR1, WashingSolutionR2
+        ''' AG 18/02/2015 - BA-2285 - New status DX (dynamically rejected). Generate it when pType = DYNAMIC. Do not remove never when pType = STATIC
+        ''' </remarks>
         Public Function InitializeNewRotorTurnWellStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                      ByVal pAnalyzerID As String, ByVal pWellNumber As Integer, ByVal pRejectedWells As String, _
                                      ByVal pInitializeBLWWell As Boolean, ByVal pReactionRotorMaxWells As Integer, _
-                                     ByVal pWashStationOutputWellOffset As Integer, ByVal pWashStationInputWellOffset As Integer) As GlobalDataTO
+                                     ByVal pWashStationOutputWellOffset As Integer, ByVal pWashStationInputWellOffset As Integer, _
+                                     ByVal pType As GlobalEnumerates.BaseLineType) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -822,6 +826,7 @@ Namespace Biosystems.Ax00.BL
                                             .RejectedFlag = False
                                         Else
                                             .WellStatus = "X" 'Well status: Rejected
+                                            If pType = GlobalEnumerates.BaseLineType.DYNAMIC Then .WellStatus = "DX" 'AG 18/02/2015 - New status: Dynamically rejected
 
                                             'Temporally comment the true code and not reject never
                                             .RejectedFlag = True
@@ -841,6 +846,13 @@ Namespace Biosystems.Ax00.BL
                                                     If Not auxDS.twksWSReactionsRotor(0).IsTestIDNull Then .TestID = auxDS.twksWSReactionsRotor(0).TestID
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR1Null Then .WashingSolutionR1 = auxDS.twksWSReactionsRotor(0).WashingSolutionR1
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR2Null Then .WashingSolutionR2 = auxDS.twksWSReactionsRotor(0).WashingSolutionR2
+
+                                                    'AG 18/02/2015 BA-2285 the wells rejected by the dynamic base line cannot change their status until new dynamic base line is performed
+                                                    If pType = GlobalEnumerates.BaseLineType.STATIC AndAlso Not auxDS.twksWSReactionsRotor.First.IsWellStatusNull AndAlso auxDS.twksWSReactionsRotor.First.WellStatus = "DX" Then
+                                                        .WellStatus = "DX"
+                                                        .RejectedFlag = True
+                                                    End If
+                                                    'AG 18/02/2015
                                                 End If
                                             End If
                                         End If
@@ -921,12 +933,14 @@ Namespace Biosystems.Ax00.BL
                                             myReactionsDS.twksWSReactionsRotor.ImportRow(myRow)
                                             myReactionsDS.AcceptChanges()
                                             resultData = myDAO.UpdateMAXRotorTurnRecord(dbConnection, updateDS)
+
+                                            listWashRequired = Nothing
                                         End If
                                     End If
                                 End If
 
 
-                            Else 'Records due the new ANSPHR instruction received has been already saved and now we are treating the base line parameters
+                            Else 'Records were created previously when the ANSPHR instruction was received. But NOW we are treating these results (when well rejections parameter FIFO becomes completed)
 
                                 'CASE: Update the RejectedWells after the initialization phase has finished
                                 If Not resultData.HasError Then
@@ -938,6 +952,17 @@ Namespace Biosystems.Ax00.BL
                                             ReDim rejectedWellList(0)
                                             rejectedWellList(0) = pRejectedWells
                                         End If
+
+                                        'AG 18/02/2015 BA-2285 - Read the current status for the reactions rotor
+                                        Dim auxDS As New ReactionsRotorDS
+                                        Dim linqResults As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
+                                        If pType = GlobalEnumerates.BaseLineType.DYNAMIC AndAlso rejectedWellList.Length > 0 Then
+                                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID)
+                                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                auxDS = CType(resultData.SetDatos, ReactionsRotorDS)
+                                            End If
+                                        End If
+                                        'AG 18/02/2015
 
                                         myReactionsDS.Clear()
                                         For i As Integer = 0 To rejectedWellList.Length - 1
@@ -951,6 +976,16 @@ Namespace Biosystems.Ax00.BL
                                                 .SetExecutionIDNull()
                                                 .WellStatus = "X" 'Well status: Rejected
 
+                                                'AG 18/02/2014 BA-2285 - If previous status of this well was DX (dynamically rejected) do not change it!!!
+                                                If pType = GlobalEnumerates.BaseLineType.DYNAMIC AndAlso Not auxDS Is Nothing AndAlso auxDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                                                    linqResults = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In auxDS.twksWSReactionsRotor _
+                                                                   Where a.WellNumber = .WellNumber Select a).ToList
+                                                    If linqResults.Count > 0 AndAlso Not linqResults.First.IsWellStatusNull AndAlso linqResults.First.WellStatus = "DX" Then
+                                                        .WellStatus = "DX" 'Well status must remain to: Dynamically Rejected
+                                                    End If
+                                                End If
+                                                'AG 18/02/2015
+
                                                 'Temporally comment the true code and not reject never
                                                 .RejectedFlag = True
                                                 '.RejectedFlag = False
@@ -962,9 +997,10 @@ Namespace Biosystems.Ax00.BL
                                         If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
                                             resultData = myDAO.UpdateMAXRotorTurnRecord(dbConnection, myReactionsDS)
                                         End If
+                                        linqResults = Nothing 'AG 18/02/2015 BA-2285
                                     End If
                                 End If
-                            End If
+                                End If
                         End If
 
                         If (Not resultData.HasError) Then
@@ -1221,7 +1257,6 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' After leave running mode some special business has to be performed
         ''' 1) The current well inside the washing station has to change his WellContent to "C" contaminated or "E" empty
-        ''' 2) The current well inside the washing station has to change his WellStatus to "R" ready or "X" rejected
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
@@ -1402,7 +1437,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <returns>GlobalDataTo with ReactionsRotorDS</returns>
-        ''' <remarks>AG 14/11/2014 BA-2065 REFACTORING</remarks>
+        ''' <remarks>AG 14/11/2014 BA-2065 REFACTORING
+        '''          AG 18/02/2015 - BA-2285 - add new status DX (dynamically rejected)
+        ''' </remarks>
         Public Function RepaintAllReactionsRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1439,8 +1476,8 @@ Namespace Biosystems.Ax00.BL
                                     'WellContent must be 'E' (empty) or 'C' (contaminated)
                                     If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
 
-                                    'WellStatus must be 'R' (ready) or 'X' (rejected)
-                                    If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
+                                    'AG 18/02/2015 BA-2285 - WellStatus must be 'R' (ready) or 'X' (rejected) or 'DX' (dynamically rejected)
+                                    If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" AndAlso item.WellStatus <> "DX" Then item.WellStatus = "R"
                                     item.EndEdit()
 
                                     newWellsDS.twksWSReactionsRotor.ImportRow(item)
@@ -1513,143 +1550,6 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
-
-#Region "OLD & Commented methods"
-        ''' <summary>
-        ''' Add record into twksWSReactionsRotor for well leaving washing station (pWellNumber) and update the 
-        ''' rejected wells if any
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWellNumber"></param>
-        ''' <param name="pRejectedWells"></param>
-        ''' <param name="pTreatBLWwell" ></param>
-        ''' <param name="pReactionRotorMaxWells" ></param>
-        ''' <param name="pWashStationInputOffset" ></param>
-        ''' <param name="pWashStationOutputOffset" ></param>
-        ''' <returns>GlobalDataTo (ReactionsRotorDS)</returns>
-        ''' <remarks>AG 12/05/2011</remarks>
-        Public Function InitializeNewRotorTurnWellStatusOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-                                     ByVal pAnalyzerID As String, ByVal pWellNumber As Integer, ByVal pRejectedWells As String, _
-                                     ByVal pTreatBLWwell As Boolean, ByVal pReactionRotorMaxWells As Integer, _
-                                     ByVal pWashStationInputOffset As Integer, ByVal pWashStationOutputOffset As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        'FIRST: Create the pWellNumber
-                        Dim myReactionsDS As New ReactionsRotorDS
-                        Dim myRow As ReactionsRotorDS.twksWSReactionsRotorRow
-                        Dim nextRotorTurn As Integer = 1
-                        Dim rejectedFlag As Boolean = False
-
-                        resultData = GetNextRotorTurn(dbConnection, pWorkSessionID, pAnalyzerID, pWellNumber)
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            nextRotorTurn = CType(resultData.SetDatos, Integer)
-                        End If
-
-                        If pTreatBLWwell Then
-                            'Only current well pWellNumber = ANSPHR.BLW
-                            rejectedFlag = CBool(IIf(pRejectedWells.Contains(" " & pWellNumber.ToString & " "), True, False))
-
-                            If Not resultData.HasError Then
-                                'Current well: ANSPHR.BLW
-                                myRow = myReactionsDS.twksWSReactionsRotor.NewtwksWSReactionsRotorRow
-                                With myRow
-                                    .AnalyzerID = pAnalyzerID
-                                    .WellNumber = pWellNumber
-                                    .RotorTurn = nextRotorTurn
-                                    .WellContent = "W" 'Washing station
-                                    .SetExecutionIDNull()
-                                    If Not rejectedFlag Then
-                                        .WellStatus = "R" 'Well status: Ready
-                                        .RejectedFlag = False
-                                    Else
-                                        .WellStatus = "X" 'Well status: Rejected
-
-                                        'Temporally comment the true code and not reject never
-                                        '.RejectedFlag = True
-                                        .RejectedFlag = False
-                                    End If
-                                End With
-                                myReactionsDS.twksWSReactionsRotor.AddtwksWSReactionsRotorRow(myRow)
-                                myReactionsDS.AcceptChanges()
-                                resultData = Create(dbConnection, myReactionsDS)
-                            End If
-
-                        Else
-                            'SECOND: Update the RejectedWells
-                            If Not resultData.HasError Then
-                                If pRejectedWells <> "" Then
-                                    Dim rejectedWellList() As String
-                                    If pRejectedWells.Contains(",") Then
-                                        rejectedWellList = Split(pRejectedWells, ",")
-                                    Else
-                                        ReDim rejectedWellList(0)
-                                        rejectedWellList(0) = pRejectedWells
-                                    End If
-
-                                    myReactionsDS.Clear()
-                                    For i As Integer = 0 To rejectedWellList.Length - 1
-                                        myRow = myReactionsDS.twksWSReactionsRotor.NewtwksWSReactionsRotorRow
-                                        With myRow
-                                            .AnalyzerID = pAnalyzerID
-                                            .WellNumber = CInt(rejectedWellList(i))
-                                            .RotorTurn = nextRotorTurn
-                                            .SetWellContentNull() 'No change WellContent
-                                            .SetExecutionIDNull()
-                                            .WellStatus = "X" 'Well status: Rejected
-
-                                            'Temporally comment the true code and not reject never
-                                            '.RejectedFlag = True
-                                            .RejectedFlag = False
-                                        End With
-                                        myReactionsDS.twksWSReactionsRotor.AddtwksWSReactionsRotorRow(myRow)
-
-                                    Next
-                                    myReactionsDS.AcceptChanges()
-                                    If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
-                                        resultData = Update(dbConnection, myReactionsDS, True)
-                                    End If
-
-                                End If
-
-                            End If
-
-                        End If
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            resultData.SetDatos = myReactionsDS
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-#End Region
 
     End Class
 

@@ -1,6 +1,18 @@
 <?xml version="1.0" standalone="yes"?>
 <DBIntegrityDS xmlns="http://tempuri.org/DBIntegrityDS.xsd">
   <IntegrityValidation>
+    <Version>3.05</Version>
+    <Label>Data validation in tfmwVersions Table for package 3.0.5</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.5'
+      AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.20')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
     <Version>2.0</Version>
     <Label>Removed ApplicationSetting Table</Label>
     <Script>
@@ -2617,13 +2629,12 @@
       SELECT 'False'
     </Script>
     <Result>True</Result>
-  </IntegrityValidation>
+  </IntegrityValidation> 
   <IntegrityValidation>
-    <Version>3.04</Version>
-    <Label>Data validation in tfmwVersions Table for package 3.0.4</Label>
+    <Version>3.05</Version>
+    <Label>Dynamic base line limits are correct</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.4'
-      AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.20')= 1
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'BL_DYNAMIC_ABS_LIMIT' AND MinValue = -0.08 AND MaxValue = 0.08 ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'

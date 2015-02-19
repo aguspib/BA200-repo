@@ -2533,6 +2533,7 @@ Partial Public Class UiMonitor
     '''              SA 20/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed 
     '''              IT 04/06/2014 - BT #1644 ==> Changed call to function UpdateRotorArea: new type of the last parameter
+    '''              AG 18/02/2015 - BA-2285 - add new status DX (dynamically rejected)
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
@@ -2695,7 +2696,7 @@ Partial Public Class UiMonitor
                                             If (rotorPosition.ElementStatus = "R") Then
                                                 PreviousSelect = "REACPOSNIUS"
                                                 auxIconPath = REACPOSNIUSS_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "X") Then
+                                            ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
                                                 PreviousSelect = "REACPOSOPTI"
                                                 auxIconPath = REACPOSOPTIS_IconName
                                             End If
@@ -2731,7 +2732,7 @@ Partial Public Class UiMonitor
                                         Case "E"   'Not in use
                                             If (rotorPosition.ElementStatus = "R") Then
                                                 auxIconPath = REACPOSNIUS_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "X") Then
+                                            ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
                                                 auxIconPath = REACPOSOPTI_IconName
                                             End If
 
