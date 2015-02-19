@@ -7904,6 +7904,21 @@ Partial Public Class UiAx00MainMDI
     '''                              any previous open screen is closed
     ''' </remarks>
     Public Function OpenMDIChildForm(ByVal pFormToOpen As BSBaseForm) As Boolean
+
+        Static Recursion As Integer = 0
+        If Recursion > 0 Then
+            'Handle errors here
+#If CONFIG = "Debug" Then
+            Dim ex = New Exception("Recursion opening MDIChildForm was encountered at: " & Environment.StackTrace.ToString)
+            GlobalBase.CreateLogActivity(ex)
+            Debug.WriteLine(ex.Message)
+            Return False
+#Else
+            GlobalBase.CreateLogActivity("Recursion in the OpenMDIChildForm when processing " & Environment.StackTrace.ToString, System.Reflection.MethodInfo.GetCurrentMethod().Name, System.Diagnostics.EventLogEntryType.Warning, False)
+#End If
+        End If
+        Recursion += 1
+
         Dim IsFormClosed As Boolean = True
         'Dim IsISEUtilClosing As Boolean = False 'SGM 10/05/2012
         Dim ISELoadingPending As Boolean = False ' XBC 11/07/2102
@@ -8135,7 +8150,7 @@ Partial Public Class UiAx00MainMDI
             Else
                 ClosedByISEUtilCloseButton = True
             End If
-
+            Recursion -= 1
         End Try
 
         Return IsFormClosed
