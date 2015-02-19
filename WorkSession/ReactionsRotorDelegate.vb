@@ -846,14 +846,14 @@ Namespace Biosystems.Ax00.BL
                                                     If Not auxDS.twksWSReactionsRotor(0).IsTestIDNull Then .TestID = auxDS.twksWSReactionsRotor(0).TestID
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR1Null Then .WashingSolutionR1 = auxDS.twksWSReactionsRotor(0).WashingSolutionR1
                                                     If Not auxDS.twksWSReactionsRotor(0).IsWashingSolutionR2Null Then .WashingSolutionR2 = auxDS.twksWSReactionsRotor(0).WashingSolutionR2
-
-                                                    'AG 18/02/2015 BA-2285 the wells rejected by the dynamic base line cannot change their status until new dynamic base line is performed
-                                                    If pType = GlobalEnumerates.BaseLineType.STATIC AndAlso Not auxDS.twksWSReactionsRotor.First.IsWellStatusNull AndAlso auxDS.twksWSReactionsRotor.First.WellStatus = "DX" Then
-                                                        .WellStatus = "DX"
-                                                        .RejectedFlag = True
-                                                    End If
-                                                    'AG 18/02/2015
                                                 End If
+
+                                                'AG 18/02/2015 BA-2285 the wells rejected by the dynamic base line cannot change their status until new dynamic base line is performed
+                                                If pType = GlobalEnumerates.BaseLineType.STATIC AndAlso Not auxDS.twksWSReactionsRotor.First.IsWellStatusNull AndAlso auxDS.twksWSReactionsRotor.First.WellStatus = "DX" Then
+                                                    .WellStatus = "DX"
+                                                    .RejectedFlag = True
+                                                End If
+                                                'AG 18/02/2015
                                             End If
                                         End If
                                         'AG 12/12/2011
@@ -1000,7 +1000,7 @@ Namespace Biosystems.Ax00.BL
                                         linqResults = Nothing 'AG 18/02/2015 BA-2285
                                     End If
                                 End If
-                                End If
+                            End If
                         End If
 
                         If (Not resultData.HasError) Then
