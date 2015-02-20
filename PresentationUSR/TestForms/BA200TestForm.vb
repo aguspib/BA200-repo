@@ -41,6 +41,10 @@ Public Class BA200TestForm
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
     End Sub
 
+    Private Sub btnCalculateResultsBL_Click(sender As Object, e As EventArgs) Handles btnCalculateResultsBL.Click
+        AnalyzerController.Instance.Analyzer.ProcessFlightReadAction()
+    End Sub
+
     Private Sub btnEmptyRotor_Click(sender As Object, e As EventArgs) Handles btnEmptyRotor.Click
         AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
         AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
@@ -48,4 +52,5 @@ Public Class BA200TestForm
         Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
     End Sub
+
 End Class

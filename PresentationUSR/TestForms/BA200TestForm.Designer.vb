@@ -27,11 +27,13 @@ Partial Class BA200TestForm
         Me.btnEmptyRotor = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.subtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.btnFillRotor = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.btnCalculateResultsBL = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.searchGroup.SuspendLayout()
         Me.SuspendLayout()
         '
         'searchGroup
         '
+        Me.searchGroup.Controls.Add(Me.btnCalculateResultsBL)
         Me.searchGroup.Controls.Add(Me.btnPerformBL)
         Me.searchGroup.Controls.Add(Me.btnEmptyRotor)
         Me.searchGroup.Controls.Add(Me.subtitleLabel)
@@ -39,7 +41,7 @@ Partial Class BA200TestForm
         Me.searchGroup.ForeColor = System.Drawing.Color.Black
         Me.searchGroup.Location = New System.Drawing.Point(12, 12)
         Me.searchGroup.Name = "searchGroup"
-        Me.searchGroup.Size = New System.Drawing.Size(288, 178)
+        Me.searchGroup.Size = New System.Drawing.Size(288, 227)
         Me.searchGroup.TabIndex = 27
         Me.searchGroup.TabStop = False
         '
@@ -51,7 +53,7 @@ Partial Class BA200TestForm
         Me.btnPerformBL.Margin = New System.Windows.Forms.Padding(3, 3, 3, 15)
         Me.btnPerformBL.Name = "btnPerformBL"
         Me.btnPerformBL.Size = New System.Drawing.Size(276, 32)
-        Me.btnPerformBL.TabIndex = 28
+        Me.btnPerformBL.TabIndex = 2
         Me.btnPerformBL.Text = "Perform BaseLine (FLIGHT)"
         Me.btnPerformBL.UseVisualStyleBackColor = True
         '
@@ -59,10 +61,10 @@ Partial Class BA200TestForm
         '
         Me.btnEmptyRotor.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.btnEmptyRotor.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnEmptyRotor.Location = New System.Drawing.Point(6, 138)
+        Me.btnEmptyRotor.Location = New System.Drawing.Point(6, 186)
         Me.btnEmptyRotor.Name = "btnEmptyRotor"
         Me.btnEmptyRotor.Size = New System.Drawing.Size(276, 32)
-        Me.btnEmptyRotor.TabIndex = 27
+        Me.btnEmptyRotor.TabIndex = 4
         Me.btnEmptyRotor.Text = "Empty Rotor (FLIGHT)"
         Me.btnEmptyRotor.UseVisualStyleBackColor = True
         '
@@ -86,20 +88,30 @@ Partial Class BA200TestForm
         Me.btnFillRotor.Margin = New System.Windows.Forms.Padding(3, 3, 3, 15)
         Me.btnFillRotor.Name = "btnFillRotor"
         Me.btnFillRotor.Size = New System.Drawing.Size(276, 32)
-        Me.btnFillRotor.TabIndex = 4
+        Me.btnFillRotor.TabIndex = 1
         Me.btnFillRotor.Text = "Fill Rotor (FLIGHT)"
         Me.btnFillRotor.UseVisualStyleBackColor = True
+        '
+        'btnCalculateResultsBL
+        '
+        Me.btnCalculateResultsBL.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btnCalculateResultsBL.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCalculateResultsBL.Location = New System.Drawing.Point(6, 138)
+        Me.btnCalculateResultsBL.Name = "btnCalculateResultsBL"
+        Me.btnCalculateResultsBL.Size = New System.Drawing.Size(276, 32)
+        Me.btnCalculateResultsBL.TabIndex = 3
+        Me.btnCalculateResultsBL.Text = "Calculate Results (FLIGHT)"
+        Me.btnCalculateResultsBL.UseVisualStyleBackColor = True
         '
         'BA200TestForm
         '
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(312, 207)
+        Me.ClientSize = New System.Drawing.Size(312, 242)
         Me.Controls.Add(Me.searchGroup)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
@@ -114,4 +126,5 @@ Partial Class BA200TestForm
     Friend WithEvents btnFillRotor As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents btnPerformBL As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents btnEmptyRotor As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents btnCalculateResultsBL As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

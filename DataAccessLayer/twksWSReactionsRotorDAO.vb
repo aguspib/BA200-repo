@@ -535,7 +535,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 12/12/2011</remarks>
+        ''' <remarks>AG 12/12/2011
+        ''' AG 19/02/2015 BA-2285 add also new wellstatus DX in WHERE clause
+        ''' </remarks>
         Public Function UpdateWellContentAndStatusAfterReset(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
@@ -561,7 +563,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     'Update WellStatus
                     cmdText &= " UPDATE twksWSReactionsRotor SET WellStatus = 'R' " & vbCrLf
                     cmdText &= " WHERE AnalyzerID = " & String.Format("'{0}'", pAnalyzerID) & vbCrLf 'Required
-                    cmdText &= " AND WellStatus <> 'X' "
+                    cmdText &= " AND WellStatus <> 'X' AND WellStatus <> 'DX' "
 
 
                     dbCmd.CommandText = cmdText
@@ -874,7 +876,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 29/06/2011 - Creation
-        ''' AG 13/12/2011 - update also wellstatus </remarks>
+        ''' AG 13/12/2011 - update also wellstatus
+        ''' AG 19/02/2015 BA-2285 add also new wellstatus DX in WHERE clause</remarks>
         Public Function SetToEmptyTheWellsInWashStation(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
@@ -898,7 +901,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     'AG 13/12/2011
                     cmdText &= " UPDATE twksWSReactionsRotor SET WellStatus = 'R' " & vbCrLf
                     cmdText &= " WHERE AnalyzerID = " & String.Format("'{0}'", pAnalyzerID) & vbCrLf 'Required
-                    cmdText &= " AND WellStatus <> 'R' AND WellStatus <> 'X' " & vbCrLf
+                    cmdText &= " AND WellStatus <> 'R' AND WellStatus <> 'X' AND WellStatus <> 'DX' " & vbCrLf
                     cmdText &= " AND CurrentTurnFlag = 1 "
                     'AG 13/12/2011
 
