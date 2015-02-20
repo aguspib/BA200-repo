@@ -351,7 +351,6 @@
 		<row><td>Analyzer.dll</td><td>{1643A39B-3C27-4C9F-BF7A-2490A12679F8}</td><td>SERVICE_SW</td><td>8</td><td/><td>analyzer.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Analyzer.dll1</td><td>{D95DC6BB-82EA-44C8-8143-D61DAC4571DE}</td><td>USER_SW</td><td>8</td><td/><td>analyzer.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AxInterop.AcroPDFLib.dll</td><td>{5191F28D-3781-49A5-8CB8-99B6CA423E8A}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AxInterop.WMPLib.dll</td><td>{807879AC-F76D-4640-B34A-67EB95412260}</td><td>SERVICE_SW</td><td>8</td><td/><td>axinterop.wmplib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BA200Service.exe</td><td>{2C6DA74C-FB03-4B24-9A09-FFE0B95D5B74}</td><td>SERVICE_SW</td><td>8</td><td/><td>ba200service.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BA200User.exe</td><td>{6CA43578-2171-4E60-9A06-F594D5F07156}</td><td>USER_SW</td><td>8</td><td/><td>ba200user.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSCSharpControl_Library.dll</td><td>{C4A1D993-C05A-4964-9C96-DD57DB872F9C}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -374,51 +373,62 @@
 		<row><td>ConfigurationSetup.dll1</td><td>{47444910-6F22-4848-B243-903DC99FBB5A}</td><td>USER_SW</td><td>8</td><td/><td>configurationsetup.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataAccessLayer.dll</td><td>{355CE934-A078-4922-ABC7-3E19257C446A}</td><td>SERVICE_SW</td><td>8</td><td/><td>dataaccesslayer.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataAccessLayer.dll1</td><td>{F84CFF09-AF5E-4736-918C-6460701AE791}</td><td>USER_SW</td><td>8</td><td/><td>dataaccesslayer.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Charts.v10.2.Core.dll</td><td>{7C0913E9-C63E-4C66-87E5-12F325A77ABF}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.charts.v10.2.core</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Charts.v10.2.Core.dll1</td><td>{954FEEF0-21D6-4B8E-9455-BD886496B36F}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.charts.v10.2.core1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.CodeParser.v10.2.dll</td><td>{B6ED94FA-1A7A-443A-9800-FEC8EE647378}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.codeparser.v10.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.CodeParser.v10.2.dll1</td><td>{83BA57EA-D55E-46E9-BB2C-B5DE9DB5609D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.codeparser.v10.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.DXCore.Controls.Data.v6.3.dll</td><td>{B0694069-AE00-49BE-997E-68CCE66252B3}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.dxcore.controls.d</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.DXCore.Controls.Utils.v6.3.dll</td><td>{748A063A-D943-4C8A-86C1-589532C2BF0B}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.dxcore.controls.u</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td><td>{85D853D0-0A73-4EC1-AABA-98223BC7B1A7}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.dxcore.controls.x</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Data.v10.2.dll</td><td>{0A9B064C-3590-4E94-9333-A62299D07A1B}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.data.v10.2.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Data.v10.2.dll1</td><td>{61124952-FE32-4D36-AE95-160AC868E452}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.data.v10.2.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.PivotGrid.v10.2.Core.dll</td><td>{535BF48D-EC77-425C-B0B3-AC7E957D99D6}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.pivotgrid.v10.2.c</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.PivotGrid.v10.2.Core.dll1</td><td>{39CAB459-4F99-49B0-B4F1-941555E23874}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.pivotgrid.v10.2.c1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.RichEdit.v10.2.Core.dll</td><td>{705B0F4A-F15F-48AF-88D1-FDFBB1A6F16C}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.richedit.v10.2.co</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.RichEdit.v10.2.Core.dll1</td><td>{10FAACF3-D8D8-41B7-A0E3-BDFC428990AC}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.richedit.v10.2.co1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Utils.v10.2.dll</td><td>{72846621-5F72-4376-91CD-1B6246043113}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.utils.v10.2.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.Utils.v10.2.dll1</td><td>{165A2074-DBE7-4B42-8891-2C72B61485DA}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.utils.v10.2.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraBars.v10.2.dll</td><td>{96259E9C-BBCE-4D70-B01D-2F0DE28AEA13}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrabars.v10.2.dl</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraBars.v10.2.dll1</td><td>{65F166AB-8E4E-44CA-AE0F-929577AC4FF4}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrabars.v10.2.dl1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>{90E3B316-9B6B-470F-BF29-4B221859B718}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.Extensions.dll1</td><td>{725AA5FF-3055-450C-A93E-E2B412C6334A}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.UI.dll</td><td>{3AE8F93C-3237-4EE2-8F87-424F87DFEF4F}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.3</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.UI.dll1</td><td>{DD9D2AD3-25CE-4D25-8F23-7EE92845B6D4}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.5</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.dll</td><td>{3B22C11D-D6F4-42C5-83D2-3D32CD2EB4B4}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraCharts.v10.2.dll1</td><td>{9463BB43-3BED-4356-88BF-A5D417303231}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v10.2.4</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraEditors.v10.2.dll</td><td>{E31EA62B-5CB3-4A5F-9E41-2D8E752E289C}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v10.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraEditors.v10.2.dll1</td><td>{044281B6-4D35-4A1C-A6CF-FA031A4C4152}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v10.21</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraGrid.v10.2.dll</td><td>{951BA660-BE83-4973-8FE9-44FB64B6A38C}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtragrid.v10.2.dl</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraGrid.v10.2.dll1</td><td>{5AE1BF90-8FDB-4E81-BC07-A9186A85A0F0}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtragrid.v10.2.dl1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraLayout.v10.2.dll</td><td>{FF270099-147C-41E2-9691-BE597C00FE50}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtralayout.v10.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraLayout.v10.2.dll1</td><td>{35D8B6DA-74DA-4651-86BD-B30D7CAF86ED}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtralayout.v10.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraNavBar.v10.2.dll</td><td>{0377786B-1A34-4AB8-8EB9-6399093C6005}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtranavbar.v10.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraNavBar.v10.2.dll1</td><td>{6F3127CE-AD9B-4011-8A97-BD7C3D9073AF}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtranavbar.v10.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraPivotGrid.v10.2.dll</td><td>{A575B9F1-6A4F-4C8F-BD8C-9D782B8D4BFD}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrapivotgrid.v10</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraPivotGrid.v10.2.dll1</td><td>{6D7A81B8-2104-4693-9177-70033ADC3208}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrapivotgrid.v101</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraPrinting.v10.2.dll</td><td>{3894CF0E-479E-41E7-8365-6B162D99BBDF}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraprinting.v10.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraPrinting.v10.2.dll1</td><td>{8A245952-D48D-4363-9712-4631B1E6884E}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraprinting.v10.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraReports.v10.2.Extensions.dll</td><td>{4CEECA02-50E2-4637-A44A-9EDBC551114F}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrareports.v10.21</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraReports.v10.2.Extensions.dll1</td><td>{697BCE30-B250-45F1-A79C-FE9BAB5A9A31}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrareports.v10.23</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraReports.v10.2.dll</td><td>{6BA557C9-DB6C-49D7-AB4C-048E38ED2F66}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrareports.v10.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraReports.v10.2.dll1</td><td>{890633E0-29C6-4443-965F-A16F452E453D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrareports.v10.22</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraRichEdit.v10.2.dll</td><td>{D4D6FF6D-70CE-4832-9FE5-26B8A6420167}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrarichedit.v10.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraRichEdit.v10.2.dll1</td><td>{C30196E1-0B5D-484F-9E3C-A3D28D50A7DD}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrarichedit.v10.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraTreeList.v10.2.dll</td><td>{703F8492-4C54-4B27-AF5C-8C9957CD6651}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtratreelist.v10.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraTreeList.v10.2.dll1</td><td>{046C8AC2-F8DB-427E-94AD-AF5288D52F96}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtratreelist.v10.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll</td><td>{38E095F3-419B-4E3C-A377-ACD2DCEF97E2}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll1</td><td>{75C26062-EC69-4AEB-BA34-0627AAD9CB6D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.BonusSkins.v14.2.dll</td><td>{4C107F68-7999-4EF5-85DC-6DB2DD9E2A54}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.bonusskins.v14.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.BonusSkins.v14.2.dll1</td><td>{D8897B78-B789-495E-A135-148A5B9FCFC3}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.bonusskins.v14.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Charts.v14.2.Core.dll</td><td>{A6292C3F-293B-4BE1-9EFA-9BD82C598D8E}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.charts.v14.2.core</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Charts.v14.2.Core.dll1</td><td>{5C8CF61A-CB03-4231-9D30-9DE48C9561A2}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.charts.v14.2.core1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Data.v14.2.dll</td><td>{1A28C89E-31A2-4BBC-9A7F-32D0935BCDD6}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.data.v14.2.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Data.v14.2.dll1</td><td>{7932CD70-EE48-445C-93DA-37BDC0E4C027}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.data.v14.2.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.DataAccess.v14.2.dll</td><td>{89874AE6-A492-40E9-9E29-F343DBD8C3F6}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.dataaccess.v14.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.DataAccess.v14.2.dll1</td><td>{377992E2-C68A-4A28-8F02-2DA32BE472C4}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.dataaccess.v14.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Design.v14.2.dll</td><td>{2D936922-E0AA-4BC7-9544-2C025F920429}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.design.v14.2.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Design.v14.2.dll1</td><td>{4ED3DD4E-21D0-47FC-BE32-726466D59908}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.design.v14.2.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Office.v14.2.Core.dll</td><td>{675BDF0A-3B2A-492B-BEC5-3CD2AF175347}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.office.v14.2.core</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Office.v14.2.Core.dll1</td><td>{93D6DC29-1A25-42EF-BF98-C08A1CAD9093}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.office.v14.2.core1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.PivotGrid.v14.2.Core.dll</td><td>{58C7D0C9-A8CD-44CF-9F6E-16014C3CECE2}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.pivotgrid.v14.2.c</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.PivotGrid.v14.2.Core.dll1</td><td>{00B2B83B-AB5B-4D3B-9FDB-7DF57D3BB42D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.pivotgrid.v14.2.c1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Printing.v14.2.Core.dll</td><td>{F683851B-DC24-4F16-B55A-B95206ED0E36}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.printing.v14.2.co</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Printing.v14.2.Core.dll1</td><td>{8BDA977B-BBEB-43E3-95A1-A084A8439E61}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.printing.v14.2.co1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.RichEdit.v14.2.Core.dll</td><td>{2C366E62-D3A9-4016-BF5B-E485B00CB36C}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.richedit.v14.2.co</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.RichEdit.v14.2.Core.dll1</td><td>{1D4C27C2-05DD-4103-AAF4-C5F6813A4D81}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.richedit.v14.2.co1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Sparkline.v14.2.Core.dll</td><td>{C0C6D45E-00AA-4E8C-B6FD-171DFEF43AC2}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.sparkline.v14.2.c</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Sparkline.v14.2.Core.dll1</td><td>{5B27C35E-9F44-4BCF-92D6-A8CD7B5130E4}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.sparkline.v14.2.c1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Utils.v14.2.UI.dll</td><td>{135373B3-CA27-405B-AB75-A05AC0D9C132}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.utils.v14.2.ui.dl</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Utils.v14.2.UI.dll1</td><td>{084AED36-3BCB-43F1-BBE9-A396256F49AB}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.utils.v14.2.ui.dl1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Utils.v14.2.dll</td><td>{5A2528E0-E3DE-4AE3-859C-6C7F56C0608E}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.utils.v14.2.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.Utils.v14.2.dll1</td><td>{FDB4CDC8-9A41-490A-AD7E-797AC96CAF3D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.utils.v14.2.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraBars.v14.2.dll</td><td>{897B76E9-288F-40F6-8B34-FBEE7C117E83}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrabars.v14.2.dl</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraBars.v14.2.dll1</td><td>{C3AA5CA3-6D0E-4959-84A8-C703DFDE938E}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrabars.v14.2.dl1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.UI.dll</td><td>{7CFAD297-426C-4B35-88BB-4758A7B8353E}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.UI.dll1</td><td>{8E3AB433-A585-4360-BD3B-5FE763E69A07}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.4</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>{E344F8BA-D358-4E35-8C4B-B6877D7CC026}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.Wizard.dll1</td><td>{596B5C9A-33C1-4F09-9590-0CCF3416B8BC}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.5</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.dll</td><td>{41818033-0C27-407F-B838-41D11636F6DB}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraCharts.v14.2.dll1</td><td>{1728219A-4B40-4CDC-9662-B046BF0C115B}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtracharts.v14.2.3</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraEditors.v14.2.Design.dll</td><td>{CD234368-091C-4568-A5DD-5B6146D55652}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v14.21</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraEditors.v14.2.Design.dll1</td><td>{19D4C0CC-8547-4C5A-BA84-691EA83C4638}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v14.23</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraEditors.v14.2.dll</td><td>{5CC3F53E-ABDF-4553-B1B1-A1D540F75556}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v14.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraEditors.v14.2.dll1</td><td>{F4DAC8A7-EEE4-4083-93D1-7A6F8425FFB9}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraeditors.v14.22</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraGauges.v14.2.Core.dll</td><td>{8DDB6FB6-4980-4227-98AA-D178C42B622B}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtragauges.v14.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraGauges.v14.2.Core.dll1</td><td>{346B3A25-AE18-49EB-BB4C-86244306D800}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtragauges.v14.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraGrid.v14.2.dll</td><td>{08C9CED5-A52B-42F4-9879-E09E79EE9BF3}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtragrid.v14.2.dl</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraGrid.v14.2.dll1</td><td>{89D1F7E1-5116-416A-8128-D5E953061716}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtragrid.v14.2.dl1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraNavBar.v14.2.dll</td><td>{BA705662-2C01-4A4D-B08D-A8F9FFBE822A}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtranavbar.v14.2.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraNavBar.v14.2.dll1</td><td>{B3170B18-F213-4C6C-B22B-C115EE82FFF8}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtranavbar.v14.2.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraPivotGrid.v14.2.dll</td><td>{70EF966B-369D-4F52-BA29-31D85DD52661}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrapivotgrid.v14</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraPivotGrid.v14.2.dll1</td><td>{CE6A7EE6-CD73-4B96-8C7D-F8BD7CF4725B}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrapivotgrid.v141</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraPrinting.v14.2.dll</td><td>{980218B9-D6B7-4033-950E-45E5EAAF5373}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraprinting.v14.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraPrinting.v14.2.dll1</td><td>{8E592FDD-2DAA-4706-AEB1-EA0C1F80AE9D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraprinting.v14.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraReports.v14.2.Extensions.dll</td><td>{2297095F-FE29-4542-B766-C0D5E4167BF9}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrareports.v14.21</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraReports.v14.2.Extensions.dll1</td><td>{7BDB1861-9F0C-4955-B77E-0CA754922C9F}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrareports.v14.23</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraReports.v14.2.dll</td><td>{F22E5126-6187-409C-A7E8-287B8A532BC7}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrareports.v14.2</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraReports.v14.2.dll1</td><td>{8DE6BA0A-9A05-4A02-9F0A-4C5F8C8C2538}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrareports.v14.22</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraRichEdit.v14.2.dll</td><td>{44482C63-78DD-48BB-B5EB-4433A1FD42A7}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtrarichedit.v14.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraRichEdit.v14.2.dll1</td><td>{0CCA4502-BB30-4085-A685-087287A43A5D}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtrarichedit.v14.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraTreeList.v14.2.dll</td><td>{33DA1CDB-10F4-4044-AAEC-F6670F1346DC}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtratreelist.v14.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraTreeList.v14.2.dll1</td><td>{85E5937F-4A23-4D75-924E-FBA6100E0B61}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtratreelist.v14.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraVerticalGrid.v14.2.dll</td><td>{1F2539B5-300D-43E4-8B19-38695E8A5E5C}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DevExpress.XtraVerticalGrid.v14.2.dll1</td><td>{8F23FAF8-06AB-4FBC-BDC6-C34E87F3C39E}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Digiface.ttf1</td><td>{1CEB55BF-9219-41E9-BFB4-35FCC73D22BC}</td><td>FontsFolder</td><td>8</td><td/><td>digiface.ttf</td><td>17</td><td>This component consists of font files to be registered on the target system.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll</td><td>{908B97F9-C114-4A41-9E9E-AAC15D47CF02}</td><td>SERVICE_SW</td><td>8</td><td/><td>framework.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll1</td><td>{A1947093-F8B8-4D7E-BD3E-09C8CD322ED5}</td><td>USER_SW</td><td>8</td><td/><td>framework.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -435,7 +445,7 @@
 		<row><td>Interop.AcroPDFLib.dll</td><td>{5C1F68CB-65BA-479C-B16E-59B66A3AF657}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll</td><td>{E4F047D8-6742-4389-AAD7-C6D5207182E4}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.communicationsax00.d</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll1</td><td>{2D282F91-6C72-4E53-A312-49B8593A1B04}</td><td>USER_SW</td><td>8</td><td/><td>interop.communicationsax00.d1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.WMPLib.dll</td><td>{722DF06C-F577-4B25-8366-BD67D1C6BFD9}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.wmplib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Interop.WMPLib.dll</td><td>{722DF06C-F577-4B25-8366-BD67D1C6BFD9}</td><td>SERVICE_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LIS.dll</td><td>{4E74697E-EE5A-48CB-B247-817F31E0590B}</td><td>USER_SW</td><td>8</td><td/><td>lis.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>MPR.dll</td><td>{11BBFA7C-2FD2-46DD-88BE-B486BEA40E6A}</td><td>CORE</td><td>8</td><td/><td>mpr.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>{6EF3F074-B7BB-4981-BC52-DDB6A339367C}</td><td>SERVICE_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2079,7 +2089,7 @@
 		<row><td>BA200</td><td/><td>##IDS_FEATURE_DISPLAY_NAME1##</td><td/><td>0</td><td>1</td><td>INSTALLDIR</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>Firmware</td><td>BA200</td><td>##ID_STRING3##</td><td/><td>0</td><td>1</td><td>FIRMWARE</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>Service_Sw</td><td>BA200</td><td>##ID_STRING5##</td><td/><td>0</td><td>1</td><td>SERVICE_SW</td><td>16</td><td/><td/><td/><td/></row>
-		<row><td>SetupScripts</td><td>BA200</td><td>##ID_STRING24##</td><td/><td>0</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
+		<row><td>SetupScripts</td><td>BA200</td><td>##ID_STRING24##</td><td/><td>0</td><td>1</td><td>INSTALLDIR</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>Usb_Drivers</td><td>BA200</td><td>##ID_STRING4##</td><td/><td>0</td><td>1</td><td>USB_DRIVERS</td><td>16</td><td/><td/><td/><td/></row>
 		<row><td>User_Sw</td><td>BA200</td><td>##ID_STRING6##</td><td/><td>0</td><td>1</td><td>USER_SW</td><td>16</td><td/><td/><td/><td/></row>
 	</table>
@@ -2087,32 +2097,10 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>BA200</td><td>BioSystemsSetupScript.exe</td></row>
-		<row><td>BA200</td><td>InstallShieldFix.exe</td></row>
-		<row><td>BA200</td><td>MPR.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationASTM1394Module.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationCDFModule.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationCoreModule.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationHL7Module.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationMessageEventModule.dll</td></row>
-		<row><td>BA200</td><td>NteCommunicationPOCT1AModule.dll</td></row>
-		<row><td>BA200</td><td>NteTraceEventModule.dll</td></row>
-		<row><td>BA200</td><td>NteTraceSubscriberOSEventLogModule.dll</td></row>
-		<row><td>BA200</td><td>SetScripts2</td></row>
-		<row><td>BA200</td><td>SetupScripts</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data_EsEngine</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td></row>
-		<row><td>BA200</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td></row>
-		<row><td>BA200</td><td>VERSION.dll</td></row>
-		<row><td>BA200</td><td>WININET.dll</td></row>
 		<row><td>Firmware</td><td>FwBA200v013</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
 		<row><td>Service_Sw</td><td>Analyzer.dll</td></row>
-		<row><td>Service_Sw</td><td>AxInterop.WMPLib.dll</td></row>
 		<row><td>Service_Sw</td><td>BA200Service.exe</td></row>
 		<row><td>Service_Sw</td><td>BSCSharpControl_Library.dll</td></row>
 		<row><td>Service_Sw</td><td>BSControl_Library.dll</td></row>
@@ -2124,30 +2112,34 @@
 		<row><td>Service_Sw</td><td>CommAx00.exe</td></row>
 		<row><td>Service_Sw</td><td>ConfigurationSetup.dll</td></row>
 		<row><td>Service_Sw</td><td>DataAccessLayer.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.Charts.v10.2.Core.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.CodeParser.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.DXCore.Controls.Data.v6.3.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.DXCore.Controls.Utils.v6.3.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.Data.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.PivotGrid.v10.2.Core.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.RichEdit.v10.2.Core.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.Utils.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraBars.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v10.2.Extensions.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v10.2.UI.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraEditors.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraGrid.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraLayout.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraNavBar.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraPivotGrid.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraPrinting.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraReports.v10.2.Extensions.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraReports.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraRichEdit.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraTreeList.v10.2.dll</td></row>
-		<row><td>Service_Sw</td><td>DevExpress.XtraVerticalGrid.v10.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.BonusSkins.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Charts.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Data.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.DataAccess.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Design.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Office.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.PivotGrid.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Printing.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.RichEdit.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Sparkline.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Utils.v14.2.UI.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.Utils.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraBars.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v14.2.UI.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v14.2.Wizard.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraCharts.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraEditors.v14.2.Design.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraEditors.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraGauges.v14.2.Core.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraGrid.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraNavBar.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraPivotGrid.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraPrinting.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraReports.v14.2.Extensions.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraReports.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraRichEdit.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraTreeList.v14.2.dll</td></row>
+		<row><td>Service_Sw</td><td>DevExpress.XtraVerticalGrid.v14.2.dll</td></row>
 		<row><td>Service_Sw</td><td>Digiface.ttf1</td></row>
 		<row><td>Service_Sw</td><td>Framework.dll</td></row>
 		<row><td>Service_Sw</td><td>FwScriptsManagement.dll</td></row>
@@ -2180,6 +2172,27 @@
 		<row><td>Service_Sw</td><td>ServiceSw_XMLFiles</td></row>
 		<row><td>Service_Sw</td><td>UpdateVersion.dll</td></row>
 		<row><td>Service_Sw</td><td>WorkSession.dll</td></row>
+		<row><td>SetupScripts</td><td>BioSystemsSetupScript.exe</td></row>
+		<row><td>SetupScripts</td><td>InstallShieldFix.exe</td></row>
+		<row><td>SetupScripts</td><td>MPR.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationASTM1394Module.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationCDFModule.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationCoreModule.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationHL7Module.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationMessageEventModule.dll</td></row>
+		<row><td>SetupScripts</td><td>NteCommunicationPOCT1AModule.dll</td></row>
+		<row><td>SetupScripts</td><td>NteTraceEventModule.dll</td></row>
+		<row><td>SetupScripts</td><td>NteTraceSubscriberOSEventLogModule.dll</td></row>
+		<row><td>SetupScripts</td><td>SetScripts2</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data_EsEngine</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse</td></row>
+		<row><td>SetupScripts</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td></row>
+		<row><td>SetupScripts</td><td>VERSION.dll</td></row>
+		<row><td>SetupScripts</td><td>WININET.dll</td></row>
 		<row><td>Usb_Drivers</td><td>CDM_2.02.04.exe</td></row>
 		<row><td>User_Sw</td><td>AX00Global.dll1</td></row>
 		<row><td>User_Sw</td><td>AX00Types.dll1</td></row>
@@ -2195,27 +2208,34 @@
 		<row><td>User_Sw</td><td>CommAx00.exe1</td></row>
 		<row><td>User_Sw</td><td>ConfigurationSetup.dll1</td></row>
 		<row><td>User_Sw</td><td>DataAccessLayer.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.Charts.v10.2.Core.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.CodeParser.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.Data.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.PivotGrid.v10.2.Core.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.RichEdit.v10.2.Core.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.Utils.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraBars.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v10.2.Extensions.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v10.2.UI.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraEditors.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraGrid.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraLayout.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraNavBar.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraPivotGrid.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraPrinting.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraReports.v10.2.Extensions.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraReports.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraRichEdit.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraTreeList.v10.2.dll1</td></row>
-		<row><td>User_Sw</td><td>DevExpress.XtraVerticalGrid.v10.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.BonusSkins.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Charts.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Data.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.DataAccess.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Design.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Office.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.PivotGrid.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Printing.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.RichEdit.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Sparkline.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Utils.v14.2.UI.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.Utils.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraBars.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v14.2.UI.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v14.2.Wizard.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraCharts.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraEditors.v14.2.Design.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraEditors.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraGauges.v14.2.Core.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraGrid.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraNavBar.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraPivotGrid.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraPrinting.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraReports.v14.2.Extensions.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraReports.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraRichEdit.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraTreeList.v14.2.dll1</td></row>
+		<row><td>User_Sw</td><td>DevExpress.XtraVerticalGrid.v14.2.dll1</td></row>
 		<row><td>User_Sw</td><td>Framework.dll1</td></row>
 		<row><td>User_Sw</td><td>FwScriptsManagement.dll1</td></row>
 		<row><td>User_Sw</td><td>History.dll1</td></row>
@@ -2311,7 +2331,6 @@
 		<row><td>ax00types.dll</td><td>AX00Types.dll</td><td>AX00TY~1.DLL|AX00Types.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\AX00Types.dll</td><td>1</td><td/></row>
 		<row><td>ax00types.dll1</td><td>AX00Types.dll1</td><td>AX00TY~1.DLL|AX00Types.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\AX00Types.dll</td><td>1</td><td/></row>
 		<row><td>axinterop.acropdflib.dll</td><td>AxInterop.AcroPDFLib.dll</td><td>AXINTE~1.DLL|AxInterop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\AxInterop.AcroPDFLib.dll</td><td>1</td><td/></row>
-		<row><td>axinterop.wmplib.dll</td><td>AxInterop.WMPLib.dll</td><td>AXINTE~1.DLL|AxInterop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\AxInterop.WMPLib.dll</td><td>1</td><td/></row>
 		<row><td>ba200service.exe</td><td>BA200Service.exe</td><td>BA200S~1.EXE|BA200Service.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>1</td><td/></row>
 		<row><td>ba200user.exe</td><td>BA200User.exe</td><td>BA200U~1.EXE|BA200User.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>1</td><td/></row>
 		<row><td>ba200v013.ba2</td><td>FwBA200v013</td><td>BA200V~1.BA2|BA200v013.ba2</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA200 Fw\BA200v013.ba2</td><td>1</td><td/></row>
@@ -2588,51 +2607,62 @@
 		<row><td>demo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>Demo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Demo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>depleted.png</td><td>ServiceSw_Images</td><td>Depleted.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Depleted.png</td><td>1</td><td/></row>
 		<row><td>depleted.png1</td><td>UserSw_Images</td><td>Depleted.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Depleted.png</td><td>1</td><td/></row>
-		<row><td>devexpress.charts.v10.2.core</td><td>DevExpress.Charts.v10.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Charts.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Charts.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.charts.v10.2.core1</td><td>DevExpress.Charts.v10.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.Charts.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Charts.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.codeparser.v10.2.</td><td>DevExpress.CodeParser.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.CodeParser.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.CodeParser.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.codeparser.v10.2.1</td><td>DevExpress.CodeParser.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.CodeParser.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.CodeParser.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.data.v10.2.dll</td><td>DevExpress.Data.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.Data.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Data.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.data.v10.2.dll1</td><td>DevExpress.Data.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.Data.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Data.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.dxcore.controls.d</td><td>DevExpress.DXCore.Controls.Data.v6.3.dll</td><td>DEVEXP~1.DLL|DevExpress.DXCore.Controls.Data.v6.3.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\IDETools\System\DXCore\BIN\DevExpress.DXCore.Controls.Data.v6.3.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.dxcore.controls.u</td><td>DevExpress.DXCore.Controls.Utils.v6.3.dll</td><td>DEVEXP~1.DLL|DevExpress.DXCore.Controls.Utils.v6.3.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\IDETools\System\DXCore\BIN\DevExpress.DXCore.Controls.Utils.v6.3.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.dxcore.controls.x</td><td>DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td><td>DEVEXP~1.DLL|DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\IDETools\System\DXCore\BIN\DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.pivotgrid.v10.2.c</td><td>DevExpress.PivotGrid.v10.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.PivotGrid.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.PivotGrid.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.pivotgrid.v10.2.c1</td><td>DevExpress.PivotGrid.v10.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.PivotGrid.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.PivotGrid.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.richedit.v10.2.co</td><td>DevExpress.RichEdit.v10.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.RichEdit.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.RichEdit.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.richedit.v10.2.co1</td><td>DevExpress.RichEdit.v10.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.RichEdit.v10.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.RichEdit.v10.2.Core.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.utils.v10.2.dll</td><td>DevExpress.Utils.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.Utils.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Utils.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.utils.v10.2.dll1</td><td>DevExpress.Utils.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.Utils.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.Utils.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrabars.v10.2.dl</td><td>DevExpress.XtraBars.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraBars.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraBars.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrabars.v10.2.dl1</td><td>DevExpress.XtraBars.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraBars.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraBars.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.</td><td>DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.1</td><td>DevExpress.XtraCharts.v10.2.Extensions.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.Extensions.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.2</td><td>DevExpress.XtraCharts.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.3</td><td>DevExpress.XtraCharts.v10.2.UI.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.UI.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.4</td><td>DevExpress.XtraCharts.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtracharts.v10.2.5</td><td>DevExpress.XtraCharts.v10.2.UI.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v10.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraCharts.v10.2.UI.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraeditors.v10.2</td><td>DevExpress.XtraEditors.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraEditors.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraeditors.v10.21</td><td>DevExpress.XtraEditors.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraEditors.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtragrid.v10.2.dl</td><td>DevExpress.XtraGrid.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraGrid.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtragrid.v10.2.dl1</td><td>DevExpress.XtraGrid.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraGrid.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtralayout.v10.2.</td><td>DevExpress.XtraLayout.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraLayout.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraLayout.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtralayout.v10.2.1</td><td>DevExpress.XtraLayout.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraLayout.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraLayout.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtranavbar.v10.2.</td><td>DevExpress.XtraNavBar.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraNavBar.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraNavBar.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtranavbar.v10.2.1</td><td>DevExpress.XtraNavBar.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraNavBar.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraNavBar.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrapivotgrid.v10</td><td>DevExpress.XtraPivotGrid.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraPivotGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraPivotGrid.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrapivotgrid.v101</td><td>DevExpress.XtraPivotGrid.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraPivotGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraPivotGrid.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraprinting.v10.</td><td>DevExpress.XtraPrinting.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraPrinting.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraPrinting.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraprinting.v10.1</td><td>DevExpress.XtraPrinting.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraPrinting.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraPrinting.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrareports.v10.2</td><td>DevExpress.XtraReports.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraReports.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrareports.v10.21</td><td>DevExpress.XtraReports.v10.2.Extensions.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v10.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraReports.v10.2.Extensions.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrareports.v10.22</td><td>DevExpress.XtraReports.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraReports.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrareports.v10.23</td><td>DevExpress.XtraReports.v10.2.Extensions.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v10.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraReports.v10.2.Extensions.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrarichedit.v10.</td><td>DevExpress.XtraRichEdit.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraRichEdit.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraRichEdit.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtrarichedit.v10.1</td><td>DevExpress.XtraRichEdit.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraRichEdit.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraRichEdit.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtratreelist.v10.</td><td>DevExpress.XtraTreeList.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraTreeList.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraTreeList.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtratreelist.v10.1</td><td>DevExpress.XtraTreeList.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraTreeList.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraTreeList.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraverticalgrid.</td><td>DevExpress.XtraVerticalGrid.v10.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraVerticalGrid.v10.2.dll</td><td>1</td><td/></row>
-		<row><td>devexpress.xtraverticalgrid.1</td><td>DevExpress.XtraVerticalGrid.v10.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v10.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 2010.2\Components\Sources\DevExpress.DLL\DevExpress.XtraVerticalGrid.v10.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.bonusskins.v14.2.</td><td>DevExpress.BonusSkins.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.BonusSkins.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.BonusSkins.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.bonusskins.v14.2.1</td><td>DevExpress.BonusSkins.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.BonusSkins.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.BonusSkins.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.charts.v14.2.core</td><td>DevExpress.Charts.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Charts.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Charts.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.charts.v14.2.core1</td><td>DevExpress.Charts.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.Charts.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Charts.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.data.v14.2.dll</td><td>DevExpress.Data.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.Data.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Data.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.data.v14.2.dll1</td><td>DevExpress.Data.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.Data.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Data.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.dataaccess.v14.2.</td><td>DevExpress.DataAccess.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.DataAccess.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.DataAccess.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.dataaccess.v14.2.1</td><td>DevExpress.DataAccess.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.DataAccess.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.DataAccess.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.design.v14.2.dll</td><td>DevExpress.Design.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.Design.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\Design\DevExpress.Design.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.design.v14.2.dll1</td><td>DevExpress.Design.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.Design.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\Design\DevExpress.Design.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.office.v14.2.core</td><td>DevExpress.Office.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Office.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Office.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.office.v14.2.core1</td><td>DevExpress.Office.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.Office.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Office.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.pivotgrid.v14.2.c</td><td>DevExpress.PivotGrid.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.PivotGrid.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.PivotGrid.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.pivotgrid.v14.2.c1</td><td>DevExpress.PivotGrid.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.PivotGrid.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.PivotGrid.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.printing.v14.2.co</td><td>DevExpress.Printing.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Printing.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Printing.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.printing.v14.2.co1</td><td>DevExpress.Printing.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.Printing.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Printing.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.richedit.v14.2.co</td><td>DevExpress.RichEdit.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.RichEdit.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.RichEdit.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.richedit.v14.2.co1</td><td>DevExpress.RichEdit.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.RichEdit.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.RichEdit.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.sparkline.v14.2.c</td><td>DevExpress.Sparkline.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Sparkline.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Sparkline.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.sparkline.v14.2.c1</td><td>DevExpress.Sparkline.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.Sparkline.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Sparkline.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.utils.v14.2.dll</td><td>DevExpress.Utils.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.Utils.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Utils.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.utils.v14.2.dll1</td><td>DevExpress.Utils.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.Utils.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Utils.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.utils.v14.2.ui.dl</td><td>DevExpress.Utils.v14.2.UI.dll</td><td>DEVEXP~1.DLL|DevExpress.Utils.v14.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Utils.v14.2.UI.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.utils.v14.2.ui.dl1</td><td>DevExpress.Utils.v14.2.UI.dll1</td><td>DEVEXP~1.DLL|DevExpress.Utils.v14.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Utils.v14.2.UI.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrabars.v14.2.dl</td><td>DevExpress.XtraBars.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraBars.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraBars.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrabars.v14.2.dl1</td><td>DevExpress.XtraBars.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraBars.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraBars.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.</td><td>DevExpress.XtraCharts.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.1</td><td>DevExpress.XtraCharts.v14.2.UI.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.UI.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.2</td><td>DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.3</td><td>DevExpress.XtraCharts.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.4</td><td>DevExpress.XtraCharts.v14.2.UI.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.UI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.UI.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtracharts.v14.2.5</td><td>DevExpress.XtraCharts.v14.2.Wizard.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraCharts.v14.2.Wizard.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraeditors.v14.2</td><td>DevExpress.XtraEditors.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraEditors.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraeditors.v14.21</td><td>DevExpress.XtraEditors.v14.2.Design.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v14.2.Design.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\Design\DevExpress.XtraEditors.v14.2.Design.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraeditors.v14.22</td><td>DevExpress.XtraEditors.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraEditors.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraeditors.v14.23</td><td>DevExpress.XtraEditors.v14.2.Design.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraEditors.v14.2.Design.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\Design\DevExpress.XtraEditors.v14.2.Design.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtragauges.v14.2.</td><td>DevExpress.XtraGauges.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraGauges.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraGauges.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtragauges.v14.2.1</td><td>DevExpress.XtraGauges.v14.2.Core.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraGauges.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraGauges.v14.2.Core.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtragrid.v14.2.dl</td><td>DevExpress.XtraGrid.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraGrid.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtragrid.v14.2.dl1</td><td>DevExpress.XtraGrid.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraGrid.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtranavbar.v14.2.</td><td>DevExpress.XtraNavBar.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraNavBar.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraNavBar.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtranavbar.v14.2.1</td><td>DevExpress.XtraNavBar.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraNavBar.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraNavBar.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrapivotgrid.v14</td><td>DevExpress.XtraPivotGrid.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraPivotGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraPivotGrid.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrapivotgrid.v141</td><td>DevExpress.XtraPivotGrid.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraPivotGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraPivotGrid.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraprinting.v14.</td><td>DevExpress.XtraPrinting.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraPrinting.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraPrinting.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraprinting.v14.1</td><td>DevExpress.XtraPrinting.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraPrinting.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraPrinting.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrareports.v14.2</td><td>DevExpress.XtraReports.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraReports.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrareports.v14.21</td><td>DevExpress.XtraReports.v14.2.Extensions.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v14.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraReports.v14.2.Extensions.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrareports.v14.22</td><td>DevExpress.XtraReports.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraReports.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrareports.v14.23</td><td>DevExpress.XtraReports.v14.2.Extensions.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraReports.v14.2.Extensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraReports.v14.2.Extensions.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrarichedit.v14.</td><td>DevExpress.XtraRichEdit.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraRichEdit.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraRichEdit.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtrarichedit.v14.1</td><td>DevExpress.XtraRichEdit.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraRichEdit.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraRichEdit.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtratreelist.v14.</td><td>DevExpress.XtraTreeList.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraTreeList.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraTreeList.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtratreelist.v14.1</td><td>DevExpress.XtraTreeList.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraTreeList.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraTreeList.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraverticalgrid.</td><td>DevExpress.XtraVerticalGrid.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraVerticalGrid.v14.2.dll</td><td>1</td><td/></row>
+		<row><td>devexpress.xtraverticalgrid.1</td><td>DevExpress.XtraVerticalGrid.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraVerticalGrid.v14.2.dll</td><td>1</td><td/></row>
 		<row><td>diamondred.png</td><td>ServiceSw_Images</td><td>DIAMON~1.PNG|DiamondRed.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\DiamondRed.png</td><td>1</td><td/></row>
 		<row><td>diamondred.png1</td><td>UserSw_Images</td><td>DIAMON~1.PNG|DiamondRed.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DiamondRed.png</td><td>1</td><td/></row>
 		<row><td>digiface.ttf</td><td>Digiface.ttf1</td><td>Digiface.ttf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PresentationSRV&gt;\Fonts\Digiface.ttf</td><td>1</td><td/></row>
@@ -2731,7 +2761,7 @@
 		<row><td>interop.acropdflib.dll</td><td>Interop.AcroPDFLib.dll</td><td>INTERO~1.DLL|Interop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\Interop.AcroPDFLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d</td><td>Interop.CommunicationsAx00.dll</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d1</td><td>Interop.CommunicationsAx00.dll1</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
-		<row><td>interop.wmplib.dll</td><td>Interop.WMPLib.dll</td><td>INTERO~1.DLL|Interop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Interop.WMPLib.dll</td><td>1</td><td/></row>
+		<row><td>interop.wmplib.dll</td><td>Interop.WMPLib.dll</td><td>INTERO~1.DLL|Interop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\SRV\Interop.WMPLib.dll</td><td>1</td><td/></row>
 		<row><td>inuse_calculatedtest.png</td><td>ServiceSw_Images</td><td>INUSE_~1.PNG|InUse_CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse_CalculatedTest.png</td><td>1</td><td/></row>
 		<row><td>inuse_calculatedtest.png1</td><td>UserSw_Images</td><td>INUSE_~1.PNG|InUse_CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUse_CalculatedTest.png</td><td>1</td><td/></row>
 		<row><td>inuse_isetest.png</td><td>ServiceSw_Images</td><td>INUSE_~1.PNG|InUse_ISETest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse_ISETest.png</td><td>1</td><td/></row>
@@ -3382,7 +3412,6 @@
 		<row><td>Analyzer.dll</td><td/><td/><td>_A9F471F6_B4D5_4C39_8B8D_8231EBDD8CD8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Analyzer.dll1</td><td/><td/><td>_E6607F37_C683_4AB3_AA03_310E798F9566_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AxInterop.AcroPDFLib.dll</td><td/><td/><td>_34E813AC_9479_400B_AF6F_D95B2216C1C1_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>AxInterop.WMPLib.dll</td><td/><td/><td>_68838D2B_C0BC_48AE_9306_10FDC79D7772_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BA200Service.exe</td><td/><td/><td>_79BD38FB_53D3_410D_99C5_9840319D219A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BA200User.exe</td><td/><td/><td>_9FBC032E_BC06_4FFE_A8A7_AF1FBB8F9675_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSCSharpControl_Library.dll</td><td/><td/><td>_72AA2BAD_A4F6_41BC_AFDC_A7A8CA8EAD56_FILTER</td><td/><td/><td/><td/></row>
@@ -3405,51 +3434,62 @@
 		<row><td>ConfigurationSetup.dll1</td><td/><td/><td>_C1BCD434_97E3_4EBC_9BFC_9D6DA9FF8B24_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataAccessLayer.dll</td><td/><td/><td>_1A476923_A4ED_4332_912F_4D4C1D525357_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataAccessLayer.dll1</td><td/><td/><td>_EAC4DE68_0F5F_43D5_A1DB_0BAAE3392306_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Charts.v10.2.Core.dll</td><td/><td/><td>_2A72AE72_94F8_40E1_98F5_5EFDC78F336A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Charts.v10.2.Core.dll1</td><td/><td/><td>_80FA275C_4E71_42C3_9703_62B8F3882A1F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.CodeParser.v10.2.dll</td><td/><td/><td>_B8ABFA74_4548_4F4D_A1B0_63CFE6528A94_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.CodeParser.v10.2.dll1</td><td/><td/><td>_12935525_CE14_4112_AE09_14CD8A1DDFFC_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.DXCore.Controls.Data.v6.3.dll</td><td/><td/><td>_11448342_5DDA_4235_9183_84726B689635_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.DXCore.Controls.Utils.v6.3.dll</td><td/><td/><td>_E81409BE_D490_4164_9C1C_485D77BF3013_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.DXCore.Controls.XtraEditors.v6.3.dll</td><td/><td/><td>_08A5FB07_0001_4849_94B2_39E3548D6400_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Data.v10.2.dll</td><td/><td/><td>_A4D34891_DC05_4360_BC6B_872E493780ED_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Data.v10.2.dll1</td><td/><td/><td>_6FBB75AB_EB9F_4E5D_8F6C_39CF072A6EF4_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.PivotGrid.v10.2.Core.dll</td><td/><td/><td>_272081FD_3AA5_462B_9C5D_2C6BBE3EEB17_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.PivotGrid.v10.2.Core.dll1</td><td/><td/><td>_7F521C48_90AF_436C_907F_1DBF61CCBA4F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.RichEdit.v10.2.Core.dll</td><td/><td/><td>_94CB447B_69CA_401D_9C86_2DB2D0E68AFF_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.RichEdit.v10.2.Core.dll1</td><td/><td/><td>_45DDF0F1_48B4_4515_808B_280DA5F5883F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Utils.v10.2.dll</td><td/><td/><td>_97A9DAD1_180E_4073_84B2_A2DCA949BD96_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.Utils.v10.2.dll1</td><td/><td/><td>_EB96D353_F472_4E16_9BBB_776DA2A6BC9E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraBars.v10.2.dll</td><td/><td/><td>_D6B6D6CE_5745_4BF6_9BF5_9273B19546B4_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraBars.v10.2.dll1</td><td/><td/><td>_F5EB9735_3F14_4ADF_BFA0_C993D07B73E8_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.Extensions.dll</td><td/><td/><td>_3C8CA8BF_0C7E_4BFC_B780_D961C1DD9A77_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.Extensions.dll1</td><td/><td/><td>_39DD9C3C_CB57_49E9_B523_222FB31BA245_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.UI.dll</td><td/><td/><td>_9189E161_680C_486A_BDD0_B25CDD6170E5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.UI.dll1</td><td/><td/><td>_B21CB31A_F19D_4C74_8615_609779CAD4A7_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.dll</td><td/><td/><td>_6F11B024_CA80_4A6B_A471_6C1217CE37FE_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraCharts.v10.2.dll1</td><td/><td/><td>_9AB7EC08_BB6B_4547_BE6D_45741D7A8B51_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraEditors.v10.2.dll</td><td/><td/><td>_396017A5_86EA_4D44_9A01_81E2C2026CFD_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraEditors.v10.2.dll1</td><td/><td/><td>_18FDA590_35CC_42D4_A4F9_E9358C425944_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraGrid.v10.2.dll</td><td/><td/><td>_7261D3CC_A062_4DD9_9C89_138C75C6F25E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraGrid.v10.2.dll1</td><td/><td/><td>_0535D78F_73B4_4510_BE16_A5F74CC49F41_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraLayout.v10.2.dll</td><td/><td/><td>_2155045C_A652_4438_B2A7_90AC4B1517DF_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraLayout.v10.2.dll1</td><td/><td/><td>_93B23961_21C6_4493_9702_8CE42D8D0DAD_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraNavBar.v10.2.dll</td><td/><td/><td>_50126C8F_187D_4871_A1FE_D754F6929051_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraNavBar.v10.2.dll1</td><td/><td/><td>_9B39954C_9089_44A1_B10D_4EF1A183D27D_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraPivotGrid.v10.2.dll</td><td/><td/><td>_E01AAD07_8B52_42CE_A8F2_826CC40B3A83_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraPivotGrid.v10.2.dll1</td><td/><td/><td>_A9A12338_2B46_4F3D_9FDA_A938130B6E55_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraPrinting.v10.2.dll</td><td/><td/><td>_0ABE90DA_6812_4DF9_9093_E45D86E447BD_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraPrinting.v10.2.dll1</td><td/><td/><td>_BDFDF56F_FFDC_402B_AB7A_A3EC3652997B_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraReports.v10.2.Extensions.dll</td><td/><td/><td>_699E7D80_2CF5_4268_9382_F67BEC76535C_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraReports.v10.2.Extensions.dll1</td><td/><td/><td>_78153073_E1F0_4780_809F_94890A7A0293_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraReports.v10.2.dll</td><td/><td/><td>_DB249761_52DA_45A2_8E88_24A9BF57625B_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraReports.v10.2.dll1</td><td/><td/><td>_EB729072_7F38_4EEF_9776_2BFCB01599A5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraRichEdit.v10.2.dll</td><td/><td/><td>_83059330_D352_44F7_ABA9_C41172F7955A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraRichEdit.v10.2.dll1</td><td/><td/><td>_D54790C7_3196_4AF0_B8DF_45E45F3D88CE_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraTreeList.v10.2.dll</td><td/><td/><td>_02BA032A_E29F_490D_91B2_D651FB5A9C93_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraTreeList.v10.2.dll1</td><td/><td/><td>_C04C961F_C295_4BB7_A0C1_B2ACD3ABBE92_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll</td><td/><td/><td>_55601598_4DDB_4996_A03D_8D461B82D6F9_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll1</td><td/><td/><td>_2BDA3CB3_C9C8_427B_ACC2_0CEE586A5278_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.BonusSkins.v14.2.dll</td><td/><td/><td>_503855D1_B8F2_4D7A_8420_1EC8CFDD2D46_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.BonusSkins.v14.2.dll1</td><td/><td/><td>_2C070238_0726_44C6_A8DB_A968400B9BB4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Charts.v14.2.Core.dll</td><td/><td/><td>_F79F7713_1528_4E42_AC5B_8BB03CA15073_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Charts.v14.2.Core.dll1</td><td/><td/><td>_61954D67_4434_4CF6_A440_BE565DFDFF70_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Data.v14.2.dll</td><td/><td/><td>_3476F865_DC8D_44A9_8AFC_39DBB64E2AFE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Data.v14.2.dll1</td><td/><td/><td>_8606AC44_17AB_4D03_9492_E0DB164E7C00_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.DataAccess.v14.2.dll</td><td/><td/><td>_F65F46A0_DFC0_46E3_A20A_3BAF745A66D9_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.DataAccess.v14.2.dll1</td><td/><td/><td>_E418F3E2_A110_4344_B7DC_D796034F63E5_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Design.v14.2.dll</td><td/><td/><td>_46250298_7A85_42EE_88B7_4FACF78B624A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Design.v14.2.dll1</td><td/><td/><td>_BB860861_CC99_42C5_B5D5_9135B06F9E97_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Office.v14.2.Core.dll</td><td/><td/><td>_B0E4D29F_1E0F_4A73_8B3F_131672BB50B6_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Office.v14.2.Core.dll1</td><td/><td/><td>_583B1080_7D7B_4655_BEA4_398B14FFD90F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.PivotGrid.v14.2.Core.dll</td><td/><td/><td>_DD6298BC_5158_4013_A8D1_627A22772A53_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.PivotGrid.v14.2.Core.dll1</td><td/><td/><td>_5C0FA616_4C87_439D_A9D6_F37DA666274C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Printing.v14.2.Core.dll</td><td/><td/><td>_8427B07E_BE37_4038_8128_2475CA48732B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Printing.v14.2.Core.dll1</td><td/><td/><td>_CA32AEF2_584A_4894_897C_B338353070E3_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.RichEdit.v14.2.Core.dll</td><td/><td/><td>_EEEE0404_2211_428B_A50C_AA60E49F4E78_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.RichEdit.v14.2.Core.dll1</td><td/><td/><td>_E250DA4B_5CE2_4A00_8087_C6A7E91C819F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Sparkline.v14.2.Core.dll</td><td/><td/><td>_4EE1B711_EA09_474E_A971_77D0A5FBA782_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Sparkline.v14.2.Core.dll1</td><td/><td/><td>_1322557E_A1E7_4FAC_A5BC_A7BCA315083D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Utils.v14.2.UI.dll</td><td/><td/><td>_D77EDA65_7BA8_47DB_B80C_8A2A3300897D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Utils.v14.2.UI.dll1</td><td/><td/><td>_DB0BE38E_60D3_489C_9BC4_0D23EEAE66F0_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Utils.v14.2.dll</td><td/><td/><td>_F5EF6A16_8394_4582_B87C_AF84C0E3779A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.Utils.v14.2.dll1</td><td/><td/><td>_50BE7260_352B_422D_9087_1CF1BC0B125F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraBars.v14.2.dll</td><td/><td/><td>_65AFE478_33D7_45B6_94F9_EC19A6C6ABEC_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraBars.v14.2.dll1</td><td/><td/><td>_3BFD0DC3_BA59_4E09_882B_F0D7974E244F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.UI.dll</td><td/><td/><td>_6EA91BD6_9E17_4113_AEC4_6C140815D5DE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.UI.dll1</td><td/><td/><td>_12B79C0B_2C9D_46D8_BACA_3DE7CEB342D4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.Wizard.dll</td><td/><td/><td>_ABA305BC_9D87_4D60_B05F_62D0B826F795_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.Wizard.dll1</td><td/><td/><td>_47E2373F_FD36_4764_813F_352C8FD06967_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.dll</td><td/><td/><td>_BFB0A351_F7D9_4DB7_ABB5_16E8D40EBD7F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraCharts.v14.2.dll1</td><td/><td/><td>_1D42AA07_F194_4F0C_8441_15DFF9D7EC95_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraEditors.v14.2.Design.dll</td><td/><td/><td>_99D28B0D_6EF6_45C8_9635_30D62BD1E06B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraEditors.v14.2.Design.dll1</td><td/><td/><td>_4E106BAD_3B65_4995_A72A_7618396A8A48_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraEditors.v14.2.dll</td><td/><td/><td>_392EE075_55F3_4E41_9457_FA684479D3DE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraEditors.v14.2.dll1</td><td/><td/><td>_B3DF6476_5E21_4587_8E76_359F04240178_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraGauges.v14.2.Core.dll</td><td/><td/><td>_A22B7A88_7764_4EE0_BA2F_A11879A08971_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraGauges.v14.2.Core.dll1</td><td/><td/><td>_F225F218_3405_4F36_BEAE_39DC8C9C43DE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraGrid.v14.2.dll</td><td/><td/><td>_994E2689_B95B_4845_9F81_CAF573C3A600_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraGrid.v14.2.dll1</td><td/><td/><td>_04E4925F_D639_4654_B593_796F0EB0EA0E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraNavBar.v14.2.dll</td><td/><td/><td>_5D9418F5_E737_4B29_8816_3D1F92892194_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraNavBar.v14.2.dll1</td><td/><td/><td>_6FA75046_BD0A_42A9_AE2B_CD4EA12E4E40_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraPivotGrid.v14.2.dll</td><td/><td/><td>_D842366D_215F_4FFC_A738_3AD8C96E668E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraPivotGrid.v14.2.dll1</td><td/><td/><td>_0B1682CB_AE20_4237_8C99_4174AE439985_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraPrinting.v14.2.dll</td><td/><td/><td>_5907B44D_9FAC_4A84_B5F6_8174637FDD9C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraPrinting.v14.2.dll1</td><td/><td/><td>_1C029011_D561_4D05_95A8_8E3177A8F59D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraReports.v14.2.Extensions.dll</td><td/><td/><td>_12535A9F_9622_42A6_879A_68E4A249E59E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraReports.v14.2.Extensions.dll1</td><td/><td/><td>_4D79EF55_C813_47A3_9D7A_AB2E1DC5E6D9_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraReports.v14.2.dll</td><td/><td/><td>_73E15DEF_48DF_47A2_954D_434FE72214D0_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraReports.v14.2.dll1</td><td/><td/><td>_09F60B64_A871_442C_8E41_7F52203AF1BE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraRichEdit.v14.2.dll</td><td/><td/><td>_E2271E20_9C29_4C40_95B4_B4BF43150BD6_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraRichEdit.v14.2.dll1</td><td/><td/><td>_0C8C1B16_0CEF_4B01_BC6F_4DE834081D3D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraTreeList.v14.2.dll</td><td/><td/><td>_DEA90B67_4EF5_4387_A3F8_C97718E03784_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraTreeList.v14.2.dll1</td><td/><td/><td>_88036208_E822_4B13_B0CF_12FF17692B78_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraVerticalGrid.v14.2.dll</td><td/><td/><td>_7ADE1346_9C60_4E00_A0C3_DA36775E05E8_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>DevExpress.XtraVerticalGrid.v14.2.dll1</td><td/><td/><td>_392795BA_84CE_4AAC_8195_F238507FBF76_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Digiface.ttf1</td><td/><td/><td>_49DE7226_5F22_4898_B7B8_F3E1F2AC47F8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Framework.dll</td><td/><td/><td>_9970581E_5041_4E7D_B2B7_C509EE09927D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Framework.dll1</td><td/><td/><td>_4C0AFB0B_AF76_41F7_A93B_0F121C6FBF1D_FILTER</td><td/><td/><td/><td/></row>
