@@ -2801,7 +2801,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
                     If (myAnalyzerData.tcfgAnalyzers.Rows.Count > 0) Then
                         'Inform properties AnalyzerID.
-                        myAnalyzerModel = myAnalyzerData.tcfgAnalyzers(0).AnalyzerID.ToString
+                        'AJG 24/02/2015 Changed AnalyzerID by AnalyzerModel
+                        myAnalyzerModel = myAnalyzerData.tcfgAnalyzers(0).AnalyzerModel
                     End If
                 End If
                 ' Get the Analyzer parameters to get the Steps values.
