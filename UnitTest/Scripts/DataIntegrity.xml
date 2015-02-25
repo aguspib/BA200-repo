@@ -1,10 +1,10 @@
 <?xml version="1.0" standalone="yes"?>
 <DBIntegrityDS xmlns="http://tempuri.org/DBIntegrityDS.xsd">
   <IntegrityValidation>
-    <Version>3.05</Version>
-    <Label>Data validation in tfmwVersions Table for package 3.0.5</Label>
+    <Version>3.06</Version>
+    <Label>Data validation in tfmwVersions Table for package 3.0.6</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.5'
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.6'
       AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.20')= 1
       SELECT 'True'
       ELSE
