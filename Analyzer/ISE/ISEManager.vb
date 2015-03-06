@@ -9604,7 +9604,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
                                 Dim volume As Single = paramsDS.tfmwSwParameters(0).ValueNumeric
 
-                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.SAMPLE_STEPS_UL.ToString, False)
+                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.SAMPLE_STEPS_UL.ToString, True)  'AJG Changed from False
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     paramsDS = CType(resultData.SetDatos, ParametersDS)
                                     If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
