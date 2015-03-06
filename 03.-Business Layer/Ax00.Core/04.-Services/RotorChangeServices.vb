@@ -518,6 +518,9 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
 
             _dynamicBaseLineValid = False
+            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
+            End If
 
         End Sub
 
