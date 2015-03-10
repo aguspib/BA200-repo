@@ -873,7 +873,6 @@ Namespace Biosystems.Ax00.Global
             REACT_COVER_ERR 'WARNING! Fw indicates Ax00 reactions cover is open while instrument working (FW ERROR CODE: 503) 'AG 01/03/2012
             REACT_COVER_WARN 'WARNING! Fw indicates Ax00 reactions cover is open (ANSINF + in Running also with FW ERROR CODE 503)
             REACT_MISSING_ERR 'ERROR! Fw indicates not exits a methacrylate reactions rotor (FW ERROR CODE 550)
-            METHACRYLATE_ROTOR_FULL 'ERROR! Fw indicates methacrylate reactions rotor is FULL (FW ERROR CODE 551)
             REACT_ENCODER_ERR 'ERROR! Fw indicates an encoder error (FW ERROR CODE: 501)
             REACT_TEMP_WARN 'WARNING! Sw generates this warning when Tº is out of limits (ANSINF)
             REACT_TEMP_ERR 'ERROR! Sw generates this error when Tº is out of limits too much time or Thermo system is damaged (ANSINF)

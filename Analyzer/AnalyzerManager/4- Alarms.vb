@@ -1132,7 +1132,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 'GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
                 GlobalBase.CreateLogActivity(ex)
 
-
                 'Finally
                 '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

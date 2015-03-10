@@ -5,9 +5,13 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
+Imports System.Data
 Imports System.Data.SqlClient
+'Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports System.Threading    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+Imports System.Windows.Forms
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
@@ -46,62 +50,731 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function ProcessStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myInstParamTO As New InstructionParameterTO
-            Dim startTime As DateTime = Now
-            Dim myStatusValue As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
 
             Try
+                'Dim Utilities As New Utilities
+                Dim myInstParamTO As New InstructionParameterTO
+                Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
+                ' XB 30/09/2014 - BA-1872
                 If ISECMDLost Or RUNNINGLost Then
+                    'Deactivate waiting time control
                     Debug.Print("Deactivate waiting time control ...")
                     numRepetitionsSTATE = 0
                     InitializeTimerSTATEControl(WAITING_TIME_OFF)
                 End If
+                ' XB 30/09/2014 - BA-1872
 
+                ' Get Status field (parameter index 3)
 
-                'Get State field (parameter index 3)
-                If Not GetStateField(pInstructionReceived, myStatusValue, myGlobal) Then
-                    Return myGlobal
+                ' AG+XBC 24/05/2012
+                'Dim myStatusValue As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
+                Dim myStatusValue As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
+                ' AG+XBC 24/05/2012
+
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
+                End If
+
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    myStatusValue = DirectCast(CInt(myInstParamTO.ParameterValue), AnalyzerManagerStatus)
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And myStatusValue = AnalyzerManagerStatus.STANDBY Then
+                        ExecuteSpecialBusinessOnAnalyzerStatusChanges(Nothing, myStatusValue) 'AG 29/06/2011
+                    End If
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then GlobalConstants.AnalyzerIsRunningFlag = True Else GlobalConstants.AnalyzerIsRunningFlag = False 'AG + DL 24/01/2012
+
+                    'AnalyzerStatusAttribute = myStatusValue 'AG 01/06/2010 - Inform the class attribute value
+                    If AnalyzerStatusAttribute <> myStatusValue Then
+                        AnalyzerStatusAttribute = myStatusValue 'AG 01/06/2010 - Inform the class attribute value
+                        UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_STATUS_CHANGED, 1, True) 'Prepare UI refresh event when analyzer status changes
+                    End If
+
                 End If
 
                 ' Get Action field (parameter index 4)
-                Dim myActionValue As AnalyzerManagerAx00Actions                
-                If Not GetActionField(pInstructionReceived, myActionValue, myGlobal) Then
-                    Return myGlobal
+                Dim myActionValue As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.NO_ACTION
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
                 End If
 
-                ' Get Time field (parameter index 5)
-                Dim myExpectedTime As Integer
-                Dim myExpectedTimeRaw As Integer
-                If Not GetTimeField(pInstructionReceived, myExpectedTime, myExpectedTimeRaw, myGlobal) Then
-                    Return myGlobal
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    myActionValue = DirectCast(CInt(myInstParamTO.ParameterValue), AnalyzerManagerAx00Actions)
+                    AnalyzerCurrentActionAttribute = myActionValue 'AG 01/06/2010 - Inform the class attribute value
+
+                    'Evaluate the Action code value (in all analyzer status)
+                    If myActionValue = AnalyzerManagerAx00Actions.SOUND_DONE Then 'AG 26/10/2011 - Sound Alarm
+                        'Change the status of AnalyzerIsRingingAttribute (TRUE --> FALSE, FALSE --> TRUE)
+                        'Except when connection ... always FALSE in this case
+                        If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                            AnalyzerIsRingingAttribute = False
+                        Else
+                            AnalyzerIsRingingAttribute = Not AnalyzerIsRingingAttribute
+                        End If
+                        UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_SOUND_CHANGED, CSng(IIf(AnalyzerIsRingingAttribute, 1, 0)), True)
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.END_RUN_START Then 'AG 05/12/2011 - Remember the ENDRUN instruction has been sent and do not send it again
+                        endRunAlreadySentFlagAttribute = True
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.END_RUN_END Then
+                        endRunAlreadySentFlagAttribute = False
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.ABORT_START Then 'AG 16/12/2011 - Remember the ABORT instruction has been sent and do not send it again
+                        abortAlreadySentFlagAttribute = True
+                        endRunAlreadySentFlagAttribute = True 'AG 10/12/2012
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.ABORT_END Then
+                        PauseAlreadySentFlagAttribute = False ' XB 15/10/2013 - BT #1318
+
+                        'PAUSED (comment these 2 lines) - AG 20/03/2014 - #1547 do not reset these flags here, do it once the StanBy instruction is sent and accepted!!!
+                        abortAlreadySentFlagAttribute = False
+                        endRunAlreadySentFlagAttribute = False 'AG 10/12/2012
+
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.PAUSE_START Then ' XB 15/10/2013 - Remember the PAUSE instruction has been sent and do not send it again - BT #1318
+                        If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "", False) <> 0 Then 'TR 21/10/2013 -Bug #1339
+                            PauseAlreadySentFlagAttribute = True
+                        End If
+
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.PAUSE_END Then ' XB 15/10/2013 - BT #1318
+                        PauseAlreadySentFlagAttribute = False
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START Then
+                        recoverAlreadySentFlagAttribute = True
+
+                    ElseIf myActionValue = AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_END Then
+                        recoverAlreadySentFlagAttribute = False
+                        myGlobal = RemoveErrorCodeAlarms(Nothing, myActionValue)
+
+                        'SGM 08/11/2012 for updating monitor refresh
+                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If GlobalBase.IsServiceAssembly Then
+                            InfoRefreshFirstTime = True
+                            'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True) 'SGM 10/05/2011 - 1 True, 0 False
+                        End If
+
+                        UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished
+
+                    End If
+
+                    ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                    If GlobalBase.IsServiceAssembly Then
+                        If myActionValue = AnalyzerManagerAx00Actions.COMMAND_START Or _
+                           myActionValue = AnalyzerManagerAx00Actions.COMMAND_END Then
+
+                            InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                            ClearStartTaskQueueToSend()
+
+                        End If
+
+                    End If
+                    ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+
                 End If
+
+                'AG 25/10/2010 - Get Time field (parameter index 5)
+                Dim myExpectedTime As Integer = WAITING_TIME_OFF 'If no request .... get the estimated time and activate the waiting timer
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
+                End If
+
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    myExpectedTime = CInt(myInstParamTO.ParameterValue)
+                    'AnalyzerIsReady = (myExpectedTimeValue = 0) 'T = 0 Ax00 is ready to work, else Ax00 is busy
+                Else
+                    Exit Try
+                End If
+                'END AG 25/10/2010
+
+                Dim myExpectedTimeRaw As Integer = myExpectedTime  ' XB 21/10/2013 - BT #1334
 
                 ' Get Well field (parameter index 7)
-                Dim myWellValue As Integer
-                If Not GetWellField(pInstructionReceived, myWellValue, myGlobal) Then
-                    Return myGlobal
+                Dim myWellValue As Integer = 0
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
+                End If
+
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    myWellValue = CInt(myInstParamTO.ParameterValue)
+                    CurrentWellAttribute = myWellValue 'Inform the class attribute
+                Else
+                    Exit Try
                 End If
 
                 ' Get Request field (parameter index 8)
-                Dim myRequestValue As Integer
-                If Not GetRequestField(pInstructionReceived, myStatusValue, myActionValue, myExpectedTime, myRequestValue, myGlobal) Then
-                    Return myGlobal
+                Dim myRequestValue As Integer = 0
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
                 End If
+
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    myRequestValue = CInt(myInstParamTO.ParameterValue)
+                Else
+                    Exit Try
+                End If
+
+                'AG 25/10/2010 - Depending the status and action use Request or not
+                useRequestFlag = False
+                If myStatusValue = AnalyzerManagerStatus.RUNNING Then
+                    'AG 16/04/2014 - #1594 add SOUND DONE to the action codes that will use R in order to evaluate if analyzer is ready or not!! - paused in v300
+                    'AnalyzerIsReadyAttribute = (myRequestValue = 1) '1 Ax00 is ready to work, 0 Ax00 is busy (for use only in RUNNING mode)
+                    If myActionValue = AnalyzerManagerAx00Actions.START_INSTRUCTION_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.TEST_PREPARATION_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.PREDILUTED_TEST_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.ISE_TEST_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.SKIP_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.WASHING_RUN_END Or _
+                       myActionValue = AnalyzerManagerAx00Actions.LOADADJ_END Then
+
+                        useRequestFlag = True
+                    End If
+                End If
+
+                If Not useRequestFlag Then
+                    ''AG 11/12/2012 not integrated in v1.0.0 - RPM: STANDBY ini in running have T:0 but it can NOT be used to set AnalyzerISReady to TRUE
+                    ''                     It is the only ini action with T:0
+                    ''                     Sw: has to treat this exception
+                    'If myActionValue = AnalyzerManagerAx00Actions.STANDBY_START AndAlso myStatusValue = AnalyzerManagerStatus.RUNNING _
+                    'AndAlso myExpectedTime = 0 Then
+                    '    myExpectedTime = WAITING_TIME_DEFAULT
+                    'End If
+                    ''AG 11/12/2012 
+                    AnalyzerIsReadyAttribute = (myExpectedTime = 0) 'T = 0 Ax00 is ready to work, else Ax00 is busy
+                Else
+                    AnalyzerIsReadyAttribute = (myRequestValue = 1) '1 Ax00 is ready to work, 0 Ax00 is busy (for use only in RUNNING mode)
+                End If
+
+                'AG 03/09/2012 - If connection analyzer always ready to receive new instructions
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
+                    AnalyzerIsReadyAttribute = True
+                End If
+                'AG 03/09/2012
+
+                If Not AnalyzerIsReadyAttribute Then
+                    If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT
+
+                    'AG 13/02/2012 - In Running activate always the waiting time
+                ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                    'AG 21/03/2012 - exception when the abort instruction has started. In this case take into account the TIME received
+                    'myExpectedTime = WAITING_TIME_DEFAULT
+                    If myActionValue <> AnalyzerManagerAx00Actions.ABORT_START Then
+                        myExpectedTime = WAITING_TIME_DEFAULT
+                    End If
+                    'AG 21/03/2012 /'AG 13/02/2012/
+
+                End If
+                Me.InitializeTimerControl(myExpectedTime)
+                AppLayer.MaxWaitTime = myExpectedTime + SYSTEM_TIME_OFFSET   ' XBC 04/05/2011
+                'END AG 25/10/2010
 
                 ' Get Error field (parameter index 9)
-                Dim errorValue As Integer
-                If Not GetErrorField(pInstructionReceived, myActionValue, myExpectedTimeRaw, errorValue, myGlobal) Then
-                    Return myGlobal
-                End If                
-
-                ' Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
-                If Not GetISEField(pInstructionReceived, myGlobal) Then
-                    Return myGlobal
+                Dim errorValue As Integer = 0
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
                 End If
 
-                ' Treatment single and multiple errors 
-                TreatmentErrorValue(myGlobal, errorValue)
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    errorValue = CInt(myInstParamTO.ParameterValue)
+                Else
+                    Exit Try
+                End If
+
+                ' XB 26/09/2014 - BA-1872
+                If errorValue <> 61 Then
+                    If ISECMDLost Then
+                        ISECMDLost = False
+
+                        If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                            sendingRepetitions = True
+                            numRepetitionsTimeout += 1
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                waitingStartTaskTimer.Enabled = False
+                                sendingRepetitions = False
+
+                                ' Activates Alarm begin
+                                Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                Dim alarmStatus As Boolean = False
+                                Dim myAlarmList As New List(Of Alarms)
+                                Dim myAlarmStatusList As New List(Of Boolean)
+
+                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmStatus = True
+                                ISEAnalyzer.IsTimeOut = True
+
+                                PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                If myAlarmList.Count > 0 Then
+                                    ' Note that this alarm is common on User and Service !
+                                    myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                End If
+                                ' Activates Alarm end
+
+                                RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                            Else
+                                ' Instruction has not started by Fw, so is need to send it again
+                                GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                myGlobal = SendStartTaskinQueue()
+                            End If
+                        End If
+
+                    End If
+
+                    If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
+                        'ISE_Manager.StopInstructionStartedTimer()
+
+                        ' Update the interval of the Timer with the expected time received from the Analyzer
+                        If myExpectedTimeRaw <= 0 Then
+                            If Not SetTimeISEOffsetFirstTime Then
+                                SetTimeISEOffsetFirstTime = True
+                                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
+                                InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                            End If
+                        Else
+                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                            InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                        End If
+                    End If
+
+                End If
+                ' XB 26/09/2014 - BA-1872
+
+                ' XB 06/11/2014 - BA-1872
+                If RUNNINGLost Then
+                    RUNNINGLost = False
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                        If (mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) = "INPROCESS") AndAlso _
+                             (mySessionFlags(AnalyzerManagerFlags.EnterRunning.ToString) = "INI") Then
+                            myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
+                            AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END
+                        End If
+                    End If
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_END Then
+                        sendingRepetitions = True
+                        numRepetitionsTimeout += 1
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                            GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            waitingStartTaskTimer.Enabled = False
+                            sendingRepetitions = False
+
+                            ' Activates Alarm begin
+                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                            Dim alarmStatus As Boolean = False
+                            Dim myAlarmList As New List(Of Alarms)
+                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                            alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                            alarmStatus = True
+                            ISEAnalyzer.IsTimeOut = True
+
+                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                            If myAlarmList.Count > 0 Then
+                                ' Note that this alarm is common on User and Service !
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+                            ' Activates Alarm end
+
+                            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                            'Update internal flags. Basically used by the running normal business
+                            If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                'Update analyzer session flags into DataBase
+                                If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                    myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                End If
+                            End If
+
+                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                        Else
+                            ' Instruction has not started by Fw, so is need to send it again
+                            GlobalBase.CreateLogActivity("Repeat RUNNING Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = SendStartTaskinQueue()
+                        End If
+                    End If
+
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_START Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    ' Update the interval of the Timer with the expected time received from the Analyzer
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
+                    InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                    StartingRunningFirstTime = True
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Or _
+                   AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                    If StartingRunningFirstTime Then
+                        StartingRunningFirstTime = False
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
+                        RUNNINGLost = False
+                        sendingRepetitions = False
+                        InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                        ClearStartTaskQueueToSend()
+
+                        ' Deactivates Alarm begin - BA-1872
+                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim alarmStatus As Boolean = False
+                        Dim myAlarmList As New List(Of Alarms)
+                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                        alarmStatus = False
+
+                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+
+                        'Finally call manage all alarms detected (new or solved)
+                        If myAlarmList.Count > 0 Then
+                            If GlobalBase.IsServiceAssembly Then
+                                ' Not Apply
+                            Else
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+
+                        End If
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
+                    End If
+                End If
+                ' XB 06/11/2014 - BA-1872
+
+
+                'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
+                Dim ISEAvailableValue As Integer = 0
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
+                End If
+
+                If IsNumeric(myInstParamTO.ParameterValue) Then
+                    ISEAvailableValue = CInt(myInstParamTO.ParameterValue)
+                    ISEModuleIsReadyAttribute = CType(IIf(ISEAvailableValue = 1, 1, 0), Boolean) 'ISEAvailableValue = 0 means ISEModuleIsReadyAttribute = True, ISEAvailableValue = 1 means ISEModuleIsReadyAttribute = False (is working)
+                Else
+                    Exit Try
+                End If
+                'AG 23/11/2011
+
+                'SGM 29/10/2012 - SERVICE: reset E:20 flag
+                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                If GlobalBase.IsServiceAssembly Then
+                    IsInstructionRejected = False
+                    IsRecoverFailed = False 'SGM 07/11/2012
+                    IsInstructionAborted = False 'SGM 19/11/2012
+                End If
+
+                If errorValue <> 0 Then
+
+                    If Not IgnoreErrorCodes(AppLayer.LastInstructionTypeSent, AppLayer.InstructionSent, errorValue) Then
+                        If errorValue = MULTIPLE_ERROR_CODE Then 'If multiple alarm error code ask for details
+                            'AG 14/03/2011: Ask for errors details (INFO;Q:ALR)
+
+                            ' XB+SG 26/10/2012 - Is no need because 99 is not displayed, it is waiting for next ANSERR answer
+                            'SGM+XBC 24/10/2012 - force Analyzer Ready
+                            'If myApplicationName.ToUpper.Contains("SERVICE") Then
+                            ' SERVICE SW
+                            '' Update Alarm sensors to inform to Presentation layer what kind of management is need to display
+                            'If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.MULTIPLE_ERROR_CODE) Then
+                            '    PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, MULTIPLE_ERROR_CODE.ToString, True)
+                            '    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE, ManagementAlarmTypes.REQUEST_INFO, True)
+                            'End If
+                            'End If
+                            ' XB+SG 26/10/2012
+
+
+                            'Debug.Print(" ERROR 99 Received !")
+
+                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
+                            '' XB 30/04/2014 - PENDING TO IMPLEMENT !!!!!!!!!!!! + REMEMBER COMMENT THE PREVIOUS LINE !!! - Task #1615
+
+                            'Dim updateISEConsumptionFlag As Boolean = False
+                            '' Estimated ISE Consumption by Firmware during WS
+                            'If Not ISEAnalyzer Is Nothing _
+                            '   AndAlso ISEAnalyzer.IsISEModuleInstalled Then
+                            '    ISEAnalyzer.EstimatedFWConsumptionWS()
+                            '    ' Update ISE consumptions if required
+                            '    If ISEAnalyzer.IsCalAUpdateRequired Or ISEAnalyzer.IsCalBUpdateRequired Then
+                            '        updateISEConsumptionFlag = True
+                            '    End If
+                            'End If
+
+                            'If Not updateISEConsumptionFlag Then
+                            '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.ALR)
+                            'End If
+                            '' XB 30/04/2014 - PENDING TO IMPLEMENT !!!!!!!!!!!! - Task #1615
+
+
+                            'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+                                SetAnalyzerNotReady()
+                            End If
+
+
+                        Else 'If single error code then treat it!!
+
+                            'Translation method
+                            Dim myAlarmsReceivedList As New List(Of Alarms)
+                            Dim myAlarmsStatusList As New List(Of Boolean)
+                            Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
+
+                            Dim myAlarms As New List(Of Alarms)
+                            Dim myErrorCode As New List(Of Integer)
+                            ' XBC 16/10/2012
+                            Dim myFwCodeErrorReceivedList As New List(Of String)
+
+                            myErrorCode.Add(errorValue)
+
+                            myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
+
+                            'SGM 09/11/2012 - reset flag in case of Rotor missing error is not received
+                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                            If GlobalBase.IsServiceAssembly Then
+                                If Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
+                                    IsServiceRotorMissingInformed = False
+                                End If
+                            End If
+
+                            'SGM 02/07/2012
+                            If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+
+                                ' XB 26/09/2014 - BA-1872
+                                If ISEAnalyzer IsNot Nothing Then
+                                    If Not ISEAnalyzer.IsISEModuleInstalled Then
+                                        ' If ISE module isn't Installed remove the ISE Timeout Alarm
+                                        Debug.Print("ISE Module NOT installed !")
+                                        myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+
+                                        If GlobalBase.IsServiceAssembly Then
+                                            ' Only Sw Service
+                                            If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                                myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                                                ISEAnalyzer.IsISESwitchON = False
+                                            End If
+
+                                        End If
+                                    Else
+
+                                        sendingRepetitions = True
+                                        numRepetitionsTimeout += 1
+                                        'Dim myLogAcciones As New ApplicationLogManager()
+                                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                            GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                            waitingStartTaskTimer.Enabled = False
+                                            sendingRepetitions = False
+
+                                            ' Activates Alarm begin
+                                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                                            Dim alarmStatus As Boolean = False
+                                            Dim myAlarmList As New List(Of Alarms)
+                                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                                            alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                            alarmStatus = True
+                                            ISEAnalyzer.IsTimeOut = True
+
+                                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                            If myAlarmList.Count > 0 Then
+                                                ' Note that this alarm is common on User and Service !
+                                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            End If
+                                            ' Activates Alarm end
+
+                                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                        Else
+                                            If myStartTaskInstructionsQueue.Count > 0 Then
+                                                Debug.Print("Deactivate waiting time control (2) ...")
+                                                numRepetitionsSTATE = 0
+                                                InitializeTimerSTATEControl(WAITING_TIME_OFF)
+
+                                                GlobalBase.CreateLogActivity("Waiting because error 61 [" & WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                                Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
+                                                While myDateTime > DateTime.Now
+                                                    ' spending time ...
+                                                End While
+                                                GlobalBase.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+
+                                                ' Instruction has not started by Fw, so is need to send it again
+                                                GlobalBase.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                                myGlobal = SendStartTaskinQueue()
+                                            End If
+
+                                        End If
+
+                                    End If
+                                End If
+
+                                'If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                '    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+
+                                '    'SGM 18/09/2012
+                                '    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                '    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                                '    If GlobalBase.IsServiceAssembly Then
+                                '        ISE_Manager.IsISESwitchON = False
+                                '    End If
+
+                                'End If
+                                'myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                                ' XB 26/09/2014 - BA-1872
+
+                            End If
+                            'end SGM 02/07/2012
+
+                            'AG 04/12/2014 BA-2236
+                            Dim index As Integer = 0
+                            Dim errorCodeID As String = ""
+                            'AG 04/12/2014 BA-2236
+
+                            For Each alarmID As GlobalEnumerates.Alarms In myAlarms
+                                'AG 04/12/2014 BA-2236 - Method 
+                                'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
+                                errorCodeID = ""
+                                If index <= myErrorCode.Count - 1 Then
+                                    errorCodeID = myErrorCode(index).ToString
+                                End If
+                                PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
+                                'AG 04/12/2014 BA-2236
+                                index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
+                            Next
+
+                            ' XBC 16/10/2012 - Alarms treatment for Service
+                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                            If GlobalBase.IsServiceAssembly Then
+                                ' Initialize Error Codes List
+                                myErrorCodesAttribute.Clear()
+                                ' Prepare error codes List received from Analyzer
+                                PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
+                            End If
+                            ' XBC 16/10/2012
+
+                            If myAlarmsReceivedList.Count > 0 Then
+                                '3- Finally call manage all alarms detected (new or fixed)
+                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                                If GlobalBase.IsServiceAssembly Then
+                                    ' XBC 16/10/2012 - Alarms treatment for Service
+                                    'myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
+                                    myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
+                                    ' XBC 16/10/2012
+                                Else
+                                    'AG 04/12/2014 BA-2236
+                                    'myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
+                                    myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
+                                    'AG 04/12/2014 BA-2236
+                                End If
+
+                            Else 'if not new alarms sure the ansinfo instruction is activated
+                                'AG 31/08/2012 - condition incomplete. When Analyzer is enter in running sw has not to sent the INFO STR instruction 
+                                'If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
+
+                                    ' XB 03/04/2014
+                                    Dim updateISEConsumptionFlag As Boolean = False
+                                    ' Estimated ISE Consumption by Firmware during WS
+                                    If Not ISEAnalyzer Is Nothing _
+                                       AndAlso ISEAnalyzer.IsISEModuleInstalled Then
+                                        ISEAnalyzer.EstimatedFWConsumptionWS()
+                                        ' Update ISE consumptions if required
+                                        If ISEAnalyzer.IsCalAUpdateRequired Or ISEAnalyzer.IsCalBUpdateRequired Then
+                                            updateISEConsumptionFlag = True
+                                        End If
+                                    End If
+
+                                    'AG 12/04/2012 - New Fw disables info when analyzer leaves running, so Sw has to activate info when standby end
+                                    If Not updateISEConsumptionFlag AndAlso mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) <> "INPROCESS" Then
+                                        ' XB 03/04/2014
+
+                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
+                                        'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+
+                                    End If ' XB 03/04/2014
+
+                                End If
+                            End If
+
+                        End If
+
+                    End If
+
+                Else 'Error code = 0
+
+                    'AG 19/11/2013 - #1396-b comment this code, out of date: XB 21/10/2013 - BT #1334
+                    'If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED And _
+                    '   myExpectedTimeRaw <= 0 Then
+                    '    ' Ignore this instruction when is Barcode action started and Expected time <= 0 
+                    '    ' because Fw is informing that that actions is still being executed
+                    '    Exit Try
+                    'End If
+
+                    ' XB 21/11/2013 - #1399 comment this code, out of date: XB 23/10/2013 - BT #1343
+                    'If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.ISE_ACTION_START And _
+                    '   myExpectedTimeRaw <= 0 Then
+                    '    ' Ignore this instruction when is Barcode action started and Expected time <= 0 
+                    '    ' because Fw is informing that that actions is still being executed
+                    '    Exit Try
+                    'End If
+
+                    ' XBC 07/11/2012
+                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                    If GlobalBase.IsServiceAssembly Then
+                        If myErrorCodesDisplayAttribute.Count > 0 Then
+                            Dim pErrorCodeList As New List(Of String)
+                            pErrorCodeList.Add("0")
+                            ' Solve all previous alarms
+                            SolveErrorCodesToDisplay(pErrorCodeList)
+                        End If
+
+                        'SGM 15/11/2012 - Initialize Error Codes List
+                        myErrorCodesAttribute.Clear()
+
+                    End If
+
+                    'Reset the freeze flags information
+                    If analyzerFREEZEFlagAttribute Then
+                        'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
+                        'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If Not GlobalBase.IsServiceAssembly Then
+                            'Clear all alarms with error code
+                            myGlobal = RemoveErrorCodeAlarms(Nothing, AnalyzerCurrentActionAttribute)
+                        End If
+                    End If
+                End If
 
 
                 '-------------------------------------------------------------------------------------                
@@ -130,13 +803,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
+                'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If Not GlobalBase.IsServiceAssembly Then 'NOT for SERVICE SOFTWARE 01/07/2011
+                    'AG 29/06/2011 - comment this IF (AG 03/11/2010)
+                    'If AnalyzerIsReadyAttribute = True Then
                     Select Case myStatusValue
                         Case AnalyzerManagerStatus.SLEEPING
+                            'AG 20/06/2012
+                            'myGlobal = Me.ManageSleepStatus(myActionValue)
                             Dim resetFlags As Boolean = True
                             If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
                                Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (STANDBY)
-                                myGlobal = ManageSleepStatus(myActionValue)
+                                myGlobal = Me.ManageSleepStatus(myActionValue)
                             End If
 
                             If myActionValue = AnalyzerManagerAx00Actions.STANDBY_START OrElse myActionValue = AnalyzerManagerAx00Actions.SLEEP_END _
@@ -155,15 +833,22 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case AnalyzerManagerStatus.STANDBY
                             If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
                                Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (STANDBY)
-                                myGlobal = ManageStandByStatus(myActionValue, myWellValue)
+                                myGlobal = Me.ManageStandByStatus(myActionValue, myWellValue)
                             End If
 
                         Case AnalyzerManagerStatus.RUNNING
+                            'PAUSED (uncomment these 4 lines) AG 20/03/2014 - #1547 Once the Standby instruction has been accepted reset these two flags
+                            'If myActionValue = GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START Then
+                            '    abortAlreadySentFlagAttribute = False
+                            '    endRunAlreadySentFlagAttribute = False
+                            'End If
+                            'AG 20/03/2014 - #1547
+
                             If Not mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso _
                                Not AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (RUNNING)
-                                myGlobal = ManageRunningStatus(myActionValue, myWellValue)
+                                myGlobal = Me.ManageRunningStatus(myActionValue, myWellValue)
 
-                                If myRequestValue = 1 Then startTime = Now 'AG 28/06/2012 - time estimation
+                                If myRequestValue = 1 Then StartTime = Now 'AG 28/06/2012 - time estimation
 
                             End If
                     End Select
@@ -260,6 +945,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
                             ManageStandByStatus(AnalyzerManagerAx00Actions.STANDBY_END, CurrentWellAttribute) 'Call this method with this action code to update ISE consumption if needed
 
+                            'AG 17/09/2012 - Activate final code for v052. Temporally commented for setup 051
+                            'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                            '    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
+                            '    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "INPROCESS")
+                            '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True)
+                            '    Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
+                            '    myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
+
+
+                            'AG 25/09/2012 - Once the connection process after recovery results has finished. If analyzer is freeze then send the SOUND ON
                             'We have to do it now because the normal connection finishes is when action SOUND_DONE is received
                             If analyzerFREEZEFlagAttribute Then
                                 myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
@@ -338,6 +1033,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     SyncLock lockThis
                         If bufferANSPHRReceived.Count > 0 AndAlso Not processingLastANSPHRInstructionFlag Then
+                            'If useRequestFlag AndAlso myRequestValue = 1 Then ' Request received and instruction already sent
+                            '    processingLastANSPHRInstructionFlag = True
+                            '    wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
+                            'ElseIf Not useRequestFlag Then 'On initialization running phase
+                            '    processingLastANSPHRInstructionFlag = True
+                            '    wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
+                            'End If
 
                             ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute + PAUSE_START and PAUSE_END also activate startDoWorker flag - BT #1318
                             'AG 19/11/2013 - #1396-b Add also BARCODE_ACTION_RECEIVED
@@ -411,8 +1113,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Treat STATUS received: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Treat STATUS received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
                 End If
+                'AG 28/06/2012
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -420,231 +1123,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex) '.Message, "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
 
-        Private Sub TreatmentErrorValue(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer)
-
-            If errorValue <> 0 Then
-
-                If Not IgnoreErrorCodes(AppLayer.LastInstructionTypeSent, AppLayer.InstructionSent, errorValue) Then
-                    If errorValue = MULTIPLE_ERROR_CODE Then 'If multiple alarm error code ask for details
-
-                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
-
-                        'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                            SetAnalyzerNotReady()
-                        End If
-
-
-                    Else 'If single error code then treat it!!
-
-                        'Translation method
-                        Dim myAlarmsReceivedList As New List(Of Alarms)
-                        Dim myAlarmsStatusList As New List(Of Boolean)
-                        Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
-
-                        Dim myAlarms As New List(Of Alarms)
-                        Dim myErrorCode As New List(Of Integer)
-                        ' XBC 16/10/2012
-                        Dim myFwCodeErrorReceivedList As New List(Of String)
-
-                        myErrorCode.Add(errorValue)
-
-                        myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
-
-                        'SGM 09/11/2012 - reset flag in case of Rotor missing error is not received
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                        If GlobalBase.IsServiceAssembly Then
-                            If Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
-                                IsServiceRotorMissingInformed = False
-                            End If
-                        End If
-
-                        'SGM 02/07/2012
-                        If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
-
-                            ' XB 26/09/2014 - BA-1872
-                            If ISEAnalyzer IsNot Nothing Then
-                                If Not ISEAnalyzer.IsISEModuleInstalled Then
-                                    ' If ISE module isn't Installed remove the ISE Timeout Alarm
-                                    Debug.Print("ISE Module NOT installed !")
-                                    myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
-
-                                    If GlobalBase.IsServiceAssembly Then
-                                        ' Only Sw Service
-                                        If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
-                                            myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                                            ISEAnalyzer.IsISESwitchON = False
-                                        End If
-
-                                    End If
-                                Else
-
-                                    sendingRepetitions = True
-                                    numRepetitionsTimeout += 1
-                                    'Dim myLogAcciones As New ApplicationLogManager()
-                                    If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                        GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                        waitingStartTaskTimer.Enabled = False
-                                        sendingRepetitions = False
-
-                                        ' Activates Alarm begin
-                                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
-                                        Dim alarmStatus As Boolean = False
-                                        Dim myAlarmList As New List(Of Alarms)
-                                        Dim myAlarmStatusList As New List(Of Boolean)
-
-                                        alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-                                        alarmStatus = True
-                                        ISEAnalyzer.IsTimeOut = True
-
-                                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-                                        If myAlarmList.Count > 0 Then
-                                            ' Note that this alarm is common on User and Service !
-                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                                        End If
-                                        ' Activates Alarm end
-
-                                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                    Else
-                                        If myStartTaskInstructionsQueue.Count > 0 Then
-                                            Debug.Print("Deactivate waiting time control (2) ...")
-                                            numRepetitionsSTATE = 0
-                                            InitializeTimerSTATEControl(WAITING_TIME_OFF)
-
-                                            GlobalBase.CreateLogActivity("Waiting because error 61 [" & WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-                                            Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
-                                            While myDateTime > DateTime.Now
-                                                ' spending time ...
-                                            End While
-                                            GlobalBase.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-
-                                            ' Instruction has not started by Fw, so is need to send it again
-                                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                            myGlobal = SendStartTaskinQueue()
-                                        End If
-
-                                    End If
-
-                                End If
-                            End If
-
-                        End If
-                        'end SGM 02/07/2012
-
-                        'AG 04/12/2014 BA-2236
-                        Dim index As Integer = 0
-                        Dim errorCodeID As String = ""
-                        'AG 04/12/2014 BA-2236
-
-                        For Each alarmID As GlobalEnumerates.Alarms In myAlarms
-                            'AG 04/12/2014 BA-2236 - Method 
-                            'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
-                            errorCodeID = ""
-                            If index <= myErrorCode.Count - 1 Then
-                                errorCodeID = myErrorCode(index).ToString
-                            End If
-                            PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
-                            'AG 04/12/2014 BA-2236
-                            index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
-                        Next
-
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                        If GlobalBase.IsServiceAssembly Then
-                            ' Initialize Error Codes List
-                            myErrorCodesAttribute.Clear()
-                            ' Prepare error codes List received from Analyzer
-                            PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
-                        End If
-                        ' XBC 16/10/2012
-
-                        If myAlarmsReceivedList.Count > 0 Then
-                            '3- Finally call manage all alarms detected (new or fixed)
-                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                            If GlobalBase.IsServiceAssembly Then
-                                ' XBC 16/10/2012 - Alarms treatment for Service
-                                'myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
-                                myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
-                                ' XBC 16/10/2012
-                            Else
-                                'AG 04/12/2014 BA-2236
-                                'myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
-                                myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                                'AG 04/12/2014 BA-2236
-                            End If
-
-                        Else 'if not new alarms sure the ansinfo instruction is activated
-                            'AG 31/08/2012 - condition incomplete. When Analyzer is enter in running sw has not to sent the INFO STR instruction 
-                            'If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) <> "INPROCESS" Then
-
-                                ' XB 03/04/2014
-                                Dim updateISEConsumptionFlag As Boolean = False
-                                ' Estimated ISE Consumption by Firmware during WS
-                                If Not ISEAnalyzer Is Nothing _
-                                   AndAlso ISEAnalyzer.IsISEModuleInstalled Then
-                                    ISEAnalyzer.EstimatedFWConsumptionWS()
-                                    ' Update ISE consumptions if required
-                                    If ISEAnalyzer.IsCalAUpdateRequired Or ISEAnalyzer.IsCalBUpdateRequired Then
-                                        updateISEConsumptionFlag = True
-                                    End If
-                                End If
-
-                                'AG 12/04/2012 - New Fw disables info when analyzer leaves running, so Sw has to activate info when standby end
-                                If Not updateISEConsumptionFlag AndAlso mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) <> "INPROCESS" Then
-                                    ' XB 03/04/2014
-
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
-                                    'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-
-                                End If ' XB 03/04/2014
-
-                            End If
-                        End If
-
-                    End If
-
-                End If
-
-            Else 'Error code = 0
-
-                ' XBC 07/11/2012
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                If GlobalBase.IsServiceAssembly Then
-                    If myErrorCodesDisplayAttribute.Count > 0 Then
-                        Dim pErrorCodeList As New List(Of String)
-                        pErrorCodeList.Add("0")
-                        ' Solve all previous alarms
-                        SolveErrorCodesToDisplay(pErrorCodeList)
-                    End If
-
-                    'SGM 15/11/2012 - Initialize Error Codes List
-                    myErrorCodesAttribute.Clear()
-
-                End If
-
-                'Reset the freeze flags information
-                If analyzerFREEZEFlagAttribute Then
-                    'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
-                    'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If Not GlobalBase.IsServiceAssembly Then
-                        'Clear all alarms with error code
-                        myGlobal = RemoveErrorCodeAlarms(Nothing, AnalyzerCurrentActionAttribute)
-                    End If
-                End If
-            End If
-        End Sub
 
         ''' <summary>
         ''' Readings reception process (save readings, update executions tables and trigger calculations when needed)
@@ -3587,7 +4071,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
             Dim AlarmStatusList As New List(Of Boolean)
-            Dim myAlarm As Alarms 
+            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
 
             Dim wupManeuversFinishFlag As Boolean = False 'AG 23/05/2012
 
@@ -3702,73 +4186,73 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
         ''' </remarks>
-        Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As WarmUpProcessFlag) Implements IAnalyzerManager.ValidateWarmUpProcess
+        Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) Implements IAnalyzerManager.ValidateWarmUpProcess
 
             Dim myGlobal As New GlobalDataTO
 
             Try
                 Dim analyzerReadyFlagMustBeSetToFALSE As Boolean = False 'AG 16/01/2015 BA-2170
-                If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
 
                     Select Case flag
-                        Case WarmUpProcessFlag.StartInstrument
+                        Case GlobalEnumerates.WarmUpProcessFlag.StartInstrument
 
-                            If (mySessionFlags(AnalyzerManagerFlags.StartInstrument.ToString) = "") Then
-                                ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True)
+                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "") Then
+                                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
                                 Exit Select
                             End If
 
-                        Case WarmUpProcessFlag.Wash
+                        Case GlobalEnumerates.WarmUpProcessFlag.Wash
 
-                            If mySessionFlags(AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
-                                mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "" Then
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
+                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
 
                                 If (Not CheckIfWashingIsPossible()) Then
                                     'If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
 
                                     ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
                                     'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
                                     Exit Select
                                 Else
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
 
                                     ' XBC 01/10/2012 - correction : When Washing process into WUPprocess is starting, previous StartInstrument process must set as END
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
                                     ' XBC 01/10/2012
 
                                     'Send a WASH instruction (Conditioning complete)
-                                    ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
+                                    ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
                                     analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Exit Select
                                 End If
 
                             End If
 
-                        Case WarmUpProcessFlag.ProcessStaticBaseLine
+                        Case GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine
 
                             'Some action button process required Alight instruction is bottle level OK before Sw sends it
-                            If mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso _
-                               mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "" Then 'If alight instruction has been not already sent
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso _
+                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "" Then 'If alight instruction has been not already sent
 
                                 If (Not CheckIfWashingIsPossible()) Then
                                     'If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "CANCELED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
 
                                     ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
                                     'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
 
                                 Else
                                     'Send the ALIGHT instruction
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "INI")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
 
                                     ' XBC 01/10/2012 - correction : When BaseLine process into WUPprocess is starting, previous StartInstrument and Washing processes must set as END
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "END")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
                                     ' XBC 01/10/2012
 
                                     'Before send ALIGHT in wup process ... delete the all ALIGHT/FLIGHT results
@@ -3777,11 +4261,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If Not myGlobal.HasError Then
                                         'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                         ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
 
                                         'When a process involves an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
                                         If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "INI")
+                                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
                                             analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         End If
                                     End If
@@ -5896,456 +6380,6 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Function
 
 #End Region
-
-#Region "RefactMethods"
-        ''' <summary>
-        ''' Evaluate the Action code value (in all analyzer status)
-        ''' </summary>
-        ''' <param name="myInstParamTo"></param>
-        ''' <param name="myGlobal"></param>
-        ''' <remarks></remarks>
-        Public Sub EvaluateActionCodeValue(ByRef myActionValue As AnalyzerManagerAx00Actions, myInstParamTo As InstructionParameterTO, ByRef myGlobal As GlobalDataTO)
-            myActionValue = DirectCast(CInt(myInstParamTo.ParameterValue), AnalyzerManagerAx00Actions)
-            AnalyzerCurrentActionAttribute = myActionValue
-
-            Select Case myActionValue
-
-                Case AnalyzerManagerAx00Actions.SOUND_DONE
-                    'Change the status of AnalyzerIsRingingAttribute (TRUE --> FALSE, FALSE --> TRUE) Except when connection ... always FALSE in this case
-                    If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
-                        AnalyzerIsRingingAttribute = False
-                    Else
-                        AnalyzerIsRingingAttribute = Not AnalyzerIsRingingAttribute
-                    End If
-                    UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_SOUND_CHANGED, CSng(IIf(AnalyzerIsRingingAttribute, 1, 0)), True)
-
-                Case AnalyzerManagerAx00Actions.END_RUN_START
-                    endRunAlreadySentFlagAttribute = True
-
-                Case AnalyzerManagerAx00Actions.END_RUN_END
-                    endRunAlreadySentFlagAttribute = False
-
-                Case AnalyzerManagerAx00Actions.ABORT_START
-                    abortAlreadySentFlagAttribute = True
-                    endRunAlreadySentFlagAttribute = True
-
-                Case AnalyzerManagerAx00Actions.ABORT_END
-                    PauseAlreadySentFlagAttribute = False
-
-                    abortAlreadySentFlagAttribute = False
-                    endRunAlreadySentFlagAttribute = False
-
-                Case AnalyzerManagerAx00Actions.PAUSE_START
-                    If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "", False) <> 0 Then
-                        PauseAlreadySentFlagAttribute = True
-                    End If
-
-                Case AnalyzerManagerAx00Actions.PAUSE_END
-                    PauseAlreadySentFlagAttribute = False
-
-                Case AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START
-                    recoverAlreadySentFlagAttribute = True
-
-                Case AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_END
-                    recoverAlreadySentFlagAttribute = False
-                    myGlobal = RemoveErrorCodeAlarms(Nothing, myActionValue)
-
-                    If GlobalBase.IsServiceAssembly Then
-                        InfoRefreshFirstTime = True
-                    End If
-
-                    UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished
-
-            End Select
-        End Sub
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="myInstParamTo"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Protected Function EvaluateAnalyzerState(ByVal myInstParamTo As InstructionParameterTO) As AnalyzerManagerStatus
-            Dim myStatusValue = DirectCast(CInt(myInstParamTo.ParameterValue), AnalyzerManagerStatus)
-
-            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And myStatusValue = AnalyzerManagerStatus.STANDBY Then
-                ExecuteSpecialBusinessOnAnalyzerStatusChanges(Nothing, myStatusValue)
-            End If
-
-            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then GlobalConstants.AnalyzerIsRunningFlag = True Else GlobalConstants.AnalyzerIsRunningFlag = False
-
-            If AnalyzerStatusAttribute <> myStatusValue Then
-                AnalyzerStatusAttribute = myStatusValue
-                UpdateSensorValuesAttribute(AnalyzerSensors.ANALYZER_STATUS_CHANGED, 1, True) 'Prepare UI refresh event when analyzer status changes
-            End If
-            Return myStatusValue
-        End Function
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="pInstructionReceived"></param>
-        ''' <param name="myGlobal"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function GetISEField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            Dim ISEAvailableValue As Integer = 0
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                ISEAvailableValue = CInt(myInstParamTO.ParameterValue)
-                ISEModuleIsReadyAttribute = CType(IIf(ISEAvailableValue = 1, 1, 0), Boolean) 'ISEAvailableValue = 0 means ISEModuleIsReadyAttribute = True, ISEAvailableValue = 1 means ISEModuleIsReadyAttribute = False (is working)
-            Else
-                Return False
-            End If
-
-            'SGM 29/10/2012 - SERVICE: reset E:20 flag
-            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-            If GlobalBase.IsServiceAssembly Then
-                IsInstructionRejected = False
-                IsRecoverFailed = False
-                IsInstructionAborted = False
-            End If
-            Return True
-        End Function
-
-        Private Function GetErrorField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myActionValue As AnalyzerManagerAx00Actions, ByVal myExpectedTimeRaw As Integer, ByRef errorValue As Integer, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            errorValue = 0
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                errorValue = CInt(myInstParamTO.ParameterValue)
-            Else
-                Return False
-            End If
-
-            If errorValue <> 61 Then
-                If ISECMDLost Then
-                    ISECMDLost = False
-
-                    If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                        sendingRepetitions = True
-                        numRepetitionsTimeout += 1
-                        If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                            GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            waitingStartTaskTimer.Enabled = False
-                            sendingRepetitions = False
-
-                            ' Activates Alarm begin
-                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
-                            Dim alarmStatus As Boolean = False
-                            Dim myAlarmList As New List(Of Alarms)
-                            Dim myAlarmStatusList As New List(Of Boolean)
-
-                            alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-                            alarmStatus = True
-                            ISEAnalyzer.IsTimeOut = True
-
-                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-                            If myAlarmList.Count > 0 Then
-                                ' Note that this alarm is common on User and Service !
-                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                            End If
-                            ' Activates Alarm end
-
-                            RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                        Else
-                            ' Instruction has not started by Fw, so is need to send it again
-                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            myGlobal = SendStartTaskinQueue()
-                        End If
-                    End If
-
-                End If
-
-                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
-
-                    ' Update the interval of the Timer with the expected time received from the Analyzer
-                    If myExpectedTimeRaw <= 0 Then
-                        If Not SetTimeISEOffsetFirstTime Then
-                            SetTimeISEOffsetFirstTime = True
-                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
-                            InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
-                        End If
-                    Else
-                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
-                        InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
-                    End If
-                End If
-
-            End If
-            If RUNNINGLost Then
-                RUNNINGLost = False
-
-                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                    If (mySessionFlags(AnalyzerManagerFlags.RUNNINGprocess.ToString) = "INPROCESS") AndAlso _
-                       (mySessionFlags(AnalyzerManagerFlags.EnterRunning.ToString) = "INI") Then
-                        myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
-                        AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END
-                    End If
-                End If
-
-                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso _
-                   AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
-                   AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_END Then
-                    sendingRepetitions = True
-                    numRepetitionsTimeout += 1
-                    If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                        GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                        waitingStartTaskTimer.Enabled = False
-                        sendingRepetitions = False
-
-                        ' Activates Alarm begin
-                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
-                        Dim alarmStatus As Boolean = False
-                        Dim myAlarmList As New List(Of Alarms)
-                        Dim myAlarmStatusList As New List(Of Boolean)
-
-                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-                        alarmStatus = True
-                        ISEAnalyzer.IsTimeOut = True
-
-                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-                        If myAlarmList.Count > 0 Then
-                            ' Note that this alarm is common on User and Service !
-                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                        End If
-                        ' Activates Alarm end
-
-                        Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
-
-                        'Update internal flags. Basically used by the running normal business
-                        If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
-                            'Update analyzer session flags into DataBase
-                            If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
-                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-                            End If
-                        End If
-
-                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                    Else
-                        ' Instruction has not started by Fw, so is need to send it again
-                        GlobalBase.CreateLogActivity("Repeat RUNNING Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                        myGlobal = SendStartTaskinQueue()
-                    End If
-                End If
-
-            End If
-
-            If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_START Then
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & AppLayer.MaxWaitTime.ToString & "] seconds")
-                ' Update the interval of the Timer with the expected time received from the Analyzer
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
-                InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
-                InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
-                StartingRunningFirstTime = True
-            End If
-
-            If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Or _
-               AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                If StartingRunningFirstTime Then
-                    StartingRunningFirstTime = False
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
-                    RUNNINGLost = False
-                    sendingRepetitions = False
-                    InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                    ClearStartTaskQueueToSend()
-
-                    ' Deactivates Alarm begin - BA-1872
-                    Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
-                    Dim alarmStatus As Boolean = False
-                    Dim myAlarmList As New List(Of Alarms)
-                    Dim myAlarmStatusList As New List(Of Boolean)
-
-                    alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-                    alarmStatus = False
-
-                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-
-                    'Finally call manage all alarms detected (new or solved)
-                    If myAlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            ' Not Apply
-                        Else
-                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                        End If
-
-                    End If
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
-                End If
-            End If
-            Return True
-        End Function
-
-        Private Function GetRequestField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByVal myStatusValue As AnalyzerManagerStatus, ByVal myActionValue As AnalyzerManagerAx00Actions, ByRef myExpectedTime As Integer, ByRef myRequestValue As Integer, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            myRequestValue = 0
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                myRequestValue = CInt(myInstParamTO.ParameterValue)
-            Else
-                Return False
-            End If
-
-            'AG 25/10/2010 - Depending the status and action use Request or not
-            useRequestFlag = False
-            If myStatusValue = AnalyzerManagerStatus.RUNNING Then
-                If myActionValue = AnalyzerManagerAx00Actions.START_INSTRUCTION_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.TEST_PREPARATION_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.PREDILUTED_TEST_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.ISE_TEST_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.SKIP_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.WASHING_RUN_END Or _
-                   myActionValue = AnalyzerManagerAx00Actions.LOADADJ_END Then
-
-                    useRequestFlag = True
-                End If
-            End If
-
-            If Not useRequestFlag Then
-                AnalyzerIsReadyAttribute = (myExpectedTime = 0) 'T = 0 Ax00 is ready to work, else Ax00 is busy
-            Else
-                AnalyzerIsReadyAttribute = (myRequestValue = 1) '1 Ax00 is ready to work, 0 Ax00 is busy (for use only in RUNNING mode)
-            End If
-
-            'AG 03/09/2012 - If connection analyzer always ready to receive new instructions
-            If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
-                AnalyzerIsReadyAttribute = True
-            End If
-            'AG 03/09/2012
-
-            If Not AnalyzerIsReadyAttribute Then
-                If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT
-
-                'AG 13/02/2012 - In Running activate always the waiting time
-            ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                'AG 21/03/2012 - exception when the abort instruction has started. In this case take into account the TIME received
-                If myActionValue <> AnalyzerManagerAx00Actions.ABORT_START Then
-                    myExpectedTime = WAITING_TIME_DEFAULT
-                End If
-
-            End If
-            InitializeTimerControl(myExpectedTime)
-            AppLayer.MaxWaitTime = myExpectedTime + SYSTEM_TIME_OFFSET
-
-            Return True
-        End Function
-
-        Private Function GetWellField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myWellValue As Integer, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            myWellValue = 0
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                myWellValue = CInt(myInstParamTO.ParameterValue)
-                CurrentWellAttribute = myWellValue 'Inform the class attribute
-            Else
-                Return False
-            End If
-
-            Return True
-        End Function
-
-        Private Function GetTimeField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myExpectedTime As Integer, ByRef myExpectedTimeRaw As Integer, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            myExpectedTime = WAITING_TIME_OFF
-            'If no request .... get the estimated time and activate the waiting timer
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                myExpectedTime = CInt(myInstParamTO.ParameterValue)
-            Else
-                Return False
-            End If
-
-            myExpectedTimeRaw = myExpectedTime
-
-            Return True
-        End Function
-
-        Private Function GetActionField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myActionValue As AnalyzerManagerAx00Actions, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            myActionValue = AnalyzerManagerAx00Actions.NO_ACTION
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                EvaluateActionCodeValue(myActionValue, myInstParamTO, myGlobal)
-
-                If GlobalBase.IsServiceAssembly Then
-                    If myActionValue = AnalyzerManagerAx00Actions.COMMAND_START Or _
-                       myActionValue = AnalyzerManagerAx00Actions.COMMAND_END Then
-
-                        InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                        ClearStartTaskQueueToSend()
-
-                    End If
-
-                End If
-            End If
-            Return True
-        End Function
-
-        Private Function GetStateField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myStatusValue As AnalyzerManagerStatus, ByRef myGlobal As GlobalDataTO) As Boolean
-            Dim myInstParamTO As InstructionParameterTO
-
-            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
-            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-            Else
-                Return False
-            End If
-
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                myStatusValue = EvaluateAnalyzerState(myInstParamTO)
-            End If
-
-            Return True
-        End Function
-#End Region
-
 
     End Class
 
