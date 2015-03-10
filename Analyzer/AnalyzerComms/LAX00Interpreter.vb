@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.Text
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 
@@ -14,33 +15,39 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' CREATE BY: TR 13/04/2010
+        '''            MI 4/3/2015: Prevented the generation of substrings and garbage.
+        '''            MI 4/3/2015: Made this function type safe.
+        '''            MI 4/3/2015: Added proper exception reporting.
         ''' </remarks>
-        Public Function Write(ByVal myParametersList As List(Of ParametersTO)) As GlobalDataTO
-            Dim myResult As String = ""
-            Dim myGlobalDataTO As New GlobalDataTO()
+        Public Function Write(ByVal myParametersList As List(Of ParametersTO)) As TypedGlobalDataTo(Of String)
+            'Dim myResult As String = ""
+
+            Dim myResultSB As New StringBuilder(256)    'Initial expected pattern size, but it'll auto-adjust. Ideally we would get a per-thread preallocated SB here that does not release memory, but reuses it instead.
             Try
                 'Dim myInstruction As New Instructions()
                 If myParametersList.Count > 0 Then
-                    For Each myParameterTO As ParametersTO In myParametersList
-                        myResult &= myParameterTO.ParameterID
+                    For Each myParameterTO In myParametersList
+                        myResultSB.Append(myParameterTO.ParameterID)
                         If myParameterTO.ParameterValues <> "" Then
-                            myResult &= ":"
-                            myResult &= myParameterTO.ParameterValues
+                            myResultSB.Append(":"c)
+                            myResultSB.Append(myParameterTO.ParameterValues)
                         End If
-                        myResult &= ";"
+                        myResultSB.Append(";"c)
                     Next
                 End If
-                myGlobalDataTO.SetDatos = myResult
+                Dim myGlobalDataTO As New TypedGlobalDataTo(Of String)
+                myGlobalDataTO.SetDatos = myResultSB.ToString()
+                Return myGlobalDataTO
 
             Catch ex As Exception
+                Dim myGlobalDataTO As New TypedGlobalDataTo(Of String)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
+                Return myGlobalDataTO
             End Try
-            Return myGlobalDataTO
         End Function
 
         ''' <summary>

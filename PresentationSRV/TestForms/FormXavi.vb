@@ -541,17 +541,17 @@ Public Class FormXavi
     ''' </remarks>
     Private Sub BsShortAction_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsShortAction.Click
         Try
-            Dim myGlobal As New GlobalDataTO
+            Dim myGlobal2 As New GlobalDataTO
 
             Dim myInstruc As New Instructions
             Dim myInstrucList As New List(Of InstructionParameterTO)
 
 
-            myGlobal = myInstruc.GenerateShortInstruction(AppLayerEventList.RUNNING)
+            myGlobal2 = myInstruc.GenerateShortInstruction(AppLayerEventList.RUNNING)
             'myGlobal = myInstruc.GenerateShortInstruction(ApplicationLayer.ClassEventList.CONNECT)
 
-            If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then Exit Try
-            myInstrucList = CType(myGlobal.SetDatos, List(Of InstructionParameterTO))
+            If myGlobal2.HasError Or myGlobal2.SetDatos Is Nothing Then Exit Try
+            myInstrucList = CType(myGlobal2.SetDatos, List(Of InstructionParameterTO))
 
             For Each myInstructionTO As InstructionParameterTO In myInstrucList
                 'agregamos a nuestra lista de intrucciones
@@ -559,9 +559,10 @@ Public Class FormXavi
             Next
 
             Dim myLAX00 As New LAX00Interpreter
-            myGlobal = myLAX00.Write(DirectCast(myInstruc.GetParameterList.SetDatos, List(Of ParametersTO)))
+
+            Dim myGlobal = myLAX00.Write(DirectCast(myInstruc.GetParameterList.SetDatos, List(Of ParametersTO)))
             If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then Exit Try
-            BsTextWrite.Text = DirectCast(myGlobal.SetDatos, String)
+            BsTextWrite.Text = myGlobal.SetDatos
 
         Catch ex As Exception
 

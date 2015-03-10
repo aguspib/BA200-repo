@@ -2270,7 +2270,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -2635,7 +2635,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -2662,7 +2662,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendShortInstruction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "ApplicationLayer.SendShortInstruction", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2692,7 +2692,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                     lastInstructionSentAttribute = myInstructionToSend     'AG 20/10/2010
@@ -2919,7 +2919,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'SECOND: Convert InstructionParameterTO into LAX00 string to send
                     Dim myInstructionToSend As String = ""
-                    myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                    myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstructionToSend = CType(myGlobal.SetDatos, String)
                     Else
@@ -2972,7 +2972,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3022,7 +3022,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3072,7 +3072,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3123,7 +3123,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3177,7 +3177,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'SECOND: Convert InstructionParameterTO into LAX00 string to send
                     Dim myInstructionToSend As String = ""
-                    myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                    myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstructionToSend = CType(myGlobal.SetDatos, String)
                     Else
@@ -3245,7 +3245,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3311,7 +3311,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3380,7 +3380,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3431,7 +3431,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3482,7 +3482,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3535,7 +3535,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3586,7 +3586,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3725,7 +3725,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                     myInstructionToSend = myInstructionToSend.Trim
@@ -3777,7 +3777,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3827,7 +3827,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3877,7 +3877,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3927,7 +3927,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -3988,7 +3988,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4038,7 +4038,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4088,7 +4088,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4138,7 +4138,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4188,7 +4188,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4238,7 +4238,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4288,7 +4288,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4338,7 +4338,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO()
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4392,7 +4392,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4445,7 +4445,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4516,7 +4516,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'SECOND: Convert InstructionParameterTO into LAX00 string to send
                     Dim myInstructionToSend As String = ""
-                    myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                    myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstructionToSend = CType(myGlobal.SetDatos, String)
                     Else
@@ -4629,7 +4629,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'SECOND: Convert InstructionParameterTO into LAX00 string to send
                 Dim myInstructionToSend As String = ""
-                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList).GetCompatibleGlobalDataTO
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstructionToSend = CType(myGlobal.SetDatos, String)
                 Else
@@ -4757,8 +4757,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pParamInstructionList"></param>
         ''' <returns>GlobalDataTO with set data as string</returns>
         ''' <remarks>Created by AG 22/04/2010 </remarks>
-        Private Function TransformToStringInstruction(ByVal pParamInstructionList As List(Of InstructionParameterTO)) As GlobalDataTO
-            Dim myGlobal As New GlobalDataTO
+        Private Function TransformToStringInstruction(ByVal pParamInstructionList As List(Of InstructionParameterTO)) As TypedGlobalDataTo(Of String)
+            Dim myGlobal As New TypedGlobalDataTo(Of String)
             Try
 
                 Dim myInstruction As New Instructions

@@ -213,7 +213,7 @@ Namespace Biosystems.Ax00.Global
 
             'Better implementation:
             Dim connectionSafeDataTo = GetSafeOpenDBConnection(pDBConnection)   'It handles its own exeptions
-            Return connectionSafeDataTo.CloneUntyped()
+            Return connectionSafeDataTo.GetCompatibleGlobalDataTO()
 
             'Return GetSafeOpenDBConnection(pDBConnection).GetCompatibleGlobalDataTo
 

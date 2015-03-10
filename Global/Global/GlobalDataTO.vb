@@ -33,17 +33,22 @@ Namespace Biosystems.Ax00.Global
 
 #Region "Methods"
         ''' <summary>
-        ''' This function creates a clone of this TypedGlobalDataTo as an older untyped GlobalDataTo. Use this for compatibility with older code.
+        '''This function converts a TypedGlobalDataTO to a untyped legacy GlobalDataTO.
+        '''Use it for compatibility needs, only when refactoring is not possible in a reasonable time.
         ''' </summary>
-        ''' <returns>A GlobalDataTo.</returns>
+        ''' <returns>A compatible GlobalDataTo</returns>
         ''' <remarks></remarks>
-        Overridable Function CloneUntyped() As GlobalDataTO
+        Overridable Function GetCompatibleGlobalDataTO() As GlobalDataTO
             Dim globalDataTo As New GlobalDataTO()
             globalDataTo.AffectedRecords = AffectedRecords
             globalDataTo.ErrorCode = ErrorCode
             globalDataTo.ErrorMessage = ErrorMessage
             globalDataTo.HasError = HasError
-            globalDataTo.SetDatos = TryCast(SetDatos, Object)
+            Try
+                globalDataTo.SetDatos = TryCast(SetDatos, Object)
+            Catch
+                Throw New Exception("Can't create a GlobalDataTo from this TypedGlobalDataTO")
+            End Try
             globalDataTo.SetUserLevel = SetUserLevel
             Return globalDataTo
         End Function
@@ -51,7 +56,7 @@ Namespace Biosystems.Ax00.Global
 #End Region
 
     End Class
-
+    ' <Obsolete("Use typed GlobalDataTo instead!")> _
     Public NotInheritable Class GlobalDataTO
         Inherits TypedGlobalDataTo(Of Object)
     End Class
