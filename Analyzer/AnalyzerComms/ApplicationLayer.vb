@@ -193,10 +193,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         Public Property MaxWaitTime() As Integer
             Get
-                Return Me.MaxWaitTimeAttr
+                Return MaxWaitTimeAttr
             End Get
             Set(ByVal value As Integer)
-                Me.MaxWaitTimeAttr = value
+                MaxWaitTimeAttr = value
             End Set
         End Property
 

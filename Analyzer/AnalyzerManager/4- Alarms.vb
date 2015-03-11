@@ -3,13 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Timers
-Imports System.Data
 Imports System.Data.SqlClient
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
 Imports Biosystems.Ax00.Core.Interfaces
@@ -46,10 +44,11 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 04/11/2014 - Add ISE_TIMEOUT_ERR alarm - BA-1872
         '''              XB 06/11/2014 - Add COMMS_TIMEOUT_ERR alarm - BA-1872
         ''' </remarks>
-        Private Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
+        Public Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
                                       ByVal pAlarmIDList As List(Of Alarms), _
                                       ByVal pAlarmStatusList As List(Of Boolean), _
-                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
+                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO _
+                                  Implements IAnalyzerManager.ManageAlarms
 
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
@@ -1288,57 +1287,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC 23/05/2011
         ''' Modified by XBC 16/10/2012 - Add pErrorCodeList functionality to manage Firmware Alarms into Service Software
         ''' </remarks>
-        Private Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
+        Public Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
                                           ByVal pAlarmIDList As List(Of Alarms), _
                                           ByVal pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pErrorCodeList As List(Of String) = Nothing, _
-                                          Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO
+                                          Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO _
+                                      Implements IAnalyzerManager.ManageAlarms_SRV
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
             Try
 
-
-                ' XBC 16/10/2012 - Is used this code ?
-                'Dim index As Integer = 0
-                'For Each alarmItem As GlobalEnumerates.Alarms In pAlarmIDList
-                '    If alarmItem <> GlobalEnumerates.Alarms.NONE Then
-                '        If Not myAlarmListAttribute.Contains(alarmItem) Then
-                '            myAlarmListAttribute.Add(alarmItem)
-
-                '            'Generate UI_Refresh event ALARMS_RECEIVED
-                '            PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmItem.ToString, True)
-
-                '            'SGM 19/06/2012
-                '            Select Case alarmItem
-
-                '                'SGM 18/09/2012
-                '                Case GlobalEnumerates.Alarms.ISE_OFF_ERR
-                '                    If pAlarmStatusList(index) Then
-                '                        ISEAnalyzer.IsISESwitchON = False
-                '                        MyClass.RefreshISEAlarms()
-                '                    End If
-
-                '                Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
-                '                    If pAlarmStatusList(index) Then
-                '                        MyClass.RefreshISEAlarms()
-                '                    End If
-                '            End Select
-
-                '        End If
-                '    End If
-
-                '    index = index + 1
-                'Next
-                ' XBC 16/10/2012 
-
-                'Dim myLogAcciones2 As New ApplicationLogManager()
                 Dim myManageAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.OMMIT_ERROR
 
                 If Not pErrorCodeList Is Nothing Then
                     If pErrorCodeList.Count > 0 Then
 
-                        ' XBC 07/11/2012
                         SolveErrorCodesToDisplay(pErrorCodeList)
 
                         Dim myAlarmsDelegate As New AlarmsDelegate
@@ -1365,7 +1329,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myErrorCodesDS = CType(myGlobal.SetDatos, AlarmErrorCodesDS)
                                 If myErrorCodesDS.tfmwAlarmErrorCodes.Count > 0 Then
 
-                                    ' XBC 07/11/2012
                                     AddErrorCodesToDisplay(myErrorCodesDS)
 
                                     Select Case myErrorCodesDS.tfmwAlarmErrorCodes(0).ManagementID
@@ -1421,13 +1384,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                         Case "6_OMMIT_ERROR"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.OMMIT_ERROR
                                             AddErrCode = False
-                                            'InformAlarm = False
                                             GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
 
                                         Case Else
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.NONE
                                             AddErrCode = False
-                                            'InformAlarm = False
 
                                     End Select
 
@@ -1471,7 +1432,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             Select Case alarmItem
                                 Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR
 
-                                    ' XBC 07/11/2012
                                     Dim myErrorCodesDS As New AlarmErrorCodesDS
                                     Dim myErrorCodesRow As AlarmErrorCodesDS.tfmwAlarmErrorCodesRow
                                     myErrorCodesRow = myErrorCodesDS.tfmwAlarmErrorCodes.NewtfmwAlarmErrorCodesRow
@@ -1485,7 +1445,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
                                     myErrorCodesDS.tfmwAlarmErrorCodes.Rows.Add(myErrorCodesRow)
                                     AddErrorCodesToDisplay(myErrorCodesDS)
-                                    ' XBC 07/11/2012
 
                                     ' Update Alarm sensors to inform to Presentation layer what kind of management is need to display
                                     PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmItem.ToString, True)
@@ -1506,7 +1465,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
 
             Finally
@@ -1545,11 +1503,11 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 06/11/2014 - Add new COMMS Timeour Alarm - BA-1872
         '''              AG 04/12/2014 BA-2236 add new optional parameters ErrorCode and pErrorCodesList
         ''' </remarks>
-        Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As Alarms, ByVal pAlarmStatus As Boolean, _
+        Public Sub PrepareLocalAlarmList(ByVal pAlarmCode As Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pAddInfo As String = "", _
                                           Optional ByRef pAdditionalInfoList As List(Of String) = Nothing, _
-                                          Optional ByVal pAddAlwaysFlag As Boolean = False)
+                                          Optional ByVal pAddAlwaysFlag As Boolean = False) Implements IAnalyzerManager.PrepareLocalAlarmList
             'NOTE: Do not use Try/Catch: the caller method implements it
 
             If (pAlarmStatus) Then
@@ -1561,34 +1519,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 If pAlarmCode = GlobalEnumerates.Alarms.REACT_TEMP_WARN Then
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Then addFlag = False
 
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
 
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.REACT_TEMP_ERR Then
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
 
                     'Exception Nr.2: if exists Fridge thermo error/nok do not add fridge thermo warning!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN Then
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR) Then addFlag = False
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
 
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR Then
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
 
                     'Exception Nr.3: if exists High contamination deposit error do not add high contamination deposit warning!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN Then
@@ -1600,26 +1542,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Exception Nr.5: if exists R1 thermo system error do not add R1 thermo warning!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.R1_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. end
 
                     'Exception Nr.6: if exists R2 thermo system error do not add R2 thermo warning!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.R2_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. end
+
                     'Exception Nr.7: if exists Washing station system error do not add washing station thermo warning!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.WS_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
 
                     'Exception Nr.8: if exists Water deposit system error do not add water deposit error (calculated by Sw)!!
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR Then
@@ -1676,26 +1607,16 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 13/04/2012 - when warm up is in process check if the alarm must be generated or not
                 If warmUpInProcess AndAlso Not pAddAlwaysFlag Then
                     'If warmUpInProcess Then
-                    'AG 13/04/2012
-
                     addFlag = False 'By default no alarms generation
 
                     'Only those alarms affecting the start instrument process 
-                    'AG 20/02/2012 - we can NOT use the method 'ExistBottleAlarms' because the alarm still has not been created
-                    'AG 24/02/2012 - the baseline error alarm can also appear in wup process
-                    'XBC 27/03/2012 - add ISE Management Alarms
-                    'SGM 27/07/2012 - add ISE independent errors alarma (ERC)
                     If Not IgnoreAlarmWhileWarmUp(pAlarmCode) Then
                         addFlag = True
                     End If
                 End If
-                'AG 10/02/2012
 
                 'AG 18/05/2012 - While shutdown instrument is inprocess only generate the alarms that affect the process
                 Dim sDownInProcess As Boolean = False
-                ' AG+XBC 24/05/2012 - no for status PAUSED for SDown Process
-                'If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS" OrElse _
-                '    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess.ToString) = "PAUSED") Then
                 If (mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS") Then
                     sDownInProcess = True
                 End If
@@ -1888,8 +1809,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created XBC 16/10/2012
         ''' </remarks>
-        Private Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), _
-                                              ByRef pErrorCodeFinalList As List(Of String))
+        Public Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), ByRef pErrorCodeFinalList As List(Of String)) Implements IAnalyzerManager.PrepareLocalAlarmList_SRV
 
             'NOTE: Do not use Try Catch do the caller method implements it
 
@@ -4515,7 +4435,9 @@ Namespace Biosystems.Ax00.Core.Entities
         '''               When method finishes, the list of alarms returned must be equivalent to the pErrorCodeList
         '''               So: define byRef the parameter pErrorCodeList (error codes that not generate alarm will be removed from list), error codes that generates N alarms will be added N-1 times to list           
         ''' </remarks>
-        Private Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
+        Public Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms) _
+            Implements IAnalyzerManager.TranslateErrorCodeToAlarmID
+
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
             Dim toReturnAlarmList As New List(Of Alarms)
@@ -4906,7 +4828,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>AG 06/03/2012
         ''' AG 27/03/2012</remarks>
-        Private Function RemoveErrorCodeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAction As AnalyzerManagerAx00Actions) As GlobalDataTO
+        Public Function RemoveErrorCodeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAction As AnalyzerManagerAx00Actions) As GlobalDataTO Implements IAnalyzerManager.RemoveErrorCodeAlarms
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
 
@@ -5076,20 +4998,19 @@ Namespace Biosystems.Ax00.Core.Entities
         '''             AG 25/09/2012 - Add the POLLRD instruction
         '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
-        Private Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
+        Public Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean _
+            Implements IAnalyzerManager.IgnoreErrorCodes
             Dim ignoreFlag As Boolean = False 'Default value FALSE
             Try
                 ' XBC 18/10/2012 - Alarms treatment for Service
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     ' Service Software no ignore errors
                     If IsServiceAlarmInformed Then
                         ignoreFlag = True
-                    ElseIf MyClass.IsFwUpdateInProcess Then
+                    ElseIf IsFwUpdateInProcess Then
                         'in case that FW update is currently being performed, ignore alarms.
                         ignoreFlag = True
-                    ElseIf MyClass.IsConfigGeneralProcess Then
+                    ElseIf IsConfigGeneralProcess Then
                         'in case user is processing general configurations, ignore corresponding alarms.
                         Dim myAlarms As New List(Of Alarms)
                         Dim myErrorCode As New List(Of Integer)
@@ -5120,10 +5041,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Select Case pLastInstructionTypeSent
-
                     Case AppLayerEventList.CONNECT, AppLayerEventList.CONFIG, AppLayerEventList.READADJ, AppLayerEventList.INFO, AppLayerEventList.SOUND, _
                         AppLayerEventList.POLLFW, AppLayerEventList.POLLHW, AppLayerEventList.LOADADJ, AppLayerEventList.STATE, AppLayerEventList.POLLSN, AppLayerEventList.POLLRD
-
                         'AG-XB 17/09/2012 - Ignore STATEs in connection process.
                         If pLastInstructionTypeSent = AppLayerEventList.STATE Then
                             If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
@@ -5133,8 +5052,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Always ignore error code
                             ignoreFlag = True
                         End If
-
-
 
                     Case AppLayerEventList.BARCODE_REQUEST
                         'Ignore error code only when barcode request in configuration mode
@@ -5146,21 +5063,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     Case AppLayerEventList.ISE_CMD
-                        'AG 30/03/2012
                         'Ignore error code only when ISE cmd request in low level control mode
                         If Not pInstructionSent Is Nothing Then
                             'The following code requires new Fw not available in 30/03/2012
-
-                            ' XBC 03/09/2012 - Correction : add new ISE instructions M:4 and M:5
-                            'If InStr(pInstructionSent, "M:1;") > 0 Then
                             If InStr(pInstructionSent, "M:1;") > 0 Or _
                                InStr(pInstructionSent, "M:4;") > 0 Or _
                                InStr(pInstructionSent, "M:5;") > 0 Then
-                                ' XBC 03/09/2012 
 
                                 ignoreFlag = True
 
-                                ' XB 04/05/2012
                                 Dim myAlarms As New List(Of Alarms)
                                 Dim myErrorCode As New List(Of Integer)
                                 myErrorCode.Add(pErrorValue)
@@ -5171,38 +5082,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ignoreFlag = False
                                     End If
                                 Next
-                                ' XB 04/05/2012
 
                             End If
-
-                            ''Temporally code: never ignore error codes with ISECMD
-                            'ignoreFlag = False
-
-                            'Abort current ise procedure in ise_manager class
                             If Not ignoreFlag Then
 
-                                ' XB 30/09/2014 - BA-1872
-                                ''SGM 25/10/2012 - Abort ISE Operation only if E:61, E:20, E:21
-                                'If pErrorValue = 61 Or pErrorValue = 20 Or pErrorValue = 21 Then
-                                '    If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException()
-                                'End If
-                                ''If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException() SGM 25/10/2012
                                 If pErrorValue = 61 Then
                                     If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException(True)
                                 End If
                                 If pErrorValue = 20 Or pErrorValue = 21 Then
                                     If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException()
                                 End If
-                                ' XB 30/09/2014 - BA-1872
                             End If
                         End If
-                        'AG 30/03/2012
-
                 End Select
 
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreErrorCodes", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag

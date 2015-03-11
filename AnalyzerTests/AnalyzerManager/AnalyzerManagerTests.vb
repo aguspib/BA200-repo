@@ -1,7 +1,7 @@
 ﻿Imports AnalyzerTests.Biosystems.Ax00.Core.Entities.Tests.Mock
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
-Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Global
 
 
@@ -15,13 +15,14 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_END()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
-            Dim instruction As New InstructionParameterTO            
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "10"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsFalse(target.EndRunInstructionSent)
+            Assert.IsFalse(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
@@ -33,14 +34,15 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         Public Sub EvaluateActionCodeValueTest_SOUND_DONE()
 
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "60"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
-            target.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS"
+            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS"
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsFalse(target.Ringing)
+            Assert.IsFalse(idAnalyzer.Ringing)
         End Sub
 
         ''' <summary>
@@ -49,13 +51,14 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_START()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "9"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsTrue(target.EndRunInstructionSent)
+            Assert.IsTrue(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
@@ -64,14 +67,15 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_START()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "15"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsTrue(target.AbortInstructionSent)
-            Assert.IsTrue(target.EndRunInstructionSent)
+            Assert.IsTrue(idAnalyzer.AbortInstructionSent)
+            Assert.IsTrue(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
@@ -80,15 +84,16 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_END()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "16"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsFalse(target.PauseInstructionSent)
-            Assert.IsFalse(target.AbortInstructionSent)
-            Assert.IsFalse(target.EndRunInstructionSent)
+            Assert.IsFalse(idAnalyzer.PauseInstructionSent)
+            Assert.IsFalse(idAnalyzer.AbortInstructionSent)
+            Assert.IsFalse(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
@@ -97,14 +102,15 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_START()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "96"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
-            target.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS"
+            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS"
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsTrue(target.PauseInstructionSent)
+            Assert.IsTrue(idAnalyzer.PauseInstructionSent)
         End Sub
 
         ''' <summary>
@@ -113,13 +119,14 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_END()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "97"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsFalse(target.PauseInstructionSent)
+            Assert.IsFalse(idAnalyzer.PauseInstructionSent)
         End Sub
 
         ''' <summary>
@@ -128,13 +135,14 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_START()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "70"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsTrue(target.RecoverInstructionSent)
+            Assert.IsTrue(idAnalyzer.RecoverInstructionSent)
         End Sub
 
         ''' <summary>
@@ -145,13 +153,14 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_END()
             Dim blMock = New BaseLineEntityMock
-            Dim target = New BA200AnalyzerMock("", "", blMock)
+            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
+            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "71"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
-            Assert.IsFalse(target.RecoverInstructionSent)
+            Assert.IsFalse(idAnalyzer.RecoverInstructionSent)
         End Sub
 
     End Class

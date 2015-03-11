@@ -6,9 +6,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
 Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel
@@ -34,18 +32,13 @@ Namespace Biosystems.Ax00.Core.Entities
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
         Private waitingTimer As New Timers.Timer() ' AG 07/05/2010 - waiting time (watchdog)
 
-        ' XB 09/12/2014 - Parametizers all these values - BA-1872
-        'Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        'Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
-        'Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
-        'Private Const WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
-        Private WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
-        Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
-        Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
-        Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECONDS waiting time for ISE module timeout (E:61) - BA-1872
-        Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECONDS waiting time for ISE repetitions - BA-1872
-        Private SetTimeISEOffsetFirstTime As Boolean = False ' Just set the ISE offset time the first time when receives T=0 by Firmware - BA-1872
+        'Private WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
+        'Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
+        'Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        'Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
+        'Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECONDS waiting time for ISE module timeout (E:61) - BA-1872
+        'Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECONDS waiting time for ISE repetitions - BA-1872
+        Private timeISEOffsetFirstTime As Boolean = False ' Just set the ISE offset time the first time when receives T=0 by Firmware - BA-1872
         ' XB 09/12/2014 - Parametizers all these values - BA-1872
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
@@ -76,7 +69,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private futureRequestNextWell As Integer = 0 'AG 07/06/2012 - Using the current next well received in Request, estimate the future well in next request
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
-        Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
+        'Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
         Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
         Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
 
@@ -109,8 +102,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'AG 12/06/2012 - The photometric instructions are treated in a different threat in order to attend quickly to the analyzer requests in Running
         Private processingLastANSPHRInstructionFlag As Boolean = False
-        Private bufferANSPHRReceived As New List(Of List(Of InstructionParameterTO)) 'AG 28/06/2012
-        Private lockThis As New Object() 'AG 28/06/2012
+        Private bufferANSPHRReceived As New List(Of List(Of InstructionParameterTO)) 'AG 28/06/2012        
 
         'AG 23/07/2012 - Read the Alarm definition when analyzer manager class is created not in several 
         'methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
@@ -141,19 +133,15 @@ Namespace Biosystems.Ax00.Core.Entities
         Private RUNNINGLost As Boolean
         Private numRepetitionsSTATE As Integer
         Private waitingSTATETimer As New Timers.Timer()
-        Private StartingRunningFirstTime As Boolean
+        'Private StartingRunningFirstTime As Boolean
 
         'Public IsDisplayingServiceData As Boolean = True 'SGM 15/09/2011 exclusion flag for avoiding to update data while displaying data
         'SGM 29/09/2011
         Private InfoRefreshFirstTimeAttr As Boolean = True
 
-        'SGM 17/02/2012
-        'Public WithEvents ISEAnalyzer As ISEManager 'REFACTORING
+        'provisional flag for starting ISE just the first time 
+        Private ISEAlreadyStarted As Boolean = False
 
-        ' XBC 24/05/2012 - Declare this flag Private for the class
-        Private ISEAlreadyStarted As Boolean = False 'provisional flag for starting ISE just the first time 
-
-        ' XBC 13/06/2012
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
 
         ' XBC 07/11/2012 - SERVICE
@@ -164,9 +152,8 @@ Namespace Biosystems.Ax00.Core.Entities
             Public Solved As Boolean
         End Structure
 
-        '' XB 17/09/2013 - Additional protection - commented by now
-        'Public WaitingGUI As Boolean = True
-        Private runningConnectionPollSnSent As Boolean = False 'AG 03/12/2013 - BT #1397 - This flag is required because if reconnect in running sometimes firmware sends 2 STATUS instruction, depends on the cycle machine moment where the connection is received
+        'This flag is required because if reconnect in running sometimes firmware sends 2 STATUS instruction, depends on the cycle machine moment where the connection is received
+        Private runningConnectionPollSnSent As Boolean = False
 #End Region
 
 #Region "Attributes definition"
@@ -507,7 +494,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
         'END AG 05/05/2010
 
-        Public ReadOnly Property Connected() As Boolean Implements IAnalyzerManager.Connected    '22/04/2010 AG
+        Public Property Connected() As Boolean Implements IAnalyzerManager.Connected    '22/04/2010 AG
             Get
 
                 If REAL_DEVELOPMENT_MODE > 0 Then
@@ -519,9 +506,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End Get
 
-            'Set(ByVal value As Boolean)
-            '    ConnectedAttribute = value
-            'End Set
+            Set(ByVal value As Boolean)
+                ConnectedAttribute = value
+            End Set
         End Property
 
         'SGM 22/09/2011
@@ -780,10 +767,13 @@ Namespace Biosystems.Ax00.Core.Entities
         '    End Get
         'End Property
 
-        Public ReadOnly Property MaxWaitTime() As Integer Implements IAnalyzerManager.MaxWaitTime
+        Public Property MaxWaitTime() As Integer Implements IAnalyzerManager.MaxWaitTime
             Get
-                Return Me.AppLayer.MaxWaitTime
+                Return AppLayer.MaxWaitTime
             End Get
+            Set(value As Integer)
+                AppLayer.MaxWaitTime = value
+            End Set
         End Property
 
 
@@ -831,10 +821,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
-        Public ReadOnly Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
+        Public Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
             Get
                 Return CurrentWellAttribute
             End Get
+            Set(ByVal value As Integer)
+                CurrentWellAttribute = value
+            End Set
         End Property
 
         Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum Implements IAnalyzerManager.BarCodeProcessBeforeRunning 'AG 04/08/2011
@@ -915,10 +908,13 @@ Namespace Biosystems.Ax00.Core.Entities
         End Property
 
 
-        Public ReadOnly Property Ringing() As Boolean Implements IAnalyzerManager.Ringing    '26/10/2011 AG
+        Public Property Ringing() As Boolean Implements IAnalyzerManager.Ringing
             Get
                 Return AnalyzerIsRingingAttribute
             End Get
+            Set(ByVal value As Boolean)
+                AnalyzerIsRingingAttribute = value
+            End Set
         End Property
 
 
@@ -1002,29 +998,41 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property EndRunInstructionSent() As Boolean Implements IAnalyzerManager.EndRunInstructionSent
+        Public Property EndRunInstructionSent() As Boolean Implements IAnalyzerManager.EndRunInstructionSent
             Get
                 Return endRunAlreadySentFlagAttribute
             End Get
+            Set(ByVal value As Boolean)
+                endRunAlreadySentFlagAttribute = value
+            End Set
         End Property
 
-        Public ReadOnly Property AbortInstructionSent() As Boolean Implements IAnalyzerManager.AbortInstructionSent
+        Public Property AbortInstructionSent() As Boolean Implements IAnalyzerManager.AbortInstructionSent
             Get
                 Return abortAlreadySentFlagAttribute
             End Get
+            Set(ByVal value As Boolean)
+                abortAlreadySentFlagAttribute = value
+            End Set
         End Property
 
-        Public ReadOnly Property RecoverInstructionSent() As Boolean Implements IAnalyzerManager.RecoverInstructionSent
+        Public Property RecoverInstructionSent() As Boolean Implements IAnalyzerManager.RecoverInstructionSent
             Get
                 Return recoverAlreadySentFlagAttribute
             End Get
+            Set(ByVal value As Boolean)
+                recoverAlreadySentFlagAttribute = value
+            End Set
         End Property
 
         ' XB 15/10/2013 - BT #1318
-        Public ReadOnly Property PauseInstructionSent() As Boolean Implements IAnalyzerManager.PauseInstructionSent
+        Public Property PauseInstructionSent() As Boolean Implements IAnalyzerManager.PauseInstructionSent
             Get
                 Return PauseAlreadySentFlagAttribute
             End Get
+            Set(ByVal value As Boolean)
+                PauseAlreadySentFlagAttribute = value
+            End Set
         End Property
 
         'TR 25/10/2013 BT #1340
@@ -1292,6 +1300,138 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Public Property ISECMDStateIsLost As Boolean Implements IAnalyzerManager.ISECMDStateIsLost
+            Get
+                Return ISECMDLost
+            End Get
+            Set(ByVal value As Boolean)
+                ISECMDLost = value
+            End Set
+        End Property
+
+        Public Property CanSendingRepetitions As Boolean Implements IAnalyzerManager.CanSendingRepetitions
+            Get
+                Return sendingRepetitions
+            End Get
+            Set(ByVal value As Boolean)
+                sendingRepetitions = value
+            End Set
+        End Property
+
+        Public Property NumSendingRepetitionsTimeout As Integer Implements IAnalyzerManager.NumSendingRepetitionsTimeout
+            Get
+                Return numRepetitionsTimeout
+            End Get
+            Set(ByVal value As Integer)
+                numRepetitionsTimeout = value
+            End Set
+        End Property
+
+        Public Property WaitingStartTaskTimerEnabled As Boolean Implements IAnalyzerManager.WaitingStartTaskTimerEnabled
+            Get
+                Return waitingStartTaskTimer.Enabled
+            End Get
+            Set(ByVal value As Boolean)
+                waitingStartTaskTimer.Enabled = value
+            End Set
+        End Property
+
+        Public Property SetTimeISEOffsetFirstTime As Boolean Implements IAnalyzerManager.SetTimeISEOffsetFirstTime
+            Get
+                Return timeISEOffsetFirstTime
+            End Get
+            Set(ByVal value As Boolean)
+                timeISEOffsetFirstTime = value
+            End Set
+        End Property
+
+        Public ReadOnly Property ConnectedPortName() As String Implements IAnalyzerManager.ConnectedPortName
+            Get
+                Return AppLayer.ConnectedPortName
+            End Get
+        End Property
+
+        Public ReadOnly Property ConnectedBauds() As String Implements IAnalyzerManager.ConnectedBauds
+            Get
+                Return AppLayer.ConnectedBauds
+            End Get
+        End Property
+
+        Public Property RecoveryResultsInPause() As Boolean Implements IAnalyzerManager.RecoveryResultsInPause
+            Get
+                Return AppLayer.RecoveryResultsInPause
+            End Get
+            Set(value As Boolean)
+                AppLayer.RecoveryResultsInPause = value
+            End Set
+        End Property
+
+        Public Property RunningLostState As Boolean Implements IAnalyzerManager.RunningLostState
+            Get
+                Return RUNNINGLost
+            End Get
+            Set(value As Boolean)
+                RUNNINGLost = value
+            End Set
+        End Property
+
+        Public Property NumRepetitionsStateInstruction As Integer Implements IAnalyzerManager.NumRepetitionsStateInstruction
+            Get
+                Return NumRepetitionsState
+            End Get
+            Set(value As Integer)
+                numRepetitionsSTATE = value
+            End Set
+        End Property
+
+        Public Property RunningConnectionPollSnSentStatus As Boolean Implements IAnalyzerManager.RunningConnectionPollSnSentStatus
+            Get
+                Return runningConnectionPollSnSent
+            End Get
+            Set(value As Boolean)
+                runningConnectionPollSnSent = value
+            End Set
+        End Property
+
+        Public Property IseIsAlreadyStarted() As Boolean Implements IAnalyzerManager.IseIsAlreadyStarted
+            Get
+                Return ISEAlreadyStarted
+            End Get
+            Set(value As Boolean)
+                ISEAlreadyStarted = value
+            End Set
+        End Property
+
+        Public ReadOnly Property BufferANSPHRReceivedCount() As Integer Implements IAnalyzerManager.BufferANSPHRReceivedCount
+            Get
+                Return bufferANSPHRReceived.Count
+            End Get
+        End Property
+
+        Public Property ProcessingLastANSPHRInstructionStatus() As Boolean Implements IAnalyzerManager.ProcessingLastANSPHRInstructionStatus
+            Get
+                Return processingLastANSPHRInstructionFlag
+            End Get
+            Set(value As Boolean)
+                processingLastANSPHRInstructionFlag = value
+            End Set
+        End Property
+
+        Public Property StartUseRequestFlag() As Boolean Implements IAnalyzerManager.StartUseRequestFlag
+            Get
+                Return useRequestFlag
+            End Get
+            Set(value As Boolean)
+                useRequestFlag = value
+            End Set
+        End Property
+
+        Public ReadOnly Property StartTaskInstructionsQueueCount() As Integer Implements IAnalyzerManager.StartTaskInstructionsQueueCount
+            Get
+                Return myStartTaskInstructionsQueue.Count
+            End Get
+        End Property
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1331,22 +1471,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Creation AG 20/04/2010
         ''' </remarks>
         Public Sub OnManageAnalyzerEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pInstructionReceived As List(Of InstructionParameterTO)) Handles AppLayer.ManageAnalyzer
-            Try
-                ''Track SGM
-                'Dim myTrackTime As Double = DateTime.Now.Subtract(AppLayer.ResponseTrack).TotalMilliseconds
-                ''Dim myLogAcciones2 As New ApplicationLogManager()
-                'GlobalBase.CreateLogActivity("AppLayer -- AnalyzerManager (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.OnManageAnalyzerEvent", EventLogEntryType.Information, False)
-                ''Select Case pAction
-                ''    Case AnalyzerManagerSwActionList.STATUS_RECEIVED, _
-                ''        AnalyzerManagerSwActionList.ARM_STATUS_RECEIVED, _
-                ''        AnalyzerManagerSwActionList.READINGS_RECEIVED
-
-                ''        Dim myTrackTime As Double = DateTime.Now.Subtract(AppLayer.ResponseTrack).TotalMilliseconds
-                ''        'Dim myLogAcciones2 As New ApplicationLogManager()
-                ''        GlobalBase.CreateLogActivity("Instruccion Received Event Receive (" & pAction.ToString & "): " & myTrackTime.ToStringWithDecimals(0), "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
-
-                ''End Select
-                ''end Track
+            Try              
 
                 ManageAnalyzer(pAction, False, pInstructionReceived)
 
@@ -2965,7 +3090,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             ' XB 03/04/2014 
 
                                             ' XB 26/09/2014 - BA-1872
-                                            SetTimeISEOffsetFirstTime = False
+                                            timeISEOffsetFirstTime = False
                                             If Not sendingRepetitions Then
                                                 numRepetitionsTimeout = 0
                                             End If
@@ -3413,7 +3538,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ''''''''''''''''''''
                             Case AnalyzerManagerSwActionList.STATUS_RECEIVED
                                 InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.STATUS_RECEIVED
-                                myGlobal = Me.ProcessStatusReceived(pInstructionReceived)
+                                Dim StatusRecived = New ProcessStatusReceived(Me)
+                                myGlobal = StatusRecived.InstructionProcessing(pInstructionReceived)
+                                'myGlobal = Me.ProcessStatusReceived(pInstructionReceived)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.ANSERR_RECEIVED
@@ -5392,6 +5519,18 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return myGlobal
         End Function
+
+        Public Sub AlarmListRemoveItem(itemToRemove As Alarms) Implements IAnalyzerManager.AlarmListRemoveItem
+            myAlarmListAttribute.Remove(itemToRemove)
+        End Sub
+
+        Public Sub AlarmListClear() Implements IAnalyzerManager.AlarmListClear
+            myAlarmListAttribute.Clear()
+        End Sub
+
+        Public Sub MyErrorCodesClear() Implements IAnalyzerManager.MyErrorCodesClear
+            myErrorCodesAttribute.Clear()
+        End Sub
 #End Region
 
     End Class

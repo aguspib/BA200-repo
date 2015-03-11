@@ -83,6 +83,7 @@
     <Compile Include="AnalyzerManager\AnalyzerManagerTests.vb" />
     <Compile Include="Mock\BA200AnalyzerMock.vb" />
     <Compile Include="Mock\BaseLineEntityMock.vb" />
+    <Compile Include="Mock\ProcessStatusReceivedMock.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
