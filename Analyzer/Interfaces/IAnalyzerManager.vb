@@ -117,6 +117,11 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property ProcessingLastANSPHRInstructionStatus() As Boolean
         Property StartUseRequestFlag() As Boolean
         ReadOnly Property StartTaskInstructionsQueueCount() As Integer
+        Property ThermoReactionsRotorWarningTimerEnabled() As Boolean
+        ReadOnly Property PauseModeIsStartingState() As Boolean
+        Property PauseSendingTestPreparations() As Boolean
+        ReadOnly Property BaselineInitializationFailures As Integer
+        Property WELLbaselineParametersFailures As Boolean
 
 #End Region
 
@@ -238,6 +243,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
         Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
         Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), ByRef pErrorCodeFinalList As List(Of String))
+        Function QueueAdds(ByVal pInstruction As AnalyzerManagerSwActionList, ByVal pParamsQueue As Object) As Boolean
 
         ' Temporal location
         Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _

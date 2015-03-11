@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
         'Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
-        Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
+        'Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
         Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
 
         Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm
@@ -785,8 +785,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>Modify AG 27/11/2014 BA-2066</remarks>
         Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerManager.ShowBaseLineInitializationFailedMessage
             Get
-                'Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
-                Return (CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False)) OrElse CBool(IIf(dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES, True, False)))
+                Return (CBool(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES) OrElse CBool(dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES))
             End Get
 
         End Property
@@ -1277,8 +1276,8 @@ Namespace Biosystems.Ax00.Core.Entities
         'SGM 29/05/2012
         Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerManager.FWUpdateResponseData '#REFACTORING
         Public Property AdjustmentsFilePath As String Implements IAnalyzerManager.AdjustmentsFilePath '#REFACTORING
-        <DefaultValue(GlobalEnumerates.InstructionActions.None)>
-        Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerManager.CurrentInstructionAction 'BA-2075
+        <DefaultValue(InstructionActions.None)>
+        Public Property CurrentInstructionAction As InstructionActions Implements IAnalyzerManager.CurrentInstructionAction 'BA-2075
 
         'IT 19/12/2014 - BA-2143
         Public Property FlightInitFailures As Integer Implements IAnalyzerManager.FlightInitFailures
@@ -1432,6 +1431,45 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
+        Public Property ThermoReactionsRotorWarningTimerEnabled() As Boolean Implements IAnalyzerManager.ThermoReactionsRotorWarningTimerEnabled
+            Get
+                Return thermoReactionsRotorWarningTimer.Enabled
+            End Get
+            Set(value As Boolean)
+                thermoReactionsRotorWarningTimer.Enabled = value
+            End Set
+        End Property
+
+        Public ReadOnly Property PauseModeIsStartingState() As Boolean Implements IAnalyzerManager.PauseModeIsStartingState
+            Get
+                Return pauseModeIsStarting
+            End Get
+        End Property
+
+        Public Property PauseSendingTestPreparations() As Boolean Implements IAnalyzerManager.PauseSendingTestPreparations
+            Get
+                Return pauseSendingTestPreparationsFlag
+            End Get
+            Set(value As Boolean)
+                pauseSendingTestPreparationsFlag = value
+            End Set
+        End Property
+
+        Public ReadOnly Property BaselineInitializationFailures As Integer Implements IAnalyzerManager.BaselineInitializationFailures
+            Get
+                Return baselineInitializationFailuresAttribute
+            End Get
+        End Property
+
+        Public Property WELLbaselineParametersFailures As Boolean Implements IAnalyzerManager.WELLbaselineParametersFailures
+            Get
+                Return WELLbaselineParametersFailuresAttribute
+            End Get
+            Set(value As Boolean)
+                WELLbaselineParametersFailuresAttribute = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1471,7 +1509,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Creation AG 20/04/2010
         ''' </remarks>
         Public Sub OnManageAnalyzerEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pInstructionReceived As List(Of InstructionParameterTO)) Handles AppLayer.ManageAnalyzer
-            Try              
+            Try
 
                 ManageAnalyzer(pAction, False, pInstructionReceived)
 
@@ -4185,6 +4223,23 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         ''' <summary>
+        ''' Add Parameters to the InstructionQueue and ParamsQueue
+        ''' </summary>
+        ''' <param name="pInstruction"></param>
+        ''' <param name="pParamsQueue"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function QueueAdds(ByVal pInstruction As AnalyzerManagerSwActionList, ByVal pParamsQueue As Object) As Boolean Implements IAnalyzerManager.QueueAdds
+
+            If Not myInstructionsQueue.Contains(pInstruction) Then
+                myInstructionsQueue.Add(pInstruction)
+                myParamsQueue.Add(pParamsQueue)
+                Return True
+            End If
+            Return False
+        End Function
+
+        ''' <summary>
         ''' Returns Scripts Data object
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Scripts</returns>
@@ -5457,7 +5512,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <remarks>AG 02/04/2013 - Creation</remarks>
         Public Sub ClearLastExportedResults() Implements IAnalyzerManager.ClearLastExportedResults
-            SyncLock lockThis
+            SyncLock LockThis
                 lastExportedResultsDSAttribute.Clear()
             End SyncLock
         End Sub
