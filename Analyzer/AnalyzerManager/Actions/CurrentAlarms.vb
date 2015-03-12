@@ -85,65 +85,13 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     If String.Equals(_analyzerManager.AnalyzerFreezeMode(), "PARTIAL") Then
-                        'INSTRUCTIONS: If Running then send END instruction (if not sent yet)
-                        'BUSINESS: Nothing
-                        'PRESENTATION: Show message box informing the user the worksesion has been paused 'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages +
-                        '              When analyzer leaves RUNNING and becomes STANDBY activate Recover button
-
-                        If Not _analyzerManager.AllowScanInRunning() AndAlso Not _analyzerManager.PauseModeIsStartingState AndAlso _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                            Not _analyzerManager.EndRunInstructionSent() AndAlso _analyzerManager.AnalyzerCurrentAction() <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then
-
-                            myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-
-                            If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
-                                methodHasToAddInstructionToQueueFlag = 1
-                                _analyzerManager.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
-                            End If
-                        End If
+                        ApplyActionsForAnalyzerInPartialFreezeMode(myGlobal, methodHasToAddInstructionToQueueFlag)
 
                     ElseIf String.Equals(_analyzerManager.AnalyzerFreezeMode(), "TOTAL") Then 'TOTAL freeze
-                        'INSTRUCTIONS: If Running then send STANDBY instruction (if not sent yet)
-                        'BUSINESS: Nothing
-                        'PRESENTATION: Show message box informing the user the worksesion has been aborted + activate Recover button
-                        If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then 'Alarm Exists
-                            If _analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then
-                                myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-                            End If
-                            'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                            If Not myGlobal.HasError Then
-                                methodHasToAddInstructionToQueueFlag = 1
-                                _analyzerManager.EndRunInstructionSent() = True 'AG 14/05/2012 - when StandBy instruction is sent the ENDRUN instruction has no sense!!
-
-                                Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
-                            End If
-                        Else
-                            'If new freeze total alarm appears during recover washings ... mark recover process as closed                            
-                            If _analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) = "INPROCESS" _
-                            AndAlso _analyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVER_PROCESS_FINISHED) = 1 Then
-                                _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
-                            End If
-                        End If
+                        ApplyActionsForAnalyzerInTotalFreezeMode(myGlobal, methodHasToAddInstructionToQueueFlag, dbConnection, myAnalyzerFlagsDs)
 
                     ElseIf String.Equals(_analyzerManager.AnalyzerFreezeMode(), "RESET") Then
-                        'INSTRUCTIONS: Stop the sensor information instructions
-                        'BUSINESS: AnalyzerManager.SetAnalyzerNotReady
-                        'PRESENTATION: Show message box informing the user the analyzer must be restarted
-                        myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
-
-                        _analyzerManager.SetAnalyzerNotReady()
-
-                        'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                        If Not myGlobal.HasError Then
-                            methodHasToAddInstructionToQueueFlag = 2
-
-                            If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                                Dim myWsAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWsAnalyzerDelegate.UpdateWSStatus(dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
-                            End If
-                        End If
-
-
+                        ApplyActionsForAnalyzerInResetFreezeMode(myGlobal, methodHasToAddInstructionToQueueFlag, dbConnection)
 
                     End If
                 End If
@@ -327,6 +275,90 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Return myGlobal
         End Function
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
+        ''' <param name="dbConnection"></param>
+        ''' <remarks>
+        ''' INSTRUCTIONS: Stop the sensor information instructions
+        ''' BUSINESS: AnalyzerManager.SetAnalyzerNotReady
+        ''' PRESENTATION: Show message box informing the user the analyzer must be restarted
+        ''' </remarks>
+        Private Sub ApplyActionsForAnalyzerInResetFreezeMode(ByRef myGlobal As GlobalDataTO, ByRef methodHasToAddInstructionToQueueFlag As Integer, ByVal dbConnection As SqlConnection)
+
+            myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
+            _analyzerManager.SetAnalyzerNotReady()
+
+            'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
+            If Not myGlobal.HasError Then
+                methodHasToAddInstructionToQueueFlag = 2
+
+                If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                    Dim myWsAnalyzerDelegate As New WSAnalyzersDelegate
+                    myGlobal = myWsAnalyzerDelegate.UpdateWSStatus(dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
+                End If
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
+        ''' <param name="dbConnection"></param>
+        ''' <param name="myAnalyzerFlagsDs"></param>
+        ''' <remarks>
+        ''' INSTRUCTIONS: If Running then send STANDBY instruction (if not sent yet)
+        ''' BUSINESS: Nothing
+        ''' PRESENTATION: Show message box informing the user the worksesion has been aborted + activate Recover button
+        ''' </remarks>
+        Private Sub ApplyActionsForAnalyzerInTotalFreezeMode(ByRef myGlobal As GlobalDataTO, ByRef methodHasToAddInstructionToQueueFlag As Integer, ByVal dbConnection As SqlConnection, ByRef myAnalyzerFlagsDs As AnalyzerManagerFlagsDS)
+
+            If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then 'Alarm Exists
+                If _analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then
+                    myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+                End If
+                'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
+                If Not myGlobal.HasError Then
+                    methodHasToAddInstructionToQueueFlag = 1
+                    _analyzerManager.EndRunInstructionSent() = True 'AG 14/05/2012 - when StandBy instruction is sent the ENDRUN instruction has no sense!!
+
+                    Dim myWsAnalyzerDelegate As New WSAnalyzersDelegate
+                    myGlobal = myWsAnalyzerDelegate.UpdateWSStatus(dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
+                End If
+            Else
+                'If new freeze total alarm appears during recover washings ... mark recover process as closed                            
+                If _analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) = "INPROCESS" _
+                   AndAlso _analyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVER_PROCESS_FINISHED) = 1 Then
+                    _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
+                End If
+            End If
+        End Sub
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
+        ''' <remarks>
+        ''' INSTRUCTIONS: If Running then send END instruction (if not sent yet)
+        ''' BUSINESS: Nothing
+        ''' PRESENTATION: Show message box informing the user the worksesion has been paused 'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages +
+        '''               When analyzer leaves RUNNING and becomes STANDBY activate Recover button
+        ''' </remarks>
+        Private Sub ApplyActionsForAnalyzerInPartialFreezeMode(ByRef myGlobal As GlobalDataTO, ByRef methodHasToAddInstructionToQueueFlag As Integer)
+            If Not _analyzerManager.AllowScanInRunning() AndAlso Not _analyzerManager.PauseModeIsStartingState AndAlso _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+               Not _analyzerManager.EndRunInstructionSent() AndAlso _analyzerManager.AnalyzerCurrentAction() <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then
+
+                myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+
+                If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
+                    methodHasToAddInstructionToQueueFlag = 1
+                    _analyzerManager.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
+                End If
+            End If
+        End Sub
 
         ''' <summary>
         ''' Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
@@ -361,8 +393,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Else 'Exists freeze auto
                         'Reset all processes flags
-                        Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                        myGlobal = flags_dlg.ResetFlags(dbConnection, _analyzerManager.ActiveAnalyzer())
+                        Dim flagsDlg As New AnalyzerManagerFlagsDelegate
+                        myGlobal = flagsDlg.ResetFlags(dbConnection, _analyzerManager.ActiveAnalyzer())
 
                         'Finally read and update our internal structures
                         If Not myGlobal.HasError Then
@@ -497,7 +529,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAlarmStatusList"></param>
         ''' <param name="index"></param>
         ''' <param name="alarmsDelg"></param>
-        ''' <param name="myISEOffErrorFixed"></param>
+        ''' <param name="myIseOffErrorFixed"></param>
         ''' <remarks>
         ''' IF: When this alarm appears in RUNNING: Lock all pending ISE preparations
         ''' 1st: Get all ISE executions pending (required to inform the UI with the locked executions
@@ -507,7 +539,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' ELSE: Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
         ''' Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
-        Private Sub IseSwitchOff(ByRef myGlobal As GlobalDataTO, ByVal dbConnection As SqlConnection, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef myISEOffErrorFixed As Boolean)
+        Private Sub IseSwitchOff(ByRef myGlobal As GlobalDataTO, ByVal dbConnection As SqlConnection, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, _
+                                 ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef myIseOffErrorFixed As Boolean)
 
             If pAlarmStatusList(index) Then
                 _analyzerManager.ISEAnalyzer.IsISESwitchON = False
@@ -734,6 +767,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         clotDetectionEnabled = CType(adjustValue, Boolean)
                     End If
 
+                    If clotDetectionEnabled Then
+                        'AG 17/07/2012 - CANCELLED again (JE+RP+ST+EF) !! Bugs Tracking 706
+                    End If
                 End If
 
             Else 'Alarm solved
@@ -1071,11 +1107,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' If some of the alarms in pAlarmList means analyzer FREEZE then return TRUE
         ''' If none of the alarms in pAlarmList means analyzer FREEZE then return FALSE
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
+        ''' <param name="pDbConnection"></param>
         ''' <param name="pAlarmList"></param>
         ''' <returns></returns>
         ''' <remarks>AG 07/03/2012</remarks>
-        Private Function ExistFreezeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAlarmList As List(Of GlobalEnumerates.Alarms)) As Boolean
+        Private Function ExistFreezeAlarms(ByVal pDbConnection As SqlConnection, ByVal pAlarmList As List(Of GlobalEnumerates.Alarms)) As Boolean
             Dim resultData As GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
             Dim returnData As Boolean = False

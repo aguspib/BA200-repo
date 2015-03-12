@@ -144,7 +144,7 @@
     <Compile Include="AnalyzerManager\6- Sending Processes.vb" />
     <Compile Include="AnalyzerManager\7- Recovery Results.vb" />
     <Compile Include="AnalyzerManager\Actions\AnalyzerEventManagement.vb" />
-    <Compile Include="AnalyzerManager\Actions\ManageAlarms.vb" />
+    <Compile Include="AnalyzerManager\Actions\CurrentAlarms.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\BA200AnalyzerEntity.vb" />

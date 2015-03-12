@@ -845,26 +845,20 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
 
                         Dim myErrorCode As New List(Of Integer)
-                        ' XBC 16/10/2012
                         Dim myFwCodeErrorReceivedList As New List(Of String)
 
                         myErrorCode.Add(errorValue)
 
                         Dim myAlarms = AnalyzerManager.TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
 
-                        'SGM 09/11/2012 - reset flag in case of Rotor missing error is not received
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If GlobalBase.IsServiceAssembly Then
                             If Not myAlarms.Contains(Alarms.REACT_MISSING_ERR) Then
                                 AnalyzerManager.IsServiceRotorMissingInformed() = False
                             End If
                         End If
 
-                        'SGM 02/07/2012
                         If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
 
-                            ' XB 26/09/2014 - BA-1872
                             If AnalyzerManager.ISEAnalyzer IsNot Nothing Then
                                 If Not AnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
                                     ' If ISE module isn't Installed remove the ISE Timeout Alarm
@@ -883,7 +877,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     AnalyzerManager.CanSendingRepetitions() = True
                                     AnalyzerManager.NumSendingRepetitionsTimeout() += 1
-                                    'Dim myLogAcciones As New ApplicationLogManager()
                                     If AnalyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
                                         GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                         AnalyzerManager.WaitingStartTaskTimerEnabled() = False
@@ -931,35 +924,24 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         End If
-                        'end SGM 02/07/2012
-
-                        'AG 04/12/2014 BA-2236
                         Dim index As Integer = 0
                         Dim errorCodeId As String
-                        'AG 04/12/2014 BA-2236
 
                         For Each alarmId As Alarms In myAlarms
-                            'AG 04/12/2014 BA-2236 - Method 
-                            'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
                             errorCodeId = ""
                             If index <= myErrorCode.Count - 1 Then
                                 errorCodeId = myErrorCode(index).ToString
                             End If
                             AnalyzerManager.PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
-                            'AG 04/12/2014 BA-2236
                             index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                         Next
 
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If GlobalBase.IsServiceAssembly Then
                             ' Initialize Error Codes List
                             AnalyzerManager.MyErrorCodesClear()
                             ' Prepare error codes List received from Analyzer
                             AnalyzerManager.PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
                         End If
-                        ' XBC 16/10/2012
 
                         If myAlarmsReceivedList.Count > 0 Then
                             '3- Finally call manage all alarms detected (new or fixed)
@@ -973,7 +955,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else 'if not new alarms sure the ansinfo instruction is activated
                             If AnalyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY AndAlso AnalyzerManager.SessionFlag(AnalyzerManagerFlags.RUNNINGprocess) <> "INPROCESS" Then
 
-                                ' XB 03/04/2014
                                 Dim updateIseConsumptionFlag As Boolean = False
                                 ' Estimated ISE Consumption by Firmware during WS
                                 If Not AnalyzerManager.ISEAnalyzer Is Nothing _
@@ -987,26 +968,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'AG 12/04/2012 - New Fw disables info when analyzer leaves running, so Sw has to activate info when standby end
                                 If Not updateIseConsumptionFlag AndAlso AnalyzerManager.SessionFlag(AnalyzerManagerFlags.ABORTprocess) <> "INPROCESS" Then
-                                    ' XB 03/04/2014
 
                                     myGlobal = AnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
                                     'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
                                     If Not myGlobal.HasError AndAlso AnalyzerManager.Connected() Then AnalyzerManager.SetAnalyzerNotReady()
-
-                                End If ' XB 03/04/2014
-
+                                End If
                             End If
                         End If
-
                     End If
-
                 End If
-
             Else 'Error code = 0
-
-                ' XBC 07/11/2012
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     If AnalyzerManager.ErrorCodesDisplay.Count > 0 Then
                         Dim pErrorCodeList As New List(Of String)
@@ -1015,9 +986,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         AnalyzerManager.SolveErrorCodesToDisplay(pErrorCodeList)
                     End If
 
-                    'SGM 15/11/2012 - Initialize Error Codes List
                     AnalyzerManager.MyErrorCodesClear()
-
                 End If
 
                 'Reset the freeze flags information
