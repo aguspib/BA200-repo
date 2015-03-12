@@ -308,33 +308,35 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Function GetNextStep() As RotorChangeStepsEnum
 
+            Dim nextStep = RotorChangeStepsEnum.None
+
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
-                Return GetNextStepWhileInProcess()
+                nextStep = GetNextStepWhileInProcess()
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
 
                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
-                        Return RotorChangeStepsEnum.Washing
+                        nextStep = RotorChangeStepsEnum.Washing
 
                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                        Return RotorChangeStepsEnum.StaticBaseLine
+                        nextStep = RotorChangeStepsEnum.StaticBaseLine
 
                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineFill
+                        nextStep = RotorChangeStepsEnum.DynamicBaseLineFill
 
                     ElseIf ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineRead
+                        nextStep = RotorChangeStepsEnum.DynamicBaseLineRead
 
                     ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineEmpty
+                        nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
 
                     End If
                 End If
 
             End If
 
-            Return RotorChangeStepsEnum.None
+            Return nextStep
 
         End Function
 
