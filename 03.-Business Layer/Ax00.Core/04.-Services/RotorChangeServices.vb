@@ -309,90 +309,98 @@ Namespace Biosystems.Ax00.Core.Services
         Private Function GetNextStep() As RotorChangeStepsEnum
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
+                Return GetNextStepWhileInProcess()
 
-                'AG 20/01/2015 BA-2216
-                If ((_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "") Or
-                    (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "INI")) Then
-                    Return RotorChangeStepsEnum.NewRotor
-                End If
-
-                If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
-
-                    If ((_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "") OrElse
-                        (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED")) Then 'Send Wash
-                        Return RotorChangeStepsEnum.Washing
-                    End If
-
-                    If ((_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "END") AndAlso
-                        ((_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "") OrElse _
-                        (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED"))) Then
-                        Return RotorChangeStepsEnum.StaticBaseLine
-                    End If
-
-                End If
-
-                If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") And
-                        ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "") OrElse (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED")) And
-                        (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineFill
-                    End If
-
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
-                        (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "") And
-                        (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineRead
-                    End If
-
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
-                        ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "") OrElse (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) And
-                        (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineEmpty
-                    End If
-
-                    If (_forceEmptyAndFinalize) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "END") And (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
-                        Return RotorChangeStepsEnum.DynamicBaseLineEmpty
-                    End If
-
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
-                        Return RotorChangeStepsEnum.Finalize
-                    End If
-                Else
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") OrElse
-                        (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                        Return RotorChangeStepsEnum.Finalize
-                    End If
-                End If
-            End If
-
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
 
                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
                         Return RotorChangeStepsEnum.Washing
-                    End If
 
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
+                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
                         Return RotorChangeStepsEnum.StaticBaseLine
-                    End If
 
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
+                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
                         Return RotorChangeStepsEnum.DynamicBaseLineFill
-                    End If
 
-                    If ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
+                    ElseIf ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
                         Return RotorChangeStepsEnum.DynamicBaseLineRead
-                    End If
 
-                    If ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
+                    ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
                         Return RotorChangeStepsEnum.DynamicBaseLineEmpty
+
                     End If
                 End If
 
             End If
 
             Return RotorChangeStepsEnum.None
+
+        End Function
+
+        Private Function GetNextStepWhileInProcess() As RotorChangeStepsEnum
+
+            Dim nextStep As RotorChangeStepsEnum = RotorChangeStepsEnum.None
+
+            Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor)
+                Case "", "INI"
+                    nextStep = RotorChangeStepsEnum.NewRotor
+
+                Case "END"
+
+                    Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
+                        Case "", "CANCELED"
+                            nextStep = RotorChangeStepsEnum.Washing
+
+                        Case "END"
+                            If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "") OrElse (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
+                                nextStep = RotorChangeStepsEnum.StaticBaseLine
+
+                            Else
+
+                                If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
+
+                                    If (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
+
+                                        If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") And
+                                           ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "") OrElse
+                                            (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED")) Then
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineFill
+
+                                        ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
+                                               (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "") Then
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineRead
+
+                                        ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
+                                               ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "") OrElse
+                                                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
+
+                                        ElseIf (_forceEmptyAndFinalize) AndAlso (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "END") Then
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
+
+                                        End If
+
+                                    End If
+
+                                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
+                                        nextStep = RotorChangeStepsEnum.Finalize
+                                    End If
+
+                                Else
+                                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") OrElse
+                                       (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
+                                        nextStep = RotorChangeStepsEnum.Finalize
+                                    End If
+                                End If
+
+                            End If
+                    End Select
+
+
+            End Select
+
+            Return nextStep
 
         End Function
 
