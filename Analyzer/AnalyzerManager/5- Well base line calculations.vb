@@ -377,14 +377,11 @@ Namespace Biosystems.Ax00.Core.Entities
                         'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
                         'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                         'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                        If GlobalBase.IsServiceAssembly Then
-                            ' XBC 16/10/2012 - Alarms treatment for Service
-                            ' Not Apply
-                            'resultData = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                        Else
+                        If Not GlobalBase.IsServiceAssembly Then
                             Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                            resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                            'Dim myLogAcciones As New ApplicationLogManager()
+                            Dim currentAlarms = New CurrentAlarms(Me)
+                            resultData = currentAlarms.Manage(dbConnection, AlarmList, AlarmStatusList)
+
                             GlobalBase.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
                         End If
                     Else
@@ -400,7 +397,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ControlWellBaseLine", EventLogEntryType.Error, False)
 
             End Try

@@ -111,8 +111,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If action say us CONNECTION_ESTABLISHMENT update internal flags
                 If myActionValue = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
 
-                    'If myApplicationName.ToUpper.Contains("SERVICE") Then SGM 22/10/2012
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     If GlobalBase.IsServiceAssembly AndAlso errorValue = 0 Then
                         AnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.STATUS_RECEIVED
                         AnalyzerManager.ConnectionDoneReceptionEvent()
@@ -124,7 +122,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     AnalyzerManager.PortName() = AnalyzerManager.ConnectedPortName
                     AnalyzerManager.Bauds() = AnalyzerManager.ConnectedBauds()
 
-                    'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.CONNECTED, CSng(AnalyzerManager.Connected()), True) 'AG 28/09/2011 - comment this line. The event will be generated when the connect process ends
                 End If
 
                 'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
@@ -148,7 +145,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = myFlagsDelg.ResetFlags(Nothing, AnalyzerManager.ActiveAnalyzer())
                                 AnalyzerManager.InitializeAnalyzerFlags(Nothing)
                             End If
-                            'AG 20/06/2012
 
                         Case AnalyzerManagerStatus.STANDBY
                             If Not AnalyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
@@ -158,25 +154,23 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Case AnalyzerManagerStatus.RUNNING
                             If Not AnalyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
-                               Not AnalyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (RUNNING)
+                               Not AnalyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (RUNNING)
                                 myGlobal = AnalyzerManager.ManageRunningStatus(myActionValue, myWellValue)
 
-                                If myRequestValue = 1 Then startTime = Now 'AG 28/06/2012 - time estimation
+                                If myRequestValue = 1 Then startTime = Now
 
                             End If
                     End Select
 
 
-                    'AG 22/06/2012 - (status <> RUNNING) After connection establishment Sw has to wait until BAx00 is ready to receive the remaining instructions of the connection process
-                    '                (status = RUNNING) Sound OFF + no more changes (until spec how to know the analyzerID)
+                    '(status <> RUNNING) After connection establishment Sw has to wait until BAx00 is ready to receive the remaining instructions of the connection process
+                    '(status = RUNNING) Sound OFF + no more changes (until spec how to know the analyzerID)
                     Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
-                    'IF clause (priority 1)
                     If AnalyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE AndAlso _
                         AnalyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
 
-                        'AG 20/06/2012 - Different connect business when analyzer status <> Running and when is running
+                        'Different connect business when analyzer status <> Running and when is running
                         If AnalyzerManager.AnalyzerStatus() <> AnalyzerManagerStatus.RUNNING Then
-                            ' XBC 02/08/2012 - initialize ReportSATonRUNNING
                             AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
 
                             AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
@@ -184,14 +178,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else
                             AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
 
-                            ' XBC 02/08/2012 - when Connecting on RUNNING Session we must ask for Serial Number (POLLSN) 
-                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True) 'Send SOUND OFF instruction
+                            'when Connecting on RUNNING Session we must ask for Serial Number (POLLSN) 
 
                             AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
                             AnalyzerManager.EndRunInstructionSent() = True 'AG 25/09/2012 - When resultsrecover process starts the Fw implements an automatic END, so add protection in order Sw do not sent this instruction again
 
-                            'AG 28/11/2013 - BT #1397 (in running Sw has to know if analyzer is in normal or paused running before call POLLSN so we has to send STATE instruction)
-                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
+                            'in running Sw has to know if analyzer is in normal or paused running before call POLLSN so we has to send STATE instruction
                             myGlobal = AnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Send STATE instruction
 
                         End If
@@ -200,7 +192,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             AnalyzerManager.SetAnalyzerNotReady()
                         End If
 
-                        'IF clause (priority 2)
                     ElseIf AnalyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
                            AnalyzerManager.SessionFlag(AnalyzerManagerFlags.WaitForAnalyzerReady) = "INI" Then
 
@@ -237,10 +228,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
                         AnalyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(AnalyzerManager.Connected(), 1, 0)), True) 'Inform connection finished OK
 
-                        'AG 04/09/2012 - when recovery results finished, Sw call the processConnection method for execute the full connection
+                        'when recovery results finished, Sw call the processConnection method for execute the full connection
                         If AnalyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso AnalyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
                             AnalyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
-                            AnalyzerManager.RecoveryResultsInPause() = False 'AG 28/11/2013 - BT #1397
+                            AnalyzerManager.RecoveryResultsInPause() = False
                             AnalyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
                             AnalyzerManager.ManageStandByStatus(AnalyzerManagerAx00Actions.STANDBY_END, AnalyzerManager.CurrentWell()) 'Call this method with this action code to update ISE consumption if needed
 
@@ -253,9 +244,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         End If
-                        'AG 04/09/2012
 
-                        'AG 18/01/2012 - If no ISE installed LOCK all pending executions in current worksession/analyzer
+                        'If no ISE installed LOCK all pending executions in current worksession/analyzer
                         If Not myGlobal.HasError Then
                             Dim adjustValue As String
                             adjustValue = AnalyzerManager.ReadAdjustValue(Ax00Adjustsments.ISEINS)
@@ -268,19 +258,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         End If
 
-                        'AG 29/03/2012 - activate info in standby
                         If AnalyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
                             AnalyzerManager.InfoActivated() = 0
                             myGlobal = AnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
                         End If
 
-                        myGlobal = AnalyzerManager.ManageInterruptedProcess(Nothing) 'AG 20/06/2012 - Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
+                        myGlobal = AnalyzerManager.ManageInterruptedProcess(Nothing) 'Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
 
-                        'AG 28/11/2013 - BT #1397
                     ElseIf AnalyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso Not AnalyzerManager.RunningConnectionPollSnSentStatus() AndAlso _
                         AnalyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso AnalyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
                         myGlobal = AnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
-                        'AG 28/11/2013
 
                     End If
 
@@ -289,21 +276,17 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                         myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                     End If
-                    'AG 23/11/2011
 
                 End If
 
 
                 If myStatusValue = AnalyzerManagerStatus.SLEEPING Then
 
-                    ' XBC 24/05/2012
                     If AnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso AnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
                         AnalyzerManager.ISEAnalyzer.IsISEInitiatedDone = False
                         AnalyzerManager.IseIsAlreadyStarted = False
                     End If
-                    ' XBC 24/05/2012
 
-                    'SGM 23/09/2011
                     If AnalyzerManager.IsShutDownRequested() Then
                         AnalyzerManager.Connected() = False
                         AnalyzerManager.InfoRefreshFirstTime = True
@@ -317,9 +300,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 If AnalyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
                     SyncLock LockThis
                         If AnalyzerManager.BufferANSPHRReceivedCount() > 0 AndAlso Not AnalyzerManager.ProcessingLastANSPHRInstructionStatus() Then
-
-                            ' XB 15/10/2013 - Add AnalyzerManager.PauseInstructionSent() + PAUSE_START and PAUSE_END also activate startDoWorker flag - BT #1318
-                            'AG 19/11/2013 - #1396-b Add also BARCODE_ACTION_RECEIVED
 
                             Dim startDoWorker As Boolean = False 'Evaluate if first ANSPHR in queue can be processed or not
                             If Not AnalyzerManager.EndRunInstructionSent() AndAlso Not AnalyzerManager.AbortInstructionSent() AndAlso Not AnalyzerManager.PauseInstructionSent() Then
@@ -370,12 +350,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                     AnalyzerManager.ProcessingLastANSPHRInstructionStatus() = True
                                     AnalyzerManager.RunWellBaseLineWorker()
                                 Else
-                                    'Dim myLogAcciones As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
                                 End If
                             End If
-
-
                         End If
                     End SyncLock
                 End If
@@ -557,7 +534,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             AnalyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count > 0 Then
                                 ' Note that this alarm is common on User and Service !
-                                myGlobal = AnalyzerManager.ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                Dim currentAlarms = New CurrentAlarms(AnalyzerManager)
+                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                
                             End If
                             ' Activates Alarm end
 
@@ -622,7 +600,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         AnalyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                         If myAlarmList.Count > 0 Then
                             ' Note that this alarm is common on User and Service !
-                            myGlobal = AnalyzerManager.ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            Dim currentAlarms = New CurrentAlarms(AnalyzerManager)
+                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                         End If
                         ' Activates Alarm end
 
@@ -680,10 +659,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Finally call manage all alarms detected (new or solved)
                     If myAlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            ' Not Apply
-                        Else
-                            myGlobal = AnalyzerManager.ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        If Not GlobalBase.IsServiceAssembly Then
+                            Dim currentAlarms = New CurrentAlarms(AnalyzerManager)
+                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                         End If
 
                     End If
@@ -923,7 +901,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         AnalyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                                         If myAlarmList.Count > 0 Then
                                             ' Note that this alarm is common on User and Service !
-                                            myGlobal = AnalyzerManager.ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            Dim currentAlarms = New CurrentAlarms(AnalyzerManager)
+                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                            
                                         End If
                                         ' Activates Alarm end
 
@@ -984,18 +963,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If myAlarmsReceivedList.Count > 0 Then
                             '3- Finally call manage all alarms detected (new or fixed)
-                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If GlobalBase.IsServiceAssembly Then
-                                ' XBC 16/10/2012 - Alarms treatment for Service
-                                'myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
                                 myGlobal = AnalyzerManager.ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
-                                ' XBC 16/10/2012
                             Else
-                                'AG 04/12/2014 BA-2236
-                                'myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
-                                myGlobal = AnalyzerManager.ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                                'AG 04/12/2014 BA-2236
+                                Dim currentAlarms = New CurrentAlarms(AnalyzerManager)
+                                myGlobal = currentAlarms.Manage(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                             End If
 
                         Else 'if not new alarms sure the ansinfo instruction is activated

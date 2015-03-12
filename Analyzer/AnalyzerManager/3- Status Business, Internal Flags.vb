@@ -555,7 +555,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim myAlarmList As New List(Of Alarms)
 
                     PrepareLocalAlarmList(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN, AllowScanInRunningAttribute, myAlarmList, myAlarmStatusList)
-                    If (myAlarmList.Count > 0) Then myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If (myAlarmList.Count > 0) Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                    End If
 
                     'TR 22/10/2013 -BT #1353 
                     If (Not myGlobal.HasError) Then myGlobal = SendEndInstructionIfRequired()
@@ -601,15 +604,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
-                                'myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' XBC 17/10/2012 - Alarms treatment for Service
-                                    ' Not Apply
-                                    'myGlobal = ManageAlarms_SRV(Nothing, AlarmList, AlarmStatusList)
-                                Else
-                                    myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                                If Not GlobalBase.IsServiceAssembly Then
+                                    Dim currentAlarms = New CurrentAlarms(Me)
+                                    myGlobal = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
                                 End If
                             End If
                         End If
@@ -788,19 +785,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
-                            If AlarmList.Count > 0 Then
-                                'myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' XBC 17/10/2012 - Alarms treatment for Service
-                                    ' Not Apply
-                                    'myGlobal = ManageAlarms_SRV(Nothing, AlarmList, AlarmStatusList)
-                                Else
-                                    myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                            If AlarmList.Count > 0 Then                                
+                                If Not GlobalBase.IsServiceAssembly Then
+                                    Dim currentAlarms = New CurrentAlarms(Me)
+                                    myGlobal = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
                                 End If
                             End If
-                            'AG 12/03/2012
 
                         End If
 
@@ -1253,7 +1243,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 22/11/2013 - Task #1397 - inform the pause mode also to the application layer
         ''' AG 10/12/2013 - Task #1397 move the 22/10/2013 code out the main IF
         ''' </remarks>
-        Private Sub SetAllowScanInRunningValue(ByVal pValue As Boolean)
+        Public Sub SetAllowScanInRunningValue(ByVal pValue As Boolean) Implements IAnalyzerManager.SetAllowScanInRunningValue
             Try
                 If AllowScanInRunningAttribute <> pValue Then
                     'Set the new value
@@ -1277,16 +1267,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                'AG 10/12/2013
-                'AG 27/11/2013 - Task #1397 - Inform the app layer that when re-connection Analzyer was in pause mode
                 'The well asked must be different from the normal running re-connection
                 If pValue AndAlso mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" Then
                     AppLayer.RecoveryResultsInPause = True
                 End If
-                'AG 10/12/2013
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetAllowScanInRunningValue", EventLogEntryType.Error, False)
             End Try
 

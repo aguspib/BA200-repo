@@ -87,13 +87,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 Next
 
                 If finalAlarmList.Count > 0 Then
-                    'myGlobal = ManageAlarms(Nothing, pAlarmList, pAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
                         myGlobal = ManageAlarms_SRV(Nothing, finalAlarmList, finalAlarmStatusList)
                     Else
-                        myGlobal = ManageAlarms(Nothing, finalAlarmList, finalAlarmStatusList)
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        myGlobal = currentAlarms.Manage(Nothing, finalAlarmList, finalAlarmStatusList)
                     End If
                 End If
 
@@ -102,7 +100,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SimulateAlarmsManagement", EventLogEntryType.Error, False)
             End Try
             Return myGlobal

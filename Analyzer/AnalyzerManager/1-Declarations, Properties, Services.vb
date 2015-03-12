@@ -77,7 +77,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
         Private WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
         Private WELL_OFFSET_FOR_ISETEST_URI As Integer = 3 'Default well offset until next request when a ISETEST (uri) instruction is sent
-        Private MAX_REACTROTOR_WELLS As Integer = 120 'Max wells inside the reactions rotor
+        'Private MAX_REACTROTOR_WELLS As Integer = 120 'Max wells inside the reactions rotor
 
         'Alarm Class variables
         Private myClassFieldLimitsDS As New FieldLimitsDS 'AG 30/03/2011 - tfmwFieldLimits contents are read once during the constructor. During running use this DS using Linq
@@ -103,11 +103,6 @@ Namespace Biosystems.Ax00.Core.Entities
         'AG 12/06/2012 - The photometric instructions are treated in a different threat in order to attend quickly to the analyzer requests in Running
         Private processingLastANSPHRInstructionFlag As Boolean = False
         Private bufferANSPHRReceived As New List(Of List(Of InstructionParameterTO)) 'AG 28/06/2012        
-
-        'AG 23/07/2012 - Read the Alarm definition when analyzer manager class is created not in several 
-        'methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
-        Dim alarmsDefintionTableDS As New AlarmsDS
-
 
         'Recovery results variables
         Private bufferInstructionsRESULTSRECOVERYProcess As New List(Of List(Of InstructionParameterTO)) 'AG 27/08/2012 - buffer of instructions received (preparations with problems, results missing, ISE missing)
@@ -696,17 +691,22 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property AnalyzerIsFreeze() As Boolean Implements IAnalyzerManager.AnalyzerIsFreeze
+        Public Property AnalyzerIsFreeze() As Boolean Implements IAnalyzerManager.AnalyzerIsFreeze
             Get
                 Return analyzerFREEZEFlagAttribute
             End Get
+            Set(value As Boolean)
+                analyzerFREEZEFlagAttribute = value
+            End Set
         End Property
 
-        'AG 02/03/2012
-        Public ReadOnly Property AnalyzerFreezeMode() As String Implements IAnalyzerManager.AnalyzerFreezeMode
+        Public Property AnalyzerFreezeMode() As String Implements IAnalyzerManager.AnalyzerFreezeMode
             Get
                 Return analyzerFREEZEModeAttribute
             End Get
+            Set(value As String)
+                analyzerFREEZEModeAttribute = value
+            End Set
         End Property
 
         Public Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String Implements IAnalyzerManager.SessionFlag  '19/04/2010 AG
@@ -801,10 +801,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
-        ' XBC 17/05/2011
         Public ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable Implements IAnalyzerManager.SensorValueChanged
             Get
                 Return Me.myUI_RefreshDS.SensorValueChanged
+            End Get
+        End Property
+
+        Public ReadOnly Property ReceivedAlarms() As UIRefreshDS.ReceivedAlarmsDataTable Implements IAnalyzerManager.ReceivedAlarms
+            Get
+                Return myUI_RefreshDS.ReceivedAlarms
             End Get
         End Property
 
@@ -1470,6 +1475,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Public Property FutureRequestNextWellValue As Integer Implements IAnalyzerManager.FutureRequestNextWellValue
+            Get
+                Return futureRequestNextWell
+            End Get
+            Set(value As Integer)
+                futureRequestNextWell = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1806,7 +1820,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         ' Not Apply
                         'myGlobal = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
                     End If
                 End If
 
@@ -3474,7 +3489,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                         If myAlarmList.Count > 0 Then
                                             ' Note that this alarm is common on User and Service !
-                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            Dim currentAlarms = New CurrentAlarms(Me)
+                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                            
                                         End If
                                         ' Activates Alarm end
 
@@ -3510,7 +3526,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                         If myAlarmList.Count > 0 Then
-                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            Dim currentAlarms = New CurrentAlarms(Me)
+                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                            
                                         End If
                                         ' Activates Alarm end
 
@@ -4215,7 +4232,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 returnValue = myInstructionsQueue.Contains(pInstruction)
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.QueueContains", EventLogEntryType.Error, False)
                 returnValue = False
             End Try
@@ -5099,15 +5115,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function ExistBottleAlarms() As Boolean Implements IAnalyzerManager.ExistBottleAlarms
             Dim returnValue As Boolean = False
             Try
-                'JV 23/01/2014 #1467
-                'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                '    OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                '    OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                '    OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
-
-                '    returnValue = True
-                'End If
-
                 'In Running pause mode only the alarms of washing solution or high contamination bottles
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso AllowScanInRunningAttribute Then
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
@@ -5517,6 +5524,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End SyncLock
         End Sub
 
+        Public Sub ClearReceivedAlarmsFromRefreshDs() Implements IAnalyzerManager.ClearReceivedAlarmsFromRefreshDs
+            'Use exclusive lock over myUI_RefreshDS variables
+            SyncLock myUI_RefreshDS.ReceivedAlarms
+                myUI_RefreshDS.ReceivedAlarms.Clear()
+            End SyncLock
+        End Sub
+
         ''' <summary>
         ''' If exist some alarm whose treatment (in RUNNING) requires send the ENDRUN instruction return TRUE, otherwise return FALSE
         ''' </summary>
@@ -5579,12 +5593,26 @@ Namespace Biosystems.Ax00.Core.Entities
             myAlarmListAttribute.Remove(itemToRemove)
         End Sub
 
+        Public Function AlarmListAddtem(itemToAdd As Alarms) As Boolean Implements IAnalyzerManager.AlarmListAddtem
+            If Not myAlarmListAttribute.Contains(itemToAdd) Then
+                myAlarmListAttribute.Add(itemToAdd)
+                Return True
+            End If
+            Return False
+        End Function
+
         Public Sub AlarmListClear() Implements IAnalyzerManager.AlarmListClear
             myAlarmListAttribute.Clear()
         End Sub
 
         Public Sub MyErrorCodesClear() Implements IAnalyzerManager.MyErrorCodesClear
             myErrorCodesAttribute.Clear()
+        End Sub
+
+        Public Sub FillNextPreparationToSend(ByRef myGlobal As GlobalDataTO) Implements IAnalyzerManager.FillNextPreparationToSend
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+            End If
         End Sub
 #End Region
 

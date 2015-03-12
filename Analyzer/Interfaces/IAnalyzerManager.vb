@@ -43,8 +43,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property IsServiceRotorMissingInformed() As Boolean
         Property IsFwUpdateInProcess() As Boolean
         Property IsConfigGeneralProcess() As Boolean
-        ReadOnly Property AnalyzerIsFreeze() As Boolean
-        ReadOnly Property AnalyzerFreezeMode() As String
+        Property AnalyzerIsFreeze() As Boolean
+        Property AnalyzerFreezeMode() As String
         Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String
         ReadOnly Property GetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single
         WriteOnly Property SetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single
@@ -122,6 +122,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property PauseSendingTestPreparations() As Boolean
         ReadOnly Property BaselineInitializationFailures As Integer
         Property WELLbaselineParametersFailures As Boolean
+        Property FutureRequestNextWellValue As Integer
+        ReadOnly Property ReceivedAlarms() As UIRefreshDS.ReceivedAlarmsDataTable
 
 #End Region
 
@@ -239,11 +241,20 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function SendStartTaskinQueue() As GlobalDataTO
         Sub AlarmListRemoveItem(itemToRemove As Alarms)
         Sub AlarmListClear()
+        Function AlarmListAddtem(itemToAdd As Alarms) As Boolean
         Sub MyErrorCodesClear()
         Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
         Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
         Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), ByRef pErrorCodeFinalList As List(Of String))
         Function QueueAdds(ByVal pInstruction As AnalyzerManagerSwActionList, ByVal pParamsQueue As Object) As Boolean
+        Sub SetAllowScanInRunningValue(ByVal pValue As Boolean)
+        Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
+        Sub FillNextPreparationToSend(ByRef myGlobal As GlobalDataTO)
+        Function PrepareUIRefreshEvent(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                               ByVal pExecutionID As Integer, ByVal pReadingNumber As Integer, _
+                                               ByVal pAlarmID As String, ByVal pAlarmStatus As Boolean) As GlobalDataTO
+        Sub ClearReceivedAlarmsFromRefreshDs()
+        Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO
 
         ' Temporal location
         Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
@@ -251,10 +262,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                           ByVal pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pErrorCodeList As List(Of String) = Nothing, _
                                           Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO
-        Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
-                                      ByVal pAlarmIDList As List(Of Alarms), _
-                                      ByVal pAlarmStatusList As List(Of Boolean), _
-                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
+        'Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
+        '                              ByVal pAlarmIDList As List(Of Alarms), _
+        '                              ByVal pAlarmStatusList As List(Of Boolean), _
+        '                              Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
 #End Region
 
     End Interface

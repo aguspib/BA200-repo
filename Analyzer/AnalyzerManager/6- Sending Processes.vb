@@ -648,10 +648,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 12/07/2012 - add parameter (optional pLookForISEExecutionsFlag). This parameter is informed only when call this method from ManageSendAndSearchNext
         '''                 and the ise requests is FALSE (I:0)
         ''' </remarks>
-        Private Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
-
-            'Dim resultData As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
+        Public Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO _
+            Implements IAnalyzerManager.SearchNextPreparation
 
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
@@ -659,7 +657,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 Dim StartTimeTotal As DateTime = Now
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                'Dim myLogAcciones As New ApplicationLogManager()
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
@@ -669,32 +666,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim nextPreparationDS As New AnalyzerManagerDS
                         Dim nextRow As AnalyzerManagerDS.nextPreparationRow
 
-                        ''''''
-                        ''1st: Check if next cuvette is optically rejected 
-                        ''''''
-                        'Dim rejectedWell As Boolean = False
-                        'resultData = Me.CheckOpticalNextWell(dbConnection, pNextWell, rejectedwell)
-                        'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(1.1)
-                        '    If rejectedwell Then
-                        '        nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
-                        '        nextRow.CuvetteOpticallyRejectedFlag = True
-
-                        '        nextRow.CuvetteContaminationFlag = False
-                        '        nextRow.ReagentContaminationFlag = False
-                        '        nextRow.ExecutionID = 0
-                        '        nextRow.ExecutionType = ""
-
-                        '        nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
-                        '    End If
-                        'Else '(1.1)
-                        '    Exit Try
-                        'End If '(1.1)
-
-                        '''''
                         'AG 24/11/2011 change order: 1st cuvette contamination, 2on optically rejected (first version was inverted)
                         '1st: Check if next cuvette requires washing (cuvette contamination)
                         '2on: Check if next cuvette is optically rejected 
-                        '''''
+
                         Dim rejectedWell As Boolean = False
                         Dim contaminatedWell As Boolean = False
                         Dim WashSol1 As String = ""
@@ -768,7 +743,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim FoundPreparation As ExecutionsDS
                                 FoundPreparation = CType(resultData.SetDatos, ExecutionsDS)
 
-                                'RH 26/06/2012 Get data from returned DS
                                 If FoundPreparation.twksWSExecutions.Rows.Count > 0 Then
                                     Dim myRow As ExecutionsDS.twksWSExecutionsRow = FoundPreparation.twksWSExecutions(0)
 
@@ -818,22 +792,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                         nextRow.WashSolution1 = WashSol1
                                         nextRow.WashSolution2 = WashSol1 'AG 24/02/2012
                                     End If
-                                    'AG 24/02/2012 - reagent contamination uses only one bottle or none but not two
-                                    'If WashSol2 = "" Then
-                                    '    nextRow.SetWashSolution2Null()
-                                    'Else
-                                    '    nextRow.WashSolution2 = WashSol2
-                                    'End If
-                                    'nextRow.ExecutionID = executionFound 'AG + DL 06/07/2012 - Inform the next execution to be sent when the wash was performed
                                     nextRow.CuvetteOpticallyRejectedFlag = False
                                     nextRow.CuvetteContaminationFlag = False
 
-                                    'AG 28/09/2012
-                                    'nextRow.ExecutionID = 0
-                                    'nextRow.ExecutionType = ""
                                     nextRow.ExecutionID = executionFound 'Execution that requires the washing
                                     nextRow.ExecutionType = "PREP_STD"
-                                    'AG 28/09/2012
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
 
@@ -868,10 +831,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
             End Try
 

@@ -44,1188 +44,1100 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 04/11/2014 - Add ISE_TIMEOUT_ERR alarm - BA-1872
         '''              XB 06/11/2014 - Add COMMS_TIMEOUT_ERR alarm - BA-1872
         ''' </remarks>
-        Public Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
-                                      ByVal pAlarmIDList As List(Of Alarms), _
-                                      ByVal pAlarmStatusList As List(Of Boolean), _
-                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO _
-                                  Implements IAnalyzerManager.ManageAlarms
-
-            Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlConnection = Nothing
-
-            Try
-                'myGlobal = DAOBase.GetOpenDBTransaction(pdbConnection)
-                'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                'AG 25/09/2012 - comment an use the attribute endRunAlreadySentFlagAttribute
-                'Dim endRunInstructionSent As Boolean = endRunAlreadySentFlagAttribute 'False 'Only send one ENDRUN while looping but send none if it has been sent before
-
-                Dim index As Integer = 0
-                Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS 'AG 12/03/2012
-
-                If Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.END_RUN_START Then
-                    endRunAlreadySentFlagAttribute = True
-                End If
-
-                Dim methodHasToAddInstructionToQueueFlag As Integer = 0 'AG 14/05/2012 - Once one instruction has been sent. The other instructions managed in this method will be added to queue
-                '                                                              0 -> Instruction can be sent
-                '                                                              1 -> One instruction has already been sent. New instructions to be sent in ManageAlarms will be add to queue
-                '                                                              2 -> None instruction can be sent (RESET FREEZE). New instructions to be sent in ManageAlarms wont be add to queue (except SOUND)
-
-                'AG 06/03/2012 - Freeze mode treatment
-                If analyzerFREEZEFlagAttribute Then
-                    'AG 05/06/2014 - #1657 - 'AG + XB 08/04/2014 - #1118 (except ISE_OFF_ERR that is always generated with status FALSE)
-                    'ClearQueueToSend() 'Clear all instruction in queue to be sent
-                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
-                        ClearQueueToSend() 'Clear all instruction in queue to be sent
-                    End If
-                    'AG 05/06/2014 - #1657
-
-                    If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                        'INSTRUCTIONS: NOTHING
-                        'BUSINESS: NOTHING
-                        'PRESENTATION: Nothing
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then 'PARTIAL freeze
-                        'INSTRUCTIONS: If Running then send END instruction (if not sent yet)
-                        'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                        'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                        If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso _
-                            Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-
-                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-
-                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
-                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                            End If
-                        End If
-
-                        'BUSINESS: Nothing
-
-                        'PRESENTATION: Show message box informing the user the worksesion has been paused 'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages +
-                        '              When analyzer leaves RUNNING and becomes STANDBY activate Recover button
-
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "TOTAL") Then 'TOTAL freeze
-                        'INSTRUCTIONS: If Running then send STANDBY instruction (if not sent yet)
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Alarm Exists
-                            'AG 25/09/2012 - do not sent STANDBY if recovery results process is INPROCESS
-                            If mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True)
-                            End If
-
-                            'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                            If Not myGlobal.HasError Then
-                                ''AG 11/12/2012 not integrated in v1.0.0
-                                'If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                                '    AnalyzerIsReadyAttribute = False
-                                'End If
-                                ''AG 11/12/2012
-                                methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
-                                endRunAlreadySentFlagAttribute = True 'AG 14/05/2012 - when StandBy instruction is sent the ENDRUN instruction has no sense!!
-
-                                Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
-                            End If
-
-                            'AG 16/04/2012
-                        Else
-                            'If new freeze total alarm appears during recover washings ... mark recover process as closed
-                            If mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" _
-                            AndAlso SensorValuesAttribute.ContainsKey(AnalyzerSensors.RECOVER_PROCESS_FINISHED) _
-                            AndAlso SensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED) = 1 Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
-                            End If
-                            'AG 16/04/2012
-                        End If
-
-
-                        'BUSINESS: Nothing
-
-                        'PRESENTATION: Show message box informing the user the worksesion has been aborted + activate Recover button
-                        'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "RESET") Then
-                        'INSTRUCTIONS: Stop the sensor information instructions
-                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
-
-                        'BUSINESS: 
-                        SetAnalyzerNotReady() 'AG 07/03/2012 - analyzer is not ready to perform anything but CONNECT
-
-                        'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                        If Not myGlobal.HasError Then
-                            methodHasToAddInstructionToQueueFlag = 2 'AG 14/05/2012
-
-                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Only abort work session if analyzer is in Running
-                                Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
-                            End If
-                        End If
-
-                        'PRESENTATION: Show message box informing the user the analyzer must be restarted
-                        'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
-
-                    End If
-                End If
-                'AG 06/03/2012
-                Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move declaration here!
-
-                Dim myISEOffErrorFixed As Boolean = False  'JV 08/01/2014 BT #1118
-                Dim myISETimeoutErrorFixed As Boolean = False ' XB 04/11/2014 - BA-1872
-                Dim myCOMMSTimeoutErrorFixed As Boolean = False ' XB 06/11/2014 - BA-1872
-                For Each alarmItem As Alarms In pAlarmIDList
-                    'General description
-                    'Apply special Business depending the alarm code
-                    '        1- Launch Sw processes
-                    '        2- Automatically send new instruction to the Analyzer
-                    'To inform the user we generate an AnalyzerManager.ReceptionEvent. We prepare event data with the 
-                    'PrepareUIRefreshEvent method called below the End Select
-                    'Buttons activation code in Ax00MainMDI (methods ActivateActionButtonBar, ActiveButtonWithAlarms)
-
-                    Select Case alarmItem
-                        'No reactions rotor
-                        Case GlobalEnumerates.Alarms.REACT_MISSING_ERR
-                            'AG 12/03/2012
-                            'Alarm detected during WarmUp or during Change Rotor process
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'If detected during WarmUp ... PAUSE the process, inform the user to change reactions rotor and finally continue WarmUp process
-                            'If detected during Change Rotor ... inform the user, reset the change rotor process 
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                If String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-
-                                ElseIf String.Equals(mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString), "INPROCESS") Then
-                                    'Re-start the whole process 
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NEWROTORprocess, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NewRotor, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-                                End If
-                            End If
-
-                            'PRESENTATION: 
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'OK: (MDI (StandBy): Disable buttons START, CONTINUE)
-                            '    Change reactions rotor: start process 
-
-                            'DL 31/07/2012. Begin
-                            'Thermo Alarms (Warnings)
-                        Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.R2_TEMP_WARN, GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR, _
-                             GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR
-
-                            'Thermo Alarms (Warnings)
-                            'Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, GlobalEnumerates.Alarms.R2_TEMP_WARN, _
-                            'GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR, _
-                            'GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR, _
-                            'GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR
-                            'DL 31/07/2012. End
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw has already determined Temp is out of limits and generate Warning (CheckTemperaturesAlarms method)
-
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'AG 05/01/2012 - Sw implements timers
-                            'Manage is the warning timers (cases REACTIONS TEMPERATURE, FRIDGE TEMPERATURE) for change warning to error
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'Activate thermo reactions rotor timer for pass from Warning to Error if needed
-                                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And Not thermoReactionsRotorWarningTimer.Enabled Then
-                                    thermoReactionsRotorWarningTimer.Enabled = True
-                                End If
-
-                                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And Not thermoFridgeWarningTimer.Enabled Then
-                                    thermoFridgeWarningTimer.Enabled = True
-                                End If
-
-                            Else 'Alarm Solved
-                                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And thermoReactionsRotorWarningTimer.Enabled Then
-                                    thermoReactionsRotorWarningTimer.Enabled = False
-                                End If
-
-                                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And thermoFridgeWarningTimer.Enabled Then
-                                    thermoFridgeWarningTimer.Enabled = False
-                                End If
-
-                            End If
-                            'AG 05/01/2012
-
-                            '(OK) case REACT_TEMP_WARN -> In method ProcessReadingsReceived
-                            '                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) Then
-                            '                            Mark the results with ThermoWarningFlag 
-
-                            'AG 06/03/2012
-                            ''(OK) recover instruction is needed
-                            'If (alarmItem = GlobalEnumerates.Alarms.R1_TEMP_WARN OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_WARN OrElse _
-                            '    alarmItem = GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then
-                            '    myPendingRecoveryInstructionFlagAttribute = pAlarmStatusList(index)
-                            'End If
-
-
-                            'PRESENTATION: 
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Bottle or scales levels
-                        Case GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN, GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR, _
-                            GlobalEnumerates.Alarms.WASH_CONTAINER_WARN, GlobalEnumerates.Alarms.WASH_CONTAINER_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw has already determined Warning or not (CheckContainerAlarms method)
-
-                            'LIMITE_WARNING. LIMITE_CRITICO
-                            'TODO
-                            'Antes de lanzar la sesion (START o CONTINUE) calcular si se puede acabar con volumen actual
-                            '¿Como calculamos el uso de depositos en funcion de los tests que nos quedan pendientes? ¿Que hacemos si la sesión es muy larga
-                            'y necesitamos más de una botella de agua o de residuos?
-                            'Cuando decidamos dejar de enviar Tests, ¿que significa? ¿enviar END o no enviar nada?
-
-                            'Por ahora se puede hacer que cuando haya que dejar de enviar preparaciones se debe activar flag pauseSendingTestPreparationsFlag = TRUE
-                            'If pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = TRUE
-                            'If Not pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = FALSE
-
-
-                            'INSTRUCTIONS:
-                            '(OK)Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR stop sending test but Sw inform the user can not remove or refill container until Ax00 indicates
-                            '(only if the ENDRUN has not been sent yet)
-                            If alarmItem = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR Or alarmItem = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR Then
-                                'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                                'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                                If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING _
-                                   And Not endRunAlreadySentFlagAttribute And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                            methodHasToAddInstructionToQueueFlag = 1
-                                            UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        End If
-
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                            myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                            myParamsQueue.Add("")
-                                            'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                            UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
-                                End If
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: When ERROR case button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) (StandBy: Disable buttons START, CONTINUE,...)
-
-                            '(OK) 2 Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR Show message informing the user
-                            '        (“No sustituya la botella hasta que el analizador le indique que puede hacerlo con seguridad”) (Ax00MainMDI.ShowAlarmWarningMessages)
-
-
-
-                        Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WATER_SYSTEM_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'S&S
-                            'When Ax00 stop running do not allow continue, block machine and show message
-                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) 2 Show message informing the user ("Revise el depósito de entrada, o la conexión a la red de agua") (Ax00MainMDI.ShowAlarmWarningMessages)
-                            'OK: (StandBy: Disable buttons START, CONTINUE,...)
-
-
-                        Case GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Inform the user and S&S
-
-                            'INSTRUCTIONS: (only if the ENDRUN has not been sent yet)
-                            If pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) 2) Show message when Ax00 stops ("Revise la salida de residuos") (Ax00MainMDI.ShowAlarmWarningMessages)
-                            'OK: (StandBy: Disable buttons START, CONTINUE,...)
-
-
-                            'Non critical collisions (R1, R2 or S arms)
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_WARN, GlobalEnumerates.Alarms.R2_COLLISION_WARN, _
-                            GlobalEnumerates.Alarms.S_COLLISION_WARN
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw sends Ax00 to S&S
-                            'Sw activates CONTINE or ABORT (Recover will be sent automatically before send the button instruction)
-
-                            'INSTRUCTIONS: S&S (only if the ENDRUN has not been sent yet)
-                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                            End If
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Status alarms (Fridge, ISE)
-                            'ISE status alarm is only generated when Instrument has ISE module installed - adjust ISEINS:1
-                        Case GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN, GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR
-                            'GlobalEnumerates.Alarms.ISE_OFF_ERR 'AG 30/05/2012  - comment this line, this alarm has an individual treatment (look for mark 'AG 23/03/2012 - ISE switch off' in this method)
-
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'FRIDGE: No business (only inform user)
-                            'ISE: Send ISE test preparations are not allowed & inform user
-                            'NOTE: All ISE alarms apply only if Ax00 has ISE module
-
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'AG 21/03/2012 - this business rule is taken into account in method SendNextPreparation
-                            ''Case ISE_STATUS_WARN: Send ISETEST instruction is not allowed
-                            'If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '    If pAlarmStatusList(index) Then 'Alarm Exists
-                            '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '            pauseSendingISETestFlag = True
-                            '        End If
-                            '    Else 'Alarm solved
-                            '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '            pauseSendingISETestFlag = False
-                            '        End If
-                            '    End If
-                            'End If
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Level Detection alarms
-                        Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN, GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN, _
-                            GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived
-
-                            'PRESENTATION: Nothing
-
-
-                            'Clot detection
-                        Case GlobalEnumerates.Alarms.CLOT_DETECTION_WARN, GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived (mark preparation results as possible clot)
-                            'Case CLOT_DETECTION_ERR -> Stop sending test preparations
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
-
-                                    'AG 16/02/2012 - Do not use the pauseSendingTestPreparationsFlag because Sw leave sending preparations but never
-                                    'sends the ENDRUN instruction ... I comment the old line and implement that when CLOT_DETECTION_ERR exits Sw sends ENDRUN
-                                    ''AG 27/10/2011 - Set to TRUE the flag pause sending test when the clot detection is enabled
-                                    ''pauseSendingTestPreparationsFlag = True
-                                    Dim clotDetectionEnabled As Boolean = True
-                                    Dim adjustValue As String = ""
-                                    adjustValue = ReadAdjustValue(Ax00Adjustsments.CLOT)
-                                    If Not String.Equals(adjustValue, String.Empty) AndAlso IsNumeric(adjustValue) Then
-                                        clotDetectionEnabled = CType(adjustValue, Boolean)
-                                    End If
-
-                                    If clotDetectionEnabled Then
-
-                                        'AG 17/07/2012 - CANCELLED again (JE+RP+ST+EF) !! Bugs Tracking 706
-
-                                        ''AG 19/06/2012 - Re activated!!
-                                        ''AG 15/03/2012 - CANCELLED - reunion seguimiento proyecto 13/03/2012: JE, RP, EF, ST, JM (se refleja en excel Instrucciones Ax00 (rev 40).xls
-                                        ''AG 16/02/2012
-                                        ''pauseSendingTestPreparationsFlag = True
-                                        'If pAlarmStatusList(index) And AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                                        '    And AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                        '    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                        '    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                        '    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                        '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        '            methodHasToAddInstructionToQueueFlag = 1
-                                        '            endRunAlreadySentFlagAttribute = True
-                                        '        End If
-
-                                        '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        '        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN)
-                                        '            myParamsQueue.Add("")
-                                        '            endRunAlreadySentFlagAttribute = True
-                                        '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                        '        End If
-                                        '    End If
-                                        'End If
-
-                                    End If
-
-                                    'AG 27/10/2011
-                                End If
-
-                            Else 'Alarm solved
-                                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
-                                    pauseSendingTestPreparationsFlag = False
-                                End If
-                            End If
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                        Case GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                            '[2011-05-12 - !!! Ax00 - Sw Espec Meetings.xls]
-
-                            'INSTRUCTIONS: 
-                            'STANDBY
-                            'If alarm is new: Automatically perform new Alight
-                            'If already exists (2on tentative also fails): If running -> Go to StandBy
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
-                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
-                                    'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
-                                    ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
-                                    'Dim SwParams As New SwParametersDelegate
-                                    'myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
-                                    'If Not myGlobal.HasError Then
-                                    '    Dim SwParamsDS As New ParametersDS
-                                    '    SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
-                                    '    If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
-                                    '        Dim reactionsDelegate As New ReactionsRotorDelegate
-                                    '        CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
-                                    '    End If
-                                    'End If
-
-                                    ''AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    ''myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    'If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    '    methodHasToAddInstructionToQueueFlag = 1
-                                    'ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    '    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    '    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
-                                    '        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
-                                    '        myParamsQueue.Add(CurrentWellAttribute.ToString)
-                                    '    End If
-                                    'End If
-                                    ''AG 14/05/2012
-
-                                    ''When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-
-
-
-                                ElseIf AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
-                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
-                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
-                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
-
-                                    Select Case wellBaseLineAutoPausesSession
-                                        Case 0 'Nothing
-
-                                        Case 1, 2 'END 'AG 06/09/2012 - also add case 2
-                                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then
-                                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                                        methodHasToAddInstructionToQueueFlag = 1
-                                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
-                                                    End If
-
-                                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                                        myParamsQueue.Add("")
-                                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                                    End If
-                                                End If
-                                            End If
-
-                                            'AG 06/09/2012 - commented, RPM says not to send STANDBY, use END better
-                                            'Case 2 'STANDBY
-                                            '    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                            '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-                                            '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
-                                            '            methodHasToAddInstructionToQueueFlag = 1
-                                            '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
-                                            '        End If
-
-                                            '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                            '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STANDBY) Then
-                                            '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY)
-                                            '            myParamsQueue.Add("")
-                                            '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
-                                            '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                            '        End If
-                                            '    End If
-                                    End Select
-                                    'AG 05/06/2012
-
-                                End If
-
-                            Else
-                                ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION: 
-                            'If alarm is new: None
-                            'If already exists (2on tentative also fails): Show message "It is highly recommended change the reactions rotor"
-                            '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-
-
-                        Case GlobalEnumerates.Alarms.BASELINE_WELL_WARN
-                            '[2011-05-04 - Ax00 - Sw Espec Meetings]
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'INSTRUCTIONS: 
-                                '(NO, IMPLEMENT THIS BUSINESS, REJECTED!!!!) If no executions IN process -> Send ENDRUN, else do nothing (wait)
-
-                                'BUSINESS: Activate flag
-                                WELLbaselineParametersFailuresAttribute = True
-
-                                'PRESENTATION: Show message "Change methacrylate rotor is high recommend" when user performs Wup, Start or finish work session 
-                                '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
-
-                            Else
-                                WELLbaselineParametersFailuresAttribute = False
-                            End If
-
-                            'Recover instruction error
-                        Case GlobalEnumerates.Alarms.RECOVER_ERR
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'The recover instruction has finished with error
-                                If recoverAlreadySentFlagAttribute Then recoverAlreadySentFlagAttribute = False
-                                UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished (but with errors)
-                            End If
-
-                            'Arm collision error (error codes)
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_ERR, GlobalEnumerates.Alarms.R2_COLLISION_ERR, _
-                            GlobalEnumerates.Alarms.S_COLLISION_ERR
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'Mark all INPROCESS executions as PENDING or LOCKED
-                                'AG 08/03/2012 - This method is called only when Software receives ANSBxx with collision information
-                                'Dim exec_dlg As New ExecutionsDelegate
-                                'myGlobal = exec_dlg.ChangeINPROCESSStatusByCollision(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                            End If
-
-                            'Instructions aborted or rejected
-                        Case GlobalEnumerates.Alarms.INST_ABORTED_ERR, GlobalEnumerates.Alarms.INST_REJECTED_ERR
-                            If pAlarmStatusList(index) Then
-                                'INSTRUCTIONS: ask for detailed errors
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.ALR) 'AG 12/03/2012: (INFO;Q:ALR)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
-                                    methodHasToAddInstructionToQueueFlag = 1
-                                    'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
-                                        'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:ALR; instead of INFO;Q:2;
-                                        'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.ALR.ToString)
-                                        myParamsQueue.Add(CInt(Ax00InfoInstructionModes.ALR))
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                                'BUSINESS: NOTHING
-                                'PRESENTATION: NOTHING
-                            End If
-
-                        Case GlobalEnumerates.Alarms.INST_REJECTED_WARN
-
-                            'TR BUG #1339  before sending the next instruction, validate if the last intruction send was pause to star logic
-                            If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
-                                PauseAlreadySentFlagAttribute = False
-                                SetAllowScanInRunningValue(False) 'AG 08/11/2013 #1358  AllowScanInRunningAttribute = False
-                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
-                                End If
-                            End If
-                            'TR BUG #1339 -END
-
-                            'Sw has received a Request but has sent instruction out of time.
-                            'Search for next instruction to be sent but using next well (only in Running)
-                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                Dim reactRotorDlg As New ReactionsRotorDelegate
-                                futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
-                                myGlobal = Me.SearchNextPreparation(dbConnection, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
-                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
-                                    myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
-                                End If
-                            End If
-
-
-                            'Debug print to leave developent traces
-                            'Dim myLogAcciones As New ApplicationLogManager()
-                            GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)
-                            Debug.Print(Now.ToString & " .Instruction rejected (out of time)")
-
-                            ''''''''''''
-                            'ISE ALARMS
-                            ''''''''''''
-                            'AG 23/03/2012 - ISE switch off
-                        Case GlobalEnumerates.Alarms.ISE_OFF_ERR
-                            If pAlarmStatusList(index) Then
-                                ISEAnalyzer.IsISESwitchON = False 'SGM 29/06/2012
-                                MyClass.RefreshISEAlarms() 'SGM 19/06/2012
-
-                                'When this alarm appears in RUNNING: Lock all pending ISE preparations
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                    Dim exec_delg As New ExecutionsDelegate
-
-                                    '1st: Get all ISE executions pending (required to inform the UI with the locked executions
-                                    myGlobal = exec_delg.GetExecutionsByStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "PENDING", False, "PREP_ISE")
-                                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                        Dim myExecutionsDS As New ExecutionsDS
-
-                                        '2on: Lock all pending ISE preparation executions
-                                        myGlobal = exec_delg.UpdateStatusByExecutionTypeAndStatus(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-
-                                        '3rd: Prepare data for generate user interface refresh event
-                                        If Not myGlobal.HasError Then
-                                            For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                                myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
-                                                If myGlobal.HasError Then Exit For
-                                            Next
-                                        End If
-
-                                    End If
-
-                                End If
-                                'JV 08/01/2014 BT #1118
-                            Else
-                                'AG 16/01/2014 - Mark IseOffError as FIXED only when exists the alarm ISE_OFF_ERR in database with status TRUE
-                                ' Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
-                                'myISEOffsErrorFixed = True
-                                myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                                If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                    Dim temporalDS As New WSAnalyzerAlarmsDS
-                                    temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED)
-                                    'in order to mark it as fixed
-                                    Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                    auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                               Where a.AlarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                    If auxList.Count > 0 Then
-                                        myISEOffErrorFixed = True
-                                    End If
-                                    auxList = Nothing
-                                End If
-                                'AG 16/01/2014 - JV 08/01/2014 BT #1118
-
-                            End If
-
-                            'AG 23/03/2012
-
-                            ' XB 04/11/2014 - BA-1872
-                        Case GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-
-                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                Dim temporalDS As New WSAnalyzerAlarmsDS
-                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                'Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED)
-                                'in order to mark it as fixed
-                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                           Where a.AlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                If auxList.Count > 0 Then
-                                    myISETimeoutErrorFixed = True
-                                End If
-                                auxList = Nothing
-                            End If
-                            ' XB 04/11/2014 - BA-1872
-
-                            ' XB 06/11/2014 - BA-1872
-                        Case GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-
-                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                Dim temporalDS As New WSAnalyzerAlarmsDS
-                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                'Search if exists alarm COMMS_TIMEOUT_ERR with status TRUE, in this case set flag myCOMMSTimeoutErrorFixed = True (FIXED)
-                                'in order to mark it as fixed
-                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                           Where a.AlarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                If auxList.Count > 0 Then
-                                    myCOMMSTimeoutErrorFixed = True
-                                End If
-                                auxList = Nothing
-                            End If
-                            ' XB 06/11/2014 - BA-1872
-
-                            'SGM 19/06/2012
-                        Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
-                            If pAlarmStatusList(index) Then
-                                MyClass.RefreshISEAlarms()
-                            End If
-                            'SGM 19/06/2012
-
-
-                            'DL 31/07/2012
-                        Case GlobalEnumerates.Alarms.FW_CPU_ERR, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR, _
-                             GlobalEnumerates.Alarms.FW_REPOSITORY_ERR, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR, _
-                             GlobalEnumerates.Alarms.FW_MAN_ERR
-
-                            If pAlarmStatusList(index) Then
-                                'INSTRUCTIONS: nothing
-                                'BUSINESS: call stopcomm
-                                ' Cut off communications channel
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, _
-                                                              True, _
-                                                              Nothing, _
-                                                              Ax00InfoInstructionModes.STP)
-                                End If
-
-                                If Not myGlobal.HasError Then StopComm()
-                                'PRESENTATION: disconnect Showmessage from Presntation
-                            End If
-
-                        Case GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR, GlobalEnumerates.Alarms.INST_REJECTED_WARN
-                            'TR BUG #1339 Validate if the last intruction send was pause to star logic
-                            If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
-                                PauseAlreadySentFlagAttribute = False
-                                SetAllowScanInRunningValue(False) 'AG 08/11/2013   AllowScanInRunningAttribute = False
-                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
-                                End If
-                            End If
-                            'TR BUG #1339 -END
-                        Case Else
-                            'Nothing
-                    End Select
-                    index = index + 1
-                Next
-
-                'AG 12/03/2012 - Update analyzer session flags into DataBase
-                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myGlobal = myFlagsDelg.Update(dbConnection, myAnalyzerFlagsDS)
-                End If
-                'AG 12/03/2012
-
-                'Save alarms into DataBase and prepare DS for UI refresh
-                'Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move definition upper
-                Dim wsAlarmsDS As New WSAnalyzerAlarmsDS
-                Dim newRowFlag As Boolean = False
-                index = 0
-
-                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
-                SyncLock myUI_RefreshDS.ReceivedAlarms
-                    myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
-                End SyncLock
-
-                'Get the alarms defined with OKType = False (never are marked as solved)
-                Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In _
-                                                            alarmsDefintionTableDS.tfmwAlarms Where a.OKType = False Select a.AlarmID).ToList
-
-                For Each alarmIDItem As Alarms In pAlarmIDList
-                    newRowFlag = False
-                    If alarmIDItem <> GlobalEnumerates.Alarms.NONE Then
-                        If pAlarmStatusList(index) Then 'Save alarms and also the alarms solved
-                            If Not myAlarmListAttribute.Contains(alarmIDItem) Then
-                                myAlarmListAttribute.Add(alarmIDItem)
-                                newRowFlag = True
-
-                                'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicate in database but not in myAlarmListAttribute
-                            ElseIf alarmsWithOKTypeFalse.Contains(alarmIDItem.ToString) Then
-                                newRowFlag = True
-
-                            End If
-                            'JV 08/01/2014 BT #1118
-                        ElseIf myISEOffErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
-                            newRowFlag = True
-                            'JV 08/01/2014 BT #1118
-                            ' XB 04/11/2014 - BA-1872
-                        ElseIf myISETimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                            newRowFlag = True
-                            ' XB 04/11/2014 - BA-1872
-                            ' XB 06/11/2014 - BA-1872
-                        ElseIf myCOMMSTimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                            newRowFlag = True
-                            ' XB 06/11/2014 - BA-1872
-                        Else 'Fixed alarms
-                            If myAlarmListAttribute.Contains(alarmIDItem) Then
-                                myAlarmListAttribute.Remove(alarmIDItem)
-                                newRowFlag = True
-                            End If
-
-                        End If
-
-                        'Add rows into WSAnalyzerAlarmsDS with the new or solved alarms and save them
-                        If newRowFlag Then
-                            Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
-                            alarmRow = wsAlarmsDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
-                            With alarmRow
-                                .BeginEdit()
-                                .AlarmID = alarmIDItem.ToString
-                                .AnalyzerID = AnalyzerIDAttribute
-
-                                .AlarmDateTime = Now
-
-                                If WorkSessionIDAttribute <> "" Then
-                                    .WorkSessionID = WorkSessionIDAttribute
-                                Else
-                                    .SetWorkSessionIDNull()
-                                End If
-                                .AlarmStatus = pAlarmStatusList(index)
-
-                                .AlarmItem = 1 'By now (25/03/2011 )always 1
-
-                                'AG 25/07/2012 - v043 code when the parameter pVolumeMissingAdditionalInfo was a single string
-                                'in v050 it is defined as a list of string because a single ansbm1 instruction can generate additional info for sample volume missing and also clot warning alarms
-                                'If String.IsNullOrEmpty(pVolumeMissingAdditionalInfo) Then
-                                '    .SetAdditionalInfoNull() 'By now (25/03/2011 )always NULL
-                                'Else
-                                '    .AdditionalInfo = pVolumeMissingAdditionalInfo
-                                'End If
-                                .SetAdditionalInfoNull() 'MI: Added count > index to condition, and item null, as strings can be null to prevent bug being generated
-                                If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
-                                    pAdditionalInfoList(index) IsNot Nothing AndAlso
-                                    String.Equals(pAdditionalInfoList(index), String.Empty) Then
-                                    .AdditionalInfo = pAdditionalInfoList(index)
-                                End If
-                                'AG 25/07/2012
-
-                                .EndEdit()
-                            End With
-
-                            wsAlarmsDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-
-                            'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                            myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmIDItem.ToString, pAlarmStatusList(index))
-
-                            'JV 08/01/2014 BT #1118
-                            If myISEOffErrorFixed Then
-                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                            End If
-                            'JV 08/01/2014 BT #1118
-
-                        End If
-
-                    End If
-                    index = index + 1
-                Next
-                wsAlarmsDS.AcceptChanges()
-
-                If wsAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0 Then
-                    myGlobal = alarmsDelg.Save(dbConnection, wsAlarmsDS, alarmsDefintionTableDS) 'AG 24/07/2012 change Create for Save who inserts alarms with status TRUE and updates alarms with status FALSE
-                    ''TR 26/10/2011 
-                    If Not myGlobal.HasError AndAlso Not AnalyzerIsRingingAttribute Then
-                        myGlobal = SoundActivationByAlarm(dbConnection, methodHasToAddInstructionToQueueFlag)
-                    End If
-                    ''TR 26/10/2011 -END.
-                End If
-
-                'AG 14/03/2012
-                If analyzerFREEZEFlagAttribute Then
-                    'AG 05/06/2014 - #1657 - (except ISE_OFF_ERR that is always generated with status FALSE)
-                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
-                        If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                            'BUSINESS: 
-                            'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
-                            'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
-
-                            'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
-
-                            If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
-                                'Analyzer has recovered an operating status automatically by closing covers
-                                analyzerFREEZEFlagAttribute = False
-                                analyzerFREEZEModeAttribute = ""
-                                AnalyzerIsReadyAttribute = True 'Analyzer is ready
-                                UpdateSensorValuesAttribute(AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
-
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                    methodHasToAddInstructionToQueueFlag = 1
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.STATE)
-                                        myParamsQueue.Add("")
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                            Else 'Exists freeze auto
-                                'Reset all processes flags
-                                Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                                myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-
-                                'Finally read and update our internal structures
-                                If Not myGlobal.HasError Then
-                                    InitializeAnalyzerFlags(dbConnection)
-                                End If
-
-                                'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
-                                'appears while sensors deactivated there is no other way to auto recover
-                                If Not myGlobal.HasError Then
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                        If methodHasToAddInstructionToQueueFlag = 0 Then
-                                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
-                                            methodHasToAddInstructionToQueueFlag = 1
-                                            'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
-                                                'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
-                                                'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
-                                                myParamsQueue.Add(CInt(Ax00InfoInstructionModes.STR))
-                                            End If
-                                        End If
-                                        'AG 14/05/2012
-                                    End If
-                                End If
-                            End If
-
-                        ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
-                            'Remove all flags ... recover is required
-                            Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                            myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-                        End If
-
-                    End If
-                End If
-                'AG 14/03/2012
-
-                alarmsWithOKTypeFalse = Nothing
-
-                'If (Not myGlobal.HasError) Then
-                '    'When the Database Connection was opened locally, then the Commit is executed
-                '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                'Else
-                '    'When the Database Connection was opened locally, then the Rollback is executed
-                '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                'End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                myGlobal.HasError = True
-                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                myGlobal.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
-                GlobalBase.CreateLogActivity(ex)
-
-
-                'Finally
-                '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return myGlobal
-        End Function
-
-
-        ''' <summary>
-        ''' Activate the Analyzer Alarm Sound if prosuce alarm require sound.
-        ''' The analyzer alarm sound must be activate on Analyzer configuration.
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pSomeInstructionAlreadySent" ></param>
-        ''' <returns></returns>
-        ''' <remarks>CREATED BY: TR 27/10/2011
-        ''' AG 14/05/2012 - add byRef parameter psomeinstructionAlreadySent. When 0 send Sound instruction, else add to queue</remarks>
-        Private Function SoundActivationByAlarm(ByVal pdbConnection As SqlConnection, ByRef pSomeInstructionAlreadySent As Integer) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
-            Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pdbConnection)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        'TR 26/10/2011 
-
-                        'if alarm sound is configured an analyzer is not currently ringing then search inside 
-                        'the new alarms if any requires sound.
-                        If Not AnalyzerIsRingingAttribute Then
-                            'Validate if Analyzer Alarm sound is enable.
-                            myGlobalDataTO = IsAlarmSoundDisable(dbConnection)
-                            If Not myGlobalDataTO.HasError Then
-                                'Alarm sound is enable
-                                If Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
-                                    'Validate if Analyzer status is Freeze
-                                    Dim sendSoundInstruction As Boolean = False
-
-                                    Dim myAlarmList As New List(Of AlarmsDS.tfmwAlarmsRow)
-                                    'Get the new active alarm, Linq over RecivedAlarms
-                                    For Each myAlarmRow As UIRefreshDS.ReceivedAlarmsRow In myUI_RefreshDS.ReceivedAlarms.Where(Function(a) a.AlarmStatus)
-                                        myAlarmList = (From a In alarmsDefintionTableDS.tfmwAlarms Where String.Equals(a.AlarmID, myAlarmRow.AlarmID) Select a).ToList()
-                                        If myAlarmList.Count = 1 Then
-                                            If AnalyzerStatus = AnalyzerManagerStatus.RUNNING AndAlso myAlarmList.First().OnRunningSound Then
-                                                sendSoundInstruction = True
-                                                Exit For
-                                            ElseIf myAlarmList.First().Sound Then
-                                                sendSoundInstruction = True
-                                                Exit For
-                                            End If
-                                        End If
-                                    Next
-
-                                    If sendSoundInstruction Then
-                                        'AG 14/05/2012
-                                        'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
-                                        If pSomeInstructionAlreadySent = 0 Then
-                                            ' XBC 21/05/2012 - to avoid send SOUND more than 1 time
-                                            'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
-                                            'pSomeInstructionAlreadySent = 1
-                                            'If myInstructionsQueue.Count > 0 and 
-                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.SOUND) Then
-                                                myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
-                                                pSomeInstructionAlreadySent = 1
-                                            End If
-                                            ' XBC 21/05/2012
-                                        Else
-                                            myInstructionsQueue.Add(AnalyzerManagerSwActionList.SOUND)
-                                            myParamsQueue.Add("")
-                                        End If
-                                        'AG 14/05/2012
-                                    End If
-                                    myAlarmList = Nothing 'AG 02/08/2012 - free memory
-                                End If
-                            End If
-                        End If
-                        'TR 26/10/2011 -END.
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SoundActivation", EventLogEntryType.Error, False)
-            Finally
-                If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return myGlobalDataTO
-
-        End Function
+        'Public Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
+        '                              ByVal pAlarmIDList As List(Of Alarms), _
+        '                              ByVal pAlarmStatusList As List(Of Boolean), _
+        '                              Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO _
+        '                          Implements IAnalyzerManager.ManageAlarms
+
+        '    Dim myGlobal As New GlobalDataTO
+        '    Dim dbConnection As SqlConnection = Nothing
+
+        '    Try
+        '        'myGlobal = DAOBase.GetOpenDBTransaction(pdbConnection)
+        '        'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+        '        '    dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+        '        '    If (Not dbConnection Is Nothing) Then
+
+        '        'AG 25/09/2012 - comment an use the attribute endRunAlreadySentFlagAttribute
+        '        'Dim endRunInstructionSent As Boolean = endRunAlreadySentFlagAttribute 'False 'Only send one ENDRUN while looping but send none if it has been sent before
+
+        '        Dim index As Integer = 0
+        '        Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS 'AG 12/03/2012
+
+        '        If Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.END_RUN_START Then
+        '            endRunAlreadySentFlagAttribute = True
+        '        End If
+
+        '        Dim methodHasToAddInstructionToQueueFlag As Integer = 0 'AG 14/05/2012 - Once one instruction has been sent. The other instructions managed in this method will be added to queue
+        '        '                                                              0 -> Instruction can be sent
+        '        '                                                              1 -> One instruction has already been sent. New instructions to be sent in ManageAlarms will be add to queue
+        '        '                                                              2 -> None instruction can be sent (RESET FREEZE). New instructions to be sent in ManageAlarms wont be add to queue (except SOUND)
+
+        '        'AG 06/03/2012 - Freeze mode treatment
+        '        If analyzerFREEZEFlagAttribute Then
+        '            'AG 05/06/2014 - #1657 - 'AG + XB 08/04/2014 - #1118 (except ISE_OFF_ERR that is always generated with status FALSE)
+        '            'ClearQueueToSend() 'Clear all instruction in queue to be sent
+        '            If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+        '                ClearQueueToSend() 'Clear all instruction in queue to be sent
+        '            End If
+        '            'AG 05/06/2014 - #1657
+
+        '            If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
+        '                'INSTRUCTIONS: NOTHING
+        '                'BUSINESS: NOTHING
+        '                'PRESENTATION: Nothing
+
+        '            ElseIf String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then 'PARTIAL freeze
+        '                'INSTRUCTIONS: If Running then send END instruction (if not sent yet)
+        '                'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
+        '                'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
+        '                If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso _
+        '                    Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+
+        '                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+
+        '                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                        methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
+        '                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                    End If
+        '                End If
+
+        '                'BUSINESS: Nothing
+
+        '                'PRESENTATION: Show message box informing the user the worksesion has been paused 'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages +
+        '                '              When analyzer leaves RUNNING and becomes STANDBY activate Recover button
+
+
+        '            ElseIf String.Equals(analyzerFREEZEModeAttribute, "TOTAL") Then 'TOTAL freeze
+        '                'INSTRUCTIONS: If Running then send STANDBY instruction (if not sent yet)
+        '                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Alarm Exists
+        '                    'AG 25/09/2012 - do not sent STANDBY if recovery results process is INPROCESS
+        '                    If mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
+        '                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True)
+        '                    End If
+
+        '                    'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
+        '                    If Not myGlobal.HasError Then
+        '                        ''AG 11/12/2012 not integrated in v1.0.0
+        '                        'If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
+        '                        '    AnalyzerIsReadyAttribute = False
+        '                        'End If
+        '                        ''AG 11/12/2012
+        '                        methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
+        '                        endRunAlreadySentFlagAttribute = True 'AG 14/05/2012 - when StandBy instruction is sent the ENDRUN instruction has no sense!!
+
+        '                        Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
+        '                        myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
+        '                    End If
+
+        '                    'AG 16/04/2012
+        '                Else
+        '                    'If new freeze total alarm appears during recover washings ... mark recover process as closed
+        '                    If mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" _
+        '                    AndAlso SensorValuesAttribute.ContainsKey(AnalyzerSensors.RECOVER_PROCESS_FINISHED) _
+        '                    AndAlso SensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED) = 1 Then
+        '                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
+        '                    End If
+        '                    'AG 16/04/2012
+        '                End If
+
+
+        '                'BUSINESS: Nothing
+
+        '                'PRESENTATION: Show message box informing the user the worksesion has been aborted + activate Recover button
+        '                'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
+
+        '            ElseIf String.Equals(analyzerFREEZEModeAttribute, "RESET") Then
+        '                'INSTRUCTIONS: Stop the sensor information instructions
+        '                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
+
+        '                'BUSINESS: 
+        '                SetAnalyzerNotReady() 'AG 07/03/2012 - analyzer is not ready to perform anything but CONNECT
+
+        '                'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
+        '                If Not myGlobal.HasError Then
+        '                    methodHasToAddInstructionToQueueFlag = 2 'AG 14/05/2012
+
+        '                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Only abort work session if analyzer is in Running
+        '                        Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
+        '                        myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
+        '                    End If
+        '                End If
+
+        '                'PRESENTATION: Show message box informing the user the analyzer must be restarted
+        '                'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
+
+        '            End If
+        '        End If
+        '        'AG 06/03/2012
+        '        Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move declaration here!
+
+        '        Dim myISEOffErrorFixed As Boolean = False  'JV 08/01/2014 BT #1118
+        '        Dim myISETimeoutErrorFixed As Boolean = False ' XB 04/11/2014 - BA-1872
+        '        Dim myCOMMSTimeoutErrorFixed As Boolean = False ' XB 06/11/2014 - BA-1872
+        '        For Each alarmItem As Alarms In pAlarmIDList
+        '            'General description
+        '            'Apply special Business depending the alarm code
+        '            '        1- Launch Sw processes
+        '            '        2- Automatically send new instruction to the Analyzer
+        '            'To inform the user we generate an AnalyzerManager.ReceptionEvent. We prepare event data with the 
+        '            'PrepareUIRefreshEvent method called below the End Select
+        '            'Buttons activation code in Ax00MainMDI (methods ActivateActionButtonBar, ActiveButtonWithAlarms)
+
+        '            Select Case alarmItem
+        '                'No reactions rotor
+        '                Case GlobalEnumerates.Alarms.REACT_MISSING_ERR
+        '                    'AG 12/03/2012
+        '                    'Alarm detected during WarmUp or during Change Rotor process
+        '                    'INSTRUCTIONS: Nothing
+
+        '                    'BUSINESS:
+        '                    'If detected during WarmUp ... PAUSE the process, inform the user to change reactions rotor and finally continue WarmUp process
+        '                    'If detected during Change Rotor ... inform the user, reset the change rotor process 
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        If String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") Then
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
+
+        '                        ElseIf String.Equals(mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString), "INPROCESS") Then
+        '                            'Re-start the whole process 
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NEWROTORprocess, "")
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NewRotor, "")
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
+        '                        End If
+        '                    End If
+
+        '                    'PRESENTATION: 
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+        '                    'OK: (MDI (StandBy): Disable buttons START, CONTINUE)
+        '                    '    Change reactions rotor: start process 
+
+        '                    'DL 31/07/2012. Begin
+        '                    'Thermo Alarms (Warnings)
+        '                Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, _
+        '                     GlobalEnumerates.Alarms.R2_TEMP_WARN, GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, _
+        '                     GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR, _
+        '                     GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR
+
+        '                    'Thermo Alarms (Warnings)
+        '                    'Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, GlobalEnumerates.Alarms.R2_TEMP_WARN, _
+        '                    'GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR, _
+        '                    'GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR, _
+        '                    'GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR
+        '                    'DL 31/07/2012. End
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'Sw has already determined Temp is out of limits and generate Warning (CheckTemperaturesAlarms method)
+
+        '                    'INSTRUCTIONS: Nothing
+
+        '                    'BUSINESS:
+        '                    'AG 05/01/2012 - Sw implements timers
+        '                    'Manage is the warning timers (cases REACTIONS TEMPERATURE, FRIDGE TEMPERATURE) for change warning to error
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        'Activate thermo reactions rotor timer for pass from Warning to Error if needed
+        '                        If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And Not thermoReactionsRotorWarningTimer.Enabled Then
+        '                            thermoReactionsRotorWarningTimer.Enabled = True
+        '                        End If
+
+        '                        If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And Not thermoFridgeWarningTimer.Enabled Then
+        '                            thermoFridgeWarningTimer.Enabled = True
+        '                        End If
+
+        '                    Else 'Alarm Solved
+        '                        If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And thermoReactionsRotorWarningTimer.Enabled Then
+        '                            thermoReactionsRotorWarningTimer.Enabled = False
+        '                        End If
+
+        '                        If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And thermoFridgeWarningTimer.Enabled Then
+        '                            thermoFridgeWarningTimer.Enabled = False
+        '                        End If
+
+        '                    End If
+        '                    'AG 05/01/2012
+
+        '                    '(OK) case REACT_TEMP_WARN -> In method ProcessReadingsReceived
+        '                    '                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) Then
+        '                    '                            Mark the results with ThermoWarningFlag 
+
+        '                    'AG 06/03/2012
+        '                    ''(OK) recover instruction is needed
+        '                    'If (alarmItem = GlobalEnumerates.Alarms.R1_TEMP_WARN OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_WARN OrElse _
+        '                    '    alarmItem = GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then
+        '                    '    myPendingRecoveryInstructionFlagAttribute = pAlarmStatusList(index)
+        '                    'End If
+
+
+        '                    'PRESENTATION: 
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+
+
+        '                    'Bottle or scales levels
+        '                Case GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN, GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR, _
+        '                    GlobalEnumerates.Alarms.WASH_CONTAINER_WARN, GlobalEnumerates.Alarms.WASH_CONTAINER_ERR
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'Sw has already determined Warning or not (CheckContainerAlarms method)
+
+        '                    'LIMITE_WARNING. LIMITE_CRITICO
+        '                    'TODO
+        '                    'Antes de lanzar la sesion (START o CONTINUE) calcular si se puede acabar con volumen actual
+        '                    '¿Como calculamos el uso de depositos en funcion de los tests que nos quedan pendientes? ¿Que hacemos si la sesión es muy larga
+        '                    'y necesitamos más de una botella de agua o de residuos?
+        '                    'Cuando decidamos dejar de enviar Tests, ¿que significa? ¿enviar END o no enviar nada?
+
+        '                    'Por ahora se puede hacer que cuando haya que dejar de enviar preparaciones se debe activar flag pauseSendingTestPreparationsFlag = TRUE
+        '                    'If pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = TRUE
+        '                    'If Not pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = FALSE
+
+
+        '                    'INSTRUCTIONS:
+        '                    '(OK)Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR stop sending test but Sw inform the user can not remove or refill container until Ax00 indicates
+        '                    '(only if the ENDRUN has not been sent yet)
+        '                    If alarmItem = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR Or alarmItem = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR Then
+        '                        'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
+        '                        'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
+        '                        If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING _
+        '                           And Not endRunAlreadySentFlagAttribute And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+        '                            'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                            'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
+        '                            If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+        '                                If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                    'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                    methodHasToAddInstructionToQueueFlag = 1
+        '                                    UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                                End If
+
+        '                            ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                                ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                                If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                    myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
+        '                                    myParamsQueue.Add("")
+        '                                    'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                    UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                                End If
+        '                            End If
+        '                            'AG 14/05/2012
+        '                        End If
+        '                    End If
+
+        '                    'BUSINESS: Nothing
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+        '                    'MDI: When ERROR case button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
+        '                    '(OK) (StandBy: Disable buttons START, CONTINUE,...)
+
+        '                    '(OK) 2 Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR Show message informing the user
+        '                    '        (“No sustituya la botella hasta que el analizador le indique que puede hacerlo con seguridad”) (Ax00MainMDI.ShowAlarmWarningMessages)
+
+
+
+        '                Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WATER_SYSTEM_ERR
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'S&S
+        '                    'When Ax00 stop running do not allow continue, block machine and show message
+        '                    'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
+        '                    'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
+        '                    If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
+        '                    And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+        '                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
+        '                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+        '                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                                methodHasToAddInstructionToQueueFlag = 1
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                            End If
+
+        '                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
+        '                                myParamsQueue.Add("")
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                            End If
+        '                        End If
+        '                        'AG 14/05/2012
+        '                    End If
+
+        '                    'BUSINESS: Nothing
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+        '                    'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
+        '                    '(OK) 2 Show message informing the user ("Revise el depósito de entrada, o la conexión a la red de agua") (Ax00MainMDI.ShowAlarmWarningMessages)
+        '                    'OK: (StandBy: Disable buttons START, CONTINUE,...)
+
+
+        '                Case GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'Inform the user and S&S
+
+        '                    'INSTRUCTIONS: (only if the ENDRUN has not been sent yet)
+        '                    If pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
+        '                    And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+        '                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
+        '                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+        '                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                                methodHasToAddInstructionToQueueFlag = 1
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                            End If
+
+        '                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
+        '                                myParamsQueue.Add("")
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                            End If
+        '                        End If
+        '                        'AG 14/05/2012
+        '                    End If
+
+        '                    'BUSINESS: Nothing
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+        '                    'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
+        '                    '(OK) 2) Show message when Ax00 stops ("Revise la salida de residuos") (Ax00MainMDI.ShowAlarmWarningMessages)
+        '                    'OK: (StandBy: Disable buttons START, CONTINUE,...)
+
+
+        '                    'Non critical collisions (R1, R2 or S arms)
+        '                Case GlobalEnumerates.Alarms.R1_COLLISION_WARN, GlobalEnumerates.Alarms.R2_COLLISION_WARN, _
+        '                    GlobalEnumerates.Alarms.S_COLLISION_WARN
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'Sw sends Ax00 to S&S
+        '                    'Sw activates CONTINE or ABORT (Recover will be sent automatically before send the button instruction)
+
+        '                    'INSTRUCTIONS: S&S (only if the ENDRUN has not been sent yet)
+        '                    'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
+        '                    'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
+        '                    If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
+        '                    And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+        '                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
+        '                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+        '                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                                methodHasToAddInstructionToQueueFlag = 1
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                            End If
+
+        '                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
+        '                                myParamsQueue.Add("")
+        '                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                            End If
+        '                        End If
+        '                        'AG 14/05/2012
+
+        '                    End If
+
+        '                    'BUSINESS:
+        '                    'NOTE: Previous business is performed in method ProcessArmStatusRecived
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+
+
+        '                    'Status alarms (Fridge, ISE)
+        '                    'ISE status alarm is only generated when Instrument has ISE module installed - adjust ISEINS:1
+        '                Case GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN, GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR
+        '                    'GlobalEnumerates.Alarms.ISE_OFF_ERR 'AG 30/05/2012  - comment this line, this alarm has an individual treatment (look for mark 'AG 23/03/2012 - ISE switch off' in this method)
+
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'FRIDGE: No business (only inform user)
+        '                    'ISE: Send ISE test preparations are not allowed & inform user
+        '                    'NOTE: All ISE alarms apply only if Ax00 has ISE module
+
+        '                    'INSTRUCTIONS: Nothing
+
+        '                    'BUSINESS:
+        '                    'AG 21/03/2012 - this business rule is taken into account in method SendNextPreparation
+        '                    ''Case ISE_STATUS_WARN: Send ISETEST instruction is not allowed
+        '                    'If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
+        '                    '    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                    '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
+        '                    '            pauseSendingISETestFlag = True
+        '                    '        End If
+        '                    '    Else 'Alarm solved
+        '                    '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
+        '                    '            pauseSendingISETestFlag = False
+        '                    '        End If
+        '                    '    End If
+        '                    'End If
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+
+
+        '                    'Level Detection alarms
+        '                Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN, GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN, _
+        '                    GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'INSTRUCTIONS: Nothing
+
+        '                    'BUSINESS:
+        '                    'NOTE: Previous business is performed in method ProcessArmStatusRecived
+
+        '                    'PRESENTATION: Nothing
+
+
+        '                    'Clot detection
+        '                Case GlobalEnumerates.Alarms.CLOT_DETECTION_WARN, GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
+        '                    '[2011-03-17 - Llistat-SensorsActuadors.xls]
+        '                    'INSTRUCTIONS: Nothing
+
+        '                    'BUSINESS:
+        '                    'NOTE: Previous business is performed in method ProcessArmStatusRecived (mark preparation results as possible clot)
+        '                    'Case CLOT_DETECTION_ERR -> Stop sending test preparations
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
+
+        '                            'AG 16/02/2012 - Do not use the pauseSendingTestPreparationsFlag because Sw leave sending preparations but never
+        '                            'sends the ENDRUN instruction ... I comment the old line and implement that when CLOT_DETECTION_ERR exits Sw sends ENDRUN
+        '                            ''AG 27/10/2011 - Set to TRUE the flag pause sending test when the clot detection is enabled
+        '                            ''pauseSendingTestPreparationsFlag = True
+        '                            Dim clotDetectionEnabled As Boolean = True
+        '                            Dim adjustValue As String = ""
+        '                            adjustValue = ReadAdjustValue(Ax00Adjustsments.CLOT)
+        '                            If Not String.Equals(adjustValue, String.Empty) AndAlso IsNumeric(adjustValue) Then
+        '                                clotDetectionEnabled = CType(adjustValue, Boolean)
+        '                            End If
+
+        '                            If clotDetectionEnabled Then
+
+        '                                'AG 17/07/2012 - CANCELLED again (JE+RP+ST+EF) !! Bugs Tracking 706
+
+        '                                ''AG 19/06/2012 - Re activated!!
+        '                                ''AG 15/03/2012 - CANCELLED - reunion seguimiento proyecto 13/03/2012: JE, RP, EF, ST, JM (se refleja en excel Instrucciones Ax00 (rev 40).xls
+        '                                ''AG 16/02/2012
+        '                                ''pauseSendingTestPreparationsFlag = True
+        '                                'If pAlarmStatusList(index) And AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
+        '                                '    And AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
+        '                                '    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                                '    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
+        '                                '    If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                                '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
+        '                                '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
+        '                                '            methodHasToAddInstructionToQueueFlag = 1
+        '                                '            endRunAlreadySentFlagAttribute = True
+        '                                '        End If
+
+        '                                '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                                '        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                                '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN)
+        '                                '            myParamsQueue.Add("")
+        '                                '            endRunAlreadySentFlagAttribute = True
+        '                                '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                                '        End If
+        '                                '    End If
+        '                                'End If
+
+        '                            End If
+
+        '                            'AG 27/10/2011
+        '                        End If
+
+        '                    Else 'Alarm solved
+        '                        If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
+        '                            pauseSendingTestPreparationsFlag = False
+        '                        End If
+        '                    End If
+
+        '                    'PRESENTATION:
+        '                    'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
+
+
+        '                Case GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+        '                    '[2011-05-12 - !!! Ax00 - Sw Espec Meetings.xls]
+
+        '                    'INSTRUCTIONS: 
+        '                    'STANDBY
+        '                    'If alarm is new: Automatically perform new Alight
+        '                    'If already exists (2on tentative also fails): If running -> Go to StandBy
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
+        '                        If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
+        '                            'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
+        '                            ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
+        '                            'Dim SwParams As New SwParametersDelegate
+        '                            'myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
+        '                            'If Not myGlobal.HasError Then
+        '                            '    Dim SwParamsDS As New ParametersDS
+        '                            '    SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
+        '                            '    If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
+        '                            '        Dim reactionsDelegate As New ReactionsRotorDelegate
+        '                            '        CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
+        '                            '    End If
+        '                            'End If
+
+        '                            ''AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                            ''myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+        '                            'If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+        '                            '    methodHasToAddInstructionToQueueFlag = 1
+        '                            'ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            '    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            '    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
+        '                            '        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
+        '                            '        myParamsQueue.Add(CurrentWellAttribute.ToString)
+        '                            '    End If
+        '                            'End If
+        '                            ''AG 14/05/2012
+
+        '                            ''When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
+        '                            'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+
+
+
+        '                        ElseIf AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+        '                            'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
+        '                            'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
+        '                            'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
+
+        '                            Select Case wellBaseLineAutoPausesSession
+        '                                Case 0 'Nothing
+
+        '                                Case 1, 2 'END 'AG 06/09/2012 - also add case 2
+        '                                    'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
+        '                                    'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
+        '                                    If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then
+        '                                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
+        '                                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                                methodHasToAddInstructionToQueueFlag = 1
+        '                                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
+        '                                            End If
+
+        '                                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
+        '                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
+        '                                                myParamsQueue.Add("")
+        '                                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
+        '                                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                                            End If
+        '                                        End If
+        '                                    End If
+
+        '                                    'AG 06/09/2012 - commented, RPM says not to send STANDBY, use END better
+        '                                    'Case 2 'STANDBY
+        '                                    '    If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+        '                                    '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+        '                                    '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
+        '                                    '            methodHasToAddInstructionToQueueFlag = 1
+        '                                    '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
+        '                                    '        End If
+
+        '                                    '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                                    '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STANDBY) Then
+        '                                    '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY)
+        '                                    '            myParamsQueue.Add("")
+        '                                    '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
+        '                                    '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
+        '                                    '        End If
+        '                                    '    End If
+        '                            End Select
+        '                            'AG 05/06/2012
+
+        '                        End If
+
+        '                    Else
+        '                        ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
+        '                    End If
+
+        '                    'BUSINESS: Nothing
+
+        '                    'PRESENTATION: 
+        '                    'If alarm is new: None
+        '                    'If already exists (2on tentative also fails): Show message "It is highly recommended change the reactions rotor"
+        '                    '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
+        '                    'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
+
+
+        '                Case GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+        '                    '[2011-05-04 - Ax00 - Sw Espec Meetings]
+
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        'INSTRUCTIONS: 
+        '                        '(NO, IMPLEMENT THIS BUSINESS, REJECTED!!!!) If no executions IN process -> Send ENDRUN, else do nothing (wait)
+
+        '                        'BUSINESS: Activate flag
+        '                        WELLbaselineParametersFailuresAttribute = True
+
+        '                        'PRESENTATION: Show message "Change methacrylate rotor is high recommend" when user performs Wup, Start or finish work session 
+        '                        '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
+
+        '                    Else
+        '                        WELLbaselineParametersFailuresAttribute = False
+        '                    End If
+
+        '                    'Recover instruction error
+        '                Case GlobalEnumerates.Alarms.RECOVER_ERR
+
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        'The recover instruction has finished with error
+        '                        If recoverAlreadySentFlagAttribute Then recoverAlreadySentFlagAttribute = False
+        '                        UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished (but with errors)
+        '                    End If
+
+        '                    'Arm collision error (error codes)
+        '                Case GlobalEnumerates.Alarms.R1_COLLISION_ERR, GlobalEnumerates.Alarms.R2_COLLISION_ERR, _
+        '                    GlobalEnumerates.Alarms.S_COLLISION_ERR
+
+        '                    If pAlarmStatusList(index) Then 'Alarm Exists
+        '                        'Mark all INPROCESS executions as PENDING or LOCKED
+        '                        'AG 08/03/2012 - This method is called only when Software receives ANSBxx with collision information
+        '                        'Dim exec_dlg As New ExecutionsDelegate
+        '                        'myGlobal = exec_dlg.ChangeINPROCESSStatusByCollision(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+        '                    End If
+
+        '                    'Instructions aborted or rejected
+        '                Case GlobalEnumerates.Alarms.INST_ABORTED_ERR, GlobalEnumerates.Alarms.INST_REJECTED_ERR
+        '                    If pAlarmStatusList(index) Then
+        '                        'INSTRUCTIONS: ask for detailed errors
+        '                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.ALR) 'AG 12/03/2012: (INFO;Q:ALR)
+        '                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+        '                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
+        '                            methodHasToAddInstructionToQueueFlag = 1
+        '                            'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+        '                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+        '                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
+        '                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
+        '                                'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:ALR; instead of INFO;Q:2;
+        '                                'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.ALR.ToString)
+        '                                myParamsQueue.Add(CInt(Ax00InfoInstructionModes.ALR))
+        '                            End If
+        '                        End If
+        '                        'AG 14/05/2012
+
+        '                        'BUSINESS: NOTHING
+        '                        'PRESENTATION: NOTHING
+        '                    End If
+
+        '                Case GlobalEnumerates.Alarms.INST_REJECTED_WARN
+
+        '                    'TR BUG #1339  before sending the next instruction, validate if the last intruction send was pause to star logic
+        '                    If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
+        '                        PauseAlreadySentFlagAttribute = False
+        '                        SetAllowScanInRunningValue(False) 'AG 08/11/2013 #1358  AllowScanInRunningAttribute = False
+        '                        If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
+        '                        End If
+        '                    End If
+        '                    'TR BUG #1339 -END
+
+        '                    'Sw has received a Request but has sent instruction out of time.
+        '                    'Search for next instruction to be sent but using next well (only in Running)
+        '                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+        '                        Dim reactRotorDlg As New ReactionsRotorDelegate
+        '                        futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+        '                        myGlobal = Me.SearchNextPreparation(dbConnection, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+        '                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
+        '                            myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+        '                        End If
+        '                    End If
+
+
+        '                    'Debug print to leave developent traces
+        '                    'Dim myLogAcciones As New ApplicationLogManager()
+        '                    GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)
+        '                    Debug.Print(Now.ToString & " .Instruction rejected (out of time)")
+
+        '                    ''''''''''''
+        '                    'ISE ALARMS
+        '                    ''''''''''''
+        '                    'AG 23/03/2012 - ISE switch off
+        '                Case GlobalEnumerates.Alarms.ISE_OFF_ERR
+        '                    If pAlarmStatusList(index) Then
+        '                        ISEAnalyzer.IsISESwitchON = False 'SGM 29/06/2012
+        '                        MyClass.RefreshISEAlarms() 'SGM 19/06/2012
+
+        '                        'When this alarm appears in RUNNING: Lock all pending ISE preparations
+        '                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+        '                            Dim exec_delg As New ExecutionsDelegate
+
+        '                            '1st: Get all ISE executions pending (required to inform the UI with the locked executions
+        '                            myGlobal = exec_delg.GetExecutionsByStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "PENDING", False, "PREP_ISE")
+        '                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+        '                                Dim myExecutionsDS As New ExecutionsDS
+
+        '                                '2on: Lock all pending ISE preparation executions
+        '                                myGlobal = exec_delg.UpdateStatusByExecutionTypeAndStatus(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
+
+        '                                '3rd: Prepare data for generate user interface refresh event
+        '                                If Not myGlobal.HasError Then
+        '                                    For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
+        '                                        myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
+        '                                        If myGlobal.HasError Then Exit For
+        '                                    Next
+        '                                End If
+
+        '                            End If
+
+        '                        End If
+        '                        'JV 08/01/2014 BT #1118
+        '                    Else
+        '                        'AG 16/01/2014 - Mark IseOffError as FIXED only when exists the alarm ISE_OFF_ERR in database with status TRUE
+        '                        ' Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
+        '                        'myISEOffsErrorFixed = True
+        '                        myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
+        '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+        '                            Dim temporalDS As New WSAnalyzerAlarmsDS
+        '                            temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+        '                            'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED)
+        '                            'in order to mark it as fixed
+        '                            Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
+        '                            auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
+        '                                       Where a.AlarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+        '                            If auxList.Count > 0 Then
+        '                                myISEOffErrorFixed = True
+        '                            End If
+        '                            auxList = Nothing
+        '                        End If
+        '                        'AG 16/01/2014 - JV 08/01/2014 BT #1118
+
+        '                    End If
+
+        '                    'AG 23/03/2012
+
+        '                    ' XB 04/11/2014 - BA-1872
+        '                Case GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+
+        '                    myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
+        '                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+        '                        Dim temporalDS As New WSAnalyzerAlarmsDS
+        '                        temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+        '                        'Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED)
+        '                        'in order to mark it as fixed
+        '                        Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
+        '                        auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
+        '                                   Where a.AlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+        '                        If auxList.Count > 0 Then
+        '                            myISETimeoutErrorFixed = True
+        '                        End If
+        '                        auxList = Nothing
+        '                    End If
+        '                    ' XB 04/11/2014 - BA-1872
+
+        '                    ' XB 06/11/2014 - BA-1872
+        '                Case GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+
+        '                    myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
+        '                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+        '                        Dim temporalDS As New WSAnalyzerAlarmsDS
+        '                        temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+        '                        'Search if exists alarm COMMS_TIMEOUT_ERR with status TRUE, in this case set flag myCOMMSTimeoutErrorFixed = True (FIXED)
+        '                        'in order to mark it as fixed
+        '                        Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
+        '                        auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
+        '                                   Where a.AlarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+        '                        If auxList.Count > 0 Then
+        '                            myCOMMSTimeoutErrorFixed = True
+        '                        End If
+        '                        auxList = Nothing
+        '                    End If
+        '                    ' XB 06/11/2014 - BA-1872
+
+        '                    'SGM 19/06/2012
+        '                Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
+        '                    If pAlarmStatusList(index) Then
+        '                        MyClass.RefreshISEAlarms()
+        '                    End If
+        '                    'SGM 19/06/2012
+
+
+        '                    'DL 31/07/2012
+        '                Case GlobalEnumerates.Alarms.FW_CPU_ERR, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR, _
+        '                     GlobalEnumerates.Alarms.FW_REPOSITORY_ERR, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR, _
+        '                     GlobalEnumerates.Alarms.FW_MAN_ERR
+
+        '                    If pAlarmStatusList(index) Then
+        '                        'INSTRUCTIONS: nothing
+        '                        'BUSINESS: call stopcomm
+        '                        ' Cut off communications channel
+        '                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, _
+        '                                                      True, _
+        '                                                      Nothing, _
+        '                                                      Ax00InfoInstructionModes.STP)
+        '                        End If
+
+        '                        If Not myGlobal.HasError Then StopComm()
+        '                        'PRESENTATION: disconnect Showmessage from Presntation
+        '                    End If
+
+        '                Case GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR, GlobalEnumerates.Alarms.INST_REJECTED_WARN
+        '                    'TR BUG #1339 Validate if the last intruction send was pause to star logic
+        '                    If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
+        '                        PauseAlreadySentFlagAttribute = False
+        '                        SetAllowScanInRunningValue(False) 'AG 08/11/2013   AllowScanInRunningAttribute = False
+        '                        If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
+        '                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
+        '                        End If
+        '                    End If
+        '                    'TR BUG #1339 -END
+        '                Case Else
+        '                    'Nothing
+        '            End Select
+        '            index = index + 1
+        '        Next
+
+        '        'AG 12/03/2012 - Update analyzer session flags into DataBase
+        '        If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+        '            Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+        '            myGlobal = myFlagsDelg.Update(dbConnection, myAnalyzerFlagsDS)
+        '        End If
+        '        'AG 12/03/2012
+
+        '        'Save alarms into DataBase and prepare DS for UI refresh
+        '        'Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move definition upper
+        '        Dim wsAlarmsDS As New WSAnalyzerAlarmsDS
+        '        Dim newRowFlag As Boolean = False
+        '        index = 0
+
+        '        'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+        '        SyncLock myUI_RefreshDS.ReceivedAlarms
+        '            myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
+        '        End SyncLock
+
+        '        'Get the alarms defined with OKType = False (never are marked as solved)
+        '        Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In _
+        '                                                    alarmsDefintionTableDS.tfmwAlarms Where a.OKType = False Select a.AlarmID).ToList
+
+        '        For Each alarmIDItem As Alarms In pAlarmIDList
+        '            newRowFlag = False
+        '            If alarmIDItem <> GlobalEnumerates.Alarms.NONE Then
+        '                If pAlarmStatusList(index) Then 'Save alarms and also the alarms solved
+        '                    If Not myAlarmListAttribute.Contains(alarmIDItem) Then
+        '                        myAlarmListAttribute.Add(alarmIDItem)
+        '                        newRowFlag = True
+
+        '                        'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicate in database but not in myAlarmListAttribute
+        '                    ElseIf alarmsWithOKTypeFalse.Contains(alarmIDItem.ToString) Then
+        '                        newRowFlag = True
+
+        '                    End If
+        '                    'JV 08/01/2014 BT #1118
+        '                ElseIf myISEOffErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
+        '                    newRowFlag = True
+        '                    'JV 08/01/2014 BT #1118
+        '                    ' XB 04/11/2014 - BA-1872
+        '                ElseIf myISETimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+        '                    newRowFlag = True
+        '                    ' XB 04/11/2014 - BA-1872
+        '                    ' XB 06/11/2014 - BA-1872
+        '                ElseIf myCOMMSTimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
+        '                    newRowFlag = True
+        '                    ' XB 06/11/2014 - BA-1872
+        '                Else 'Fixed alarms
+        '                    If myAlarmListAttribute.Contains(alarmIDItem) Then
+        '                        myAlarmListAttribute.Remove(alarmIDItem)
+        '                        newRowFlag = True
+        '                    End If
+
+        '                End If
+
+        '                'Add rows into WSAnalyzerAlarmsDS with the new or solved alarms and save them
+        '                If newRowFlag Then
+        '                    Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
+        '                    alarmRow = wsAlarmsDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
+        '                    With alarmRow
+        '                        .BeginEdit()
+        '                        .AlarmID = alarmIDItem.ToString
+        '                        .AnalyzerID = AnalyzerIDAttribute
+
+        '                        .AlarmDateTime = Now
+
+        '                        If WorkSessionIDAttribute <> "" Then
+        '                            .WorkSessionID = WorkSessionIDAttribute
+        '                        Else
+        '                            .SetWorkSessionIDNull()
+        '                        End If
+        '                        .AlarmStatus = pAlarmStatusList(index)
+
+        '                        .AlarmItem = 1 'By now (25/03/2011 )always 1
+
+        '                        'AG 25/07/2012 - v043 code when the parameter pVolumeMissingAdditionalInfo was a single string
+        '                        'in v050 it is defined as a list of string because a single ansbm1 instruction can generate additional info for sample volume missing and also clot warning alarms
+        '                        'If String.IsNullOrEmpty(pVolumeMissingAdditionalInfo) Then
+        '                        '    .SetAdditionalInfoNull() 'By now (25/03/2011 )always NULL
+        '                        'Else
+        '                        '    .AdditionalInfo = pVolumeMissingAdditionalInfo
+        '                        'End If
+        '                        .SetAdditionalInfoNull() 'MI: Added count > index to condition, and item null, as strings can be null to prevent bug being generated
+        '                        If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
+        '                            pAdditionalInfoList(index) IsNot Nothing AndAlso
+        '                            String.Equals(pAdditionalInfoList(index), String.Empty) Then
+        '                            .AdditionalInfo = pAdditionalInfoList(index)
+        '                        End If
+        '                        'AG 25/07/2012
+
+        '                        .EndEdit()
+        '                    End With
+
+        '                    wsAlarmsDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
+
+        '                    'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
+        '                    myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmIDItem.ToString, pAlarmStatusList(index))
+
+        '                    'JV 08/01/2014 BT #1118
+        '                    If myISEOffErrorFixed Then
+        '                        myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+        '                    End If
+        '                    'JV 08/01/2014 BT #1118
+
+        '                End If
+
+        '            End If
+        '            index = index + 1
+        '        Next
+        '        wsAlarmsDS.AcceptChanges()
+
+        '        If wsAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0 Then
+        '            myGlobal = alarmsDelg.Save(dbConnection, wsAlarmsDS, alarmsDefintionTableDS) 'AG 24/07/2012 change Create for Save who inserts alarms with status TRUE and updates alarms with status FALSE
+        '            ''TR 26/10/2011 
+        '            If Not myGlobal.HasError AndAlso Not AnalyzerIsRingingAttribute Then
+        '                myGlobal = SoundActivationByAlarm(dbConnection, methodHasToAddInstructionToQueueFlag)
+        '            End If
+        '            ''TR 26/10/2011 -END.
+        '        End If
+
+        '        'AG 14/03/2012
+        '        If analyzerFREEZEFlagAttribute Then
+        '            'AG 05/06/2014 - #1657 - (except ISE_OFF_ERR that is always generated with status FALSE)
+        '            If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+        '                If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
+        '                    'BUSINESS: 
+        '                    'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
+        '                    'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
+
+        '                    'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
+
+        '                    If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
+        '                        'Analyzer has recovered an operating status automatically by closing covers
+        '                        analyzerFREEZEFlagAttribute = False
+        '                        analyzerFREEZEModeAttribute = ""
+        '                        AnalyzerIsReadyAttribute = True 'Analyzer is ready
+        '                        UpdateSensorValuesAttribute(AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
+
+        '                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+        '                        If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+        '                            methodHasToAddInstructionToQueueFlag = 1
+        '                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
+        '                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.STATE)
+        '                                myParamsQueue.Add("")
+        '                            End If
+        '                        End If
+        '                        'AG 14/05/2012
+
+        '                    Else 'Exists freeze auto
+        '                        'Reset all processes flags
+        '                        Dim flags_dlg As New AnalyzerManagerFlagsDelegate
+        '                        myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
+
+        '                        'Finally read and update our internal structures
+        '                        If Not myGlobal.HasError Then
+        '                            InitializeAnalyzerFlags(dbConnection)
+        '                        End If
+
+        '                        'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
+        '                        'appears while sensors deactivated there is no other way to auto recover
+        '                        If Not myGlobal.HasError Then
+        '                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+        '                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+        '                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+        '                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+        '                                If methodHasToAddInstructionToQueueFlag = 0 Then
+        '                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
+        '                                    methodHasToAddInstructionToQueueFlag = 1
+        '                                    'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+        '                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+        '                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+        '                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+        '                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
+        '                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
+        '                                        'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
+        '                                        'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
+        '                                        myParamsQueue.Add(CInt(Ax00InfoInstructionModes.STR))
+        '                                    End If
+        '                                End If
+        '                                'AG 14/05/2012
+        '                            End If
+        '                        End If
+        '                    End If
+
+        '                ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
+        '                    'Remove all flags ... recover is required
+        '                    Dim flags_dlg As New AnalyzerManagerFlagsDelegate
+        '                    myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
+        '                End If
+
+        '            End If
+        '        End If
+        '        'AG 14/03/2012
+
+        '        alarmsWithOKTypeFalse = Nothing
+
+        '        'If (Not myGlobal.HasError) Then
+        '        '    'When the Database Connection was opened locally, then the Commit is executed
+        '        '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '        'Else
+        '        '    'When the Database Connection was opened locally, then the Rollback is executed
+        '        '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '        'End If
+        '        '    End If
+        '        'End If
+
+        '    Catch ex As Exception
+        '        myGlobal.HasError = True
+        '        myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
+        '        myGlobal.ErrorMessage = ex.Message
+
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        'GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex)
+
+
+        '        'Finally
+        '        '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+
+        '    Return myGlobal
+        'End Function
 
 
         ''' <summary>
@@ -1233,23 +1145,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>CREATE BY: TR 27/10/2011</remarks>
-        Private Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO
+        Public Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.IsAlarmSoundDisable
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim dbConnection As New SqlConnection
             Try
-                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pdbConnection)
+                myGlobalDataTO = GetOpenDBTransaction(pdbConnection)
                 If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         'Search on tcfgAnalyzerSettings where setting id = ALARM_DISABLED
                         Dim myAnalyzerSettingDelegate As New AnalyzerSettingsDelegate
-                        Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
                         myGlobalDataTO = myAnalyzerSettingDelegate.GetAnalyzerSetting(pdbConnection, Me.AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED.ToString())
 
                         If Not myGlobalDataTO.HasError Then
-                            myAnalyzerSettingsDS = DirectCast(myGlobalDataTO.SetDatos, AnalyzerSettingsDS)
+                            Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = DirectCast(myGlobalDataTO.SetDatos, AnalyzerSettingsDS)
                             If (myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count = 1) Then
                                 myGlobalDataTO.SetDatos = CType(myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, Boolean)
                             End If
@@ -1262,7 +1173,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsAlarmSoundEnable", EventLogEntryType.Error, False)
 
             Finally
@@ -2594,7 +2504,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim instrAddedToLogFlag As Boolean = False 'Indicates if the instruction has been added to log file
                 If myAlarmList.Count > 0 Then
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
-                    myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    Dim currentAlarms = New CurrentAlarms(Me)
+                    myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
 
                     'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
                     '                Previous code only saved it when new alarms were generated
@@ -3854,11 +3765,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If pSensor = AnalyzerSensors.CONNECTED Then
 
                         'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                        If GlobalBase.IsServiceAssembly Then
-                            'Nothing
-
-                        Else
+                        If Not GlobalBase.IsServiceAssembly Then
                             'Add into alarms table
                             Dim myAlarmList As New List(Of Alarms)
                             Dim myAlarmStatusList As New List(Of Boolean)
@@ -3868,17 +3775,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count > 0 Then
                                 Dim myGlobal As New GlobalDataTO
-                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                Dim currentAlarms = New CurrentAlarms(Me)
+                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                             End If
                         End If
 
                     End If
-                    'AG 17/10/2011
 
                     Return True
                 End If
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSensorValuesAttribute", EventLogEntryType.Error, False)
             End Try
 
@@ -4897,12 +4803,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             '3- Finally call manage all alarms detected (new or fixed)
                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                            If GlobalBase.IsServiceAssembly Then
-                                ' XBC 16/10/2012 - Alarms treatment for Service
-                                ' Not Apply
-                                'resultData = ManageAlarms_SRV(dbConnection, okAlarmList, okAlarmStatusList)
-                            Else
-                                resultData = ManageAlarms(dbConnection, okAlarmList, okAlarmStatusList)
+                            If Not GlobalBase.IsServiceAssembly Then
+                                Dim currentAlarms = New CurrentAlarms(Me)
+                                resultData = currentAlarms.Manage(dbConnection, okAlarmList, okAlarmStatusList)
                             End If
                         End If
 
@@ -5239,20 +5142,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoReactionsRotorError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5281,20 +5177,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoFridgeError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5324,21 +5213,17 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
                     'AG 29/05/2014 - #1630
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WasteDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5377,7 +5262,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
                     End If
                 End If
 
@@ -5408,20 +5294,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.R1_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR1ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5447,20 +5326,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 PrepareLocalAlarmList(GlobalEnumerates.Alarms.R2_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR2ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
