@@ -124,6 +124,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property WELLbaselineParametersFailures As Boolean
         Property FutureRequestNextWellValue As Integer
         ReadOnly Property ReceivedAlarms() As UIRefreshDS.ReceivedAlarmsDataTable
+        ReadOnly Property FieldLimits As FieldLimitsDS.tfmwFieldLimitsDataTable
+        ReadOnly Property SentPreparations As AnalyzerManagerDS.sentPreparationsDataTable
+        ReadOnly Property NextPreparationsToSend As AnalyzerManagerDS.nextPreparationDataTable
+        Property NextPreparationsAnalyzerManagerDS As AnalyzerManagerDS
 
 #End Region
 
@@ -153,7 +157,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ManageAnalyzer(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
                                Optional ByVal pSwAdditionalParameters As Object = Nothing, _
-                               Optional ByVal pFwScriptID As String = "", _
+                               Optional ByVal pFwScriptId As String = "", _
                                Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO
         Sub InitializeAnalyzerFlags(ByVal pDBConnection As SqlConnection, Optional ByVal pPreviousAnalyzerID As String = "")
         Function SetSessionFlags(ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String) As GlobalDataTO
@@ -197,7 +201,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function LoadAppFwScriptsData() As GlobalDataTO
         Function LoadFwAdjustmentsMasterData(Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO
         Function ReadFwAdjustmentsDS() As GlobalDataTO
-        Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDS As SRVAdjustmentsDS) As GlobalDataTO
+        Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDs As SRVAdjustmentsDS) As GlobalDataTO
         Function ReadPhotometryData() As GlobalDataTO
         Function SetPhotometryData(ByVal pPhotometryData As PhotometryDataTO) As GlobalDataTO
         Function ReadStressModeData() As GlobalDataTO
@@ -208,12 +212,12 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO
         Function StopAnalyzerInfo() As GlobalDataTO
         Function ReadAdjustValue(ByVal pAdjust As Ax00Adjustsments) As String
-        Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO
+        Function ManageBarCodeRequestBeforeRUNNING(ByVal pDbConnection As SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO
         Function ExistBottleAlarms() As Boolean
-        Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlConnection) As GlobalDataTO
-        Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO
+        Function ProcessUpdateWSByAnalyzerID(ByVal pDbConnection As SqlConnection) As GlobalDataTO
+        Function ProcessToMountTheNewSession(ByVal pDbConnection As SqlConnection, ByVal pWsAnalyzerId As String) As GlobalDataTO
         Function InsertConnectedAnalyzer(ByVal pDBConnection As SqlConnection) As GlobalDataTO
-        Function ReadAdjustments(ByVal pDBConnection As SqlConnection) As GlobalDataTO
+        Function ReadAdjustments(ByVal pDbConnection As SqlConnection) As GlobalDataTO
         Sub ClearLastExportedResults()
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
         Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO
@@ -255,17 +259,21 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                                ByVal pAlarmID As String, ByVal pAlarmStatus As Boolean) As GlobalDataTO
         Sub ClearReceivedAlarmsFromRefreshDs()
         Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO
-
-        ' Temporal location
         Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
                                           ByVal pAlarmIDList As List(Of Alarms), _
                                           ByVal pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pErrorCodeList As List(Of String) = Nothing, _
                                           Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO
-        'Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
-        '                              ByVal pAlarmIDList As List(Of Alarms), _
-        '                              ByVal pAlarmStatusList As List(Of Boolean), _
-        '                              Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
+        Function PrepareUIRefreshEventNum3(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                               ByVal pReactionsRotorWellDS As ReactionsRotorDS, ByVal pMainThreadIsUsedFlag As Boolean) As GlobalDataTO
+
+        Function PrepareUIRefreshEventNum2(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                               ByVal pRotorType As String, ByVal pCellNumber As Integer, ByVal pStatus As String, ByVal pElementStatus As String, _
+                                               ByVal pRealVolume As Single, ByVal pTestsLeft As Integer, ByVal pBarCodeInfo As String, ByVal pBarCodeStatus As String, _
+                                               ByVal pSensorId As AnalyzerSensors, ByVal pSensorValue As Single, _
+                                               ByVal pScannedPosition As Boolean, ByVal pElementID As Integer, ByVal pMultiTubeNumber As Integer, _
+                                               ByVal pTubeType As String, ByVal pTubeContent As String) As GlobalDataTO
+        
 #End Region
 
     End Interface

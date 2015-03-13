@@ -16,9 +16,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Public WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
         Public WELL_OFFSET_FOR_ISETEST_URI As Integer = 3 'Default well offset until next request when a ISETEST (uri) instruction is sent
 
-        'TR 25/01/2011 -Replace by corresponding value on global base.
-        Public REAL_DEVELOPMENT_MODE As Integer = GlobalBase.RealDevelopmentMode
-
         Public alarmsDefintionTableDS As New AlarmsDS 'Read the Alarm definition when analyzer manager class is created not in several methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
 
         Public LockThis As New Object() 'AG 28/06/2012

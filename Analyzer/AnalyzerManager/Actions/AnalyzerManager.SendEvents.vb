@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -16,7 +17,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function ConnectSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
             ' Set Waiting Timer Current Instruction OFF
-            If REAL_DEVELOPMENT_MODE > 0 Then
+            If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                 ClearQueueToSend()
             Else
                 myGlobal = ProcessConnection(pSwAdditionalParameters, False)
@@ -29,11 +30,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pAction"></param>
         ''' <param name="pSwAdditionalParameters"></param>
-        ''' <param name="pFwScriptID"></param>
+        ''' <param name="pFwScriptId"></param>
         ''' <param name="pServiceParams"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function RunningSendEvent(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptID As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
+        Private Function RunningSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptId As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
             Dim myGlobal As GlobalDataTO
 
             If Not sendingRepetitions Then
@@ -42,7 +43,7 @@ Namespace Biosystems.Ax00.Core.Entities
             InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
             StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
 
-            myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RUNNING)
+            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RUNNING)
             Return myGlobal
         End Function
 
@@ -54,18 +55,18 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSwAdditionalParameters"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function PauseSendEvent(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+        Private Function PauseSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
-            If AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-               AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute Then
+            If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
+               AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute Then
 
-                If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     If Not myInstructionsQueue.Contains(pAction) Then
                         myInstructionsQueue.Add(pAction)
                         myParamsQueue.Add(pSwAdditionalParameters)
                     End If
                 Else
-                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.PAUSE)
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.PAUSE)
                     If Not myGlobal.HasError Then useRequestFlag = False
                 End If
             End If
@@ -80,11 +81,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSwAdditionalParameters"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function StartSendEvent(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+        Private Function StartSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
-            If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                 If Not ContinueAlreadySentFlagAttribute AndAlso _
-                   (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") AndAlso Not myInstructionsQueue.Contains(GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE) Then
+                   (mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") AndAlso Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.PAUSE) Then
                     If Not myInstructionsQueue.Contains(pAction) Then
                         myInstructionsQueue.Add(pAction)
                         myParamsQueue.Add(pSwAdditionalParameters)
@@ -92,7 +93,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Else
-                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.START)
                 If Not myGlobal.HasError Then
                     endRunAlreadySentFlagAttribute = False
                     abortAlreadySentFlagAttribute = False
@@ -110,23 +111,23 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSwAdditionalParameters"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function EndRunSendEvent(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+        Private Function EndRunSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
-            If AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START AndAlso Not endRunAlreadySentFlagAttribute AndAlso _
-               AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-               AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
-               AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START Then
+            If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START AndAlso Not endRunAlreadySentFlagAttribute AndAlso _
+               AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
+               AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
+               AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.STANDBY_START Then
 
-                If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     If AllowScanInRunningAttribute Then
                         If Not stopRequestedByUserInPauseModeFlag AndAlso Not pSwAdditionalParameters Is Nothing Then
                             If TypeOf (pSwAdditionalParameters) Is Boolean Then
                                 stopRequestedByUserInPauseModeFlag = DirectCast(pSwAdditionalParameters, Boolean)
 
                                 If stopRequestedByUserInPauseModeFlag AndAlso _
-                                   (AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_START OrElse _
-                                    AnalyzerCurrentActionAttribute = GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_END OrElse _
-                                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartRunning.ToString) = "INI") Then
+                                   (AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.START_INSTRUCTION_START OrElse _
+                                    AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.STANDBY_END OrElse _
+                                    mySessionFlags(AnalyzerManagerFlags.StartRunning.ToString) = "INI") Then
                                     stopRequestedByUserInPauseModeFlag = False
                                 End If
                             End If
@@ -142,14 +143,14 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                     Else
                         GlobalBase.CreateLogActivity("In paused mode user decides stop the Worksession, 1st add START instruction into queue (or recovery results while analyzer is in pause mode)", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
-                        If Not myInstructionsQueue.Contains(GlobalEnumerates.AnalyzerManagerSwActionList.START) Then
-                            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.START)
+                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.START) Then
+                            myInstructionsQueue.Add(AnalyzerManagerSwActionList.START)
                             myParamsQueue.Add(Nothing)
                         End If
                     End If
 
                 Else
-                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDRUN)
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDRUN)
                     If Not myGlobal.HasError Then useRequestFlag = False
                 End If
             End If
@@ -239,9 +240,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks></remarks>
         Private Function NextPreparationSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
-            Dim nextWell As Integer = 0
             If IsNumeric(pSwAdditionalParameters) Then
-                nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
+                Dim nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
 
                 'The pauseSendingTestPreparationsFlag becomes TRUE with several alarms appears and becomes FALSE when solved
                 'AG 29/06/2012 - Add 'AndAlso Not endRunAlreadySentFlagAttribute AndAlso Not abortAlreadySentFlagAttribute'
@@ -268,10 +268,9 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function AdjustLightSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object, ByVal pServiceParams As List(Of String)) As GlobalDataTO
 
             If ConnectedAttribute Then
-                Dim nextWell As Integer = 0
                 If IsNumeric(pSwAdditionalParameters) Then
-                    nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
-                    myGlobal = Me.SendAdjustLightInstruction(nextWell)
+                    Dim nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
+                    myGlobal = SendAdjustLightInstruction(nextWell)
                 ElseIf Not pServiceParams Is Nothing Then
                     myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ALIGHT, Nothing, "", "", pServiceParams)
                 End If
@@ -321,7 +320,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 'If AnalyzerIsInfoActivatedAttribute = 0 AndAlso queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then allowToSendFlag = False
 
                 'SGM 24/10/2012 - Not to allow send INFO Q:3 in case of Alarm details requested
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 If GlobalBase.IsServiceAssembly Then
 
                     Dim myInstructionsQueueTemp As New List(Of AnalyzerManagerSwActionList)
@@ -377,8 +375,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If queryMode = Ax00InfoInstructionModes.ALR Then
                             AnalyzerIsInfoActivatedAttribute = 0
-                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If GlobalBase.IsServiceAssembly Then
                                 IsAlarmInfoRequested = True
                             End If
@@ -458,9 +454,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim anSetts As New AnalyzerSettingsDelegate
                 myGlobal = anSetts.ReadAll(Nothing, AnalyzerIDAttribute)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    Dim mySettingsDS As New AnalyzerSettingsDS
-                    mySettingsDS = CType(myGlobal.SetDatos, AnalyzerSettingsDS)
-                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.CONFIG, mySettingsDS)
+                    Dim mySettingsDs = CType(myGlobal.SetDatos, AnalyzerSettingsDS)
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.CONFIG, mySettingsDs)
                 End If
             End If
             Return myGlobal
@@ -491,16 +486,16 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAction"></param>
         ''' <param name="myGlobal"></param>
         ''' <param name="pSwAdditionalParameters"></param>
-        ''' <param name="pFwScriptID"></param>
+        ''' <param name="pFwScriptId"></param>
         ''' <param name="pServiceParams"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function IseCmdSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptID As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
+        Private Function IseCmdSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptId As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
 
             If ConnectedAttribute Then
-                Dim myISECommand As ISECommandTO
-                myISECommand = CType(pSwAdditionalParameters, ISECommandTO)
-                If myISECommand.ISEMode <> ISEModes.None Then
+                Dim myIseCommand As ISECommandTO
+                myIseCommand = CType(pSwAdditionalParameters, ISECommandTO)
+                If myIseCommand.ISEMode <> ISEModes.None Then
                     ' XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
                     If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                         If Not myInstructionsQueue.Contains(pAction) Then
@@ -514,9 +509,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             numRepetitionsTimeout = 0
                         End If
                         InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
+                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
-                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myISECommand)
+                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myIseCommand)
 
                     End If
 
@@ -535,10 +530,10 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function FwUtilSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
             If ConnectedAttribute Then
-                Dim myFWAction As FWUpdateRequestTO
-                myFWAction = CType(pSwAdditionalParameters, FWUpdateRequestTO)
-                If myFWAction.ActionType <> FwUpdateActions.None Then
-                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FW_UTIL, myFWAction)
+                Dim myFwAction As FWUpdateRequestTO
+                myFwAction = CType(pSwAdditionalParameters, FWUpdateRequestTO)
+                If myFwAction.ActionType <> FwUpdateActions.None Then
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FW_UTIL, myFwAction)
                 End If
             End If
             Return myGlobal
@@ -552,7 +547,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function RecoverSendEvent() As GlobalDataTO
             Dim myGlobal As GlobalDataTO
 
-            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
             If GlobalBase.IsServiceAssembly Then
                 SensorValuesAttribute.Clear()
             End If
@@ -571,11 +565,11 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function PollRdSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
 
             If ConnectedAttribute Then
-                Dim ActionMode As Integer = Ax00PollRDAction.Biochemical
+                Dim actionMode As Integer = Ax00PollRDAction.Biochemical
                 If IsNumeric(pSwAdditionalParameters) Then
-                    ActionMode = CInt(pSwAdditionalParameters)
+                    actionMode = CInt(pSwAdditionalParameters)
                 End If
-                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLRD, ActionMode)
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLRD, actionMode)
             End If
             Return myGlobal
         End Function
@@ -585,14 +579,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pAction"></param>
         ''' <param name="pSwAdditionalParameters"></param>
-        ''' <param name="pFwScriptID"></param>
+        ''' <param name="pFwScriptId"></param>
         ''' <param name="pServiceParams"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function CommandSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptID As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
+        Private Function CommandSendEvent(ByVal pAction As AnalyzerManagerSwActionList, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptId As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
             Dim myGlobal As GlobalDataTO
 
-            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pServiceParams)
+            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptId, pServiceParams)
 
             If GlobalBase.IsServiceAssembly Then
                 If Not myGlobal.HasError Then
@@ -600,7 +594,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         numRepetitionsTimeout = 0
                     End If
                     InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
-                    StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
+                    StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptId, pServiceParams)
                 End If
             End If
             Return myGlobal
@@ -654,6 +648,292 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function TanksTestSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+            If ConnectedAttribute Then
+                Dim queryMode As String = ""
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = pSwAdditionalParameters.ToString
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.TANKSTEST, queryMode)
+            End If
+            Return myGlobal
+        End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function PollFwSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                Dim queryMode As POLL_IDs
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = CType(pSwAdditionalParameters, POLL_IDs)
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLFW, queryMode)
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function PollHwSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                Dim queryMode As POLL_IDs
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = CType(pSwAdditionalParameters, POLL_IDs)
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLHW, queryMode)
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function UpdateFwSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+            If ConnectedAttribute Then
+                Dim queryMode() As Byte = Nothing
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = CType(pSwAdditionalParameters, Byte())
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.UPDATE_FIRMWARE, queryMode)
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function ReadCyclesSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                Dim queryMode As String = ""
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = pSwAdditionalParameters.ToString
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.READCYC, queryMode)
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function WriteCyclesSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                Dim queryMode As String = ""
+                If Not pSwAdditionalParameters Is Nothing Then
+                    queryMode = pSwAdditionalParameters.ToString
+                End If
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.WRITECYC, queryMode)
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pSwAdditionalParameters"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function UtilSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                Dim myUtilCommand As UTILCommandTO
+                myUtilCommand = CType(pSwAdditionalParameters, UTILCommandTO)
+                If myUtilCommand.ActionType <> UTILInstructionTypes.None Then
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.UTIL, myUtilCommand)
+                End If
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function PollSnSendEvent(ByVal myGlobal As GlobalDataTO) As GlobalDataTO
+
+            If ConnectedAttribute Then
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLSN)
+                runningConnectionPollSnSent = True
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function WaitingTimeExpiredSendEvent(ByVal myGlobal As GlobalDataTO) As GlobalDataTO
+
+            If myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.ISE_CMD) Then
+                ISECMDLost = True
+                GlobalBase.CreateLogActivity("ISE CMD lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+
+            ElseIf myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                Debug.Print("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...")
+                RUNNINGLost = True
+                GlobalBase.CreateLogActivity("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+
+            Else
+                RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+
+                If ConnectedAttribute Then
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                End If
+
+            End If
+            Return myGlobal
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <remarks></remarks>
+        Private Function StartTaskTimeoutSendEvent(ByRef myGlobal As GlobalDataTO) As Boolean
+
+            If myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.ISE_CMD) Then
+                ' ISE COMMAND Instructions
+                ISECMDLost = True
+                GlobalBase.CreateLogActivity("ISE CMD lost !!! [START_TASK_TIMEOUT] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                If numRepetitionsSTATE > GlobalBase.MaxRepetitionsTimeout Then
+                    GlobalBase.CreateLogActivity("Num of Repetitions for STATE timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                    ' Activates Alarm begin
+                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+
+                    Const alarmId As Alarms = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    Const alarmStatus As Boolean = True
+                    ISEAnalyzer.IsTimeOut = True
+
+                    PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                    If myAlarmList.Count > 0 Then
+                        ' Note that this alarm is common on User and Service !
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                    End If
+                    ' Activates Alarm end
+
+                    RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                Else
+                    ' Instruction has not started by Fw, so is need to send it again
+                    GlobalBase.CreateLogActivity("Repeat STATE Instruction [" & numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                    InitializeTimerSTATEControl(WAITING_TIME_FAST)
+                End If
+
+
+            ElseIf myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                ' RUNNING Instruction
+                RUNNINGLost = True
+                GlobalBase.CreateLogActivity("RUNNING lost !!! [START_TASK_TIMEOUT] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                If numRepetitionsSTATE > GlobalBase.MaxRepetitionsTimeout Then
+                    GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                    ' Activates Alarm begin
+                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+
+                    Const alarmId As Alarms = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                    Const alarmStatus As Boolean = True
+                    ISEAnalyzer.IsTimeOut = True
+
+                    PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                    If myAlarmList.Count > 0 Then
+                        Dim currentAlarms = New CurrentAlarms(Me)
+                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                    End If
+                    ' Activates Alarm end
+
+                    Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+                    UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                    'Update internal flags. Basically used by the running normal business
+                    If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                        'Update analyzer session flags into DataBase
+                        If (myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                            Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                            myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                        End If
+                    End If
+
+                    RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                Else
+                    ' Instruction has not started by Fw, so is need to send it again
+                    GlobalBase.CreateLogActivity("Repeat STATE Instruction [" & numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
+                    InitializeTimerSTATEControl(WAITING_TIME_FAST)
+                End If
+
+            Else
+                ' Another Instructions
+
+                If GlobalBase.IsServiceAssembly Then
+                    sendingRepetitions = True
+                    ClearQueueToSend()
+                    numRepetitionsTimeout += 1
+                    If numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                        waitingStartTaskTimer.Enabled = False
+                        sendingRepetitions = False
+
+                        ConnectedAttribute = False
+                        InfoRefreshFirstTime = True
+                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(ConnectedAttribute), True)
+
+                        RaiseEvent SendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                        Return False
+
+                    Else
+                        ' Instruction has not started by Fw, so is need to send it again
+                        GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Error, False)
+                        myGlobal = SendStartTaskinQueue()
+                    End If
+                End If
+
+            End If
+            Return True
+        End Function
     End Class
 End Namespace

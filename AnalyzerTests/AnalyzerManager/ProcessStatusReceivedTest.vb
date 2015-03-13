@@ -15,9 +15,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_END()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "10"
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
             Dim myGlobal As New GlobalDataTO
             target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
@@ -32,7 +32,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         <Obsolete("Not working")>
         Public Sub EvaluateActionCodeValueTest_SOUND_DONE()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "60"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -48,7 +48,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_START()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "9"
@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_START()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "15"
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_END()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "16"
@@ -99,7 +99,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_START()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "96"
@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_END()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "97"
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_START()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "70"
@@ -150,7 +150,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_END()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer)
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "71"
