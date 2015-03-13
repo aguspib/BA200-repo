@@ -40,7 +40,6 @@ Namespace Biosystems.Ax00.Global.Tests
 
     End Class
 
-
 End Namespace
 
 

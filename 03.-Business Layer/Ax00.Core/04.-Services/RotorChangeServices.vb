@@ -411,7 +411,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function IsEmptyingAllowed()
+        Private Function IsEmptyingAllowed() As Boolean
             Return (_dynamicBaseLineValid Or _forceEmptyAndFinalize)
         End Function
 
@@ -420,7 +420,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function IsReadingAllowed()
+        Private Function IsReadingAllowed() As Boolean
             Return (_analyzer.DynamicBaselineInitializationFailures < _analyzer.FlightInitFailures)
         End Function
 
@@ -429,7 +429,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function IsValidStaticBaseLine()
+        Private Function IsValidStaticBaseLine() As Boolean
             If (_staticBaseLineFinished) Then
                 Return (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) <> "CANCELED")
             Else
