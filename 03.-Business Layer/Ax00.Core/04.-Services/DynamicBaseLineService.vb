@@ -178,7 +178,6 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim nextStep = DynamicBaseLineStepsEnum.None
 
-
             Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
                 Case "", "CANCELED"
                     nextStep = DynamicBaseLineStepsEnum.ConditioningWashing
@@ -228,15 +227,9 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
             End Select
 
-
             Return nextStep
 
         End Function
-
-
-
-#End Region
-
         Private Sub ProcessStaticBaseLine()
             Throw New NotImplementedException
         End Sub
@@ -249,8 +242,10 @@ Namespace Biosystems.Ax00.Core.Services
             Throw New NotImplementedException
         End Sub
 
-    End Class
+#End Region
 
+
+    End Class
 
 End Namespace
 
