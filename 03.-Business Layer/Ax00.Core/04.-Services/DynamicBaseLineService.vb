@@ -126,14 +126,14 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub TryToStartNextStep()
 
-            Dim nextStep As RotorChangeStepsEnum
+            Dim nextStep As DynamicBaseLineStepsEnum
             nextStep = GetNextStep()
 
             Select Case nextStep
-                Case RotorChangeStepsEnum.Washing,
-                     RotorChangeStepsEnum.StaticBaseLine,
-                     RotorChangeStepsEnum.DynamicBaseLineFill,
-                     RotorChangeStepsEnum.DynamicBaseLineEmpty
+                Case DynamicBaseLineStepsEnum.ConditioningWashing,
+                     DynamicBaseLineStepsEnum.StaticBaseLine,
+                     DynamicBaseLineStepsEnum.DynamicBaseLineFill,
+                     DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
                     ValidateProcess()
             End Select
 
@@ -236,6 +236,19 @@ Namespace Biosystems.Ax00.Core.Services
 
 
 #End Region
+
+        Private Sub ProcessStaticBaseLine()
+            Throw New NotImplementedException
+        End Sub
+
+        Private Sub ValidateProcess()
+            Throw New NotImplementedException
+        End Sub
+
+        Private Sub ProcessDynamicBaseLine()
+            Throw New NotImplementedException
+        End Sub
+
     End Class
 
 
