@@ -118,12 +118,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End If
 
-                    ''AG 07/02/2014 - BT #1594 (move here this code) - Queue instructions priority establishment
-                    'If myInterruptInstruction <> GlobalEnumerates.AnalyzerManagerSwActionList.NONE Then
-                    '    myInterruptInstruction = TreatQueueExceptionsInRunning(myInterruptInstruction, pAx00ActionCode)
-                    'End If
-                    ''AG 07/02/2014 - BT #1594
-
 
                 Else 'Anlayzer not ready
                     ''AG 07/02/2014 - BT #1594 - althought the analyzer is not ready the SOUND instruction can be sent on STATUS reception!!
@@ -473,13 +467,11 @@ Namespace Biosystems.Ax00.Core.Entities
                             stopRequestedByUserInPauseModeFlag = False
                             myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
                         End If
-                        'AG 30/10/2013
 
                         ' XB 15/10/2013 - BT #1318
                     ElseIf (myInterruptInstruction = AnalyzerManagerSwActionList.PAUSE And Not PauseAlreadySentFlagAttribute) Then
                         myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.PAUSE)
 
-                        'AG 16/10/2013
                     ElseIf (myInterruptInstruction = AnalyzerManagerSwActionList.BARCODE_REQUEST AndAlso AllowScanInRunning AndAlso Not queuedParam Is Nothing) Then
                         myBarcodeRequestDS = CType(queuedParam, AnalyzerManagerDS)
                         myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
@@ -488,15 +480,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         Debug.Print("******************************* WATCHDOG INTERVAL WOULD CHANGE TO [" & MaxWaitTime.ToString & "]")
                         Debug.Print("******************************* WATCHDOG ENABLE CHANGED RAISED TO [true]")
                         RaiseEvent WatchDogEvent(True)
-                        ' XB 29/01/2014
 
-                        'AG 26/01/2012
                     ElseIf (myInterruptInstruction = AnalyzerManagerSwActionList.SOUND) Then
                         myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SOUND)
 
                     ElseIf (myInterruptInstruction = AnalyzerManagerSwActionList.ENDSOUND) Then
                         myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDSOUND)
-                        'AG 26/01/2012
 
                     ElseIf (myInterruptInstruction = AnalyzerManagerSwActionList.INFO) Then
                         myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.INFO, CInt(queuedParam)) 'AG 11/12/2012 add cint to the param for info instruction
@@ -510,23 +499,15 @@ Namespace Biosystems.Ax00.Core.Entities
                         myISECommand = CType(queuedParam, ISECommandTO)
                         If myISECommand.ISEMode <> ISEModes.None Then
 
-                            ' XB 12/11/2014 - BA-1872
                             timeISEOffsetFirstTime = False
                             If Not CanSendingRepetitions Then
                                 numRepetitionsTimeout = 0
                             End If
                             InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
                             StoreStartTaskinQueue(AnalyzerManagerSwActionList.ISE_CMD, queuedParam, "", Nothing)
-                            ' XB 12/11/2014 - BA-1872
 
                             myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myISECommand)
                         End If
-
-                        ' XB 30/09/2014 - BA-1872
-                        'If Not myGlobal.HasError Then
-                        '    myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
-                        'End If
-                        ' XB 23/10/2013
 
                     End If
 
@@ -564,7 +545,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (Not myGlobal.HasError) Then myGlobal = SendEndInstructionIfRequired()
                 End If
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -879,102 +859,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageStandByStatus", EventLogEntryType.Error, False)
-            End Try
-            Return myGlobal
-        End Function
-
-        ''' <summary>
-        ''' Sleep business logic
-        ''' </summary>
-        ''' <param name="pAx00ActionCode"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by  AG 28/02/2011 - Tested PENDING
-        ''' Modified by XB 30/01/2013 - DateTime to Invariant Format (Bugs tracking #1121)
-        ''' </remarks>
-        Private Function ManageSleepStatus(ByVal pAx00ActionCode As AnalyzerManagerAx00Actions) As GlobalDataTO
-            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-            Dim myGlobal As New GlobalDataTO
-
-            Try
-                'Dim resetFlagsValue As Boolean = True
-
-                Select Case pAx00ActionCode
-                    'When the STANDBY instruction starts then update internal Sw flags
-                    Case AnalyzerManagerAx00Actions.STANDBY_START
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "INI")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WupStartDateTime, Now.ToString(CultureInfo.InvariantCulture))
-
-                        'Delete flags for SLEEP status
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.SDOWNprocess, "")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.SleepInstrument, "")
-
-                        'Delete flags for RUNNING status
-                        '...
-                        '...
-
-                        'resetFlagsValue = False
-
-                        'Ax00 enters in SLEEP status
-                    Case AnalyzerManagerAx00Actions.SLEEP_END
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.SleepInstrument, "END")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.SDOWNprocess, "CLOSED")
-
-                        myAlarmListAttribute.Clear() 'AG 23/05/2012 - In sleeping Remove all alarms
-
-                        'Delete flags for STANDBY, RUNNING status
-                        '...
-                        '...
-
-                        'resetFlagsValue = False
-
-                        'AG 16/04/2012 - Stop the sensor information instructions
-                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
-                        SetAnalyzerNotReady() 'analyzer is not ready to perform anything but CONNECT
-                        'AG 16/04/2012
-
-                        'AG 03/10/2011 - Set to false the Connected attribute + prepare ui refresh
-                        ConnectedAttribute = False
-                        UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(ConnectedAttribute, 1, 0)), True)
-                        'AG 03/10/2011 
-
-                        'AG 23/03/2012 - case change status not succeeded because some error codes appears
-                        '(curent status SLEEP but Fw informs action standby end (status must be stand by) or running end (status must be running)
-                    Case AnalyzerManagerAx00Actions.STANDBY_END, AnalyzerManagerAx00Actions.RUNNING_END
-                        'resetFlagsValue = True
-                        UpdateSensorValuesAttribute(AnalyzerSensors.ERROR_IN_STATUS_CHANGING, 1, True)
-                        'AG 23/03/2012
-
-                    Case Else
-
-                End Select
-
-                If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                    'Update analyzer session flags into DataBase
-                    If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                        myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-                    End If
-                End If
-
-                'AG 20/06/2012 - Reset flags is moved into ProcessStatusReceived method case SLEEPING because while connection process no instruction are treated
-                'but this business is required
-                ''AG 17/10/2011 - reset internal flags when analyzer is sleeping and no action has been performed
-                'If Not myGlobal.HasError AndAlso resetFlagsValue Then
-                '    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                '    myGlobal = myFlagsDelg.ResetFlags(Nothing, AnalyzerIDAttribute)
-                '    InitializeAnalyzerFlags(Nothing)
-                'End If
-                'AG 20/06/2012 - 'AG 17/10/2011
-
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSleepStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1034,43 +919,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '2) Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
                             Dim reactionsDelegate As New ReactionsRotorDelegate
 
-                            'AG 14/11/2014 BA-2065 REFACTORING
-                            'resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                            'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '    Dim wellsDS As ReactionsRotorDS
-                            '    wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                            '    'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
-                            '    'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
-                            '    Dim contaminatedWellsDS As New ReactionsRotorDS
-                            '    resultData = reactionsDelegate.AsignFinalValuesAfterLeavingRunning(dbConnection, AnalyzerIDAttribute, wellsDS)
-                            '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '        contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-                            '    End If
-
-                            '    'Read again the complete current reactions rotor (last turn)
-                            '    resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                            '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '        wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                            '        'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
-                            '        Dim newWellsDS As New ReactionsRotorDS
-                            '        For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor.Rows
-                            '            item.BeginEdit()
-                            '            'WellContent must be 'E' (empty) or 'C' (contaminated)
-                            '            If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
-
-                            '            'WellStatus must be 'R' (ready) or 'X' (rejected)
-                            '            If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
-                            '            item.EndEdit()
-
-                            '            newWellsDS.twksWSReactionsRotor.ImportRow(item)
-                            '        Next
-                            '        newWellsDS.AcceptChanges()
-                            '        resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
-                            '    End If
-                            'End If
-                            ''AG 26/09/2012 -NEW
+                            
                             resultData = reactionsDelegate.RepaintAllReactionsRotor(dbConnection, AnalyzerIDAttribute)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 Dim newWellsDS As New ReactionsRotorDS
@@ -1134,7 +983,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExecuteSpecialBusinessOnAnalyzerStatusChanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1176,7 +1024,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.TreatQueueExceptions", EventLogEntryType.Error, False)
             End Try
             Return actionToReturn
@@ -1225,7 +1072,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 End If
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendEndInstruction", EventLogEntryType.Error, False)
             End Try
 
@@ -1492,7 +1338,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerFlags", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1562,7 +1407,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerSettings", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1631,7 +1475,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerLedPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1774,7 +1617,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeFWAdjustments", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1791,8 +1633,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>AG 01/03/2011 - Tested PENDING
         ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Public Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, _
-                                            ByVal pNewValue As String) Implements IAnalyzerManager.UpdateSessionFlags
+        Public Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String) Implements IAnalyzerManager.UpdateSessionFlags
             Try
                 'Update dictionary flags variables
                 mySessionFlags(pFlagCode.ToString) = pNewValue
@@ -1816,7 +1657,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSessionFlags", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1840,26 +1680,26 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetSessionFlags", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
-
+#Region "unused code"
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub CreateNewFlag()
-            Try
+        'Private Sub CreateNewFlag()
+        '    Try
 
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CreateNewFlag", EventLogEntryType.Error, False)
+        '    Catch ex As Exception
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CreateNewFlag", EventLogEntryType.Error, False)
 
-            End Try
+        '    End Try
 
-        End Sub
+        'End Sub
+#End Region
 
         ''' <summary>
         ''' Read the settings for the AnalyzerID Generic and copy it 
@@ -2250,7 +2090,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RecoverStableSetup", EventLogEntryType.Error, False)
 
             Finally
@@ -2327,7 +2166,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFirstFromQueue", EventLogEntryType.Error, False)
                 myInstructionsQueue.Clear()
                 myParamsQueue.Clear() 'AG 19/07/2011
@@ -2353,7 +2191,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFirstParametersFromQueue", EventLogEntryType.Error, False)
                 myParamsQueue.Clear()
             End Try
@@ -2395,7 +2232,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerStartTaskControl", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -2411,17 +2247,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                           ByVal pFwScriptID As String, _
                                           ByVal pServiceParams As List(Of String))
             Try
-                MyClass.ClearStartTaskQueueToSend()
+                ClearStartTaskQueueToSend()
 
-                MyClass.myStartTaskInstructionsQueue.Add(pAction)
-                MyClass.myStartTaskParamsQueue.Add(pSwAdditionalParameters)
-                MyClass.myStartTaskFwScriptIDsQueue.Add(pFwScriptID)
-                MyClass.myStartTaskFwScriptParamsQueue.Add(pServiceParams)
+                myStartTaskInstructionsQueue.Add(pAction)
+                myStartTaskParamsQueue.Add(pSwAdditionalParameters)
+                myStartTaskFwScriptIDsQueue.Add(pFwScriptID)
+                myStartTaskFwScriptParamsQueue.Add(pServiceParams)
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StoreStartTaskinQueue", EventLogEntryType.Error, False)
-                MyClass.ClearStartTaskQueueToSend()
+                ClearStartTaskQueueToSend()
             End Try
         End Sub
 
@@ -2469,7 +2304,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 queuedFwScriptID = (From a In myStartTaskFwScriptIDsQueue Select a).First
                 queuedFwParams = (From a In myStartTaskFwScriptParamsQueue Select a).First
 
-                MyClass.ClearStartTaskQueueToSend()
+                ClearStartTaskQueueToSend()
 
                 ' XB 09/12/2014 - BA-1872
                 Dim myISECMD As ISECommandTO = Nothing
@@ -2501,9 +2336,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendStartTaskinQueue", EventLogEntryType.Error, False)
-                MyClass.ClearStartTaskQueueToSend()
+                ClearStartTaskQueueToSend()
             End Try
             Return myGlobal
         End Function
@@ -2534,7 +2368,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerSTATEControl", EventLogEntryType.Error, False)
             End Try
         End Sub

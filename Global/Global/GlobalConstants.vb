@@ -40,9 +40,6 @@ Namespace Biosystems.Ax00.Global
 
         Public Const MAX_WAVELENGTHS As Integer = 11
 
-        'TR 25/01/2011 -Replace by corresponding value on global base.
-        Public Shared REAL_DEVELOPMENT_MODE As Integer = GlobalBase.RealDevelopmentMode
-
         'AG 02/08/2010
         'Constants used during calculations
         Public Const CALCULATION_ERROR_VALUE As Single = -1

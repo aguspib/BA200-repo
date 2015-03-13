@@ -56,21 +56,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'AG 28/06/2012 - Add to buffer and not launch the threat here (unless the end instruction has been sent)
-                'Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-
-                ''Loop Sw can not process more than 1 ansphr instruction at any time
-                'While processingLastANSPHRInstructionFlag
-                '    Application.DoEvents() 'This line requires import windows forms
-                'End While
-
-                ''Inform last readings received are in process 
-                'processingLastANSPHRInstructionFlag = True
-                'wellBaseLineWorker.RunWorkerAsync(pInstructionReceived)
-
-                ''Dim myLogAcciones As New ApplicationLogManager()
-                'GlobalBase.CreateLogActivity("Treat ANSPHR received. Launch parallel trheat: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessReadingsReceived", EventLogEntryType.Information, False)
-
                 Dim startTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
                 SyncLock LockThis
@@ -380,7 +365,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBaseLineReceived", EventLogEntryType.Error, False)
             End Try
 
@@ -416,13 +400,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Try
                 Debug.Print("ANSERR received !")
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                'myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-
-                'If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                '    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
-
-                '    If (Not dbConnection Is Nothing) Then
                 Dim myAlarmsReceivedList As New List(Of Alarms)
                 Dim myAlarmsStatusList As New List(Of Boolean)
                 Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
@@ -566,17 +543,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 End If
 
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                '    End If
-                'End If
-
-
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwAlarmDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
@@ -1535,7 +1506,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(String.Format("Message: {0} InnerException: {1}", ex.Message, ex.InnerException.Message), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Error, False)
             End Try
 

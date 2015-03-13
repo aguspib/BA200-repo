@@ -118,6 +118,9 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Biosystems.Ax00.CommunicationsSwFw" />
@@ -143,7 +146,8 @@
     <Compile Include="AnalyzerManager\5- Well base line calculations.vb" />
     <Compile Include="AnalyzerManager\6- Sending Processes.vb" />
     <Compile Include="AnalyzerManager\7- Recovery Results.vb" />
-    <Compile Include="AnalyzerManager\Actions\AnalyzerEventManagement.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerSentEvents.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerThreadEventManagement.vb" />
     <Compile Include="AnalyzerManager\Actions\CurrentAlarms.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
@@ -195,6 +199,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CommAx00.exe">

@@ -1,22 +1,21 @@
-﻿Imports AnalyzerTests.Biosystems.Ax00.Core.Entities.Tests.Mock
+﻿Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
+Imports Telerik.JustMock
 Imports Biosystems.Ax00.Global
 
 
 Namespace Biosystems.Ax00.Core.Entities.Tests
 
-    <TestClass()> Public Class AnalyzerManagerTests
+    <TestClass()> Public Class ProcessStatusReceivedTest
 
         ''' <summary>
         ''' Test End_run_end state
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_END()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "10"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -32,10 +31,8 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         <TestMethod()>
         <Obsolete("Not working")>
         Public Sub EvaluateActionCodeValueTest_SOUND_DONE()
-
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "60"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -50,9 +47,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_END_RUN_START()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "9"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -66,9 +63,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_START()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "15"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -83,9 +80,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_ABORT_END()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "16"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -101,9 +98,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_START()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "96"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -118,9 +115,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_PAUSE_END()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "97"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -134,9 +131,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' </summary>
         ''' <remarks></remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_START()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "70"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
@@ -152,9 +149,9 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' WARNING!! This case has a possible access to database, the immutability of the scenario is not guaranteed
         ''' </remarks>
         <TestMethod()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_END()
-            Dim blMock = New BaseLineEntityMock
-            Dim idAnalyzer As IAnalyzerManager = New BA200AnalyzerMock("", "", blMock)
-            Dim target = New ProcessStatusReceivedMock(idAnalyzer)
+            Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+            Dim target = New ProcessStatusReceived(idAnalyzer)
+
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "71"
             Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions

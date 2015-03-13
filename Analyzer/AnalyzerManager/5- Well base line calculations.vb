@@ -30,55 +30,15 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim resultData As New GlobalDataTO
 
             Try
-                'AG 28/06/2012 - new code
-                '1) Get the argument
                 Dim InstructionReceived As New List(Of InstructionParameterTO)
                 InstructionReceived = CType(e.Argument, List(Of InstructionParameterTO))
                 resultData = ProcessANSPHRInstruction(InstructionReceived)
-
-                'AG 28/06/2012 - old code
-                'Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                ''Dim myLogAcciones As New ApplicationLogManager()
-
-                ''1) Get the argument
-                'Dim InstructionReceived As New List(Of InstructionParameterTO)
-                'InstructionReceived = CType(e.Argument, List(Of InstructionParameterTO))
-
-                ''2) Call the biochemical readings treatment
-                'resultData = ProcessBiochemicalReadings(Nothing, InstructionReceived)
-                'GlobalBase.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False) 'AG 28/06/2012
-                'StartTime = Now
-
-                ''3) Call the well base line and well rejection control
-                ''No do this (they are independent processes)
-                ''If not resultData.HasError  Then
-                ''resultData = ProcessWellBaseLineReadings (Nothing, InstructionReceived)
-                ''End If
-                'resultData = ProcessWellBaseLineReadings(Nothing, InstructionReceived)
-
-                ''Inform NO readings received are in process (also here, protection against slow refreshs) 
-                'processingLastANSPHRInstructionFlag = False
-
-                'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                '    'Raise event for UI refrsh
-                '    'If Not resultData.HasError Then
-                '    'Now do not use the secondary refresh (mySecondaryUI_RefreshDS, mySecondaryUI_RefreshEvent) use always the primary (myUI_RefreshDS, myUI_RefreshEvent)
-                '    If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
-                '    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
-                '    'eventDataPendingToTriggerFlag = False 'AG 07/10/2011 - inform not exists information in UI_RefreshDS to be send to the event
-                '    'End If
-                'End If
-
-                'GlobalBase.CreateLogActivity("Treat readings (Wells Rejections): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False)
-                'AG 28/06/2012
-
 
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Error, False)
             End Try
 
@@ -199,19 +159,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Error, False)
             End Try
-
-            'AG 02/07/2012 - moved to wellBaseLineWorker_RunWorkerCompleted
-            ''AG 28/06/2012 - once treated remove item 0
-            'SyncLock lockThis
-            '    If bufferANSPHRReceived.Count > 0 Then
-            '        bufferANSPHRReceived.RemoveRange(0, 1)
-            '    End If
-            '    processingLastANSPHRInstructionFlag = False 'Inform NO readings received are in process
-            'End SyncLock
-
             Return resultData
         End Function
 
@@ -318,30 +267,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 End If
 
-                'AG 29/06/2012 - Running Cycles lost - Solution!
-                'If (Not resultData.HasError) Then
-                '    'When the Database Connection was opened locally, then the Commit is executed
-                '    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                '    'resultData.SetDatos = <value to return; if any>
-                'Else
-                '    'When the Database Connection was opened locally, then the Rollback is executed
-                '    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                'End If
-                '    End If
-                'End If
-
             Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection) 'AG 29/06/2012 - Running Cycles lost - Solution!
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Error, False)
-                'Finally
-                'If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
             End Try
             Return resultData
         End Function
@@ -597,15 +529,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'Verify if it is needed to activate ThermoWarningFlag for the Execution
                             If (Not myExecutionDS.twksWSExecutions(0).ThermoWarningFlag) Then
-                                'DL 31/07/2012.Begin
                                 If (myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) OrElse _
                                     myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) OrElse _
                                     myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
-                                    'If (myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) OrElse _
-                                    '    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) OrElse _
-                                    '    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) OrElse _
-                                    '    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
-                                    'DL 31/07/2012. End
                                     myExecutionDS.twksWSExecutions(0).BeginEdit()
                                     myExecutionDS.twksWSExecutions(0).ThermoWarningFlag = True
                                     myExecutionDS.twksWSExecutions(0).EndEdit()
@@ -659,17 +585,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 completeReadingsFlag = (CType(myGlobal.SetDatos, twksWSReadingsDS).twksWSReadings.Count > 0)
                             End If
 
-                            'AG 22/05/2014 - #1634 - If CompleteReadings is FALSE do not update it to TRUE (the error flag cannot be removed or calculations will call and exception could appear)
-                            ' EXCEPTION: when the 1st reading is received the flag must be set to TRUE
-                            'Make it in two IFs, do not mixed because condition is wrong
-                            'If (Not validReadingFlag OrElse myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
-                            '    myExecutionDS.twksWSExecutions(0).BeginEdit()
-                            '    myExecutionDS.twksWSExecutions(0).ValidReadings = validReadingFlag
-                            '    myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
-                            '    myExecutionDS.twksWSExecutions(0).EndEdit()
-                            '    executionUpdated = True
-                            'End If
-
                             '1- Update ValidRedingFlag (1st reading initiate value, else evaluate it but if current value is FALSE do not change it!!!)
                             If ((myReadingNumber - internalReadingsOffset) = 1) OrElse (Not validReadingFlag AndAlso myExecutionDS.twksWSExecutions(0).ValidReadings <> validReadingFlag) Then
                                 myExecutionDS.twksWSExecutions(0).BeginEdit()
@@ -685,7 +600,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myExecutionDS.twksWSExecutions(0).EndEdit()
                                 executionUpdated = True
                             End If
-                            'AG 22/05/2014 - #1634
 
                             'Move the Execution to the DS containing all processed Executions
                             allExecutionsDS.twksWSExecutions.ImportRow(myExecutionDS.twksWSExecutions(0))

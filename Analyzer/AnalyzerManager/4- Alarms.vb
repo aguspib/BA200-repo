@@ -2033,9 +2033,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-
-
-
         ''' <summary>
         ''' SW has received FW data
         ''' Service Sw has his own threatment different form User SW
@@ -2095,317 +2092,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-        ' TO DELETE !!!
-        '''' <summary>
-        '''' SW has received MANIFOLD data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwManifoldInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD), True)
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' SW has received FLUIDIC data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwFluidicsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-
-
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1), True)
-        '        End If
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' SW has received PHOTOMETRICS data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwPhotometricsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP) Then
-        '            UpdatePhotometricsValuesAttribute(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP, pElements(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP), True)
-        '        End If
-
-
-
-        '        'PDT
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwPhotometricsInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-        ' TO DELETE !!!
-
         ''' <summary>
         ''' SW has received ARMS data
         ''' Service Sw has his own threatment different form User SW
@@ -2452,7 +2138,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwArmsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -2495,7 +2180,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
                     myUI_RefreshDS.ProbeValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
                 End SyncLock
-                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event PROBESSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.PROBESVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.PROBESVALUE_CHANGED)
@@ -2505,7 +2189,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwProbesInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -2560,8 +2243,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     myUI_RefreshDS.RotorValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
                 End SyncLock
 
-                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
-
                 'Generate UI_Refresh event ROTORSSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.ROTORSVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.ROTORSVALUE_CHANGED)
 
@@ -2570,7 +2251,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwRotorsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -2594,10 +2274,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim flagChanges As Boolean = False
 
             Try
-
-                'SGM 29/09/2011
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     If InfoRefreshFirstTime Then
                         InfoRefreshFirstTime = False
@@ -2646,10 +2322,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Add into alarms table
                             Dim myAlarmList As New List(Of Alarms)
                             Dim myAlarmStatusList As New List(Of Boolean)
-                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.COMMS_ERR
-                            Dim alarmStatus As Boolean = False
-                            If pNewValue <> 1 Then alarmStatus = True
-                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                            Const alarmId As Alarms = GlobalEnumerates.Alarms.COMMS_ERR
+                            Dim alarmStatus = pNewValue <> 1
+                            PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count > 0 Then
                                 Dim myGlobal As New GlobalDataTO
                                 Dim currentAlarms = New CurrentAlarms(Me)
@@ -2700,7 +2375,7 @@ Namespace Biosystems.Ax00.Core.Entities
             'End If
 
         End Sub
-
+#Region "unused Code"
         ''' <summary>
         ''' Update the internal attribte CyclesValuesAttribute
         ''' </summary>
@@ -2708,28 +2383,29 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pNewValue"></param>
         ''' <param name="pUIEventForChangesFlag"></param>
         ''' <remarks></remarks>
-        Private Sub UpdateHwCyclesValuesAttribute(ByVal pElement As CYCLE_ELEMENTS, _
-                                                  ByVal pSubsystem As SUBSYSTEMS, _
-                                                  ByVal pUnits As CYCLE_UNITS, _
-                                                  ByVal pNewValue As String, _
-                                                  ByVal pUIEventForChangesFlag As Boolean)
-            'NOTE: Do not implement Try .. Catch due the methods who call it implements it
+        'Private Sub UpdateHwCyclesValuesAttribute(ByVal pElement As CYCLE_ELEMENTS, _
+        '                                          ByVal pSubsystem As SUBSYSTEMS, _
+        '                                          ByVal pUnits As CYCLE_UNITS, _
+        '                                          ByVal pNewValue As String, _
+        '                                          ByVal pUIEventForChangesFlag As Boolean)
+        '    'NOTE: Do not implement Try .. Catch due the methods who call it implements it
 
-            Dim flagChanges As Boolean = False
+        '    Dim flagChanges As Boolean = False
 
-            'If Not CyclesValuesAttribute.ContainsKey(pElement) Then
-            '    CyclesValuesAttribute.Add(pElement, pNewValue)
-            '    flagChanges = True
+        '    'If Not CyclesValuesAttribute.ContainsKey(pElement) Then
+        '    '    CyclesValuesAttribute.Add(pElement, pNewValue)
+        '    '    flagChanges = True
 
-            'ElseIf CyclesValuesAttribute(pElement) <> pNewValue Then
-            '    CyclesValuesAttribute(pElement) = pNewValue
-            '    flagChanges = True
-            'End If
+        '    'ElseIf CyclesValuesAttribute(pElement) <> pNewValue Then
+        '    '    CyclesValuesAttribute(pElement) = pNewValue
+        '    '    flagChanges = True
+        '    'End If
 
-            'Generate UI_Refresh event MANIFOLDVALUE_CHANGED
-            PrepareUIRefreshEventCycles(Nothing, UI_RefreshEvents.HWCYCLES_CHANGED, pElement, pSubsystem, pUnits, pNewValue)
+        '    'Generate UI_Refresh event MANIFOLDVALUE_CHANGED
+        '    PrepareUIRefreshEventCycles(Nothing, UI_RefreshEvents.HWCYCLES_CHANGED, pElement, pSubsystem, pUnits, pNewValue)
 
-        End Sub
+        'End Sub
+#End Region
 
         ''' <summary>
         ''' Update the internal attribte ManifoldValuesAttribute
@@ -2885,7 +2561,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
 
-
+#Region "unused code"
         ''' <summary>
         ''' The fridge status damaged is when fw sends any of these error codes: 301, 302 or 303 (belongs to FRIDGE_TEMP_SYS_ERR and FRIDGE_FAN_WARN)
         ''' </summary>
@@ -2893,23 +2569,24 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAlarmStatusList"></param>
         ''' <returns>Boolean</returns>
         ''' <remarks></remarks>
-        Private Function IsFridgeStatusDamaged(ByVal pAlarmList As List(Of Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As Boolean
-            Dim myReturn As Boolean = False
-            Try
-                'DL 31/07/2012. Begin
-                If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) OrElse pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
-                    'If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) OrElse _
-                    '  pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) OrElse _
-                    ' pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
-                    myReturn = True
-                End If
-                'DL 31/07/2012. End
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsFridgeStatusDamaged", EventLogEntryType.Error, False)
-            End Try
-            Return myReturn
-        End Function
+        'Private Function IsFridgeStatusDamaged(ByVal pAlarmList As List(Of Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As Boolean
+        '    Dim myReturn As Boolean = False
+        '    Try
+        '        'DL 31/07/2012. Begin
+        '        If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) OrElse pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
+        '            'If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) OrElse _
+        '            '  pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) OrElse _
+        '            ' pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
+        '            myReturn = True
+        '        End If
+        '        'DL 31/07/2012. End
+        '    Catch ex As Exception
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsFridgeStatusDamaged", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return myReturn
+        'End Function
+#End Region
 
 
         ''' <summary>
@@ -2973,7 +2650,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SolveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -3015,7 +2691,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -3035,7 +2710,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -3065,10 +2739,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                 'AG 20/02/2012 - The following condition is added into a public method
-                'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
                 If ExistBottleAlarms() Then
                     bottleErrAlarm = True
                 End If
@@ -3106,7 +2776,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                 End If
-                'AG 22/02/2012
 
                 If readyToSentInstruction Then
 
@@ -3167,7 +2836,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckIfProcessCanContinue", EventLogEntryType.Error, False)
             End Try
             Return readyToSentInstruction
@@ -3384,219 +3052,6 @@ Namespace Biosystems.Ax00.Core.Entities
             For Each row As String In pAlarmStringCodes
                 'AG 04/12/2014 BA-2236 code improvement
                 alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(Alarms), row), Alarms))
-
-                'This select must be updated with every alarmID added into enumerate GlobalEnumerates.Alarms
-                'Select Case row
-                '    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
-                '    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
-
-                '    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-                '    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
-
-                '    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-                '    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
-
-                '    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
-                '    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-                '        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
-                '        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-                '    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
-                '    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
-                '    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
-                '    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
-                '    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
-                '    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-                '    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-                '    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-                '        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
-                '    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
-                '        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
-                '        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
-                '    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
-
-                '    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
-                '    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-                '        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
-                '        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-                '    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
-                '    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
-                '    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
-                '    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-                '    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
-                '    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-                '    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
-                '    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-                '    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
-                '    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
-                '    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-                '    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-                '    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-                '    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-                '    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-                '        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
-                '    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
-                '        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
-                '        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
-                '    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
-                '    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
-                '        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
-                '        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-
-                '    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
-                '    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-                '    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-                '    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
-
-                '    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-                '    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
-                '    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
-                '    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
-                '    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
-                '    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
-
-                '    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
-                '    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
-
-                '    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
-                '    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
-                '    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
-                '    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
-                '    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
-                '    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
-                '    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
-                '    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
-                '    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
-                '    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
-                '    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
-                '    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
-                '    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
-                '    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
-                '    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
-                '    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
-                '    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
-                '    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
-
-                '    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                '    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                '    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
-                '    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
-                '    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
-                '    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
-                '    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
-                '    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
-
-                '        'DL 13/06/2012. Begin
-                '    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
-                '    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
-                '    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
-                '    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
-                '    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
-                '    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
-                '    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
-                '    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
-                '    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
-                '    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
-                '    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
-                '    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
-                '    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
-                '    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
-                '    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
-                '    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
-                '    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
-                '    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
-                '    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
-                '    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
-                '    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
-                '    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
-                '    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
-                '        'DL 13/06/2012. End
-
-                '    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                '    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
-                '    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
-
-                ' XBC 21/03/2012
-                '    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                '    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                '    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-                '    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                '    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                '    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-                '    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                '    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                '    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                '    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
-                '    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-                '    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-
-                ' XB 20/01/2015 - BA-1873
-                '    Case "ISE_CALB_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
-                '    Case "ISE_PUMP_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
-                '    Case "ISE_CLEAN_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
-                '
-                '    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                '    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                '    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
-                '    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
-                '    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
-                '    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
-
-                '        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
-                '    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
-
-                '    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
-                '
-                'Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)                     'DL 27/07/2012 
-                'Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)     'DL 27/07/2012 
-                'Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)       'DL 27/07/2012 
-                'Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)           'DL 27/07/2012 
-                'Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)           'DL 27/07/2012 
-                'Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)                     'DL 27/07/2012 
-                'Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)                     'DL 27/07/2012 
-                'Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)           'DL 27/07/2012 
-                'Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR) 'DL 27/07/2012 
-                'Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'DL 27/07/2012 
-                'Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)       'DL 27/07/2012 
-                'Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)       'DL 27/07/2012 
-
-                'End Select
-
-                '' XBC 18/10/2012 - Alarms treatment for Service
-                ''SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                ''If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                'If GlobalBase.IsServiceAssembly Then
-                '    Select Case row
-                '        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
-                '        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
-                '        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
-                '        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
-                '        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
-                '        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
-                '        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
-                '        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
-                '        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
-                '        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
-                '        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
-                '        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
-                '        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                '        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                '    End Select
-                'End If
-                '' XBC 18/10/2012 
-                'AG 04/12/2014 BA-2236
-
             Next
             Return alarmIDEnumList
         End Function
@@ -3700,7 +3155,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodeAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3751,7 +3205,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistFreezeAlarms", EventLogEntryType.Error, False)
 
             Finally
@@ -3921,7 +3374,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileWarmUp", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
@@ -3937,28 +3389,11 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function IgnoreAlarmWhileCommError(ByVal pAlarmID As Alarms) As Boolean
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
-                'AG 16/05/2012 - When no connection only treat the informative alarm reportsat loaded
-                'If pAlarmID = GlobalEnumerates.Alarms.BASELINE_INIT_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.REPORTSATLOADED_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR Then
-                '    ignoreFlag = False
-                'End If
                 If pAlarmID = GlobalEnumerates.Alarms.REPORTSATLOADED_WARN Then
                     ignoreFlag = False
                 End If
-                'AG 16/05/2012
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileCommError", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
@@ -4129,8 +3564,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
-                    'AG 29/05/2014 - #1630
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
@@ -4145,7 +3578,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub

@@ -32,12 +32,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
         Private waitingTimer As New Timers.Timer() ' AG 07/05/2010 - waiting time (watchdog)
 
-        'Private WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        'Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
-        'Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
-        'Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
-        'Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECONDS waiting time for ISE module timeout (E:61) - BA-1872
-        'Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECONDS waiting time for ISE repetitions - BA-1872
         Private timeISEOffsetFirstTime As Boolean = False ' Just set the ISE offset time the first time when receives T=0 by Firmware - BA-1872
         ' XB 09/12/2014 - Parametizers all these values - BA-1872
 
@@ -52,16 +46,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private myUI_RefreshDS As New UIRefreshDS
         Private eventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
 
-        'AG 22/05/2014 - #1637 Clear code, comment non used variables that could make read code difficult
-        'Private mySecondaryUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
-        'Private mySecondaryUI_RefreshDS As New UIRefreshDS
-        'Private secondaryEventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
-        'AG 07/10/2011
-
-
-
         Private pauseSendingTestPreparationsFlag As Boolean = False 'This flag becomes to TRUE when some alarm appears and Sw stop sending new test preparations
-        'Private pauseSendingISETestFlag As Boolean = False 'AG 21/03/2012 - do not use this flag ... use the alarms that activate it (ise status warn or err)
 
         'Class variables for the send next preparation process
         Private mySentPreparationsDS As New AnalyzerManagerDS 'AG 18/01/2011 - remembers the lasts preparation & reagent wash sents (in RUNNING)
@@ -69,15 +54,9 @@ Namespace Biosystems.Ax00.Core.Entities
         Private futureRequestNextWell As Integer = 0 'AG 07/06/2012 - Using the current next well received in Request, estimate the future well in next request
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
-        'Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
-        'Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
         Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
 
-        Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm
-        Private WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
-        Private WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
-        Private WELL_OFFSET_FOR_ISETEST_URI As Integer = 3 'Default well offset until next request when a ISETEST (uri) instruction is sent
-        'Private MAX_REACTROTOR_WELLS As Integer = 120 'Max wells inside the reactions rotor
+        Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm                        
 
         'Alarm Class variables
         Private myClassFieldLimitsDS As New FieldLimitsDS 'AG 30/03/2011 - tfmwFieldLimits contents are read once during the constructor. During running use this DS using Linq
@@ -121,17 +100,12 @@ Namespace Biosystems.Ax00.Core.Entities
         Private myStartTaskParamsQueue As New List(Of Object)
         Private myStartTaskFwScriptIDsQueue As New List(Of String)
         Private myStartTaskFwScriptParamsQueue As New List(Of List(Of String))
-        ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
 
-        ' XB 26/09/2014 - BA-1872
         Private ISECMDLost As Boolean
         Private RUNNINGLost As Boolean
         Private numRepetitionsSTATE As Integer
         Private waitingSTATETimer As New Timers.Timer()
-        'Private StartingRunningFirstTime As Boolean
 
-        'Public IsDisplayingServiceData As Boolean = True 'SGM 15/09/2011 exclusion flag for avoiding to update data while displaying data
-        'SGM 29/09/2011
         Private InfoRefreshFirstTimeAttr As Boolean = True
 
         'provisional flag for starting ISE just the first time 
@@ -139,7 +113,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
 
-        ' XBC 07/11/2012 - SERVICE
         Public Structure ErrorCodesDisplayStruct
             Public ErrorDateTime As DateTime
             Public ErrorCode As String
@@ -163,7 +136,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'AG 21 & 22/04/2010 Communications attributes
         Private CommThreadsStartedAttribute As Boolean = False      ' Communications threads started
-        'Private InitCommAttribute As Boolean = False               ' Port open (init) - AG 05/05/2010 (The INIT instruction isnt used in Ax00 physical layer)
         Private ConnectedAttribute As Boolean = False               ' Connection established
         Private PortNameAttribute As String = ""                    ' If "" automatic (try all ports)||If <> "" connected port name
         Private BaudsAttribute As String = ""                       ' If "" automatic (try all bauds)||If <> "" connected bauds
@@ -178,7 +150,6 @@ Namespace Biosystems.Ax00.Core.Entities
         'AG 01/06/2010
 
         ' AG+XBC 24/05/2012
-        'Private AnalyzerStatusAttribute As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
         Private AnalyzerStatusAttribute As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
         ' AG+XBC 24/05/2012
 
@@ -239,10 +210,6 @@ Namespace Biosystems.Ax00.Core.Entities
         'XBC 08/06/2011
         Private CpuValuesAttribute As New Dictionary(Of CPU_ELEMENTS, String)
 
-
-        'SGM 28/07/2011
-        'Private CyclesValuesAttribute As New Dictionary(Of GlobalEnumerates.CYCLE_ELEMENTS, String)
-
         'SGM 23/09/2011
         Private IsShutDownRequestedAttribute As Boolean = False
         Private IsUserConnectRequestedAttribute As Boolean = False
@@ -252,10 +219,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'SGM 28/11/2011
         Private FwVersionAttribute As String = ""
-
-        'SGM 11/01/2012
-        'Private LastISECommandAttr As ISECommandTO
-        'Private LastISEResultAttr As ISEResultTO
 
         ' XBC 03/05/2012
         Private IsStressingAttribute As Boolean
@@ -2661,12 +2624,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'SEND EVENTS!!!
                             '''''''''''''''
                             Case AnalyzerManagerSwActionList.CONNECT
-                                ' Set Waiting Timer Current Instruction OFF
-                                If REAL_DEVELOPMENT_MODE > 0 Then
-                                    ClearQueueToSend()
-                                Else
-                                    myGlobal = ProcessConnection(pSwAdditionalParameters, False)
-                                End If
+                                myGlobal = ConnectSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                                 'AG 06/05/2010 - Short instructions (generical)
@@ -2683,136 +2641,19 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.RUNNING
-                                ' XB 06/11/2014 - BA-1872
-                                If Not sendingRepetitions Then
-                                    numRepetitionsTimeout = 0
-                                End If
-                                InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                                StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
-                                ' XB 06/11/2014 - BA-1872
-
-                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RUNNING)
-
+                                myGlobal = RunningSendEvent(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                 Exit Select
 
-                                ' XB 10/10/2013 - BT #1317
                             Case AnalyzerManagerSwActionList.PAUSE
-                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute Then
-
-                                    'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_START Then
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                        If Not myInstructionsQueue.Contains(pAction) Then
-                                            myInstructionsQueue.Add(pAction)
-                                            myParamsQueue.Add(pSwAdditionalParameters)
-                                        End If
-                                    Else
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.PAUSE)
-                                        If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
-                                    End If
-                                End If
-
+                                myGlobal = PauseSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.START
-                                'AG 06/03/20102 - add into queue and send after receive status instruction
-                                'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
-                                '    If Not myGlobal.HasError Then
-                                '        endRunAlreadySentFlagAttribute = False 'AG 13/01/2012
-                                '        abortAlreadySentFlagAttribute = False
-                                '    End If
-
-                                'AG 26/03/2014 - #1501 (1) add condition (AndAlso Not  ContinueAlreadySentFlagAttribute) - do not add START into queue if analyzer is starting running
-
-                                'AG 15/04/2014 - #1591 - Condition ContinueAlreadySentFlagAttribute using another IF (besides add protection for not send START when analyzer is starting pause)
-                                'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso Not ContinueAlreadySentFlagAttribute Then
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                    If Not ContinueAlreadySentFlagAttribute AndAlso _
-                                        (mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") AndAlso Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.PAUSE) Then
-                                        'AG 15/04/2014 - #1591
-                                        If Not myInstructionsQueue.Contains(pAction) Then
-                                            myInstructionsQueue.Add(pAction)
-                                            myParamsQueue.Add(pSwAdditionalParameters)
-                                        End If
-                                    End If 'AG 15/04/2014 - #1591
-
-                                Else
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.START)
-                                    If Not myGlobal.HasError Then
-                                        endRunAlreadySentFlagAttribute = False 'AG 13/01/2012
-                                        abortAlreadySentFlagAttribute = False
-                                        PauseAlreadySentFlagAttribute = False ' XB 15/10/2013 - BT #1318
-                                    End If
-                                End If
-                                'AG 06/03/2012
+                                myGlobal = StartSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.ENDRUN
-                                'AG 08/07/2011 - Special case for sending ENDRUN during RUNNING initialization
-                                'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDRUN)
-                                'If Not myGlobal.HasError Then
-                                '    useRequestFlag = False 'AG 02/11/2010
-                                'End If
-                                'Exit Select
-                                'AG 09/12/2013 - Add action <> STANDBY_START (for case partial freeze appears during recover results)
-                                ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute - BT #1318
-                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START AndAlso Not endRunAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
-                                    AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.STANDBY_START Then
-
-                                    'If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.START_INSTRUCTION_START Then
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                        'AG 30/10/2013 - in pause mode if SwAdditionalParameter = TRue means EndUser has decided to stop worksession
-                                        '1st send START, later END - Task #1342
-                                        'If Not myInstructionsQueue.Contains(pAction) Then
-                                        '    myInstructionsQueue.Add(pAction)
-                                        '    myParamsQueue.Add(pSwAdditionalParameters)
-                                        '    'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
-                                        'End If
-
-                                        If AllowScanInRunningAttribute Then
-                                            If Not stopRequestedByUserInPauseModeFlag AndAlso Not pSwAdditionalParameters Is Nothing Then
-                                                If TypeOf (pSwAdditionalParameters) Is Boolean Then
-                                                    stopRequestedByUserInPauseModeFlag = DirectCast(pSwAdditionalParameters, Boolean)
-
-                                                    'AG + XB 11/12/2013 - inside the brackets add: OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartRunning.ToString) = "INI" - Task #1422
-                                                    'AG 12/11/2013 - If current action is START_INI / START_END do not send the START instruction again. Add end into queue
-                                                    If stopRequestedByUserInPauseModeFlag AndAlso _
-                                                       (AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.START_INSTRUCTION_START OrElse _
-                                                        AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.STANDBY_END OrElse _
-                                                        mySessionFlags(AnalyzerManagerFlags.StartRunning.ToString) = "INI") Then
-                                                        stopRequestedByUserInPauseModeFlag = False
-                                                    End If
-                                                    'AG 12/11/2013
-
-                                                End If
-                                            End If
-                                        Else
-                                            stopRequestedByUserInPauseModeFlag = False
-                                        End If
-
-                                        If Not stopRequestedByUserInPauseModeFlag Then 'Code until v2.1.1
-                                            If Not myInstructionsQueue.Contains(pAction) Then
-                                                myInstructionsQueue.Add(pAction) 'END instruction added to queue
-                                                myParamsQueue.Add(Nothing)
-                                            End If
-                                        Else
-                                            'Dim myLogAcciones As New ApplicationLogManager()
-                                            GlobalBase.CreateLogActivity("In paused mode user decides stop the Worksession, 1st add START instruction into queue (or recovery results while analyzer is in pause mode)", "AnalyzerManager.ManageAnalyzer", EventLogEntryType.Information, False)
-                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.START) Then
-                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.START)
-                                                myParamsQueue.Add(Nothing)
-                                            End If
-                                        End If
-                                        'AG 30/10/2013 - Task #1342
-
-                                    Else
-                                        'Death code. The ENDRUN instruction has no sense out of Running (it is here for develop. testings)
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDRUN)
-                                        If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
-                                    End If
-                                End If
+                                myGlobal = EndRunSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.NROTOR
@@ -2820,58 +2661,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.ABORT
-                                If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute Then
-                                    'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ABORT)
-                                    'If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                        If Not myInstructionsQueue.Contains(pAction) Then
-                                            myInstructionsQueue.Add(pAction)
-                                            myParamsQueue.Add(pSwAdditionalParameters)
-                                            'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
-                                        End If
-                                    Else
-                                        'AG 08/11/2013 Task #1358 ' XB 15/10/2013 - BT #1318
-                                        SetAllowScanInRunningValue(False) 'AllowScanInRunningAttribute = False
-
-                                        ' XB 06/11/2013 - Remove END instructions from the queue when ABORT instruction is performed
-                                        RemoveItemFromQueue(AnalyzerManagerSwActionList.ENDRUN)
-
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ABORT)
-                                        If Not myGlobal.HasError Then useRequestFlag = False 'AG 02/11/2010
-                                    End If
-                                End If
+                                myGlobal = AbortSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.SOUND
-                                'AG 26/01/2012 - In Running the SOUND instruction is sent only after receive a STATUS instruction
-                                'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SOUND)
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso Not AnalyzerIsRingingAttribute Then
-                                    If Not myInstructionsQueue.Contains(pAction) Then
-                                        myInstructionsQueue.Add(pAction)
-                                        myParamsQueue.Add(pSwAdditionalParameters)
-                                        'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
-                                    End If
-                                Else
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SOUND)
-                                End If
-                                'AG 26/01/2012
+                                myGlobal = SoundSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.ENDSOUND
-                                'AG 26/01/2012 - In Running the SOUND instruction is sent only after receive a STATUS instruction
-                                'AG 03/09/2012 - during conection (running) force sent always endsound, do not use queue
-                                'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ENDSOUND)
-                                If (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso AnalyzerIsRingingAttribute) _
-                                AndAlso mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) <> "INPROCESS" Then
-                                    If Not myInstructionsQueue.Contains(pAction) Then
-                                        myInstructionsQueue.Add(pAction)
-                                        myParamsQueue.Add(pSwAdditionalParameters)
-                                        'RaiseEvent SendEvent("Action add in queue: " & pAction.ToString & " .Time max: " & CSng(waitingTimer.Interval / 1000)) 'Temporal testings
-                                    End If
-                                Else
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ENDSOUND)
-                                End If
-                                'AG 26/01/2012
+                                myGlobal = EndSoundSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.RESULTSRECOVER
@@ -2879,10 +2677,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.STATE
-
                                 myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.STATE)
                                 Exit Select
-                                'END AG 06/05/2010
 
                             Case AnalyzerManagerSwActionList.WASH
                                 'AG 02/03/2011 - By now implement only the conditioning case. When the wash utility has defined
@@ -2891,381 +2687,61 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.NEXT_PREPARATION
-                                ''ConnectedAttribute = True 'AG 07/02/2012 - Uncomment this line only for testings
-                                'If ConnectedAttribute Then
-                                Dim nextWell As Integer = 0
-                                If IsNumeric(pSwAdditionalParameters) Then
-                                    'myWell = DirectCast(pSwAdditionalParameters, Integer)
-                                    nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
-
-                                    'The pauseSendingTestPreparationsFlag becomes TRUE with several alarms appears and becomes FALSE when solved
-                                    'AG 29/06/2012 - Add 'AndAlso Not endRunAlreadySentFlagAttribute AndAlso Not abortAlreadySentFlagAttribute'
-                                    ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute - BT #1318
-                                    If Not pauseSendingTestPreparationsFlag AndAlso _
-                                       Not endRunAlreadySentFlagAttribute AndAlso _
-                                       Not abortAlreadySentFlagAttribute AndAlso _
-                                       Not PauseAlreadySentFlagAttribute Then
-                                        'AG 07/06/2012
-                                        'myGlobal = Me.SendNextPreparation(nextWell)
-                                        myGlobal = ManageSendAndSearchNext(nextWell)
-                                    End If
-
-                                End If
-                                'End If
+                                myGlobal = NextPreparationSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                                'AG 18/05/2010
                             Case AnalyzerManagerSwActionList.ADJUST_LIGHT
-                                If ConnectedAttribute Then
-                                    Dim nextWell As Integer = 0
-                                    If IsNumeric(pSwAdditionalParameters) Then
-                                        nextWell = Integer.Parse(pSwAdditionalParameters.ToString)
-                                        myGlobal = Me.SendAdjustLightInstruction(nextWell)
-                                    ElseIf Not pServiceParams Is Nothing Then
-                                        ' XBC 20/02/2012
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ALIGHT, Nothing, "", "", pServiceParams)
-                                    End If
-                                End If
+                                myGlobal = AdjustLightSendEvent(myGlobal, pSwAdditionalParameters, pServiceParams)
                                 Exit Select
 
-
-                                'IT 29/10/2014: BA-2061
                             Case AnalyzerManagerSwActionList.ADJUST_FLIGHT
-                                If ConnectedAttribute Then
-                                    If Not pSwAdditionalParameters Is Nothing Then
-                                        Dim myParams As New List(Of String)
-                                        myParams = DirectCast(pSwAdditionalParameters, List(Of String))
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, myParams, String.Empty, String.Empty, Nothing)
-                                    End If
-                                End If
+                                myGlobal = AdjustFLightSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.INFO
-
-                                If ConnectedAttribute Then
-                                    Dim queryMode As Integer = Ax00InfoInstructionModes.ALR
-                                    If IsNumeric(pSwAdditionalParameters) Then
-                                        queryMode = CInt(pSwAdditionalParameters)
-                                    End If
-
-                                    'SGM 06/11/2012
-                                    '' XBC 21/09/2011 - this instruction don't expect answer
-                                    'If myApplicationName.ToUpper.Contains("SERVICE") Then
-                                    '    If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then
-                                    '        ClearQueueToSend()
-                                    '    End If
-                                    'End If
-
-                                    'AG 14/03/2012
-                                    'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.INFO, queryMode)
-                                    Dim allowToSendFlag As Boolean = True
-
-                                    'AG 21/03/2012 - the following code try to optimize the INFO str or stp sending instructions depending
-                                    'if sw has activated or deactivated it ... problem new Fw versions deactivates ansinf automatically so
-                                    'this code not works ok always
-                                    'If AnalyzerIsInfoActivatedAttribute = 1 AndAlso queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STR Then allowToSendFlag = False
-                                    'If AnalyzerIsInfoActivatedAttribute = 0 AndAlso queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then allowToSendFlag = False
-
-                                    'SGM 24/10/2012 - Not to allow send INFO Q:3 in case of Alarm details requested
-                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                    If GlobalBase.IsServiceAssembly Then
-
-                                        'SGM 06/11/2012 - remove if the current action is alredy in queue
-                                        Dim myInstructionsQueueTemp As New List(Of AnalyzerManagerSwActionList)
-                                        Dim myParamsQueueTemp As New List(Of Object)
-
-                                        For Each A As AnalyzerManagerSwActionList In myInstructionsQueue
-                                            Dim j As Integer = myInstructionsQueue.IndexOf(A)
-                                            myInstructionsQueueTemp.Add(A)
-                                            myParamsQueueTemp.Add(myParamsQueue(j))
-                                        Next
-                                        For Each A As AnalyzerManagerSwActionList In myInstructionsQueueTemp
-                                            If A = AnalyzerManagerSwActionList.INFO Then
-                                                Dim myInfoType As Ax00InfoInstructionModes = CType(queryMode, Ax00InfoInstructionModes)
-                                                Dim j As Integer = myInstructionsQueueTemp.IndexOf(A)
-                                                If CType(myParamsQueueTemp(j), Ax00InfoInstructionModes) = myInfoType Then
-                                                    myInstructionsQueue.RemoveAt(j)
-                                                    myParamsQueue.RemoveAt(j)
-                                                End If
-                                            End If
-                                        Next
-
-                                        If queryMode = Ax00InfoInstructionModes.STR Or queryMode = Ax00InfoInstructionModes.STP Then
-                                            allowToSendFlag = Not IsAlarmInfoRequested 'SGM 26/10/2012
-                                            If Not allowToSendFlag Then
-                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
-                                                myParamsQueue.Add(CInt(pSwAdditionalParameters)) 'AG 11/12/2012 - add cint to querymode
-                                            End If
-
-                                        End If
-
-                                    End If
-
-                                    If allowToSendFlag Then
-
-                                        ' SGM 06/11/2012 - this instruction don't expect answer
-                                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                        If GlobalBase.IsServiceAssembly Then
-                                            If queryMode = Ax00InfoInstructionModes.STP Then
-                                                ClearQueueToSend()
-                                            End If
-                                        End If
-
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.INFO, CInt(queryMode)) 'AG 11/12/2012 - add cint to querymode
-
-                                        'SGM 07/11/2012
-                                        If Not myGlobal.HasError Then
-
-                                            If queryMode = Ax00InfoInstructionModes.STR Then
-                                                AnalyzerIsInfoActivatedAttribute = 1
-                                                IsAlarmInfoRequested = False
-                                            End If
-
-                                            If queryMode = Ax00InfoInstructionModes.STP Then
-                                                AnalyzerIsInfoActivatedAttribute = 0
-                                                IsAlarmInfoRequested = False
-                                            End If
-
-                                            If queryMode = Ax00InfoInstructionModes.ALR Then
-                                                AnalyzerIsInfoActivatedAttribute = 0
-                                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                                If GlobalBase.IsServiceAssembly Then
-                                                    IsAlarmInfoRequested = True
-                                                End If
-                                            End If
-
-                                        Else
-                                            IsAlarmInfoRequested = False
-                                        End If
-
-
-                                        'If Not myGlobal.HasError Then
-                                        '    If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STR Then AnalyzerIsInfoActivatedAttribute = 1
-                                        '    If queryMode = GlobalEnumerates.Ax00InfoInstructionModes.STP Then AnalyzerIsInfoActivatedAttribute = 0
-                                        'End If
-
-                                        'end SGM 07/11/2012
-
-                                    End If
-
-
-                                    'AG 14/03/2012
-
-                                End If
+                            Case AnalyzerManagerSwActionList.INFO
+                                myGlobal = InfoSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.WASH_STATION_CTRL
-                                If ConnectedAttribute Then
-                                    Dim queryMode As Integer = Ax00WashStationControlModes.UP
-                                    If IsNumeric(pSwAdditionalParameters) Then
-                                        queryMode = CInt(pSwAdditionalParameters)
-                                    End If
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.WSCTRL, queryMode)
-                                End If
+                                myGlobal = WashStationControlSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
                             Case AnalyzerManagerSwActionList.BARCODE_REQUEST
-                                If ConnectedAttribute Then
-                                    'AG 16/10/2013 - In Running add the barcoderequest and the BarcodeRequestDS into queue, the instruction will be sent after STATUS reception
-                                    'myBarcodeRequestDS = CType(pSwAdditionalParameters, AnalyzerManagerDS)
-                                    'myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
-
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                        If (AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ABORT_START AndAlso Not abortAlreadySentFlagAttribute) _
-                                            AndAlso (AllowScanInRunning) Then
-                                            If Not myInstructionsQueue.Contains(pAction) Then
-                                                myInstructionsQueue.Add(pAction)
-                                                myParamsQueue.Add(pSwAdditionalParameters)
-
-                                                ' XB 29/01/2014 - Deactivate WatchDog timer - Task #1438
-                                                RaiseEvent WatchDogEvent(False)
-                                            End If
-                                        End If
-                                    Else
-                                        myBarcodeRequestDS = CType(pSwAdditionalParameters, AnalyzerManagerDS)
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
-
-                                        ' XB 29/01/2014 - Task #1438
-                                        BarcodeStartInstrExpected = True
-                                    End If
-                                    'AG 16/10/2013
-
-                                    Exit Select
-                                End If
+                                myGlobal = BarCodeSendEvent(pAction, myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                                'AG 23/11/2011
                             Case AnalyzerManagerSwActionList.CONFIG
-                                If ConnectedAttribute Then
-                                    Dim anSetts As New AnalyzerSettingsDelegate
-                                    myGlobal = anSetts.ReadAll(Nothing, AnalyzerIDAttribute)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                        Dim mySettingsDS As New AnalyzerSettingsDS
-                                        mySettingsDS = CType(myGlobal.SetDatos, AnalyzerSettingsDS)
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.CONFIG, mySettingsDS)
-                                    End If
-                                End If
+                                myGlobal = ConfigSendEvent(myGlobal)
                                 Exit Select
-                                'AG 23/11/2011
 
-
-                                ' XBC 03/05/2011  
                             Case AnalyzerManagerSwActionList.READADJ
-                                If ConnectedAttribute Then
-                                    Dim queryMode As String = ""
-                                    If Not pSwAdditionalParameters Is Nothing Then
-                                        queryMode = pSwAdditionalParameters.ToString
-                                    End If
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.READADJ, queryMode)
-                                End If
+                                myGlobal = ReadAdjSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-
-                                ' SGM 12/12/2011
                             Case AnalyzerManagerSwActionList.ISE_CMD
-                                If ConnectedAttribute Then
-                                    Dim myISECommand As ISECommandTO
-                                    myISECommand = CType(pSwAdditionalParameters, ISECommandTO)
-                                    If myISECommand.ISEMode <> ISEModes.None Then
-
-
-                                        ' XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
-                                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                            If Not myInstructionsQueue.Contains(pAction) Then
-                                                myInstructionsQueue.Add(pAction)
-                                                myParamsQueue.Add(pSwAdditionalParameters)
-                                                Debug.Print("ISECMD TO THE QUEUE !!! [" & pAction.ToString & "] [" & pSwAdditionalParameters.ToString & "]")
-                                            End If
-                                        Else
-                                            ' XB 03/04/2014 
-
-                                            ' XB 26/09/2014 - BA-1872
-                                            timeISEOffsetFirstTime = False
-                                            If Not sendingRepetitions Then
-                                                numRepetitionsTimeout = 0
-                                            End If
-                                            InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                                            StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
-                                            ' XB 26/09/2014 - BA-1872
-
-                                            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.ISE_CMD, myISECommand)
-
-                                            ' XB 26/09/2014 - BA-1872
-                                            '' XBC 05/09/2012 - Start Timeout for ISE commands must emplaced inside ManageAnalyzer
-                                            'If Not myGlobal.HasError Then
-                                            '    myGlobal = ISEAnalyzer.StartInstructionStartedTimer
-                                            'End If
-                                            '' XBC 05/09/2012 
-                                            ' XB 26/09/2014 - BA-1872
-
-                                        End If ' XB 03/04/2014 
-
-
-                                    End If
-                                End If
+                                myGlobal = IseCmdSendEvent(pAction, myGlobal, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                 Exit Select
 
-                                ' SGM 12/12/2011
                             Case AnalyzerManagerSwActionList.FW_UTIL
-                                If ConnectedAttribute Then
-                                    Dim myFWAction As FWUpdateRequestTO
-                                    myFWAction = CType(pSwAdditionalParameters, FWUpdateRequestTO)
-                                    If myFWAction.ActionType <> FwUpdateActions.None Then
-                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FW_UTIL, myFWAction)
-                                    End If
-                                End If
+                                myGlobal = FwUtilSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                            Case AnalyzerManagerSwActionList.RECOVER 'AG 22/02/2012 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    SensorValuesAttribute.Clear() 'SGM 08/11/2012
-                                End If
-                                ClearQueueToSend() 'Before sent recover instruction clear the instructions in queue to be sent
-                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.RECOVER)
+                            Case AnalyzerManagerSwActionList.RECOVER
+                                myGlobal = RecoverSendEvent()
                                 Exit Select
 
-                            Case AnalyzerManagerSwActionList.POLLRD  'AG 31/07/2012 
-                                If ConnectedAttribute Then
-                                    Dim ActionMode As Integer = Ax00PollRDAction.Biochemical
-                                    If IsNumeric(pSwAdditionalParameters) Then
-                                        ActionMode = CInt(pSwAdditionalParameters)
-                                    End If
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.POLLRD, ActionMode)
-                                End If
+                            Case AnalyzerManagerSwActionList.POLLRD
+                                myGlobal = PollRdSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                                '
-                                ' SERVICE SOFTWARE----------------------------------------------------------------------------------------------------------
-                                ' 
-
-                                ' XBC 08/11/2010  
                             Case AnalyzerManagerSwActionList.COMMAND
-
-                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.COMMAND, pSwAdditionalParameters, "", pFwScriptID, pServiceParams)
-
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
-                                    If Not myGlobal.HasError Then
-                                        If Not sendingRepetitions Then
-                                            numRepetitionsTimeout = 0
-                                        End If
-                                        InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
-                                        StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
-                                    End If
-                                    ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
-                                End If
-
+                                myGlobal = CommandSendEvent(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
                                 Exit Select
 
-
-                                ' XBC 03/05/2011  
                             Case AnalyzerManagerSwActionList.LOADADJ
-                                If ConnectedAttribute Then
-                                    Dim queryMode As String = ""
-                                    If Not pSwAdditionalParameters Is Nothing Then
-                                        queryMode = pSwAdditionalParameters.ToString
-                                        'queryMode = "{Brazo Muestra}" & vbCrLf & _
-                                        '"M1PI:4400;   {REF Punto Inicial Detección de nivel - Vertical}" & vbCrLf & _
-                                        '"M1RPI:4000;  {REF Punto Inicial Detección de nivel - Vertical - En Rotor de Reacciones}" '& vbCrLf & _
-
-                                        '"CLOT:0;      {Detección de clot desactivada}" & vbCrLf & _
-                                        '"M1DH1:16635; {Dispensación en Rotor Posicion 1 - Horizontal}" & vbCrLf & _
-                                        '"M1DH2:16188; {Dispensación en Rotor Posicion 2 - Horizontal}" & vbCrLf & _
-                                        '"M1DV1:7474;  {REF Dispensación en Rotor Posicion 1 - Vertical}" & vbCrLf & _
-                                        '"M1DV2:8050;  {REF Dispensación en Rotor Posicion 2 - Vertical}" & vbCrLf & _
-                                        '"M1H:1763;    {Posición Parking - Horizontal}" & vbCrLf & _
-                                        '"M1ISEH:-60;  {Dispensación en ISE - Horizontal}" & vbCrLf & _
-                                        '"M1ISEV:16000;{Dispensación en ISE - Vertical}" & vbCrLf & _
-                                        '"M1PH1:10632; {Rotor de Muestras Corona 1 - Horizontal}" & vbCrLf & _
-                                        '"M1PH2:9970;  {Rotor de Muestras Corona 2 - Horizontal}" & vbCrLf & _
-                                        '"M1PH3:8710;  {Rotor de Muestras Corona 3 - Horizontal}" & vbCrLf & _
-                                        '"M1PI:4400;   {REF Punto Inicial Detección de nivel - Vertical}" & vbCrLf & _
-                                        '"M1PV1p:16300;{Rotor de Muestras Corona 1 Punto máximo detección pediátrico - Vertical}" & vbCrLf & _
-                                        '"M1PV1t:16400;{Rotor de Muestras Corona 1 Punto máximo detección tubo - Vertical}" & vbCrLf & _
-                                        '"M1PV2p:16200;{Rotor de Muestras Corona 2 Punto máximo detección pediátrico - Vertical}" & vbCrLf & _
-                                        '"M1PV2t:16400;{Rotor de Muestras Corona 2 Punto máximo detección tubo - Vertical}" & vbCrLf & _
-                                        '"M1PV3p:16200;{Rotor de Muestras Corona 3 Punto máximo detección pediátrico - Vertical}" & vbCrLf & _
-                                        '"M1PV3t:16400;{Rotor de Muestras Corona 3 Punto máximo detección tubo - Vertical}" & vbCrLf & _
-                                        '"M1RPI:4000;  {REF Punto Inicial Detección de nivel - Vertical - En Rotor de Reacciones}" & vbCrLf & _
-                                        '"M1RV:200;    {Posicion referencia - Vertical}" & vbCrLf & _
-                                        '"M1SV:580;    {Posición Segura para movimiento Horizontal - Vertical}" & vbCrLf & _
-                                        '"M1V:16332;   {REF Posición Parking - Vertical}" & vbCrLf & _
-                                        '"M1WH:12620;  {Estación de Lavado - Horizontal}" & vbCrLf & _
-                                        '"M1WVR:4250;  {Estación de Lavado - Vertical Relativo a R1SV}"
-
-                                    End If
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.LOADADJ, queryMode)
-                                End If
+                                myGlobal = LoadAdjSendEvent(myGlobal, pSwAdditionalParameters)
                                 Exit Select
 
-                                ' XBC 20/04/2011
                             Case AnalyzerManagerSwActionList.ADJUST_BLIGHT
                                 If ConnectedAttribute Then
                                     myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BLIGHT, Nothing, "", "", pServiceParams)
@@ -3490,7 +2966,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If myAlarmList.Count > 0 Then
                                             ' Note that this alarm is common on User and Service !
                                             Dim currentAlarms = New CurrentAlarms(Me)
-                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                            
+                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                                         End If
                                         ' Activates Alarm end
 
@@ -3527,7 +3003,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                         If myAlarmList.Count > 0 Then
                                             Dim currentAlarms = New CurrentAlarms(Me)
-                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                                            
+                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
                                         End If
                                         ' Activates Alarm end
 
@@ -4164,7 +3640,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return myGlobal
         End Function
-
 
         ''' <summary>
         ''' Remove any instruction from the queue

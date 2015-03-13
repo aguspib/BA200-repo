@@ -714,7 +714,6 @@ Namespace Biosystems.Ax00.Core.Entities
             If AnalyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
                 AnalyzerManager.AnalyzerIsReady() = True
             End If
-            'AG 03/09/2012
 
             If Not AnalyzerManager.AnalyzerIsReady() Then
                 If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT

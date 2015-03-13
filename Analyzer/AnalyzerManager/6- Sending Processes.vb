@@ -844,61 +844,62 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Function
 
+#Region "Unused Code"
+        ' ''' <summary>
+        ' ''' Checks the next well and determine if is optically rejected or not
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pNextWell"></param>
+        ' ''' <param name="pRejected " ></param>
+        ' ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
+        ' ''' <remarks>AG 17/01/2011</remarks>
+        'Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlConnection
 
-        ''' <summary>
-        ''' Checks the next well and determine if is optically rejected or not
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pNextWell"></param>
-        ''' <param name="pRejected " ></param>
-        ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
-        ''' <remarks>AG 17/01/2011</remarks>
-        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                pRejected = False
 
-                    If (Not dbConnection Is Nothing) Then
-                        pRejected = False
+        '                Dim reactionsDlgt As New ReactionsRotorDelegate
+        '                'Get only the last RotorNumber
+        '                resultData = reactionsDlgt.ReadWellHistoricalUse(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, pNextWell, False)
 
-                        Dim reactionsDlgt As New ReactionsRotorDelegate
-                        'Get only the last RotorNumber
-                        resultData = reactionsDlgt.ReadWellHistoricalUse(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, pNextWell, False)
+        '                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+        '                    Dim myReactionsDS As New ReactionsRotorDS
+        '                    myReactionsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myReactionsDS As New ReactionsRotorDS
-                            myReactionsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+        '                    If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
+        '                        If Not myReactionsDS.twksWSReactionsRotor(0).IsRejectedFlagNull Then
+        '                            If myReactionsDS.twksWSReactionsRotor(0).RejectedFlag Then
+        '                                pRejected = True
+        '                            End If
+        '                        End If
 
-                            If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
-                                If Not myReactionsDS.twksWSReactionsRotor(0).IsRejectedFlagNull Then
-                                    If myReactionsDS.twksWSReactionsRotor(0).RejectedFlag Then
-                                        pRejected = True
-                                    End If
-                                End If
+        '                    End If
+        '                End If
 
-                            End If
-                        End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
 
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
+        '    Return resultData
+        'End Function
+#End Region
 
         ''' <summary>
         ''' Checks if next well is contaminated by last reagent used on it or if next well is optically rejected
@@ -944,63 +945,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
                                 End If
 
-                                'AG 24/11/2011
-                                'If Not pRejectedWell Then
-                                '    'Search if next well is reagent contaminated by his last execution on it
-                                '    Dim listSTDtest As New List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                                '    listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
-                                '                   Where a.WellContent = "C" Select a).ToList
-
-                                '    If listSTDtest.Count > 0 Then
-                                '        'Search the last execution performed in this well
-                                '        listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
-                                '                       Where Not a.IsExecutionIDNull Select a).ToList
-
-                                '        If listSTDtest.Count > 0 Then
-                                '            'Look if the last test prepared in this well is a well contaminator or not and his washing mode
-                                '            Dim myExecutionsDlgte As New ExecutionsDelegate
-                                '            resultData = myExecutionsDlgte.GetExecutionContaminationCuvette(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, listSTDtest(0).ExecutionID)
-
-                                '            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                '                Dim myLocalDS As New AnalyzerManagerDS
-                                '                myLocalDS = CType(resultData.SetDatos, AnalyzerManagerDS)
-
-                                '                If myLocalDS.searchNext.Rows.Count > 0 Then
-                                '                    If Not myLocalDS.searchNext(0).IsContaminationIDNull Then
-                                '                        'Last TEST is a well contaminator test ... look if a wash cuvette cycle has been already sent
-                                '                        'Else activate Contaminated Well flag
-                                '                        Dim myWellContaminatorExecutionID As Integer = myLocalDS.searchNext(0).ExecutionID
-                                '                        Dim washAlreadySend As Boolean = False
-
-                                '                        For Each itemRow As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor.Rows
-                                '                            If Not itemRow.IsExecutionIDNull Then
-                                '                                If itemRow.ExecutionID = myWellContaminatorExecutionID Then Exit For
-                                '                            End If
-
-                                '                            'If thw washFlag is TRUE means the cuvette has been washed
-                                '                            If itemRow.WashedFlag Then 'Wash cuvette contaminator has been sent after sending myWellContaminatorExecutionID
-                                '                                washAlreadySend = True
-                                '                                Exit For
-                                '                            End If
-                                '                        Next
-
-                                '                        If Not washAlreadySend Then
-                                '                            pContaminatedWell = True
-                                '                            If Not myLocalDS.searchNext(0).IsWashingSolution1Null Then pWashSol1 = myLocalDS.searchNext(0).WashingSolution1
-                                '                            If Not myLocalDS.searchNext(0).IsWashingSolution2Null Then pWashSol2 = myLocalDS.searchNext(0).WashingSolution2
-
-                                '                            wellContaminatedWithWashSent = myWellContaminatorExecutionID 'Inform the class variable for use it into method MarkWashRunningAccepted
-                                '                        End If
-
-                                '                    End If
-                                '                End If
-                                '            End If
-
-                                '        End If
-                                '    End If 'If listSTDtest.Count > 0 Then
-
-                                'End If 'If Not pRejectedWell Then
-
                                 'Search if next well is reagent contaminated by his last execution on it
                                 Dim listSTDtest As New List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
                                 Dim rotorTurnWithWellContamination As Integer = 0
@@ -1038,7 +982,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
 
             Finally
@@ -1047,51 +990,51 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+#Region "Unused Code"
+        ' ''' <summary>
+        ' ''' Search if Sw has to send a new ISE execution
+        ' ''' Requires de ISEModule is ready, search execution inside current patient or inside previous ones
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pExecutionISEFound"></param>
+        ' ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
+        ' ''' <remarks>AG 18/01/2011</remarks>
+        'Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlConnection
 
-        ''' <summary>
-        ''' Search if Sw has to send a new ISE execution
-        ''' Requires de ISEModule is ready, search execution inside current patient or inside previous ones
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionISEFound"></param>
-        ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
-        ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then '(2)
+        '                If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
+        '                    Dim execDel As New ExecutionsDelegate
+        '                    resultData = execDel.GetNextPendingISEPatientExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
 
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
-                            Dim execDel As New ExecutionsDelegate
-                            resultData = execDel.GetNextPendingISEPatientExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+        '                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+        '                        pExecutionISEFound = CType(resultData.SetDatos, Integer)
+        '                    End If
 
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                pExecutionISEFound = CType(resultData.SetDatos, Integer)
-                            End If
+        '                End If '(3)
+        '            End If '(2)
+        '        End If '(1)
 
-                        End If '(3)
-                    End If '(2)
-                End If '(1)
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+#End Region
 
         ''' <summary>
         ''' Search if Sw has to send a new ISE execution
@@ -1234,22 +1177,18 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '//Sorting by SampleClass search myStatFlag executions with the different OrderID-SampleType as lastOrderID-lastSampleType
                                     '// (priority without contaminations with the last sent)
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "BLANK")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "BLANK", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "CALIB")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CALIB", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "CTRL")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CTRL", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "PATIENT")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "PATIENT", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
@@ -1292,7 +1231,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
@@ -1460,7 +1398,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
                 'Finally
@@ -1578,8 +1515,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         End If
-                        'AG 02/03/2012
-
 
                         Dim nextExecutionFound As Boolean = False
                         Dim indexNextToSend As Integer = 0
