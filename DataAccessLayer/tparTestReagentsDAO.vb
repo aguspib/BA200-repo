@@ -273,6 +273,52 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Retrieves all the current reagents used in all the available tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>TypedGlobalDataTo(Of TestReagentsDS) with all the reagents related to their tests</returns>
+        ''' <remarks> 
+        ''' Created 17/03/2015 by AJG
+        ''' </remarks>
+        Public Function GetAllReagents(ByVal pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of TestReagentsDS)
+            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS) = Nothing
+            Dim dbConnection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+
+            Try
+                If (Not dbConnection Is Nothing) Then
+                    Dim cmdText As String = "SELECT T.TestID, T.TestName, T.ShortName, T.ReagentsNumber, T.BlankReplicates, TR.ReagentID, TR.ReagentNumber, R.ReagentName, " & vbCrLf & _
+                                            " R.PreloadedReagent, R.CodeTest " & vbCrLf & _
+                                            " FROM   tparTestReagents TR INNER JOIN tparReagents R ON TR.ReagentID = R.ReagentID " & vbCrLf & _
+                                            " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
+                                            " ORDER BY REAGENTID "
+
+                    Dim myTestReagentsDS As New TestReagentsDS
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection.SetDatos)
+                        Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                            dbDataAdapter.Fill(myTestReagentsDS.tparTestReagents)
+                        End Using
+                    End Using
+
+                    resultData.SetDatos = myTestReagentsDS
+                    resultData.HasError = False
+                End If
+            Catch ex As Exception
+                resultData = New TypedGlobalDataTo(Of TestReagentsDS)
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then
+                    dbConnection.SetDatos.Close()
+                End If
+            End Try
+            Return resultData
+
+        End Function
 #End Region
 
 #Region "TO REVIEW-DELETE"

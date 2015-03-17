@@ -1152,6 +1152,8 @@ Namespace Biosystems.Ax00.BL
                     Dim contaminatedOrderTest As Integer = -1
                     Dim MainContaminatorID As Integer = -1
 
+                    'ajg hasta aquí bien
+
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminated until becomes not contaminated)
                     For i As Integer = 1 To sortedOTList.Count - 1
                         'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
@@ -1164,10 +1166,7 @@ Namespace Biosystems.Ax00.BL
                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                     Where a.OrderTestID = sortedOTList(auxIndex) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                        Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                             AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                             Select wse).ToList()
+                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
 
                         'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin: [If (i-2) contaminates (i)]
                         'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
@@ -1177,20 +1176,12 @@ Namespace Biosystems.Ax00.BL
                                              Where a.OrderTestID = sortedOTList(auxIndex - 1) Select a.ReplicateNumber).Max
                             If maxReplicates < pHighContaminationPersistance Then
                                 If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
                                 ElseIf i > 1 Then
                                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                             Where a.OrderTestID = sortedOTList(auxIndex - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                 End If
                             End If
                         End If
@@ -1218,6 +1209,7 @@ Namespace Biosystems.Ax00.BL
                             End If
                             'AG 25/11/2011
 
+                            'ajg hecho
                             'For j As Integer = i + 1 To sortedOTList.Count - 1
                             For j As Integer = i + offset To sortedOTList.Count - 1
                                 ' ReSharper disable once InconsistentNaming
@@ -1231,6 +1223,8 @@ Namespace Biosystems.Ax00.BL
                                     limit = pHighContaminationPersistance
                                 End If
 
+                                'ajg hecho
+
                                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
                                 For jj = aux_j To aux_j - limit Step -1   '- pHighContaminationPersistance - 1 Step -1
@@ -1241,16 +1235,9 @@ Namespace Biosystems.Ax00.BL
                                                                  Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         If aux_jj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         Else 'search for contamination (only high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                Select wse).ToList()
+                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         End If
 
                                         If contaminations.Count > 0 Then Exit For
@@ -1284,10 +1271,7 @@ Namespace Biosystems.Ax00.BL
                                         newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                 Where a.OrderTestID = sortedOTList(auxIndex + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                            Where wse.ReagentContaminatorID = MainContaminatorID _
-                                                            AndAlso wse.ReagentContaminatedID = newContaminatedID _
-                                                           Select wse).ToList()
+                                        contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
                                     End If
 
                                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
@@ -1296,10 +1280,7 @@ Namespace Biosystems.Ax00.BL
                                         If aux_j < sortedOTList.Count - 1 Then
                                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                                Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatedID _
-                                                                AndAlso wse.ReagentContaminatedID = newContaminatedID _
-                                                               Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
                                         End If
                                     End If
 
@@ -1325,36 +1306,8 @@ Namespace Biosystems.Ax00.BL
                     Next
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                    Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
-                    For Each lockedOrderTestitem As Integer In myOTListLinq
-                        If Not sortedOTList.Contains(lockedOrderTestitem) Then
-                            sortedOTList.Add(lockedOrderTestitem)
-                        End If
-                    Next
-
-                    'Create a copy of pExecutions and then move executions from copy -> pExecutions
-                    Dim copypExecutions As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                    copypExecutions = pExecutions.ToList
-
-                    pExecutions.Clear()
-                    Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                    For Each orderTestitem As Integer In sortedOTList
-                        'Get executions of orderTestitem using the copypExecutions
-                        'Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                        myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
-                                       Where a.OrderTestID = orderTestitem Select a).ToList
-
-                        For Each execution In myOTExecutions
-                            pExecutions.Add(execution)
-                        Next
-                    Next
-                    myOTExecutions = Nothing 'AG 19/02/2014 - #1514
-
+                    AddLockedExecutions(pExecutions, sortedOTList)
                     ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-
-                    sortedOTList = Nothing
-                    copypExecutions = Nothing
 
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
                     ContaminationNumber = addContaminationBetweenGroups
@@ -1439,6 +1392,7 @@ Namespace Biosystems.Ax00.BL
                     Dim contaminatedOrderTest As Integer = -1
                     Dim MainContaminatorID As Integer = -1
 
+                    'ajg hecho
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminated until becomes not contaminated)
                     For i As Integer = 1 To sortedOTList.Count - 1
                         ' ReSharper disable once InconsistentNaming
@@ -1452,10 +1406,7 @@ Namespace Biosystems.Ax00.BL
                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                     Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                        Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                             AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                             Select wse).ToList()
+                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
 
                         'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
                         'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
@@ -1465,20 +1416,12 @@ Namespace Biosystems.Ax00.BL
                                              Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
                             If maxReplicates < pHighContaminationPersistance Then
                                 If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
                                 ElseIf aux_i > 1 Then
                                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                             Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                 End If
                             End If
                         End If
@@ -1490,6 +1433,8 @@ Namespace Biosystems.Ax00.BL
                             'Limit: when pPreviousReagentID <> Nothing the upper limit is 1, otherwise 0
                             Dim upperLimit As Integer = 0
                             If Not pPreviousReagentID Is Nothing Then upperLimit = 1
+
+                            'ajg hecho
 
                             For j As Integer = aux_i - 2 To upperLimit Step -1
                                 Dim aux_j = j  'Datatyp3e inference
@@ -1505,6 +1450,9 @@ Namespace Biosystems.Ax00.BL
                                 '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
                                 '                   Select wse).ToList()
 
+
+                                'ajg hecho
+
                                 'Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
                                 For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
@@ -1516,16 +1464,9 @@ Namespace Biosystems.Ax00.BL
                                                                 Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         If aux_jj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                               AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                               Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         Else 'search for contamination (only high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                Select wse).ToList()
+                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         End If
 
                                         If contaminations.Count > 0 Then Exit For
@@ -1558,10 +1499,7 @@ Namespace Biosystems.Ax00.BL
                                         newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                 Where a.OrderTestID = sortedOTList(aux_i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                            Where wse.ReagentContaminatorID = MainContaminatorID _
-                                                            AndAlso wse.ReagentContaminatedID = newContaminatedID _
-                                                           Select wse).ToList()
+                                        contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
                                     End If
 
                                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
@@ -1570,10 +1508,7 @@ Namespace Biosystems.Ax00.BL
                                         If aux_j < sortedOTList.Count - 1 Then
                                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                                Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatedID _
-                                                                AndAlso wse.ReagentContaminatedID = newContaminatedID _
-                                                               Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
                                         End If
                                     End If
 
@@ -1595,37 +1530,8 @@ Namespace Biosystems.Ax00.BL
                     Next
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                    Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
-                    For Each lockedOrderTestitem As Integer In myOTListLinq
-                        If Not sortedOTList.Contains(lockedOrderTestitem) Then
-                            sortedOTList.Add(lockedOrderTestitem)
-                        End If
-                    Next
-
-                    'Create a copy of pExecutions and then move executions from copy -> pExecutions
-                    Dim copypExecutions As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                    copypExecutions = pExecutions.ToList
-
-                    pExecutions.Clear()
-                    Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                    For Each orderTestitem As Integer In sortedOTList
-                        'Get executions of orderTestitem using the copypExecutions
-                        'Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                        myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
-                                       Where a.OrderTestID = orderTestitem Select a).ToList
-
-                        For Each execution In myOTExecutions
-                            pExecutions.Add(execution)
-                        Next
-                    Next
-                    myOTExecutions = Nothing 'AG 19/02/2014 - #1514
-
+                    AddLockedExecutions(pExecutions, sortedOTList)
                     ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-
-                    sortedOTList = Nothing
-                    copypExecutions = Nothing
-
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
                     ContaminationNumber = addContaminationBetweenGroups
                 End If
@@ -1726,11 +1632,7 @@ Namespace Biosystems.Ax00.BL
                                                     Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                         MainContaminatedID = ReagentContaminatedID
 
-                        Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                             AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                             Select wse).ToList()
-
+                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                         'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
                         'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
                         If contaminations.Count = 0 Then
@@ -1740,19 +1642,10 @@ Namespace Biosystems.Ax00.BL
                             If maxReplicates < pHighContaminationPersistance Then
                                 If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
                                     'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
-                                    'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                    '                  Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
-                                    '                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                    '                  AndAlso Not wse.IsWashingSolutionR1Null _
-                                    '                  Select wse).ToList()
                                 ElseIf aux_i > 1 Then
                                     Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                             Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = highContaminatorID _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                 End If
                             End If
                         End If
@@ -1787,16 +1680,9 @@ Namespace Biosystems.Ax00.BL
                                                                 Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         If auxJj = auxJ Then 'search for contamination (low or high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         Else 'search for contamination (only high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                Select wse).ToList()
+                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         End If
 
                                         If contaminations.Count > 0 Then Exit For
@@ -1829,10 +1715,7 @@ Namespace Biosystems.Ax00.BL
                                         newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                 Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                            Where wse.ReagentContaminatorID = newContaminatorID _
-                                                            AndAlso wse.ReagentContaminatedID = MainContaminatedID _
-                                                           Select wse).ToList()
+                                        contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
                                     End If
 
                                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j)) be carefull is not contaminated by current OrderTest(j-1)
@@ -1841,10 +1724,7 @@ Namespace Biosystems.Ax00.BL
                                         If auxJ > 0 Then
                                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                                Where a.OrderTestID = sortedOTList(auxJ - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = newContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatorID _
-                                                               Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
                                         End If
                                     End If
 
@@ -1872,37 +1752,8 @@ Namespace Biosystems.Ax00.BL
                     Next
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                    Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
-                    For Each lockedOrderTestitem As Integer In myOTListLinq
-                        If Not sortedOTList.Contains(lockedOrderTestitem) Then
-                            sortedOTList.Add(lockedOrderTestitem)
-                        End If
-                    Next
-
-                    'Create a copy of pExecutions and then move executions from copy -> pExecutions
-                    Dim copypExecutions As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                    copypExecutions = pExecutions.ToList
-
-                    pExecutions.Clear()
-                    Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                    For Each orderTestitem As Integer In sortedOTList
-                        'Get executions of orderTestitem using the copypExecutions
-                        'Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                        myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
-                                       Where a.OrderTestID = orderTestitem Select a).ToList
-
-                        For Each execution In myOTExecutions
-                            pExecutions.Add(execution)
-                        Next
-                    Next
-
+                    AddLockedExecutions(pExecutions, sortedOTList)
                     ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-
-                    sortedOTList = Nothing
-                    copypExecutions = Nothing
-                    myOTExecutions = Nothing 'AG 19/02/2014 - #1514
-
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
                     ContaminationNumber = addContaminationBetweenGroups
                 End If
@@ -2000,11 +1851,7 @@ Namespace Biosystems.Ax00.BL
                                                     Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                         MainContaminatedID = ReagentContaminatedID
 
-                        Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                             AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                             Select wse).ToList()
-
+                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                         'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
                         'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
                         If contaminations.Count = 0 Then
@@ -2023,11 +1870,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                             Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                    contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                      Where wse.ReagentContaminatorID = highContaminatorID _
-                                                      AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                      Select wse).ToList()
+                                    contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                 End If
                             End If
                         End If
@@ -2088,16 +1931,9 @@ Namespace Biosystems.Ax00.BL
                                                                 Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         If auxJj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         Else 'search for contamination (only high level)
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                                                AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                Select wse).ToList()
+                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                                         End If
 
                                         If contaminations.Count > 0 Then Exit For
@@ -2131,10 +1967,7 @@ Namespace Biosystems.Ax00.BL
                                         newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                 Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                            Where wse.ReagentContaminatorID = newContaminatorID _
-                                                            AndAlso wse.ReagentContaminatedID = MainContaminatedID _
-                                                           Select wse).ToList()
+                                        contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
                                     End If
 
                                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j-1)) be carefull is not contaminated by OrderTest(j-1) (and future OrderTest(j-2))
@@ -2143,10 +1976,7 @@ Namespace Biosystems.Ax00.BL
                                         If aux_j > 0 Then
                                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                                Where a.OrderTestID = sortedOTList(aux_j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                Where wse.ReagentContaminatorID = newContaminatorID _
-                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatorID _
-                                                               Select wse).ToList()
+                                            contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
                                         End If
                                     End If
 
@@ -2175,37 +2005,8 @@ Namespace Biosystems.Ax00.BL
                     Next
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                    Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
-                    For Each lockedOrderTestitem As Integer In myOTListLinq
-                        If Not sortedOTList.Contains(lockedOrderTestitem) Then
-                            sortedOTList.Add(lockedOrderTestitem)
-                        End If
-                    Next
-
-                    'Create a copy of pExecutions and then move executions from copy -> pExecutions
-                    Dim copypExecutions As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                    copypExecutions = pExecutions.ToList
-
-                    pExecutions.Clear()
-                    Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                    For Each orderTestitem As Integer In sortedOTList
-                        'Get executions of orderTestitem using the copypExecutions
-                        'Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                        myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
-                                       Where a.OrderTestID = orderTestitem Select a).ToList
-
-                        For Each execution In myOTExecutions
-                            pExecutions.Add(execution)
-                        Next
-                    Next
-
+                    AddLockedExecutions(pExecutions, sortedOTList)
                     ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-
-                    myOTListLinq = Nothing
-                    copypExecutions = Nothing
-                    myOTExecutions = Nothing 'AG 19/02/2014 - #1514
-
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
                     ContaminationNumber = addContaminationBetweenGroups
                 End If
@@ -11949,6 +11750,100 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
+        'ajg traspasado
+        ''' <summary>
+        ''' Get the contaminations that exist between contaminator and contaminated reagents
+        ''' </summary>
+        ''' <param name="Contaminator">Reagent that contaminates</param>
+        ''' <param name="Contaminated">Reagent that is contaminated</param>
+        ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
+        ''' <returns>List of contaminations between Contaminator and Contaminated</returns>
+        ''' <remarks>
+        ''' Created by AJG in 17/03/2015
+        ''' </remarks>
+        Private Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+            Dim result = (From wse In pContaminationsDS.tparContaminations _
+                                             Where wse.ReagentContaminatorID = Contaminator _
+                                             AndAlso wse.ReagentContaminatedID = Contaminated _
+                                             Select wse).ToList()
+
+            Return result
+        End Function
+
+        'ajg traspasado
+        ''' <summary>
+        ''' Get the hard contaminations that exist between contaminator and contaminated reagents.
+        ''' Hard contaminations are those that requires a washing solution to applied.
+        ''' </summary>
+        ''' <param name="Contaminator">Reagent that contaminates</param>
+        ''' <param name="Contaminated">Reagent that is contaminated</param>
+        ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
+        ''' <returns>List of hard contaminations between Contaminator and Contaminated</returns>
+        ''' <remarks>
+        ''' Created by AJG in 17/03/2015
+        ''' </remarks>
+        Private Function GetHardContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+            Dim result = (From wse In pContaminationsDS.tparContaminations _
+                                             Where wse.ReagentContaminatorID = Contaminator _
+                                             AndAlso wse.ReagentContaminatedID = Contaminated _
+                                             AndAlso Not wse.IsWashingSolutionR1Null _
+                                             Select wse).ToList()
+
+            Return result
+        End Function
+
+        'ajg traspasado
+        Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
+            Dim TestReagentsDAO As New tparTestReagentsDAO()
+            Dim testReagentsDataDS As TestReagentsDS = Nothing
+            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
+
+            resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
+            If Not resultData.HasError Then
+                testReagentsDataDS = resultData.SetDatos
+            End If
+
+            Return testReagentsDataDS
+        End Function
+
+        'ajg traspasado
+        Private Sub AddLockedExecutions(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal sortedOTList As List(Of Integer))
+            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+            Dim myOTListLinq = (From a In pExecutions _
+                            Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
+            For Each lockedOrderTestitem As Integer In myOTListLinq
+                If Not sortedOTList.Contains(lockedOrderTestitem) Then
+                    sortedOTList.Add(lockedOrderTestitem)
+                End If
+            Next
+
+            'Create a copy of pExecutions and then move executions from copy -> pExecutions
+            Dim copypExecutions = pExecutions.ToList
+
+            pExecutions.Clear()
+            Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+            For Each orderTestitem As Integer In sortedOTList
+                'Get executions of orderTestitem using the copypExecutions
+                myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
+                               Where a.OrderTestID = orderTestitem Select a).ToList
+
+                pExecutions.AddRange(myOTExecutions)
+            Next
+        End Sub
+
+        'ajg traspasado
+        Public Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As Integer
+            Static testReagentsDataDS As TestReagentsDS
+
+            If testReagentsDataDS Is Nothing Then
+                testReagentsDataDS = GetAllReagents(pDBConnection)
+            End If
+
+            Dim result = (From a In testReagentsDataDS.tparTestReagents
+                          Where a.ReagentID = reagentID Select a.ReagentNumber).First
+
+            Return result
+        End Function
     End Class
 End Namespace
 
