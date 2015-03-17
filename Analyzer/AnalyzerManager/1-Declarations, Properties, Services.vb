@@ -53,7 +53,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private myNextPreparationToSendDS As New AnalyzerManagerDS 'AG 07/06/2012 - remembers the next preparation & reagent wash to be sent (in RUNNING)
         Private futureRequestNextWell As Integer = 0 'AG 07/06/2012 - Using the current next well received in Request, estimate the future well in next request
 
-        Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
         Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
 
         Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm                        
@@ -75,7 +74,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private wellBaseLineWorker As New BackgroundWorker 'Worker to perform the well base line process C:\Documents and Settings\Sergio_Garcia\Mis documentos\Ax00_v1.0\FwScriptsManagement\Screen Delegates\PositionsAdjustmentDelegate.vb
         '#REFACTORING Private WithEvents baselineCalcs As BaseLineCalculations 'AG 29/04/2011 - Instance is created in AnalyzerManager constructor
 
-        Private wellContaminatedWithWashSent As Integer = 0 'AG 07/06/2011
+        Private wellContaminatedWithWashSentAttr As Integer = 0
         Private myBarcodeRequestDS As New AnalyzerManagerDS 'AG 03/08/2011 - When barcode request has several records. Sw has to send: 1st row ... wait results, 2on row ... wait results and so on
         Private readBarCodeBeforeRunningPerformedFlag As Boolean = False 'AG 09/05/2012
 
@@ -1182,7 +1181,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'AG 19/03/2013 - Information to export to LIS (using ES) that will be executed from presentation layer
         Public ReadOnly Property LastExportedResults() As ExecutionsDS Implements IAnalyzerManager.LastExportedResults
             Get
-                SyncLock lockThis
+                SyncLock LockThis
                     Return lastExportedResultsDSAttribute
                 End SyncLock
             End Get
@@ -1344,7 +1343,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Property NumRepetitionsStateInstruction As Integer Implements IAnalyzerManager.NumRepetitionsStateInstruction
             Get
-                Return NumRepetitionsState
+                Return numRepetitionsSTATE
             End Get
             Set(value As Integer)
                 numRepetitionsSTATE = value
@@ -1474,6 +1473,14 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Public Property wellContaminatedWithWashSent As Integer Implements IAnalyzerManager.wellContaminatedWithWashSent
+            Get
+                Return wellContaminatedWithWashSentAttr
+            End Get
+            Set(value As Integer)
+                wellContaminatedWithWashSentAttr = value
+            End Set
+        End Property
 #End Region
 
 #Region "Events definition & methods"
@@ -4294,6 +4301,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
             End If
         End Sub
+
+        Public Function ActivateProtocolWrapper(ByVal pEvent As AppLayerEventList, Optional ByVal pSwEntry As Object = Nothing, _
+                                          Optional ByVal pFwEntry As String = "", _
+                                          Optional ByVal pFwScriptID As String = "", _
+                                          Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO _
+                                      Implements IAnalyzerManager.ActivateProtocolWrapper
+            Return AppLayer.ActivateProtocol(pEvent, pSwEntry, pFwEntry, pFwScriptID, pServiceParams)
+        End Function
 #End Region
 
     End Class

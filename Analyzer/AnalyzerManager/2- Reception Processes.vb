@@ -1721,7 +1721,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         newRow = myReactionsDS.twksWSReactionsRotor.NewtwksWSReactionsRotorRow
                         With newRow
                             .AnalyzerID = AnalyzerIDAttribute
-                            .WellNumber = wellContaminatedWithWashSent
+                            .WellNumber = wellContaminatedWithWashSentAttr
                             .SetRotorTurnNull()
                             .SetWellContentNull()
                             .SetWellStatusNull()

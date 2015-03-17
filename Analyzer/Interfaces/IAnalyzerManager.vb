@@ -128,6 +128,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property SentPreparations As AnalyzerManagerDS.sentPreparationsDataTable
         ReadOnly Property NextPreparationsToSend As AnalyzerManagerDS.nextPreparationDataTable
         Property NextPreparationsAnalyzerManagerDS As AnalyzerManagerDS
+        Property wellContaminatedWithWashSent As Integer
 
 #End Region
 
@@ -273,6 +274,11 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                                ByVal pSensorId As AnalyzerSensors, ByVal pSensorValue As Single, _
                                                ByVal pScannedPosition As Boolean, ByVal pElementID As Integer, ByVal pMultiTubeNumber As Integer, _
                                                ByVal pTubeType As String, ByVal pTubeContent As String) As GlobalDataTO
+
+        Function ActivateProtocolWrapper(ByVal pEvent As AppLayerEventList, Optional ByVal pSwEntry As Object = Nothing, _
+                                          Optional ByVal pFwEntry As String = "", _
+                                          Optional ByVal pFwScriptID As String = "", _
+                                          Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO
         
 #End Region
 

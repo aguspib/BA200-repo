@@ -681,7 +681,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(2.1)
-                                wellContaminatedWithWashSent = 0 'AG 24/11/2011
+                                wellContaminatedWithWashSentAttr = 0 'AG 24/11/2011
 
                                 Debug.Print("Step 1 - SearchNextPreparation -> pNextWell = " & pNextWell.ToString & _
                                             "; contaminatedWell = " & contaminatedWell & _
@@ -689,7 +689,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             "; WashSol2 = " & WashSol2.ToString)
 
                                 If contaminatedWell Then
-                                    wellContaminatedWithWashSent = pNextWell 'AG 24/11/2011
+                                    wellContaminatedWithWashSentAttr = pNextWell 'AG 24/11/2011
 
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.CuvetteContaminationFlag = True

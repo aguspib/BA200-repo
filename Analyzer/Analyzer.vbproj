@@ -156,6 +156,7 @@
     <Compile Include="AnalyzerManager\BA400AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\DynamicBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\Shared\ConstantParameters.vb" />
+    <Compile Include="AnalyzerManager\Shared\Preparation.vb" />
     <Compile Include="AnalyzerManager\SN- Temporal Testing and Old Methods.vb" />
     <Compile Include="AnalyzerManager\StaticBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\ToIntegrate.vb" />

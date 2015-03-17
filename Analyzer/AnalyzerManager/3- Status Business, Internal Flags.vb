@@ -253,9 +253,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.SKIP_START
                             'The well (cuvette) washings are required to be marked as already washed
                             If (pAx00ActionCode = AnalyzerManagerAx00Actions.WASHING_RUN_START) Then
-                                Debug.Print("Setp 2 - ManageRunningStatus -> wellContaminatedWithWashSent = " & wellContaminatedWithWashSent)
+                                Debug.Print("Setp 2 - ManageRunningStatus -> wellContaminatedWithWashSentAttr = " & wellContaminatedWithWashSentAttr)
 
-                                If (wellContaminatedWithWashSent > 0) Then
+                                If (wellContaminatedWithWashSentAttr > 0) Then
                                     myGlobal = MarkWashWellContaminationRunningAccepted(Nothing)
                                 End If
                             End If

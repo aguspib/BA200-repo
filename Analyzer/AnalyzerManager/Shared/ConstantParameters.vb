@@ -15,6 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Public WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
         Public WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
         Public WELL_OFFSET_FOR_ISETEST_URI As Integer = 3 'Default well offset until next request when a ISETEST (uri) instruction is sent
+        Public REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
 
         Public alarmsDefintionTableDS As New AlarmsDS 'Read the Alarm definition when analyzer manager class is created not in several methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
 
