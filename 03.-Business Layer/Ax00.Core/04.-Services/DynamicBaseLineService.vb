@@ -7,22 +7,18 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Namespace Biosystems.Ax00.Core.Services
 
     Public Class DynamicBaseLineService
-        Implements IAsyncService
+        Inherits AsyncService
 
-
-        Public Sub New(analyzer As IAnalyzerManager)
-            _analyzer = analyzer
-
+        Sub New(analyzer As IAnalyzerManager)
+            MyBase.New(analyzer)
         End Sub
 
-        Public Property OnServiceStatusChange As Action(Of IServiceStatusCallback) Implements IAsyncService.OnServiceStatusChange
-
-        Public Function StartService() As Boolean Implements IAsyncService.StartService
+        Public Overrides Function StartService() As Boolean
 
 
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
-
+            If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then Return False
 
             'Method flow:
             Dim startProcessSuccess As Boolean = False
@@ -50,7 +46,7 @@ Namespace Biosystems.Ax00.Core.Services
                     resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
 
                     If resultData.HasError Then
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "")
+                        '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "")
                         Throw New Exception(resultData.ErrorCode)
                     Else
                         'Update analyzer session flags into DataBase
@@ -81,21 +77,21 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Attributes"
 
-        Private WithEvents _analyzer As IAnalyzerManager
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As DynamicBaseLineStepsEnum
+        Private _alreadyFinalized As Boolean = False
 
 #End Region
 
 #Region "Event Handlers"
 
-        Public Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
+        Private Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
             TryToStartNextStep()
         End Sub
 
-        Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
+        Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
                     ProcessStaticBaseLine()
@@ -121,13 +117,12 @@ Namespace Biosystems.Ax00.Core.Services
             _dynamicBaseLineValid = False
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
+            _alreadyFinalized = False
 
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
             End If
 
-            Dim SSC As IServiceStatusCallback
-            If Me.OnServiceStatusChange IsNot Nothing Then Me.OnServiceStatusChange.Invoke(SSC)
 
         End Sub
 
@@ -139,7 +134,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim nextStep As DynamicBaseLineStepsEnum
             nextStep = GetNextStep()
-
+            Debug.WriteLine("Nexi step is " & nextStep.ToString)
             Select Case nextStep
                 Case DynamicBaseLineStepsEnum.ConditioningWashing,
                      DynamicBaseLineStepsEnum.StaticBaseLine,
@@ -150,44 +145,10 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Private Function GetNextStep() As DynamicBaseLineStepsEnum
 
             Dim nextStep = DynamicBaseLineStepsEnum.None
-
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
-                nextStep = GetNextStepWhileInProcess()
-
-            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
-
-                If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.ConditioningWashing
-
-                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.StaticBaseLine
-
-                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineFill
-
-                    ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
-
-                    End If
-                End If
-
-            End If
-            Return nextStep
-
-        End Function
-
-        Private Function GetNextStepWhileInProcess() As DynamicBaseLineStepsEnum
-
-            Dim nextStep = DynamicBaseLineStepsEnum.None
+            If _alreadyFinalized Then Return DynamicBaseLineStepsEnum.None
 
             Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
                 Case "", "CANCELED"
@@ -237,7 +198,9 @@ Namespace Biosystems.Ax00.Core.Services
 
                     End If
             End Select
-
+            If nextStep <> DynamicBaseLineStepsEnum.None Then
+                Debug.Print("Current doing: " & nextStep.ToString)
+            End If
             Return nextStep
 
         End Function
@@ -412,7 +375,7 @@ Namespace Biosystems.Ax00.Core.Services
 
 
         Private Sub ProcessDynamicBaseLine()
-            Throw New NotImplementedException
+            _dynamicBaseLineValid = _analyzer.ProcessFlightReadAction()
         End Sub
 
         ''' <summary>
@@ -458,6 +421,10 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub FinalizeProcess()
 
+            'Reentrance check:
+            If _alreadyFinalized Then Return
+            _alreadyFinalized = True
+
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "CLOSED")
@@ -482,6 +449,12 @@ Namespace Biosystems.Ax00.Core.Services
                 Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                 myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
             End If
+
+            ServiceStatusCallback.Invoke(Me, ServiceStatusEnum.ServiceSuccess)
+
+            'Clean up event listening:
+            '_analyzer = Nothing
+            GC.Collect()
 
         End Sub
 
@@ -621,6 +594,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 #End Region
+
 
 
     End Class

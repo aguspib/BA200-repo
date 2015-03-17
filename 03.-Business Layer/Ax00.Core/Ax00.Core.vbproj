@@ -94,6 +94,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="04.-Services\AsyncService.vb" />
     <Compile Include="04.-Services\DynamicBaseLineService.vb" />
     <Compile Include="04.-Services\ServicesInterfaces\IServiceStatusCallback.vb" />
     <Compile Include="04.-Services\RotorChangeServices.vb" />

@@ -45,10 +45,13 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Event Handlers"
 
         Public Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
+            Debug.Print("I'm alive!")
             CheckIfCanContinue()
         End Sub
 
         Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
+            Debug.Print("I'm alive 2!")
+
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
                     ProcessStaticBaseLine()

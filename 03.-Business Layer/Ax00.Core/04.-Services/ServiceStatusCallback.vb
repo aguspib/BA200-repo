@@ -16,11 +16,14 @@
         ''' <param name="status">The status to be sent</param>
         ''' <remarks></remarks>
         Shared Sub Invoke(service As IAsyncService, status As ServiceStatusEnum)
-            If service Is Nothing OrElse service.OnServiceStatusChange Is Nothing Then Return
-            Dim SSC As New ServiceStatusCallback
-            SSC.Sender = service
-            SSC.NewServiceStatus = status
-            service.OnServiceStatusChange.Invoke(SSC)
+            If service Is Nothing OrElse service.OnServiceStatusChange Is Nothing Then
+                Return
+            Else
+                Dim SSC As New ServiceStatusCallback
+                SSC.Sender = service
+                SSC.NewServiceStatus = status
+                service.OnServiceStatusChange.Invoke(SSC)
+            End If
         End Sub
 
     End Class
