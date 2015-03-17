@@ -672,23 +672,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         ''''''
                         ''1st: Check if next cuvette is optically rejected 
                         ''''''
-                        'Dim rejectedWell As Boolean = False
-                        'resultData = Me.CheckOpticalNextWell(dbConnection, pNextWell, rejectedwell)
-                        'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(1.1)
-                        '    If rejectedwell Then
-                        '        nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
-                        '        nextRow.CuvetteOpticallyRejectedFlag = True
-
-                        '        nextRow.CuvetteContaminationFlag = False
-                        '        nextRow.ReagentContaminationFlag = False
-                        '        nextRow.ExecutionID = 0
-                        '        nextRow.ExecutionType = ""
-
-                        '        nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
-                        '    End If
-                        'Else '(1.1)
-                        '    Exit Try
-                        'End If '(1.1)
 
                         '''''
                         'AG 24/11/2011 change order: 1st cuvette contamination, 2on optically rejected (first version was inverted)

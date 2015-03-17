@@ -1222,20 +1222,18 @@ Namespace Biosystems.Ax00.BL
                             For j As Integer = i + offset To sortedOTList.Count - 1
                                 ' ReSharper disable once InconsistentNaming
                                 Dim aux_j = j
-                                'AG 28/11/2011
-                                ''Next contamination to analyze is between OrderTest(i+1) --> OrderTest(i) / OrderTest(i+2) --> OrderTest(i) / ... /
-                                ''until an OrderTest that not contaminates OrderTest(i) is found
-                                'ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                '                   Select wse).ToList()
+                                'Only have to look back a maximum of pHighContaminationPersistance steps, but maxReplicates have to be taken into account for every position
+                                Dim limit As Integer
+                                If (pHighContaminationPersistance > i) Then
+                                    limit = i
+                                Else
+                                    limit = pHighContaminationPersistance
+                                End If
 
                                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+                                For jj = aux_j To aux_j - limit Step -1   '- pHighContaminationPersistance - 1 Step -1
                                     ' ReSharper disable once InconsistentNaming
                                     Dim aux_jj = jj
                                     If aux_jj >= 0 Then
@@ -8571,6 +8569,21 @@ Namespace Biosystems.Ax00.BL
                                                                     bestContaminationNumber = currentContaminationNumber
                                                                     'bestResult.Clear()
                                                                     bestResult = currentResult
+                                                                End If
+                                                            End If
+
+                                                            'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
+                                                            If currentContaminationNumber > 0 Then
+                                                                If OrderTests.Count = 2 Then
+                                                                    'Okay, if there are contaminations, why not to try interchange them?
+                                                                    currentResult.Clear()
+                                                                    For z = OrderTests.Count - 1 To 0 Step -1
+                                                                        currentResult.Add(OrderTests(z))
+                                                                    Next
+                                                                    currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                                    If currentContaminationNumber = 0 Then
+                                                                        bestResult = currentResult
+                                                                    End If
                                                                 End If
                                                             End If
 
