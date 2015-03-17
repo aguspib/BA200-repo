@@ -26,14 +26,16 @@ Namespace Biosystems.Ax00.Core.Services
     ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
     Public Class RotorChangeServices
+        Inherits AsyncService
 
         Public Sub New(analyzer As IAnalyzerManager)
-            _analyzer = analyzer
+            MyBase.New(analyzer)
+            '_analyzer = analyzer
         End Sub
 
 #Region "Attributes"
 
-        Private WithEvents _analyzer As IAnalyzerManager
+        'Private WithEvents _analyzer As IAnalyzerManager
         Private _currentStep As RotorChangeStepsEnum
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
@@ -45,12 +47,10 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Event Handlers"
 
         Public Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
-            Debug.Print("I'm alive!")
             CheckIfCanContinue()
         End Sub
 
         Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
-            Debug.Print("I'm alive 2!")
 
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
@@ -75,7 +75,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function StartProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Overloads Function StartService(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
@@ -124,6 +124,15 @@ Namespace Biosystems.Ax00.Core.Services
 
             Return True
 
+        End Function
+
+        ''' <summary>
+        ''' Starts the change rotor service, assuming it's not in recovery mode.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function StartService() As Boolean
+            Return Me.StartService(False)
         End Function
 
         ''' <summary>

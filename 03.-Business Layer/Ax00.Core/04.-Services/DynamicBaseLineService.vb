@@ -199,7 +199,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
             End Select
             If nextStep <> DynamicBaseLineStepsEnum.None Then
-                Debug.Print("Current doing: " & nextStep.ToString)
+                Debug.Print("Currently doing: " & nextStep.ToString)
             End If
             Return nextStep
 

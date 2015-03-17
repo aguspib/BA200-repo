@@ -341,11 +341,13 @@ Public Class Ax00MainForm
         Dim FLS As New Biosystems.Ax00.Core.Services.DynamicBaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
         FLS.OnServiceStatusChange =
             Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)
-                    Try
-                        Debug.WriteLine(status.NewServiceStatus.ToString & " " & Now.ToString)
-                    Catch
-                    End Try
-                End Sub
+                Try
+                    Debug.WriteLine(status.NewServiceStatus.ToString & " " & Now.ToString)
+                    status.Sender.Dispose()
+                Catch ex As Exception
+                    MsgBox(ex.Message)
+                End Try
+            End Sub
         If FLS.StartService() = False Then
             Debug.WriteLine("Service could not be started.")
         Else
