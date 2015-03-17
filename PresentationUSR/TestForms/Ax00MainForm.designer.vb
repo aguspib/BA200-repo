@@ -27,6 +27,7 @@ Partial Class Ax00MainForm
         Me.bsTestUpdateVersionProcessButton = New System.Windows.Forms.Button()
         Me.bsLogFileViewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsXmlEncryptButton = New System.Windows.Forms.Button()
+        Me.bsAGTestingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.SimpleButton2 = New DevExpress.XtraEditors.SimpleButton()
         Me.SimpleButton1 = New DevExpress.XtraEditors.SimpleButton()
@@ -36,7 +37,6 @@ Partial Class Ax00MainForm
         Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsOrderRequestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.bsAGTestingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsButton2 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Panel3 = New System.Windows.Forms.Panel()
@@ -44,6 +44,7 @@ Partial Class Ax00MainForm
         Me.Button4 = New System.Windows.Forms.Button()
         Me.butTestSergio = New System.Windows.Forms.Button()
         Me.Button6 = New System.Windows.Forms.Button()
+        Me.MITestProcess = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
@@ -51,6 +52,7 @@ Partial Class Ax00MainForm
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.MITestProcess)
         Me.Panel1.Controls.Add(Me.bsTestUpdateVersionProcessButton)
         Me.Panel1.Controls.Add(Me.bsLogFileViewButton)
         Me.Panel1.Controls.Add(Me.bsXmlEncryptButton)
@@ -88,6 +90,16 @@ Partial Class Ax00MainForm
         Me.bsXmlEncryptButton.TabIndex = 15
         Me.bsXmlEncryptButton.Text = "XML FILE ENCRYPT (TASKS)"
         Me.bsXmlEncryptButton.UseVisualStyleBackColor = True
+        '
+        'bsAGTestingButton
+        '
+        Me.bsAGTestingButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsAGTestingButton.Location = New System.Drawing.Point(12, 144)
+        Me.bsAGTestingButton.Name = "bsAGTestingButton"
+        Me.bsAGTestingButton.Size = New System.Drawing.Size(142, 38)
+        Me.bsAGTestingButton.TabIndex = 15
+        Me.bsAGTestingButton.Text = "AG Testings"
+        Me.bsAGTestingButton.UseVisualStyleBackColor = True
         '
         'Panel2
         '
@@ -182,16 +194,6 @@ Partial Class Ax00MainForm
         Me.BsButton6.Text = "Contaminations"
         Me.BsButton6.UseVisualStyleBackColor = True
         '
-        'bsAGTestingButton
-        '
-        Me.bsAGTestingButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsAGTestingButton.Location = New System.Drawing.Point(12, 144)
-        Me.bsAGTestingButton.Name = "bsAGTestingButton"
-        Me.bsAGTestingButton.Size = New System.Drawing.Size(142, 38)
-        Me.bsAGTestingButton.TabIndex = 15
-        Me.bsAGTestingButton.Text = "AG Testings"
-        Me.bsAGTestingButton.UseVisualStyleBackColor = True
-        '
         'BsButton3
         '
         Me.BsButton3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
@@ -260,10 +262,19 @@ Partial Class Ax00MainForm
         Me.Button6.Text = "ISE Test"
         Me.Button6.UseVisualStyleBackColor = True
         '
+        'BsButton5
+        '
+        Me.MITestProcess.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.MITestProcess.Location = New System.Drawing.Point(12, 188)
+        Me.MITestProcess.Name = "BsButton5"
+        Me.MITestProcess.Size = New System.Drawing.Size(142, 38)
+        Me.MITestProcess.TabIndex = 26
+        Me.MITestProcess.Text = "MI Testings"
+        Me.MITestProcess.UseVisualStyleBackColor = True
+        '
         'Ax00MainForm
         '
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
@@ -307,5 +318,6 @@ Partial Class Ax00MainForm
     Friend WithEvents BsButton4 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SimpleButton1 As DevExpress.XtraEditors.SimpleButton
     Friend WithEvents SimpleButton2 As DevExpress.XtraEditors.SimpleButton
+    Friend WithEvents MITestProcess As Biosystems.Ax00.Controls.UserControls.BSButton
 
 End Class
