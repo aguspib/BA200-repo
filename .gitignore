@@ -178,3 +178,5 @@ UpgradeLog*.htm
 FakesAssemblies/
 DropLocalDB/Resources/Thumbs.db
 *.bak
+Analyzer/AnalyzerManager/6- Sending Processes - Modificado con ReFactoring.vb
+Analyzer/AnalyzerManager/PreparationFinder(No sirve).vb
