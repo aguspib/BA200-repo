@@ -95,10 +95,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="04.-Services\DynamicBaseLineService.vb" />
-    <Compile Include="04.-Services\IServiceResults.vb" />
+    <Compile Include="04.-Services\ServicesInterfaces\IServiceStatusCallback.vb" />
     <Compile Include="04.-Services\RotorChangeServices.vb" />
+    <Compile Include="04.-Services\ServiceStatusCallback.vb" />
     <Compile Include="04.-Services\ServiceStatusEnum.vb" />
-    <Compile Include="IAsyncService.vb" />
+    <Compile Include="04.-Services\ServicesInterfaces\IAsyncService.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

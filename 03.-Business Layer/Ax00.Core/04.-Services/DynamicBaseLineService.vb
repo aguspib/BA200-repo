@@ -19,11 +19,13 @@ Namespace Biosystems.Ax00.Core.Services
 
         Public Function StartService() As Boolean Implements IAsyncService.StartService
 
+
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
 
+
             'Method flow:
-            Dim StartProcessSuccess As Boolean = False
+            Dim startProcessSuccess As Boolean = False
 
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -35,7 +37,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "") 'AG + IT 10/02/2015 BA-2246 apply same rules in Change Rotor and in StartInstr
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
-                StartProcessSuccess = False
+                startProcessSuccess = False
             Else
                 If _analyzer.Connected Then
                     _analyzer.StopAnalyzerRinging()
@@ -56,14 +58,14 @@ Namespace Biosystems.Ax00.Core.Services
                             Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                             myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                         End If
-                        StartProcessSuccess = True
+                        startProcessSuccess = True
                     End If
                 Else
-                    StartProcessSuccess = False
+                    startProcessSuccess = False
                 End If
             End If
 
-            Return StartProcessSuccess
+            Return startProcessSuccess
 
         End Function
 
@@ -123,6 +125,9 @@ Namespace Biosystems.Ax00.Core.Services
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
             End If
+
+            Dim SSC As IServiceStatusCallback
+            If Me.OnServiceStatusChange IsNot Nothing Then Me.OnServiceStatusChange.Invoke(SSC)
 
         End Sub
 
