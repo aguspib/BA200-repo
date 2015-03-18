@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
+            Me._currentStep = DynamicBaseLineStepsEnum.NotStarted
         End Sub
 
         Public Overrides Function StartService() As Boolean
@@ -60,12 +61,19 @@ Namespace Biosystems.Ax00.Core.Services
                     startProcessSuccess = False
                 End If
             End If
-
+            If startProcessSuccess Then
+                AddHandlers()
+            End If
             Return startProcessSuccess
 
         End Function
 
+        Public Function CurrentStep() As DynamicBaseLineStepsEnum
+            Return _currentStep
+        End Function
+
         Public Enum DynamicBaseLineStepsEnum
+            NotStarted
             ConditioningWashing
             StaticBaseLine
             DynamicBaseLineFill
@@ -82,16 +90,21 @@ Namespace Biosystems.Ax00.Core.Services
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As DynamicBaseLineStepsEnum
         Private _alreadyFinalized As Boolean = False
-
 #End Region
 
 #Region "Event Handlers"
 
-        Private Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
+        Private Sub OnReceivedStatusInformationEvent()
+            'Handles _analyzer.ReceivedStatusInformationEventHandler
+            'Debug.WriteLine("Hello 1")
+            If _currentStep = DynamicBaseLineStepsEnum.NotStarted Then Return
             TryToStartNextStep()
         End Sub
 
-        Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
+        Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
+            'Handles _analyzer.ProcessFlagEventHandler
+            'Debug.WriteLine("Hello 2")
+            If _currentStep = DynamicBaseLineStepsEnum.NotStarted Then Return
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
                     ProcessStaticBaseLine()
@@ -111,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Private methods"
         Private Sub Initialize()
-
+            _currentStep = DynamicBaseLineStepsEnum.None
             _forceEmptyAndFinalize = False
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
@@ -122,7 +135,7 @@ Namespace Biosystems.Ax00.Core.Services
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
             End If
-
+            Status = ServiceStatusEnum.Running
 
         End Sub
 
@@ -134,7 +147,6 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim nextStep As DynamicBaseLineStepsEnum
             nextStep = GetNextStep()
-            Debug.WriteLine("Nexi step is " & nextStep.ToString)
             Select Case nextStep
                 Case DynamicBaseLineStepsEnum.ConditioningWashing,
                      DynamicBaseLineStepsEnum.StaticBaseLine,
@@ -225,7 +237,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case DynamicBaseLineStepsEnum.ConditioningWashing
                     If (_analyzer.CheckIfWashingIsPossible()) Then
-                        'RestartProcess() '--> This only has sense inside a ChangeRotor scenario
+                        RestartProcess() '--> This only has sense inside a ChangeRotor scenario
                         ExecuteWashingStep()
                     Else
                         CancelWashingStep()
@@ -234,7 +246,7 @@ Namespace Biosystems.Ax00.Core.Services
                 Case DynamicBaseLineStepsEnum.StaticBaseLine
                     If (Not _staticBaseLineFinished) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
-                            'RestartProcess()   '--> Indica en la base de datos que se inicia el proceso de cambio de rotor. N/A aquí
+                            RestartProcess()   '--> Indica en la base de datos que se inicia el proceso de cambio de rotor. N/A aquí
                             ExecuteStaticBaseLineStep()
                         Else
                             CancelStaticBaseLineStep()
@@ -249,27 +261,27 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case DynamicBaseLineStepsEnum.DynamicBaseLineFill
                     If (_analyzer.CheckIfWashingIsPossible()) Then
-                        'RestartProcess()
+                        RestartProcess()
                         ExecuteDynamicBaseLineFillStep()
                     Else
                         CancelDynamicBaseLineFillStep()
                     End If
 
                 Case DynamicBaseLineStepsEnum.DynamicBaseLineRead
-                    'RestartProcess()
+                    RestartProcess()
                     ExecuteDynamicBaseLineReadStep()
 
                 Case DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
-                            'RestartProcess()
+                            RestartProcess()
                             ExecuteDynamicBaseLineEmptyStep()
                         Else
                             CancelDynamicBaseLineEmptyStep()
                         End If
                     Else
                         If (IsReadingAllowed()) Then
-                            'RestartProcess()
+                            RestartProcess()
                             ExecuteDynamicBaseLineReadStep()
                         Else
                             CancelDynamicBaseLineReadStep()
@@ -282,6 +294,12 @@ Namespace Biosystems.Ax00.Core.Services
             End Select
 
             Return
+        End Sub
+
+        Private Sub RestartProcess()
+
+            Status = ServiceStatusEnum.Running
+
         End Sub
 
         ''' <summary>
@@ -313,22 +331,22 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) <> "PAUSED") Or
-                (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) <> "CANCELED") Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) <> "CANCELED") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "CANCELED")
+
 
                 'Update analyzer session flags into DataBase
                 If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                 End If
+                Status = ServiceStatusEnum.Paused
 
+                'TODO: MIC Discuss later
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
-
 
         ''' <summary>
         ''' 
@@ -387,7 +405,7 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) <> "CANCELED") Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+                '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "CANCELED")
 
                 'Update analyzer session flags into DataBase
@@ -397,8 +415,9 @@ Namespace Biosystems.Ax00.Core.Services
                 End If
 
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
-            End If
 
+            End If
+            FinalizeProcess()
         End Sub
 
         ''' <summary>
@@ -450,12 +469,30 @@ Namespace Biosystems.Ax00.Core.Services
                 myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
             End If
 
-            ServiceStatusCallback.Invoke(Me, ServiceStatusEnum.ServiceSuccess)
+            RemoveHandlers()
+            NotifyProcessResult()
 
-            'Clean up event listening:
-            '_analyzer = Nothing
-            GC.Collect()
+        End Sub
 
+        Private Sub NotifyProcessResult()
+
+            'We provide results callback
+            Dim status = ServiceStatusEnum.EndError
+            If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
+                If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
+                    status = ServiceStatusEnum.EndSuccess
+                Else
+                    status = ServiceStatusEnum.EndError
+                End If
+            Else
+                If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") Then
+                    status = ServiceStatusEnum.EndSuccess
+                Else
+                    status = ServiceStatusEnum.EndError
+                End If
+            End If
+
+            ServiceStatusCallback.Invoke(Me)
         End Sub
 
         ''' <summary>
@@ -491,7 +528,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
-
+            FinalizeProcess()
         End Sub
 
         ''' <summary>
@@ -544,7 +581,7 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "CANCELED") Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+                '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
 
                 'Update analyzer session flags into DataBase
@@ -576,7 +613,7 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) <> "CANCELED") Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+                '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
 
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.DYNAMIC_BASELINE_ERROR, 1, True)
@@ -588,13 +625,31 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                 End If
-
-                _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
+                FinalizeProcess()   'MI
+                '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
-#End Region
 
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            RemoveHandlers()
+            MyBase.Dispose(disposing)
+        End Sub
+
+
+        Sub RemoveHandlers()
+            Try
+                RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
+                RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+            Catch : End Try
+        End Sub
+
+        Private Sub AddHandlers()
+            AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
+            AddHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+        End Sub
+
+#End Region
 
 
     End Class

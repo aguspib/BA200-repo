@@ -338,16 +338,21 @@ Public Class Ax00MainForm
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
         Debug.WriteLine("Trying to launch FLIGHT as a service")
+
         Dim FLS As New Biosystems.Ax00.Core.Services.DynamicBaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
+
         FLS.OnServiceStatusChange =
             Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)
                 Try
-                    Debug.WriteLine(status.NewServiceStatus.ToString & " " & Now.ToString)
+                    Debug.WriteLine(status.Sender.Status.ToString & " " & Now.ToString)
                     status.Sender.Dispose()
                 Catch ex As Exception
                     MsgBox(ex.Message)
                 End Try
             End Sub
+
+        'FLS.Dispose()
+        'FLS = Nothing
         If FLS.StartService() = False Then
             Debug.WriteLine("Service could not be started.")
         Else

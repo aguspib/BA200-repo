@@ -2,29 +2,32 @@
     Public Enum ServiceStatusEnum
 
         ''' <summary>
+        ''' The service has been instantiated but hasn't started yet
+        ''' </summary>
+        ''' <remarks></remarks>
+        NotYetStarted
+
+        ''' <summary>
         ''' The service has ended successfuly
         ''' </summary>
-        ServiceSuccess
+        EndSuccess
 
         ''' <summary>
         ''' The service has ended because error or exception was met
         ''' </summary>
-        ServiceAborted
+        EndError
 
         ''' <summary>
         ''' The service is currently paused
         ''' </summary>
-        ServicePaused
+        Paused
 
         ''' <summary>
         ''' The service has started execution
         ''' </summary>
-        ServiceStarted
+        Running
 
-        ''' <summary>
-        ''' The service has started execution after a Pause
-        ''' </summary>
-        ServiceResumed
+
 
     End Enum
 

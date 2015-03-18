@@ -4,7 +4,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Namespace Biosystems.Ax00.Core.Services
+Namespace Biosystems.Ax00.Core.Services.TEMP
 
     Public Enum RotorChangeStepsEnum
         WashStationControl
@@ -12,9 +12,8 @@ Namespace Biosystems.Ax00.Core.Services
         Washing
         StaticBaseLine
         DynamicBaseLineFill
-        DynamicBaseLineRead_TODELETE
-        DynamicBaseLineEmpty_TODELETE
-        BaseLine
+        DynamicBaseLineRead
+        DynamicBaseLineEmpty
         Finalize
         None
     End Enum
@@ -26,11 +25,12 @@ Namespace Biosystems.Ax00.Core.Services
     ''' Created by:  IT 19/12/2014 - BA-2143
     ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
-    Public Class RotorChangeServices
+    Public Class RotorChangeServices_TEMP
         Inherits AsyncService
 
         Public Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
+            '_analyzer = analyzer
         End Sub
 
 #Region "Attributes"
@@ -196,10 +196,10 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Select Case nextStep
                     Case RotorChangeStepsEnum.NewRotor,
-                         RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE,
+                         RotorChangeStepsEnum.DynamicBaseLineRead,
                          RotorChangeStepsEnum.Finalize
                         ValidateProcess()
-                    Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                    Case RotorChangeStepsEnum.DynamicBaseLineEmpty
                         ProcessDynamicBaseLine()
                 End Select
 
@@ -232,7 +232,7 @@ Namespace Biosystems.Ax00.Core.Services
                     Case RotorChangeStepsEnum.Washing,
                          RotorChangeStepsEnum.StaticBaseLine,
                          RotorChangeStepsEnum.DynamicBaseLineFill,
-                         RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                         RotorChangeStepsEnum.DynamicBaseLineEmpty
                         ValidateProcess()
                 End Select
             End If
@@ -284,11 +284,11 @@ Namespace Biosystems.Ax00.Core.Services
                         CancelDynamicBaseLineFillStep()
                     End If
 
-                Case RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
+                Case RotorChangeStepsEnum.DynamicBaseLineRead
                     RestartProcess()
                     ExecuteDynamicBaseLineReadStep()
 
-                Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                Case RotorChangeStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
                             RestartProcess()
@@ -328,7 +328,6 @@ Namespace Biosystems.Ax00.Core.Services
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
 
                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
-
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
                         nextStep = RotorChangeStepsEnum.Washing
 
@@ -339,10 +338,10 @@ Namespace Biosystems.Ax00.Core.Services
                         nextStep = RotorChangeStepsEnum.DynamicBaseLineFill
 
                     ElseIf ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
-                        nextStep = RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
+                        nextStep = RotorChangeStepsEnum.DynamicBaseLineRead
 
                     ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                        nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                        nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
 
                     End If
                 End If
@@ -384,15 +383,15 @@ Namespace Biosystems.Ax00.Core.Services
 
                                         ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
                                                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "") Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineRead
 
                                         ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
                                                ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "") OrElse
                                                 (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
 
                                         ElseIf (_forceEmptyAndFinalize) AndAlso (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "END") Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty
 
                                         End If
 
