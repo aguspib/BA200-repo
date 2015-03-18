@@ -5,6 +5,9 @@
 
         Property OnServiceStatusChange As Action(Of IServiceStatusCallback)
 
+        Property Status As ServiceStatusEnum
+
+
         Function StartService() As Boolean
 
     End Interface

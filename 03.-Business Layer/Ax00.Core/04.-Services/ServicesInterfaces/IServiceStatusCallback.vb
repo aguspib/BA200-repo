@@ -2,8 +2,6 @@
 
     Public Interface IServiceStatusCallback
 
-        Property NewServiceStatus As ServiceStatusEnum
-
         Property Sender As IAsyncService
 
     End Interface

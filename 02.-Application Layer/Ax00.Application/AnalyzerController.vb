@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.App
                     _rotorChangeServices = New RotorChangeServices(Analyzer)
                 End If
 
-                Return _rotorChangeServices.StartProcess(isInRecovering)
+                Return _rotorChangeServices.StartService(isInRecovering)
             Catch ex As Exception
                 Throw ex
             End Try
@@ -210,6 +210,7 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Sub ChangeRotorCloseProcess()
             Try
+                _rotorChangeServices.Dispose()
                 _rotorChangeServices = Nothing
             Catch ex As Exception
                 Throw ex

@@ -8,6 +8,9 @@ Namespace Biosystems.Ax00.Core.Services
     Public MustInherit Class AsyncService
         Implements IAsyncService
 
+
+
+
         Protected WithEvents _analyzer As IAnalyzerManager
 
         Sub New(analyzer As IAnalyzerManager)
@@ -17,6 +20,26 @@ Namespace Biosystems.Ax00.Core.Services
         Public Property OnServiceStatusChange As Action(Of IServiceStatusCallback) Implements IAsyncService.OnServiceStatusChange
 
         Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
+
+
+        'Public MustOverride ReadOnly Property Status As ServiceStatusEnum Implements IAsyncService.Status
+        Public Property Status As ServiceStatusEnum Implements IAsyncService.Status
+            Get
+                Return _status
+            End Get
+            Set(value As ServiceStatusEnum)
+                If value <> _status Then
+                    value = _status
+                    If OnServiceStatusChange IsNot Nothing Then
+                        ServiceStatusCallback.Invoke(Me)
+                    End If
+                End If
+            End Set
+        End Property
+
+#Region "attributes"
+        Protected _status As ServiceStatusEnum = ServiceStatusEnum.NotYetStarted
+#End Region
 
 #Region "IDisposable Support"
         Private disposedValue As Boolean ' To detect redundant calls
@@ -28,6 +51,7 @@ Namespace Biosystems.Ax00.Core.Services
                     ' TODO: dispose managed state (managed objects).
                 End If
                 _analyzer = Nothing
+                Debug.WriteLine("Service has been disposed")
                 ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
                 ' TODO: set large fields to null.
             End If
