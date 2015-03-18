@@ -1088,942 +1088,952 @@ Namespace Biosystems.Ax00.BL
             Return ContaminationNumber
         End Function
 
-        ''' <summary>
-        ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
-        ''' 
-        ''' Applies Optimization Policy A over param pExecutions
-        ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
-        '''   searching a reagent not contaminated by pPreviousElementLastReagentID
-        ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
-        '''         Inside the Element Group try avoid contaminations moving the contaminated down until it becomes not contaminated
-        '''    Else
-        '''         Exit sub
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Executions</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
-        ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' AG 09/11/2011 created
-        ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyA but it does not work properly
-        '''       so I create a new method
-        ''' 
-        ''' AG 25/11/2011 - add the high contamination persistance functionality
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
-        Public Function ApplyOptimizationPolicyANew(ByVal pContaminationsDS As ContaminationsDS, _
-                                                  ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal pHighContaminationPersistance As Integer, _
-                                                  Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
-                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim startTime As DateTime = Now
-
-            Dim ContaminationNumber As Integer = 0
-
-            'This code is execute only when pPreviousReagentID is informed
-            'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
-            'and place his executions first
-            Dim originalOrderChanged As Boolean = False
-            Dim addContaminationBetweenGroups As Integer = 0
-            If Not pPreviousReagentID Is Nothing Then
-                MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
-            End If
-
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
-
-                'Get all different ordertests in pExecutions list with executions pending
-                Dim myOTListLinq As List(Of Integer)
-                myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                               Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
-
-                If myOTListLinq.Count > 1 Then
-                    'Initialize the ordertest list to be sorted  ... use a temporal list
-                    Dim sortedOTList As New List(Of Integer)
-                    sortedOTList = myOTListLinq.ToList
-
-                    Dim ReagentContaminatorID As Integer = -1
-                    Dim ReagentContaminatedID As Integer = -1
-                    Dim contaminatedOrderTest As Integer = -1
-                    Dim MainContaminatorID As Integer = -1
-
-                    'ajg hasta aquí bien
-
-                    'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminated until becomes not contaminated)
-                    For i As Integer = 1 To sortedOTList.Count - 1
-                        'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
-                        Dim auxIndex = i
-                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(auxIndex - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        MainContaminatorID = ReagentContaminatorID
-
-                        contaminatedOrderTest = sortedOTList(i)
-                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(auxIndex) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-
-                        'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin: [If (i-2) contaminates (i)]
-                        'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                        If contaminations.Count = 0 Then
-                            Dim maxReplicates As Integer = 1
-                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(auxIndex - 1) Select a.ReplicateNumber).Max
-                            If maxReplicates < pHighContaminationPersistance Then
-                                If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
-                                ElseIf i > 1 Then
-                                    ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(auxIndex - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                End If
-                            End If
-                        End If
-                        'AG 19/21/2011
-
-                        'OrderTest(i-1) (the MainContaminatorID) contaminates OrderTest(i) ... so try move OrderTes(i) down until becomes no contaminated
-                        If contaminations.Count > 0 Then
-                            'AG 25/11/2011 Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                            'Evaluate if it is a LOW contamination ... next process starts in index: i + 1
-                            'or if it is a HIGH contamination ... next process starts in index: i + pHighContaminationPersistance
-                            Dim offset As Integer = 1
-                            Dim maxReplicates As Integer = 1
-                            If pHighContaminationPersistance > 1 AndAlso Not contaminations(0).IsWashingSolutionR1Null Then
-
-                                'AG 19/12/2011 - if orderTest(i+1) maxreplicates > persistance --> offset = 1 // else: --> offset = pHighContaminationPersistance
-                                'offset = pHighContaminationPersistance
-                                If i + offset <= sortedOTList.Count - 1 Then
-                                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                     Where a.OrderTestID = sortedOTList(auxIndex + offset) Select a.ReplicateNumber).Max
-                                    If maxReplicates < pHighContaminationPersistance Then
-                                        offset = pHighContaminationPersistance
-                                    End If
-                                End If
-                                'AG 19/12/2011 
-                            End If
-                            'AG 25/11/2011
-
-                            'ajg hecho
-                            'For j As Integer = i + 1 To sortedOTList.Count - 1
-                            For j As Integer = i + offset To sortedOTList.Count - 1
-                                ' ReSharper disable once InconsistentNaming
-                                Dim aux_j = j
-
-                                'Only have to look back a maximum of pHighContaminationPersistance steps, but maxReplicates have to be taken into account for every position
-                                Dim limit As Integer
-                                If (pHighContaminationPersistance > i) Then
-                                    limit = i
-                                Else
-                                    limit = pHighContaminationPersistance
-                                End If
-
-                                'ajg hecho
-
-                                'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                                'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = aux_j To aux_j - limit Step -1   '- pHighContaminationPersistance - 1 Step -1
-                                    ' ReSharper disable once InconsistentNaming
-                                    Dim aux_jj = jj
-                                    If aux_jj >= 0 Then
-                                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                 Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        If aux_jj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        Else 'search for contamination (only high level)
-                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        End If
-
-                                        If contaminations.Count > 0 Then Exit For
-
-                                        'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
-                                        'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If aux_jj = aux_j Then
-                                            maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
-                                            If maxReplicates >= pHighContaminationPersistance Then
-                                                Exit For 'Do not evaluate high contamination persistance
-                                            End If
-                                        End If
-                                        'AG 19/12/2011
-
-                                    Else
-                                        Exit For
-                                    End If
-
-                                Next
-                                'AG 28/11/2011
-
-                                If contaminations.Count = 0 Then
-                                    'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
-
-                                    'New BAx00 (Ax5 do not implement this business
-                                    'Only when the OrderTest(i-1) (the MainContaminatorID) does not contaminates the current OrderTest(i+1) (the future OrderTest(i))
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    Dim newContaminatedID As Integer
-                                    If i < sortedOTList.Count - 1 Then
-                                        newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(auxIndex + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
-                                    End If
-
-                                    'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    If contaminations.Count = 0 Then
-                                        If aux_j < sortedOTList.Count - 1 Then
-                                            newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
-                                        End If
-                                    End If
-
-
-                                    If contaminations.Count = 0 Then
-                                        '(i < j)
-                                        If sortedOTList.Count - 1 > aux_j Then
-                                            sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
-                                        Else
-                                            sortedOTList.Add(contaminatedOrderTest)
-                                        End If
-                                        sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
-                                        Exit For
-                                    End If
-                                End If
-                            Next
-
-                        Else
-                            'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
-                        End If
-
-                        contaminations = Nothing
-                    Next
-
-                    'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-
-                ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = addContaminationBetweenGroups
-                End If
-
-                myOTListLinq = Nothing
-
-            Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-            End If
-
-            ''AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim elapsedTime As Double = 0
-            'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-            Return ContaminationNumber
-
-        End Function
-
-
-        ''' <summary>
-        ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
-        ''' 
-        ''' Applies Optimization Policy B over param pExecutions
-        ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
-        '''   searching a reagent not contaminated by pPreviousReagentID
-        ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
-        '''         Inside the Element Group try avoid contaminations moving the contaminated up until it becomes not contaminated
-        '''    Else
-        '''         Exit sub
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Executions</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
-        ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' AG 09/11/2011 created
-        ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyB but it does not work properly
-        '''       so I create a new method
-        ''' 
-        ''' ''' AG 25/11/2011 - add the high contamination persistance functionality
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
-        Public Function ApplyOptimizationPolicyBNew(ByVal pContaminationsDS As ContaminationsDS, _
-                                                  ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal pHighContaminationPersistance As Integer, _
-                                                  Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
-                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim startTime As DateTime = Now
-
-            Dim ContaminationNumber As Integer = 0
-
-            'This code is execute only when pPreviousReagentID is informed
-            'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
-            'and place his executions first
-            Dim originalOrderChanged As Boolean = False
-            Dim addContaminationBetweenGroups As Integer = 0
-
-            If Not pPreviousReagentID Is Nothing Then
-                MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
-            End If
-
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
-                'Get all different ordertests in pExecutions list with executions pending
-                Dim myOTListLinq As List(Of Integer)
-                myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                               Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
-
-                If myOTListLinq.Count > 1 Then
-                    'Initialize the ordertest list to be sorted  ... use a temporal list
-                    Dim sortedOTList As New List(Of Integer)
-                    sortedOTList = myOTListLinq.ToList
-
-                    Dim ReagentContaminatorID As Integer = -1
-                    Dim ReagentContaminatedID As Integer = -1
-                    Dim contaminatedOrderTest As Integer = -1
-                    Dim MainContaminatorID As Integer = -1
-
-                    'ajg hecho
-                    'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminated until becomes not contaminated)
-                    For i As Integer = 1 To sortedOTList.Count - 1
-                        ' ReSharper disable once InconsistentNaming
-                        Dim aux_i = i
-                        'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
-                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        MainContaminatorID = ReagentContaminatorID
-
-                        contaminatedOrderTest = sortedOTList(aux_i)
-                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-
-                        'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
-                        'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                        If contaminations.Count = 0 Then
-                            Dim maxReplicates As Integer = 1
-                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
-                            If maxReplicates < pHighContaminationPersistance Then
-                                If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
-                                ElseIf aux_i > 1 Then
-                                    ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                End If
-                            End If
-                        End If
-                        'AG 19/21/2011
-
-                        'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i) up until becomes no contaminated
-                        If contaminations.Count > 0 Then
-
-                            'Limit: when pPreviousReagentID <> Nothing the upper limit is 1, otherwise 0
-                            Dim upperLimit As Integer = 0
-                            If Not pPreviousReagentID Is Nothing Then upperLimit = 1
-
-                            'ajg hecho
-
-                            For j As Integer = aux_i - 2 To upperLimit Step -1
-                                Dim aux_j = j  'Datatyp3e inference
-
-                                'AG 25/11/2011
-                                ''Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
-                                ''until an OrderTest that not contaminates OrderTest(i) is found
-                                'ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                '                   Select wse).ToList()
-
-
-                                'ajg hecho
-
-                                'Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                                'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
-                                    Dim aux_jj = jj
-                                    'Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
-                                    'until an OrderTest that not contaminates OrderTest(i) is found
-                                    If aux_jj >= upperLimit Then
-                                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        If aux_jj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        Else 'search for contamination (only high level)
-                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        End If
-
-                                        If contaminations.Count > 0 Then Exit For
-
-                                        'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
-                                        'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If aux_jj = aux_j Then
-                                            Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
-                                            If maxReplicates >= pHighContaminationPersistance Then
-                                                Exit For 'Do not evaluate high contamination persistance
-                                            End If
-                                        End If
-                                        'AG 19/12/2011
-
-                                    Else
-                                        Exit For
-                                    End If
-                                Next
-                                'AG 25/11/2011
-
-                                If contaminations.Count = 0 Then
-                                    'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
-
-                                    'New BAx00 (Ax5 do not implement this business
-                                    'Only when the OrderTest(i-1) (the MainContaminatorID, and future OrderTest(i)) does not contaminates the OrderTest(i+1)
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    Dim newContaminatedID As Integer
-                                    If aux_i < sortedOTList.Count - 1 Then
-                                        newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(aux_i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
-                                    End If
-
-                                    'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    If contaminations.Count = 0 Then
-                                        If aux_j < sortedOTList.Count - 1 Then
-                                            newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
-                                        End If
-                                    End If
-
-                                    If contaminations.Count = 0 Then
-                                        '(j < i)
-                                        sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
-                                        sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
-                                        Exit For
-                                    End If
-                                End If
-                            Next
-
-                        Else
-                            'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
-                        End If
-
-                        contaminations = Nothing
-
-                    Next
-
-                    'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-                ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = addContaminationBetweenGroups
-                End If
-
-                myOTListLinq = Nothing
-
-            Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-            End If
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim elapsedTime As Double = 0
-            'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-            Return ContaminationNumber
-
-        End Function
-
-
-        ''' <summary>
-        ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
-        ''' 
-        ''' Applies Optimization Policy C over param pExecutions
-        ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
-        '''   searching a reagent not contaminated by pPreviousReagentID
-        ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
-        '''         Inside the Element Group try avoid contaminations moving the contaminator down until it does not contaminates
-        '''    Else
-        '''         Exit sub
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Executions</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
-        ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' AG 09/11/2011 created
-        ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyC but it does not work properly
-        '''       so I create a new method
-        ''' 
-        ''' AG 25/11/2011 - add the high contamination persistance functionality
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
-        Public Function ApplyOptimizationPolicyCNew(ByVal pContaminationsDS As ContaminationsDS, _
-                                                  ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal pHighContaminationPersistance As Integer, _
-                                                  Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
-                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim startTime As DateTime = Now
-
-            Dim ContaminationNumber As Integer = 0
-
-            'This code is execute only when pPreviousReagentID is informed
-            'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
-            'and place his executions first
-            Dim originalOrderChanged As Boolean = False
-            Dim addContaminationBetweenGroups As Integer = 0
-            If Not pPreviousReagentID Is Nothing Then
-                MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
-            End If
-
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
-
-                'Get all different ordertests in pExecutions list with executions pending
-                Dim myOTListLinq As List(Of Integer)
-                myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                               Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
-
-                If myOTListLinq.Count > 1 Then
-                    'Initialize the ordertest list to be sorted  ... use a temporal list
-                    Dim sortedOTList As New List(Of Integer)
-                    sortedOTList = myOTListLinq.ToList
-
-                    Dim ReagentContaminatorID As Integer = -1
-                    Dim ReagentContaminatedID As Integer = -1
-                    Dim contaminatorOrderTest As Integer = -1
-                    Dim MainContaminatedID As Integer = -1
-
-                    'Limit: when pPreviousReagentID <> nothing the initial limit is 2, otherwise 1
-                    Dim initialLimit As Integer = 1
-                    If Not pPreviousReagentID Is Nothing Then initialLimit = 2
-
-                    'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminator until it does not contaminates)
-                    For i As Integer = initialLimit To sortedOTList.Count - 1
-                        ' ReSharper disable once InconsistentNaming
-                        Dim aux_i = i
-                        'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
-                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        contaminatorOrderTest = sortedOTList(aux_i - 1)
-
-                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        MainContaminatedID = ReagentContaminatedID
-
-                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                        'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
-                        'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                        If contaminations.Count = 0 Then
-                            Dim maxReplicates As Integer = 1
-                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
-                            If maxReplicates < pHighContaminationPersistance Then
-                                If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
-                                ElseIf aux_i > 1 Then
-                                    Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                    contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                End If
-                            End If
-                        End If
-                        'AG 19/21/2011
-
-                        'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) down until it does not contaminates
-                        If contaminations.Count > 0 Then
-                            For j = aux_i + 1 To sortedOTList.Count - 1
-                                Dim auxJ = j
-                                'AG 25/11/2011 
-                                ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
-                                ''until an OrderTest that not has contaminated by OrderTest(i-1) is found
-                                'ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                '                   Select wse).ToList()
-
-                                'Move the contaminator where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                                Dim offset As Integer = 1
-                                If pHighContaminationPersistance > 1 Then offset = pHighContaminationPersistance
-
-                                'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = auxJ To auxJ + pHighContaminationPersistance - 1
-                                    Dim auxJj = jj
-                                    'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
-                                    'until an OrderTest that not has contaminated by OrderTest(i-1) is found
-                                    If auxJj <= sortedOTList.Count - 1 Then
-                                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        If auxJj = auxJ Then 'search for contamination (low or high level)
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        Else 'search for contamination (only high level)
-                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        End If
-
-                                        If contaminations.Count > 0 Then Exit For
-
-                                        'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
-                                        'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If auxJj = auxJ Then
-                                            Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
-                                            If maxReplicates >= pHighContaminationPersistance Then
-                                                Exit For 'Do not evaluate high contamination persistance
-                                            End If
-                                        End If
-                                        'AG 19/12/2011
-
-                                    Else
-                                        Exit For
-                                    End If
-                                Next
-                                'AG 25/11/2011
-
-                                If contaminations.Count = 0 Then
-                                    'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
-
-                                    'New BAx00 (Ax5 do not implement this business
-                                    'Only when OrderTest(i-2) does not contaminates the OrderTest(i) (the MainContaminated and future OrderTest(i-1))
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    Dim newContaminatorID As Integer
-                                    If aux_i > 1 Then
-                                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
-                                    End If
-
-                                    'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j)) be carefull is not contaminated by current OrderTest(j-1)
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    If contaminations.Count = 0 Then
-                                        If auxJ > 0 Then
-                                            newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(auxJ - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
-                                        End If
-                                    End If
-
-                                    If contaminations.Count = 0 Then
-                                        '(i < j)
-                                        If sortedOTList.Count - 1 > auxJ - 1 Then
-                                            sortedOTList.Insert(auxJ, contaminatorOrderTest)
-                                        Else
-                                            sortedOTList.Add(contaminatorOrderTest)
-                                        End If
-
-                                        sortedOTList.Remove(contaminatorOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
-                                        Exit For
-                                    End If
-
-                                End If
-
-                            Next
-
-                        Else
-                            'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
-                        End If
-
-                        contaminations = Nothing
-                    Next
-
-                    'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-                ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = addContaminationBetweenGroups
-                End If
-
-                myOTListLinq = Nothing
-
-            Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-            End If
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim elapsedTime As Double = 0
-            'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-            Return ContaminationNumber
-
-        End Function
-
-
-        ''' <summary>
-        ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
-        ''' 
-        ''' Applies Optimization Policy D over param pExecutions
-        ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
-        '''   searching a reagent not contaminated by pPreviousReagentID
-        ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
-        '''         Inside the Element Group try avoid contaminations moving the contaminator up until it doest not contaminates
-        '''    Else
-        '''         Exit sub
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Executions</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
-        ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' AG 09/11/2011 created
-        ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyD but it does not work properly
-        '''       so I create a new method
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
-        Public Function ApplyOptimizationPolicyDNew(ByVal pContaminationsDS As ContaminationsDS, _
-                                                  ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal pHighContaminationPersistance As Integer, _
-                                                  Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
-                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim startTime As DateTime = Now
-
-            Dim ContaminationNumber As Integer = 0
-
-            'This code is execute only when pPreviousReagentID is informed
-            'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
-            'and place his executions first
-            Dim originalOrderChanged As Boolean = False
-            Dim addContaminationBetweenGroups As Integer = 0
-
-            If Not pPreviousReagentID Is Nothing Then
-                MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
-            End If
-
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
-                'Get all different ordertests in pExecutions list with executions pending
-                Dim myOTListLinq As List(Of Integer)
-                myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                               Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
-
-                If myOTListLinq.Count > 1 Then
-                    'Initialize the ordertest list to be sorted  ... use a temporal list
-                    Dim sortedOTList As New List(Of Integer)
-                    sortedOTList = myOTListLinq.ToList
-
-                    Dim ReagentContaminatorID As Integer = -1
-                    Dim ReagentContaminatedID As Integer = -1
-                    Dim contaminatorOrderTest As Integer = -1
-                    Dim MainContaminatedID As Integer = -1
-
-                    'Limit: when pPreviousReagentID <> -1 the initial limit is 2, otherwise 1
-                    Dim initialLimit As Integer = 1
-                    If Not pPreviousReagentID Is Nothing Then initialLimit = 2
-
-                    'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminator until it does not contaminates)
-                    For i2 = initialLimit To sortedOTList.Count - 1
-                        Dim i = i2
-                        'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
-                        ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                        contaminatorOrderTest = sortedOTList(i - 1)
-                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        MainContaminatedID = ReagentContaminatedID
-
-                        Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                        'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
-                        'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                        If contaminations.Count = 0 Then
-                            Dim maxReplicates As Integer = 1
-                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(i - 1) Select a.ReplicateNumber).Max
-                            If maxReplicates < pHighContaminationPersistance Then
-                                If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
-                                    'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
-                                    'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                    '                  Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
-                                    '                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                    '                  AndAlso Not wse.IsWashingSolutionR1Null _
-                                    '                  Select wse).ToList()
-                                ElseIf i > 1 Then
-                                    Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                    contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                End If
-                            End If
-                        End If
-                        'AG 19/21/2011
-
-
-                        'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) up until it does not contaminates
-                        If contaminations.Count > 0 Then
-                            'Limit: when pPreviousReagentID <> -1 the upper limit is 1, otherwise 0
-                            Dim upperLimit As Integer = 0
-                            If Not pPreviousReagentID Is Nothing Then upperLimit = 1
-
-
-                            'AG 28/11/2011 Move the contaminator reagent where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                            'Evaluate if it is a LOW contamination ... next process starts in index: i - 2
-                            'or if it is a HIGH contamination ... next process starts in index: i -2 - pHighContaminationPersistance-1
-                            Dim offset As Integer = 0
-                            Dim maxReplicates As Integer = 1
-
-                            If pHighContaminationPersistance > 1 AndAlso Not contaminations(0).IsWashingSolutionR1Null Then
-
-                                'AG 19/12/2011 - if orderTest(i-2) maxreplicates > persistance --> offset = 0 // else: --> offset = pHighContaminationPersistance - 1
-                                'offset = pHighContaminationPersistance - 1
-                                If i - 2 >= upperLimit Then
-                                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                     Where a.OrderTestID = sortedOTList(i - 2) Select a.ReplicateNumber).Max
-                                    If maxReplicates < pHighContaminationPersistance Then
-                                        offset = pHighContaminationPersistance - 1
-                                    End If
-                                End If
-                                'AG 19/12/2011 
-
-                            End If
-                            'AG 25/11/2011
-
-
-                            For j = i - 2 - offset To upperLimit Step -1
-                                Dim aux_j = j
-                                'AG 28/11/2011
-                                ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
-                                ''until an OrderTest that it is not contaminated bytOrderTest(i) is found
-                                'ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                'contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                                '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                                '                   Select wse).ToList()
-
-                                'Move the contaminator where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
-                                'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
-                                    Dim auxJj = jj
-                                    If auxJj >= 0 Then
-                                        'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
-                                        'until an OrderTest that it is not contaminated bytOrderTest(i) is found
-                                        ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        If auxJj = aux_j Then 'search for contamination (low or high level)
-                                            contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        Else 'search for contamination (only high level)
-                                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
-                                        End If
-
-                                        If contaminations.Count > 0 Then Exit For
-
-                                        'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
-                                        'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If auxJj = aux_j Then
-                                            maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
-                                            If maxReplicates >= pHighContaminationPersistance Then
-                                                Exit For 'Do not evaluate high contamination persistance
-                                            End If
-                                        End If
-                                        'AG 19/12/2011
-
-
-                                    Else
-                                        Exit For
-                                    End If
-                                Next
-                                'AG 28/11/2011
-
-                                If contaminations.Count = 0 Then
-                                    'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
-
-                                    'New BAx00 (Ax5 do not implement this business
-                                    'Only when OrderTest(i-2) does not contaminates the OrderTest(i) (the MainContaminated)
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    Dim newContaminatorID As Integer
-                                    If i > 1 Then
-                                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-
-                                        contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
-                                    End If
-
-                                    'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j-1)) be carefull is not contaminated by OrderTest(j-1) (and future OrderTest(j-2))
-                                    'Simplication: In this point do not take care about High contamination persistance
-                                    If contaminations.Count = 0 Then
-                                        If aux_j > 0 Then
-                                            newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(aux_j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                                            contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
-                                        End If
-                                    End If
-
-                                    If contaminations.Count = 0 Then
-                                        '(j < i)
-                                        sortedOTList.Remove(contaminatorOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
-                                        'AG 30/05/2012 - Fix system error (index out of bounds when j = 0)
-                                        'sortedOTList.Insert(j - 1, contaminatorOrderTest)
-                                        If aux_j > 0 Then
-                                            sortedOTList.Insert(aux_j - 1, contaminatorOrderTest)
-                                        Else
-                                            sortedOTList.Insert(0, contaminatorOrderTest)
-                                        End If
-                                        'AG 30/05/2012
-                                        Exit For
-                                    End If
-                                End If
-                            Next
-
-                        Else
-                            'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
-                        End If
-
-                        contaminations = Nothing
-
-                    Next
-
-                    'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-                    AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-                ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = addContaminationBetweenGroups
-                End If
-
-                myOTListLinq = Nothing
-
-            Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
-            End If
-
-            'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim elapsedTime As Double = 0
-            'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-            Return ContaminationNumber
-
-        End Function
+        'AJG PENDIENTE DE BORRAR!!!!
+
+
+        ' ''' <summary>
+        ' ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
+        ' ''' 
+        ' ''' Applies Optimization Policy A over param pExecutions
+        ' ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
+        ' '''   searching a reagent not contaminated by pPreviousElementLastReagentID
+        ' ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
+        ' '''         Inside the Element Group try avoid contaminations moving the contaminated down until it becomes not contaminated
+        ' '''    Else
+        ' '''         Exit sub
+        ' ''' </summary>
+        ' ''' <param name="pContaminationsDS" ></param>
+        ' ''' <param name="pExecutions">List of Executions</param>
+        ' ''' <param name="pHighContaminationPersistance" ></param>
+        ' ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
+        ' ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
+        ' ''' <returns>
+        ' ''' Returns the Contamination Number
+        ' ''' </returns>
+        ' ''' <remarks>
+        ' ''' AG 09/11/2011 created
+        ' ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyA but it does not work properly
+        ' '''       so I create a new method
+        ' ''' 
+        ' ''' AG 25/11/2011 - add the high contamination persistance functionality
+        ' ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
+        ' ''' </remarks>
+        'Public Function ApplyOptimizationPolicyANew(ByVal pContaminationsDS As ContaminationsDS, _
+        '                                          ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        '                                          ByVal pHighContaminationPersistance As Integer, _
+        '                                          Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
+        '                                          Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim startTime As DateTime = Now
+
+        '    Dim ContaminationNumber As Integer = 0
+
+        '    'This code is execute only when pPreviousReagentID is informed
+        '    'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
+        '    'and place his executions first
+        '    Dim originalOrderChanged As Boolean = False
+        '    Dim addContaminationBetweenGroups As Integer = 0
+        '    If Not pPreviousReagentID Is Nothing Then
+        '        MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
+        '    End If
+
+        '    If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
+
+        '        'Get all different ordertests in pExecutions list with executions pending
+        '        Dim myOTListLinq As List(Of Integer)
+        '        myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                       Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
+
+        '        If myOTListLinq.Count > 1 Then
+        '            'Initialize the ordertest list to be sorted  ... use a temporal list
+        '            Dim sortedOTList As New List(Of Integer)
+        '            sortedOTList = myOTListLinq.ToList
+
+        '            Dim ReagentContaminatorID As Integer = -1
+        '            Dim ReagentContaminatedID As Integer = -1
+        '            Dim contaminatedOrderTest As Integer = -1
+        '            Dim MainContaminatorID As Integer = -1
+
+        '            'ajg hasta aquí bien
+
+        '            'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminated until becomes not contaminated)
+        '            For i As Integer = 1 To sortedOTList.Count - 1
+        '                'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
+        '                Dim auxIndex = i
+        '                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(auxIndex - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                MainContaminatorID = ReagentContaminatorID
+
+        '                contaminatedOrderTest = sortedOTList(i)
+        '                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(auxIndex) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+
+        '                'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin: [If (i-2) contaminates (i)]
+        '                'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
+        '                If contaminations.Count = 0 Then
+        '                    Dim maxReplicates As Integer = 1
+        '                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                     Where a.OrderTestID = sortedOTList(auxIndex - 1) Select a.ReplicateNumber).Max
+        '                    If maxReplicates < pHighContaminationPersistance Then
+        '                        If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+        '                            contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
+        '                        ElseIf i > 1 Then
+        '                            ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                    Where a.OrderTestID = sortedOTList(auxIndex - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                        End If
+        '                    End If
+        '                End If
+        '                'AG 19/21/2011
+
+        '                'OrderTest(i-1) (the MainContaminatorID) contaminates OrderTest(i) ... so try move OrderTes(i) down until becomes no contaminated
+        '                If contaminations.Count > 0 Then
+        '                    'AG 25/11/2011 Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                    'Evaluate if it is a LOW contamination ... next process starts in index: i + 1
+        '                    'or if it is a HIGH contamination ... next process starts in index: i + pHighContaminationPersistance
+        '                    Dim offset As Integer = 1
+        '                    Dim maxReplicates As Integer = 1
+        '                    If pHighContaminationPersistance > 1 AndAlso Not contaminations(0).IsWashingSolutionR1Null Then
+
+        '                        'AG 19/12/2011 - if orderTest(i+1) maxreplicates > persistance --> offset = 1 // else: --> offset = pHighContaminationPersistance
+        '                        'offset = pHighContaminationPersistance
+        '                        If i + offset <= sortedOTList.Count - 1 Then
+        '                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                             Where a.OrderTestID = sortedOTList(auxIndex + offset) Select a.ReplicateNumber).Max
+        '                            If maxReplicates < pHighContaminationPersistance Then
+        '                                offset = pHighContaminationPersistance
+        '                            End If
+        '                        End If
+        '                        'AG 19/12/2011 
+        '                    End If
+        '                    'AG 25/11/2011
+
+        '                    'ajg hecho
+        '                    'For j As Integer = i + 1 To sortedOTList.Count - 1
+        '                    For j As Integer = i + offset To sortedOTList.Count - 1
+        '                        ' ReSharper disable once InconsistentNaming
+        '                        Dim aux_j = j
+
+        '                        'Only have to look back a maximum of pHighContaminationPersistance steps, but maxReplicates have to be taken into account for every position
+        '                        Dim limit As Integer
+        '                        If (pHighContaminationPersistance > i) Then
+        '                            limit = i
+        '                        Else
+        '                            limit = pHighContaminationPersistance
+        '                        End If
+
+        '                        'ajg hecho
+
+        '                        'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                        'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
+        '                        For jj = aux_j To aux_j - limit Step -1   '- pHighContaminationPersistance - 1 Step -1
+        '                            ' ReSharper disable once InconsistentNaming
+        '                            Dim aux_jj = jj
+        '                            If aux_jj >= 0 Then
+        '                                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                         Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                If aux_jj = aux_j Then 'search for contamination (low or high level)
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                Else 'search for contamination (only high level)
+        '                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                End If
+
+        '                                If contaminations.Count > 0 Then Exit For
+
+        '                                'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
+        '                                'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
+        '                                If aux_jj = aux_j Then
+        '                                    maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                     Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
+        '                                    If maxReplicates >= pHighContaminationPersistance Then
+        '                                        Exit For 'Do not evaluate high contamination persistance
+        '                                    End If
+        '                                End If
+        '                                'AG 19/12/2011
+
+        '                            Else
+        '                                Exit For
+        '                            End If
+
+        '                        Next
+        '                        'AG 28/11/2011
+
+        '                        If contaminations.Count = 0 Then
+        '                            'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
+
+        '                            'New BAx00 (Ax5 do not implement this business
+        '                            'Only when the OrderTest(i-1) (the MainContaminatorID) does not contaminates the current OrderTest(i+1) (the future OrderTest(i))
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            Dim newContaminatedID As Integer
+        '                            If i < sortedOTList.Count - 1 Then
+        '                                newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(auxIndex + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
+        '                            End If
+
+        '                            'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            If contaminations.Count = 0 Then
+        '                                If aux_j < sortedOTList.Count - 1 Then
+        '                                    newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                                       Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
+        '                                End If
+        '                            End If
+
+
+        '                            If contaminations.Count = 0 Then
+        '                                '(i < j)
+        '                                If sortedOTList.Count - 1 > aux_j Then
+        '                                    sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
+        '                                Else
+        '                                    sortedOTList.Add(contaminatedOrderTest)
+        '                                End If
+        '                                sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
+        '                                Exit For
+        '                            End If
+        '                        End If
+        '                    Next
+
+        '                Else
+        '                    'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
+        '                End If
+
+        '                contaminations = Nothing
+        '            Next
+
+        '            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+        '            AddLockedExecutions(pExecutions, sortedOTList)
+        '            ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+
+        '        ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
+        '            ContaminationNumber = addContaminationBetweenGroups
+        '        End If
+
+        '        myOTListLinq = Nothing
+
+        '    Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
+        '        ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '    End If
+
+        '    ''AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim elapsedTime As Double = 0
+        '    'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
+
+        '    Return ContaminationNumber
+
+        'End Function
+
+
+        ' ''' <summary>
+        ' ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
+        ' ''' 
+        ' ''' Applies Optimization Policy B over param pExecutions
+        ' ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
+        ' '''   searching a reagent not contaminated by pPreviousReagentID
+        ' ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
+        ' '''         Inside the Element Group try avoid contaminations moving the contaminated up until it becomes not contaminated
+        ' '''    Else
+        ' '''         Exit sub
+        ' ''' </summary>
+        ' ''' <param name="pContaminationsDS" ></param>
+        ' ''' <param name="pExecutions">List of Executions</param>
+        ' ''' <param name="pHighContaminationPersistance" ></param>
+        ' ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
+        ' ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
+        ' ''' <returns>
+        ' ''' Returns the Contamination Number
+        ' ''' </returns>
+        ' ''' <remarks>
+        ' ''' AG 09/11/2011 created
+        ' ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyB but it does not work properly
+        ' '''       so I create a new method
+        ' ''' 
+        ' ''' ''' AG 25/11/2011 - add the high contamination persistance functionality
+        ' ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
+        ' ''' </remarks>
+        'Public Function ApplyOptimizationPolicyBNew(ByVal pContaminationsDS As ContaminationsDS, _
+        '                                          ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        '                                          ByVal pHighContaminationPersistance As Integer, _
+        '                                          Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
+        '                                          Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim startTime As DateTime = Now
+
+        '    Dim ContaminationNumber As Integer = 0
+
+        '    'This code is execute only when pPreviousReagentID is informed
+        '    'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
+        '    'and place his executions first
+        '    Dim originalOrderChanged As Boolean = False
+        '    Dim addContaminationBetweenGroups As Integer = 0
+
+        '    If Not pPreviousReagentID Is Nothing Then
+        '        MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
+        '    End If
+
+        '    If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
+        '        'Get all different ordertests in pExecutions list with executions pending
+        '        Dim myOTListLinq As List(Of Integer)
+        '        myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                       Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
+
+        '        If myOTListLinq.Count > 1 Then
+        '            'Initialize the ordertest list to be sorted  ... use a temporal list
+        '            Dim sortedOTList As New List(Of Integer)
+        '            sortedOTList = myOTListLinq.ToList
+
+        '            Dim ReagentContaminatorID As Integer = -1
+        '            Dim ReagentContaminatedID As Integer = -1
+        '            Dim contaminatedOrderTest As Integer = -1
+        '            Dim MainContaminatorID As Integer = -1
+
+        '            'ajg hecho
+        '            'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminated until becomes not contaminated)
+        '            For i As Integer = 1 To sortedOTList.Count - 1
+        '                ' ReSharper disable once InconsistentNaming
+        '                Dim aux_i = i
+        '                'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
+        '                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                MainContaminatorID = ReagentContaminatorID
+
+        '                contaminatedOrderTest = sortedOTList(aux_i)
+        '                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+
+        '                'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
+        '                'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
+        '                If contaminations.Count = 0 Then
+        '                    Dim maxReplicates As Integer = 1
+        '                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                     Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
+        '                    If maxReplicates < pHighContaminationPersistance Then
+        '                        If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+        '                            contaminations = GetHardContaminationBetweenReagents(pPreviousReagentID(pPreviousReagentID.Count - 1), ReagentContaminatedID, pContaminationsDS)
+        '                        ElseIf aux_i > 1 Then
+        '                            ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                    Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                            contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                        End If
+        '                    End If
+        '                End If
+        '                'AG 19/21/2011
+
+        '                'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i) up until becomes no contaminated
+        '                If contaminations.Count > 0 Then
+
+        '                    'Limit: when pPreviousReagentID <> Nothing the upper limit is 1, otherwise 0
+        '                    Dim upperLimit As Integer = 0
+        '                    If Not pPreviousReagentID Is Nothing Then upperLimit = 1
+
+        '                    'ajg hecho
+
+        '                    For j As Integer = aux_i - 2 To upperLimit Step -1
+        '                        Dim aux_j = j  'Datatyp3e inference
+
+        '                        'AG 25/11/2011
+        '                        ''Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
+        '                        ''until an OrderTest that not contaminates OrderTest(i) is found
+        '                        'ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                        '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                        'contaminations = (From wse In pContaminationsDS.tparContaminations _
+        '                        '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
+        '                        '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
+        '                        '                   Select wse).ToList()
+
+
+        '                        'ajg hecho
+
+        '                        'Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                        'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
+        '                        For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+        '                            Dim aux_jj = jj
+        '                            'Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
+        '                            'until an OrderTest that not contaminates OrderTest(i) is found
+        '                            If aux_jj >= upperLimit Then
+        '                                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                If aux_jj = aux_j Then 'search for contamination (low or high level)
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                Else 'search for contamination (only high level)
+        '                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                End If
+
+        '                                If contaminations.Count > 0 Then Exit For
+
+        '                                'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
+        '                                'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
+        '                                If aux_jj = aux_j Then
+        '                                    Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                     Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
+        '                                    If maxReplicates >= pHighContaminationPersistance Then
+        '                                        Exit For 'Do not evaluate high contamination persistance
+        '                                    End If
+        '                                End If
+        '                                'AG 19/12/2011
+
+        '                            Else
+        '                                Exit For
+        '                            End If
+        '                        Next
+        '                        'AG 25/11/2011
+
+        '                        If contaminations.Count = 0 Then
+        '                            'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
+
+        '                            'New BAx00 (Ax5 do not implement this business
+        '                            'Only when the OrderTest(i-1) (the MainContaminatorID, and future OrderTest(i)) does not contaminates the OrderTest(i+1)
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            Dim newContaminatedID As Integer
+        '                            If aux_i < sortedOTList.Count - 1 Then
+        '                                newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(aux_i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, pContaminationsDS)
+        '                            End If
+
+        '                            'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            If contaminations.Count = 0 Then
+        '                                If aux_j < sortedOTList.Count - 1 Then
+        '                                    newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                                       Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatedID, newContaminatedID, pContaminationsDS)
+        '                                End If
+        '                            End If
+
+        '                            If contaminations.Count = 0 Then
+        '                                '(j < i)
+        '                                sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
+        '                                sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
+        '                                Exit For
+        '                            End If
+        '                        End If
+        '                    Next
+
+        '                Else
+        '                    'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
+        '                End If
+
+        '                contaminations = Nothing
+
+        '            Next
+
+        '            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+        '            AddLockedExecutions(pExecutions, sortedOTList)
+        '            ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '        ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
+        '            ContaminationNumber = addContaminationBetweenGroups
+        '        End If
+
+        '        myOTListLinq = Nothing
+
+        '    Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
+        '        ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '    End If
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim elapsedTime As Double = 0
+        '    'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
+
+        '    Return ContaminationNumber
+
+        'End Function
+
+
+        ' ''' <summary>
+        ' ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
+        ' ''' 
+        ' ''' Applies Optimization Policy C over param pExecutions
+        ' ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
+        ' '''   searching a reagent not contaminated by pPreviousReagentID
+        ' ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
+        ' '''         Inside the Element Group try avoid contaminations moving the contaminator down until it does not contaminates
+        ' '''    Else
+        ' '''         Exit sub
+        ' ''' </summary>
+        ' ''' <param name="pContaminationsDS" ></param>
+        ' ''' <param name="pExecutions">List of Executions</param>
+        ' ''' <param name="pHighContaminationPersistance" ></param>
+        ' ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
+        ' ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
+        ' ''' <returns>
+        ' ''' Returns the Contamination Number
+        ' ''' </returns>
+        ' ''' <remarks>
+        ' ''' AG 09/11/2011 created
+        ' ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyC but it does not work properly
+        ' '''       so I create a new method
+        ' ''' 
+        ' ''' AG 25/11/2011 - add the high contamination persistance functionality
+        ' ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
+        ' ''' </remarks>
+        'Public Function ApplyOptimizationPolicyCNew(ByVal pContaminationsDS As ContaminationsDS, _
+        '                                          ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        '                                          ByVal pHighContaminationPersistance As Integer, _
+        '                                          Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
+        '                                          Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim startTime As DateTime = Now
+
+        '    Dim ContaminationNumber As Integer = 0
+
+        '    'This code is execute only when pPreviousReagentID is informed
+        '    'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
+        '    'and place his executions first
+        '    Dim originalOrderChanged As Boolean = False
+        '    Dim addContaminationBetweenGroups As Integer = 0
+        '    If Not pPreviousReagentID Is Nothing Then
+        '        MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
+        '    End If
+
+        '    If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
+
+        '        'Get all different ordertests in pExecutions list with executions pending
+        '        Dim myOTListLinq As List(Of Integer)
+        '        myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                       Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
+
+        '        If myOTListLinq.Count > 1 Then
+        '            'Initialize the ordertest list to be sorted  ... use a temporal list
+        '            Dim sortedOTList As New List(Of Integer)
+        '            sortedOTList = myOTListLinq.ToList
+
+        '            Dim ReagentContaminatorID As Integer = -1
+        '            Dim ReagentContaminatedID As Integer = -1
+        '            Dim contaminatorOrderTest As Integer = -1
+        '            Dim MainContaminatedID As Integer = -1
+
+        '            'Limit: when pPreviousReagentID <> nothing the initial limit is 2, otherwise 1
+        '            Dim initialLimit As Integer = 1
+        '            If Not pPreviousReagentID Is Nothing Then initialLimit = 2
+
+        '            'ajg hecho
+        '            'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminator until it does not contaminates)
+        '            For i As Integer = initialLimit To sortedOTList.Count - 1
+        '                ' ReSharper disable once InconsistentNaming
+        '                Dim aux_i = i
+        '                'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
+        '                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                contaminatorOrderTest = sortedOTList(aux_i - 1)
+
+        '                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                MainContaminatedID = ReagentContaminatedID
+
+        '                Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
+        '                'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
+        '                If contaminations.Count = 0 Then
+        '                    Dim maxReplicates As Integer = 1
+        '                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                     Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
+        '                    If maxReplicates < pHighContaminationPersistance Then
+        '                        If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+        '                            'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
+        '                        ElseIf aux_i > 1 Then
+        '                            Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                    Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                            contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                        End If
+        '                    End If
+        '                End If
+        '                'AG 19/21/2011
+
+        '                'ajg hecho
+        '                'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) down until it does not contaminates
+        '                If contaminations.Count > 0 Then
+        '                    For j = aux_i + 1 To sortedOTList.Count - 1
+        '                        Dim auxJ = j
+        '                        'AG 25/11/2011 
+        '                        ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
+        '                        ''until an OrderTest that not has contaminated by OrderTest(i-1) is found
+        '                        'ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                        '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                        'contaminations = (From wse In pContaminationsDS.tparContaminations _
+        '                        '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
+        '                        '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
+        '                        '                   Select wse).ToList()
+
+        '                        'Move the contaminator where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                        Dim offset As Integer = 1
+        '                        If pHighContaminationPersistance > 1 Then offset = pHighContaminationPersistance
+
+        '                        'ajg hecho
+        '                        'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
+        '                        For jj = auxJ To auxJ + pHighContaminationPersistance - 1
+        '                            Dim auxJj = jj
+        '                            'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
+        '                            'until an OrderTest that not has contaminated by OrderTest(i-1) is found
+        '                            If auxJj <= sortedOTList.Count - 1 Then
+        '                                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                If auxJj = auxJ Then 'search for contamination (low or high level)
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                Else 'search for contamination (only high level)
+        '                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                End If
+
+        '                                If contaminations.Count > 0 Then Exit For
+
+        '                                'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
+        '                                'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
+        '                                If auxJj = auxJ Then
+        '                                    Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                     Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
+        '                                    If maxReplicates >= pHighContaminationPersistance Then
+        '                                        Exit For 'Do not evaluate high contamination persistance
+        '                                    End If
+        '                                End If
+        '                                'AG 19/12/2011
+
+        '                            Else
+        '                                Exit For
+        '                            End If
+        '                        Next
+        '                        'AG 25/11/2011
+
+        '                        If contaminations.Count = 0 Then
+        '                            'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
+
+        '                            'New BAx00 (Ax5 do not implement this business
+        '                            'Only when OrderTest(i-2) does not contaminates the OrderTest(i) (the MainContaminated and future OrderTest(i-1))
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            Dim newContaminatorID As Integer
+        '                            If aux_i > 1 Then
+        '                                newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
+        '                            End If
+
+        '                            'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j)) be carefull is not contaminated by current OrderTest(j-1)
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            If contaminations.Count = 0 Then
+        '                                If auxJ > 0 Then
+        '                                    newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                                       Where a.OrderTestID = sortedOTList(auxJ - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                                    contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
+        '                                End If
+        '                            End If
+
+        '                            If contaminations.Count = 0 Then
+        '                                '(i < j)
+        '                                If sortedOTList.Count - 1 > auxJ - 1 Then
+        '                                    sortedOTList.Insert(auxJ, contaminatorOrderTest)
+        '                                Else
+        '                                    sortedOTList.Add(contaminatorOrderTest)
+        '                                End If
+
+        '                                sortedOTList.Remove(contaminatorOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
+        '                                Exit For
+        '                            End If
+
+        '                        End If
+
+        '                    Next
+
+        '                Else
+        '                    'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
+        '                End If
+
+        '                contaminations = Nothing
+        '            Next
+
+        '            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+        '            AddLockedExecutions(pExecutions, sortedOTList)
+        '            ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '        ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
+        '            ContaminationNumber = addContaminationBetweenGroups
+        '        End If
+
+        '        myOTListLinq = Nothing
+
+        '    Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
+        '        ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '    End If
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim elapsedTime As Double = 0
+        '    'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
+
+        '    Return ContaminationNumber
+
+        'End Function
+
+
+        ' ''' <summary>
+        ' ''' PRECONDITION: pExecution list contains only PREP_STD exectuions!!!!
+        ' ''' 
+        ' ''' Applies Optimization Policy D over param pExecutions
+        ' ''' 1)(OPTIONALLY) If pPreviousReagentID informed try avoid contaminations between pPreviousReagentID and the next Element Group
+        ' '''   searching a reagent not contaminated by pPreviousReagentID
+        ' ''' 2) If (pPreviousReagentID informed and changes made) or pPreviousReagentID not informed
+        ' '''         Inside the Element Group try avoid contaminations moving the contaminator up until it doest not contaminates
+        ' '''    Else
+        ' '''         Exit sub
+        ' ''' </summary>
+        ' ''' <param name="pContaminationsDS" ></param>
+        ' ''' <param name="pExecutions">List of Executions</param>
+        ' ''' <param name="pHighContaminationPersistance" ></param>
+        ' ''' <param name="pPreviousReagentID">Only informed when contaminations between different Element Groups are taken into account (the nearest reagents use the higher indexs)</param>
+        ' ''' <param name="pPreviousReagentIDMaxReplicates">Informed with pPreviousReagentID (indicates the replicates number for each item in pPreviousReagentID parameter</param>
+        ' ''' <returns>
+        ' ''' Returns the Contamination Number
+        ' ''' </returns>
+        ' ''' <remarks>
+        ' ''' AG 09/11/2011 created
+        ' ''' NOTE: First I try to used with litte changes the current method ApplyOptimizationPolicyD but it does not work properly
+        ' '''       so I create a new method
+        ' ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
+        ' ''' </remarks>
+        'Public Function ApplyOptimizationPolicyDNew(ByVal pContaminationsDS As ContaminationsDS, _
+        '                                          ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        '                                          ByVal pHighContaminationPersistance As Integer, _
+        '                                          Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
+        '                                          Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim startTime As DateTime = Now
+
+        '    Dim ContaminationNumber As Integer = 0
+
+        '    'This code is execute only when pPreviousReagentID is informed
+        '    'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
+        '    'and place his executions first
+        '    Dim originalOrderChanged As Boolean = False
+        '    Dim addContaminationBetweenGroups As Integer = 0
+
+        '    If Not pPreviousReagentID Is Nothing Then
+        '        MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
+        '    End If
+
+        '    If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
+        '        'Get all different ordertests in pExecutions list with executions pending
+        '        Dim myOTListLinq As List(Of Integer)
+        '        myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                       Where a.ExecutionStatus = "PENDING" Select a.OrderTestID Distinct).ToList
+
+        '        If myOTListLinq.Count > 1 Then
+        '            'Initialize the ordertest list to be sorted  ... use a temporal list
+        '            Dim sortedOTList As New List(Of Integer)
+        '            sortedOTList = myOTListLinq.ToList
+
+        '            Dim ReagentContaminatorID As Integer = -1
+        '            Dim ReagentContaminatedID As Integer = -1
+        '            Dim contaminatorOrderTest As Integer = -1
+        '            Dim MainContaminatedID As Integer = -1
+
+        '            'Limit: when pPreviousReagentID <> -1 the initial limit is 2, otherwise 1
+        '            Dim initialLimit As Integer = 1
+        '            If Not pPreviousReagentID Is Nothing Then initialLimit = 2
+
+        '            'ajg hecho
+        '            'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminator until it does not contaminates)
+        '            For i2 = initialLimit To sortedOTList.Count - 1
+        '                Dim i = i2
+        '                'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
+        '                ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                contaminatorOrderTest = sortedOTList(i - 1)
+        '                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                            Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                MainContaminatedID = ReagentContaminatedID
+
+        '                Dim contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
+        '                'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
+        '                If contaminations.Count = 0 Then
+        '                    Dim maxReplicates As Integer = 1
+        '                    maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                     Where a.OrderTestID = sortedOTList(i - 1) Select a.ReplicateNumber).Max
+        '                    If maxReplicates < pHighContaminationPersistance Then
+        '                        If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+        '                            'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
+        '                            'contaminations = (From wse In pContaminationsDS.tparContaminations _
+        '                            '                  Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
+        '                            '                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
+        '                            '                  AndAlso Not wse.IsWashingSolutionR1Null _
+        '                            '                  Select wse).ToList()
+        '                        ElseIf i > 1 Then
+        '                            Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                    Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                            contaminations = GetHardContaminationBetweenReagents(highContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                        End If
+        '                    End If
+        '                End If
+        '                'AG 19/21/2011
+
+
+        '                'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) up until it does not contaminates
+        '                If contaminations.Count > 0 Then
+        '                    'Limit: when pPreviousReagentID <> -1 the upper limit is 1, otherwise 0
+        '                    Dim upperLimit As Integer = 0
+        '                    If Not pPreviousReagentID Is Nothing Then upperLimit = 1
+
+
+        '                    'AG 28/11/2011 Move the contaminator reagent where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                    'Evaluate if it is a LOW contamination ... next process starts in index: i - 2
+        '                    'or if it is a HIGH contamination ... next process starts in index: i -2 - pHighContaminationPersistance-1
+        '                    Dim offset As Integer = 0
+        '                    Dim maxReplicates As Integer = 1
+
+        '                    If pHighContaminationPersistance > 1 AndAlso Not contaminations(0).IsWashingSolutionR1Null Then
+
+        '                        'AG 19/12/2011 - if orderTest(i-2) maxreplicates > persistance --> offset = 0 // else: --> offset = pHighContaminationPersistance - 1
+        '                        'offset = pHighContaminationPersistance - 1
+        '                        If i - 2 >= upperLimit Then
+        '                            maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                             Where a.OrderTestID = sortedOTList(i - 2) Select a.ReplicateNumber).Max
+        '                            If maxReplicates < pHighContaminationPersistance Then
+        '                                offset = pHighContaminationPersistance - 1
+        '                            End If
+        '                        End If
+        '                        'AG 19/12/2011 
+
+        '                    End If
+        '                    'AG 25/11/2011
+
+        '                    'ajg hecho
+        '                    For j = i - 2 - offset To upperLimit Step -1
+        '                        Dim aux_j = j
+        '                        'AG 28/11/2011
+        '                        ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
+        '                        ''until an OrderTest that it is not contaminated bytOrderTest(i) is found
+        '                        'ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                        '                        Where a.OrderTestID = sortedOTList(j) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                        'contaminations = (From wse In pContaminationsDS.tparContaminations _
+        '                        '                    Where wse.ReagentContaminatorID = ReagentContaminatorID _
+        '                        '                   AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
+        '                        '                   Select wse).ToList()
+
+
+        '                        'ajg hecho
+
+        '                        'Move the contaminator where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
+        '                        'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
+        '                        For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+        '                            Dim auxJj = jj
+        '                            If auxJj >= 0 Then
+        '                                'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
+        '                                'until an OrderTest that it is not contaminated bytOrderTest(i) is found
+        '                                ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                If auxJj = aux_j Then 'search for contamination (low or high level)
+        '                                    contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                Else 'search for contamination (only high level)
+        '                                    contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
+        '                                End If
+
+        '                                If contaminations.Count > 0 Then Exit For
+
+        '                                'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
+        '                                'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
+        '                                If auxJj = aux_j Then
+        '                                    maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                     Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
+        '                                    If maxReplicates >= pHighContaminationPersistance Then
+        '                                        Exit For 'Do not evaluate high contamination persistance
+        '                                    End If
+        '                                End If
+        '                                'AG 19/12/2011
+
+
+        '                            Else
+        '                                Exit For
+        '                            End If
+        '                        Next
+        '                        'AG 28/11/2011
+
+        '                        If contaminations.Count = 0 Then
+        '                            'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
+
+        '                            'New BAx00 (Ax5 do not implement this business
+        '                            'Only when OrderTest(i-2) does not contaminates the OrderTest(i) (the MainContaminated)
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            Dim newContaminatorID As Integer
+        '                            If i > 1 Then
+        '                                newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                        Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
+        '                                contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, pContaminationsDS)
+        '                            End If
+
+        '                            'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j-1)) be carefull is not contaminated by OrderTest(j-1) (and future OrderTest(j-2))
+        '                            'Simplication: In this point do not take care about High contamination persistance
+        '                            If contaminations.Count = 0 Then
+        '                                If aux_j > 0 Then
+        '                                    newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+        '                                                                       Where a.OrderTestID = sortedOTList(aux_j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+        '                                    contaminations = GetContaminationBetweenReagents(newContaminatorID, ReagentContaminatorID, pContaminationsDS)
+        '                                End If
+        '                            End If
+
+        '                            If contaminations.Count = 0 Then
+        '                                '(j < i)
+        '                                sortedOTList.Remove(contaminatorOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
+        '                                'AG 30/05/2012 - Fix system error (index out of bounds when j = 0)
+        '                                'sortedOTList.Insert(j - 1, contaminatorOrderTest)
+        '                                If aux_j > 0 Then
+        '                                    sortedOTList.Insert(aux_j - 1, contaminatorOrderTest)
+        '                                Else
+        '                                    sortedOTList.Insert(0, contaminatorOrderTest)
+        '                                End If
+        '                                'AG 30/05/2012
+        '                                Exit For
+        '                            End If
+        '                        End If
+        '                    Next
+
+        '                Else
+        '                    'OK, no contamination between OrderTest(i-1) and OrderTest(i), go to next iteration, analyze contamination between OrderTest(i) and OrderTest(i+1) ...
+        '                End If
+
+        '                contaminations = Nothing
+
+        '            Next
+
+        '            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+        '            AddLockedExecutions(pExecutions, sortedOTList)
+        '            ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '        ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
+        '            ContaminationNumber = addContaminationBetweenGroups
+        '        End If
+
+        '        myOTListLinq = Nothing
+
+        '    Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
+        '        ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+        '    End If
+
+        '    'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
+        '    'Dim elapsedTime As Double = 0
+        '    'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
+
+        '    Return ContaminationNumber
+
+        'End Function
 
         ''' <summary>
         ''' Gets the list of Execution's Element groups sorted by ReadingCycle.
@@ -8183,7 +8193,7 @@ Namespace Biosystems.Ax00.BL
             Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim bestContaminationNumber As Integer = Integer.MaxValue
-            Dim currentContaminationNumber As Integer
+            'Dim currentContaminationNumber As Integer
             Dim contaminationsDataDS As ContaminationsDS = Nothing
 
             Try
@@ -8311,111 +8321,92 @@ Namespace Biosystems.Ax00.BL
                                                             OrderContaminationNumber = GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
                                                         End If
 
-                                                        If (OrderContaminationNumber > 0) Then
-                                                            'Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-                                                            currentResult = OrderTests.ToList()
+                                                        ManageContaminations(dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
 
-                                                            'AG 10/11/2011 - by default assume the best result is the original one
-                                                            bestContaminationNumber = OrderContaminationNumber
-                                                            bestResult = OrderTests.ToList()
-                                                            'currentContaminationNumber = ApplyOptimizationPolicyA(contaminationsDataDS, currentResult)
-                                                            currentContaminationNumber = ApplyOptimizationPolicyANew(contaminationsDataDS, currentResult, highContaminationPersitance)
-                                                            'AG 10/11/2011
+                                                        'AJG PENDIENTE DE BORRAR!!!
+                                                        'If (OrderContaminationNumber > 0) Then
+                                                        ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+                                                        'currentResult = OrderTests.ToList()
 
-                                                            'AG 07/11/2011 - Accept policy A only when improves '' Assume it is the best result.
-                                                            'bestContaminationNumber = currentContaminationNumber
-                                                            'bestResult = currentResult
-                                                            If currentContaminationNumber < bestContaminationNumber Then
-                                                                bestContaminationNumber = currentContaminationNumber
-                                                                bestResult = currentResult
-                                                            End If
-                                                            'AG 07/11/2011
+                                                        ''AG 10/11/2011 - by default assume the best result is the original one
+                                                        'bestContaminationNumber = OrderContaminationNumber
+                                                        'bestResult = OrderTests.ToList()
 
-                                                            'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-                                                            If currentContaminationNumber > 0 Then
-                                                                currentResult = OrderTests.ToList()
-                                                                'AG 10/11/2011
-                                                                'currentContaminationNumber = ApplyOptimizationPolicyB(contaminationsDataDS, currentResult)
-                                                                currentContaminationNumber = ApplyOptimizationPolicyBNew(contaminationsDataDS, currentResult, highContaminationPersitance)
-                                                                'AG 10/11/2011
-                                                                If currentContaminationNumber < bestContaminationNumber Then
-                                                                    bestContaminationNumber = currentContaminationNumber
-                                                                    'bestResult.Clear()
-                                                                    bestResult = currentResult
-                                                                End If
-                                                            End If
+                                                        'Dim myAOptimizer = New OptimizationAPolicyApplier()
+                                                        'currentContaminationNumber = myAOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                        ''AG 07/11/2011 - Accept policy A only when improves '' Assume it is the best result.
+                                                        'If currentContaminationNumber < bestContaminationNumber Then
+                                                        '    bestContaminationNumber = currentContaminationNumber
+                                                        '    bestResult = currentResult
+                                                        'End If
+                                                        ''AG 07/11/2011
 
-                                                            'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-                                                            If currentContaminationNumber > 0 Then
-                                                                currentResult = OrderTests.ToList()
-                                                                'AG 10/11/2011
-                                                                'currentContaminationNumber = ApplyOptimizationPolicyC(contaminationsDataDS, currentResult)
-                                                                currentContaminationNumber = ApplyOptimizationPolicyCNew(contaminationsDataDS, currentResult, highContaminationPersitance)
-                                                                'AG 10/11/2011
-                                                                If currentContaminationNumber < bestContaminationNumber Then
-                                                                    bestContaminationNumber = currentContaminationNumber
-                                                                    'bestResult.Clear()
-                                                                    bestResult = currentResult
-                                                                End If
-                                                            End If
+                                                        ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+                                                        'If currentContaminationNumber > 0 Then
+                                                        '    currentResult = OrderTests.ToList()
+                                                        '    Dim myBOptimizer = New OptimizationBPolicyApplier()
+                                                        '    currentContaminationNumber = myBOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                        '    If currentContaminationNumber < bestContaminationNumber Then
+                                                        '        bestContaminationNumber = currentContaminationNumber
+                                                        '        bestResult = currentResult
+                                                        '    End If
+                                                        'End If
 
-                                                            'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-                                                            If currentContaminationNumber > 0 Then
-                                                                currentResult = OrderTests.ToList()
-                                                                'AG 10/11/2011
-                                                                'currentContaminationNumber = ApplyOptimizationPolicyD(contaminationsDataDS, currentResult)
-                                                                currentContaminationNumber = ApplyOptimizationPolicyDNew(contaminationsDataDS, currentResult, highContaminationPersitance)
-                                                                'AG 10/11/2011
-                                                                If currentContaminationNumber < bestContaminationNumber Then
-                                                                    bestContaminationNumber = currentContaminationNumber
-                                                                    'bestResult.Clear()
-                                                                    bestResult = currentResult
-                                                                End If
-                                                            End If
+                                                        ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+                                                        'If currentContaminationNumber > 0 Then
+                                                        '    currentResult = OrderTests.ToList()
+                                                        '    Dim myCOptimizer = New OptimizationCPolicyApplier()
+                                                        '    currentContaminationNumber = myCOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                        '    If currentContaminationNumber < bestContaminationNumber Then
+                                                        '        bestContaminationNumber = currentContaminationNumber
+                                                        '        bestResult = currentResult
+                                                        '    End If
+                                                        'End If
 
-                                                            'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                                                            If currentContaminationNumber > 0 Then
-                                                                If OrderTests.Count = 2 Then
-                                                                    'Okay, if there are contaminations, why not to try interchange them?
-                                                                    currentResult.Clear()
-                                                                    For z = OrderTests.Count - 1 To 0 Step -1
-                                                                        currentResult.Add(OrderTests(z))
-                                                                    Next
-                                                                    currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                                                                    If currentContaminationNumber = 0 Then
-                                                                        bestResult = currentResult
-                                                                    End If
-                                                                End If
-                                                            End If
+                                                        ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+                                                        'If currentContaminationNumber > 0 Then
+                                                        '    currentResult = OrderTests.ToList()
+                                                        '    Dim myDOptimizer = New OptimizationDPolicyApplier()
+                                                        '    currentContaminationNumber = myDOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                        '    If currentContaminationNumber < bestContaminationNumber Then
+                                                        '        bestContaminationNumber = currentContaminationNumber
+                                                        '        bestResult = currentResult
+                                                        '    End If
+                                                        'End If
 
-                                                            'AG 14/12/2011 - Different test types
-                                                            'For Each wse In bestResult
-                                                            '    returnDS.twksWSExecutions.ImportRow(wse)
-                                                            'Next
+                                                        ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
+                                                        'If currentContaminationNumber > 0 Then
+                                                        '    If OrderTests.Count = 2 Then
+                                                        '        'Okay, if there are contaminations, why not to try interchange them?
+                                                        '        currentResult.Clear()
+                                                        '        For z = OrderTests.Count - 1 To 0 Step -1
+                                                        '            currentResult.Add(OrderTests(z))
+                                                        '        Next
+                                                        '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
+                                                        '        If currentContaminationNumber = 0 Then
+                                                        '            bestResult = currentResult
+                                                        '        End If
+                                                        '    End If
+                                                        'End If
 
-                                                            Dim stdPrepFlag As Boolean = False
-                                                            For Each wse In AllTestTypeOrderTests
-                                                                If wse.ExecutionType <> "PREP_STD" Then
-                                                                    returnDS.twksWSExecutions.ImportRow(wse)
-                                                                ElseIf Not stdPrepFlag Then
-                                                                    stdPrepFlag = True
-                                                                    'Add all std test executions using bestResult
-                                                                    For Each wseStdTest In bestResult
-                                                                        returnDS.twksWSExecutions.ImportRow(wseStdTest)
-                                                                    Next
-                                                                End If
-                                                            Next
-                                                            'AG 14/12/2011
-                                                        Else
-                                                            'AG 14/12/2011 - Different test types
-                                                            'For Each wse In OrderTests
-                                                            '    returnDS.twksWSExecutions.ImportRow(wse)
-                                                            'Next
-                                                            For Each wse In AllTestTypeOrderTests
-                                                                returnDS.twksWSExecutions.ImportRow(wse)
-                                                            Next
-                                                            'AG 14/12/2011
-                                                        End If
+                                                        'Dim stdPrepFlag As Boolean = False
+                                                        'For Each wse In AllTestTypeOrderTests
+                                                        '    If wse.ExecutionType <> "PREP_STD" Then
+                                                        '        returnDS.twksWSExecutions.ImportRow(wse)
+                                                        '    ElseIf Not stdPrepFlag Then
+                                                        '        stdPrepFlag = True
+                                                        '        'Add all std test executions using bestResult
+                                                        '        For Each wseStdTest In bestResult
+                                                        '            returnDS.twksWSExecutions.ImportRow(wseStdTest)
+                                                        '        Next
+                                                        '    End If
+                                                        'Next
+                                                        ''AG 14/12/2011
+                                                        'Else
+                                                        '    For Each wse In AllTestTypeOrderTests
+                                                        '        returnDS.twksWSExecutions.ImportRow(wse)
+                                                        '    Next
+                                                        'End If
 
                                                         If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
 
@@ -9159,7 +9150,7 @@ Namespace Biosystems.Ax00.BL
             Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim bestContaminationNumber As Integer = Integer.MaxValue
-            Dim currentContaminationNumber As Integer
+            'Dim currentContaminationNumber As Integer
             Dim contaminationsDataDS As ContaminationsDS = Nothing
 
             Try
@@ -9359,131 +9350,120 @@ Namespace Biosystems.Ax00.BL
                                                                 End If 'If pendingOrderTestInNewElement.Count > 0 Then
                                                             End If 'If previousElementLastReagentID <> -1 Then
 
-                                                            If (OrderContaminationNumber > 0) Then
-                                                                'Apply Optimization Policy A (move contaminated OrderTest down until it becomes no contaminated)
-                                                                currentResult = OrderTests.ToList()
-                                                                bestContaminationNumber = OrderContaminationNumber
-                                                                bestResult = OrderTests.ToList()
+                                                            ManageContaminations(dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
 
-                                                                'currentContaminationNumber = ApplyOptimizationPolicyA(contaminationsDataDS, currentResult, previousElementLastReagentID)
-                                                                currentContaminationNumber = ApplyOptimizationPolicyANew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+                                                            'AJG PENDIENTE DE BORRAR!!!
+                                                            'If (OrderContaminationNumber > 0) Then
 
-                                                                'Accept policy A only when improves '' Assume it is the best result.
-                                                                If currentContaminationNumber < bestContaminationNumber Then
-                                                                    bestContaminationNumber = currentContaminationNumber
-                                                                    bestResult = currentResult
+                                                            ''Apply Optimization Policy A (move contaminated OrderTest down until it becomes no contaminated)
+                                                            'currentResult = OrderTests.ToList()
+                                                            'bestContaminationNumber = OrderContaminationNumber
+                                                            'bestResult = OrderTests.ToList()
+
+                                                            'currentContaminationNumber = ApplyOptimizationPolicyANew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+
+                                                            ''Accept policy A only when improves '' Assume it is the best result.
+                                                            'If currentContaminationNumber < bestContaminationNumber Then
+                                                            '    bestContaminationNumber = currentContaminationNumber
+                                                            '    bestResult = currentResult
+                                                            'End If
+
+                                                            ''Apply Optimization Policy B.(move contaminated OrderTest up until it becomes no contaminated)
+                                                            'If currentContaminationNumber > 0 Then
+                                                            '    currentResult = OrderTests.ToList()
+                                                            '    currentContaminationNumber = ApplyOptimizationPolicyBNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+
+                                                            '    If currentContaminationNumber < bestContaminationNumber Then
+                                                            '        bestContaminationNumber = currentContaminationNumber
+                                                            '        bestResult = currentResult
+                                                            '    End If
+                                                            'End If
+
+                                                            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+                                                            'If currentContaminationNumber > 0 Then
+                                                            '    currentResult = OrderTests.ToList()
+                                                            '    currentContaminationNumber = ApplyOptimizationPolicyCNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+                                                            '    If currentContaminationNumber < bestContaminationNumber Then
+                                                            '        bestContaminationNumber = currentContaminationNumber
+                                                            '        bestResult = currentResult
+                                                            '    End If
+                                                            'End If
+
+                                                            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+                                                            'If currentContaminationNumber > 0 Then
+                                                            '    currentResult = OrderTests.ToList()
+                                                            '    currentContaminationNumber = ApplyOptimizationPolicyDNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+                                                            '    If currentContaminationNumber < bestContaminationNumber Then
+                                                            '        bestContaminationNumber = currentContaminationNumber
+                                                            '        bestResult = currentResult
+                                                            '    End If
+                                                            'End If
+
+                                                            'Dim stdPrepFlag As Boolean = False
+                                                            'For Each wse In AllTestTypeOrderTests
+                                                            '    If wse.ExecutionType <> "PREP_STD" Then
+                                                            '        returnDS.twksWSExecutions.ImportRow(wse)
+                                                            '    ElseIf Not stdPrepFlag Then
+                                                            '        stdPrepFlag = True
+                                                            '        'Add all std test executions using bestResult
+                                                            '        For Each wseStdTest In bestResult
+                                                            '            returnDS.twksWSExecutions.ImportRow(wseStdTest)
+                                                            '        Next
+                                                            '    End If
+                                                            'Next
+
+                                                            'Else
+                                                            '    For Each wse In AllTestTypeOrderTests
+                                                            '        returnDS.twksWSExecutions.ImportRow(wse)
+                                                            '    Next
+                                                            'End If
+
+                                                        'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
+                                                        OrderTests = (From wse In returnDS.twksWSExecutions _
+                                                                        Where wse.StatFlag = Stat AndAlso _
+                                                                        wse.SampleClass = SClass AndAlso _
+                                                                        wse.ElementID = ID AndAlso _
+                                                                        wse.ExecutionStatus = "PENDING" _
+                                                                        Select wse).ToList()
+
+                                                        If OrderTests.Count > 0 Then
+                                                            'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
+                                                            'The last reagentID used has the higher indexes
+                                                            Dim maxReplicates As Integer
+                                                            For item = 0 To OrderTests.Count - 1
+                                                                Dim itemIndex = item
+                                                                maxReplicates = (From wse In returnDS.twksWSExecutions _
+                                                                                                    Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
+                                                                                                    Select wse.ReplicateNumber).Max
+
+                                                                If PreviousReagentsIDList.Count = 0 Then
+                                                                    PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+                                                                    previousOrderTestMaxReplicatesList.Add(maxReplicates)
+
+                                                                    'When reagent changes
+                                                                ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
+                                                                    PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+                                                                    previousOrderTestMaxReplicatesList.Add(maxReplicates)
                                                                 End If
 
-                                                                'Apply Optimization Policy B.(move contaminated OrderTest up until it becomes no contaminated)
-                                                                If currentContaminationNumber > 0 Then
-                                                                    currentResult = OrderTests.ToList()
-                                                                    'currentContaminationNumber = ApplyOptimizationPolicyB(contaminationsDataDS, currentResult, previousElementLastReagentID)
-                                                                    currentContaminationNumber = ApplyOptimizationPolicyBNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
-
-                                                                    If currentContaminationNumber < bestContaminationNumber Then
-                                                                        bestContaminationNumber = currentContaminationNumber
-                                                                        bestResult = currentResult
-                                                                    End If
+                                                                If itemIndex = OrderTests.Count - 1 Then
+                                                                    previousElementLastReagentID = OrderTests(itemIndex).ReagentID
+                                                                    previousElementLastMaxReplicates = maxReplicates
                                                                 End If
-
-                                                                'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-                                                                If currentContaminationNumber > 0 Then
-                                                                    currentResult = OrderTests.ToList()
-                                                                    'currentContaminationNumber = ApplyOptimizationPolicyC(contaminationsDataDS, currentResult, previousElementLastReagentID)
-                                                                    currentContaminationNumber = ApplyOptimizationPolicyCNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
-                                                                    If currentContaminationNumber < bestContaminationNumber Then
-                                                                        bestContaminationNumber = currentContaminationNumber
-                                                                        bestResult = currentResult
-                                                                    End If
-                                                                End If
-
-                                                                'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-                                                                If currentContaminationNumber > 0 Then
-                                                                    currentResult = OrderTests.ToList()
-                                                                    'currentContaminationNumber = ApplyOptimizationPolicyD(contaminationsDataDS, currentResult, previousElementLastReagentID)
-                                                                    currentContaminationNumber = ApplyOptimizationPolicyDNew(contaminationsDataDS, currentResult, highContaminationPersitance, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
-                                                                    If currentContaminationNumber < bestContaminationNumber Then
-                                                                        bestContaminationNumber = currentContaminationNumber
-                                                                        bestResult = currentResult
-                                                                    End If
-                                                                End If
-
-                                                                'AG 14/12/2011 - Different test types
-                                                                'For Each wse In bestResult
-                                                                '    returnDS.twksWSExecutions.ImportRow(wse)
-                                                                'Next
-
-                                                                Dim stdPrepFlag As Boolean = False
-                                                                For Each wse In AllTestTypeOrderTests
-                                                                    If wse.ExecutionType <> "PREP_STD" Then
-                                                                        returnDS.twksWSExecutions.ImportRow(wse)
-                                                                    ElseIf Not stdPrepFlag Then
-                                                                        stdPrepFlag = True
-                                                                        'Add all std test executions using bestResult
-                                                                        For Each wseStdTest In bestResult
-                                                                            returnDS.twksWSExecutions.ImportRow(wseStdTest)
-                                                                        Next
-                                                                    End If
-                                                                Next
-                                                                'AG 14/12/2011
-
-                                                            Else
-                                                                'AG 14/12/2011 - Different test types
-                                                                'For Each wse In OrderTests
-                                                                '    returnDS.twksWSExecutions.ImportRow(wse)
-                                                                'Next
-                                                                For Each wse In AllTestTypeOrderTests
-                                                                    returnDS.twksWSExecutions.ImportRow(wse)
-                                                                Next
-                                                                'AG 14/12/2011
-                                                            End If
-
-                                                            'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
-                                                            OrderTests = (From wse In returnDS.twksWSExecutions _
-                                                                            Where wse.StatFlag = Stat AndAlso _
-                                                                            wse.SampleClass = SClass AndAlso _
-                                                                            wse.ElementID = ID AndAlso _
-                                                                            wse.ExecutionStatus = "PENDING" _
-                                                                            Select wse).ToList()
-
-                                                            If OrderTests.Count > 0 Then
-                                                                'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
-                                                                'The last reagentID used has the higher indexes
-                                                                Dim maxReplicates As Integer
-                                                                For item = 0 To OrderTests.Count - 1
-                                                                    Dim itemIndex = item
-                                                                    maxReplicates = (From wse In returnDS.twksWSExecutions _
-                                                                                                        Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
-                                                                                                        Select wse.ReplicateNumber).Max
-
-                                                                    If PreviousReagentsIDList.Count = 0 Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
-
-                                                                        'When reagent changes
-                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
-                                                                    End If
-
-                                                                    If itemIndex = OrderTests.Count - 1 Then
-                                                                        previousElementLastReagentID = OrderTests(itemIndex).ReagentID
-                                                                        previousElementLastMaxReplicates = maxReplicates
-                                                                    End If
-                                                                    'AG 19/12/2011
-                                                                Next
-                                                            Else
-                                                                'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
-                                                                'WS could contain a Element LOCKED completely
-                                                            End If
-                                                            'AG 07/11/2011
-                                                        Else
-                                                            'AG 14/12/2011 - Different test types
-                                                            For Each wse In AllTestTypeOrderTests
-                                                                returnDS.twksWSExecutions.ImportRow(wse)
+                                                                'AG 19/12/2011
                                                             Next
-                                                            'AG 14/12/2011
+                                                        Else
+                                                            'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
+                                                            'WS could contain a Element LOCKED completely
                                                         End If
+                                                        'AG 07/11/2011
+                                                    Else
+                                                        'AG 14/12/2011 - Different test types
+                                                        For Each wse In AllTestTypeOrderTests
+                                                            returnDS.twksWSExecutions.ImportRow(wse)
+                                                        Next
+                                                        'AG 14/12/2011
+                                                    End If
 
                                                         If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
 
@@ -11750,100 +11730,263 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
-        'ajg traspasado
-        ''' <summary>
-        ''' Get the contaminations that exist between contaminator and contaminated reagents
-        ''' </summary>
-        ''' <param name="Contaminator">Reagent that contaminates</param>
-        ''' <param name="Contaminated">Reagent that is contaminated</param>
-        ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
-        ''' <returns>List of contaminations between Contaminator and Contaminated</returns>
-        ''' <remarks>
-        ''' Created by AJG in 17/03/2015
-        ''' </remarks>
-        Private Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
-            Dim result = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = Contaminator _
-                                             AndAlso wse.ReagentContaminatedID = Contaminated _
-                                             Select wse).ToList()
+        'AJG PENDIENTE DE BORAR!!!
 
-            Return result
-        End Function
+        ''ajg traspasado
+        ' ''' <summary>
+        ' ''' Get the contaminations that exist between contaminator and contaminated reagents
+        ' ''' </summary>
+        ' ''' <param name="Contaminator">Reagent that contaminates</param>
+        ' ''' <param name="Contaminated">Reagent that is contaminated</param>
+        ' ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
+        ' ''' <returns>List of contaminations between Contaminator and Contaminated</returns>
+        ' ''' <remarks>
+        ' ''' Created by AJG in 17/03/2015
+        ' ''' </remarks>
+        'Private Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+        '    Dim result = (From wse In pContaminationsDS.tparContaminations _
+        '                                     Where wse.ReagentContaminatorID = Contaminator _
+        '                                     AndAlso wse.ReagentContaminatedID = Contaminated _
+        '                                     Select wse).ToList()
 
-        'ajg traspasado
-        ''' <summary>
-        ''' Get the hard contaminations that exist between contaminator and contaminated reagents.
-        ''' Hard contaminations are those that requires a washing solution to applied.
-        ''' </summary>
-        ''' <param name="Contaminator">Reagent that contaminates</param>
-        ''' <param name="Contaminated">Reagent that is contaminated</param>
-        ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
-        ''' <returns>List of hard contaminations between Contaminator and Contaminated</returns>
-        ''' <remarks>
-        ''' Created by AJG in 17/03/2015
-        ''' </remarks>
-        Private Function GetHardContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
-            Dim result = (From wse In pContaminationsDS.tparContaminations _
-                                             Where wse.ReagentContaminatorID = Contaminator _
-                                             AndAlso wse.ReagentContaminatedID = Contaminated _
-                                             AndAlso Not wse.IsWashingSolutionR1Null _
-                                             Select wse).ToList()
+        '    Return result
+        'End Function
 
-            Return result
-        End Function
+        ''ajg traspasado
+        ' ''' <summary>
+        ' ''' Get the hard contaminations that exist between contaminator and contaminated reagents.
+        ' ''' Hard contaminations are those that requires a washing solution to applied.
+        ' ''' </summary>
+        ' ''' <param name="Contaminator">Reagent that contaminates</param>
+        ' ''' <param name="Contaminated">Reagent that is contaminated</param>
+        ' ''' <param name="pContaminationsDS">List of contaminations for a given patient</param>
+        ' ''' <returns>List of hard contaminations between Contaminator and Contaminated</returns>
+        ' ''' <remarks>
+        ' ''' Created by AJG in 17/03/2015
+        ' ''' </remarks>
+        'Private Function GetHardContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+        '    Dim result = (From wse In pContaminationsDS.tparContaminations _
+        '                                     Where wse.ReagentContaminatorID = Contaminator _
+        '                                     AndAlso wse.ReagentContaminatedID = Contaminated _
+        '                                     AndAlso Not wse.IsWashingSolutionR1Null _
+        '                                     Select wse).ToList()
 
-        'ajg traspasado
-        Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
-            Dim TestReagentsDAO As New tparTestReagentsDAO()
-            Dim testReagentsDataDS As TestReagentsDS = Nothing
-            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
+        '    Return result
+        'End Function
 
-            resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
-            If Not resultData.HasError Then
-                testReagentsDataDS = resultData.SetDatos
+        ''ajg traspasado
+        'Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
+        '    Dim TestReagentsDAO As New tparTestReagentsDAO()
+        '    Dim testReagentsDataDS As TestReagentsDS = Nothing
+        '    Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
+
+        '    resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
+        '    If Not resultData.HasError Then
+        '        testReagentsDataDS = resultData.SetDatos
+        '    End If
+
+        '    Return testReagentsDataDS
+        'End Function
+
+        ''ajg traspasado
+        'Private Sub AddLockedExecutions(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal sortedOTList As List(Of Integer))
+        '    'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
+        '    Dim myOTListLinq = (From a In pExecutions _
+        '                    Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
+        '    For Each lockedOrderTestitem As Integer In myOTListLinq
+        '        If Not sortedOTList.Contains(lockedOrderTestitem) Then
+        '            sortedOTList.Add(lockedOrderTestitem)
+        '        End If
+        '    Next
+
+        '    'Create a copy of pExecutions and then move executions from copy -> pExecutions
+        '    Dim copypExecutions = pExecutions.ToList
+
+        '    pExecutions.Clear()
+        '    Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+        '    For Each orderTestitem As Integer In sortedOTList
+        '        'Get executions of orderTestitem using the copypExecutions
+        '        myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
+        '                       Where a.OrderTestID = orderTestitem Select a).ToList
+
+        '        pExecutions.AddRange(myOTExecutions)
+        '    Next
+        'End Sub
+
+        ''ajg traspasado
+        'Public Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As Integer
+        '    Static testReagentsDataDS As TestReagentsDS
+
+        '    If testReagentsDataDS Is Nothing Then
+        '        testReagentsDataDS = GetAllReagents(pDBConnection)
+        '    End If
+
+        '    Dim result = (From a In testReagentsDataDS.tparTestReagents
+        '                  Where a.ReagentID = reagentID Select a.ReagentNumber).First
+
+        '    Return result
+        'End Function
+
+        Private Sub ManageContaminations(ByVal pConn As SqlConnection,
+                                         ByRef returnDS As ExecutionsDS,
+                                         ByVal contaminationsDataDS As ContaminationsDS,
+                                         ByVal highContaminationPersitance As Integer,
+                                         ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                                         ByVal AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                                         ByVal OrderContaminationNumber As Integer,
+                                         Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
+                                         Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
+
+            Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+            'Dim bestContaminationNumber As Integer = Integer.MaxValue
+            Dim currentContaminationNumber As Integer
+
+            If (OrderContaminationNumber > 0) Then
+
+                currentContaminationNumber = OrderContaminationNumber
+                currentResult = OrderTests.ToList()
+                bestResult = ManageContaminationsForRunningAndStatic(pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+
+                'AJG PENDIENTE DE BORRAR!!!!
+                ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+                'currentResult = OrderTests.ToList()
+
+                ''AG 10/11/2011 - by default assume the best result is the original one
+                'bestContaminationNumber = OrderContaminationNumber
+                'bestResult = OrderTests.ToList()
+
+                'Dim myAOptimizer = New OptimizationAPolicyApplier()
+                'currentContaminationNumber = myAOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                ''Accept policy A only when improves '' Assume it is the best result.
+                'If currentContaminationNumber < bestContaminationNumber Then
+                '    bestContaminationNumber = currentContaminationNumber
+                '    bestResult = currentResult
+                'End If
+
+                ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+                'If currentContaminationNumber > 0 Then
+                '    currentResult = OrderTests.ToList()
+                '    Dim myBOptimizer = New OptimizationBPolicyApplier()
+                '    currentContaminationNumber = myBOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                '    If currentContaminationNumber < bestContaminationNumber Then
+                '        bestContaminationNumber = currentContaminationNumber
+                '        bestResult = currentResult
+                '    End If
+                'End If
+
+                ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+                'If currentContaminationNumber > 0 Then
+                '    currentResult = OrderTests.ToList()
+                '    Dim myCOptimizer = New OptimizationCPolicyApplier()
+                '    currentContaminationNumber = myCOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                '    If currentContaminationNumber < bestContaminationNumber Then
+                '        bestContaminationNumber = currentContaminationNumber
+                '        bestResult = currentResult
+                '    End If
+                'End If
+
+                ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+                'If currentContaminationNumber > 0 Then
+                '    currentResult = OrderTests.ToList()
+                '    Dim myDOptimizer = New OptimizationDPolicyApplier()
+                '    currentContaminationNumber = myDOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                '    If currentContaminationNumber < bestContaminationNumber Then
+                '        bestResult = currentResult
+                '    End If
+                'End If
+
+                'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
+                If currentContaminationNumber > 0 Then
+                    If OrderTests.Count = 2 Then
+                        'Okay, if there are contaminations, why not to try interchange them?
+                        currentResult.Clear()
+                        For z = OrderTests.Count - 1 To 0 Step -1
+                            currentResult.Add(OrderTests(z))
+                        Next
+                        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
+                        If currentContaminationNumber = 0 Then
+                            bestResult = currentResult
+                        End If
+                    End If
+                End If
+
+                Dim stdPrepFlag As Boolean = False
+                For Each wse In AllTestTypeOrderTests
+                    If wse.ExecutionType <> "PREP_STD" Then
+                        returnDS.twksWSExecutions.ImportRow(wse)
+                    ElseIf Not stdPrepFlag Then
+                        stdPrepFlag = True
+                        'Add all std test executions using bestResult
+                        For Each wseStdTest In bestResult
+                            returnDS.twksWSExecutions.ImportRow(wseStdTest)
+                        Next
+                    End If
+                Next
+            Else
+                For Each wse In AllTestTypeOrderTests
+                    returnDS.twksWSExecutions.ImportRow(wse)
+                Next
             End If
 
-            Return testReagentsDataDS
-        End Function
-
-        'ajg traspasado
-        Private Sub AddLockedExecutions(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal sortedOTList As List(Of Integer))
-            'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
-            Dim myOTListLinq = (From a In pExecutions _
-                            Where a.ExecutionStatus = "LOCKED" Select a.OrderTestID Distinct).ToList
-            For Each lockedOrderTestitem As Integer In myOTListLinq
-                If Not sortedOTList.Contains(lockedOrderTestitem) Then
-                    sortedOTList.Add(lockedOrderTestitem)
-                End If
-            Next
-
-            'Create a copy of pExecutions and then move executions from copy -> pExecutions
-            Dim copypExecutions = pExecutions.ToList
-
-            pExecutions.Clear()
-            Dim myOTExecutions As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-            For Each orderTestitem As Integer In sortedOTList
-                'Get executions of orderTestitem using the copypExecutions
-                myOTExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In copypExecutions _
-                               Where a.OrderTestID = orderTestitem Select a).ToList
-
-                pExecutions.AddRange(myOTExecutions)
-            Next
         End Sub
 
-        'ajg traspasado
-        Public Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As Integer
-            Static testReagentsDataDS As TestReagentsDS
+        Public Function ManageContaminationsForRunningAndStatic(ByVal pConn As SqlConnection,
+                                                                ByVal contaminationsDataDS As ContaminationsDS,
+                                                                ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                                                                ByVal highContaminationPersistance As Integer,
+                                                                ByRef currentContaminationNumber As Integer,
+                                                                Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
+                                                                Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
-            If testReagentsDataDS Is Nothing Then
-                testReagentsDataDS = GetAllReagents(pDBConnection)
+            'Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+            Dim currentResult = OrderTests.ToList()
+            Dim bestContaminationNumber = Integer.MaxValue
+            Dim bestResult = OrderTests.ToList()
+
+            Dim myAOptimizer = New OptimizationAPolicyApplier(pConn)
+            currentContaminationNumber = myAOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            'Accept policy A only when improves '' Assume it is the best result.
+            If currentContaminationNumber < bestContaminationNumber Then
+                bestContaminationNumber = currentContaminationNumber
+                bestResult = currentResult
             End If
 
-            Dim result = (From a In testReagentsDataDS.tparTestReagents
-                          Where a.ReagentID = reagentID Select a.ReagentNumber).First
+            'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+            If currentContaminationNumber > 0 Then
+                currentResult = OrderTests.ToList()
+                Dim myBOptimizer = New OptimizationBPolicyApplier(pConn)
+                currentContaminationNumber = myBOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                If currentContaminationNumber < bestContaminationNumber Then
+                    bestContaminationNumber = currentContaminationNumber
+                    bestResult = currentResult
+                End If
+            End If
 
-            Return result
+            'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+            If currentContaminationNumber > 0 Then
+                currentResult = OrderTests.ToList()
+                Dim myCOptimizer = New OptimizationCPolicyApplier(pConn)
+                currentContaminationNumber = myCOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                If currentContaminationNumber < bestContaminationNumber Then
+                    bestContaminationNumber = currentContaminationNumber
+                    bestResult = currentResult
+                End If
+            End If
+
+            'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+            If currentContaminationNumber > 0 Then
+                currentResult = OrderTests.ToList()
+                Dim myDOptimizer = New OptimizationDPolicyApplier(pConn)
+                currentContaminationNumber = myDOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                If currentContaminationNumber < bestContaminationNumber Then
+                    bestResult = currentResult
+                End If
+            End If
+
+            Return bestResult
         End Function
+
     End Class
 End Namespace
 

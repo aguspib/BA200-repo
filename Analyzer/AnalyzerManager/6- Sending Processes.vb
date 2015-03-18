@@ -1720,7 +1720,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 contaminNumber = 1 + myExDlgte.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
                                 If contaminNumber > 0 Then '(5)
-                                    Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
+                                    'Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
                                     Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
                                     Dim bestContaminationNumber As Integer = 0
                                     Dim currentContaminationNumber As Integer = 0
@@ -1752,53 +1752,56 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '2.2) If contaminations: ApplyOptimizationPolicyANew, ApplyOptimizationPolicyBNew, ApplyOptimizationPolicyCNew and ApplyOptimizationPolicyDNew
                                     'and choose the best solution
 
-                                    'Original sort result
+
                                     currentResultList = toSendList.ToList() 'Initial order
-                                    bestContaminationNumber = contaminNumber
-                                    currentContaminationNumber = contaminNumber
-                                    bestResultList = toSendList.ToList()
+                                    toSendList = myExDlgte.ManageContaminationsForRunningAndStatic(dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
-                                    'Apply Optimization Policy A (move contaminated OrderTest down until it becomes no contaminated)
-                                    currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyANew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
+                                    ''Original sort result
+                                    'currentResultList = toSendList.ToList() 'Initial order
+                                    'bestContaminationNumber = contaminNumber
+                                    'bestResultList = toSendList.ToList()
 
-                                    'Accept policy A only when improves '' Assume it is the best result.
-                                    If currentContaminationNumber < bestContaminationNumber Then
-                                        bestContaminationNumber = currentContaminationNumber
-                                        bestResultList = currentResultList
-                                    End If
+                                    ''Apply Optimization Policy A (move contaminated OrderTest down until it becomes no contaminated)
+                                    'currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyANew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
 
-                                    'Apply Optimization Policy B.(move contaminated OrderTest up until it becomes no contaminated)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyBNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
+                                    ''Accept policy A only when improves '' Assume it is the best result.
+                                    'If currentContaminationNumber < bestContaminationNumber Then
+                                    '    bestContaminationNumber = currentContaminationNumber
+                                    '    bestResultList = currentResultList
+                                    'End If
 
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
+                                    ''Apply Optimization Policy B.(move contaminated OrderTest up until it becomes no contaminated)
+                                    'If currentContaminationNumber > 0 Then
+                                    '    currentResultList = toSendList.ToList() 'Initial order.ToList()
+                                    '    currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyBNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
 
-                                    'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyCNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
+                                    '    If currentContaminationNumber < bestContaminationNumber Then
+                                    '        bestContaminationNumber = currentContaminationNumber
+                                    '        bestResultList = currentResultList
+                                    '    End If
+                                    'End If
 
-                                    'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyDNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
+                                    ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+                                    'If currentContaminationNumber > 0 Then
+                                    '    currentResultList = toSendList.ToList() 'Initial order.ToList()
+                                    '    currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyCNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
+                                    '    If currentContaminationNumber < bestContaminationNumber Then
+                                    '        bestContaminationNumber = currentContaminationNumber
+                                    '        bestResultList = currentResultList
+                                    '    End If
+                                    'End If
 
-                                    toSendList = bestResultList
+                                    ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+                                    'If currentContaminationNumber > 0 Then
+                                    '    currentResultList = toSendList.ToList() 'Initial order.ToList()
+                                    '    currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyDNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
+                                    '    If currentContaminationNumber < bestContaminationNumber Then
+                                    '        bestContaminationNumber = currentContaminationNumber
+                                    '        bestResultList = currentResultList
+                                    '    End If
+                                    'End If
+
+                                    'toSendList = bestResultList
 
                                     '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
                                     'If contamination sent Wash, else sent toSendList(0).ExecutionID

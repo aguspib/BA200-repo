@@ -18,16 +18,30 @@ Namespace Biosystems.Ax00.BL
     ''' </remarks>
     Public Class OptimizationPolicyApplier
 #Region "Properties"
-        Property ContaminationNumber As Integer
-        Property sortedOTList As List(Of Integer)
-        Property myOTListLinq As List(Of Integer)
-        Property ReagentContaminatorID As Integer
-        Property ReagentContaminatedID As Integer
-        Property contaminatedOrderTest As Integer
-        Property MainContaminatorID As Integer
-        Property contaminations As List(Of ContaminationsDS.tparContaminationsRow)
-        Property ContaminDS As ContaminationsDS
-        Property HighContaminationPersistence As Integer
+        Protected Property ContaminationNumber As Integer
+        Protected Property sortedOTList As List(Of Integer)
+        Protected Property myOTListLinq As List(Of Integer)
+        Protected Property ReagentContaminatorID As Integer
+        Protected Property ReagentContaminatedID As Integer
+        Protected Property contaminatedOrderTest As Integer
+        Protected Property MainContaminatorID As Integer
+        Protected Property contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+        Protected Property ContaminDS As ContaminationsDS
+        Protected Property HighContaminationPersistence As Integer
+        Protected Property contaminatorOrderTest As Integer
+        Protected Property MainContaminatedID As Integer
+        Protected Property dbConnection As SqlConnection
+        Protected Property TypeContaminator As TypeReagent
+        Protected Property TypeContaminated As TypeReagent
+        Protected Property typeExpectedResult As TypeReagent
+        Protected Property typeResult As TypeReagent
+#End Region
+
+#Region "Enums"
+        Protected Enum TypeReagent As Integer
+            MonoReactive = 1
+            BiReactive = 2
+        End Enum
 #End Region
 
 #Region "Constructor"
@@ -37,6 +51,20 @@ Namespace Biosystems.Ax00.BL
             contaminatedOrderTest = -1
             MainContaminatorID = -1
             contaminations = New List(Of ContaminationsDS.tparContaminationsRow)
+            contaminatorOrderTest = -1
+            MainContaminatedID = -1
+        End Sub
+
+        Public Sub New(ByVal pConn As SqlConnection)
+            Me.New()
+            dbConnection = pConn
+        End Sub
+
+#End Region
+
+#Region "Destructor"
+        Protected Overrides Sub Finalize()
+            dbConnection = Nothing
         End Sub
 #End Region
 
@@ -85,30 +113,13 @@ Namespace Biosystems.Ax00.BL
                 ContaminationNumber = myExecutionDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
             End If
 
-            ''AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-            'Dim elapsedTime As Double = 0
-            'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
             Return ContaminationNumber
-        End Function
-
-        Public Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As Integer
-            Static testReagentsDataDS As TestReagentsDS
-
-            If testReagentsDataDS Is Nothing Then
-                testReagentsDataDS = GetAllReagents(pDBConnection)
-            End If
-
-            Dim result = (From a In testReagentsDataDS.tparTestReagents
-                          Where a.ReagentID = reagentID Select a.ReagentNumber).First
-
-            Return result
         End Function
 
 #End Region
 
 #Region "Overridable methods"
-        Public Overridable Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
+        Protected Overridable Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
@@ -118,14 +129,14 @@ Namespace Biosystems.Ax00.BL
             HighContaminationPersistence = pHighContaminationPersistance
         End Sub
 
-        Public Overridable Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        Protected Overridable Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexI As Integer, _
                                                   ByVal lowerLimit As Integer, _
                                                   ByVal upperLimit As Integer)
             'this function must be overriden by children classes
         End Sub
 
-        Public Overridable Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        Protected Overridable Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexJ As Integer, _
                                                   ByVal leftLimit As Integer, _
                                                   ByVal rightLimit As Integer, _
@@ -135,6 +146,37 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "Private methods"
+        Protected Sub SetExpectedTypeReagent()
+            TypeContaminator = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
+            TypeContaminated = GetTypeReagentInTest(dbConnection, ReagentContaminatedID)
+
+            If TypeContaminator = TypeReagent.BiReactive AndAlso TypeContaminated = TypeReagent.BiReactive Then
+                typeExpectedResult = TypeReagent.BiReactive
+            Else
+                typeExpectedResult = TypeReagent.MonoReactive
+            End If
+        End Sub
+
+        Protected Function ReagentsAreCompatibleType() As Boolean
+            If (typeExpectedResult = typeResult OrElse typeExpectedResult = TypeReagent.MonoReactive) Then
+                Return True
+            End If
+            Return False
+        End Function
+
+        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
+            Static testReagentsDataDS As TestReagentsDS
+
+            If testReagentsDataDS Is Nothing Then
+                testReagentsDataDS = GetAllReagents(pDBConnection)
+            End If
+
+            Dim result = (From a In testReagentsDataDS.tparTestReagents
+                          Where a.ReagentID = reagentID Select a.ReagentsNumber).First
+
+            Return CType(result, TypeReagent)
+        End Function
+
         Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
             Dim TestReagentsDAO As New tparTestReagentsDAO()
             Dim testReagentsDataDS As TestReagentsDS = Nothing

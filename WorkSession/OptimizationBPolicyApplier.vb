@@ -15,7 +15,11 @@ Namespace Biosystems.Ax00.BL
             MyBase.New()
         End Sub
 
-        Public Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
+        Public Sub New(ByVal pConn As SqlConnection)
+            MyBase.New(pConn)
+        End Sub
+
+        Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
@@ -36,7 +40,7 @@ Namespace Biosystems.Ax00.BL
 
                 contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
 
-                'AG 19/12/2011 - If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
+                'If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
                 'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
                 If contaminations.Count = 0 Then
                     Dim maxReplicates As Integer = 1
@@ -53,11 +57,11 @@ Namespace Biosystems.Ax00.BL
                         End If
                     End If
                 End If
-                'AG 19/21/2011
+
+                SetExpectedTypeReagent()
 
                 'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i) up until becomes no contaminated
                 If contaminations.Count > 0 Then
-
                     'Limit: when pPreviousReagentID <> Nothing the upper limit is 1, otherwise 0
                     Dim upperLimit As Integer = 0
                     If Not pPreviousReagentID Is Nothing Then upperLimit = 1
@@ -72,7 +76,7 @@ Namespace Biosystems.Ax00.BL
 
         End Sub
 
-        Public Overrides Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        Protected Overrides Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexI As Integer, _
                                                   ByVal lowerLimit As Integer, _
                                                   ByVal upperLimit As Integer)
@@ -116,7 +120,7 @@ Namespace Biosystems.Ax00.BL
             Next
         End Sub
 
-        Public Overrides Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        Protected Overrides Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexJ As Integer, _
                                                   ByVal leftLimit As Integer, _
                                                   ByVal rightLimit As Integer, _

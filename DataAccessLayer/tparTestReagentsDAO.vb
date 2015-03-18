@@ -283,7 +283,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created 17/03/2015 by AJG
         ''' </remarks>
         Public Function GetAllReagents(ByVal pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of TestReagentsDS)
-            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS) = Nothing
+            Dim resultData As New TypedGlobalDataTo(Of TestReagentsDS)
             Dim dbConnection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
 
             Try
@@ -291,8 +291,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = "SELECT T.TestID, T.TestName, T.ShortName, T.ReagentsNumber, T.BlankReplicates, TR.ReagentID, TR.ReagentNumber, R.ReagentName, " & vbCrLf & _
                                             " R.PreloadedReagent, R.CodeTest " & vbCrLf & _
                                             " FROM   tparTestReagents TR INNER JOIN tparReagents R ON TR.ReagentID = R.ReagentID " & vbCrLf & _
-                                            " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
-                                            " ORDER BY REAGENTID "
+                                            " INNER JOIN tparTests T ON TR.TestID = T.TestID "
 
                     Dim myTestReagentsDS As New TestReagentsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection.SetDatos)
