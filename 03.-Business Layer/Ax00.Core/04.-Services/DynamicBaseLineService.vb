@@ -498,21 +498,9 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "CLOSED")
-
             'Remove alarm change rotor recommend
             If _analyzer.Alarms.Contains(Alarms.BASELINE_WELL_WARN) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_WELL_WARN)
-            End If
-
-            '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PERFORMED, 1, True) 'Inform the FALSE sensor the new rotor process is finished for UI refresh
-
-            'AG 26/03/2012 - Special case: maybe the user was starting the instrument and the process has been
-            'paused because there is not reactions rotor ... in this case when a valid alight is received
-            'Sw must inform the start instrument process is OK
-            If _analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                _analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDs, WarmUpProcessFlag.Finalize) 'BA-2075
             End If
 
             'Update analyzer session flags into DataBase
