@@ -150,6 +150,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\..\..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -949,6 +952,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\CHECKMRK.ICO" />
+    <None Include="packages.config" />
     <None Include="Resources\collapse.png" />
     <None Include="Resources\expand.png" />
     <Content Include="Images\Find.ico" />

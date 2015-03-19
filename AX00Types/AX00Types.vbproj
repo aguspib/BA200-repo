@@ -1845,6 +1845,7 @@
     <None Include="OrderTestsLISInfoDS.xss">
       <DependentUpon>OrderTestsLISInfoDS.xsd</DependentUpon>
     </None>
+    <None Include="packages.config" />
     <None Include="QCResultsForWestgardDS.xsc">
       <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
     </None>

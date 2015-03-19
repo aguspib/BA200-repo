@@ -247,6 +247,7 @@ Partial Public Class UiAx00MainMDI
 
                     'SHUT DOWN INSTRUMENT button
                 Case ActionButton.SHUT_DOWN
+                    'samplesCoverAlarm = False
                     If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                        mainCoverAlarm OrElse reactionsCoverAlarm OrElse fridgeCoverAlarm OrElse samplesCoverAlarm OrElse iSEUtilitiesActiveFlag Then
                         myStatus = False
@@ -291,6 +292,7 @@ Partial Public Class UiAx00MainMDI
                     '    myStatus = False
                     'End If
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                        'samplesCoverAlarm = False
                         'AG 06/11/2013 - Task #1375
 
                         If mainCoverAlarm OrElse _
@@ -347,6 +349,7 @@ Partial Public Class UiAx00MainMDI
 
                     'CONTINUE running button
                 Case GlobalEnumerates.ActionButton.CONTINUE_WS
+                    'samplesCoverAlarm = False
                     'AG 06/11/2013 - Task #1375
                     'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                     'JV 23/01/2014 #1467

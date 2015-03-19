@@ -5,13 +5,9 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
-Imports System.Timers
 Imports System.Data
 Imports System.Data.SqlClient
-Imports System.ComponentModel
 Imports System.Text
 Imports Biosystems.Ax00.Core.Interfaces
 
