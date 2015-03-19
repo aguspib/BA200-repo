@@ -8,9 +8,6 @@ Namespace Biosystems.Ax00.Core.Services
     Public MustInherit Class AsyncService
         Implements IAsyncService
 
-
-
-
         Protected WithEvents _analyzer As IAnalyzerManager
 
         Sub New(analyzer As IAnalyzerManager)
@@ -29,7 +26,7 @@ Namespace Biosystems.Ax00.Core.Services
             End Get
             Set(value As ServiceStatusEnum)
                 If value <> _status Then
-                    value = _status
+                    _status = value
                     If OnServiceStatusChange IsNot Nothing Then
                         ServiceStatusCallback.Invoke(Me)
                     End If

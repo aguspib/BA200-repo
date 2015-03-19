@@ -9,11 +9,11 @@ Namespace Biosystems.Ax00.Core.Services
     Public Enum RotorChangeStepsEnum
         WashStationControl
         NewRotor
-        Washing
-        StaticBaseLine
-        DynamicBaseLineFill
-        DynamicBaseLineRead_TODELETE
-        DynamicBaseLineEmpty_TODELETE
+        'Washing
+        'StaticBaseLine
+        'DynamicBaseLineFill
+        'DynamicBaseLineRead_TODELETE
+        'DynamicBaseLineEmpty_TODELETE
         BaseLine
         Finalize
         None
@@ -31,8 +31,31 @@ Namespace Biosystems.Ax00.Core.Services
 
         Public Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
+            _baseLineService = New DynamicBaseLineService(_analyzer)
+            _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
+
         End Sub
 
+        Private Sub BaseLineStatusChanged(callback As IServiceStatusCallback)
+            Select Case callback.Sender.Status
+                Case ServiceStatusEnum.Paused
+                    Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+
+                    'Update analyzer session flags into DataBase
+                    If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                        myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                    End If
+
+                    _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
+
+                Case ServiceStatusEnum.Running
+                    RestartProcess()
+
+            End Select
+        End Sub
 #Region "Attributes"
 
         'Private WithEvents _analyzer As IAnalyzerManager
@@ -42,12 +65,14 @@ Namespace Biosystems.Ax00.Core.Services
         Private _dynamicBaseLineValid As Boolean = False
         Private _isInRecovering As Boolean = False
 
+        Private _baseLineService As DynamicBaseLineService
+
 #End Region
 
 #Region "Event Handlers"
 
         Public Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
-            CheckIfCanContinue()
+            TryToResume()
         End Sub
 
         Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
@@ -196,11 +221,13 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Select Case nextStep
                     Case RotorChangeStepsEnum.NewRotor,
-                         RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE,
-                         RotorChangeStepsEnum.Finalize
+                        RotorChangeStepsEnum.Finalize   'RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE,
                         ValidateProcess()
-                    Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-                        ProcessDynamicBaseLine()
+                        'Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                        '   ProcessDynamicBaseLine()
+                    Case RotorChangeStepsEnum.BaseLine
+                        'TODO: Add here Baseline recover logic
+
                 End Select
 
                 _isInRecovering = False
@@ -222,19 +249,23 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub CheckIfCanContinue()
+        Private Sub TryToResume()
 
             If (Not _isInRecovering) Then
                 Dim nextStep As RotorChangeStepsEnum
                 nextStep = GetNextStep()
 
+                'Select Case nextStep
+                'Case RotorChangeStepsEnum.Washing
+                'RotorChangeStepsEnum.StaticBaseLine,
+                'RotorChangeStepsEnum.DynamicBaseLineFill,
+                'RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE()
                 Select Case nextStep
-                    Case RotorChangeStepsEnum.Washing,
-                         RotorChangeStepsEnum.StaticBaseLine,
-                         RotorChangeStepsEnum.DynamicBaseLineFill,
-                         RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                    Case RotorChangeStepsEnum.BaseLine
                         ValidateProcess()
                 End Select
+                'ValidateProcess()
+                'End Select
             End If
 
         End Sub
@@ -252,65 +283,70 @@ Namespace Biosystems.Ax00.Core.Services
                 Case RotorChangeStepsEnum.NewRotor
                     ExecuteNewRotorStep()
 
-                Case RotorChangeStepsEnum.Washing
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
-                        RestartProcess()
-                        ExecuteWashingStep()
-                    Else
-                        CancelWashingStep()
-                    End If
+                    'Case RotorChangeStepsEnum.Washing
+                    '    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    '        RestartProcess()
+                    '        ExecuteWashingStep()
+                    '    Else
+                    '        CancelWashingStep()
+                    '    End If
 
-                Case RotorChangeStepsEnum.StaticBaseLine
-                    If (Not _staticBaseLineFinished) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
-                            RestartProcess()
-                            ExecuteStaticBaseLineStep()
-                        Else
-                            CancelStaticBaseLineStep()
-                        End If
-                    Else
-                        If (Not IsValidStaticBaseLine()) Then
-                            CancelStaticBaseLineStep()
-                            FinalizeProcess()
-                        End If
-                    End If
+                    'Case RotorChangeStepsEnum.StaticBaseLine
+                    '    If (Not _staticBaseLineFinished) Then
+                    '        If (_analyzer.CheckIfWashingIsPossible()) Then
+                    '            RestartProcess()
+                    '            ExecuteStaticBaseLineStep()
+                    '        Else
+                    '            CancelStaticBaseLineStep()
+                    '        End If
+                    '    Else
+                    '        If (Not IsValidStaticBaseLine()) Then
+                    '            CancelStaticBaseLineStep()
+                    '            FinalizeProcess()
+                    '        End If
+                    '    End If
 
 
-                Case RotorChangeStepsEnum.DynamicBaseLineFill
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
-                        RestartProcess()
-                        ExecuteDynamicBaseLineFillStep()
-                    Else
-                        CancelDynamicBaseLineFillStep()
-                    End If
+                    'Case RotorChangeStepsEnum.DynamicBaseLineFill
+                    '    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    '        RestartProcess()
+                    '        ExecuteDynamicBaseLineFillStep()
+                    '    Else
+                    '        CancelDynamicBaseLineFillStep()
+                    '    End If
 
-                Case RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
-                    RestartProcess()
-                    ExecuteDynamicBaseLineReadStep()
+                    'Case RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
+                    '    RestartProcess()
+                    '    ExecuteDynamicBaseLineReadStep()
 
-                Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-                    If (IsEmptyingAllowed()) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
-                            RestartProcess()
-                            ExecuteDynamicBaseLineEmptyStep()
-                        Else
-                            CancelDynamicBaseLineEmptyStep()
-                        End If
-                    Else
-                        If (IsReadingAllowed()) Then
-                            RestartProcess()
-                            ExecuteDynamicBaseLineReadStep()
-                        Else
-                            CancelDynamicBaseLineReadStep()
-                        End If
-                    End If
-
+                    'Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
+                    '    If (IsEmptyingAllowed()) Then
+                    '        If (_analyzer.CheckIfWashingIsPossible()) Then
+                    '            RestartProcess()
+                    '            ExecuteDynamicBaseLineEmptyStep()
+                    '        Else
+                    '            CancelDynamicBaseLineEmptyStep()
+                    '        End If
+                    '    Else
+                    '        If (IsReadingAllowed()) Then
+                    '            RestartProcess()
+                    '            ExecuteDynamicBaseLineReadStep()
+                    '        Else
+                    '            CancelDynamicBaseLineReadStep()
+                    '        End If
+                    '    End If
+                Case RotorChangeStepsEnum.BaseLine
+                    ExecuteBaseLineStep()
                 Case RotorChangeStepsEnum.Finalize
                     FinalizeProcess()
 
             End Select
 
             Return
+        End Sub
+
+        Private Sub ExecuteBaseLineStep()
+            _baseLineService.StartService()
         End Sub
 
         ''' <summary>
@@ -320,37 +356,24 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Function GetNextStep() As RotorChangeStepsEnum
 
-            Dim nextStep = RotorChangeStepsEnum.None
+            Dim nextStep As RotorChangeStepsEnum
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
                 nextStep = GetNextStepWhileInProcess()
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
-
-                If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = "END") Then
-
-                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
-                        nextStep = RotorChangeStepsEnum.Washing
-
-                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                        nextStep = RotorChangeStepsEnum.StaticBaseLine
-
-                    ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
-                        nextStep = RotorChangeStepsEnum.DynamicBaseLineFill
-
-                    ElseIf ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
-                        nextStep = RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
-
-                    ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                        nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-
-                    End If
-                End If
-
+                nextStep = GetNextStepWhilePaused()
+            Else
+                nextStep = RotorChangeStepsEnum.None
             End If
 
             Return nextStep
 
+        End Function
+
+        Private Function GetNextStepWhilePaused() As RotorChangeStepsEnum
+            Dim nextStep As RotorChangeStepsEnum = RotorChangeStepsEnum.None
+            Return nextStep
         End Function
 
         Private Function GetNextStepWhileInProcess() As RotorChangeStepsEnum
@@ -362,54 +385,14 @@ Namespace Biosystems.Ax00.Core.Services
                     nextStep = RotorChangeStepsEnum.NewRotor
 
                 Case "END"
+                    Select Case _baseLineService.Status
+                        Case ServiceStatusEnum.NotYetStarted, ServiceStatusEnum.EndError
+                            nextStep = RotorChangeStepsEnum.BaseLine
+                        Case ServiceStatusEnum.EndSuccess
+                            nextStep = RotorChangeStepsEnum.Finalize
+                        Case ServiceStatusEnum.Running
+                            nextStep = RotorChangeStepsEnum.None
 
-                    Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
-                        Case "", "CANCELED"
-                            nextStep = RotorChangeStepsEnum.Washing
-
-                        Case "END"
-                            If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "") OrElse (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                                nextStep = RotorChangeStepsEnum.StaticBaseLine
-
-                            Else
-
-                                If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-
-                                    If (_analyzer.CurrentInstructionAction = InstructionActions.None) Then
-
-                                        If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") And
-                                           ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "") OrElse
-                                            (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED")) Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineFill
-
-                                        ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
-                                               (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "") Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE
-
-                                        ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
-                                               ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "") OrElse
-                                                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-
-                                        ElseIf (_forceEmptyAndFinalize) AndAlso (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "END") Then
-                                            nextStep = RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-
-                                        End If
-
-                                    End If
-
-                                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
-                                        nextStep = RotorChangeStepsEnum.Finalize
-                                    End If
-
-                                Else
-                                    If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") OrElse
-                                       (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                                        nextStep = RotorChangeStepsEnum.Finalize
-                                    End If
-                                End If
-
-                            End If
                     End Select
 
 
@@ -676,7 +659,6 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
 
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.DYNAMIC_BASELINE_ERROR, 1, True)
-                '_analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.Alarms.BASELINE_INIT_ERR, 1, True)
                 _analyzer.Alarms.Add(Alarms.BASELINE_INIT_ERR)
 
                 'Update analyzer session flags into DataBase
