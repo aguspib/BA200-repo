@@ -962,7 +962,7 @@ Namespace Biosystems.Ax00.Global
             FRIDGE_RESET_ERR        '(OK v0.5.0) Reagents rotor board reset             | FW ERROR CODE: 349 | DL 13/06/2012
             S_ROTOR_BOARD_ERR       '(OK v0.5.0) Samples rotor board not responding     | FW ERROR CODE: 398 | DL 13/06/2012
             S_ROTOR_RESET_ERR       '(OK v0.5.0) Samples rotor board reset              | FW ERROR CODE: 399 | DL 13/06/2012
-            GLF_BOARD_ERR           '(OK v0.5.0) Photometric board not responding       | FW ERROR CODE: 598 | DL 13/06/2012
+            GLF_BOARD_ERR           '            Photometric board not responding       | FW ERROR CODE: 560 | AC 19/03/2015
             SFX_BOARD_ERR           '(OK v0.5.0) Fluid system board not responding      | FW ERROR CODE: 698 | DL 13/06/2012
             JEX_BOARD_ERR           '(OK v0.5.0) Manifold board not responding          | FW ERROR CODE: 798 | DL 13/06/2012
 

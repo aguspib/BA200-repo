@@ -537,7 +537,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If myAlarmList.Count > 0 Then
                                 ' Note that this alarm is common on User and Service !
                                 Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                             ' Activates Alarm end
 
@@ -603,7 +603,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myAlarmList.Count > 0 Then
                             ' Note that this alarm is common on User and Service !
                             Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                         End If
                         ' Activates Alarm end
 
@@ -663,7 +663,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myAlarmList.Count > 0 Then
                         If Not GlobalBase.IsServiceAssembly Then
                             Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                         End If
 
                     End If
@@ -896,7 +896,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If myAlarmList.Count > 0 Then
                                             ' Note that this alarm is common on User and Service !
                                             Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                                         End If
                                         ' Activates Alarm end
 
@@ -950,7 +950,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = _analyzerManager.ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
                             Else
                                 Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                                myGlobal = currentAlarms.Manage(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
+                                myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                             End If
 
                         Else 'if not new alarms sure the ansinfo instruction is activated

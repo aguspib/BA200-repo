@@ -538,7 +538,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     PrepareLocalAlarmList(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN, AllowScanInRunningAttribute, myAlarmList, myAlarmStatusList)
                     If (myAlarmList.Count > 0) Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
 
                     'TR 22/10/2013 -BT #1353 
@@ -586,7 +586,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If AlarmList.Count > 0 Then
                                 If Not GlobalBase.IsServiceAssembly Then
                                     Dim currentAlarms = New CurrentAlarms(Me)
-                                    myGlobal = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
+                                    myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                 End If
                             End If
                         End If
@@ -768,7 +768,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If AlarmList.Count > 0 Then                                
                                 If Not GlobalBase.IsServiceAssembly Then
                                     Dim currentAlarms = New CurrentAlarms(Me)
-                                    myGlobal = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
+                                    myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                 End If
                             End If
 

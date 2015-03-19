@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{244EE25F-D83F-4A60-A2C1-485612B01EA3}</ProjectGuid>
+    <ProjectGuid>{2A561AD6-B78E-42BE-9DB3-BD8B9CBF43E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>AnalyzerTests</RootNamespace>
     <AssemblyName>AnalyzerTests</AssemblyName>
@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Telerik.JustMock">
       <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
     </Reference>
@@ -118,19 +119,14 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
-      <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
-      <Name>AX00Types</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
-      <Project>{053CFFD3-17B1-4A95-AF8C-FF4B6DE08809}</Project>
+      <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
       <Name>Calculations</Name>
     </ProjectReference>
     <ProjectReference Include="..\Global\Global\Global.vbproj">

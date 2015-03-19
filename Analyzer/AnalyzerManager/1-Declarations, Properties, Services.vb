@@ -1800,7 +1800,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'myGlobal = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
+                        myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
