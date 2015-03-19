@@ -10,7 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ReadOnly _instructionReceived As List(Of InstructionParameterTO)
 
         ''' <summary>
-        ''' 
+        ''' Sw has received an ANSBR1 or ANSBR2 or ANSBM1 instruction
         ''' </summary>
         ''' <param name="analyzerMan"></param>
         ''' <param name="instructionReceived"></param>

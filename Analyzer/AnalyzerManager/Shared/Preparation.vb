@@ -31,7 +31,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Search next pending preparation to send or wash contamination
         ''' </summary>
         ''' <param name="pNextWell"></param>
-        ''' <param name="pLookForISEExecutionsFlag"></param>
+        ''' <param name="pLookForIseExecutionsFlag"></param>
         ''' <returns> GlobalDataTo indicating if an error has occurred or not
         ''' If no error: Return an AnalyzerManagerDS.nextPreparation (the ExecutionID (integer) to send. If no items found return NO_ITEMS_FOUND (-1)</returns>
         ''' <remarks>
@@ -44,7 +44,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' REFACTOR: SearchNextPreparation
         ''' </remarks>
-        Public Function SearchNext(ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
+        Public Function SearchNext(ByVal pNextWell As Integer, Optional ByVal pLookForIseExecutionsFlag As Boolean = True) As GlobalDataTO
             Try
                 _resultData = GetOpenDBConnection(_pDbConnection)
 
@@ -104,312 +104,298 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' REFACTOR: SendNextPreparation
         ''' </remarks>
-        'Public Function SendNext(ByVal pNextWell As Integer, ByRef pActionSentFlag As Boolean, ByRef pEndRunSentFlag As Boolean, ByRef pSystemErrorFlag As Boolean) As GlobalDataTO
+        Public Function SendNext(ByVal pNextWell As Integer, ByRef pActionSentFlag As Boolean, ByRef pEndRunSentFlag As Boolean, ByRef pSystemErrorFlag As Boolean) As GlobalDataTO
 
-        '    Dim myGlobal As New GlobalDataTO
+            Dim myGlobal As New GlobalDataTO
 
-        '    Try
-        '        Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
+            Try
+                Dim startTime As DateTime
 
-        '        Dim iseStatusOK As Boolean = False
-        '        Dim iseInstalledFlag As Boolean = False
-        '        Dim adjustValue As String = ""
-        '        adjustValue = _analyzerManager.ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.ISEINS)
-        '        If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
-        '            iseInstalledFlag = CType(adjustValue, Boolean)
-        '        End If
+                Dim iseStatusOk As Boolean = False
+                Dim iseInstalledFlag As Boolean = False
+                Dim adjustValue = _analyzerManager.ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.ISEINS)
+                If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
+                    iseInstalledFlag = CType(adjustValue, Boolean)
+                End If
 
-        '        If iseInstalledFlag Then
-        '            If _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) OrElse _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
-        '                iseStatusOK = False
-        '            Else
-        '                iseStatusOK = True
-        '            End If
-        '        End If
+                If iseInstalledFlag Then
+                    If _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) OrElse _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                        iseStatusOk = False
+                    Else
+                        iseStatusOk = True
+                    End If
+                End If
 
-        '        'AG 07/06/2012 - This method only sends, not searchs
-        '        'Search for the next preparation to send
-        '        Dim actionAlreadySent As Boolean = False
-        '        Dim endRunToSend As Boolean = False
-        '        Dim systemErrorFlag As Boolean = False 'AG 25/01/2012 Indicates if search next has produced a system error. In this case send a END instruction
-        '        Dim emptyFieldsDetected As Boolean = False 'AG 03/06/2014 - #1519 when Sw cannot send the proper instruction because there are emtpy fields error then send SKIP
+                'AG 07/06/2012 - This method only sends, not searchs
+                'Search for the next preparation to send
+                Dim actionAlreadySent As Boolean = False
+                Dim endRunToSend As Boolean = False
+                Dim systemErrorFlag As Boolean = False 'AG 25/01/2012 Indicates if search next has produced a system error. In this case send a END instruction
+                Dim emptyFieldsDetected As Boolean = False 'AG 03/06/2014 - #1519 when Sw cannot send the proper instruction because there are emtpy fields error then send SKIP
 
-        '        'myGlobal = Me.SearchNextPreparation(Nothing, pNextWell)
-        '        'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
-        '        'AG 07/06/2012
+                If Not myGlobal.HasError Then '(1)
 
-        '        If Not myGlobal.HasError Then '(1)
-        '            Dim myAnManagerDS As New AnalyzerManagerDS
-        '            'myAnManagerDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+                    Dim myAnManagerDs = _analyzerManager.NextPreparationsAnalyzerManagerDS
 
-        '            myAnManagerDS = CType(_analyzerManager.NextPreparationsAnalyzerManagerDS, AnalyzerManagerDS)
+                    If myAnManagerDs.nextPreparation.Rows.Count > 0 Then '(2)
+                        'Analyze the row0 found
+                        '1st: Check if next cuvette is optically rejected ... send nothing (DUMMY)
+                        If Not actionAlreadySent And Not endRunToSend Then
+                            If Not myAnManagerDs.nextPreparation(0).IsCuvetteOpticallyRejectedFlagNull AndAlso myAnManagerDs.nextPreparation(0).CuvetteOpticallyRejectedFlag Then
+                                'Send a SKIP instruction but mark as actionAlreadySend. So Ax00 will performe a Dummy cycle 
+                                startTime = Now
 
-        '            If myAnManagerDS.nextPreparation.Rows.Count > 0 Then '(2)
-        '                'Analyze the row0 found
-        '                '1st: Check if next cuvette is optically rejected ... send nothing (DUMMY)
-        '                If Not actionAlreadySent And Not endRunToSend Then
-        '                    If Not myAnManagerDS.nextPreparation(0).IsCuvetteOpticallyRejectedFlagNull AndAlso myAnManagerDS.nextPreparation(0).CuvetteOpticallyRejectedFlag Then
-        '                        'Send a SKIP instruction but mark as actionAlreadySend. So Ax00 will performe a Dummy cycle 
-        '                        StartTime = Now 'AG 28/06/2012
+                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
+                                actionAlreadySent = True
 
-        '                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
-        '                        actionAlreadySent = True
+                                GlobalBase.CreateLogActivity("SKIP sent: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                            End If
+                        End If
 
-        '                        GlobalBase.CreateLogActivity("SKIP sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
-        '                    End If
-        '                End If
+                        '2on: Check if next cuvette requires washing (cuvette contamination)
+                        If Not actionAlreadySent And Not endRunToSend Then
+                            If Not myAnManagerDs.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso myAnManagerDs.nextPreparation(0).CuvetteContaminationFlag Then
+                                startTime = Now 'AG 28/06/2012
 
-        '                '2on: Check if next cuvette requires washing (cuvette contamination)
-        '                If Not actionAlreadySent And Not endRunToSend Then
-        '                    If Not myAnManagerDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso myAnManagerDS.nextPreparation(0).CuvetteContaminationFlag Then
-        '                        StartTime = Now 'AG 28/06/2012
+                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.WASH_RUNNING, myAnManagerDs)
+                                actionAlreadySent = True
+                                If Not myGlobal.HasError Then
+                                    AddNewSentPreparationsList(Nothing, myAnManagerDs, pNextWell) 'Update sent instructions DS
+                                    GlobalBase.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                Else
+                                    'AG 27/09/2012 - the instruction could not be sent because empty fields. The cuvette must continue marked as Contamianted, so nothing to do
+                                    ' except remove the error flag and code
+                                    If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
+                                        myGlobal.HasError = False
+                                        myGlobal.ErrorCode = ""
+                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                                    End If
+                                End If
+                            End If
+                        End If
 
-        '                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.WASH_RUNNING, myAnManagerDS)
-        '                        actionAlreadySent = True
-        '                        If Not myGlobal.HasError Then
-        '                            AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-        '                            GlobalBase.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
-        '                        Else
-        '                            'AG 27/09/2012 - the instruction could not be sent because empty fields. The cuvette must continue marked as Contamianted, so nothing to do
-        '                            ' except remove the error flag and code
-        '                            If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
-        '                                myGlobal.HasError = False
-        '                                myGlobal.ErrorCode = ""
-        '                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
+                        '3rd: Check if next preparation is an ISE preparation
+                        If Not actionAlreadySent And Not endRunToSend Then
+                            If Not myAnManagerDs.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDs.nextPreparation(0).ExecutionType = "PREP_ISE" Then
+                                'endRunToSend = True  'AG 30/11/2011 comment this line (Sw has to send ENDRUN)
 
-        '                '3rd: Check if next preparation is an ISE preparation
-        '                If Not actionAlreadySent And Not endRunToSend Then
-        '                    If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_ISE" Then
-        '                        'endRunToSend = True  'AG 30/11/2011 comment this line (Sw has to send ENDRUN)
+                                If iseStatusOk Then 'Only if ISE modul is active 
+                                    If Not myAnManagerDs.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDs.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
+                                        If _analyzerManager.ISEAnalyzer IsNot Nothing Then
+                                            _analyzerManager.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.Test
+                                        End If
+                                        startTime = Now 'AG 28/06/2012
 
-        '                        If iseStatusOK Then 'Only if ISE modul is active 
-        '                            If Not myAnManagerDS.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-        '                                'ISEModuleIsReadyAttribute = False 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 ISE module becomes not available)
-        '                                'SGM 08/03/2012
-        '                                If _analyzerManager.ISEAnalyzer IsNot Nothing Then
-        '                                    _analyzerManager.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.Test
-        '                                End If
-        '                                'end SGM 08/03/2012
-        '                                StartTime = Now 'AG 28/06/2012
+                                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_ISE_PREPARATION, myAnManagerDs.nextPreparation(0).ExecutionID)
+                                        'endRunToSend = False 'AG 30/11/2011 comment this line
+                                        actionAlreadySent = True
 
-        '                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_ISE_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
-        '                                'endRunToSend = False 'AG 30/11/2011 comment this line
-        '                                actionAlreadySent = True
+                                        If myGlobal.HasError Then
+                                            'ISEModuleIsReadyAttribute = True 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 ISE module becomes available again)
+                                            'Not needed in this case due the ISE test no affect to the reagent contaminations
+                                            'If Not myGlobal.HasError Then AddNewSentPreparationsList(Nothing, myAnManagerDS) 'Update sent instructions DS
 
-        '                                If myGlobal.HasError Then
-        '                                    'ISEModuleIsReadyAttribute = True 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 ISE module becomes available again)
-        '                                    'Not needed in this case due the ISE test no affect to the reagent contaminations
-        '                                    'If Not myGlobal.HasError Then AddNewSentPreparationsList(Nothing, myAnManagerDS) 'Update sent instructions DS
+                                            'AG 27/09/2012 - the instruction could not be sent because empty fields. Affected executions has been LOCKED in GenerateIsePreparation
+                                            ' method in Instructions class. Now we have to remove the error flag and code
+                                            If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
+                                                'Prepare UIRefreshDS - execution status changed
+                                                myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDs.nextPreparation(0).ExecutionID, 0, Nothing, False)
 
-        '                                    'AG 27/09/2012 - the instruction could not be sent because empty fields. Affected executions has been LOCKED in GenerateIsePreparation
-        '                                    ' method in Instructions class. Now we have to remove the error flag and code
-        '                                    If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
-        '                                        'Prepare UIRefreshDS - execution status changed
-        '                                        myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID, 0, Nothing, False)
+                                                myGlobal.HasError = False
+                                                myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                                            End If
+                                        End If
 
-        '                                        myGlobal.HasError = False
-        '                                        myGlobal.ErrorCode = ""
-        '                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
-        '                                    End If
-        '                                End If
+                                        GlobalBase.CreateLogActivity("ISETEST sent: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    End If
+                                End If
 
-        '                                GlobalBase.CreateLogActivity("ISETEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
-        '                            End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
-        '                        End If
+                            End If
+                        End If
 
-        '                    End If 'If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull Then
-        '                End If 'If Not actionAlreadySent And Not endRunToSend Then
+                        '4rh: Check if exists reagent contaminations
+                        If Not actionAlreadySent And Not endRunToSend Then
+                            If Not myAnManagerDs.nextPreparation(0).IsReagentContaminationFlagNull AndAlso myAnManagerDs.nextPreparation(0).ReagentContaminationFlag Then
+                                startTime = Now
 
-        '                '4rh: Check if exists reagent contaminations
-        '                If Not actionAlreadySent And Not endRunToSend Then
-        '                    If Not myAnManagerDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso myAnManagerDS.nextPreparation(0).ReagentContaminationFlag Then
-        '                        StartTime = Now 'AG 28/06/2012
+                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.WASH_RUNNING, myAnManagerDs)
+                                actionAlreadySent = True
 
-        '                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.WASH_RUNNING, myAnManagerDS)
-        '                        actionAlreadySent = True
+                                If Not myGlobal.HasError Then
+                                    AddNewSentPreparationsList(Nothing, myAnManagerDs, pNextWell) 'Update sent instructions DS
+                                    GlobalBase.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                Else
+                                    Dim sendWrunErrorCode As String = myGlobal.ErrorCode 'AG 27/09/2012
 
-        '                        If Not myGlobal.HasError Then
-        '                            AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-        '                            GlobalBase.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
-        '                        Else
-        '                            Dim sendWRUNErrorCode As String = myGlobal.ErrorCode 'AG 27/09/2012
+                                    'DL 06/07/2012 -In case of error the LOCK execution.
+                                    'Lock the next execution to be sent
+                                    Dim myExecutionDelegate As New ExecutionsDelegate
 
-        '                            'DL 06/07/2012 -In case of error the LOCK execution.
-        '                            'Lock the next execution to be sent
-        '                            Dim myWSExecutionDS As New ExecutionsDS
-        '                            Dim myExecutionDelegate As New ExecutionsDelegate
+                                    'get the execution data 
+                                    myGlobal = myExecutionDelegate.GetExecution(Nothing, myAnManagerDs.nextPreparation.First.ExecutionID)
+                                    If Not myGlobal.HasError Then
+                                        Dim myWsExecutionDs = DirectCast(myGlobal.SetDatos, ExecutionsDS)
 
-        '                            'get the execution data 
-        '                            myGlobal = myExecutionDelegate.GetExecution(Nothing, myAnManagerDS.nextPreparation.First.ExecutionID)
-        '                            If Not myGlobal.HasError Then
-        '                                myWSExecutionDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
+                                        If myWsExecutionDs.twksWSExecutions.Rows.Count > 0 Then
+                                            myWsExecutionDs.twksWSExecutions.First.BeginEdit()
+                                            myWsExecutionDs.twksWSExecutions.First.ExecutionStatus = "LOCKED"
+                                            myWsExecutionDs.twksWSExecutions.First.EndEdit()
+                                            myGlobal = myExecutionDelegate.UpdateStatus(Nothing, myWsExecutionDs)
 
-        '                                If myWSExecutionDS.twksWSExecutions.Rows.Count > 0 Then
-        '                                    myWSExecutionDS.twksWSExecutions.First.BeginEdit()
-        '                                    myWSExecutionDS.twksWSExecutions.First.ExecutionStatus = "LOCKED"
-        '                                    myWSExecutionDS.twksWSExecutions.First.EndEdit()
-        '                                    myGlobal = myExecutionDelegate.UpdateStatus(Nothing, myWSExecutionDS)
+                                            ''make sure send error.
+                                            'AG 27/09/2012 - If the instruction could not be sent because empty fields. Remove the error code, when all his treatment has done, else keep the error
+                                            If sendWrunErrorCode = "EMPTY_FIELDS" Then
+                                                myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDs.nextPreparation.First.ExecutionID, 0, Nothing, False)
 
-        '                                    ''make sure send error.
-        '                                    'If Not myGlobal.HasError Then myGlobal.HasError = True
-        '                                    'AG 27/09/2012 - If the instruction could not be sent because empty fields. Remove the error code, when all his treatment has done, else keep the error
-        '                                    If sendWRUNErrorCode = "EMPTY_FIELDS" Then
-        '                                        'Prepare UIRefreshDS - execution status changed
-        '                                        myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation.First.ExecutionID, 0, Nothing, False)
+                                                myGlobal.HasError = False
+                                                myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                                            Else
+                                                myGlobal.HasError = True
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
 
-        '                                        myGlobal.HasError = False
-        '                                        myGlobal.ErrorCode = ""
-        '                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
-        '                                    Else
-        '                                        myGlobal.HasError = True
-        '                                    End If
-        '                                End If
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
+                        '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
+                        If Not actionAlreadySent And Not endRunToSend Then
+                            If Not myAnManagerDs.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDs.nextPreparation(0).ExecutionType = "PREP_STD" Then
 
-        '                '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
-        '                If Not actionAlreadySent And Not endRunToSend Then
-        '                    If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_STD" Then
+                                If Not myAnManagerDs.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDs.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
+                                    startTime = Now 'AG 28/06/2012
 
-        '                        If Not myAnManagerDS.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-        '                            StartTime = Now 'AG 28/06/2012
+                                    'AG 31/05/2012 - Evaluate the proper well for contamination or rejection for PTEST case
+                                    Dim testPrepData As New PreparationTestDataDelegate
+                                    Dim isPtesTinstructionFlag As Boolean = False
+                                    myGlobal = testPrepData.isPTESTinstruction(Nothing, myAnManagerDs.nextPreparation(0).ExecutionID, isPtesTinstructionFlag)
+                                    If Not isPtesTinstructionFlag Then 'TEST instruction
+                                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_PREPARATION, myAnManagerDs.nextPreparation(0).ExecutionID)
+                                        actionAlreadySent = True
+                                        If Not myGlobal.HasError Then
+                                            AddNewSentPreparationsList(Nothing, myAnManagerDs, pNextWell) 'Update sent instructions DS
+                                        Else
+                                            'AG 27/09/2012 - the instruction could not be sent because empty fields. Executions has been LOCKED in GeneratePreparation (test o ptest)
+                                            ' method in Instructions class. Now we have to remove the error flag and code
+                                            If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
+                                                'Prepare UIRefreshDS - execution status changed
+                                                myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDs.nextPreparation(0).ExecutionID, 0, Nothing, False)
 
-        '                            'AG 31/05/2012 - Evaluate the proper well for contamination or rejection for PTEST case
-        '                            Dim testPrepData As New PreparationTestDataDelegate
-        '                            Dim isPTESTinstructionFlag As Boolean = False
-        '                            myGlobal = testPrepData.isPTESTinstruction(Nothing, myAnManagerDS.nextPreparation(0).ExecutionID, isPTESTinstructionFlag)
-        '                            If Not isPTESTinstructionFlag Then 'TEST instruction
-        '                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
-        '                                actionAlreadySent = True
-        '                                If Not myGlobal.HasError Then
-        '                                    AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-        '                                Else
-        '                                    'AG 27/09/2012 - the instruction could not be sent because empty fields. Executions has been LOCKED in GeneratePreparation (test o ptest)
-        '                                    ' method in Instructions class. Now we have to remove the error flag and code
-        '                                    If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
-        '                                        'Prepare UIRefreshDS - execution status changed
-        '                                        myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID, 0, Nothing, False)
-
-        '                                        myGlobal.HasError = False
-        '                                        myGlobal.ErrorCode = ""
-        '                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
-        '                                    End If
-        '                                End If
+                                                myGlobal.HasError = False
+                                                myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                                            End If
+                                        End If
 
 
-        '                            Else 'PTEST instruction
-        '                                'Before send the PTEST instruction Sw has to evaluate the well (pNextWell + WELL_OFFSET_FOR_PREDILUTION)
-        '                                'looking for cuvette contamination or optical rejection
-        '                                Dim rejectedPTESTWell As Boolean = False
-        '                                Dim contaminatePTESTdWell As Boolean = False
-        '                                Dim WashPTESTSol1 As String = ""
-        '                                Dim WashPTESTSol2 As String = ""
+                                    Else 'PTEST instruction
+                                        'Before send the PTEST instruction Sw has to evaluate the well (pNextWell + WELL_OFFSET_FOR_PREDILUTION)
+                                        'looking for cuvette contamination or optical rejection
+                                        Dim rejectedPtestWell As Boolean = False
+                                        Dim contaminatePtesTdWell As Boolean = False
+                                        Dim washPtestSol1 As String = ""
+                                        Dim washPtestSol2 As String = ""
 
-        '                                Dim nextPTESTWell As Integer = pNextWell
-        '                                'Next well where the PTEST instruction will be perform is (pNextwell + WELL_OFFSET_FOR_PREDILUTION) but from 1 to 120 ciclycal
-        '                                Dim reactRotorDlg As New ReactionsRotorDelegate
-        '                                nextPTESTWell = reactRotorDlg.GetRealWellNumber(pNextWell + WELL_OFFSET_FOR_PREDILUTION, MAX_REACTROTOR_WELLS)
+                                        'Next well where the PTEST instruction will be perform is (pNextwell + WELL_OFFSET_FOR_PREDILUTION) but from 1 to 120 ciclycal
+                                        Dim reactRotorDlg As New ReactionsRotorDelegate
+                                        Dim nextPtestWell = reactRotorDlg.GetRealWellNumber(pNextWell + WELL_OFFSET_FOR_PREDILUTION, MAX_REACTROTOR_WELLS)
 
-        '                                myGlobal = CheckRejectedContaminatedNextWell(Nothing, nextPTESTWell, rejectedPTESTWell, contaminatePTESTdWell, WashPTESTSol1, WashPTESTSol2)
-        '                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-        '                                    If contaminatePTESTdWell OrElse rejectedPTESTWell Then 'SKIP
-        '                                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
-        '                                        actionAlreadySent = True
+                                        myGlobal = CheckRejectedContaminatedNextWell(Nothing, nextPtestWell, rejectedPtestWell, contaminatePtesTdWell, washPtestSol1, washPtestSol2)
+                                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                            If contaminatePtesTdWell OrElse rejectedPtestWell Then 'SKIP
+                                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
+                                                actionAlreadySent = True
 
-        '                                    Else 'PTEST 
-        '                                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
-        '                                        actionAlreadySent = True
-        '                                        If Not myGlobal.HasError Then
-        '                                            AddNewSentPreparationsList(Nothing, myAnManagerDS, nextPTESTWell) 'Update sent instructions DS
-        '                                        Else
-        '                                            'AG 27/09/2012 - the instruction could not be sent because empty fields. Affected executions has been LOCKED in GeneratePreparation (test o ptest)
-        '                                            ' method in Instructions class. Now we have to remove the error flag and code
-        '                                            If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
-        '                                                'Prepare UIRefreshDS - execution status changed
-        '                                                myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID, 0, Nothing, False)
+                                            Else 'PTEST 
+                                                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SEND_PREPARATION, myAnManagerDs.nextPreparation(0).ExecutionID)
+                                                actionAlreadySent = True
+                                                If Not myGlobal.HasError Then
+                                                    AddNewSentPreparationsList(Nothing, myAnManagerDs, nextPtestWell) 'Update sent instructions DS
+                                                Else
+                                                    'AG 27/09/2012 - the instruction could not be sent because empty fields. Affected executions has been LOCKED in GeneratePreparation (test o ptest)
+                                                    ' method in Instructions class. Now we have to remove the error flag and code
+                                                    If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
+                                                        'Prepare UIRefreshDS - execution status changed
+                                                        myGlobal = _analyzerManager.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDs.nextPreparation(0).ExecutionID, 0, Nothing, False)
 
-        '                                                myGlobal.HasError = False
-        '                                                myGlobal.ErrorCode = ""
-        '                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
-        '                                            End If
-        '                                        End If
-        '                                    End If
-        '                                ElseIf myGlobal.HasError Then
-        '                                    systemErrorFlag = True
-        '                                End If
-        '                            End If
-        '                            GlobalBase.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
-        '                        End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
-        '                    End If 'If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull Then
-        '                End If 'If Not actionAlreadySent And Not endRunToSend Then
+                                                        myGlobal.HasError = False
+                                                        myGlobal.ErrorCode = ""
+                                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                                                    End If
+                                                End If
+                                            End If
+                                        ElseIf myGlobal.HasError Then
+                                            systemErrorFlag = True
+                                        End If
+                                    End If
+                                    GlobalBase.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                End If
+                            End If
+                        End If
 
-        '            Else '(2) If myNextPrepDS.nextPreparation.Rows.Count > 0 Then
+                    Else
 
-        '            End If
-        '        ElseIf myGlobal.HasError Then
-        '            systemErrorFlag = True
-        '        End If
+                    End If
+                ElseIf myGlobal.HasError Then
+                    systemErrorFlag = True
+                End If
 
-        '        'New Conditions 
-        '        '- When EMPTY_FIELDS error detected --> Sw sends SKIP
-        '        '- When NO ise installed: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
-        '        '- When ise installed but ise switch off: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
-        '        '- When ise installed and ise switch on: No action sent + AnalyzerIsReady (R:1) + ISEModuleIsReady (I:1) --> Sw sends ENDRUN
-        '        '- Else if No action sent --> Sw sends SKIP
-        '        If emptyFieldsDetected Then
-        '            myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP) 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+                'New Conditions 
+                '- When EMPTY_FIELDS error detected --> Sw sends SKIP
+                '- When NO ise installed: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
+                '- When ise installed but ise switch off: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
+                '- When ise installed and ise switch on: No action sent + AnalyzerIsReady (R:1) + ISEModuleIsReady (I:1) --> Sw sends ENDRUN
+                '- Else if No action sent --> Sw sends SKIP
+                If emptyFieldsDetected Then
+                    myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP) 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
 
-        '        ElseIf Not actionAlreadySent Then
-        '            If Not systemErrorFlag Then
-        '                endRunToSend = False
-        '                If Not iseInstalledFlag AndAlso _analyzerManager.AnalyzerIsReady Then
-        '                    endRunToSend = True
-        '                ElseIf iseInstalledFlag AndAlso Not iseStatusOK AndAlso _analyzerManager.AnalyzerIsReady Then
-        '                    endRunToSend = True
-        '                ElseIf iseInstalledFlag AndAlso iseStatusOK Then
-        '                    If _analyzerManager.AnalyzerIsReady AndAlso _analyzerManager.ISEModuleIsReady Then
-        '                        endRunToSend = True
-        '                    End If
-        '                End If
+                ElseIf Not actionAlreadySent Then
+                    If Not systemErrorFlag Then
+                        endRunToSend = False
+                        If Not iseInstalledFlag AndAlso _analyzerManager.AnalyzerIsReady Then
+                            endRunToSend = True
+                        ElseIf iseInstalledFlag AndAlso Not iseStatusOk AndAlso _analyzerManager.AnalyzerIsReady Then
+                            endRunToSend = True
+                        ElseIf iseInstalledFlag AndAlso iseStatusOk Then
+                            If _analyzerManager.AnalyzerIsReady AndAlso _analyzerManager.ISEModuleIsReady Then
+                                endRunToSend = True
+                            End If
+                        End If
 
-        '            Else 'AG 25/01/2012 - systemErrorFlag: True
-        '                endRunToSend = True
+                    Else 'AG 25/01/2012 - systemErrorFlag: True
+                        endRunToSend = True
 
-        '                'Send END and mark as it like if used had press paused. Else we will enter into a loop END <-> START <-> END <-> START ....
-        '                Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-        '                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                        'Send END and mark as it like if used had press paused. Else we will enter into a loop END <-> START <-> END <-> START ....
+                        Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
 
-        '                _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ENDprocess, "INPROCESS")
-        '                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-        '            End If
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, GlobalEnumerates.AnalyzerManagerFlags.ENDprocess, "INPROCESS")
+                        myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                    End If
 
-        '            If endRunToSend Then 'ENDRUN - no more to be sent
-        '                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.ENDRUN)
-        '                actionAlreadySent = True
-        '            Else 'SKIP - No more std tests but some ise test are pending to be sent but the ISE module is working...
-        '                myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
-        '                actionAlreadySent = True
-        '            End If
-        '        End If
-        '        pActionSentFlag = actionAlreadySent
-        '        pEndRunSentFlag = endRunToSend
-        '        pSystemErrorFlag = systemErrorFlag
+                    If endRunToSend Then 'ENDRUN - no more to be sent
+                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.ENDRUN)
+                        actionAlreadySent = True
+                    Else 'SKIP - No more std tests but some ise test are pending to be sent but the ISE module is working...
+                        myGlobal = _analyzerManager.ActivateProtocolWrapper(GlobalEnumerates.AppLayerEventList.SKIP)
+                        actionAlreadySent = True
+                    End If
+                End If
+                pActionSentFlag = actionAlreadySent
+                pEndRunSentFlag = endRunToSend
+                pSystemErrorFlag = systemErrorFlag
 
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
+            Catch ex As Exception
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorMessage = ex.Message
 
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobal
-        'End Function
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobal
+        End Function
 #End Region
 
 #Region "Aux Functions"
@@ -417,7 +403,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' Checks if next well is contaminated by last reagent used on it or if next well is optically rejected
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
+        ''' <param name="pDbConnection"></param>
         ''' <param name="pNextWell"></param>
         ''' <param name="pRejectedWell " ></param>
         ''' <param name="pContaminatedWell"></param>
@@ -426,7 +412,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/0/2011
         ''' AG 24/11/2011 - Priority 1st Contaminated well, 2on Rejected Well + change the business to prepare the contaminated well washing</remarks>
-        Private Function CheckRejectedContaminatedNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, _
+        Private Function CheckRejectedContaminatedNextWell(ByVal pDbConnection As SqlConnection, ByVal pNextWell As Integer, _
                                                     ByRef pRejectedWell As Boolean, ByRef pContaminatedWell As Boolean, _
                                                     ByRef pWashSol1 As String, ByRef pWashSol2 As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -447,38 +433,37 @@ Namespace Biosystems.Ax00.Core.Entities
                         resultData = myReactionsDelgte.ReadWellHistoricalUse(dbConnection, _analyzerManager.ActiveWorkSession, _analyzerManager.ActiveAnalyzer, pNextWell, True)
 
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myReactionsDS As New ReactionsRotorDS
-                            myReactionsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+                            Dim myReactionsDs = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                            If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                            If myReactionsDs.twksWSReactionsRotor.Rows.Count > 0 Then
                                 'Look if next well is rejected or not
-                                If Not myReactionsDS.twksWSReactionsRotor(0).IsRejectedFlagNull Then
-                                    If String.Equals(myReactionsDS.twksWSReactionsRotor.First.WellContent, "E") And myReactionsDS.twksWSReactionsRotor(0).RejectedFlag Then
+                                If Not myReactionsDs.twksWSReactionsRotor(0).IsRejectedFlagNull Then
+                                    If String.Equals(myReactionsDs.twksWSReactionsRotor.First.WellContent, "E") And myReactionsDs.twksWSReactionsRotor(0).RejectedFlag Then
                                         pRejectedWell = True
                                     End If
                                 End If
 
                                 'Search if next well is reagent contaminated by his last execution on it                            
                                 Dim rotorTurnWithWellContamination As Integer = 0
-                                Dim listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
+                                Dim listStDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDs.twksWSReactionsRotor _
                                                Where a.WellContent = "C" AndAlso a.WashRequiredFlag = True AndAlso a.WashedFlag = False _
                                                Select a Order By a.RotorTurn Descending)
 
-                                If listSTDtest.Count > 0 Then
+                                If listStDtest.Count > 0 Then
                                     'Get the last cuvette contaminator washing information (WashingSolutionR1, WashingSolutionR2)
                                     pContaminatedWell = True
-                                    rotorTurnWithWellContamination = listSTDtest(0).RotorTurn
-                                    If Not listSTDtest(0).IsWashingSolutionR1Null Then pWashSol1 = listSTDtest(0).WashingSolutionR1
-                                    If Not listSTDtest(0).IsWashingSolutionR2Null Then pWashSol2 = listSTDtest(0).WashingSolutionR2
+                                    rotorTurnWithWellContamination = listStDtest(0).RotorTurn
+                                    If Not listStDtest(0).IsWashingSolutionR1Null Then pWashSol1 = listStDtest(0).WashingSolutionR1
+                                    If Not listStDtest(0).IsWashingSolutionR2Null Then pWashSol2 = listStDtest(0).WashingSolutionR2
                                 End If 'If listSTDtest.Count > 0 Then
 
                                 'If well contaminated search if the previous well contamination has been washed or not
                                 If pContaminatedWell Then
-                                    listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
+                                    listStDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDs.twksWSReactionsRotor _
                                                    Where a.WashRequiredFlag = True AndAlso a.WashedFlag = True _
                                                    Select a Order By a.RotorTurn Descending)
-                                    If listSTDtest.Count > 0 Then
-                                        If listSTDtest(0).RotorTurn > rotorTurnWithWellContamination Then pContaminatedWell = False
+                                    If listStDtest.Count > 0 Then
+                                        If listStDtest(0).RotorTurn > rotorTurnWithWellContamination Then pContaminatedWell = False
                                     End If
                                 End If
                             End If
@@ -505,12 +490,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Inform the instruction sent in Running (only STD test preparation, or WRUN (reagent contamination) or WRUN (cuvette contamination)
         ''' into the structure that contains the last instructions sent used for calculate the next to be send
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
+        ''' <param name="pDbConnection"></param>
         ''' <param name="pNewPreparationSent"></param>
         ''' <param name="pNextWell"></param>
         ''' <returns></returns>
         ''' <remarks>Modified AG 10/01/2014</remarks>
-        Private Function AddNewSentPreparationsList(ByVal pDBConnection As SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
+        Private Function AddNewSentPreparationsList(ByVal pDbConnection As SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
@@ -586,28 +571,28 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Get execution additional information
                                 Dim execDelg As New ExecutionsDelegate
-                                Dim myExecDS As New AnalyzerManagerDS
+                                Dim myExecDs As New AnalyzerManagerDS
 
                                 resultData = execDelg.GetSendPreparationDataByExecution(dbConnection, _analyzerManager.ActiveAnalyzer, _analyzerManager.ActiveWorkSession, myExecution)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    myExecDS = CType(resultData.SetDatos, AnalyzerManagerDS)
+                                    myExecDs = CType(resultData.SetDatos, AnalyzerManagerDS)
                                 Else
                                     Exit Try
                                 End If
 
                                 'Add row to mySentPreparationsDS
-                                If myExecDS.searchNext.Rows.Count > 0 Then '(6.1)
+                                If myExecDs.searchNext.Rows.Count > 0 Then '(6.1)
                                     nextRow = _analyzerManager.SentPreparations.NewsentPreparationsRow
                                     nextRow.CuvetteWashFlag = False
                                     nextRow.ReagentWashFlag = False
-                                    nextRow.ExecutionID = myExecDS.searchNext(0).ExecutionID
-                                    nextRow.StatFlag = myExecDS.searchNext(0).StatFlag
-                                    nextRow.SampleClass = myExecDS.searchNext(0).SampleClass
-                                    nextRow.ExecutionType = myExecDS.searchNext(0).ExecutionType
-                                    nextRow.ReagentID = myExecDS.searchNext(0).ReagentID
-                                    nextRow.OrderTestID = myExecDS.searchNext(0).OrderTestID
-                                    nextRow.OrderID = myExecDS.searchNext(0).OrderID
-                                    nextRow.SampleType = myExecDS.searchNext(0).SampleType
+                                    nextRow.ExecutionID = myExecDs.searchNext(0).ExecutionID
+                                    nextRow.StatFlag = myExecDs.searchNext(0).StatFlag
+                                    nextRow.SampleClass = myExecDs.searchNext(0).SampleClass
+                                    nextRow.ExecutionType = myExecDs.searchNext(0).ExecutionType
+                                    nextRow.ReagentID = myExecDs.searchNext(0).ReagentID
+                                    nextRow.OrderTestID = myExecDs.searchNext(0).OrderTestID
+                                    nextRow.OrderID = myExecDs.searchNext(0).OrderID
+                                    nextRow.SampleType = myExecDs.searchNext(0).SampleType
                                     nextRow.WellUsed = pNextWell
                                     _analyzerManager.SentPreparations.AddsentPreparationsRow(nextRow)
                                     _analyzerManager.SentPreparations.AcceptChanges()
@@ -679,12 +664,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 _startTime = Now
 
                 If Not _resultData.HasError AndAlso Not _resultData.SetDatos Is Nothing Then '(3.1)
-                    Dim FoundPreparation As ExecutionsDS
-                    FoundPreparation = CType(_resultData.SetDatos, ExecutionsDS)
+                    Dim foundPreparation As ExecutionsDS
+                    foundPreparation = CType(_resultData.SetDatos, ExecutionsDS)
 
                     'RH 26/06/2012 Get data from returned DS
-                    If FoundPreparation.twksWSExecutions.Rows.Count > 0 Then
-                        Dim myRow As ExecutionsDS.twksWSExecutionsRow = FoundPreparation.twksWSExecutions(0)
+                    If foundPreparation.twksWSExecutions.Rows.Count > 0 Then
+                        Dim myRow As ExecutionsDS.twksWSExecutionsRow = foundPreparation.twksWSExecutions(0)
 
                         _nextRow = _nextPreparationDs.nextPreparation.NewnextPreparationRow
                         _nextRow.ExecutionType = "PREP_ISE"
@@ -834,22 +819,22 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Returns the next STD execution in the same patient - sampletype to perform without contamination
         ''' If not is possible then returns a contamination wash to perform
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionSTDFound"></param>
+        ''' <param name="pDbConnection"></param>
+        ''' <param name="pExecutionStdFound"></param>
         ''' <param name="pReagentWashFlag"></param>
         ''' <param name="pWashSol1"></param>
         ''' <param name="pWashSol2"></param>
         ''' <param name="pSampleClassFound" ></param>
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextSTDPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionSTDFound As Integer, _
+        Private Function SearchNextStdPreparation(ByVal pDbConnection As SqlConnection, ByRef pExecutionStdFound As Integer, _
                                                   ByRef pReagentWashFlag As Boolean, ByRef pWashSol1 As String, _
                                                   ByRef pWashSol2 As String, ByRef pSampleClassFound As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
             Try
-                resultData = GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDbConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
@@ -864,9 +849,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         resultData = myExecDlg.GetPendingExecutionForSendNextProcess(dbConnection, _analyzerManager.ActiveAnalyzer, _analyzerManager.ActiveWorkSession, True)
 
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(3)
-                            Dim myExecList As New ExecutionsDS 'AnalyzerManagerDS
-                            myExecList = CType(resultData.SetDatos, ExecutionsDS)
-
+                            Dim myExecList = CType(resultData.SetDatos, ExecutionsDS)
 
                             If myExecList.twksWSExecutions.Rows.Count > 0 Then '(4)
                                 '// 0) Remember the last OrderID - SampleType sent to prepare
@@ -885,13 +868,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'AG 28/11/2011 - 1) Get all R1 Contaminations and HIGH contamination persistance
-                                Dim contaminationsDataDS As ContaminationsDS = Nothing
+                                Dim contaminationsDataDs As ContaminationsDS = Nothing
                                 Dim highContaminationPersitance As Integer = 0
 
                                 Dim myContaminationsDelegate As New ContaminationsDelegate
                                 resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
+                                    contaminationsDataDs = DirectCast(resultData.SetDatos, ContaminationsDS)
                                     highContaminationPersitance = REAGENT_CONTAMINATION_PERSISTANCE
                                 End If
 
@@ -905,7 +888,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '// 1) Search myStatFlag executions with the same OrderID-SampleType as lastOrderID-lastSampleType
                                     '// (priority without contaminations with the last sent)
                                     If Not String.Equals(lastOrderID, "") And Not String.Equals(lastSampleType, "") And Not String.Equals(lastSampleClass, "PATIENT") Then
-                                        resultData = GetNextExecution(dbConnection, found, myExecList, lastOrderID, lastSampleType, myStatFlag, "", contaminationsDataDS, highContaminationPersitance)
+                                        resultData = GetNextExecution(dbConnection, found, myExecList, lastOrderID, lastSampleType, myStatFlag, "", contaminationsDataDs, highContaminationPersitance)
                                     End If
 
 
@@ -913,19 +896,19 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '//Sorting by SampleClass search myStatFlag executions with the different OrderID-SampleType as lastOrderID-lastSampleType
                                     '// (priority without contaminations with the last sent)
                                     If Not resultData.HasError And Not found Then
-                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "BLANK", contaminationsDataDS, highContaminationPersitance)
+                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "BLANK", contaminationsDataDs, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CALIB", contaminationsDataDS, highContaminationPersitance)
+                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CALIB", contaminationsDataDs, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CTRL", contaminationsDataDS, highContaminationPersitance)
+                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CTRL", contaminationsDataDs, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "PATIENT", contaminationsDataDS, highContaminationPersitance)
+                                        resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "PATIENT", contaminationsDataDs, highContaminationPersitance)
                                     End If
 
                                     myStatFlag = Not myStatFlag
@@ -953,9 +936,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ElseIf Not resultData.HasError And Not found Then '(5)
                                     resultData.SetDatos = GlobalConstants.NO_PENDING_PREPARATION_FOUND
                                 End If ''(5)
-                                sentLinqList = Nothing 'AG 02/08/2012 release memory
 
-                            End If '(4) If myExecList.searchNext.Rows.Count > 0 Then
+                            End If '(4) 
 
                         End If '(3)
 
@@ -970,7 +952,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -981,32 +963,32 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' This method look for the next execution sorting using the same algoritm that the used in CreateWSExecutions
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
+        ''' <param name="pDbConnection"></param>
         ''' <param name="pFound" ></param>
-        ''' <param name="pSTDExecutionList" ></param>
-        ''' <param name="pOrderID " ></param>
+        ''' <param name="pStdExecutionList" ></param>
+        ''' <param name="pOrderId " ></param>
         ''' <param name="pSampleType " ></param>
         ''' <param name="pStatFlag" ></param>
         ''' <param name="pSampleClass" ></param>
-        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="pContaminationsDs"></param>
         ''' <param name="pHighContaminationPersitance"></param>
         ''' <returns>AnalyzerManager.searchNext inside a GlobalDataTo</returns>
         ''' <remarks>AG 25/01/2011 - Created</remarks>
-        Private Function GetNextExecution(ByVal pDBConnection As SqlConnection, _
+        Private Function GetNextExecution(ByVal pDbConnection As SqlConnection, _
                                           ByRef pFound As Boolean, _
-                                          ByVal pSTDExecutionList As ExecutionsDS, _
-                                          ByVal pOrderID As String, _
+                                          ByVal pStdExecutionList As ExecutionsDS, _
+                                          ByVal pOrderId As String, _
                                           ByVal pSampleType As String, _
                                           ByVal pStatFlag As Boolean, _
                                           ByVal pSampleClass As String, _
-                                          ByVal pContaminationsDS As ContaminationsDS, _
+                                          ByVal pContaminationsDs As ContaminationsDS, _
                                           ByVal pHighContaminationPersitance As Integer) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = DAOBase.GetOpenDBConnection(pDbConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
@@ -1015,22 +997,22 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Get the list of pending executions depending the entry parameters case
                         'Apply different LINQ (where clause)
                         Dim toSendList As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                        If pOrderID <> "" And pSampleType <> "" Then '(3)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.OrderID = pOrderID AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag _
+                        If pOrderId <> "" And pSampleType <> "" Then '(3)
+                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pStdExecutionList.twksWSExecutions _
+                                            Where a.OrderID = pOrderId AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag _
                                             Select a).ToList
-                        ElseIf pOrderID <> "" And pSampleType <> "" And pSampleClass <> "" Then '(1)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.OrderID = pOrderID AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
+                        ElseIf pOrderId <> "" And pSampleType <> "" And pSampleClass <> "" Then '(1)
+                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pStdExecutionList.twksWSExecutions _
+                                            Where a.OrderID = pOrderId AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
                                             Select a).ToList
 
                         ElseIf pSampleClass <> "" Then '(1)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pStdExecutionList.twksWSExecutions _
                                             Where a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
                                             Select a).ToList
 
                         Else '(3)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pStdExecutionList.twksWSExecutions _
                                             Where a.StatFlag = pStatFlag _
                                             Select a).ToList
 
