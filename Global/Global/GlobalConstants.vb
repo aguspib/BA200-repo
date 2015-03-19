@@ -25,7 +25,8 @@ Namespace Biosystems.Ax00.Global
         Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
         Public Shared CreateWSExecutionsWithSemaphore As Boolean = True 'AG 03/06/2014 - #1644
 
-
+        'TR 25/01/2011 -Replace by corresponding value on global base.
+        Public Shared REAL_DEVELOPMENT_MODE As Integer = GlobalBase.RealDevelopmentMode
 
         '**************************
         '**** GLOBAL CONSTANTs ****
@@ -39,9 +40,6 @@ Namespace Biosystems.Ax00.Global
         Public Const READING_ERROR As Integer = 0
 
         Public Const MAX_WAVELENGTHS As Integer = 11
-
-        'TR 25/01/2011 -Replace by corresponding value on global base.
-        Public Shared REAL_DEVELOPMENT_MODE As Integer = GlobalBase.RealDevelopmentMode
 
         'AG 02/08/2010
         'Constants used during calculations
