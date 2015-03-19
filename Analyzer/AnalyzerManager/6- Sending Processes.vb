@@ -1753,8 +1753,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'and choose the best solution
 
 
-                                    currentResultList = toSendList.ToList() 'Initial order
-                                    toSendList = myExDlgte.ManageContaminationsForRunningAndStatic(dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+                                    currentResultList = toSendList.ToList() 'Initial order                                    
+                                    toSendList = myExDlgte.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
                                     ''Original sort result
                                     'currentResultList = toSendList.ToList() 'Initial order
