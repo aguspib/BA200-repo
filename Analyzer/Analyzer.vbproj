@@ -118,6 +118,9 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Biosystems.Ax00.CommunicationsSwFw" />
@@ -143,10 +146,17 @@
     <Compile Include="AnalyzerManager\5- Well base line calculations.vb" />
     <Compile Include="AnalyzerManager\6- Sending Processes.vb" />
     <Compile Include="AnalyzerManager\7- Recovery Results.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerManager.SendEvents.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerThreadEventManagement.vb" />
+    <Compile Include="AnalyzerManager\Actions\CurrentAlarms.vb" />
+    <Compile Include="AnalyzerManager\Actions\ProcessArmStatusRecived.vb" />
+    <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\BA200AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\BA400AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\DynamicBaseLineEntity.vb" />
+    <Compile Include="AnalyzerManager\Shared\ConstantParameters.vb" />
+    <Compile Include="AnalyzerManager\Shared\Preparation.vb" />
     <Compile Include="AnalyzerManager\SN- Temporal Testing and Old Methods.vb" />
     <Compile Include="AnalyzerManager\StaticBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\ToIntegrate.vb" />
@@ -181,6 +191,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalyzerManager\Actions\AnalizerManager.ReceivedEvents.vb" />
     <None Include="BioSystems.pfx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -191,6 +202,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CommAx00.exe">
@@ -245,6 +257,7 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

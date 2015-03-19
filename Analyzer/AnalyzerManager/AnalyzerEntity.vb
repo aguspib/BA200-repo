@@ -1,8 +1,5 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Core.Entities
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Data
 
