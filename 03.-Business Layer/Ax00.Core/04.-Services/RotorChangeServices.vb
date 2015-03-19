@@ -63,9 +63,6 @@ Namespace Biosystems.Ax00.Core.Services
 
         'Private WithEvents _analyzer As IAnalyzerManager
         Private _currentStep As RotorChangeStepsEnum
-        Private _forceEmptyAndFinalize As Boolean = False
-        Private _staticBaseLineFinished As Boolean = False
-        Private _dynamicBaseLineValid As Boolean = False
         Private _isInRecovering As Boolean = False
 
         Private _baseLineService As DynamicBaseLineService
