@@ -15,8 +15,8 @@ Namespace Biosystems.Ax00.BL
             MyBase.New()
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection)
-            MyBase.New(pConn)
+        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
+            MyBase.New(pConn, ActiveAnalyzer)
         End Sub
 
         Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
@@ -111,7 +111,7 @@ Namespace Biosystems.Ax00.BL
                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                 Execute_jj_loop(pExecutions, aux_j, aux_j, (aux_j - limit))
 
-                If contaminations.Count = 0 Then
+                If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
                     'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -174,6 +174,8 @@ Namespace Biosystems.Ax00.BL
                     End If
 
                     If contaminations.Count > 0 Then Exit For
+
+                    If Not ReagentsAreCompatibleType() Then Exit For
 
                     'Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                     'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
