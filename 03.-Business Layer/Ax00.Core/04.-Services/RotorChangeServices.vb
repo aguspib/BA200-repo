@@ -64,6 +64,10 @@ Namespace Biosystems.Ax00.Core.Services
         'Private WithEvents _analyzer As IAnalyzerManager
         Private _currentStep As RotorChangeStepsEnum
         Private _isInRecovering As Boolean = False
+        Private _forceEmptyAndFinalize As Boolean = False
+        Private _dynamicBaseLineValid As Boolean = False
+        Private _statucBaseLineFinished As Boolean = False
+        Private _staticBaseLineFinished As Boolean = False
 
         Private _baseLineService As DynamicBaseLineService
 
@@ -125,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Services
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
-                        _staticBaseLineFinished = False
+                        '_staticBaseLineFinished = False
 
                         resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
 
