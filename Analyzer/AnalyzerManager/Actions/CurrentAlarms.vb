@@ -325,8 +325,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     Where a.AlarmID = GlobalEnumerates.Alarms.GLF_BOARD_ERR.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
                     ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
                 Else
-                    myInstructionsQueue.Add(pAction)
-                    myParamsQueue.Add(pSwAdditionalParameters)
+                    'myInstructionsQueue.Add(pAction)
+                    'myParamsQueue.Add(pSwAdditionalParameters)
                 End If
             End If
         End Sub
