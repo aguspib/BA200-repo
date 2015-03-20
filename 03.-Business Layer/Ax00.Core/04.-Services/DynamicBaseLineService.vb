@@ -30,55 +30,35 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Public methods"
         Public Overrides Function StartService() As Boolean
 
-
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
             If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then Return False
 
             'Method flow:
             Dim startProcessSuccess As Boolean = False
-
-            Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             Initialize()
 
-            If _analyzer.ExistBottleAlarms Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "") 'AG + IT 10/02/2015 BA-2246 apply same rules in Change Rotor and in StartInstr
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
-                startProcessSuccess = False
-            Else
-                If _analyzer.Connected Then
-                    _analyzer.StopAnalyzerRinging()
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
-                    _staticBaseLineFinished = False
+            If _analyzer.Connected Then
+                _analyzer.StopAnalyzerRinging()
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
 
-                    resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
-
-                    If resultData.HasError Then
-                        '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "")
-                        Throw New Exception(resultData.ErrorCode)
-                    Else
-                        'Update analyzer session flags into DataBase
-                        If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                            Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                            myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-                        End If
-                        startProcessSuccess = True
-                    End If
-                Else
-                    startProcessSuccess = False
+                'Update analyzer session flags into DataBase
+                If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                 End If
-            End If
-            If startProcessSuccess Then
+
+                startProcessSuccess = True
+
                 Status = ServiceStatusEnum.Running
                 AddRequiredEventHandlers()
             End If
+
             Return startProcessSuccess
 
         End Function
@@ -423,11 +403,12 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                 End If
-                Status = ServiceStatusEnum.Paused
+
 
                 'TODO: MIC Discuss later
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
+            Status = ServiceStatusEnum.Paused
 
         End Sub
 
@@ -706,6 +687,7 @@ Namespace Biosystems.Ax00.Core.Services
             If Not eventHandlersAdded Then
                 AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
                 AddHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+                eventHandlersAdded = True
             End If
         End Sub
 
