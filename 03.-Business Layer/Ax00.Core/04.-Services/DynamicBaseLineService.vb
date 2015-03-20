@@ -6,14 +6,28 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Services
 
-    Public Class DynamicBaseLineService
+    Public Enum BaseLineStepsEnum
+        NotStarted
+        ConditioningWashing
+        StaticBaseLine
+        DynamicBaseLineFill
+        DynamicBaseLineRead
+        DynamicBaseLineEmpty
+        Finalize
+        None
+    End Enum
+
+    Public Class BaseLineService
         Inherits AsyncService
 
+#Region "Consutrcutors"
         Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
-            Me._currentStep = DynamicBaseLineStepsEnum.NotStarted
+            Me._currentStep = BaseLineStepsEnum.NotStarted
         End Sub
+#End Region
 
+#Region "Public methods"
         Public Overrides Function StartService() As Boolean
 
 
@@ -63,35 +77,73 @@ Namespace Biosystems.Ax00.Core.Services
             End If
             If startProcessSuccess Then
                 Status = ServiceStatusEnum.Running
-                AddHandlers()
+                AddRequiredEventHandlers()
             End If
             Return startProcessSuccess
 
         End Function
 
-        Public Function CurrentStep() As DynamicBaseLineStepsEnum
+        Public Function CurrentStep() As BaseLineStepsEnum
             Return _currentStep
         End Function
 
-        Public Enum DynamicBaseLineStepsEnum
-            NotStarted
-            ConditioningWashing
-            StaticBaseLine
-            DynamicBaseLineFill
-            DynamicBaseLineRead
-            DynamicBaseLineEmpty
-            Finalize
-            None
-        End Enum
+        Public Sub EmptyAndFinalizeProcess()
+            _forceEmptyAndFinalize = True
+            Status = ServiceStatusEnum.Running
+        End Sub
+
+
+        Public Function RecoverProcess() As Boolean
+            Try
+                _isInRecovering = True
+                '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
+
+                Dim nextStep = GetNextStep()
+
+                Select Case nextStep
+                    Case BaseLineStepsEnum.Finalize,
+                        BaseLineStepsEnum.DynamicBaseLineRead
+                        ValidateProcess()
+                    Case BaseLineStepsEnum.DynamicBaseLineEmpty
+                        ProcessDynamicBaseLine()
+                End Select
+
+                _isInRecovering = False
+
+                Return True
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex)
+                Return False
+            End Try
+        End Function
+
+        Public Sub RepeatDynamicBaseLineReadStep()
+
+            _analyzer.DynamicBaselineInitializationFailures = 0
+
+            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
+            End If
+
+            RestartProcess()
+
+            ExecuteDynamicBaseLineReadStep()
+
+        End Sub
+
+#End Region
 
 #Region "Attributes"
 
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
-        Private _currentStep As DynamicBaseLineStepsEnum
+        Private _currentStep As BaseLineStepsEnum
         Private _alreadyFinalized As Boolean = False
         Private _isInRecovering As Boolean = False
+        Private eventHandlersAdded As Boolean = False
 
 #End Region
 
@@ -100,14 +152,14 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub OnReceivedStatusInformationEvent()
             'Handles _analyzer.ReceivedStatusInformationEventHandler
             'Debug.WriteLine("Hello 1")
-            If _currentStep = DynamicBaseLineStepsEnum.NotStarted Then Return
+            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             TryToResume()
         End Sub
 
         Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
             'Handles _analyzer.ProcessFlagEventHandler
             'Debug.WriteLine("Hello 2")
-            If _currentStep = DynamicBaseLineStepsEnum.NotStarted Then Return
+            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
                     ProcessStaticBaseLine()
@@ -125,8 +177,9 @@ Namespace Biosystems.Ax00.Core.Services
 #End Region
 
 #Region "Private methods"
+
         Private Sub Initialize()
-            _currentStep = DynamicBaseLineStepsEnum.None
+            _currentStep = BaseLineStepsEnum.None
             _forceEmptyAndFinalize = False
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
@@ -147,30 +200,30 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub TryToResume()
 
-            Dim nextStep As DynamicBaseLineStepsEnum
+            Dim nextStep As BaseLineStepsEnum
             nextStep = GetNextStep()
             Select Case nextStep
-                Case DynamicBaseLineStepsEnum.ConditioningWashing,
-                     DynamicBaseLineStepsEnum.StaticBaseLine,
-                     DynamicBaseLineStepsEnum.DynamicBaseLineFill,
-                     DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
+                Case BaseLineStepsEnum.ConditioningWashing,
+                     BaseLineStepsEnum.StaticBaseLine,
+                     BaseLineStepsEnum.DynamicBaseLineFill,
+                     BaseLineStepsEnum.DynamicBaseLineEmpty
                     ValidateProcess()
             End Select
 
         End Sub
 
-        Private Function GetNextStep() As DynamicBaseLineStepsEnum
-            Dim nextStep = DynamicBaseLineStepsEnum.None
+        Private Function GetNextStep() As BaseLineStepsEnum
+            Dim nextStep = BaseLineStepsEnum.None
             If Status = ServiceStatusEnum.Running Then
-                If _alreadyFinalized Then Return DynamicBaseLineStepsEnum.None
+                If _alreadyFinalized Then Return BaseLineStepsEnum.None
 
                 Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
                     Case "", "CANCELED"
-                        nextStep = DynamicBaseLineStepsEnum.ConditioningWashing
+                        nextStep = BaseLineStepsEnum.ConditioningWashing
 
                     Case "END"
                         If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "") OrElse (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                            nextStep = DynamicBaseLineStepsEnum.StaticBaseLine
+                            nextStep = BaseLineStepsEnum.StaticBaseLine
 
                         Else
 
@@ -181,38 +234,38 @@ Namespace Biosystems.Ax00.Core.Services
                                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") And
                                        ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "") OrElse
                                         (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED")) Then
-                                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineFill
+                                        nextStep = BaseLineStepsEnum.DynamicBaseLineFill
 
                                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
                                            (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "") Then
-                                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineRead
+                                        nextStep = BaseLineStepsEnum.DynamicBaseLineRead
 
                                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
                                            ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "") OrElse
                                             (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
+                                        nextStep = BaseLineStepsEnum.DynamicBaseLineEmpty
 
                                     ElseIf (_forceEmptyAndFinalize) AndAlso (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) <> "END") Then
-                                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
+                                        nextStep = BaseLineStepsEnum.DynamicBaseLineEmpty
 
                                     End If
 
                                 End If
 
                                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
-                                    nextStep = DynamicBaseLineStepsEnum.Finalize
+                                    nextStep = BaseLineStepsEnum.Finalize
                                 End If
 
                             Else
                                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "END") OrElse
                                    (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                                    nextStep = DynamicBaseLineStepsEnum.Finalize
+                                    nextStep = BaseLineStepsEnum.Finalize
                                 End If
                             End If
 
                         End If
                 End Select
-                If nextStep <> DynamicBaseLineStepsEnum.None Then
+                If nextStep <> BaseLineStepsEnum.None Then
                     Debug.Print("Currently doing: " & nextStep.ToString)
                 End If
 
@@ -222,19 +275,19 @@ Namespace Biosystems.Ax00.Core.Services
 
 
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.ConditioningWashing
+                        nextStep = BaseLineStepsEnum.ConditioningWashing
 
                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.StaticBaseLine
+                        nextStep = BaseLineStepsEnum.StaticBaseLine
 
                     ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
-                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineFill
+                        nextStep = BaseLineStepsEnum.DynamicBaseLineFill
 
                     ElseIf ((_isInRecovering) And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
-                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineRead
+                        nextStep = BaseLineStepsEnum.DynamicBaseLineRead
 
                     ElseIf ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                        nextStep = DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
+                        nextStep = BaseLineStepsEnum.DynamicBaseLineEmpty
 
                     End If
                 End If
@@ -242,6 +295,8 @@ Namespace Biosystems.Ax00.Core.Services
             Return nextStep
 
         End Function
+
+
         Private Sub ProcessStaticBaseLine()
             _staticBaseLineFinished = True
 
@@ -261,7 +316,7 @@ Namespace Biosystems.Ax00.Core.Services
             Select Case _currentStep
 
 
-                Case DynamicBaseLineStepsEnum.ConditioningWashing
+                Case BaseLineStepsEnum.ConditioningWashing
                     If (_analyzer.CheckIfWashingIsPossible()) Then
                         RestartProcess()
                         ExecuteWashingStep()
@@ -269,7 +324,7 @@ Namespace Biosystems.Ax00.Core.Services
                         WashingStepPaused()
                     End If
 
-                Case DynamicBaseLineStepsEnum.StaticBaseLine
+                Case BaseLineStepsEnum.StaticBaseLine
                     If (Not _staticBaseLineFinished) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
                             RestartProcess()
@@ -285,7 +340,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
 
 
-                Case DynamicBaseLineStepsEnum.DynamicBaseLineFill
+                Case BaseLineStepsEnum.DynamicBaseLineFill
                     If (_analyzer.CheckIfWashingIsPossible()) Then
                         RestartProcess()
                         ExecuteDynamicBaseLineFillStep()
@@ -293,11 +348,11 @@ Namespace Biosystems.Ax00.Core.Services
                         DynamicBaseLineFillStepPaused()
                     End If
 
-                Case DynamicBaseLineStepsEnum.DynamicBaseLineRead
+                Case BaseLineStepsEnum.DynamicBaseLineRead
                     RestartProcess()
                     ExecuteDynamicBaseLineReadStep()
 
-                Case DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
+                Case BaseLineStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
                             RestartProcess()
@@ -314,7 +369,7 @@ Namespace Biosystems.Ax00.Core.Services
                         End If
                     End If
 
-                Case DynamicBaseLineStepsEnum.Finalize
+                Case BaseLineStepsEnum.Finalize
                     FinalizeProcess()
 
             End Select
@@ -322,34 +377,9 @@ Namespace Biosystems.Ax00.Core.Services
             Return
         End Sub
 
-        Public Function RecoverProcess() As Boolean
-            Try
-                _isInRecovering = True
-                '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
-
-                Dim nextStep = GetNextStep()
-
-                Select Case nextStep
-                    Case DynamicBaseLineStepsEnum.Finalize,
-                        DynamicBaseLineStepsEnum.DynamicBaseLineRead
-                        ValidateProcess()
-                    Case DynamicBaseLineStepsEnum.DynamicBaseLineEmpty
-                        ProcessDynamicBaseLine()
-                End Select
-
-                _isInRecovering = False
-
-                Return True
-
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex)
-                Return False
-            End Try
-        End Function
-
         Private Sub RestartProcess()
 
+            AddRequiredEventHandlers()
             Status = ServiceStatusEnum.Running
 
         End Sub
@@ -496,20 +526,7 @@ Namespace Biosystems.Ax00.Core.Services
             If _alreadyFinalized Then Return
             _alreadyFinalized = True
 
-            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
-
-            'Remove alarm change rotor recommend
-            If _analyzer.Alarms.Contains(Alarms.BASELINE_WELL_WARN) Then
-                _analyzer.Alarms.Remove(Alarms.BASELINE_WELL_WARN)
-            End If
-
-            'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
-
-            RemoveHandlers()
+            RemoveRequiredEventHandlers()
             NotifyProcessResult()
 
         End Sub
@@ -671,20 +688,25 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-            RemoveHandlers()
+            RemoveRequiredEventHandlers()
             MyBase.Dispose(disposing)
         End Sub
 
-        Sub RemoveHandlers()
-            Try
-                RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
-                RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
-            Catch : End Try
+        Private Sub RemoveRequiredEventHandlers()
+            If eventHandlersAdded Then
+                Try
+                    RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
+                    RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+                    eventHandlersAdded = False
+                Catch : End Try
+            End If
         End Sub
 
-        Private Sub AddHandlers()
-            AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
-            AddHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+        Private Sub AddRequiredEventHandlers()
+            If Not eventHandlersAdded Then
+                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
+                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
+            End If
         End Sub
 
 #End Region
