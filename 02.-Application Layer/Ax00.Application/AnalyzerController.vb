@@ -210,8 +210,10 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Sub ChangeRotorCloseProcess()
             Try
-                _rotorChangeServices.Dispose()
-                _rotorChangeServices = Nothing
+                If _rotorChangeServices IsNot Nothing Then
+                    _rotorChangeServices.Dispose()
+                    _rotorChangeServices = Nothing
+                End If
             Catch ex As Exception
                 Throw ex
             End Try

@@ -6040,6 +6040,9 @@ Namespace Biosystems.Ax00.BL
                 End If
                 'AG 25/03/2013
 
+                'AJG ADDED BECAUSE THE ANALYZER MODEL IS NEEDED BECAUSE MANAGING CONTAMINATIONS IS ANALYZER DEPENDANT
+                Dim activeAnalyzer As String = GetActiveAnalyzer(dbConnection)
+
                 If (Not pWorkInRunningMode) Then 'AG 19/02/2014 - #1514 note that this parameter value is FALSE when called from create repetitions process!!!
                     'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
                     resultData = myDAO.SearchNotInCourseExecutionsToDelete(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID)
@@ -6640,7 +6643,7 @@ Namespace Biosystems.Ax00.BL
                                         'Dim startTime As DateTime = Now
 
                                         'Sort by Contamination
-                                        resultData = SortWSExecutionsByContamination(dbConnection, executionDataDS)
+                                        resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                             executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
@@ -6652,7 +6655,7 @@ Namespace Biosystems.Ax00.BL
                                                 'Sort Orders by Contamination
                                                 'AG 07/11/2011
                                                 'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
-                                                resultData = SortWSExecutionsByElementGroupContaminationNew(dbConnection, executionDataDS) 'AG 07/11/2011
+                                                resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
                                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                     executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
@@ -6864,6 +6867,26 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Gets the active analyzer model
+        ''' </summary>
+        ''' <param name="dbConnection">Connection to db</param>
+        ''' <returns>The analyzer model that is currently connected to</returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
+        Protected Function GetActiveAnalyzer(ByVal dbConnection As SqlConnection) As String
+            Dim resultData As GlobalDataTO = Nothing
+            Dim myAnalyzerDAO As New tcfgAnalyzersDAO            
+            Dim activeAnalyzer As String = ""
+            resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)            
+            If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
+                Dim myDS = CType(resultData.SetDatos, AnalyzersDS)
+                activeAnalyzer = myDS.tcfgAnalyzers(0).Item("AnalyzerModel").ToString()
+            End If
+            Return activeAnalyzer
+        End Function
+
 
         ''' <summary>
         ''' Delete all Executions for a group of Order Tests that fulfill the following condition: ALL their Executions 
@@ -7068,6 +7091,9 @@ Namespace Biosystems.Ax00.BL
                             Next
                         End If
                         'AG 25/03/2013
+
+                        'AJG ADDED BECAUSE THE ANALYZER MODEL IS NEEDED BECAUSE MANAGING CONTAMINATIONS IS ANALYZER DEPENDANT
+                        Dim activeAnalyzer As String = GetActiveAnalyzer(dbConnection)
 
                         If (Not pWorkInRunningMode) Then 'AG 19/02/2014 - #1514 note that this parameter value is FALSE when called from create repetitions process!!!
                             'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
@@ -7974,7 +8000,7 @@ Namespace Biosystems.Ax00.BL
                                                 'Dim startTime As DateTime = Now
 
                                                 'Sort by Contamination
-                                                resultData = SortWSExecutionsByContamination(dbConnection, executionDataDS)
+                                                resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
                                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                     executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
@@ -7986,7 +8012,7 @@ Namespace Biosystems.Ax00.BL
                                                         'Sort Orders by Contamination
                                                         'AG 07/11/2011
                                                         'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
-                                                        resultData = SortWSExecutionsByElementGroupContaminationNew(dbConnection, executionDataDS) 'AG 07/11/2011
+                                                        resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
                                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                             executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
@@ -8185,8 +8211,9 @@ Namespace Biosystems.Ax00.BL
         '''              AG 25/11/2011 - Added the high contamination persistance functionality
         '''              AG 20/06/2012 - Executions for CONTROLS have to be processed in the same way than Executions for PATIENT Samples
         '''              AG 27/05/2013 - Add the new sample types LIQ, SEM
+        '''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
         ''' </remarks>
-        Public Function SortWSExecutionsByContamination(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
+        Public Function SortWSExecutionsByContamination(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -8321,7 +8348,7 @@ Namespace Biosystems.Ax00.BL
                                                             OrderContaminationNumber = GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
                                                         End If
 
-                                                        ManageContaminations(dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
+                                                        ManageContaminations(activeAnalyzer, dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
 
                                                         'AJG PENDIENTE DE BORRAR!!!
                                                         'If (OrderContaminationNumber > 0) Then
@@ -9142,8 +9169,9 @@ Namespace Biosystems.Ax00.BL
         '''              AG 25/11/2011 - Added the high contamination persistance functionality
         '''              AG 20/06/2012 - Executions for CONTROLS have to be processed in the same way than Executions for PATIENT Samples
         '''              AG 27/05/2013 - Add new samples types LIQ and SER
+        '''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
         ''' </remarks>
-        Public Function SortWSExecutionsByElementGroupContaminationNew(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
+        Public Function SortWSExecutionsByElementGroupContaminationNew(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -9350,7 +9378,7 @@ Namespace Biosystems.Ax00.BL
                                                                 End If 'If pendingOrderTestInNewElement.Count > 0 Then
                                                             End If 'If previousElementLastReagentID <> -1 Then
 
-                                                            ManageContaminations(dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
+                                                            ManageContaminations(activeAnalyzer, dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber)
 
                                                             'AJG PENDIENTE DE BORRAR!!!
                                                             'If (OrderContaminationNumber > 0) Then
@@ -9418,52 +9446,52 @@ Namespace Biosystems.Ax00.BL
                                                             '    Next
                                                             'End If
 
-                                                        'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
-                                                        OrderTests = (From wse In returnDS.twksWSExecutions _
-                                                                        Where wse.StatFlag = Stat AndAlso _
-                                                                        wse.SampleClass = SClass AndAlso _
-                                                                        wse.ElementID = ID AndAlso _
-                                                                        wse.ExecutionStatus = "PENDING" _
-                                                                        Select wse).ToList()
+                                                            'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
+                                                            OrderTests = (From wse In returnDS.twksWSExecutions _
+                                                                            Where wse.StatFlag = Stat AndAlso _
+                                                                            wse.SampleClass = SClass AndAlso _
+                                                                            wse.ElementID = ID AndAlso _
+                                                                            wse.ExecutionStatus = "PENDING" _
+                                                                            Select wse).ToList()
 
-                                                        If OrderTests.Count > 0 Then
-                                                            'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
-                                                            'The last reagentID used has the higher indexes
-                                                            Dim maxReplicates As Integer
-                                                            For item = 0 To OrderTests.Count - 1
-                                                                Dim itemIndex = item
-                                                                maxReplicates = (From wse In returnDS.twksWSExecutions _
-                                                                                                    Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
-                                                                                                    Select wse.ReplicateNumber).Max
+                                                            If OrderTests.Count > 0 Then
+                                                                'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
+                                                                'The last reagentID used has the higher indexes
+                                                                Dim maxReplicates As Integer
+                                                                For item = 0 To OrderTests.Count - 1
+                                                                    Dim itemIndex = item
+                                                                    maxReplicates = (From wse In returnDS.twksWSExecutions _
+                                                                                                        Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
+                                                                                                        Select wse.ReplicateNumber).Max
 
-                                                                If PreviousReagentsIDList.Count = 0 Then
-                                                                    PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                    previousOrderTestMaxReplicatesList.Add(maxReplicates)
+                                                                    If PreviousReagentsIDList.Count = 0 Then
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
 
-                                                                    'When reagent changes
-                                                                ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
-                                                                    PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                    previousOrderTestMaxReplicatesList.Add(maxReplicates)
-                                                                End If
+                                                                        'When reagent changes
+                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
+                                                                    End If
 
-                                                                If itemIndex = OrderTests.Count - 1 Then
-                                                                    previousElementLastReagentID = OrderTests(itemIndex).ReagentID
-                                                                    previousElementLastMaxReplicates = maxReplicates
-                                                                End If
-                                                                'AG 19/12/2011
-                                                            Next
+                                                                    If itemIndex = OrderTests.Count - 1 Then
+                                                                        previousElementLastReagentID = OrderTests(itemIndex).ReagentID
+                                                                        previousElementLastMaxReplicates = maxReplicates
+                                                                    End If
+                                                                    'AG 19/12/2011
+                                                                Next
+                                                            Else
+                                                                'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
+                                                                'WS could contain a Element LOCKED completely
+                                                            End If
+                                                            'AG 07/11/2011
                                                         Else
-                                                            'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
-                                                            'WS could contain a Element LOCKED completely
+                                                            'AG 14/12/2011 - Different test types
+                                                            For Each wse In AllTestTypeOrderTests
+                                                                returnDS.twksWSExecutions.ImportRow(wse)
+                                                            Next
+                                                            'AG 14/12/2011
                                                         End If
-                                                        'AG 07/11/2011
-                                                    Else
-                                                        'AG 14/12/2011 - Different test types
-                                                        For Each wse In AllTestTypeOrderTests
-                                                            returnDS.twksWSExecutions.ImportRow(wse)
-                                                        Next
-                                                        'AG 14/12/2011
-                                                    End If
 
                                                         If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
 
@@ -11827,7 +11855,24 @@ Namespace Biosystems.Ax00.BL
         '    Return result
         'End Function
 
-        Private Sub ManageContaminations(ByVal pConn As SqlConnection,
+        ''' <summary>
+        ''' This code executes the 4 different optimizations for solving contaminations, that were duplicated on the sort methods with contaminations.
+        ''' </summary>
+        ''' <param name="activeAnalyzer">Needed analyzer model, because optimizations are model dependent</param>
+        ''' <param name="pConn">Connection to database</param>
+        ''' <param name="returnDS">Sorted executions as result of optimizations</param>
+        ''' <param name="contaminationsDataDS">List of existing contaminations</param>
+        ''' <param name="highContaminationPersitance">value that defines high contamination persistence</param>
+        ''' <param name="OrderTests">List of the order tests to treat</param>
+        ''' <param name="AllTestTypeOrderTests">List of all the order tests</param>
+        ''' <param name="OrderContaminationNumber">Number of previous existing contaminations</param>
+        ''' <param name="pPreviousReagentID">Optional parameter</param>
+        ''' <param name="pPreviousReagentIDMaxReplicates">Optional parameter</param>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
+        Private Sub ManageContaminations(ByVal activeAnalyzer As String,
+                                         ByVal pConn As SqlConnection,
                                          ByRef returnDS As ExecutionsDS,
                                          ByVal contaminationsDataDS As ContaminationsDS,
                                          ByVal highContaminationPersitance As Integer,
@@ -11846,55 +11891,7 @@ Namespace Biosystems.Ax00.BL
 
                 currentContaminationNumber = OrderContaminationNumber
                 currentResult = OrderTests.ToList()
-                bestResult = ManageContaminationsForRunningAndStatic(pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-
-                'AJG PENDIENTE DE BORRAR!!!!
-                ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-                'currentResult = OrderTests.ToList()
-
-                ''AG 10/11/2011 - by default assume the best result is the original one
-                'bestContaminationNumber = OrderContaminationNumber
-                'bestResult = OrderTests.ToList()
-
-                'Dim myAOptimizer = New OptimizationAPolicyApplier()
-                'currentContaminationNumber = myAOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-                ''Accept policy A only when improves '' Assume it is the best result.
-                'If currentContaminationNumber < bestContaminationNumber Then
-                '    bestContaminationNumber = currentContaminationNumber
-                '    bestResult = currentResult
-                'End If
-
-                ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-                'If currentContaminationNumber > 0 Then
-                '    currentResult = OrderTests.ToList()
-                '    Dim myBOptimizer = New OptimizationBPolicyApplier()
-                '    currentContaminationNumber = myBOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-                '    If currentContaminationNumber < bestContaminationNumber Then
-                '        bestContaminationNumber = currentContaminationNumber
-                '        bestResult = currentResult
-                '    End If
-                'End If
-
-                ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-                'If currentContaminationNumber > 0 Then
-                '    currentResult = OrderTests.ToList()
-                '    Dim myCOptimizer = New OptimizationCPolicyApplier()
-                '    currentContaminationNumber = myCOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-                '    If currentContaminationNumber < bestContaminationNumber Then
-                '        bestContaminationNumber = currentContaminationNumber
-                '        bestResult = currentResult
-                '    End If
-                'End If
-
-                ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-                'If currentContaminationNumber > 0 Then
-                '    currentResult = OrderTests.ToList()
-                '    Dim myDOptimizer = New OptimizationDPolicyApplier()
-                '    currentContaminationNumber = myDOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersitance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-                '    If currentContaminationNumber < bestContaminationNumber Then
-                '        bestResult = currentResult
-                '    End If
-                'End If
+                bestResult = ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
                 'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
                 If currentContaminationNumber > 0 Then
@@ -11931,7 +11928,25 @@ Namespace Biosystems.Ax00.BL
 
         End Sub
 
-        Public Function ManageContaminationsForRunningAndStatic(ByVal pConn As SqlConnection,
+        ''' <summary>
+        ''' Applies the 4 different optimizations for solving contaminations between order tests
+        ''' </summary>
+        ''' <param name="ActiveAnalyzer"></param>
+        ''' <param name="pConn"></param>
+        ''' <param name="contaminationsDataDS"></param>
+        ''' <param name="OrderTests"></param>
+        ''' <param name="highContaminationPersistance"></param>
+        ''' <param name="currentContaminationNumber"></param>
+        ''' <param name="pPreviousReagentID"></param>
+        ''' <param name="pPreviousReagentIDMaxReplicates"></param>
+        ''' <returns>
+        ''' the order test optimized in execution order, if it has been possible
+        ''' </returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
+        Public Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
+                                                                ByVal pConn As SqlConnection,
                                                                 ByVal contaminationsDataDS As ContaminationsDS,
                                                                 ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
                                                                 ByVal highContaminationPersistance As Integer,
@@ -11944,7 +11959,7 @@ Namespace Biosystems.Ax00.BL
             Dim bestContaminationNumber = Integer.MaxValue
             Dim bestResult = OrderTests.ToList()
 
-            Dim myAOptimizer = New OptimizationAPolicyApplier(pConn)
+            Dim myAOptimizer = New OptimizationAPolicyApplier(pConn, ActiveAnalyzer)
             currentContaminationNumber = myAOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
             'Accept policy A only when improves '' Assume it is the best result.
             If currentContaminationNumber < bestContaminationNumber Then
@@ -11955,7 +11970,7 @@ Namespace Biosystems.Ax00.BL
             'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
             If currentContaminationNumber > 0 Then
                 currentResult = OrderTests.ToList()
-                Dim myBOptimizer = New OptimizationBPolicyApplier(pConn)
+                Dim myBOptimizer = New OptimizationBPolicyApplier(pConn, ActiveAnalyzer)
                 currentContaminationNumber = myBOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
                 If currentContaminationNumber < bestContaminationNumber Then
                     bestContaminationNumber = currentContaminationNumber
@@ -11966,7 +11981,7 @@ Namespace Biosystems.Ax00.BL
             'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
             If currentContaminationNumber > 0 Then
                 currentResult = OrderTests.ToList()
-                Dim myCOptimizer = New OptimizationCPolicyApplier(pConn)
+                Dim myCOptimizer = New OptimizationCPolicyApplier(pConn, ActiveAnalyzer)
                 currentContaminationNumber = myCOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
                 If currentContaminationNumber < bestContaminationNumber Then
                     bestContaminationNumber = currentContaminationNumber
@@ -11977,7 +11992,7 @@ Namespace Biosystems.Ax00.BL
             'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
             If currentContaminationNumber > 0 Then
                 currentResult = OrderTests.ToList()
-                Dim myDOptimizer = New OptimizationDPolicyApplier(pConn)
+                Dim myDOptimizer = New OptimizationDPolicyApplier(pConn, ActiveAnalyzer)
                 currentContaminationNumber = myDOptimizer.ExecuteOptimization(contaminationsDataDS, currentResult, highContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
                 If currentContaminationNumber < bestContaminationNumber Then
                     bestResult = currentResult
