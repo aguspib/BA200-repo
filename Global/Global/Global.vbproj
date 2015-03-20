@@ -142,6 +142,7 @@
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
     <Compile Include="Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Enums\BarcodeWorksessionActionsEnum.vb" />
+    <Compile Include="Enums\StringStepStatus.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="FwAdjustments\ArmTO.vb" />
     <Compile Include="FwAdjustments\FwAdjustmentsDataTO.vb" />

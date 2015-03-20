@@ -1211,14 +1211,15 @@
       END
       GO
     </UpdateScript>
-  </AppVersion >
+  </AppVersion>
   <AppVersion>
-    <Version>X.XX</Version>
+    <Version>3.07</Version>
     <UpdateScript>
       --|====================|
-      --| BA200: vX.XX       |
+      --| BA200: v3.07     	 |
       --|====================|
-
+      ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
+	  
       IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
       BEGIN
       INSERT INTO dbo.tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, OKType)
