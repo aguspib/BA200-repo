@@ -339,7 +339,7 @@ Public Class Ax00MainForm
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
         Debug.WriteLine("Trying to launch FLIGHT as a service")
 
-        Dim FLS As New Biosystems.Ax00.Core.Services.DynamicBaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
+        Dim FLS As New Biosystems.Ax00.Core.Services.BaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
 
         FLS.OnServiceStatusChange =
             Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)

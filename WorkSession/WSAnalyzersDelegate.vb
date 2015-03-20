@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.BL
         ''' Change the status of the informed Analyzer WorkSession from the specified current Status to the new one.  
         ''' If the current status of the specified Work Session is different of the indicated, the Status is not changed
         ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pDbConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
         ''' <param name="pNewStatus">New Work Session Status</param>
@@ -76,13 +76,13 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 26/04/2010 
         ''' Modified by: SA 14/06/2010 - Parameter for current WS Status change to optional to allow reuse the function
         ''' </remarks>
-        Public Function UpdateWSStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function UpdateWSStatus(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                        ByVal pNewStatus As String, Optional ByVal pCurrentStatus As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                resultData = GetOpenDBTransaction(pDbConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
