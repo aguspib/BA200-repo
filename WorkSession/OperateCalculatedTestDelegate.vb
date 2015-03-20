@@ -1,7 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
@@ -412,11 +412,11 @@ Namespace Biosystems.Ax00.BL
                 If (pResultRow.CONC_Error = GlobalEnumerates.ConcentrationErrors.OUT.ToString()) Then
                     'Conc NOT calculated
                     AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
-                                   GlobalEnumerates.Alarms.CONC_REMARK1.ToString)
+                                   Alarms.CONC_REMARK1.ToString)
                 ElseIf (pResultRow.CONC_Error = String.Empty AndAlso pResultRow.CONC_Value < 0) Then
                     'Conc < 0
                     AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
-                                   GlobalEnumerates.Alarms.CONC_REMARK4.ToString)
+                                   Alarms.CONC_REMARK4.ToString)
                 End If
 
                 'Read Reference Range Limits
@@ -443,11 +443,11 @@ Namespace Biosystems.Ax00.BL
                         'BT #1659 - Save CONC_REMARK7 if CONC_Value < Min Range and CONC_REMARK8 if CONC_Value > Max Range
                         If (pResultRow.CONC_Value < minimunValue.Value) Then
                             AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
-                                           GlobalEnumerates.Alarms.CONC_REMARK7.ToString)
+                                           Alarms.CONC_REMARK7.ToString)
 
                         ElseIf (pResultRow.CONC_Value > maximunValue.Value) Then
                             AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
-                                           GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
+                                           Alarms.CONC_REMARK8.ToString)
                         End If
                     End If
                 End If
@@ -455,7 +455,7 @@ Namespace Biosystems.Ax00.BL
                 If (pRelatedStandardTestHasRemark) Then
                     'Some tests with remarks
                     AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
-                                   GlobalEnumerates.Alarms.CONC_REMARK11.ToString)
+                                   Alarms.CONC_REMARK11.ToString)
                 End If
 
                 'BT #1659- Delete all previous Alarms always, not only when new alarms have been found

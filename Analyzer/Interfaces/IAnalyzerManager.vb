@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.Core.Interfaces
@@ -37,14 +38,15 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property InstructionTypeReceived() As AnalyzerManagerSwActionList
         ReadOnly Property InstructionTypeSent() As AppLayerEventList
         Property ISEModuleIsReady() As Boolean
-        ReadOnly Property Alarms() As List(Of Alarms)
+        ReadOnly Property Alarms() As List(Of AlarmEnumerates.Alarms)
         ReadOnly Property ErrorCodes() As String
         Property IsServiceAlarmInformed() As Boolean
         Property IsServiceRotorMissingInformed() As Boolean
         Property IsFwUpdateInProcess() As Boolean
         Property IsConfigGeneralProcess() As Boolean
-        Property AnalyzerIsFreeze() As Boolean
+        Property AnalyzerIsFreeze() As Boolean        
         Property AnalyzerFreezeMode() As String
+        Property AnalyzerHasSubStatus() As Boolean
         Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String
         ReadOnly Property GetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single
         WriteOnly Property SetSensorValue(ByVal pSensorID As AnalyzerSensors) As Single
@@ -249,7 +251,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function AlarmListAddtem(itemToAdd As Alarms) As Boolean
         Sub MyErrorCodesClear()
         Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
-        Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
+        Function TranslateErrorCodeToAlarmID(ByVal pDbConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
         Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), ByRef pErrorCodeFinalList As List(Of String))
         Function QueueAdds(ByVal pInstruction As AnalyzerManagerSwActionList, ByVal pParamsQueue As Object) As Boolean
         Sub SetAllowScanInRunningValue(ByVal pValue As Boolean)

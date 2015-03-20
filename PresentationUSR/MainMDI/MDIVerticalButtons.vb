@@ -67,7 +67,7 @@ Partial Public Class UiAx00MainMDI
                         Dim myAx00Ready As Boolean = True
                         Dim myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions
                         Dim myAx00InstructionReceived As GlobalEnumerates.AnalyzerManagerSwActionList
-                        'Dim myAx00CurrentAlarms As New List(Of GlobalEnumerates.Alarms) 'AG 01/12/11
+                        'Dim myAx00CurrentAlarms As New List(Of AlarmEnumerates.Alarms) 'AG 01/12/11
 
                         myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
                         myAx00Ready = AnalyzerController.Instance.Analyzer.AnalyzerIsReady
@@ -163,7 +163,7 @@ Partial Public Class UiAx00MainMDI
         Dim myStatus As Boolean = True
         Try
             Dim resultData As New GlobalDataTO
-            Dim myAlarms As List(Of GlobalEnumerates.Alarms) 'AG 21/01/2014 - Do not use New in definition New List(Of GlobalEnumerates.Alarms)
+            Dim myAlarms As List(Of AlarmEnumerates.Alarms) 'AG 21/01/2014 - Do not use New in definition New List(Of AlarmEnumerates.Alarms)
 
             ' AG+XBC 24/05/2012
             'Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
@@ -174,10 +174,10 @@ Partial Public Class UiAx00MainMDI
             myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
             'AG 25/10/2011 - Before treat the cover alarms read if they are deactivated (0 disabled, 1 enabled)
-            Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
-            Dim reactionsCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.REACT_COVER_WARN), 1, 0), Boolean)
-            Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
-            Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
+            Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
+            Dim reactionsCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN), 1, 0), Boolean)
+            Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
+            Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
 
             resultData = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
@@ -238,7 +238,7 @@ Partial Public Class UiAx00MainMDI
                 'AG 14/09/2011 - Use the adjustment for treat or not the covers alarms (tested ok 26/10/2011 AG with cover detection disabled)
                 'START INSTRUMENT button
                 Case ActionButton.START_INSTRUMENT
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                    If myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                        mainCoverAlarm OrElse reactionsCoverAlarm OrElse fridgeCoverAlarm OrElse samplesCoverAlarm OrElse iSEUtilitiesActiveFlag Then
                         myStatus = False
                     Else
@@ -248,7 +248,7 @@ Partial Public Class UiAx00MainMDI
                     'SHUT DOWN INSTRUMENT button
                 Case ActionButton.SHUT_DOWN
                     'samplesCoverAlarm = False
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                    If myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                        mainCoverAlarm OrElse reactionsCoverAlarm OrElse fridgeCoverAlarm OrElse samplesCoverAlarm OrElse iSEUtilitiesActiveFlag Then
                         myStatus = False
                     Else
@@ -266,24 +266,24 @@ Partial Public Class UiAx00MainMDI
                     '    'AG 06/11/2013 - Task #1375
 
                     '    If mainCoverAlarm OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                     '        reactionsCoverAlarm OrElse _
                     '        fridgeCoverAlarm OrElse _
                     '        samplesCoverAlarm OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                    '        myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                    '        myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                     '        Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                     '        myStatus = False
@@ -296,24 +296,24 @@ Partial Public Class UiAx00MainMDI
                         'AG 06/11/2013 - Task #1375
 
                         If mainCoverAlarm OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                             reactionsCoverAlarm OrElse _
                             fridgeCoverAlarm OrElse _
                             samplesCoverAlarm OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                             Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
@@ -323,21 +323,21 @@ Partial Public Class UiAx00MainMDI
                            reactionsCoverAlarm OrElse _
                            fridgeCoverAlarm OrElse _
                            samplesCoverAlarm Then 'OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                             'Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
@@ -357,24 +357,24 @@ Partial Public Class UiAx00MainMDI
                     ''AG 06/11/2013 - Task #1375
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                         If mainCoverAlarm OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) OrElse _
                             reactionsCoverAlarm OrElse _
                             fridgeCoverAlarm OrElse _
                             samplesCoverAlarm OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                            myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                            myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                             Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
@@ -385,20 +385,20 @@ Partial Public Class UiAx00MainMDI
                             reactionsCoverAlarm OrElse _
                             fridgeCoverAlarm OrElse _
                             samplesCoverAlarm Then
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                            'myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.REACT_ENCODER_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.R1_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WS_COLLISION_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                            'myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                             'Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
@@ -417,8 +417,8 @@ Partial Public Class UiAx00MainMDI
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         'JV 23/01/2014 #1467
                         'Depending the analyzer alarms activate or not the button (myStatus = True or False)
-                        'If myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
-                        '   myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
+                        'If myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarms.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
+                        '   myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse myAlarms.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
                         If AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
                             myStatus = True
 
@@ -464,7 +464,7 @@ Partial Public Class UiAx00MainMDI
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                         'AG 03/05/2012 - do not allowed when ise not initiated and reactions rotor is found
                         'If Not iseInitiatedFinishedFlag Then
-                        If Not iseInitiatedFinishedFlag AndAlso Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
+                        If Not iseInitiatedFinishedFlag AndAlso Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                             myStatus = False
                         End If
 
@@ -477,7 +477,7 @@ Partial Public Class UiAx00MainMDI
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                         'AG 03/05/2012 - do not allowed when reactions rotor cover error or (ise not initiated and reactions rotor is found)
                         'If reactionsCoverAlarm OrElse Not iseInitiatedFinishedFlag Then
-                        If reactionsCoverAlarm OrElse (Not iseInitiatedFinishedFlag AndAlso Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR)) Then
+                        If reactionsCoverAlarm OrElse (Not iseInitiatedFinishedFlag AndAlso Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR)) Then
                             myStatus = False
                         End If
                     Else

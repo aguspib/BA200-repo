@@ -4,7 +4,7 @@ Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
@@ -1050,7 +1050,7 @@ Public Class UiHisAlarms
             'RH 30/01/2012 Decode Additional Info
             If Not String.IsNullOrEmpty(pRow.AdditionalInfo) Then
                 'SGM 30/07/2012 ISE aditional Info
-                If pRow.AlarmID = Alarms.ISE_CALIB_ERROR.ToString Or _
+                If pRow.AlarmID = AlarmEnumerates.Alarms.ISE_CALIB_ERROR.ToString Or _
                    pRow.AlarmID = Alarms.ISE_ERROR_A.ToString Or _
                    pRow.AlarmID = Alarms.ISE_ERROR_B.ToString Or _
                    pRow.AlarmID = Alarms.ISE_ERROR_C.ToString Or _
@@ -1104,7 +1104,7 @@ Public Class UiHisAlarms
                         additionalInfo = String.Empty
 
                         Select Case pRow.AlarmID
-                            Case GlobalEnumerates.Alarms.S_NO_VOLUME_WARN.ToString()
+                            Case Alarms.S_NO_VOLUME_WARN.ToString()
                                 If String.Equals(adRow.SampleClass, "BLANK") Then
                                     additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, _
                                                                    SampleClassDict(adRow.SampleClass), _
@@ -1117,7 +1117,7 @@ Public Class UiHisAlarms
                                                                    adRow.RotorPosition)
                                 End If
 
-                            Case GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString()
+                            Case Alarms.PREP_LOCKED_WARN.ToString()
                                 If String.Equals(adRow.SampleClass, "BLANK") Then
                                     additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, _
                                                                    SampleClassDict(adRow.SampleClass), _
@@ -1131,7 +1131,7 @@ Public Class UiHisAlarms
                                 End If
 
                                 'AG 25/07/2012
-                            Case GlobalEnumerates.Alarms.CLOT_DETECTION_ERR.ToString(), GlobalEnumerates.Alarms.CLOT_DETECTION_WARN.ToString()
+                            Case Alarms.CLOT_DETECTION_ERR.ToString(), Alarms.CLOT_DETECTION_WARN.ToString()
                                 If String.Equals(adRow.SampleClass, "BLANK") Then
                                     additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, _
                                                                    SampleClassDict(adRow.SampleClass), _
@@ -1145,8 +1145,8 @@ Public Class UiHisAlarms
                                 End If
                                 'AG 25/07/2012
 
-                            Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN.ToString(), _
-                                 GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN.ToString()
+                            Case Alarms.R1_NO_VOLUME_WARN.ToString(), _
+                                 Alarms.R2_NO_VOLUME_WARN.ToString()
                                 'RH 18/05/2012
                                 Select Case adRow.TubeContent
                                     Case "SPEC_SOL"

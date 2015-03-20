@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 
 Namespace Biosystems.Ax00.Core.Entities
     Public Class Preparation
@@ -119,7 +120,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If iseInstalledFlag Then
-                    If _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) OrElse _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If _analyzerManager.Alarms.Contains(Alarms.ISE_FAILED_ERR) OrElse _analyzerManager.Alarms.Contains(Alarms.ISE_OFF_ERR) Then
                         iseStatusOk = False
                     Else
                         iseStatusOk = True

@@ -47,8 +47,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If SensorValuesAttribute.ContainsKey(GlobalEnumerates.AnalyzerSensors.CONNECTED) Then
                     SensorValuesAttribute.Remove(GlobalEnumerates.AnalyzerSensors.CONNECTED)
                 End If
-                If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_ERR) Then
-                    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_ERR)
+                If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_ERR) Then
+                    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.COMMS_ERR)
                 End If
                 'myUI_RefreshEvent.Clear()
                 'myUI_RefreshDS.Clear()
@@ -303,7 +303,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If iseInstalledFlag Then
                     'Ise damaged (ERR) or switch off (WARN)
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then
                         iseStatusOK = False
                     Else
                         iseStatusOK = True

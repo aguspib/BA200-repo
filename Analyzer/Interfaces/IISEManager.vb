@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function DoMaintenanceExit() As GlobalDataTO
         Function DoPurge(ByVal pType As String) As GlobalDataTO
         Function CheckCleanPackInstalled() As GlobalDataTO
-        Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO
+        Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of AlarmEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO
         Function SaveConsumptions() As GlobalDataTO
         Function DoElectrodesCalibration() As GlobalDataTO
         Function DoPumpsCalibration() As GlobalDataTO

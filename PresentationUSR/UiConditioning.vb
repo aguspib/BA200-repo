@@ -139,15 +139,15 @@ Public Class UiConditioning
 
             'AG 22/11/2012 - v055 Button disabled when NO reactions rotor alarm!!! (not temperarture alarms)
             If (AnalyzerController.IsAnalyzerInstantiated) And _
-               Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR)) Then
+               Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR)) Then
 
                 'If Not mdiAnalyzerCopy Is Nothing And _
-                '   Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                '   AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
+                '   Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                '   AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
                 '    '    If Not mdiAnalyzerCopy Is Nothing And Not _
-                '    '         (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                '    '         AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
-                '    '        AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
+                '    '         (AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                '    '         AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
+                '    '        AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
 
                 If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                     disableButtons = True
@@ -160,14 +160,14 @@ Public Class UiConditioning
 
             ElseIf (AnalyzerController.IsAnalyzerInstantiated) Then
                 'AG 22/11/2012 - v055 Button disabled when NO reactions rotor alarm!!! (not temperarture alarms)
-                If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
+                If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
 
                     ''DL 31/07/2012. Begin
-                    'If (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
-                    '    '    If (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
-                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
+                    'If (AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
+                    '    '    If (AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
+                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
                     '    'DL 31/07/2012. End
 
                     disableButtons = True
@@ -290,7 +290,7 @@ Public Class UiConditioning
                 If Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
                     Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
                     linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                                 Where String.Equals(a.AlarmID, GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString) _
+                                 Where String.Equals(a.AlarmID, AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString) _
                                  And a.AlarmStatus = True Select a).ToList
 
                     If linQAlarm.Count > 0 Then

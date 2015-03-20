@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 
@@ -843,7 +844,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim myAlarmList As New List(Of Alarms)
                     Dim myAlarmStatusList As New List(Of Boolean)
 
-                    Const alarmId As Alarms = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    Const alarmId As Alarms = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
                     Const alarmStatus As Boolean = True
                     ISEAnalyzer.IsTimeOut = True
 
@@ -876,7 +877,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim myAlarmList As New List(Of Alarms)
                     Dim myAlarmStatusList As New List(Of Boolean)
 
-                    Const alarmId As Alarms = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                    Const alarmId As Alarms = AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR
                     Const alarmStatus As Boolean = True
                     ISEAnalyzer.IsTimeOut = True
 

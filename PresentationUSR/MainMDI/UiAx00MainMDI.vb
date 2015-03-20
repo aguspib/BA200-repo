@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
@@ -65,7 +66,7 @@ Partial Public Class UiAx00MainMDI
     Public SamplesRotorAlert As bsAlert
 
     Public AlertList As New List(Of bsAlert)
-    Public AlertText As New Dictionary(Of GlobalEnumerates.Alarms, String)
+    Public AlertText As New Dictionary(Of Alarms, String)
     'RH 01/07/2011 END
 
     Private myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
@@ -3425,7 +3426,7 @@ Partial Public Class UiAx00MainMDI
 
                     'AG 29/09/2011 - If bootle alarms show message and not start the shutdown process
                     Dim activateButtonsFlag As Boolean = False
-                    Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
+                    Dim myCurrentAlarms As List(Of Alarms)
                     myCurrentAlarms = AnalyzerController.Instance.Analyzer.Alarms
 
                     'DL 10/10/2012. Begin !!!
@@ -6583,55 +6584,52 @@ Partial Public Class UiAx00MainMDI
             AlertText.Clear()
 
             'CoverAlert
-            Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR) 'AG 14/03/2012
+            Dim myAlarms As New List(Of Alarms)
+            myAlarms.Add(Alarms.MAIN_COVER_WARN)
+            myAlarms.Add(Alarms.MAIN_COVER_ERR) 'AG 14/03/2012
 
             CoverAlert = New bsAlert(Me, 220, 45 + ParentMDITopHeight, 85, 0, "Analyzer", True)
             CoverAlert.Tag = myAlarms
             AlertList.Add(CoverAlert)
 
             'ISEModuleAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR) 'ag 09/01/2012 - this alarm excludes the ISE_STATUS_WARN so it is not necessary change the bsAlert size
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.ISE_OFF_ERR)
+            myAlarms.Add(Alarms.ISE_FAILED_ERR) 'ag 09/01/2012 - this alarm excludes the ISE_STATUS_WARN so it is not necessary change the bsAlert size
 
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_EXP_CONS)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_EXP_DATE)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) ' XB 03/11/2014 - BA-1872
+            myAlarms.Add(Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
+            myAlarms.Add(Alarms.ISE_RP_INVALID_ERR)
+            myAlarms.Add(Alarms.ISE_RP_DEPLETED_ERR)
+            myAlarms.Add(Alarms.ISE_ELEC_WRONG_ERR)
+            myAlarms.Add(Alarms.ISE_CP_INSTALL_WARN)
+            myAlarms.Add(Alarms.ISE_CP_WRONG_ERR)
+            myAlarms.Add(Alarms.ISE_LONG_DEACT_ERR)
+            myAlarms.Add(Alarms.ISE_ACTIVATED)
+            myAlarms.Add(Alarms.ISE_RP_NO_INST_ERR)
+            myAlarms.Add(Alarms.ISE_TIMEOUT_ERR) ' XB 03/11/2014 - BA-1872
 
             ' XB 20/01/2015 - BA-1873
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_CALB_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_PUMP_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_CLEAN_PDT_WARN)
 
             ISEModuleAlert = New bsAlert(Me, 220, 115 + ParentMDITopHeight, 170, 40, "ISE Module", True)
             ISEModuleAlert.Tag = myAlarms
             AlertList.Add(ISEModuleAlert)
 
             'WashingSolutionAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WASH_CONTAINER_ERR)
+            myAlarms.Add(Alarms.WASH_CONTAINER_WARN)
 
             WashingSolutionAlert = New bsAlert(Me, 220, 300 + ParentMDITopHeight, 150, 0, "Washing Solution bottle", True)
             WashingSolutionAlert.Tag = myAlarms
             AlertList.Add(WashingSolutionAlert)
 
             'ResiduesBalanceAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.HIGH_CONTAMIN_ERR)
+            myAlarms.Add(Alarms.HIGH_CONTAMIN_WARN)
 
             'ResiduesBalanceAlert = New bsAlert(Me, 220, 295 + ParentMDITopHeight, 210, 0, "High Contamination bottle", True)
             ResiduesBalanceAlert = New bsAlert(Me, 645, 280 + ParentMDITopHeight, 135, 0, "High Contamination bottle", False)
@@ -6639,99 +6637,94 @@ Partial Public Class UiAx00MainMDI
             AlertList.Add(ResiduesBalanceAlert)
 
             'Reagents1ArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R1_Temp_Warm so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR) 'AG 21/05/2012 - R1_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.R1_TEMP_WARN)
+            myAlarms.Add(Alarms.R1_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R1_Temp_Warm so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.R1_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.R1_COLLISION_ERR) 'AG 21/05/2012 - R1_COLLISION_WARN
 
             Reagents1ArmAlert = New bsAlert(Me, 220, 390 + ParentMDITopHeight, 100, 70, "Reagent1 Arm", True)
             Reagents1ArmAlert.Tag = myAlarms
             AlertList.Add(Reagents1ArmAlert)
 
             'ReagentsRotorAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR) 'AG 14/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) 'AG 21/05/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.FRIDGE_COVER_WARN)
+            myAlarms.Add(Alarms.FRIDGE_COVER_ERR) 'AG 14/03/2012
+            myAlarms.Add(Alarms.FRIDGE_TEMP_ERR)
+            myAlarms.Add(Alarms.FRIDGE_TEMP_WARN)
+            myAlarms.Add(Alarms.FRIDGE_TEMP_SYS_ERR) 'AG 21/05/2012
+            myAlarms.Add(Alarms.FRIDGE_STATUS_ERR)
+            myAlarms.Add(Alarms.FRIDGE_STATUS_WARN)
 
             ReagentsRotorAlert = New bsAlert(Me, 220, 482 + ParentMDITopHeight, 70, 40, "Reagents Rotor", True)
             ReagentsRotorAlert.Tag = myAlarms
             AlertList.Add(ReagentsRotorAlert)
 
             'Reagents2ArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R2_Temp_Warm so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR) 'AG 21/05/2012 - R2_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.R2_TEMP_WARN)
+            myAlarms.Add(Alarms.R2_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R2_Temp_Warm so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.R2_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.R2_COLLISION_ERR) 'AG 21/05/2012 - R2_COLLISION_WARN
 
             Reagents2ArmAlert = New bsAlert(Me, 220, 570 + ParentMDITopHeight, 179, -35, "Reagent2 Arm", True)
             Reagents2ArmAlert.Tag = myAlarms
             AlertList.Add(Reagents2ArmAlert)
 
             'OthersAlert       
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WATER_DEPOSIT_ERR so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WASTE_DEPOSIT_ERR so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WATER_DEPOSIT_ERR)
+            myAlarms.Add(Alarms.WATER_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WATER_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.WASTE_DEPOSIT_ERR)
+            myAlarms.Add(Alarms.WASTE_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WASTE_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.REACT_ROTOR_FAN_WARN)
+            myAlarms.Add(Alarms.FRIDGE_FAN_WARN)
 
             OthersAlert = New bsAlert(Me, 780, 60 + ParentMDITopHeight, 0, 0, "Others", False)
             OthersAlert.Tag = myAlarms
             AlertList.Add(OthersAlert)
 
             'ReactionsRotorAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR) 'AG 14/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) 'AG 31/01/2012 - this alarm excludes the METHACRYL_ROTOR_WARN so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.REACT_COVER_WARN)
+            myAlarms.Add(Alarms.REACT_COVER_ERR) 'AG 14/03/2012
+            myAlarms.Add(Alarms.REACT_MISSING_ERR)
+            myAlarms.Add(Alarms.BASELINE_WELL_WARN)
+            myAlarms.Add(Alarms.BASELINE_INIT_ERR) 'AG 31/01/2012 - this alarm excludes the METHACRYL_ROTOR_WARN so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.REACT_ENCODER_ERR)
+            myAlarms.Add(Alarms.REACT_TEMP_ERR)
+            myAlarms.Add(Alarms.REACT_TEMP_WARN)
+            myAlarms.Add(Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
 
             ReactionsRotorAlert = New bsAlert(Me, 605, 335 + ParentMDITopHeight, 175, 110, "Reactions Rotor", False)
             ReactionsRotorAlert.Tag = myAlarms
             AlertList.Add(ReactionsRotorAlert)
 
             'WashingStationHeaterTempAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WS_TEMP_WARN)
+            myAlarms.Add(Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.WS_COLLISION_ERR)
 
             WashingStationAlert = New bsAlert(Me, 635, 430 + ParentMDITopHeight, 145, 30, "Washing Station", False)
             WashingStationAlert.Tag = myAlarms
             AlertList.Add(WashingStationAlert)
 
             'SampleArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            'myAlarms.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR) 'AG 25/07/2012 - Alarm related with a preparation, not in globe in the same way as S_NO_VOLUME_WARN
-            'myAlarms.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN) 'AG 25/07/2012 - Alarm related with a preparation, not in globe in the same way as S_NO_VOLUME_WARN
-            myAlarms.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR) 'AG 12/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.S_OBSTRUCTED_ERR) 'AG 12/03/2012
+            myAlarms.Add(Alarms.S_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
 
             SampleArmAlert = New bsAlert(Me, 620, 503 + ParentMDITopHeight, 160, 45, "Samples Arm", False)
             SampleArmAlert.Tag = myAlarms
             AlertList.Add(SampleArmAlert)
 
             'SamplesRotorCoverAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COVER_ERR) 'AG 14/03/2012
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.S_COVER_WARN)
+            myAlarms.Add(Alarms.S_COVER_ERR) 'AG 14/03/2012
 
             SamplesRotorAlert = New bsAlert(Me, 710, 607 + ParentMDITopHeight, 70, -55, "Samples Rotor", False)
             SamplesRotorAlert.Tag = myAlarms
@@ -6742,7 +6735,7 @@ Partial Public Class UiAx00MainMDI
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
@@ -6766,7 +6759,7 @@ Partial Public Class UiAx00MainMDI
                 Dim linqRes As List(Of AlarmsDS.tfmwAlarmsRow)
                 Dim myText As String
 
-                For Each alarm As GlobalEnumerates.Alarms In [Enum].GetValues(GetType(GlobalEnumerates.Alarms))
+                For Each alarm As Alarms In [Enum].GetValues(GetType(Alarms))
                     linqRes = (From a As AlarmsDS.tfmwAlarmsRow In myAlarmsDS.tfmwAlarms _
                                Where String.Equals(a.AlarmID, alarm.ToString()) _
                                Select a).ToList()
@@ -9813,7 +9806,7 @@ Partial Public Class UiAx00MainMDI
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateLISWrapper ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitiateLISWrapper ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage(Name & ".InitiateLISWrapper ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 

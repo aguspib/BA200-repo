@@ -460,28 +460,25 @@ Public Class UiISECalibHistory
     ''' <param name="pButton"></param>
     ''' <returns></returns>
     ''' <remarks>AG 29/03/2012</remarks>
-    Public Function ActivateButtonWithAlarms(ByVal pButton As GlobalEnumerates.ActionButton) As Boolean
+    Public Function ActivateButtonWithAlarms(ByVal pButton As ActionButton) As Boolean
         Dim myStatus As Boolean = True
         Try
             '#REFACTORING
             If (AnalyzerController.IsAnalyzerInstantiated) Then
 
-                'Dim resultData As New GlobalDataTO
-                Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
-
                 ' AG+XBC 24/05/2012
                 'Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
-                Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
+                Dim myAx00Status As AnalyzerManagerStatus
                 ' AG+XBC 24/05/2012
 
-                myAlarms = AnalyzerController.Instance.Analyzer.Alarms
+                Dim myAlarms = AnalyzerController.Instance.Analyzer.Alarms
                 myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
                 ''AG 25/10/2011 - Before treat the cover alarms read if they are deactivated (0 disabled, 1 enabled)
-                'Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
-                'Dim reactionsCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.REACT_COVER_WARN), 1, 0), Boolean)
-                'Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
-                'Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
+                'Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
+                'Dim reactionsCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN), 1, 0), Boolean)
+                'Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
+                'Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
 
                 'resultData = mdiAnalyzerCopy.ReadFwAdjustmentsDS
                 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
@@ -550,7 +547,7 @@ Public Class UiISECalibHistory
                         myStatus = False
                     End If
                 Else
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If myAlarms.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then
                         myStatus = False
                     End If
                 End If

@@ -296,12 +296,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     'ControlAdjustBaseLine only generates myAlarm = Alarms.METHACRYL_ROTOR_WARN  ... now 
                     'we have to calculate his status = TRUE or FALSE
                     Dim alarmStatus As Boolean = False 'By default no alarm
-                    Dim myAlarm As Alarms = GlobalEnumerates.Alarms.NONE
-                    myAlarm = CType(resultData.SetDatos, Alarms)
-                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
+                    Dim myAlarm As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
+                    myAlarm = CType(resultData.SetDatos, AlarmEnumerates.Alarms)
+                    If myAlarm <> AlarmEnumerates.Alarms.NONE Then alarmStatus = True
                     'If Not alarmStatus Then myAlarm = Alarms.METHACRYL_ROTOR_WARN 'AG 04/06/2012 - This method is called in Running, if the alarm METHACRYL_ROTOR_WARN already exists do not remove it
 
-                    Dim AlarmList As New List(Of Alarms)
+                    Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
                     Dim AlarmStatusList As New List(Of Boolean)
                     PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
                     'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
@@ -319,7 +319,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         ''If no alarm items in list ... inform presentation the reactions rotor is good!!
                         'resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _
-                        '                                 GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
+                        '                                 AlarmEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
                     End If
                 End If
 
@@ -529,9 +529,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'Verify if it is needed to activate ThermoWarningFlag for the Execution
                             If (Not myExecutionDS.twksWSExecutions(0).ThermoWarningFlag) Then
-                                If (myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) OrElse _
-                                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) OrElse _
-                                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
+                                If (myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_WARN) OrElse _
+                                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) OrElse _
+                                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
                                     myExecutionDS.twksWSExecutions(0).BeginEdit()
                                     myExecutionDS.twksWSExecutions(0).ThermoWarningFlag = True
                                     myExecutionDS.twksWSExecutions(0).EndEdit()
@@ -543,7 +543,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Verify Sample Arm obstructed
                             If (myExecutionDS.twksWSExecutions(0).IsClotValueNull OrElse _
                                 Not String.Equals(myExecutionDS.twksWSExecutions(0).ClotValue, GlobalEnumerates.Ax00ArmClotDetectionValues.BS.ToString)) Then
-                                If (myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)) Then
+                                If (myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_OBSTRUCTED_ERR)) Then
                                     myExecutionDS.twksWSExecutions(0).BeginEdit()
                                     myExecutionDS.twksWSExecutions(0).ClotValue = GlobalEnumerates.Ax00ArmClotDetectionValues.BS.ToString
                                     myExecutionDS.twksWSExecutions(0).EndEdit()

@@ -606,8 +606,8 @@ Public Class UiChangeRotor
         myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
 
         'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
-        Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
-        If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
+        Dim myAlarms As List(Of AlarmEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
+        If (Not myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)) Then
             ScreenWorkingProcess = False 'Process finished
             ExistBaseLineInitError = False
         Else
@@ -733,7 +733,7 @@ Public Class UiChangeRotor
             If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
                 Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
                 linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                            Where a.AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString _
+                            Where a.AlarmID = AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString _
                           AndAlso a.AlarmStatus = True _
                            Select a).ToList
 

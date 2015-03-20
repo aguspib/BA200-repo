@@ -3,7 +3,7 @@ Option Strict On
 
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
@@ -3388,7 +3388,7 @@ Namespace Biosystems.Ax00.BL
                                                                        ByVal pWorkSessionID As String, _
                                                                        ByVal pExecutionID As Integer, _
                                                                        ByVal pRotorPosition As Integer, _
-                                                                       ByVal pAlarmCode As GlobalEnumerates.Alarms, _
+                                                                       ByVal pAlarmCode As Alarms, _
                                                                        ByVal pReagentNumber As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -10820,7 +10820,7 @@ Namespace Biosystems.Ax00.BL
                             If (pSTDPrepFlag) Then
                                 execAlarmRow = execAlarmDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
                                 execAlarmRow.ExecutionID = row.ExecutionID
-                                execAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
+                                execAlarmRow.AlarmID = Alarms.ABS_REMARK13.ToString
                                 execAlarmRow.AlarmDateTime = DateTime.Now
                                 execAlarmDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(execAlarmRow)
                             Else
@@ -10872,7 +10872,7 @@ Namespace Biosystems.Ax00.BL
                                             resultAlarmRow.OrderTestID = executionsRow.OrderTestID
                                             resultAlarmRow.MultiPointNumber = executionsRow.MultiItemNumber
                                             resultAlarmRow.RerunNumber = executionsRow.RerunNumber
-                                            resultAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
+                                            resultAlarmRow.AlarmID = Alarms.ABS_REMARK13.ToString
                                             resultAlarmRow.AlarmDateTime = DateTime.Now
                                             resultAlarmDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
                                         Else

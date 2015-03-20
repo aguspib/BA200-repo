@@ -158,9 +158,11 @@ Namespace Biosystems.Ax00.Core.Entities
         Private InstructionReceivedAttribute As String = "" 'AG 20/10/2010
         Private InstructionTypeReceivedAttribute As AnalyzerManagerSwActionList
 
-        Private myAlarmListAttribute As New List(Of Alarms) 'AG 16/03/2011
+        Private myAlarmListAttribute As New List(Of AlarmEnumerates.Alarms) 'AG 16/03/2011
         Private analyzerFREEZEFlagAttribute As Boolean = False 'AG 31/03/2011 indicates the Fw has become into FREEZE mode (several error code indicates this mode)
         Private analyzerFREEZEModeAttribute As String = "" 'AG 02/03/2010 - indicates if the FREEZE is single element or if applies the whole instrument
+
+        Private _analyzerSubStatusAttr As Boolean = False
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
@@ -373,8 +375,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         'The complete solution is next code but requires a futher validation because it could exists some exceptions (alarm not depending on the connected analyzer) - so remove
                         'only the alarms recalculated with data in DataBase (the base line alarms)
                         'myAlarmListAttribute.Clear()
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
                         'AG 30/08/2013
 
                         ' XBC 14/06/2012
@@ -584,7 +586,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property Alarms() As List(Of Alarms) Implements IAnalyzerManager.Alarms
+        Public ReadOnly Property Alarms() As List(Of AlarmEnumerates.Alarms) Implements IAnalyzerManager.Alarms
             Get
                 Return myAlarmListAttribute
             End Get
@@ -659,6 +661,18 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(value As Boolean)
                 analyzerFREEZEFlagAttribute = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' SubStatus examples: 551, 552
+        ''' </summary>
+        Public Property AnalyzerHasSubStatus() As Boolean Implements IAnalyzerManager.AnalyzerHasSubStatus
+            Get
+                Return _analyzerSubStatusAttr
+            End Get
+            Set(value As Boolean)
+                _analyzerSubStatusAttr = value
             End Set
         End Property
 
@@ -1712,9 +1726,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myGlobal As New GlobalDataTO
                 Dim myValue As Integer = 0
 
-                Dim myAlarmListTmp As New List(Of Alarms)
+                Dim myAlarmListTmp As New List(Of AlarmEnumerates.Alarms)
                 Dim myAlarmStatusListTmp As New List(Of Boolean)
-                Dim myAlarmList As New List(Of Alarms)
+                Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 myGlobal = ISEAnalyzer.CheckAlarms(Connected, myAlarmList, myAlarmStatusList)
@@ -1724,20 +1738,20 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'The ISE Module was switched On and the user has connected from Utilities
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                     myAlarmStatusList.Add(False)
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
                     myAlarmStatusList.Add(False)
 
                 Else
                     myValue = 2
 
                     'The ISE Module was switched On but the connection is failed and then is pending
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                     myAlarmStatusList.Add(True)
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
                     myAlarmStatusList.Add(False)
                 End If
 
@@ -1749,7 +1763,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         electrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                     End If
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CALB_PDT_WARN)
                     If electrodesCalibrationRequired Then
                         myAlarmStatusList.Add(True)
                     Else
@@ -1763,7 +1777,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         pumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                     End If
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_PUMP_PDT_WARN)
                     If pumpsCalibrationRequired Then
                         myAlarmStatusList.Add(True)
                     Else
@@ -1777,7 +1791,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         cleanRequired = CType(myGlobal.SetDatos, Boolean)
                     End If
 
-                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                    myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
                     If cleanRequired Then
                         myAlarmStatusList.Add(True)
                     Else
@@ -2010,9 +2024,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
                             End If
 
-                            If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                            If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                            If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
+                            If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
                                 WELLbaselineParametersFailuresAttribute = False
                             End If
 
@@ -2036,15 +2050,15 @@ Namespace Biosystems.Ax00.Core.Entities
                             existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
 
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myAlarm = CType(resultData.SetDatos, Alarms)
+                                Dim myAlarm = CType(resultData.SetDatos, AlarmEnumerates.Alarms)
                                 'Update internal alarm list if exists alarm but not saved it into database!!!
-                                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                If myAlarm <> AlarmEnumerates.Alarms.NONE Then
                                     If Not myAlarmListAttribute.Contains(myAlarm) Then
                                         myAlarmListAttribute.Add(myAlarm)
 
                                         'AG 12/09/2012 - If base line error when app is starting set the attribute baselineInitializationFailuresAttribute to value in order to show the alarm globe in monitor
                                         'Wup not in process 
-                                        If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                        If pStartingApplication AndAlso myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR Then
                                             Dim showGlobeFlag As Boolean = False
                                             If (String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
                                                 String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
@@ -3795,18 +3809,18 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 'In Running pause mode only the alarms of washing solution or high contamination bottles
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso AllowScanInRunningAttribute Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                   OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
+                   OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
 
                         returnValue = True
                     End If
 
                     'Otherwise all: washing solution, high contamination, waster deposit or water deposit
                 Else
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                   OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                   OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                   OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
+                   OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
+                   OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) _
+                   OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
 
                         returnValue = True
                     End If
@@ -4213,12 +4227,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 25/07/2012 - the clot detection error do not implies ENDRUN - remove from condition the alarm CLOT_DETECTION_ERR
 
                     'AG 22/02/2012 - NOTE: To prevent the bottle level ERROR or WARNING oscillations when near the limits Sw will not remove the ERROR level alarm until neither error neither warming exists 
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
-                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
-                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
-                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
-                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_COLLISION_WARN) OrElse _
-                    myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.S_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse _
+                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
+                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse _
+                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
+                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R1_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R2_COLLISION_WARN) OrElse _
+                    myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
                     BaseLine.exitRunningType <> 0 OrElse analyzerFREEZEFlagAttribute Then
                         returnValue = True
                     End If
@@ -4257,7 +4271,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="itemToRemove"></param>
         ''' <remarks></remarks>
-        Public Sub AlarmListRemoveItem(itemToRemove As Alarms) Implements IAnalyzerManager.AlarmListRemoveItem
+        Public Sub AlarmListRemoveItem(itemToRemove As AlarmEnumerates.Alarms) Implements IAnalyzerManager.AlarmListRemoveItem
             myAlarmListAttribute.Remove(itemToRemove)
         End Sub
 
@@ -4267,7 +4281,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="itemToAdd"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function AlarmListAddtem(itemToAdd As Alarms) As Boolean Implements IAnalyzerManager.AlarmListAddtem
+        Public Function AlarmListAddtem(itemToAdd As AlarmEnumerates.Alarms) As Boolean Implements IAnalyzerManager.AlarmListAddtem
             If Not myAlarmListAttribute.Contains(itemToAdd) Then
                 myAlarmListAttribute.Add(itemToAdd)
                 Return True
