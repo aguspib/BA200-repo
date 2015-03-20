@@ -480,7 +480,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
 
             End If
-            FinalizeProcess()
+            Status = ServiceStatusEnum.Paused
         End Sub
 
         ''' <summary>
@@ -565,7 +565,8 @@ Namespace Biosystems.Ax00.Core.Services
 
                 '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
-            FinalizeProcess()
+            Status = ServiceStatusEnum.Paused
+
         End Sub
 
         ''' <summary>
@@ -629,7 +630,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
-
+            Status = ServiceStatusEnum.Paused
         End Sub
 
         ''' <summary>
