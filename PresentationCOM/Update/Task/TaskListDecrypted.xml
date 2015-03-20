@@ -1211,5 +1211,12 @@
       END
       GO
     </UpdateScript>
-  </AppVersion >
+  </AppVersion>
+  <AppVersion>
+    <Version>3.07</Version>
+    <StructureScript>
+      ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
+    </StructureScript>
+    <UpdateScript></UpdateScript>
+  </AppVersion>
 </TaskListDS>
