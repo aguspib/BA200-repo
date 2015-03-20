@@ -85,38 +85,41 @@ Namespace Biosystems.Ax00.Core.Services
 
             Initialize()
 
-            'NEWROTORprocess in INPROCESS status
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Initialized) Then
-
-            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = StepStringStatus.Initialized) Then
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = StepStringStatus.Initialized) Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Empty) 'Re-send Washing
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = StepStringStatus.Initialized) Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Empty) 'Re-send ALIGHT
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = StepStringStatus.Initialized) Then
+                _staticBaseLineFinished = True
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Empty) 'Re-send FLIGHT mode fill
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Initialized) Then
+                _staticBaseLineFinished = True
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty) 'Re-send FLIGHT mode read
-
             ElseIf ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Empty) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized)) And
                 (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Canceled) Then
+                _dynamicBaseLineValid = False
+                _forceEmptyAndFinalize = True
                 _analyzer.Alarms.Add(Alarms.BASELINE_INIT_ERR)
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty) 'Re-send FLIGHT mode read
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized) Then
+                _staticBaseLineFinished = True
+                _dynamicBaseLineValid = True
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty) 'Re-send FLIGHT mode empty
-
 
                 'NEWROTORprocess in PAUSED status
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Canceled) And
                 (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Canceled) Then
+                _forceEmptyAndFinalize = True
+                _dynamicBaseLineValid = False
                 _analyzer.Alarms.Add(Alarms.BASELINE_INIT_ERR)
 
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Canceled) And
                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Ended) Then
-
+                _dynamicBaseLineValid = True
 
             End If
 
