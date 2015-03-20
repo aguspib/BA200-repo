@@ -91,7 +91,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         myGlobal = ManageAlarms_SRV(Nothing, finalAlarmList, finalAlarmStatusList)
                     Else
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobal = currentAlarms.Manage(Nothing, finalAlarmList, finalAlarmStatusList)
+                        myGlobal = currentAlarms.Manage(finalAlarmList, finalAlarmStatusList)
                     End If
                 End If
 

@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not GlobalBase.IsServiceAssembly Then
                             Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
                             Dim currentAlarms = New CurrentAlarms(Me)
-                            resultData = currentAlarms.Manage(dbConnection, AlarmList, AlarmStatusList)
+                            resultData = currentAlarms.Manage(AlarmList, AlarmStatusList)
 
                             GlobalBase.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
                         End If

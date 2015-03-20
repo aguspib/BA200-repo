@@ -693,7 +693,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If Not GlobalBase.IsServiceAssembly Then
                         Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                        myGlobal = currentAlarms.Manage(dbConnection, alarmList, alarmStatusList, alarmAdditionalInfoList)
+                        myGlobal = currentAlarms.Manage(alarmList, alarmStatusList, alarmAdditionalInfoList)
                     End If
                 End If
 

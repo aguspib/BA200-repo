@@ -1214,9 +1214,25 @@
   </AppVersion>
   <AppVersion>
     <Version>3.07</Version>
-    <StructureScript>
+    <UpdateScript>
+      --|====================|
+      --| BA200: v3.07     	 |
+      --|====================|
       ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
-    </StructureScript>
-    <UpdateScript></UpdateScript>
+	  
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, OKType)
+      VALUES ('GLF_BOARD_ERR','INS','ERROR','GLF  error during FBLD','GLF_BOARD_ERR','GLF  error during FBLD','ALM_GLF_BOARD_ERR','Switch off the analyzer and the application, wait 30 seconds and then switch them on both again. Then press the Connect button','SOL_RECOVER_ERR',0,0,0)
+      END
+      GO
+
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('GLF_BOARD_ERR',560,'2_FATAL_ERROR')
+      END
+      GO
+    </UpdateScript>
   </AppVersion>
 </TaskListDS>

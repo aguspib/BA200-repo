@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
                                             Else
                                                 Dim currentAlarms = New CurrentAlarms(Me)
-                                                myGlobalDataTO = currentAlarms.Manage(dbConnection, AlarmList, AlarmStatusList)                                                
+                                                myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                             End If
                                         End If
                                     End If
@@ -537,7 +537,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' XBC 16/10/2012
                         Else
                             Dim currentAlarms = New CurrentAlarms(Me)
-                            myGlobal = currentAlarms.Manage(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)                            
+                            myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                         End If
                     End If
 
@@ -894,11 +894,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             If myAlarmList.Count > 0 Then
                                                 Dim currentAlarms = New CurrentAlarms(Me)
-                                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                                                 If Not GlobalBase.IsServiceAssembly Then
                                                     Dim currentAlarmsRetry = New CurrentAlarms(Me)
-                                                    myGlobal = currentAlarmsRetry.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                                    myGlobal = currentAlarmsRetry.Manage(myAlarmList, myAlarmStatusList)
                                                 End If
                                             End If
 
@@ -1940,7 +1940,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobal = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
+                        myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                         GlobalBase.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
                     End If
                 End If
@@ -2043,7 +2043,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
                     Else
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobalDataTO = currentAlarms.Manage(Nothing, AlarmList, AlarmStatusList)
+                        myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
                     End If
                 End If
             End If
@@ -3145,11 +3145,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Finally call manage all alarms detected (new or solved)
                     If myAlarmList.Count > 0 Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        myGlobalDataTO = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        myGlobalDataTO = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                         If Not GlobalBase.IsServiceAssembly Then
                             Dim currentAlarmsRetry = New CurrentAlarms(Me)
-                            myGlobalDataTO = currentAlarmsRetry.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                            myGlobalDataTO = currentAlarmsRetry.Manage(myAlarmList, myAlarmStatusList)
                         End If
 
                     End If
@@ -3691,7 +3691,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myAlarmList.Count > 0 Then
                         If Not GlobalBase.IsServiceAssembly Then
                             Dim currentAlarms = New CurrentAlarms(Me)
-                            myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                         End If
 
                     End If
@@ -3830,7 +3830,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myAlarmList.Count > 0 Then
                             If Not GlobalBase.IsServiceAssembly Then
                                 Dim currentAlarms = New CurrentAlarms(Me)
-                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                         End If
 

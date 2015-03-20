@@ -130,13 +130,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                             InformAlarm = True
 
                                         Case "3_RECOVER_ERROR"
-                                            MyClass.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP) 'SGM 19/11/2012
+                                            ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP) 'SGM 19/11/2012
                                             If (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString Or AlarmID = GlobalEnumerates.Alarms.RECOVER_ERR.ToString) _
                                                AndAlso Not pAnswerErrorReception Then
                                                 myManageAlarmTypeTemp = ManagementAlarmTypes.REQUEST_INFO
                                                 AddErrCode = False
                                                 InformAlarm = False
-                                                MyClass.IsInstructionAborted = (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString)
+                                                IsInstructionAborted = (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString)
                                                 GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
                                             Else
                                                 myManageAlarmTypeTemp = ManagementAlarmTypes.RECOVER_ERROR
@@ -148,20 +148,20 @@ Namespace Biosystems.Ax00.Core.Entities
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.SIMPLE_ERROR
                                             AddErrCode = True
                                             If AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString Then 'SGM 07/11/2012 - reactions rotor
-                                                If Not MyClass.IsServiceRotorMissingInformed Then
+                                                If Not IsServiceRotorMissingInformed Then
                                                     InformAlarm = True
                                                 End If
                                             Else
-                                                InformAlarm = InformAlarm Or (MyClass.IsInstructionRejected Or MyClass.IsRecoverFailed) 'SGM 29/10/2012 - manage only in case of origin of Error 20 - INST_REJECTED_WARN
+                                                InformAlarm = InformAlarm Or (IsInstructionRejected Or IsRecoverFailed) 'SGM 29/10/2012 - manage only in case of origin of Error 20 - INST_REJECTED_WARN
                                             End If
 
 
                                         Case "5_REQUEST_INFO"
                                             'SGM 29/10/2012 - reset flag that indicates E:20 received (Instruction Rejected)
-                                            MyClass.IsInstructionRejected = (AlarmID = GlobalEnumerates.Alarms.INST_REJECTED_ERR.ToString)
+                                            IsInstructionRejected = (AlarmID = GlobalEnumerates.Alarms.INST_REJECTED_ERR.ToString)
 
                                             'SGM 07/11/2012 - reset flag that indicates E:22 received (Recover failed)
-                                            MyClass.IsRecoverFailed = (AlarmID = GlobalEnumerates.Alarms.RECOVER_ERR.ToString)
+                                            IsRecoverFailed = (AlarmID = GlobalEnumerates.Alarms.RECOVER_ERR.ToString)
 
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.REQUEST_INFO
                                             AddErrCode = False
@@ -1382,7 +1382,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myAlarmList.Count > 0 Then
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
                     Dim currentAlarms = New CurrentAlarms(Me)
-                    myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                    myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                     'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
                     '                Previous code only saved it when new alarms were generated
@@ -2328,7 +2328,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If myAlarmList.Count > 0 Then
                                 Dim myGlobal As New GlobalDataTO
                                 Dim currentAlarms = New CurrentAlarms(Me)
-                                myGlobal = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                         End If
 
@@ -3137,7 +3137,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If Not GlobalBase.IsServiceAssembly Then
                                 Dim currentAlarms = New CurrentAlarms(Me)
-                                resultData = currentAlarms.Manage(dbConnection, okAlarmList, okAlarmStatusList)
+                                resultData = currentAlarms.Manage(okAlarmList, okAlarmStatusList)
                             End If
                         End If
 
@@ -3456,7 +3456,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
@@ -3491,7 +3491,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
@@ -3531,7 +3531,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
@@ -3573,7 +3573,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
@@ -3605,7 +3605,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
@@ -3637,7 +3637,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
                         Dim currentAlarms = New CurrentAlarms(Me)
-                        resultData = currentAlarms.Manage(Nothing, myAlarmList, myAlarmStatusList)                        
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 

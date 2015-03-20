@@ -876,23 +876,12 @@ Namespace Biosystems.Ax00.Global
             REACT_ENCODER_ERR 'ERROR! Fw indicates an encoder error (FW ERROR CODE: 501)
             REACT_TEMP_WARN 'WARNING! Sw generates this warning when Tº is out of limits (ANSINF)
             REACT_TEMP_ERR 'ERROR! Sw generates this error when Tº is out of limits too much time or Thermo system is damaged (ANSINF)
-            'DL 31/07/2012. Begin
             REACT_TEMP_SYS_ERR 'ERROR! Fw indicates the reactions thermo system is damaged (AG 04/01/2012 NEW) (NOTE the REACT_TEMP_SYSTEM_ERR alarmID it too long) (FW ERROR CODE: 510, 511)
-            'Substitute REACT_TEMP_SYS_ERR by REACT_TEMP_SYS1_ERR and REACT_TEMP_SYS2_ERR
-            'REACT_TEMP_SYS1_ERR 'ERROR! Fw indicates the fridge thermo system is damaged   (FW ERROR CODE: 510)
-            'REACT_TEMP_SYS2_ERR 'ERROR! Fw indicates the fridge thermo system is damaged   (FW ERROR CODE: 511)
-            'DL 31/07/2012. End
 
             REACT_SAFESTOP_ERR 'ERROR! Fw indicates a reactions rotor safety stop because the washing station is down (FW ERROR CODE: 502)
             'WashingStationAlert
             WS_TEMP_WARN 'WARNING! Sw generates this warning when Tº is out of limits (ANSINF)
-            'WS_TEMP_ERR 'ERROR! Sw generates this warning when Tº is out of limits too much time - NOT SPECIFIED TO IMPLEMENT TIMER FOR WASHING STATION TEMPERATURE CONTROL!!!
-            'DL 31/07/2012. Begin
             WS_TEMP_SYSTEM_ERR 'ERROR! Fw indicates the washing station thermo system is damaged (AG 04/01/2012 change alarmID from WS_TEMP_ERR to WS_TEMP_SYSTEM_ERR) (FW ERROR CODE: 610, 611)
-            'Substitute WS_TEMP_SYSTEM_ERR by WS_TEMP_SYS1_ERR and WS_TEMP_SYS2_ERR
-            'WS_TEMP_SYS1_ERR 'ERROR! Fw indicates the fridge thermo system is damaged   (FW ERROR CODE: 610)
-            'WS_TEMP_SYS2_ERR 'ERROR! Fw indicates the fridge thermo system is damaged   (FW ERROR CODE: 611)
-            'DL 31/07/2012. End
 
             WS_COLLISION_ERR 'ERROR! Fw indicates a collision with the washing station (FW ERROR CODE: 504)
 
@@ -962,7 +951,7 @@ Namespace Biosystems.Ax00.Global
             FRIDGE_RESET_ERR        '(OK v0.5.0) Reagents rotor board reset             | FW ERROR CODE: 349 | DL 13/06/2012
             S_ROTOR_BOARD_ERR       '(OK v0.5.0) Samples rotor board not responding     | FW ERROR CODE: 398 | DL 13/06/2012
             S_ROTOR_RESET_ERR       '(OK v0.5.0) Samples rotor board reset              | FW ERROR CODE: 399 | DL 13/06/2012
-            GLF_BOARD_ERR           '(OK v0.5.0) Photometric board not responding       | FW ERROR CODE: 598 | DL 13/06/2012
+            GLF_BOARD_ERR           '            Photometric board not responding       | FW ERROR CODE: 560 | AC 19/03/2015
             SFX_BOARD_ERR           '(OK v0.5.0) Fluid system board not responding      | FW ERROR CODE: 698 | DL 13/06/2012
             JEX_BOARD_ERR           '(OK v0.5.0) Manifold board not responding          | FW ERROR CODE: 798 | DL 13/06/2012
 
