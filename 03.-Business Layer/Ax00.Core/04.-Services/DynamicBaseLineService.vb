@@ -28,7 +28,12 @@ Namespace Biosystems.Ax00.Core.Services
 #End Region
 
 #Region "Public methods"
+
         Public Overrides Function StartService() As Boolean
+            Return StartService(False)
+        End Function
+
+        Public Overloads Function StartService(isInRecover As Boolean) As Boolean
 
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
@@ -38,30 +43,89 @@ Namespace Biosystems.Ax00.Core.Services
             Dim startProcessSuccess As Boolean = False
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            Initialize()
+            If isInRecover Then
+                InitializeRecover()
+            Else
+                Initialize()
 
-            If _analyzer.Connected Then
-                _analyzer.StopAnalyzerRinging()
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
+                If _analyzer.Connected Then
+                    _analyzer.StopAnalyzerRinging()
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
 
-                'Update analyzer session flags into DataBase
-                If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                    'Update analyzer session flags into DataBase
+                    If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                        myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                    End If
+
+                    startProcessSuccess = True
+
+                    Status = ServiceStatusEnum.Running
+                    AddRequiredEventHandlers()
                 End If
-
-                startProcessSuccess = True
-
-                Status = ServiceStatusEnum.Running
-                AddRequiredEventHandlers()
             End If
 
             Return startProcessSuccess
 
         End Function
+
+
+        ''' <summary>
+        ''' Set the flags into a stable value for repeat last action and recover the process
+        ''' </summary>
+        ''' <remarks>Created by:  AG 20/01/2015 BA-2216
+        '''          Modified by: IT 16/02/2015 BA-2266
+        '''  </remarks>
+        Private Sub InitializeRecover()
+
+            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+
+            Initialize()
+
+            'NEWROTORprocess in INPROCESS status
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Initialized) Then
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = StepStringStatus.Initialized) Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Empty) 'Re-send Washing
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = StepStringStatus.Initialized) Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Empty) 'Re-send ALIGHT
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = StepStringStatus.Initialized) Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Empty) 'Re-send FLIGHT mode fill
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Initialized) Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty) 'Re-send FLIGHT mode read
+
+            ElseIf ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Empty) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized)) And
+                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Canceled) Then
+                _analyzer.Alarms.Add(Alarms.BASELINE_INIT_ERR)
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty) 'Re-send FLIGHT mode read
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized) Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty) 'Re-send FLIGHT mode empty
+
+
+                'NEWROTORprocess in PAUSED status
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Canceled) And
+                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Canceled) Then
+                _analyzer.Alarms.Add(Alarms.BASELINE_INIT_ERR)
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Canceled) And
+               (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Ended) Then
+
+
+            End If
+
+            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+            End If
+
+        End Sub
 
         Public Function CurrentStep() As BaseLineStepsEnum
             Return _currentStep
