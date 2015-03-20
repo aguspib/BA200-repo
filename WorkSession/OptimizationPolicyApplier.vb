@@ -35,12 +35,18 @@ Namespace Biosystems.Ax00.BL
         Protected Property TypeContaminated As TypeReagent
         Protected Property typeExpectedResult As TypeReagent
         Protected Property typeResult As TypeReagent
+        Protected Property AnalyzerModel As AnalyzerModelEnum
 #End Region
 
 #Region "Enums"
         Protected Enum TypeReagent As Integer
             MonoReactive = 1
             BiReactive = 2
+        End Enum
+
+        Protected Enum AnalyzerModelEnum
+            BA400
+            BA200
         End Enum
 #End Region
 
@@ -55,9 +61,14 @@ Namespace Biosystems.Ax00.BL
             MainContaminatedID = -1
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection)
+        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
             Me.New()
             dbConnection = pConn
+            If ActiveAnalyzer = "A200" Then
+                AnalyzerModel = AnalyzerModelEnum.BA200
+            Else
+                AnalyzerModel = AnalyzerModelEnum.BA400
+            End If
         End Sub
 
 #End Region
@@ -70,6 +81,18 @@ Namespace Biosystems.Ax00.BL
 
 #Region "Public Methods"
 
+        ''' <summary>
+        ''' This code executes an optimization for solving contaminations between executions
+        ''' </summary>
+        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="pExecutions"></param>
+        ''' <param name="pHighContaminationPersistance"></param>
+        ''' <param name="pPreviousReagentID"></param>
+        ''' <param name="pPreviousReagentIDMaxReplicates"></param>
+        ''' <returns>the number of contaminations after optimization process</returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
         Public Function ExecuteOptimization(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
@@ -119,6 +142,17 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "Overridable methods"
+        ''' <summary>
+        ''' Virtual method that needs to be overriden on children classes
+        ''' </summary>
+        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="pExecutions"></param>
+        ''' <param name="pHighContaminationPersistance"></param>
+        ''' <param name="pPreviousReagentID"></param>
+        ''' <param name="pPreviousReagentIDMaxReplicates"></param>
+        ''' <remarks>
+        ''' Created on 18/03/2015 by AJG
+        ''' </remarks>
         Protected Overridable Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
@@ -129,6 +163,16 @@ Namespace Biosystems.Ax00.BL
             HighContaminationPersistence = pHighContaminationPersistance
         End Sub
 
+        ''' <summary>
+        ''' Virtual method that needs to be overriden on children classes
+        ''' </summary>
+        ''' <param name="pExecutions"></param>
+        ''' <param name="indexI"></param>
+        ''' <param name="lowerLimit"></param>
+        ''' <param name="upperLimit"></param>
+        ''' <remarks>
+        ''' Created on 18/03/2015 by AJG
+        ''' </remarks>
         Protected Overridable Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexI As Integer, _
                                                   ByVal lowerLimit As Integer, _
@@ -136,6 +180,17 @@ Namespace Biosystems.Ax00.BL
             'this function must be overriden by children classes
         End Sub
 
+        ''' <summary>
+        ''' Virtual method that needs to be overriden on children classes
+        ''' </summary>
+        ''' <param name="pExecutions"></param>
+        ''' <param name="indexJ"></param>
+        ''' <param name="leftLimit"></param>
+        ''' <param name="rightLimit"></param>
+        ''' <param name="upperTotalLimit"></param>
+        ''' <remarks>
+        ''' Created on 18/03/2015 by AJG
+        ''' </remarks>
         Protected Overridable Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal indexJ As Integer, _
                                                   ByVal leftLimit As Integer, _
@@ -146,7 +201,13 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "Private methods"
-        Protected Sub SetExpectedTypeReagent()
+        ''' <summary>
+        ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated when the analyzer is a "A200" model
+        ''' </summary>
+        ''' <remarks>
+        ''' Created on 19/03/2015
+        ''' </remarks>
+        Private Sub SetExpectedTypeReagent200()
             TypeContaminator = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
             TypeContaminated = GetTypeReagentInTest(dbConnection, ReagentContaminatedID)
 
@@ -157,14 +218,59 @@ Namespace Biosystems.Ax00.BL
             End If
         End Sub
 
-        Protected Function ReagentsAreCompatibleType() As Boolean
+        ''' <summary>
+        ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
+        ''' </summary>
+        ''' <remarks>
+        ''' Created on 19/03/2015
+        ''' </remarks>
+        Protected Sub SetExpectedTypeReagent()
+            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+                SetExpectedTypeReagent200()
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
+        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are.
+        ''' This is the version for the analyzer "A200" model
+        ''' </summary>
+        ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015
+        ''' </remarks>
+        Private Function ReagentsAreCompatibleType200() As Boolean
             If (typeExpectedResult = typeResult OrElse typeExpectedResult = TypeReagent.MonoReactive) Then
                 Return True
             End If
             Return False
         End Function
 
-        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
+        ''' <summary>
+        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
+        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are
+        ''' </summary>
+        ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
+        ''' <remarks>
+        ''' Created on 18/03/2015
+        ''' </remarks>
+        Protected Function ReagentsAreCompatibleType() As Boolean
+            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+                Return ReagentsAreCompatibleType200()
+            End If
+            Return True
+        End Function
+
+        ''' <summary>
+        ''' Gets the type of reagent, given a reagentID. This code is the version for the analyzer "A200" model
+        ''' </summary>
+        ''' <param name="pDBConnection">Connection to database</param>
+        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
+        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
+        Private Function GetTypeReagentInTest200(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
             Static testReagentsDataDS As TestReagentsDS
 
             If testReagentsDataDS Is Nothing Then
@@ -177,14 +283,42 @@ Namespace Biosystems.Ax00.BL
             Return CType(result, TypeReagent)
         End Function
 
+        ''' <summary>
+        ''' Gets the type of reagent, given a reagentID
+        ''' </summary>
+        ''' <param name="pDBConnection">Connection to database</param>
+        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
+        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
+        ''' <remarks>
+        ''' Created on 18/03/2015 by AJG
+        ''' </remarks>
+        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
+            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+                Return GetTypeReagentInTest200(pDBConnection, reagentID)
+            End If
+
+            Return TypeReagent.MonoReactive
+        End Function
+
+        ''' <summary>
+        ''' Gets all the reagents and their type of reagent from DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Connection to DB</param>
+        ''' <returns>A testReagentsDS with the info</returns>
+        ''' <remarks>
+        ''' Created on 18/03/2015 by AJG
+        ''' </remarks>
         Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
             Dim TestReagentsDAO As New tparTestReagentsDAO()
-            Dim testReagentsDataDS As TestReagentsDS = Nothing
+            Static testReagentsDataDS As TestReagentsDS
             Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
 
-            resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
-            If Not resultData.HasError Then
-                testReagentsDataDS = resultData.SetDatos
+            If testReagentsDataDS Is Nothing Then
+                resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
+
+                If Not resultData.HasError Then
+                    testReagentsDataDS = resultData.SetDatos
+                End If
             End If
 
             Return testReagentsDataDS

@@ -177,9 +177,6 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Telerik.JustMock">
-      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -669,7 +666,6 @@
     <None Include="InfoDocs\NO V1_test botellas internas-ENG.xps" />
     <None Include="My Project\DataSources\Biosystems.Ax00.Types.SRVAdjustmentsDS+tsrvAdjustmentsDataTable.datasource" />
     <None Include="My Project\DataSources\Biosystems.Ax00.Types.SRVAdjustmentsDS.datasource" />
-    <None Include="packages.config" />
     <None Include="Resources\Biosystemslogo.jpg" />
   </ItemGroup>
   <ItemGroup>

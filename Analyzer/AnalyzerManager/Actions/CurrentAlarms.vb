@@ -324,6 +324,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
                     Where a.AlarmID = GlobalEnumerates.Alarms.GLF_BOARD_ERR.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
                     ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+                Else
+                    myInstructionsQueue.Add(pAction)
+                    myParamsQueue.Add(pSwAdditionalParameters)
                 End If
             End If
         End Sub
