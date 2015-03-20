@@ -173,7 +173,7 @@ Namespace Biosystems.Ax00.Core.Services
                 End Select
 
                 _isInRecovering = False
-
+                AddRequiredEventHandlers()
                 Return True
 
             Catch ex As Exception
