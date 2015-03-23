@@ -368,8 +368,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR 'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
                         If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
 
-                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR 'if exists GLF_BOARD Error in the read FLIGHT process do not add it again !!
-                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then addFlag = False
                 End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
                 Dim warmUpInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
@@ -443,31 +443,33 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'AG 15/03/2012 - Special code for AUTOrecove FREEZE alarms - if error code appears add it, but if the warning level already exists then remove it
-                If pAlarmCode = AlarmEnumerates.Alarms.MAIN_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.REACT_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.S_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-                End If
-
+                Select Case pAlarmCode
+                    Case AlarmEnumerates.Alarms.MAIN_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.FRIDGE_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.REACT_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.S_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR)
+                            pAlarmStatusList.Add(False)
+                        End If
+                End Select
             Else
                 'ALARM SOLVED
                 '''''''''''''

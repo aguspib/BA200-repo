@@ -451,9 +451,12 @@ Public Class UiChangeRotor
             End If
 
             Try
-                processStarted = AnalyzerController.Instance.ChangeRotorStartProcess(_recoverProcess)
 
-                If (processStarted) Then
+                If (Not _recoverProcess) Then
+                    processStarted = AnalyzerController.Instance.ChangeRotorStartProcess()
+                End If
+
+                If (processStarted Or _recoverProcess) Then
                     'Disable buttons
                     'DL 28/02/2012
                     dxProgressBar.Visible = False

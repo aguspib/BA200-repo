@@ -1499,7 +1499,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Property IsAlreadyManagedAlarms As Boolean Implements IAnalyzerManager.IsAlreadyManagedAlarms
+        Public Property CanManageRetryAlarm As Boolean Implements IAnalyzerManager.CanManageRetryAlarm
             Get
                 Return IsAlreadyManagedAlarmsAttr
             End Get

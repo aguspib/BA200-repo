@@ -131,7 +131,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property NextPreparationsToSend As AnalyzerManagerDS.nextPreparationDataTable
         Property NextPreparationsAnalyzerManagerDS As AnalyzerManagerDS
         Property wellContaminatedWithWashSent As Integer
-        Property IsAlreadyManagedAlarms As Boolean
+        Property CanManageRetryAlarm As Boolean
 
 #End Region
 

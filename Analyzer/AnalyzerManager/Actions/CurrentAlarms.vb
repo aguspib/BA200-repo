@@ -242,17 +242,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
         Private Sub GlfBoardErrorDuringFBLD(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef methodHasToAddInstructionToQueueFlag As Integer)
-
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.GLF_BOARD_FBLD_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
-            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
-                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
-                    Where a.AlarmID = Alarms.GLF_BOARD_FBLD_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                If auxList.Count > 0 Then
-                    _myGlfErrorFixed = True
-                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
-                End If
+            If _analyzerManager.CanManageRetryAlarm Then
+                _myGlfErrorFixed = True
+                _analyzerManager.CanManageRetryAlarm = False
             End If
         End Sub
 
@@ -1185,5 +1177,23 @@ Namespace Biosystems.Ax00.Core.Entities
             Return returnData
         End Function
 #End Region
+
+        Private Sub ApplyActionsForAnalyzerInResetRetryMode(ByRef methodHasToAddInstructionToQueueFlag As Integer)
+            If _analyzerManager.CanManageRetryAlarm Then
+                _myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
+                _analyzerManager.SetAnalyzerNotReady()
+
+                'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
+                If Not _myGlobal.HasError Then
+                    methodHasToAddInstructionToQueueFlag = 2
+
+                    If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                        Dim myWsAnalyzerDelegate As New WSAnalyzersDelegate
+                        _myGlobal = myWsAnalyzerDelegate.UpdateWSStatus(_dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
+                    End If
+                End If
+            End If
+        End Sub
+
     End Class
 End Namespace

@@ -677,22 +677,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     _analyzerManager.CanSendingRepetitions() = False
 
                     ' Activates Alarm begin
-                    Dim alarmId As Alarms
-                    Dim alarmStatus As Boolean
-                    Dim myAlarmList As New List(Of Alarms)
-                    Dim myAlarmStatusList As New List(Of Boolean)
-
-                    alarmId = Alarms.GLF_BOARD_FBLD_ERR
-                    alarmStatus = True
-
-                    _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
-                    If myAlarmList.Count > 0 Then
-                        Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                        myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-                    End If
+                    _analyzerManager.CanManageRetryAlarm = True
                 Else
                     GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                     myGlobal = _analyzerManager.SendStartTaskinQueue()
+
                 End If
 
             ElseIf errorValue <> 61 Then

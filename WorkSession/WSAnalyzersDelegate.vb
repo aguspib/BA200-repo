@@ -127,10 +127,10 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  XBC 11/06/2012
         ''' </remarks>
         Public Function UpdateWSAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
+            Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                resultData = GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -139,24 +139,23 @@ Namespace Biosystems.Ax00.BL
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
                         End If
                     End If
                 End If
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then RollbackTransaction(dbConnection)
 
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "WSAnalyzersDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
