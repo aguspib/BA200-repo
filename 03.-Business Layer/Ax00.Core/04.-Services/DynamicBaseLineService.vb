@@ -118,6 +118,7 @@ Namespace Biosystems.Ax00.Core.Services
             ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Initialized) Then
                 _staticBaseLineFinished = True
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty) 'Re-send FLIGHT mode read
+
             ElseIf ((_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Empty) Or (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized)) And
                 (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Canceled) Then
                 _dynamicBaseLineValid = False
@@ -161,9 +162,9 @@ Namespace Biosystems.Ax00.Core.Services
             Try
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
+                InitializeRecover()
 
                 Dim nextStep = GetNextStep()
-
                 Select Case nextStep
                     Case BaseLineStepsEnum.Finalize,
                         BaseLineStepsEnum.DynamicBaseLineRead
