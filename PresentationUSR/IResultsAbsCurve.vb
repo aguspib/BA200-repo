@@ -1554,7 +1554,7 @@ Public Class UiResultsAbsCurve
 
             Dim myUserSettingsDelegate As New GeneralSettingsDelegate
             Dim myGlobalDataTO As GlobalDataTO
-            myGlobalDataTO = myUserSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INTERVAL_ABS_T.ToString)
+            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INTERVAL_ABS_T.ToString)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 'Save value in global variable maxPatientOrderTests
                 Dim myNewValue As String = DirectCast(myGlobalDataTO.SetDatos, String)

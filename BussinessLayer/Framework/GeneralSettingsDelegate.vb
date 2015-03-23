@@ -7,9 +7,14 @@ Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
-    Public Class GeneralSettingsDelegate
+    Public NotInheritable Class GeneralSettingsDelegate
 
 #Region "Other Methods"
+
+        <Obsolete("Don't instantiate abstract class")> _
+        Sub New()
+            Throw (New Exception("This class is abstract"))
+        End Sub
 
         ''' <summary>
         '''  Update the Current value of an specific Setting ID
@@ -19,7 +24,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentValue">New Current Value</param>
         ''' <returns></returns>
         ''' <remarks>CREATED BY: TR 25/11/2011</remarks>
-        Public Function UpdateCurrValBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Shared Function UpdateCurrValBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                  ByVal pSetingID As String, ByVal pCurrentValue As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -76,17 +81,18 @@ Namespace Biosystems.Ax00.BL
         '''                              Master Data Missing when the Setting Value is not found
         '''              SA 26/03/2010 - Verification of Master Data Missing is done only when the DAO function return an error
         ''' </remarks>
-        Public Function GetGeneralSettingValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSettingID As String) As GlobalDataTO
+        Public Shared Function GetGeneralSettingValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSettingID As String) As GlobalDataTO
             Dim dataToReturn As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
+            Dim conexion = DAOBase.GetSafeOpenDBConnection(pDBConnection)
 
             Try
-                dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not dataToReturn.HasError And Not dataToReturn.SetDatos Is Nothing) Then
-                    dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myGeneralSettingsDAO As New tfmwGeneralSettingsDAO
-                        dataToReturn = myGeneralSettingsDAO.ReadBySettingIDAndStatus(dbConnection, pSettingID)
+
+                'dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not conexion.HasError And Not conexion.SetDatos Is Nothing) Then
+                    dbConnection = conexion.SetDatos
+                    If (Not conexion.SetDatos Is Nothing) Then
+                        dataToReturn = tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus(dbConnection, pSettingID).GetCompatibleGlobalDataTO
 
                         If (dataToReturn.HasError) Then
                             If (dataToReturn.SetDatos Is Nothing) Then
@@ -103,11 +109,31 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return dataToReturn
+        End Function
+
+        ''' <summary>
+        ''' Made a simplified global settings reader.
+        ''' </summary>
+        ''' <param name="pSettingID">Name of the global setting</param>
+        ''' <returns>A typed global data to, with a String SetDatos that contains the setting value contents</returns>
+        ''' <remarks>This method does not catch recurring access to the setting, so it's a slow method</remarks>
+        Public Shared Function GetGeneralSettingValue(pSettingID As String) As TypedGlobalDataTo(Of String)
+            Try
+                Return tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus(Nothing, pSettingID)
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Dim result = New TypedGlobalDataTo(Of String)
+                result.HasError = True
+                result.ErrorCode = "SYSTEM_ERROR"
+                result.ErrorMessage = ex.Message
+                Return result
+            End Try
+
         End Function
 #End Region
     End Class

@@ -460,7 +460,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Get value of the General Setting for the maximum number of Cumulated Series 
                         Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
-                        myGlobalDataTO = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES.ToString)
+                        myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES.ToString)
 
                         Dim maxNumber As Integer = 0
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then

@@ -1014,7 +1014,7 @@ Public Class UiWSIncompleteSamplesAuxScreen
 
             'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
             Dim myUserSettingsDelegate As New GeneralSettingsDelegate
-            myGlobalDataTO = myUserSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
+            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
 
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 'Save value in global variable maxPatientOrderTests

@@ -154,7 +154,7 @@ Namespace Biosystems.Ax00.BL
                     Dim maxDaysPreviousBlkCalib As String = ""
                     Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
 
-                    resultData = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
+                    resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         maxDaysPreviousBlkCalib = DirectCast(resultData.SetDatos, String)
                     End If
@@ -593,7 +593,7 @@ Namespace Biosystems.Ax00.BL
                     'Get maximum number of days that can have passed from the last Blank or Calibrator execution
                     Dim maxDaysPreviousBlkCalib As String = ""
                     Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
-                    resultData = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
+                    resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         maxDaysPreviousBlkCalib = DirectCast(resultData.SetDatos, String)
@@ -5148,7 +5148,7 @@ Namespace Biosystems.Ax00.BL
                         Dim maxDaysPreviousBlkCalib As String = ""
                         Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
 
-                        resultData = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
+                        resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_DAYS_PREVIOUS_BLK_CALIB.ToString)
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             maxDaysPreviousBlkCalib = DirectCast(resultData.SetDatos, String)
                         End If

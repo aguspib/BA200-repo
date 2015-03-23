@@ -6250,7 +6250,7 @@ Public Class UiWSSampleRequest
             If (Not myGlobalDataTO.HasError) Then
                 'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
                 Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
-                myGlobalDataTO = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
+                myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     'Save value in global variable maxPatientOrderTests
                     maxPatientOrderTests = CType(myGlobalDataTO.SetDatos, Integer)
