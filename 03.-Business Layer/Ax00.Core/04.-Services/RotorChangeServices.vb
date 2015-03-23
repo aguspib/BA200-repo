@@ -63,69 +63,62 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overloads Function StartService(ByVal isInRecovering As Boolean) As Boolean
+        Public Overrides Function StartService() As Boolean
+            'Public Overloads Function StartService(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             Initialize()
-            If (Not isInRecovering) Then
 
-                If _analyzer.ExistBottleAlarms Then
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Canceled)
-                    Return False
-                Else
-                    'TR 28/10/2011 -Turn off Sound alarm
-                    _analyzer.StopAnalyzerRinging()
-                    If _analyzer.Connected Then
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Empty)
-
-                        resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
-
-                        If resultData.HasError Then
-                            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, StepStringStatus.Empty)
-                            Throw New Exception(resultData.ErrorCode)
-                        End If
-                    Else
-                        Return False
-                    End If
-                End If
-
-                'Update analyzer session flags into DataBase
-                If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-                End If
+            If _analyzer.ExistBottleAlarms Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Canceled)
+                Return False
             Else
-                InitializeRecover()
+                'TR 28/10/2011 -Turn off Sound alarm
+                _analyzer.StopAnalyzerRinging()
+                If _analyzer.Connected Then
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Empty)
+
+                    resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
+
+                    If resultData.HasError Then
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, StepStringStatus.Empty)
+                        Throw New Exception(resultData.ErrorCode)
+                    End If
+                Else
+                    Return False
+                End If
+            End If
+
+            'Update analyzer session flags into DataBase
+            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
             End If
 
             Return True
 
         End Function
 
-        ''' <summary>
-        ''' Starts the change rotor service, assuming it's not in recovery mode.
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function StartService() As Boolean
-            Return Me.StartService(False)
-        End Function
+        ' ''' <summary>
+        ' ''' Starts the change rotor service, assuming it's not in recovery mode.
+        ' ''' </summary>
+        ' ''' <returns></returns>
+        ' ''' <remarks></remarks>
+        'Public Overrides Function StartService() As Boolean
+        '    Return Me.StartService(False)
+        'End Function
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ContinueProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Function ContinueProcess() As Boolean
             If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
-                If (isInRecovering) Then
-                    RecoverProcess()
-                Else
-                    ExecuteNewRotorStep()
-                End If
+                ValidateProcess()
             Else
                 Return False
             End If
@@ -161,9 +154,11 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks>
         ''' Modified by:  AG 20/01/2015 - BA-2216
         ''' </remarks>
-        Private Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean
             Try
                 _isInRecovering = True
+
+                InitializeRecover()
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
 
                 Dim nextStep As RotorChangeStepsEnum
@@ -413,7 +408,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             'NEWROTORprocess in INPROCESS status
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Initialized) Then
-                '_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Empty
+                _analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Empty
             End If
 
             If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
