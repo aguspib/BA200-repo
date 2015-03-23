@@ -14,6 +14,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private _dbConnection As SqlConnection = Nothing
         Private _myIseOffErrorFixed As Boolean = False
         Private _myIseTimeoutErrorFixed As Boolean = False
+        Private _myGlfErrorFixed As Boolean = False
         Private _myCommsTimeoutErrorFixed As Boolean = False
 
         ''' <summary>
@@ -80,7 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim methodHasToAddInstructionToQueueFlag As Integer = 0
 
                 If _analyzerManager.AnalyzerHasSubStatus Then
-                    'BLABLABLA
+                    'TODO: BA-2358 
                 End If
 
                 'Once one instruction has been sent. The other instructions managed in this method will be added to queue
@@ -103,7 +104,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case "RESET"
                             ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
 
-                        Case "RETRY"
                     End Select
 
                 End If
@@ -181,8 +181,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case Alarms.INST_NOALLOW_INS_ERR, Alarms.INST_REJECTED_WARN
                             InstructionError(myAnalyzerFlagsDs)
 
-                        Case Alarms.GLF_BOARD_ERR
-                            GlfBoardError(alarmsDelg, methodHasToAddInstructionToQueueFlag)
+                        Case Alarms.GLF_BOARD_FBLD_ERR
+                            GlfBoardErrorDuringFBLD(alarmsDelg, methodHasToAddInstructionToQueueFlag)
+
                     End Select
                     index = index + 1
                 Next
@@ -234,6 +235,28 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="alarmsDelg"></param>
+        ''' <remarks>
+        ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
+        ''' </remarks>
+        Private Sub GlfBoardErrorDuringFBLD(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef methodHasToAddInstructionToQueueFlag As Integer)
+
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.GLF_BOARD_FBLD_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
+                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
+                    Where a.AlarmID = Alarms.GLF_BOARD_FBLD_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+                If auxList.Count > 0 Then
+                    _myGlfErrorFixed = True
+                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+                End If
+            End If
+        End Sub
+
+        ''' <summary>
         ''' Save alarms and also the alarms solved
         ''' </summary>
         ''' <param name="pAlarmStatusList"></param>
@@ -254,6 +277,8 @@ Namespace Biosystems.Ax00.Core.Entities
             ElseIf _myIseOffErrorFixed AndAlso alarmIdItem = Alarms.ISE_OFF_ERR Then
                 newRowFlag = True
             ElseIf _myIseTimeoutErrorFixed AndAlso alarmIdItem = Alarms.ISE_TIMEOUT_ERR Then
+                newRowFlag = True
+            ElseIf _myGlfErrorFixed AndAlso alarmIdItem = Alarms.GLF_BOARD_FBLD_ERR Then
                 newRowFlag = True
             ElseIf _myCommsTimeoutErrorFixed AndAlso alarmIdItem = Alarms.COMMS_TIMEOUT_ERR Then
                 newRowFlag = True
@@ -314,54 +339,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End If
         End Sub
-
-        ''' <summary>
-        ''' GLF_BOARD_ERR
-        ''' </summary>
-        ''' <param name="alarmsDelg"></param>
-        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
-        ''' <remarks></remarks>
-        Private Sub GlfBoardError(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef methodHasToAddInstructionToQueueFlag As Integer)
-
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.GLF_BOARD_ERR.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
-            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
-                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS).twksWSAnalyzerAlarms
-                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
-                    Where a.AlarmID = Alarms.GLF_BOARD_ERR.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
-                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
-                Else
-                    'myInstructionsQueue.Add(pAction)
-                    'myParamsQueue.Add(pSwAdditionalParameters)
-                End If
-            End If
-        End Sub
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
-        ''' <remarks>
-        ''' INSTRUCTIONS: Stop the sensor information instructions
-        ''' BUSINESS: AnalyzerManager.SetAnalyzerNotReady
-        ''' PRESENTATION: Show message box informing the user the analyzer must be restarted
-        ''' </remarks>
-        Private Sub ApplyActionsForAnalyzerInRetryFreezeMode(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByVal alarmItem As Alarms, ByRef methodHasToAddInstructionToQueueFlag As Integer)
-
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, alarmItem.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
-
-            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
-                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS).twksWSAnalyzerAlarms
-                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
-                    Where a.AlarmID = alarmItem.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
-
-                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
-                Else
-
-                End If
-
-            End If
-        End Sub
-
 
         ''' <summary>
         ''' 

@@ -94,9 +94,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' Get Error field (parameter index 9)
                 Dim errorValue As Integer
-                If Not GetErrorField(_instructionReceived, myActionValue, myExpectedTimeRaw, errorValue, myGlobal, myInstParamTo) Then
+                If Not GetErrorField(_instructionReceived, errorValue, myGlobal, myInstParamTo) Then
                     Return myGlobal
                 End If
+
+                ManageErrorField(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
                 ' Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 If Not GetIseField(_instructionReceived, myGlobal, myInstParamTo) Then
@@ -495,182 +497,23 @@ Namespace Biosystems.Ax00.Core.Entities
             Return True
         End Function
 
-        Private Function GetErrorField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myActionValue As AnalyzerManagerAx00Actions, ByVal myExpectedTimeRaw As Integer, _
-                                       ByRef errorValue As Integer, ByRef myGlobal As GlobalDataTO, ByRef myInstParamTo As InstructionParameterTO) As Boolean
+        Private Function GetErrorField(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef errorValue As Integer, _
+                                       ByRef myGlobal As GlobalDataTO, ByRef myInstParamTo As InstructionParameterTO) As Boolean
 
             errorValue = 0
             myGlobal = GetItemByParameterIndex(pInstructionReceived, 9)
             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
             Else
                 Return False
             End If
 
-            If IsNumeric(myInstParamTO.ParameterValue) Then
-                errorValue = CInt(myInstParamTO.ParameterValue)
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                errorValue = CInt(myInstParamTo.ParameterValue)
             Else
                 Return False
             End If
 
-            If errorValue <> 61 Then 'CInt(Alarms.ISE_TIMEOUT_ERR) Then
-                If _analyzerManager.ISECMDStateIsLost() Then
-                    _analyzerManager.ISECMDStateIsLost() = False
-
-                    If _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                        _analyzerManager.CanSendingRepetitions() = True
-                        _analyzerManager.NumSendingRepetitionsTimeout() += 1
-                        If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
-                            GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            _analyzerManager.WaitingStartTaskTimerEnabled() = False
-                            _analyzerManager.CanSendingRepetitions() = False
-
-                            ' Activates Alarm begin
-                            Dim alarmId As Alarms
-                            Dim alarmStatus As Boolean
-                            Dim myAlarmList As New List(Of Alarms)
-                            Dim myAlarmStatusList As New List(Of Boolean)
-
-                            alarmId = Alarms.ISE_TIMEOUT_ERR
-                            alarmStatus = True
-                            _analyzerManager.ISEAnalyzer.IsTimeOut = True
-
-                            _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
-                            If myAlarmList.Count > 0 Then
-                                ' Note that this alarm is common on User and Service !
-                                Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-                            End If
-                            ' Activates Alarm end
-
-                            _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                        Else
-                            ' Instruction has not started by Fw, so is need to send it again
-                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            myGlobal = _analyzerManager.SendStartTaskinQueue()
-                        End If
-                    End If
-
-                End If
-
-                If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
-
-                    ' Update the interval of the Timer with the expected time received from the Analyzer
-                    If myExpectedTimeRaw <= 0 Then
-                        If Not _analyzerManager.SetTimeISEOffsetFirstTime() Then
-                            _analyzerManager.SetTimeISEOffsetFirstTime() = True
-                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
-                            _analyzerManager.InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
-                        End If
-                    Else
-                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
-                        _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
-                    End If
-                End If
-
-            End If
-            If _analyzerManager.RunningLostState() Then
-                _analyzerManager.RunningLostState() = False
-
-                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                    If (_analyzerManager.SessionFlag(AnalyzerManagerFlags.RUNNINGprocess) = "INPROCESS") AndAlso _
-                       (_analyzerManager.SessionFlag(AnalyzerManagerFlags.EnterRunning) = "INI") Then
-                        myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
-                        _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END
-                    End If
-                End If
-
-                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY AndAlso _
-                   _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
-                   _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_END Then
-                    _analyzerManager.CanSendingRepetitions() = True
-                    _analyzerManager.NumSendingRepetitionsTimeout() += 1
-                    If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
-                        GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                        _analyzerManager.WaitingStartTaskTimerEnabled() = False
-                        _analyzerManager.CanSendingRepetitions() = False
-
-                        ' Activates Alarm begin
-                        Dim alarmId As Alarms
-                        Dim alarmStatus As Boolean
-                        Dim myAlarmList As New List(Of Alarms)
-                        Dim myAlarmStatusList As New List(Of Boolean)
-
-                        alarmId = Alarms.COMMS_TIMEOUT_ERR
-                        alarmStatus = True
-                        _analyzerManager.ISEAnalyzer.IsTimeOut = True
-
-                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
-                        If myAlarmList.Count > 0 Then
-                            ' Note that this alarm is common on User and Service !
-                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-                        End If
-                        ' Activates Alarm end
-
-                        Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
-                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
-
-                        'Update internal flags. Basically used by the running normal business
-                        If (Not myGlobal.HasError AndAlso _analyzerManager.Connected()) Then
-                            'Update analyzer session flags into DataBase
-                            If (myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
-                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-                            End If
-                        End If
-
-                        _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                    Else
-                        ' Instruction has not started by Fw, so is need to send it again
-                        GlobalBase.CreateLogActivity("Repeat RUNNING Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                        myGlobal = _analyzerManager.SendStartTaskinQueue()
-                    End If
-                End If
-
-            End If
-
-            If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_START Then
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
-                ' Update the interval of the Timer with the expected time received from the Analyzer
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
-                _analyzerManager.InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
-                _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
-                _startingRunningFirstTime = True
-            End If
-
-            If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END Or _
-               _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                If _startingRunningFirstTime Then
-                    _startingRunningFirstTime = False
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
-                    _analyzerManager.RunningLostState() = False
-                    _analyzerManager.CanSendingRepetitions() = False
-                    _analyzerManager.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                    _analyzerManager.ClearStartTaskQueueToSend()
-
-                    ' Deactivates Alarm begin - BA-1872
-                    Dim alarmId As Alarms
-                    Dim alarmStatus As Boolean
-                    Dim myAlarmList As New List(Of Alarms)
-                    Dim myAlarmStatusList As New List(Of Boolean)
-
-                    alarmId = Alarms.COMMS_TIMEOUT_ERR
-                    alarmStatus = False
-
-                    _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
-
-                    'Finally call manage all alarms detected (new or solved)
-                    If myAlarmList.Count > 0 Then
-                        If Not GlobalBase.IsServiceAssembly Then
-                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-                        End If
-
-                    End If
-                    If _analyzerManager.Alarms().Contains(Alarms.COMMS_TIMEOUT_ERR) Then _analyzerManager.AlarmListRemoveItem(Alarms.COMMS_TIMEOUT_ERR)
-                End If
-            End If
             Return True
         End Function
 
@@ -823,6 +666,196 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Return True
         End Function
+
+        Private Sub ManageErrorField(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer, ByRef myActionValue As AnalyzerManagerAx00Actions, ByVal myExpectedTimeRaw As Integer)
+            If errorValue = 560 Then
+                _analyzerManager.CanSendingRepetitions() = True
+                _analyzerManager.NumSendingRepetitionsTimeout() += 1
+
+                If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsRetry Then
+                    GlobalBase.CreateLogActivity("FLIGHT Error: GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                    _analyzerManager.CanSendingRepetitions() = False
+
+                    ' Activates Alarm begin
+                    Dim alarmId As Alarms
+                    Dim alarmStatus As Boolean
+                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+
+                    alarmId = Alarms.GLF_BOARD_FBLD_ERR
+                    alarmStatus = True
+
+                    _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                    If myAlarmList.Count > 0 Then
+                        Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                        myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                    End If
+                Else
+                    GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                    myGlobal = _analyzerManager.SendStartTaskinQueue()
+                End If
+
+            ElseIf errorValue <> 61 Then
+                If _analyzerManager.ISECMDStateIsLost() Then
+                    _analyzerManager.ISECMDStateIsLost() = False
+
+                    If _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                        _analyzerManager.CanSendingRepetitions() = True
+                        _analyzerManager.NumSendingRepetitionsTimeout() += 1
+                        If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
+                            GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            _analyzerManager.WaitingStartTaskTimerEnabled() = False
+                            _analyzerManager.CanSendingRepetitions() = False
+
+                            ' Activates Alarm begin
+                            Dim alarmId As Alarms
+                            Dim alarmStatus As Boolean
+                            Dim myAlarmList As New List(Of Alarms)
+                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                            alarmId = Alarms.ISE_TIMEOUT_ERR
+                            alarmStatus = True
+                            _analyzerManager.ISEAnalyzer.IsTimeOut = True
+
+                            _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                            If myAlarmList.Count > 0 Then
+                                ' Note that this alarm is common on User and Service !
+                                Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                            End If
+                            ' Activates Alarm end
+
+                            _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                        Else
+                            ' Instruction has not started by Fw, so is need to send it again
+                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = _analyzerManager.SendStartTaskinQueue()
+                        End If
+                    End If
+
+                End If
+
+                If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
+
+                    ' Update the interval of the Timer with the expected time received from the Analyzer
+                    If myExpectedTimeRaw <= 0 Then
+                        If Not _analyzerManager.SetTimeISEOffsetFirstTime() Then
+                            _analyzerManager.SetTimeISEOffsetFirstTime() = True
+                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
+                            _analyzerManager.InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                        End If
+                    Else
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
+                        _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
+                    End If
+                End If
+
+            End If
+
+            If _analyzerManager.RunningLostState() Then
+                _analyzerManager.RunningLostState() = False
+
+                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
+                    If (_analyzerManager.SessionFlag(AnalyzerManagerFlags.RUNNINGprocess) = "INPROCESS") AndAlso _
+                       (_analyzerManager.SessionFlag(AnalyzerManagerFlags.EnterRunning) = "INI") Then
+                        myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
+                        _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END
+                    End If
+                End If
+
+                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY AndAlso _
+                   _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
+                   _analyzerManager.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_END Then
+                    _analyzerManager.CanSendingRepetitions() = True
+                    _analyzerManager.NumSendingRepetitionsTimeout() += 1
+                    If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
+                        GlobalBase.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                        _analyzerManager.WaitingStartTaskTimerEnabled() = False
+                        _analyzerManager.CanSendingRepetitions() = False
+
+                        ' Activates Alarm begin
+                        Dim alarmId As Alarms
+                        Dim alarmStatus As Boolean
+                        Dim myAlarmList As New List(Of Alarms)
+                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                        alarmId = Alarms.COMMS_TIMEOUT_ERR
+                        alarmStatus = True
+                        _analyzerManager.ISEAnalyzer.IsTimeOut = True
+
+                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                        If myAlarmList.Count > 0 Then
+                            ' Note that this alarm is common on User and Service !
+                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                        End If
+                        ' Activates Alarm end
+
+                        Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                        'Update internal flags. Basically used by the running normal business
+                        If (Not myGlobal.HasError AndAlso _analyzerManager.Connected()) Then
+                            'Update analyzer session flags into DataBase
+                            If (myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                            End If
+                        End If
+
+                        _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                    Else
+                        ' Instruction has not started by Fw, so is need to send it again
+                        GlobalBase.CreateLogActivity("Repeat RUNNING Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                        myGlobal = _analyzerManager.SendStartTaskinQueue()
+                    End If
+                End If
+
+            End If
+
+            If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_START Then
+                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
+                ' Update the interval of the Timer with the expected time received from the Analyzer
+                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
+                _analyzerManager.InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
+                _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
+                _startingRunningFirstTime = True
+            End If
+
+            If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END Or _
+               _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
+                If _startingRunningFirstTime Then
+                    _startingRunningFirstTime = False
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
+                    _analyzerManager.RunningLostState() = False
+                    _analyzerManager.CanSendingRepetitions() = False
+                    _analyzerManager.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    _analyzerManager.ClearStartTaskQueueToSend()
+
+                    ' Deactivates Alarm begin - BA-1872
+                    Dim alarmId As Alarms
+                    Dim alarmStatus As Boolean
+                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+
+                    alarmId = Alarms.COMMS_TIMEOUT_ERR
+                    alarmStatus = False
+
+                    _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+
+                    'Finally call manage all alarms detected (new or solved)
+                    If myAlarmList.Count > 0 Then
+                        If Not GlobalBase.IsServiceAssembly Then
+                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                        End If
+
+                    End If
+                    If _analyzerManager.Alarms().Contains(Alarms.COMMS_TIMEOUT_ERR) Then _analyzerManager.AlarmListRemoveItem(Alarms.COMMS_TIMEOUT_ERR)
+                End If
+            End If
+        End Sub
 
         Private Sub TreatmentErrorValue(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer)
 

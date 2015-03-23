@@ -567,6 +567,13 @@ Namespace Biosystems.Ax00.Global
             End Get
         End Property
 
+        ' XBC 05/05/2011
+        Shared ReadOnly Property MaxRepetitionsRetry() As Integer
+            Get
+                Return My.Settings.MaxRepetitionsRetry
+            End Get
+        End Property
+
 #End Region
 
 #Region "Public methods"
