@@ -74,14 +74,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              Changes to return Nothing plus HasError=True when the setting exists in DB and is active 
         '''                              but it has not value
         ''' </remarks>
-        Public Function ReadBySettingIDAndStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pGeneralSettingID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
+        Public Shared Function ReadBySettingIDAndStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pGeneralSettingID As String) As TypedGlobalDataTo(Of String)
+            Dim resultData As New TypedGlobalDataTo(Of String)
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+                If (Not connection.HasError And Not connection.SetDatos Is Nothing) Then
+                    dbConnection = connection.SetDatos 'CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
                         cmdText = " SELECT CurrentValue " & _
@@ -100,7 +100,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (dbDataReader.HasRows) Then
                             dbDataReader.Read()
                             If (Not dbDataReader.IsDBNull(0)) Then
-                                resultData.SetDatos = CType(dbDataReader.Item("CurrentValue"), String)
+                                resultData.SetDatos = dbDataReader.Item("CurrentValue").ToString
                             Else
                                 resultData.HasError = True
                                 resultData.SetDatos = Nothing

@@ -1552,9 +1552,8 @@ Public Class UiResultsAbsCurve
 
             'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
 
-            Dim myUserSettingsDelegate As New GeneralSettingsDelegate
             Dim myGlobalDataTO As GlobalDataTO
-            myGlobalDataTO = myUserSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INTERVAL_ABS_T.ToString)
+            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INTERVAL_ABS_T.ToString)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 'Save value in global variable maxPatientOrderTests
                 Dim myNewValue As String = DirectCast(myGlobalDataTO.SetDatos, String)

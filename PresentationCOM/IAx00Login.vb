@@ -536,10 +536,8 @@ Public Class UiAx00Login
         Dim myResult As Boolean = False
         Try
             Dim myGlobalDataTO As GlobalDataTO
-            'Dim myGeneralSettingDS As New GeneralSettingsDS
-            Dim myGeneralSettingDelegate As New GeneralSettingsDelegate
 
-            myGlobalDataTO = myGeneralSettingDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INITIAL_KEY.ToString())
+            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INITIAL_KEY.ToString())
 
             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then  'DL 28/03/2012 Add check if setdatos is nothing
                 If bsPasswordTextBox.Text = myGlobalDataTO.SetDatos.ToString() Then

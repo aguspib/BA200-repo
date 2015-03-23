@@ -8276,8 +8276,7 @@ Namespace Biosystems.Ax00.BL
                                 dataToReturn = reagentsTubes.GetMinimumBottleSize(dbConnection)
                             Else
                                 'Search for minimum volume of big bottles
-                                Dim generalSettings As New GeneralSettingsDelegate
-                                dataToReturn = generalSettings.GetGeneralSettingValue(dbConnection, GeneralSettingsEnum.BIG_BOTTLE_MIN_VOLUME.ToString) '"BIG_BOTTLE_MIN_VOLUME")
+                                dataToReturn = GeneralSettingsDelegate.GetGeneralSettingValue(dbConnection, GeneralSettingsEnum.BIG_BOTTLE_MIN_VOLUME.ToString) '"BIG_BOTTLE_MIN_VOLUME")
                             End If
 
                             If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then

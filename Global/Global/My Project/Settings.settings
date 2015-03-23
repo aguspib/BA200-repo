@@ -42,7 +42,7 @@
       <Value Profile="(Default)">.SAT</Value>
     </Setting>
     <Setting Name="DataBaseVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">3.06</Value>
+      <Value Profile="(Default)">3.07</Value>
     </Setting>
     <Setting Name="AllowDBGreaterVersion" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -141,7 +141,7 @@
       <Value Profile="(Default)">\Reports\Templates</Value>
     </Setting>
     <Setting Name="BiosystemsConnDev" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Data Source=(local)\SQLEXPRESS;Initial Catalog=Ax00;user=sa;Password=BIOSYSTEMS;Persist Security Info=true;</Value>
+      <Value Profile="(Default)">Data Source=(local)\SQLEXPRESS;Initial Catalog=Ax00;user=sa;Password=BIOSYSTEMS;Persist Security Info=true;min pool size=1; max pool size=10;</Value>
     </Setting>
     <Setting Name="IsSystemLogFull" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

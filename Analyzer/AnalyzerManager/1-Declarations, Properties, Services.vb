@@ -4043,7 +4043,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myWsDelegate As New WorkSessionsDelegate
                 Dim mySavedWsDelegate As New SavedWSDelegate
 
-                myGlobal = myWsDelegate.GetOrderTestsForWS(pDbConnection, ActiveWorkSession)
+                myGlobal = WorkSessionsDelegate.GetOrderTestsForWS(pDbConnection, ActiveWorkSession)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim myWorkSessionResultDs As WorkSessionResultDS = DirectCast(myGlobal.SetDatos, WorkSessionResultDS)
 
