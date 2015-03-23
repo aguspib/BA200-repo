@@ -2784,9 +2784,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Try
                 'AG 03/07/2012 - Running Cycles lost - Solution!
-                'myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
-                'If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
-                '    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
 
                 Dim myPreparationID As Integer = -1
                 Dim myISEResultStr As String = ""
@@ -2798,8 +2795,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myISEResult As New ISEResultTO
                 myISEResult.ReceivedResults = myISEResultStr
 
-
-                'SGM 08/03/11 Get from SWParameters table
                 Dim myISEMode As String = "SimpleMode"
                 Dim myParams As New SwParametersDelegate
                 myGlobalDataTO = myParams.ReadTextValueByParameterName(dbConnection, SwParameters.ISE_MODE.ToString, Nothing)
@@ -2809,10 +2804,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     myISEMode = "SimpleMode"
                 End If
 
-                'XBC 20/01/2012
                 Dim myISEResultsDelegate As New ISEReception(Me)
-                'XBC 20/01/2012
-                'SGM 10/01/2012 choose method depending on instruction type sent (ISECMD or ISETEST)
 
                 If myPreparationID = 0 Then
 
@@ -2852,7 +2844,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                     For Each E As ISEErrorTO In ISEAnalyzer.LastISEResult.Errors
                                         If myCurrentProcedure = ISEManager.ISEProcedures.CalibrateElectrodes Then
-                                            Me.BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                                            BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                         End If
                                     Next
                                 End If
@@ -2874,9 +2866,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Else
                         'USER SOFTWARE
-                        If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString), "INI") Then
+                        If String.Equals(mySessionFlags(AnalyzerManagerFlags.ISEClean.ToString), "INI") Then
                             If Not ISEAnalyzer.LastISEResult.IsCancelError Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "END")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "END")
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "CANCELED")
                             End If
@@ -2896,29 +2888,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             'The ISE consumption flag is updated in OnISEProcedureFinished event handler
-
-
-                            '    'AG 12/04/2012 - ISE consumption updated
-                            'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption.ToString) = "INI" Then
-                            '    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption, "END")
-
-                            '    'If pause in process mark as closed
-                            '    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString) = "INPROCESS" Then
-                            '        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess, "CLOSED")
-                            '    End If
-
-                            '    'Once the ise consumption is updated activate ansinf
-                            '    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            '        AnalyzerIsInfoActivatedAttribute = 0
-                            '        myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-
-                            '        'This is not required with the INFO because it is an immediate instruction
-                            '        ''When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                            '        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                            '        '    SetAnalyzerNotReady()
-                            '        'End If
-                            '    End If
-                            '    'AG 12/04/2012
 
                         End If
 

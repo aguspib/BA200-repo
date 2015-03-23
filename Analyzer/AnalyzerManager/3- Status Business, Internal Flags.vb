@@ -2329,7 +2329,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                     End If
 
-                    'myGlobal = MyClass.ISE_Manager.SaveConsumptions()
                     ' XB 09/12/2014 - BA-1872
                 Else
                     myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
