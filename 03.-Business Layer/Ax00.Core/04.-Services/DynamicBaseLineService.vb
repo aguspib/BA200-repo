@@ -41,7 +41,6 @@ Namespace Biosystems.Ax00.Core.Services
             If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then Return False
 
             'Method flow:
-            Dim startProcessSuccess As Boolean = False
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If isInRecover Then
@@ -49,24 +48,21 @@ Namespace Biosystems.Ax00.Core.Services
             Else
                 Initialize()
 
-                If _analyzer.Connected Then
-                    _analyzer.StopAnalyzerRinging()
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
+                _analyzer.StopAnalyzerRinging()
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
 
-                    'Update analyzer session flags into DataBase
-                    UpdateFlags(myAnalyzerFlagsDs)
+                'Update analyzer session flags into DataBase
+                UpdateFlags(myAnalyzerFlagsDs)
 
-                    startProcessSuccess = True
-
-                    Status = ServiceStatusEnum.Running
-                    AddRequiredEventHandlers()
-                End If
             End If
 
-            Return startProcessSuccess
+            Status = ServiceStatusEnum.Running
+            AddRequiredEventHandlers()
+
+            Return True
 
         End Function
 
@@ -178,7 +174,7 @@ Namespace Biosystems.Ax00.Core.Services
                 End Select
 
                 _isInRecovering = False
-
+                AddRequiredEventHandlers()
                 Return True
 
             Catch ex As Exception

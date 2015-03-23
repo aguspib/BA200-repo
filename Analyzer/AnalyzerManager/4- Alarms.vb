@@ -303,88 +303,71 @@ Namespace Biosystems.Ax00.Core.Entities
                 '''''''''''''
                 Dim addFlag As Boolean = True 'By default add all new alarms
 
-                'Exception Nr.1: if exists Reactions rotor thermo error/nok do not add reaction rotor thermo warning!!
-                If pAlarmCode = AlarmEnumerates.Alarms.REACT_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Then addFlag = False
+                Select Case pAlarmCode
+                    Case AlarmEnumerates.Alarms.REACT_TEMP_WARN 'Exception Nr.1: if exists Reactions rotor thermo error/nok do not add reaction rotor thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Then addFlag = False
 
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.REACT_TEMP_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
 
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.REACT_TEMP_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN 'Exception Nr.2: if exists Fridge thermo error/nok do not add fridge thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR) Then addFlag = False
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
 
-                    'Exception Nr.2: if exists Fridge thermo error/nok do not add fridge thermo warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR) Then addFlag = False
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
 
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN 'Exception Nr.3: if exists High contamination deposit error do not add high contamination deposit warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then addFlag = False
 
-                    'Exception Nr.3: if exists High contamination deposit error do not add high contamination deposit warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WASH_CONTAINER_WARN 'Exception Nr.4: if exists Wash solution deposit error do not add Wash solution deposit warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) Then addFlag = False
 
-                    'Exception Nr.4: if exists Wash solution deposit error do not add Wash solution deposit warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.WASH_CONTAINER_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.R1_TEMP_WARN 'Exception Nr.5: if exists R1 thermo system error do not add R1 thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.5: if exists R1 thermo system error do not add R1 thermo warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.R1_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.R2_TEMP_WARN 'Exception Nr.6: if exists R2 thermo system error do not add R2 thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.6: if exists R2 thermo system error do not add R2 thermo warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.R2_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WS_TEMP_WARN 'Exception Nr.7: if exists Washing station system error do not add washing station thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.7: if exists Washing station system error do not add washing station thermo warning!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.WS_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR 'Exception Nr.8: if exists Water deposit system error do not add water deposit error (calculated by Sw)!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.8: if exists Water deposit system error do not add water deposit error (calculated by Sw)!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR 'Exception Nr.8: if exists Waste deposit system error do not add waste deposit error (calculated by Sw)!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.8: if exists Waste deposit system error do not add waste deposit error (calculated by Sw)!!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.ISE_OFF_ERR 'Exception Nr.9: if exists ISE system error do not add ise status off !!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then addFlag = False
 
-                    'Exception Nr.9: if exists ISE system error do not add ise status off !!
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.ISE_OFF_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.MAIN_COVER_WARN 'Exception Nr.10: if exists main cover error do not add main cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.10: if exists main cover error do not add main cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.MAIN_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.FRIDGE_COVER_WARN 'Exception Nr.11: if exists fridge cover error do not add fridge cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.11: if exists fridge cover error do not add fridge cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.S_COVER_WARN 'Exception Nr.12: if exists samples cover error do not add samples cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.12: if exists samples cover error do not add samples cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.S_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.REACT_COVER_WARN 'Exception Nr.13: if exists reactions cover error do not add reactions cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.13: if exists reactions cover error do not add reactions cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.REACT_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.BASELINE_WELL_WARN 'Exception Nr.14: if exists base line error do not add BASE LINE WELL warn (baseline warn)!! 'AG 26/04/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then addFlag = False
 
-                    'Exception Nr.14: if exists base line error do not add BASE LINE WELL warn (baseline warn)!! 'AG 26/04/2012
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.BASELINE_WELL_WARN Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.BASELINE_INIT_ERR 'AG 07/09/2012 - In running if the Base line init error appears remove the METHACRYL_ROTOR_WARN alarm if exists
+                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                            myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
+                        End If
 
-                    'AG 07/09/2012 - In running if the Base line init error appears remove the METHACRYL_ROTOR_WARN alarm if exists
-                ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso pAlarmCode = AlarmEnumerates.Alarms.BASELINE_INIT_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                        myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
-                    End If
-                    'if exists ISE timeout or  ise status off do not add it again !!   ' XB 03/11/2014 - BA-1872
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
-                    'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
-                End If
+                    Case AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR 'if exists ISE timeout or  ise status off do not add it again !!   ' XB 03/11/2014 - BA-1872
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
 
+                    Case AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR 'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
+                End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
                 Dim warmUpInProcess As Boolean = False
                 If (String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
@@ -487,9 +470,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         pAlarmStatusList.Add(False)
                     End If
                 End If
-                'AG 15/03/2012
-
-                alarmsWithOKTypeFalse = Nothing
 
             Else
                 'ALARM SOLVED
@@ -584,6 +564,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             pAlarmStatusList.Add(False)
                         End If
                     Next
+
                 End If
 
             End If
@@ -3020,14 +3001,11 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 20/01/2015 - Add new ISE Alarms - BA-1873
         ''' </remarks>
         Private Function ConvertToAlarmIDEnumerate(ByVal pAlarmStringCodes As List(Of String)) As List(Of Alarms)
-            'Do not implement Try/Catch: the caller method does it
-
-            Dim alarmIDEnumList As New List(Of Alarms)
+            Dim alarmIdEnumList As New List(Of Alarms)
             For Each row As String In pAlarmStringCodes
-                'AG 04/12/2014 BA-2236 code improvement
-                alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(Alarms), row), Alarms))
+                alarmIdEnumList.Add(DirectCast([Enum].Parse(GetType(Alarms), row), Alarms))
             Next
-            Return alarmIDEnumList
+            Return alarmIdEnumList
         End Function
 
 

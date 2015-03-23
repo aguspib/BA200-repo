@@ -512,9 +512,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Return False
             End If
 
-
-            '---------------------------------------------------------------------------
-            If errorValue <> 61 Then
+            If errorValue <> 61 Then 'CInt(Alarms.ISE_TIMEOUT_ERR) Then
                 If _analyzerManager.ISECMDStateIsLost() Then
                     _analyzerManager.ISECMDStateIsLost() = False
 
@@ -673,7 +671,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     If _analyzerManager.Alarms().Contains(Alarms.COMMS_TIMEOUT_ERR) Then _analyzerManager.AlarmListRemoveItem(Alarms.COMMS_TIMEOUT_ERR)
                 End If
             End If
-
             Return True
         End Function
 

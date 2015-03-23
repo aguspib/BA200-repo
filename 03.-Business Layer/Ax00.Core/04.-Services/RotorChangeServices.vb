@@ -170,7 +170,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks>
         ''' Modified by:  AG 20/01/2015 - BA-2216
         ''' </remarks>
-        Public Function RecoverProcess() As Boolean
+        Private Function RecoverProcess() As Boolean
             Try
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
@@ -184,11 +184,12 @@ Namespace Biosystems.Ax00.Core.Services
                         ValidateProcess()
                         'Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
                         '   ProcessDynamicBaseLine()
-                    Case RotorChangeStepsEnum.BaseLine
+                    Case Else
 
                         _baseLineService.RecoverProcess()
+                        '_baseLineService.RecoverProcess()
                 End Select
-
+                '_baseLineService.RecoverProcess()
                 _isInRecovering = False
 
                 Return True

@@ -102,6 +102,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Case "RESET"
                             ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+
+                        Case "RETRY"
                     End Select
 
                 End If
@@ -333,6 +335,32 @@ Namespace Biosystems.Ax00.Core.Entities
                     'myInstructionsQueue.Add(pAction)
                     'myParamsQueue.Add(pSwAdditionalParameters)
                 End If
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
+        ''' <remarks>
+        ''' INSTRUCTIONS: Stop the sensor information instructions
+        ''' BUSINESS: AnalyzerManager.SetAnalyzerNotReady
+        ''' PRESENTATION: Show message box informing the user the analyzer must be restarted
+        ''' </remarks>
+        Private Sub ApplyActionsForAnalyzerInRetryFreezeMode(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByVal alarmItem As Alarms, ByRef methodHasToAddInstructionToQueueFlag As Integer)
+
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, alarmItem.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+
+            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS).twksWSAnalyzerAlarms
+                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
+                    Where a.AlarmID = alarmItem.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
+
+                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+                Else
+
+                End If
+
             End If
         End Sub
 

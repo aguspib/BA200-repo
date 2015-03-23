@@ -59,6 +59,8 @@ Namespace Biosystems.Ax00.BL
             contaminations = New List(Of ContaminationsDS.tparContaminationsRow)
             contaminatorOrderTest = -1
             MainContaminatedID = -1
+            typeExpectedResult = TypeReagent.MonoReactive
+            typeResult = TypeReagent.MonoReactive
         End Sub
 
         Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
@@ -216,6 +218,8 @@ Namespace Biosystems.Ax00.BL
             Else
                 typeExpectedResult = TypeReagent.MonoReactive
             End If
+
+            typeResult = TypeReagent.MonoReactive
         End Sub
 
         ''' <summary>
