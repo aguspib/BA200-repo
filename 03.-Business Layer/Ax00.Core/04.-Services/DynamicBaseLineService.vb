@@ -811,6 +811,8 @@ Namespace Biosystems.Ax00.Core.Services
                 ExecuteDynamicBaseLineEmptyStep()
             Else
                 '551 correcta
+
+                _checkedPreviousAlarms = True
             End If
         End Sub
 
