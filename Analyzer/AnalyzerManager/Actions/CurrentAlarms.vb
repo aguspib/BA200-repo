@@ -242,7 +242,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="alarmsWithOkTypeFalse"></param>
         ''' <param name="wsAlarmsDs"></param>
         ''' <param name="pAdditionalInfoList"></param>
-        ''' <returns></returns>
         ''' <remarks></remarks>
         Private Sub CheckIfSaveAlarm(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As Alarms, _
                                      ByVal alarmsWithOkTypeFalse As List(Of String), ByVal wsAlarmsDs As WSAnalyzerAlarmsDS, ByVal pAdditionalInfoList As List(Of String))
@@ -276,7 +275,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="newRowFlag"></param>
         ''' <param name="wsAlarmsDs"></param>
         ''' <param name="pAdditionalInfoList"></param>
-        ''' <returns></returns>
         ''' <remarks></remarks>
         Private Sub AddAlarmIntoWsAnalyzerAlarmDsAndRefreshUi(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As Alarms, _
                                                               ByVal newRowFlag As Boolean, ByVal wsAlarmsDs As WSAnalyzerAlarmsDS, ByVal pAdditionalInfoList As List(Of String))
@@ -1101,7 +1099,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' The analyzer alarm sound must be activate on Analyzer configuration.
         ''' </summary>
         ''' <param name="pSomeInstructionAlreadySent" ></param>
-        ''' <returns></returns>
         ''' <remarks>CREATED BY: TR 27/10/2011
         ''' AG 14/05/2012 - add byRef parameter psomeinstructionAlreadySent. When 0 send Sound instruction, else add to queue</remarks>
         Private Sub SoundActivationByAlarm(ByRef pSomeInstructionAlreadySent As Integer)
