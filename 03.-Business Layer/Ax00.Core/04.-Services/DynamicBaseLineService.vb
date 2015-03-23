@@ -789,7 +789,7 @@ Namespace Biosystems.Ax00.Core.Services
             'Previous constraint:
             If _analyzer.Connected = False Then Return
 
-            Dim Alarm551Present As Boolean = False
+            Dim Alarm551Present As Boolean = True
             Dim Alarm551Date = Now.AddMinutes(-15)
 
             If Alarm551Present Then
@@ -802,8 +802,11 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Private Sub ProcessAlarm551(Alarm551Date As Date)
-            Dim MinutosCaducidadRotorLleno = 30
-            If Alarm551Date < Now.AddMinutes(-MinutosCaducidadRotorLleno) Then
+            Dim minutosCaducidadRotorLleno = 30
+            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue("FLIGHT_FULL_ROTOR_CADUCITY")
+            If caducityParameter IsNot Nothing AndAlso caducityParameter.HasError = False Then minutosCaducidadRotorLleno = CInt(caducityParameter.SetDatos)
+
+            If Alarm551Date < Now.AddMinutes(-minutosCaducidadRotorLleno) Then
                 '551 caducada
                 ExecuteDynamicBaseLineEmptyStep()
             Else

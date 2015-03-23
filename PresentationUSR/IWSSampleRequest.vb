@@ -6234,13 +6234,11 @@ Public Class UiWSSampleRequest
             'Get the list of Sample Tube Types (for the ComboBox column of TubeType in all the grids)
             myGlobalDataTO = GetSampleTubeTypes()
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim lstSorted As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow)
-                lstSorted = DirectCast(myGlobalDataTO.SetDatos, List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow))
+                Dim lstSorted = DirectCast(myGlobalDataTO.SetDatos, List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow))
 
                 InitializePatientGrid(lstSorted, currentLanguage)
                 InitializeControlGrid(lstSorted, currentLanguage)
                 InitializeBlkCalibGrid(lstSorted, currentLanguage)
-                lstSorted = Nothing
             Else
                 'Show the error Message
                 ShowMessage(Name & ".ScreenLoad", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
@@ -6249,7 +6247,6 @@ Public Class UiWSSampleRequest
             Application.DoEvents()
             If (Not myGlobalDataTO.HasError) Then
                 'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
-                Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
                 myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     'Save value in global variable maxPatientOrderTests
@@ -6261,9 +6258,8 @@ Public Class UiWSSampleRequest
                 'If a WorkSession Identifier was informed, get the list of Order Tests currently linked to it
                 '(both, OPEN and IN PROCESS ones of whatever Sample Class)
                 If Not String.Equals(WorkSessionIDAttribute.Trim, String.Empty) Then
-                    Dim myWSDelegate As New WorkSessionsDelegate
 
-                    myGlobalDataTO = myWSDelegate.GetOrderTestsForWS(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                    myGlobalDataTO = WorkSessionsDelegate.GetOrderTestsForWS(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myWorkSessionResultDS = DirectCast(myGlobalDataTO.SetDatos, WorkSessionResultDS)
                     Else

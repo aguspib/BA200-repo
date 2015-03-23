@@ -1658,7 +1658,6 @@ Public Class UiHQBarcode
                 bsScreenErrorProvider.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
             Else
                 'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
-                Dim myUserSettingsDelegate As New GeneralSettingsDelegate
                 myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_PATIENT_ORDER_TESTS.ToString)
 
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -1672,9 +1671,8 @@ Public Class UiHQBarcode
                 'If there is an active WS with requested Order Tests, then get all of them
                 If (Not myGlobalDataTO.HasError) Then
                     If (WSStatusAttribute.Trim <> "EMPTY") Then
-                        Dim myWSDelegate As New WorkSessionsDelegate
 
-                        myGlobalDataTO = myWSDelegate.GetOrderTestsForWS(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, False)
+                        myGlobalDataTO = WorkSessionsDelegate.GetOrderTestsForWS(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, False)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             WorkSessionResultDSAttribute = DirectCast(myGlobalDataTO.SetDatos, WorkSessionResultDS)
                         Else

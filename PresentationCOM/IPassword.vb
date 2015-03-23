@@ -241,8 +241,6 @@ Public Class UiPassword
         Dim myResult As Boolean = False
         Try
             Dim myGlobalDataTO As GlobalDataTO
-            Dim myGeneralSettingDS As New GeneralSettingsDS
-            Dim myGeneralSettingDelegate As New GeneralSettingsDelegate
 
             myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INITIAL_KEY.ToString())
 

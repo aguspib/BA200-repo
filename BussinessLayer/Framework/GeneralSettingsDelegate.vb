@@ -7,14 +7,11 @@ Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
-    Public NotInheritable Class GeneralSettingsDelegate
+    Public Module GeneralSettingsDelegate
 
 #Region "Other Methods"
 
-        <Obsolete("Don't instantiate abstract class")> _
-        Sub New()
-            Throw (New Exception("This class is abstract"))
-        End Sub
+
 
         ''' <summary>
         '''  Update the Current value of an specific Setting ID
@@ -24,7 +21,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentValue">New Current Value</param>
         ''' <returns></returns>
         ''' <remarks>CREATED BY: TR 25/11/2011</remarks>
-        Public Shared Function UpdateCurrValBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Function UpdateCurrValBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                  ByVal pSetingID As String, ByVal pCurrentValue As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -81,7 +78,7 @@ Namespace Biosystems.Ax00.BL
         '''                              Master Data Missing when the Setting Value is not found
         '''              SA 26/03/2010 - Verification of Master Data Missing is done only when the DAO function return an error
         ''' </remarks>
-        Public Shared Function GetGeneralSettingValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSettingID As String) As GlobalDataTO
+        Public Function GetGeneralSettingValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSettingID As String) As GlobalDataTO
             Dim dataToReturn As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Dim conexion = DAOBase.GetSafeOpenDBConnection(pDBConnection)
@@ -122,7 +119,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSettingID">Name of the global setting</param>
         ''' <returns>A typed global data to, with a String SetDatos that contains the setting value contents</returns>
         ''' <remarks>This method does not catch recurring access to the setting, so it's a slow method</remarks>
-        Public Shared Function GetGeneralSettingValue(pSettingID As String) As TypedGlobalDataTo(Of String)
+        Public Function GetGeneralSettingValue(pSettingID As String) As TypedGlobalDataTo(Of String)
             Try
                 Return tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus(Nothing, pSettingID)
             Catch ex As Exception
@@ -136,6 +133,6 @@ Namespace Biosystems.Ax00.BL
 
         End Function
 #End Region
-    End Class
+    End Module
 
 End Namespace
