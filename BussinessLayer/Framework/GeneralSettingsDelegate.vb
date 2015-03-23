@@ -7,9 +7,11 @@ Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
-    Public Class GeneralSettingsDelegate
+    Public Module GeneralSettingsDelegate
 
 #Region "Other Methods"
+
+
 
         ''' <summary>
         '''  Update the Current value of an specific Setting ID
@@ -79,14 +81,15 @@ Namespace Biosystems.Ax00.BL
         Public Function GetGeneralSettingValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSettingID As String) As GlobalDataTO
             Dim dataToReturn As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
+            Dim conexion = DAOBase.GetSafeOpenDBConnection(pDBConnection)
 
             Try
-                dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not dataToReturn.HasError And Not dataToReturn.SetDatos Is Nothing) Then
-                    dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myGeneralSettingsDAO As New tfmwGeneralSettingsDAO
-                        dataToReturn = myGeneralSettingsDAO.ReadBySettingIDAndStatus(dbConnection, pSettingID)
+
+                'dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not conexion.HasError And Not conexion.SetDatos Is Nothing) Then
+                    dbConnection = conexion.SetDatos
+                    If (Not conexion.SetDatos Is Nothing) Then
+                        dataToReturn = tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus(dbConnection, pSettingID).GetCompatibleGlobalDataTO
 
                         If (dataToReturn.HasError) Then
                             If (dataToReturn.SetDatos Is Nothing) Then
@@ -103,13 +106,33 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return dataToReturn
         End Function
+
+        ''' <summary>
+        ''' Made a simplified global settings reader.
+        ''' </summary>
+        ''' <param name="pSettingID">Name of the global setting</param>
+        ''' <returns>A typed global data to, with a String SetDatos that contains the setting value contents</returns>
+        ''' <remarks>This method does not catch recurring access to the setting, so it's a slow method</remarks>
+        Public Function GetGeneralSettingValue(pSettingID As String) As TypedGlobalDataTo(Of String)
+            Try
+                Return tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus(Nothing, pSettingID)
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Dim result = New TypedGlobalDataTo(Of String)
+                result.HasError = True
+                result.ErrorCode = "SYSTEM_ERROR"
+                result.ErrorMessage = ex.Message
+                Return result
+            End Try
+
+        End Function
 #End Region
-    End Class
+    End Module
 
 End Namespace

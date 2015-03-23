@@ -448,19 +448,18 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myXMLFileName As String = String.Empty
-                        Dim myFileNameToDelete As String = String.Empty
+                        'Dim myXMLFileName As String = String.Empty
+                        'Dim myFileNameToDelete As String = String.Empty
                         Dim myQCResultsToExportDS As New QCResultsDS
                         Dim allQCResultsToExportDS As New QCResultsDS
 
-                        Dim myQCResultDS As New QCResultsDS
+                        'Dim myQCResultDS As New QCResultsDS
                         Dim myQCResultCalculationDS As New QCResultsCalculationDS
                         Dim myQCResultDelegate As New QCResultsDelegate
                         Dim myCumResultNumDAO As New tqcCumulatedResultsDAO
 
                         'Get value of the General Setting for the maximum number of Cumulated Series 
-                        Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
-                        myGlobalDataTO = myGeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES.ToString)
+                        myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES.ToString)
 
                         Dim maxNumber As Integer = 0
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
