@@ -31,11 +31,11 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Public methods"
 
-        Public Overrides Function StartService() As Boolean
-            Return StartService(False)
-        End Function
+        'Public Overrides Function StartService() As Boolean
+        '    Return StartService(False)
+        'End Function
 
-        Public Overloads Function StartService(isInRecover As Boolean) As Boolean
+        Public Overrides Function StartService() As Boolean
 
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
@@ -44,21 +44,21 @@ Namespace Biosystems.Ax00.Core.Services
             'Method flow:
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            If isInRecover Then
-                InitializeRecover()
-            Else
-                Initialize()
+            'If isInRecover Then
+            'InitializeRecover()
+            'Else
+            Initialize()
 
-                _analyzer.StopAnalyzerRinging()
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
+            _analyzer.StopAnalyzerRinging()
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, "")
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, "")
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, "")
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
 
-                'Update analyzer session flags into DataBase
-                UpdateFlags(myAnalyzerFlagsDs)
+            'Update analyzer session flags into DataBase
+            UpdateFlags(myAnalyzerFlagsDs)
 
-            End If
+            'End If
 
             Status = ServiceStatusEnum.Running
             AddRequiredEventHandlers()

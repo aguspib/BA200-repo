@@ -73,10 +73,6 @@ Namespace Biosystems.Ax00.Core.Services
                 If _analyzer.ExistBottleAlarms Then
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
                     _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Canceled)
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Canceled)
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Canceled)
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty) 'AG + IT 10/02/2015 BA-2246 apply same rules in Change Rotor and in StartInstr
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Canceled)
                     Return False
                 Else
                     'TR 28/10/2011 -Turn off Sound alarm
@@ -84,11 +80,6 @@ Namespace Biosystems.Ax00.Core.Services
                     If _analyzer.Connected Then
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NewRotor, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty)
-                        '_staticBaseLineFinished = False
 
                         resultData = _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")
 
@@ -107,7 +98,7 @@ Namespace Biosystems.Ax00.Core.Services
                     myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
                 End If
             Else
-                'InitializeRecover()
+                InitializeRecover()
             End If
 
             Return True
@@ -278,7 +269,8 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Private Sub ExecuteBaseLineStep()
-            _baseLineService.StartService(_isInRecovering)
+            '_baseLineService.StartService(_isInRecovering)
+            _baseLineService.StartService()
         End Sub
 
         ''' <summary>
@@ -421,7 +413,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             'NEWROTORprocess in INPROCESS status
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Initialized) Then
-
+                '_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Empty
             End If
 
             If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
