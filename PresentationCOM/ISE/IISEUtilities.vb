@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.IO
 Imports System.Runtime.InteropServices 'WIN32
 Imports Biosystems.Ax00.App
@@ -2196,7 +2196,7 @@ Public Class UiISEUtilities
                         myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
-                            Me.AppendISEAlarmsText(Me.BsRichTextBox1, myAlarms, myPendingCal)
+                            Me.AppendISEAlarmsText(BsRichTextBox1, myAlarms, myPendingCal)
                         End If
                         Exit Sub
                     End If
@@ -3201,7 +3201,7 @@ Public Class UiISEUtilities
     ''' <param name="RTC"></param>
     ''' <param name="pAlarmsList"></param>
     ''' <remarks></remarks>
-    Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of GlobalEnumerates.Alarms), _
+    Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of Alarms), _
                                     ByVal pPendingCalibrations As List(Of ISEManager.MaintenanceOperations))
         Try
 
@@ -4020,7 +4020,7 @@ Public Class UiISEUtilities
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
 
                 'Dim resultData As New GlobalDataTO
-                Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarms As New List(Of Alarms)
 
                 ' AG+XBC 24/05/2012
                 'Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
@@ -4102,7 +4102,7 @@ Public Class UiISEUtilities
                         myStatus = False
                     End If
                 Else
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If myAlarms.Contains(Alarms.ISE_OFF_ERR) Then
                         myStatus = False
                     End If
                 End If

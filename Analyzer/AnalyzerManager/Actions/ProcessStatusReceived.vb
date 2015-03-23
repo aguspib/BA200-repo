@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Namespace Biosystems.Ax00.Core.Entities
     Public Class ProcessStatusReceived
 
@@ -511,7 +512,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Return False
             End If
 
-            If errorValue <> 61 Then
+            If errorValue <> 61 Then 'CInt(Alarms.ISE_TIMEOUT_ERR) Then
                 If _analyzerManager.ISECMDStateIsLost() Then
                     _analyzerManager.ISECMDStateIsLost() = False
 
@@ -837,105 +838,32 @@ Namespace Biosystems.Ax00.Core.Entities
                             _analyzerManager.SetAnalyzerNotReady()
                         End If
 
-
                     Else 'If single error code then treat it!!
 
-                        'Translation method
                         Dim myAlarmsReceivedList As New List(Of Alarms)
                         Dim myAlarmsStatusList As New List(Of Boolean)
-                        Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
-
+                        Dim myAlarmsAdditionalInfoList As New List(Of String)
                         Dim myErrorCode As New List(Of Integer)
                         Dim myFwCodeErrorReceivedList As New List(Of String)
 
                         myErrorCode.Add(errorValue)
 
+                        'Translation method
                         Dim myAlarms = _analyzerManager.TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
 
+                        ' SERVICE ROTOR MISSING
                         If GlobalBase.IsServiceAssembly Then
                             If Not myAlarms.Contains(Alarms.REACT_MISSING_ERR) Then
                                 _analyzerManager.IsServiceRotorMissingInformed() = False
                             End If
                         End If
 
+                        ' ISE TIMEOUT
                         If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
-
-                            If _analyzerManager.ISEAnalyzer IsNot Nothing Then
-                                If Not _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
-                                    ' If ISE module isn't Installed remove the ISE Timeout Alarm
-                                    Debug.Print("ISE Module NOT installed !")
-                                    myAlarms.Remove(Alarms.ISE_TIMEOUT_ERR)
-
-                                    If GlobalBase.IsServiceAssembly Then
-                                        ' Only Sw Service
-                                        If Not myAlarms.Contains(Alarms.ISE_OFF_ERR) Then
-                                            myAlarms.Add(Alarms.ISE_OFF_ERR)
-                                            _analyzerManager.ISEAnalyzer.IsISESwitchON = False
-                                        End If
-
-                                    End If
-                                Else
-
-                                    _analyzerManager.CanSendingRepetitions() = True
-                                    _analyzerManager.NumSendingRepetitionsTimeout() += 1
-                                    If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
-                                        GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                        _analyzerManager.WaitingStartTaskTimerEnabled() = False
-                                        _analyzerManager.CanSendingRepetitions() = False
-
-                                        ' Activates Alarm begin
-                                        Dim alarmStatus As Boolean
-                                        Dim myAlarmList As New List(Of Alarms)
-                                        Dim myAlarmStatusList As New List(Of Boolean)
-
-                                        Const alarmId As Alarms = Alarms.ISE_TIMEOUT_ERR
-                                        alarmStatus = True
-                                        _analyzerManager.ISEAnalyzer.IsTimeOut = True
-
-                                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
-                                        If myAlarmList.Count > 0 Then
-                                            ' Note that this alarm is common on User and Service !
-                                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
-                                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-                                        End If
-                                        ' Activates Alarm end
-
-                                        _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                    Else
-                                        If _analyzerManager.StartTaskInstructionsQueueCount() > 0 Then
-                                            Debug.Print("Deactivate waiting time control (2) ...")
-                                            _analyzerManager.NumRepetitionsStateInstruction() = 0
-                                            _analyzerManager.InitializeTimerSTATEControl(WAITING_TIME_OFF)
-
-                                            GlobalBase.CreateLogActivity("Waiting because error 61 [" & WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-                                            Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
-                                            While myDateTime > DateTime.Now
-                                                ' spending time ...
-                                            End While
-                                            GlobalBase.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-
-                                            ' Instruction has not started by Fw, so is need to send it again
-                                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                            myGlobal = _analyzerManager.SendStartTaskinQueue()
-                                        End If
-
-                                    End If
-
-                                End If
-                            End If
-
+                            IseTimeoutErrorTreatment(myGlobal, myAlarms)
                         End If
-                        Dim index As Integer = 0
-                        Dim errorCodeId As String
 
-                        For Each alarmId As Alarms In myAlarms
-                            errorCodeId = ""
-                            If index <= myErrorCode.Count - 1 Then
-                                errorCodeId = myErrorCode(index).ToString
-                            End If
-                            _analyzerManager.PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
-                            index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
-                        Next
+                        myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
 
                         If GlobalBase.IsServiceAssembly Then
                             ' Initialize Error Codes List
@@ -998,6 +926,89 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Clear all alarms with error code
                         myGlobal = _analyzerManager.RemoveErrorCodeAlarms(Nothing, _analyzerManager.AnalyzerCurrentAction())
                     End If
+                End If
+            End If
+        End Sub
+
+        Private Function PrepareLocalAlarms(ByVal myErrorCode As List(Of Integer), ByVal myAlarms As List(Of Alarms), ByVal myAlarmsReceivedList As List(Of Alarms), ByRef myAlarmsStatusList As List(Of Boolean), ByRef myAlarmsAdditionalInfoList As List(Of String)) As List(Of Alarms)
+
+            Dim index As Integer = 0
+            Dim errorCodeId As String
+
+            For Each alarmId As Alarms In myAlarms
+                errorCodeId = ""
+                If index <= myErrorCode.Count - 1 Then
+                    errorCodeId = myErrorCode(index).ToString
+                End If
+                _analyzerManager.PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
+                index += 1
+            Next
+            Return myAlarmsReceivedList
+        End Function
+
+        Private Sub IseTimeoutErrorTreatment(ByRef myGlobal As GlobalDataTO, ByVal myAlarms As List(Of Alarms))
+
+            If _analyzerManager.ISEAnalyzer IsNot Nothing Then
+                If Not _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
+                    ' If ISE module isn't Installed remove the ISE Timeout Alarm
+                    Debug.Print("ISE Module NOT installed !")
+                    myAlarms.Remove(Alarms.ISE_TIMEOUT_ERR)
+
+                    If GlobalBase.IsServiceAssembly Then
+                        ' Only Sw Service
+                        If Not myAlarms.Contains(Alarms.ISE_OFF_ERR) Then
+                            myAlarms.Add(Alarms.ISE_OFF_ERR)
+                            _analyzerManager.ISEAnalyzer.IsISESwitchON = False
+                        End If
+
+                    End If
+                Else
+
+                    _analyzerManager.CanSendingRepetitions() = True
+                    _analyzerManager.NumSendingRepetitionsTimeout() += 1
+                    If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsTimeout Then
+                        GlobalBase.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                        _analyzerManager.WaitingStartTaskTimerEnabled() = False
+                        _analyzerManager.CanSendingRepetitions() = False
+
+                        ' Activates Alarm begin
+                        Dim alarmStatus As Boolean
+                        Dim myAlarmList As New List(Of Alarms)
+                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                        Const alarmId As Alarms = Alarms.ISE_TIMEOUT_ERR
+                        alarmStatus = True
+                        _analyzerManager.ISEAnalyzer.IsTimeOut = True
+
+                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
+                        If myAlarmList.Count > 0 Then
+                            ' Note that this alarm is common on User and Service !
+                            Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                        End If
+                        ' Activates Alarm end
+
+                        _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                    Else
+                        If _analyzerManager.StartTaskInstructionsQueueCount() > 0 Then
+                            Debug.Print("Deactivate waiting time control (2) ...")
+                            _analyzerManager.NumRepetitionsStateInstruction() = 0
+                            _analyzerManager.InitializeTimerSTATEControl(WAITING_TIME_OFF)
+
+                            GlobalBase.CreateLogActivity("Waiting because error 61 [" & WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                            Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
+                            While myDateTime > DateTime.Now
+                                ' spending time ...
+                            End While
+                            GlobalBase.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+
+                            ' Instruction has not started by Fw, so is need to send it again
+                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = _analyzerManager.SendStartTaskinQueue()
+                        End If
+
+                    End If
+
                 End If
             End If
         End Sub

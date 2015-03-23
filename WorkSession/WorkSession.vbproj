@@ -139,6 +139,7 @@
     <Compile Include="AutoReportsDelegate.vb" />
     <Compile Include="BarcodeWSDelegate.vb" />
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
+    <Compile Include="ContaminationManager.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
     <Compile Include="OperateCalculatedTestDelegate.vb" />

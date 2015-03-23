@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.Linq
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -54,15 +55,15 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' --------------------------------DELETED CODE------------------------------------------
         ''' If String.Equals(AnalyzerManager.AnalyzerFreezeMode(), "AUTO") Then
         ''' 
-        ''' Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN, GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN, GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
+        ''' Case Alarms.R1_NO_VOLUME_WARN, Alarms.R2_NO_VOLUME_WARN, Alarms.S_NO_VOLUME_WARN
         ''' 'NOTE: Previous business is performed in method ProcessArmStatusRecived
         ''' 
-        ''' Case GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN, GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR
+        ''' Case Alarms.FRIDGE_STATUS_WARN, Alarms.FRIDGE_STATUS_ERR
         ''' FRIDGE: No business (only inform user)
         ''' ISE: Send ISE test preparations are not allowed and inform user
         ''' 
         ''' </code>
-        Public Function Manage(ByVal pAlarmIdList As List(Of GlobalEnumerates.Alarms), _
+        Public Function Manage(ByVal pAlarmIdList As List(Of Alarms), _
                                       ByVal pAlarmStatusList As List(Of Boolean), _
                                       Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
 
@@ -77,13 +78,18 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Dim methodHasToAddInstructionToQueueFlag As Integer = 0
+
+                If _analyzerManager.AnalyzerHasSubStatus Then
+                    'BLABLABLA
+                End If
+
                 'Once one instruction has been sent. The other instructions managed in this method will be added to queue
                 '  0 -> Instruction can be sent
                 '  1 -> One instruction has already been sent. New instructions to be sent in ManageAlarms will be add to queue
                 '  2 -> None instruction can be sent (RESET FREEZE). New instructions to be sent in ManageAlarms wont be add to queue (except SOUND)
 
                 If _analyzerManager.AnalyzerIsFreeze() Then
-                    If ((pAlarmIdList.Count = 1 AndAlso Not pAlarmIdList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIdList.Count > 1) Then
+                    If ((pAlarmIdList.Count = 1 AndAlso Not pAlarmIdList.Contains(Alarms.ISE_OFF_ERR)) OrElse pAlarmIdList.Count > 1) Then
                         _analyzerManager.ClearQueueToSend() 'Clear all instruction in queue to be sent
                     End If
 
@@ -96,85 +102,86 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Case "RESET"
                             ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+
+                        Case "RETRY"
                     End Select
 
                 End If
                 Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
 
-                Dim glfBoardErrorFixed As Boolean = False
-                For Each alarmItem As GlobalEnumerates.Alarms In pAlarmIdList
+                For Each alarmItem As Alarms In pAlarmIdList
                     'General description: Apply special Business depending the alarm code
                     '        1- Launch Sw processes
                     '        2- Automatically send new instruction to the Analyzer
 
                     Select Case alarmItem
 
-                        Case GlobalEnumerates.Alarms.REACT_MISSING_ERR
+                        Case Alarms.REACT_MISSING_ERR
                             NoReactionsRotor(myAnalyzerFlagsDs, pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.R2_TEMP_WARN, GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR, _
-                             GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR
+                        Case Alarms.REACT_TEMP_WARN, Alarms.R1_TEMP_WARN, _
+                             Alarms.R2_TEMP_WARN, Alarms.FRIDGE_TEMP_WARN, _
+                             Alarms.WS_TEMP_WARN, Alarms.WS_TEMP_SYSTEM_ERR, _
+                             Alarms.R1_TEMP_SYSTEM_ERR, Alarms.R2_TEMP_SYSTEM_ERR
                             TemperatureWarning(alarmItem, pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN, GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR, _
-                            GlobalEnumerates.Alarms.WASH_CONTAINER_WARN, GlobalEnumerates.Alarms.WASH_CONTAINER_ERR
+                        Case Alarms.HIGH_CONTAMIN_WARN, Alarms.HIGH_CONTAMIN_ERR, _
+                            Alarms.WASH_CONTAINER_WARN, Alarms.WASH_CONTAINER_ERR
                             ContainerWarnings(alarmItem, pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WATER_SYSTEM_ERR
+                        Case Alarms.WATER_DEPOSIT_ERR, Alarms.WATER_SYSTEM_ERR
                             WaterError(pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR
+                        Case Alarms.WASTE_DEPOSIT_ERR, Alarms.WASTE_SYSTEM_ERR
                             WasteSystemError(pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_WARN, GlobalEnumerates.Alarms.R2_COLLISION_WARN, _
-                            GlobalEnumerates.Alarms.S_COLLISION_WARN
+                        Case Alarms.R1_COLLISION_WARN, Alarms.R2_COLLISION_WARN, _
+                            Alarms.S_COLLISION_WARN
                             NonCriticalCollisions(pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.CLOT_DETECTION_WARN, GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
+                        Case Alarms.CLOT_DETECTION_WARN, Alarms.CLOT_DETECTION_ERR
                             ClotDetection(alarmItem, pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                        Case Alarms.BASELINE_INIT_ERR
                             BaseLineInitError(pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+                        Case Alarms.BASELINE_WELL_WARN
                             BaselineWellWarning(pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.RECOVER_ERR
+                        Case Alarms.RECOVER_ERR
                             RecoverInstructionError(pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_ERR, GlobalEnumerates.Alarms.R2_COLLISION_ERR, _
-                            GlobalEnumerates.Alarms.S_COLLISION_ERR
+                        Case Alarms.R1_COLLISION_ERR, Alarms.R2_COLLISION_ERR, _
+                            Alarms.S_COLLISION_ERR
                             ArmCollitionError(pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.INST_ABORTED_ERR, GlobalEnumerates.Alarms.INST_REJECTED_ERR
+                        Case Alarms.INST_ABORTED_ERR, Alarms.INST_REJECTED_ERR
                             InstructionAborted(pAlarmStatusList, index, methodHasToAddInstructionToQueueFlag)
 
-                        Case GlobalEnumerates.Alarms.INST_REJECTED_WARN
+                        Case Alarms.INST_REJECTED_WARN
                             InstructionRejected(myAnalyzerFlagsDs)
 
-                        Case GlobalEnumerates.Alarms.ISE_OFF_ERR
+                        Case Alarms.ISE_OFF_ERR
                             IseSwitchOff(pAlarmStatusList, index, alarmsDelg)
 
-                        Case GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                        Case Alarms.ISE_TIMEOUT_ERR
                             IseTimeout(alarmsDelg)
 
-                        Case GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                        Case Alarms.COMMS_TIMEOUT_ERR
                             CommsTimeout(alarmsDelg)
 
-                        Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
+                        Case Alarms.ISE_CONNECT_PDT_ERR
                             IseConnectPdtError(pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.FW_CPU_ERR, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR, _
-                             GlobalEnumerates.Alarms.FW_REPOSITORY_ERR, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR, _
-                             GlobalEnumerates.Alarms.FW_MAN_ERR
+                        Case Alarms.FW_CPU_ERR, Alarms.FW_DISTRIBUTED_ERR, _
+                             Alarms.FW_REPOSITORY_ERR, Alarms.FW_CHECKSUM_ERR, _
+                             Alarms.FW_MAN_ERR
                             FirmwareError(pAlarmStatusList, index)
 
-                        Case GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR, GlobalEnumerates.Alarms.INST_REJECTED_WARN
+                        Case Alarms.INST_NOALLOW_INS_ERR, Alarms.INST_REJECTED_WARN
                             InstructionError(myAnalyzerFlagsDs)
 
-                        Case GlobalEnumerates.Alarms.GLF_BOARD_ERR
+                        Case Alarms.GLF_BOARD_ERR
                             GlfBoardError(alarmsDelg, methodHasToAddInstructionToQueueFlag)
                     End Select
                     index = index + 1
@@ -195,8 +202,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim alarmsWithOkTypeFalse = (From a As AlarmsDS.tfmwAlarmsRow In _
                                                             alarmsDefintionTableDS.tfmwAlarms Where a.OKType = False Select a.AlarmID).ToList
 
-                For Each alarmIdItem As GlobalEnumerates.Alarms In pAlarmIdList
-                    If alarmIdItem <> GlobalEnumerates.Alarms.NONE Then
+                For Each alarmIdItem As Alarms In pAlarmIdList
+                    If alarmIdItem <> Alarms.NONE Then
                         CheckIfSaveAlarm(pAlarmStatusList, index, alarmIdItem, _
                                          alarmsWithOkTypeFalse, wsAlarmsDs, pAdditionalInfoList)
                     End If
@@ -237,7 +244,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAdditionalInfoList"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Sub CheckIfSaveAlarm(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As GlobalEnumerates.Alarms, _
+        Private Sub CheckIfSaveAlarm(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As Alarms, _
                                      ByVal alarmsWithOkTypeFalse As List(Of String), ByVal wsAlarmsDs As WSAnalyzerAlarmsDS, ByVal pAdditionalInfoList As List(Of String))
             Dim newRowFlag = False
 
@@ -245,11 +252,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If _analyzerManager.AlarmListAddtem(alarmIdItem) Or alarmsWithOkTypeFalse.Contains(alarmIdItem.ToString) Then
                     newRowFlag = True
                 End If
-            ElseIf _myIseOffErrorFixed AndAlso alarmIdItem = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
+            ElseIf _myIseOffErrorFixed AndAlso alarmIdItem = Alarms.ISE_OFF_ERR Then
                 newRowFlag = True
-            ElseIf _myIseTimeoutErrorFixed AndAlso alarmIdItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+            ElseIf _myIseTimeoutErrorFixed AndAlso alarmIdItem = Alarms.ISE_TIMEOUT_ERR Then
                 newRowFlag = True
-            ElseIf _myCommsTimeoutErrorFixed AndAlso alarmIdItem = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
+            ElseIf _myCommsTimeoutErrorFixed AndAlso alarmIdItem = Alarms.COMMS_TIMEOUT_ERR Then
                 newRowFlag = True
             Else
                 If _analyzerManager.Alarms.Contains(alarmIdItem) Then
@@ -271,7 +278,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAdditionalInfoList"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Sub AddAlarmIntoWsAnalyzerAlarmDsAndRefreshUi(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As GlobalEnumerates.Alarms, _
+        Private Sub AddAlarmIntoWsAnalyzerAlarmDsAndRefreshUi(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, ByVal alarmIdItem As Alarms, _
                                                               ByVal newRowFlag As Boolean, ByVal wsAlarmsDs As WSAnalyzerAlarmsDS, ByVal pAdditionalInfoList As List(Of String))
 
             If newRowFlag Then
@@ -304,7 +311,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmIdItem.ToString, pAlarmStatusList(index))
 
                 If _myIseOffErrorFixed Then
-                    _analyzerManager.AlarmListRemoveItem(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                    _analyzerManager.AlarmListRemoveItem(Alarms.ISE_OFF_ERR)
                 End If
 
             End If
@@ -318,16 +325,42 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks></remarks>
         Private Sub GlfBoardError(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef methodHasToAddInstructionToQueueFlag As Integer)
 
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, GlobalEnumerates.Alarms.GLF_BOARD_ERR.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.GLF_BOARD_ERR.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS).twksWSAnalyzerAlarms
                 If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
-                    Where a.AlarmID = GlobalEnumerates.Alarms.GLF_BOARD_ERR.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
+                    Where a.AlarmID = Alarms.GLF_BOARD_ERR.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
                     ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
                 Else
                     'myInstructionsQueue.Add(pAction)
                     'myParamsQueue.Add(pSwAdditionalParameters)
                 End If
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="methodHasToAddInstructionToQueueFlag"></param>
+        ''' <remarks>
+        ''' INSTRUCTIONS: Stop the sensor information instructions
+        ''' BUSINESS: AnalyzerManager.SetAnalyzerNotReady
+        ''' PRESENTATION: Show message box informing the user the analyzer must be restarted
+        ''' </remarks>
+        Private Sub ApplyActionsForAnalyzerInRetryFreezeMode(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByVal alarmItem As Alarms, ByRef methodHasToAddInstructionToQueueFlag As Integer)
+
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, alarmItem.ToString(), Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+
+            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS).twksWSAnalyzerAlarms
+                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs _
+                    Where a.AlarmID = alarmItem.ToString AndAlso a.AlarmStatus = True Select a).Count > 1 Then
+
+                    ApplyActionsForAnalyzerInResetFreezeMode(methodHasToAddInstructionToQueueFlag)
+                Else
+
+                End If
+
             End If
         End Sub
 
@@ -422,9 +455,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
         ''' NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
         ''' </remarks>
-        Private Sub ManageAllFreezeAlarms(ByVal pAlarmIdList As List(Of GlobalEnumerates.Alarms), ByVal methodHasToAddInstructionToQueueFlag As Integer)
+        Private Sub ManageAllFreezeAlarms(ByVal pAlarmIdList As List(Of Alarms), ByVal methodHasToAddInstructionToQueueFlag As Integer)
 
-            If ((pAlarmIdList.Count = 1 AndAlso Not pAlarmIdList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIdList.Count > 1) Then
+            If ((pAlarmIdList.Count = 1 AndAlso Not pAlarmIdList.Contains(Alarms.ISE_OFF_ERR)) OrElse pAlarmIdList.Count > 1) Then
                 If String.Equals(_analyzerManager.AnalyzerFreezeMode(), "AUTO") Then
 
 
@@ -530,12 +563,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </remarks>
         Private Sub CommsTimeout(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate)
 
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                 Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
                 auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
-                    Where a.AlarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+                    Where a.AlarmID = Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
                 If auxList.Count > 0 Then
                     _myCommsTimeoutErrorFixed = True
                 End If
@@ -551,12 +584,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </remarks>
         Private Sub IseTimeout(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate)
 
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                 Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
                 auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
-                    Where a.AlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+                    Where a.AlarmID = Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
                 If auxList.Count > 0 Then
                     _myIseTimeoutErrorFixed = True
                 End If
@@ -600,11 +633,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
             Else
-                _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+                _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
                 If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                     Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                     Dim auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
-                        Where a.AlarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+                        Where a.AlarmID = Alarms.ISE_OFF_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
                     If auxList.Count > 0 Then
                         _myIseOffErrorFixed = True
                     End If
@@ -791,10 +824,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' PRESENTATION:
         ''' Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
         ''' </remarks>
-        Private Sub ClotDetection(ByVal alarmItem As GlobalEnumerates.Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer)
+        Private Sub ClotDetection(ByVal alarmItem As Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer)
 
             If pAlarmStatusList(index) Then 'Alarm Exists
-                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
+                If alarmItem = Alarms.CLOT_DETECTION_ERR Then
 
                     Dim clotDetectionEnabled As Boolean = True
                     Dim adjustValue = _analyzerManager.ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.CLOT)
@@ -808,7 +841,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Else 'Alarm solved
-                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
+                If alarmItem = Alarms.CLOT_DETECTION_ERR Then
                     _analyzerManager.PauseSendingTestPreparations = False
                 End If
             End If
@@ -964,9 +997,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' (OK) 2 Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR Show message informing the user
         ''' (“No sustituya la botella hasta que el analizador le indique que puede hacerlo con seguridad”) (Ax00MainMDI.ShowAlarmWarningMessages)
         ''' </remarks>
-        Private Sub ContainerWarnings(ByVal alarmItem As GlobalEnumerates.Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, _
+        Private Sub ContainerWarnings(ByVal alarmItem As Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, _
                                            ByRef methodHasToAddInstructionToQueueFlag As Integer)
-            If alarmItem = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR Or alarmItem = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR Then
+            If alarmItem = Alarms.HIGH_CONTAMIN_ERR Or alarmItem = Alarms.WASH_CONTAINER_ERR Then
                 If Not _analyzerManager.AllowScanInRunning() AndAlso Not _analyzerManager.PauseModeIsStartingState AndAlso pAlarmStatusList(index) And _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING _
                    And Not _analyzerManager.EndRunInstructionSent() And _analyzerManager.AnalyzerCurrentAction() <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
                     If methodHasToAddInstructionToQueueFlag = 0 Then
@@ -1003,24 +1036,24 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
         ''' Bottle or scales levels
         ''' </remarks>
-        Private Sub TemperatureWarning(ByVal alarmItem As GlobalEnumerates.Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer)
+        Private Sub TemperatureWarning(ByVal alarmItem As Alarms, ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer)
 
             If pAlarmStatusList(index) Then 'Alarm Exists
                 'Activate thermo reactions rotor timer for pass from Warning to Error if needed
-                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And Not _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
+                If alarmItem = Alarms.REACT_TEMP_WARN And Not _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
                     _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() = True
                 End If
 
-                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And Not _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
+                If alarmItem = Alarms.FRIDGE_TEMP_WARN And Not _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
                     _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() = True
                 End If
 
             Else 'Alarm Solved
-                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
+                If alarmItem = Alarms.REACT_TEMP_WARN And _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
                     _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() = False
                 End If
 
-                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
+                If alarmItem = Alarms.FRIDGE_TEMP_WARN And _analyzerManager.ThermoReactionsRotorWarningTimerEnabled() Then
                     _analyzerManager.ThermoReactionsRotorWarningTimerEnabled = False
                 End If
 
@@ -1137,7 +1170,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAlarmList"></param>
         ''' <returns></returns>
         ''' <remarks>AG 07/03/2012</remarks>
-        Private Function ExistFreezeAlarms(ByVal pAlarmList As List(Of GlobalEnumerates.Alarms)) As Boolean
+        Private Function ExistFreezeAlarms(ByVal pAlarmList As List(Of Alarms)) As Boolean
             Dim resultData As GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
             Dim returnData As Boolean = False
@@ -1151,7 +1184,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Dim myLinq As List(Of AlarmsDS.tfmwAlarmsRow)
 
-                        For Each item As GlobalEnumerates.Alarms In pAlarmList
+                        For Each item As Alarms In pAlarmList
                             myLinq = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
                                       Where String.Equals(a.AlarmID, item.ToString) AndAlso Not a.IsFreezeNull Select a).ToList
 

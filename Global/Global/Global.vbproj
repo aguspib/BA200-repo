@@ -135,6 +135,8 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlarmEnumerates.vb" />
+    <Compile Include="AnalyzerManager\StatusParameters.vb" />
     <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
     <Compile Include="DAOBase.vb" />
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />

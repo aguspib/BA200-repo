@@ -7,9 +7,9 @@ Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.FwScriptsManagement
 'Imports Biosystems.Ax00.InfoAnalyzer
 'Imports System.IO
@@ -1294,7 +1294,7 @@ Public Class Ax00ServiceMainMDI
                                 mySpecialSimpleErrors.Clear()
                                 Dim lnqRes As List(Of UIRefreshDS.ReceivedAlarmsRow)
                                 lnqRes = (From a As UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                                          Where String.Equals(a.AlarmID, GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR.ToString) _
+                                          Where String.Equals(a.AlarmID, AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR.ToString) _
                                           Select a).ToList
 
                                 If lnqRes.Count > 0 Then
@@ -1303,7 +1303,7 @@ Public Class Ax00ServiceMainMDI
 
                                 Dim lnqRes2 As List(Of UIRefreshDS.ReceivedAlarmsRow)
                                 lnqRes2 = (From a As UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                                          Where String.Equals(a.AlarmID, GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR.ToString) _
+                                          Where String.Equals(a.AlarmID, AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR.ToString) _
                                           Select a).ToList
 
                                 If lnqRes2.Count > 0 Then
@@ -2415,7 +2415,7 @@ Public Class Ax00ServiceMainMDI
             ' XB 05/11/2014 - BA-1872
             If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString, False) = 0 Then
 
-                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+                If MDIAnalyzerManager.Alarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
                     ' Just for ISE timeout
                     If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso _
                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled AndAlso _

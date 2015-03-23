@@ -533,9 +533,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 'BT #1355 - Verify if the new Alarm WS_PAUSE_MODE_WARN has to be added to the list of Analyzer Alarms
                 If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
                     Dim myAlarmStatusList As New List(Of Boolean)
-                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
 
-                    PrepareLocalAlarmList(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN, AllowScanInRunningAttribute, myAlarmList, myAlarmStatusList)
+                    PrepareLocalAlarmList(AlarmEnumerates.Alarms.WS_PAUSE_MODE_WARN, AllowScanInRunningAttribute, myAlarmList, myAlarmStatusList)
                     If (myAlarmList.Count > 0) Then
                         Dim currentAlarms = New CurrentAlarms(Me)
                         myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
@@ -579,9 +579,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING (only if current status is SLEEPING)
                         If AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
-                            Dim AlarmList As New List(Of Alarms)
+                            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
                             Dim AlarmStatusList As New List(Of Boolean)
-                            PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
+                            PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
                                 If Not GlobalBase.IsServiceAssembly Then
@@ -761,9 +761,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSensorValuesAttribute(AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 0, False)
 
                             'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING
-                            Dim AlarmList As New List(Of Alarms)
+                            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
                             Dim AlarmStatusList As New List(Of Boolean)
-                            PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
+                            PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then                                
                                 If Not GlobalBase.IsServiceAssembly Then
@@ -912,7 +912,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If WELLbaselineParametersFailuresAttribute Then
                                 'Prepare DS for inform presentation
                                 'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                                resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, GlobalEnumerates.Alarms.BASELINE_WELL_WARN.ToString, True)
+                                resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, AlarmEnumerates.Alarms.BASELINE_WELL_WARN.ToString, True)
                             End If
 
                             'AG 26/09/2012 -NEW -Simplification: When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells

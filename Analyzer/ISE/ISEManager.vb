@@ -3,11 +3,10 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.InfoAnalyzer
-Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Globalization
 Imports Biosystems.Ax00.Core.Interfaces
@@ -113,7 +112,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Enum
 
         'ISE related alarms
-        Public Enum Alarms
+        Public Enum IseAlarms
             ReagentsPack_Invalid = 0
             ReagentsPack_Depleted = 1
             ReagentsPack_Expired = 2
@@ -3520,18 +3519,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' XBC 26/03/2012
                 ReDim myAlarms(11)
-                myAlarms(Alarms.ReagentsPack_Invalid) = False
-                myAlarms(Alarms.ReagentsPack_Depleted) = False
-                myAlarms(Alarms.ReagentsPack_Expired) = False
-                myAlarms(Alarms.Electrodes_Wrong) = False
-                myAlarms(Alarms.Electrodes_Cons_Expired) = False
-                myAlarms(Alarms.Electrodes_Date_Expired) = False
-                myAlarms(Alarms.CleanPack_Installed) = False
-                myAlarms(Alarms.CleanPack_Wrong) = False
-                myAlarms(Alarms.LongTermDeactivated) = False
-                myAlarms(Alarms.ReagentsPack_DateInstall) = False
-                myAlarms(Alarms.Switch_Off) = False 'SGM 18/06/2012
-                myAlarms(Alarms.Timeout) = False ' XB 04/11/2014 - BA-1872
+                myAlarms(IseAlarms.ReagentsPack_Invalid) = False
+                myAlarms(IseAlarms.ReagentsPack_Depleted) = False
+                myAlarms(IseAlarms.ReagentsPack_Expired) = False
+                myAlarms(IseAlarms.Electrodes_Wrong) = False
+                myAlarms(IseAlarms.Electrodes_Cons_Expired) = False
+                myAlarms(IseAlarms.Electrodes_Date_Expired) = False
+                myAlarms(IseAlarms.CleanPack_Installed) = False
+                myAlarms(IseAlarms.CleanPack_Wrong) = False
+                myAlarms(IseAlarms.LongTermDeactivated) = False
+                myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
+                myAlarms(IseAlarms.Switch_Off) = False 'SGM 18/06/2012
+                myAlarms(IseAlarms.Timeout) = False ' XB 04/11/2014 - BA-1872
                 ' XBC 26/03/2012
 
 
@@ -3781,40 +3780,40 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO Implements IISEManager.GetISEAlarmsForUtilities
             Dim myGlobal As New GlobalDataTO
             Try
-                If Not MyClass.IsISEModuleInstalled Then
+                If Not IsISEModuleInstalled Then
                     Return myGlobal 'not to show anything in case of not installed
                 End If
 
-                Dim myISEUtilAlarms As New List(Of GlobalEnumerates.Alarms)
+                Dim myISEUtilAlarms As New List(Of AlarmEnumerates.Alarms)
 
-                If MyClass.myAlarms(Alarms.LongTermDeactivated) Or MyClass.IsLongTermDeactivation Then
-                    myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                    If Not MyClass.IsISEInitiatedOK Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                If myAlarms(IseAlarms.LongTermDeactivated) Or MyClass.IsLongTermDeactivation Then
+                    myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR)
+                    If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                 Else
-                    If Not MyClass.IsISESwitchON Then
-                        myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                    If Not IsISESwitchON Then
+                        myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
                     Else
-                        If MyClass.myAlarms(Alarms.CleanPack_Installed) Then
-                            If MyClass.myAlarms(Alarms.CleanPack_Installed) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                            If MyClass.myAlarms(Alarms.CleanPack_Wrong) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
+                        If myAlarms(IseAlarms.CleanPack_Installed) Then
+                            If myAlarms(IseAlarms.CleanPack_Installed) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN)
+                            If myAlarms(IseAlarms.CleanPack_Wrong) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR)
                         Else
-                            If Not MyClass.IsISEInitiatedOK Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
-                            If MyClass.myAlarms(Alarms.ReagentsPack_Invalid) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                            If MyClass.myAlarms(Alarms.ReagentsPack_DateInstall) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                            If MyClass.myAlarms(Alarms.ReagentsPack_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                            If MyClass.myAlarms(Alarms.ReagentsPack_Depleted) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
+                            If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_Invalid) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
+                            If myAlarms(IseAlarms.ReagentsPack_Depleted) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
 
-                            If MyClass.myAlarms(Alarms.Electrodes_Wrong) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                            If MyClass.myAlarms(Alarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                            If MyClass.myAlarms(Alarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
+                            If myAlarms(IseAlarms.Electrodes_Wrong) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
+                            If myAlarms(IseAlarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN)
+                            If myAlarms(IseAlarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN)
 
                             ' XB 04/11/2014 - BA-1872
-                            If MyClass.myAlarms(Alarms.Timeout) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                            If myAlarms(IseAlarms.Timeout) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
                             pPendingCalibrations = New List(Of MaintenanceOperations)
-                            If MyClass.IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
-                            If MyClass.IsPumpCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.PumpsCalibration)
-                            If MyClass.IsBubbleCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.BubbleCalibration)
+                            If IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
+                            If IsPumpCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.PumpsCalibration)
+                            If IsBubbleCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.BubbleCalibration)
 
                         End If
 
@@ -7214,7 +7213,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC 26/03/2012
         ''' Modified by XB 04/11/2014 - Add ISE Timeout Alarm - BA-1872
         ''' </remarks>
-        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEManager.CheckAlarms
+        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of AlarmEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEManager.CheckAlarms
             Dim resultData As New GlobalDataTO
             Try
                 Dim treat As Boolean = True
@@ -7235,105 +7234,105 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
-                Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmID As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
                 Dim alarmStatus As Boolean = False
 
                 If treat Then
 
                     ' Ise module is deativated by longterm
-                    If MyClass.IsLongTermDeactivation Then
-                        alarmID = GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR
+                    If IsLongTermDeactivation Then
+                        alarmID = AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR
                         alarmStatus = True
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
-                        myAlarms(Alarms.LongTermDeactivated) = True
+                        myAlarms(IseAlarms.LongTermDeactivated) = True
 
                         'SGM 14/06/2012
                         'deactivate all ISE Alarms
                         alarmStatus = False
 
                         'ReagentsPack_Invalid
-                        myAlarms(Alarms.ReagentsPack_Invalid) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR
+                        myAlarms(IseAlarms.ReagentsPack_Invalid) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_Depleted
-                        myAlarms(Alarms.ReagentsPack_Depleted) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                        myAlarms(IseAlarms.ReagentsPack_Depleted) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_Expired
-                        myAlarms(Alarms.ReagentsPack_Expired) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                        myAlarms(IseAlarms.ReagentsPack_Expired) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Wrong
-                        myAlarms(Alarms.Electrodes_Wrong) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                        myAlarms(IseAlarms.Electrodes_Wrong) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Cons_Expired
-                        myAlarms(Alarms.Electrodes_Cons_Expired) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                        myAlarms(IseAlarms.Electrodes_Cons_Expired) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Date_Expired
-                        myAlarms(Alarms.Electrodes_Date_Expired) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                        myAlarms(IseAlarms.Electrodes_Date_Expired) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'CleanPack_Installed
-                        myAlarms(Alarms.CleanPack_Installed) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                        myAlarms(IseAlarms.CleanPack_Installed) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'CleanPack_Wrong
-                        myAlarms(Alarms.CleanPack_Wrong) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR
+                        myAlarms(IseAlarms.CleanPack_Wrong) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_DateInstall
-                        myAlarms(Alarms.ReagentsPack_DateInstall) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                        myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'switch off
-                        myAlarms(Alarms.Switch_Off) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR
+                        myAlarms(IseAlarms.Switch_Off) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_OFF_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
                         'SGM 14/06/2012
 
                         'Timeout    XB 04/11/2014 - BA-1872
-                        myAlarms(Alarms.Timeout) = False
-                        alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                        myAlarms(IseAlarms.Timeout) = False
+                        alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                     Else
-                        If myAlarms(Alarms.LongTermDeactivated) Then
-                            myAlarms(Alarms.LongTermDeactivated) = False
+                        If myAlarms(IseAlarms.LongTermDeactivated) Then
+                            myAlarms(IseAlarms.LongTermDeactivated) = False
                             ' solved
-                            alarmID = GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR
+                            alarmID = AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR
                             alarmStatus = False
                             pAlarmList.Add(alarmID)
                             pAlarmStatusList.Add(alarmStatus)
                         End If
 
                         If Not pConnectedAttribute Then
-                            MyClass.CheckElectrodesCalibrationIsNeeded()
-                            MyClass.CheckPumpsCalibrationIsNeeded()
-                            MyClass.CheckCleanIsNeeded()
+                            CheckElectrodesCalibrationIsNeeded()
+                            CheckPumpsCalibrationIsNeeded()
+                            CheckCleanIsNeeded()
                         End If
 
 
@@ -7341,12 +7340,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         ''SGM 18/06/2012
                         'If Not MyClass.IsISESwitchON Then
 
-                        '    alarmID = GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
+                        '    alarmID = AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR
                         '    alarmStatus = False
                         '    pAlarmList.Add(alarmID)
                         '    pAlarmStatusList.Add(alarmStatus)
 
-                        '    alarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR
+                        '    alarmID = AlarmEnumerates.Alarms.ISE_OFF_ERR
                         '    alarmStatus = True
                         '    pAlarmList.Add(alarmID)
                         '    pAlarmStatusList.Add(alarmStatus)
@@ -7365,30 +7364,30 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         ' Reagents Pack valid
                                         If Not MyClass.HasBiosystemsCode Then
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.ReagentsPack_Invalid) = True
+                                            myAlarms(IseAlarms.ReagentsPack_Invalid) = True
 
                                         Else
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.ReagentsPack_DateInstall) = True
+                                            myAlarms(IseAlarms.ReagentsPack_DateInstall) = True
 
                                         End If
 
                                     End If
 
                                 Else
-                                    If myAlarms(Alarms.ReagentsPack_DateInstall) Then
-                                        myAlarms(Alarms.ReagentsPack_DateInstall) = False
+                                    If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then
+                                        myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
                                         ' solved
-                                        alarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                        alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
                                         alarmStatus = False
                                         pAlarmList.Add(alarmID)
                                         pAlarmStatusList.Add(alarmStatus)
@@ -7408,47 +7407,47 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 MyClass.ISEDallasPage00 IsNot Nothing And _
                                                 MyClass.ISEDallasPage01 IsNot Nothing Then
 
-                                                alarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
                                                 alarmStatus = True
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
 
-                                                myAlarms(Alarms.ReagentsPack_Invalid) = True
+                                                myAlarms(IseAlarms.ReagentsPack_Invalid) = True
                                             End If
 
                                         ElseIf MyClass.IsISEInitiatedOK And MyClass.ReagentsPackInstallationDate = Nothing Then
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.ReagentsPack_DateInstall) = True
+                                            myAlarms(IseAlarms.ReagentsPack_DateInstall) = True
 
                                         ElseIf MyClass.IsCleanPackInstalled Then
-                                            alarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                            alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.CleanPack_Installed) = True
+                                            myAlarms(IseAlarms.CleanPack_Installed) = True
                                         End If
                                         'End SGM 16/01/2013 Bug #1108
 
                                     Else
                                         'reset alarm RP invalid
-                                        If myAlarms(Alarms.ReagentsPack_Invalid) Then
-                                            myAlarms(Alarms.ReagentsPack_Invalid) = False
+                                        If myAlarms(IseAlarms.ReagentsPack_Invalid) Then
+                                            myAlarms(IseAlarms.ReagentsPack_Invalid) = False
                                             ' solved
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
                                             alarmStatus = False
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
                                         End If
                                         'reset CP Installed
-                                        If myAlarms(Alarms.CleanPack_Installed) Then
-                                            myAlarms(Alarms.CleanPack_Installed) = False
+                                        If myAlarms(IseAlarms.CleanPack_Installed) Then
+                                            myAlarms(IseAlarms.CleanPack_Installed) = False
                                             ' solved
-                                            alarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                            alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
                                             alarmStatus = False
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7460,17 +7459,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If Not MyClass.MonitorDataTO.RP_IsEnoughVolA Or _
                                            Not MyClass.MonitorDataTO.RP_IsEnoughVolB Then
 
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.ReagentsPack_Depleted) = True
+                                            myAlarms(IseAlarms.ReagentsPack_Depleted) = True
                                         Else
-                                            If myAlarms(Alarms.ReagentsPack_Depleted) Then
-                                                myAlarms(Alarms.ReagentsPack_Depleted) = False
+                                            If myAlarms(IseAlarms.ReagentsPack_Depleted) Then
+                                                myAlarms(IseAlarms.ReagentsPack_Depleted) = False
                                                 ' solved
-                                                alarmID = GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
                                                 alarmStatus = False
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
@@ -7480,17 +7479,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ' Ise Reagents Pack Expired by date
                                         If MyClass.MonitorDataTO.RP_IsExpired Then
 
-                                            alarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
 
-                                            myAlarms(Alarms.ReagentsPack_Expired) = True
+                                            myAlarms(IseAlarms.ReagentsPack_Expired) = True
                                         Else
-                                            If myAlarms(Alarms.ReagentsPack_Expired) Then
-                                                myAlarms(Alarms.ReagentsPack_Expired) = False
+                                            If myAlarms(IseAlarms.ReagentsPack_Expired) Then
+                                                myAlarms(IseAlarms.ReagentsPack_Expired) = False
                                                 ' solved
-                                                alarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
                                                 alarmStatus = False
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
@@ -7500,34 +7499,34 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                             Else
-                                If myAlarms(Alarms.ReagentsPack_Invalid) Then
-                                    myAlarms(Alarms.ReagentsPack_Invalid) = False
+                                If myAlarms(IseAlarms.ReagentsPack_Invalid) Then
+                                    myAlarms(IseAlarms.ReagentsPack_Invalid) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
                                 End If
-                                If myAlarms(Alarms.ReagentsPack_Depleted) Then
-                                    myAlarms(Alarms.ReagentsPack_Depleted) = False
+                                If myAlarms(IseAlarms.ReagentsPack_Depleted) Then
+                                    myAlarms(IseAlarms.ReagentsPack_Depleted) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
                                 End If
-                                If myAlarms(Alarms.ReagentsPack_Expired) Then
-                                    myAlarms(Alarms.ReagentsPack_Expired) = False
+                                If myAlarms(IseAlarms.ReagentsPack_Expired) Then
+                                    myAlarms(IseAlarms.ReagentsPack_Expired) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
                                 End If
-                                If myAlarms(Alarms.ReagentsPack_DateInstall) Then
-                                    myAlarms(Alarms.ReagentsPack_DateInstall) = False
+                                If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then
+                                    myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7538,17 +7537,17 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Electrodes is wrong installed
                             If Not MyClass.IsElectrodesReady Then
 
-                                alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
 
-                                myAlarms(Alarms.Electrodes_Wrong) = True
+                                myAlarms(IseAlarms.Electrodes_Wrong) = True
                             Else
-                                If myAlarms(Alarms.Electrodes_Wrong) Then
-                                    myAlarms(Alarms.Electrodes_Wrong) = False
+                                If myAlarms(IseAlarms.Electrodes_Wrong) Then
+                                    myAlarms(IseAlarms.Electrodes_Wrong) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7560,26 +7559,26 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Clean Pack installed
                             If MyClass.IsCleanPackInstalled Then
 
-                                alarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
                                 alarmStatus = Not MyClass.IsLongTermDeactivation 'True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
 
-                                myAlarms(Alarms.CleanPack_Installed) = True
+                                myAlarms(IseAlarms.CleanPack_Installed) = True
 
-                                If myAlarms(Alarms.CleanPack_Wrong) Then
-                                    myAlarms(Alarms.CleanPack_Wrong) = False
+                                If myAlarms(IseAlarms.CleanPack_Wrong) Then
+                                    myAlarms(IseAlarms.CleanPack_Wrong) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
                                 End If
                             Else
-                                If myAlarms(Alarms.CleanPack_Installed) Then
-                                    myAlarms(Alarms.CleanPack_Installed) = False
+                                If myAlarms(IseAlarms.CleanPack_Installed) Then
+                                    myAlarms(IseAlarms.CleanPack_Installed) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7591,18 +7590,18 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim isFinished As Boolean = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                                 If isFinished And Not MyClass.IsCleanPackInstalled Then
 
-                                    alarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
                                     alarmStatus = True
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
 
-                                    myAlarms(Alarms.CleanPack_Wrong) = True
+                                    myAlarms(IseAlarms.CleanPack_Wrong) = True
 
                                     'Else
                                     '    If myAlarms(Alarms.CleanPack_Wrong) Then
                                     '        myAlarms(Alarms.CleanPack_Wrong) = False
                                     '        ' solved
-                                    '        alarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG
+                                    '        alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG
                                     '        alarmStatus = False
                                     '        pAlarmList.Add(alarmID)
                                     '        pAlarmStatusList.Add(alarmStatus)
@@ -7615,17 +7614,17 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Timeout   
                             If MyClass.IsTimeOut Then
 
-                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
 
-                                myAlarms(Alarms.Timeout) = True
+                                myAlarms(IseAlarms.Timeout) = True
                             Else
-                                If myAlarms(Alarms.Timeout) Then
-                                    myAlarms(Alarms.Timeout) = False
+                                If myAlarms(IseAlarms.Timeout) Then
+                                    myAlarms(IseAlarms.Timeout) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                    alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7642,17 +7641,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                MyClass.MonitorDataTO.CL_Data.IsOverUsed Or _
                                (MyClass.MonitorDataTO.LI_Enabled And MyClass.MonitorDataTO.LI_Data.IsOverUsed) Then
 
-                                alarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
 
-                                myAlarms(Alarms.Electrodes_Cons_Expired) = True
+                                myAlarms(IseAlarms.Electrodes_Cons_Expired) = True
                             Else
-                                If myAlarms(Alarms.Electrodes_Cons_Expired) Then
-                                    myAlarms(Alarms.Electrodes_Cons_Expired) = False
+                                If myAlarms(IseAlarms.Electrodes_Cons_Expired) Then
+                                    myAlarms(IseAlarms.Electrodes_Cons_Expired) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7666,17 +7665,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                MyClass.MonitorDataTO.CL_Data.IsExpired Or _
                                (MyClass.MonitorDataTO.LI_Enabled And MyClass.MonitorDataTO.LI_Data.IsExpired) Then
 
-                                alarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
 
-                                myAlarms(Alarms.Electrodes_Date_Expired) = True
+                                myAlarms(IseAlarms.Electrodes_Date_Expired) = True
                             Else
-                                If myAlarms(Alarms.Electrodes_Date_Expired) Then
-                                    myAlarms(Alarms.Electrodes_Date_Expired) = False
+                                If myAlarms(IseAlarms.Electrodes_Date_Expired) Then
+                                    myAlarms(IseAlarms.Electrodes_Date_Expired) = False
                                     ' solved
-                                    alarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7686,7 +7685,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         '' Ise module is Activated  
                         'If MyClass.IsISEModuleInstalled Then           SERVICE !!!!
 
-                        '    alarmID = GlobalEnumerates.Alarms.ISE_ACTIVATED
+                        '    alarmID = AlarmEnumerates.Alarms.ISE_ACTIVATED
                         '    alarmStatus = True
 
                         '     pAlarmList.Add(alarmID)
@@ -7873,20 +7872,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myDescID As String = ""
 
                 If pISEError.IsCancelError Then
-                    Dim myAlarmID As GlobalEnumerates.Alarms
+                    Dim myAlarmID As AlarmEnumerates.Alarms
                     Select Case pISEError.CancelErrorCode
-                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
-                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
-                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
-                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
-                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
-                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
-                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
-                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
-                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
-                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
-                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
-                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
+                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_A
+                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_B
+                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_C
+                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_D
+                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_F
+                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_M
+                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_N
+                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_P
+                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_R
+                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_S
+                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_T
+                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_W
 
                     End Select
 
@@ -7894,37 +7893,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Else
 
-                    Dim myRemarkID As GlobalEnumerates.Alarms
+                    Dim myRemarkID As AlarmEnumerates.Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB
+                            myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutA_SER
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutA_SER
                             Else
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB_URI
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB
+                            myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseA_SER
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseA_SER
                             Else
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB_URI
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_SER
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_Drift_SER
                             Else
-                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_CAL
+                                myRemarkID = AlarmEnumerates.Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myRemarkID = GlobalEnumerates.Alarms.ISE_OutSlope
+                            myRemarkID = AlarmEnumerates.Alarms.ISE_OutSlope
 
                     End Select
 
@@ -8161,7 +8160,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
-     ''' <summary>
+        ''' <summary>
         ''' Returns an formated string displaying the results with the corresponding ISE test names
         ''' </summary>
         ''' <param name="pAffected"></param>

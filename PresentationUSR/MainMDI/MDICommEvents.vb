@@ -944,10 +944,10 @@ Partial Public Class UiAx00MainMDI
             SetActionButtonsEnableProperty(False)
             If Not myGlobal.HasError Then
                 ''does not call the method ManageAlarms
-                'AnalyzerController.Instance.Analyzer.Alarms.Add(GlobalEnumerates.Alarms.COMMS_ERR)
+                'AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.COMMS_ERR)
                 'Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                 'myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                '        GlobalEnumerates.Alarms.COMMS_ERR.ToString(), AnalyzerIDAttribute, _
+                '        AlarmEnumerates.Alarms.COMMS_ERR.ToString(), AnalyzerIDAttribute, _
                 '        DateTime.Now, 1, WorkSessionIDAttribute, Nothing, True, Nothing)
 
                 'Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
@@ -1066,7 +1066,7 @@ Partial Public Class UiAx00MainMDI
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             If Not MDIAnalyzerManager.Alarms Is Nothing Then
-                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+                If MDIAnalyzerManager.Alarms.Contains(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
                     myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
 
                     If StartSessionisPending Then
@@ -1084,7 +1084,7 @@ Partial Public Class UiAx00MainMDI
                     End If
                 End If
 
-                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
+                If MDIAnalyzerManager.Alarms.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
                     myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "COMMS_TIMEOUT_ERR", CurrentLanguageAttribute)
                     'Automatic process aborted
                     SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
@@ -1210,10 +1210,10 @@ Partial Public Class UiAx00MainMDI
                         'AG 13/02/2012 - Insert a COMMS_ERR alarm in DB (this is required because the ProcessUSBCableDisconnection
                         'does not call the method ManageAlarms
                         'AnalyzerController.Instance.Analyzer.Alarms.Clear() 'AG 21/05/2012 - if not communications do not remove analyzermanager alarms, only do not show them
-                        AnalyzerController.Instance.Analyzer.Alarms.Add(GlobalEnumerates.Alarms.COMMS_ERR)
+                        AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.COMMS_ERR)
                         Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                         myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                                GlobalEnumerates.Alarms.COMMS_ERR.ToString(), AnalyzerIDAttribute, _
+                                AlarmEnumerates.Alarms.COMMS_ERR.ToString(), AnalyzerIDAttribute, _
                                 DateTime.Now, 1, WorkSessionIDAttribute, Nothing, True, Nothing)
 
                         Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
@@ -1812,11 +1812,11 @@ Partial Public Class UiAx00MainMDI
 
             'DisconnectComms GUI 
             linq = (From a As UIRefreshDS.ReceivedAlarmsRow In copyRefreshDS.ReceivedAlarms _
-                     Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CPU_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_MAN_ERR.ToString)) _
+                     Where (String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_CPU_ERR.ToString) _
+                    OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
+                    OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
+                    OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
+                    OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_MAN_ERR.ToString)) _
                        And a.AlarmStatus = True _
                     Select a).ToList
 
@@ -2593,7 +2593,7 @@ Partial Public Class UiAx00MainMDI
                 '"Reactions Rotor must be changed"
                 'Condition: Base line initializations fails
                 linq = (From a As UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                         Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.BASELINE_INIT_ERR.ToString)) _
+                         Where (String.Equals(a.AlarmID, AlarmEnumerates.Alarms.BASELINE_INIT_ERR.ToString)) _
                            And a.AlarmStatus = True _
                         Select a).ToList
 
@@ -2606,7 +2606,7 @@ Partial Public Class UiAx00MainMDI
 
                 'AG 12/03/2012 - Reactions rotor missing messages
                 linq = (From a As UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                        Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString.ToString)) _
+                        Where (String.Equals(a.AlarmID, AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString.ToString)) _
                         And a.AlarmStatus = True _
                         Select a).ToList
 
@@ -2636,11 +2636,11 @@ Partial Public Class UiAx00MainMDI
                 'FW_MAN_ERR: Maneuvers or Adjustments Firmware Error
 
                 linq = (From a As UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                        Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CPU_ERR.ToString) _
-                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
-                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
-                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
-                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_MAN_ERR.ToString)) _
+                        Where (String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_CPU_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, AlarmEnumerates.Alarms.FW_MAN_ERR.ToString)) _
                            And a.AlarmStatus = True _
                         Select a).ToList
 

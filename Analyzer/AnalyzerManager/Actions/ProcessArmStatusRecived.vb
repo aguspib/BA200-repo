@@ -141,26 +141,26 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Prepare internal variables for Alarms Management
                 Dim alarmStatusList As New List(Of Boolean)
                 Dim alarmAdditionalInfoList As New List(Of String)
-                Dim alarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim alarmList As New List(Of AlarmEnumerates.Alarms)
 
                 Dim reagentNumberWithNoVolume As Integer = 0 'NOTE: 0=Sample, 1=Reagent1, 2=Reagent2
-                Dim alarmLevelDetectionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                Dim alarmCollisionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmLevelDetectionEnum As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
+                Dim alarmCollisionEnum As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
 
                 Select Case (myInst)
                     Case GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString
-                        alarmLevelDetectionEnum = GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN
-                        alarmCollisionEnum = GlobalEnumerates.Alarms.R1_COLLISION_WARN
+                        alarmLevelDetectionEnum = AlarmEnumerates.Alarms.R1_NO_VOLUME_WARN
+                        alarmCollisionEnum = AlarmEnumerates.Alarms.R1_COLLISION_WARN
                         reagentNumberWithNoVolume = 1
 
                     Case GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString
-                        alarmLevelDetectionEnum = GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN
-                        alarmCollisionEnum = GlobalEnumerates.Alarms.R2_COLLISION_WARN
+                        alarmLevelDetectionEnum = AlarmEnumerates.Alarms.R2_NO_VOLUME_WARN
+                        alarmCollisionEnum = AlarmEnumerates.Alarms.R2_COLLISION_WARN
                         reagentNumberWithNoVolume = 2
 
                     Case GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString
-                        alarmLevelDetectionEnum = GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
-                        alarmCollisionEnum = GlobalEnumerates.Alarms.S_COLLISION_WARN
+                        alarmLevelDetectionEnum = AlarmEnumerates.Alarms.S_NO_VOLUME_WARN
+                        alarmCollisionEnum = AlarmEnumerates.Alarms.S_COLLISION_WARN
                         reagentNumberWithNoVolume = 0
                 End Select
 
@@ -267,10 +267,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                                     'Get the information needed and add the Alarm to the Alarms List
                                                     myGlobal = execDelg.EncodeAdditionalInfo(dbConnection, _analyzerManager.ActiveAnalyzer, _analyzerManager.ActiveWorkSession, myExecution, myBottlePos, _
-                                                                                              GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
+                                                                                              AlarmEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
                                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                                         addInfoInvalidRefill = CType(myGlobal.SetDatos, String)
-                                                        _analyzerManager.PrepareLocalAlarmList(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False)
+                                                        _analyzerManager.PrepareLocalAlarmList(AlarmEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False)
                                                     End If
                                                 End If
                                             End If
@@ -512,7 +512,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If (Not lockedExecutionsDs Is Nothing) Then
                             If (lockedExecutionsDs.twksWSExecutions.Rows.Count > 0) Then
                                 'Inform Diluted Sample Volume missing Alarm
-                                _analyzerManager.PrepareLocalAlarmList(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN, True, alarmList, alarmStatusList, "", alarmAdditionalInfoList, False) 'Inform about the volume missing warm as "" in this case (with additionalinfoList)
+                                _analyzerManager.PrepareLocalAlarmList(AlarmEnumerates.Alarms.DS_NO_VOLUME_WARN, True, alarmList, alarmStatusList, "", alarmAdditionalInfoList, False) 'Inform about the volume missing warm as "" in this case (with additionalinfoList)
 
                                 myGlobal = execDelg.UpdateStatusByExecutionID(dbConnection, "LOCKED", affectedExecutionId, _analyzerManager.ActiveWorkSession, _analyzerManager.ActiveAnalyzer)
                             End If
@@ -637,12 +637,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 '*********************************************'
                 '(2.5) CLOT DETECTED (ONLY FOR SAMPLES ROTOR) '
                 '*********************************************'
-                Dim alarmClotDetectionEnum As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmClotDetectionEnum As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
                 Dim clotAffectedExecutionsDS As New ExecutionsDS
                 'AG 27/10/2011 - NOTE when required save CLOT alarm always but when CLOT detection is disabled do not treat it in ManageAlarms
                 'If Not clotDetectionDisabled Then 'Treat field clot status only when clot detection is enabled
                 If (myRotorName = "SAMPLES" AndAlso myClotStatus <> GlobalEnumerates.Ax00ArmClotDetectionValues.OK.ToString) Then
-                    If (Not _analyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)) Then 'Ignore ANSBM clot warnings if clot system err alarm exists 
+                    If (Not _analyzerManager.Alarms.Contains(AlarmEnumerates.Alarms.CLOT_SYSTEM_ERR)) Then 'Ignore ANSBM clot warnings if clot system err alarm exists 
                         'Implement business using the variables: myWellStatus, myPrepID, myClotStatus,...
                         'If not already read it ... read the execution related to the status arm now
                         If (myExecutionId = -1) Then
@@ -671,18 +671,18 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         If (myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.BS.ToString) Then 'Blocked system 
-                            alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
+                            alarmClotDetectionEnum = AlarmEnumerates.Alarms.CLOT_DETECTION_ERR
                         ElseIf (myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.CD.ToString Or myClotStatus = GlobalEnumerates.Ax00ArmClotDetectionValues.CP.ToString) Then 'Clot Detected or Clot possible
-                            alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_WARN
+                            alarmClotDetectionEnum = AlarmEnumerates.Alarms.CLOT_DETECTION_WARN
                         End If
                     End If
 
                 ElseIf myRotorName = "SAMPLES" Then 'No clot found: If exists clear alarms 
                     'AG 25/07/2012 - these alarms has not OK
-                    'alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
+                    'alarmClotDetectionEnum = AlarmEnumerates.Alarms.CLOT_DETECTION_ERR
                     'PrepareLocalAlarmList(alarmClotDetectionEnum, False, alarmList, alarmStatusList)
                     '
-                    'alarmClotDetectionEnum = GlobalEnumerates.Alarms.CLOT_DETECTION_WARN
+                    'alarmClotDetectionEnum = AlarmEnumerates.Alarms.CLOT_DETECTION_WARN
                     'PrepareLocalAlarmList(alarmClotDetectionEnum, False, alarmList, alarmStatusList)
                 End If
                 'End If 'If Not clotDetectionDisabled Then
@@ -714,7 +714,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
                                 alarmRow = alarmPrepLockedDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
                                 With alarmRow
-                                    .AlarmID = GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString
+                                    .AlarmID = AlarmEnumerates.Alarms.PREP_LOCKED_WARN.ToString
                                     .AnalyzerID = _analyzerManager.ActiveAnalyzer
                                     .AlarmDateTime = Now
                                     If _analyzerManager.ActiveWorkSession <> "" Then
@@ -728,7 +728,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'Create DATA with information of the locked execution (sample class, sampleid, test name, replicates,...)
                                     myGlobal = execDelg.EncodeAdditionalInfo(dbConnection, firstExecutionLockedByOT.First.AnalyzerID, firstExecutionLockedByOT.First.WorkSessionID, _
                                                                               firstExecutionLockedByOT.First.ExecutionID, myBottlePos, _
-                                                                              GlobalEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
+                                                                              AlarmEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
 
                                     If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                         .AdditionalInfo = CType(myGlobal.SetDatos, String)
@@ -784,7 +784,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Create DATA with information of the locked execution (sample class, sampleid, test name, replicates,...)
                             myGlobal = execDelg.EncodeAdditionalInfo(dbConnection, item.AnalyzerID, item.WorkSessionID, _
                                                                       item.ExecutionID, myBottlePos, _
-                                                                      GlobalEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
+                                                                      AlarmEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
                             If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                 .AdditionalInfo = CType(myGlobal.SetDatos, String)
                             Else

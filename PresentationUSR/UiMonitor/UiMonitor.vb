@@ -793,59 +793,59 @@ Public Class UiMonitor
             'Forces all globe alarms to show up
             'Uncomment just for testing, and comment the after lines.
             ''BEGIN Simulation
-            'Dim Alarms As New List(Of GlobalEnumerates.Alarms)
+            'Dim Alarms As New List(Of AlarmEnumerates.Alarms)
 
-            'For Each alarm As GlobalEnumerates.Alarms In [Enum].GetValues(GetType(GlobalEnumerates.Alarms))
+            'For Each alarm As AlarmEnumerates.Alarms In [Enum].GetValues(GetType(AlarmEnumerates.Alarms))
             '    Alarms.Add(alarm) 'All the alarms for simulation
             'Next
 
             ' ''Remove exclusive alarms (Warnings)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_STATUS_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.METHACRYL_ROTOR_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_TEMP_WARN)
 
             ' ''New alarms
-            ''Alarms.Remove(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.S_COLLISION_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.S_COVER_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WS_TEMP_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.MAIN_COVER_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R1_COLLISION_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R2_COLLISION_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_COVER_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.S_COLLISION_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.S_COVER_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R1_TEMP_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R2_TEMP_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_WARN)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WS_TEMP_WARN)
 
             ''Or remove the others exclusive alarms (Errors)
-            'Alarms.Remove(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-            'Alarms.Remove(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_ERR)
+            'Alarms.Remove(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
 
             ''New alarms
-            ''Alarms.Remove(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.REACT_COVER_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.S_COLLISION_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.S_COVER_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
-            ''Alarms.Remove(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.MAIN_COVER_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R1_COLLISION_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R2_COLLISION_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_COVER_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.S_COLLISION_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.S_COVER_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
 
             'UpdateGlobesInMainTab(Alarms)
             ''END Simulation
@@ -873,9 +873,9 @@ Public Class UiMonitor
 
                 Else
                     'SGM 11/04/2012
-                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) Then
-                        If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
-                            AnalyzerController.Instance.Analyzer.Alarms.Remove(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR) Then
+                        If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
+                            AnalyzerController.Instance.Analyzer.Alarms.Remove(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                         End If
                     End If
 
@@ -1472,7 +1472,7 @@ Public Class UiMonitor
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
                 'Get the current alarms in analyzer
-                Dim myAlarms As List(Of GlobalEnumerates.Alarms)
+                Dim myAlarms As List(Of AlarmEnumerates.Alarms)
                 myAlarms = AnalyzerController.Instance.Analyzer.Alarms
 
                 '********************
@@ -1490,10 +1490,10 @@ Public Class UiMonitor
                     '* Fridge Status LED *
                     '*********************
                     'AG 29/03/2012 - Do not use only alarms (they appear only when Wup process is finished) use sensor + alarms
-                    'If (myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)) Then 'damaged
+                    'If (myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR)) Then 'damaged
                     '    bsFridgeStatusLed.StateIndex = bsLed.LedColors.RED
 
-                    'ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)) Then 'off
+                    'ElseIf (myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_STATUS_WARN)) Then 'off
                     '    bsFridgeStatusLed.StateIndex = bsLed.LedColors.GRAY
 
                     'ElseIf (myAx00Status = AnalyzerManagerStatus.SLEEPING) Then 'Unknown
@@ -1506,10 +1506,10 @@ Public Class UiMonitor
                     If (myAx00Status = AnalyzerManagerStatus.SLEEPING) Then 'Sleeping, fridge status unknown (keep gray)
                         bsFridgeStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                    ElseIf (CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS)) <= 0) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN) Then 'Fridge status unknown or OFF
+                    ElseIf (CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS)) <= 0) OrElse myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_STATUS_WARN) Then 'Fridge status unknown or OFF
                         bsFridgeStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                    ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)) Then 'damaged
+                    ElseIf (myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR)) Then 'damaged
                         bsFridgeStatusLed.StateIndex = bsLed.LedColors.RED
 
                     Else 'ON & OK
@@ -1556,7 +1556,7 @@ Public Class UiMonitor
                         ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE Switch OFF
                             bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
-                        ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR)) Then 'error after trying ise connection
+                        ElseIf (myAlarms.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR)) Then 'error after trying ise connection
                             bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
                         ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
@@ -1605,7 +1605,7 @@ Public Class UiMonitor
                     '    ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE status OFF
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.RED 'GRAY
 
-                    '    ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.ISE_STATUS_ERR)) Then 'damaged
+                    '    ElseIf (myAlarms.Contains(AlarmEnumerates.Alarms.ISE_STATUS_ERR)) Then 'damaged
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
                     '    Else 'ON
@@ -1642,9 +1642,9 @@ Public Class UiMonitor
                     'SGM 11/04/2012
 
                     'RH 04/05/2012 Reactions Rotor Temperature alarms simulation
-                    'myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_WARN)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
 
                     'DL 21/06/2012. Begin
                     Dim reactioncoverFlag As Boolean
@@ -1658,19 +1658,19 @@ Public Class UiMonitor
 
                     'Reactions Rotor Temperature LED
                     'DL 31/07/2012. Begin
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then
-                        'If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) OrElse _
-                        '  myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then
+                    If myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then
+                        'If myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS1_ERR) OrElse _
+                        '  myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then
                         'DL 31/07/2012. End
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.RED
 
-                    ElseIf myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Then
+                    ElseIf myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Then
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.RED
 
                     ElseIf Not reactioncoverFlag Then                                       'Reaction cover deactivate
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.GRAY
 
-                    ElseIf myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) Then  'Exists Temperature warning
+                    ElseIf myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_WARN) Then  'Exists Temperature warning
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.ORANGE
 
                     ElseIf myAx00Status = AnalyzerManagerStatus.SLEEPING Then               'Unknown
@@ -1680,9 +1680,9 @@ Public Class UiMonitor
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.GREEN
                     End If
 
-                    'If myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then
+                    'If myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) OrElse myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then
                     '    bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.RED
-                    'ElseIf myAlarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) Then 'Exists Temperature warning
+                    'ElseIf myAlarms.Contains(AlarmEnumerates.Alarms.REACT_TEMP_WARN) Then 'Exists Temperature warning
                     '    bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.ORANGE
                     'ElseIf myAx00Status = AnalyzerManagerStatus.SLEEPING Then 'Unknown
                     '    bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.GRAY
@@ -1692,22 +1692,22 @@ Public Class UiMonitor
                     'DL 21/06/2012. End
 
                     'RH 04/05/2012 Fridge Temperature alarms simulation
-                    'myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR)
 
                     'Fridge Temperature LED
                     'DL 31/07/2012.Begin
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then 'Exists Temperature error (only system damaged)
-                        'If myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) OrElse _
-                        '  myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then 'Exists Temperature error (only system damaged)
+                    If myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then 'Exists Temperature error (only system damaged)
+                        'If myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) OrElse _
+                        '  myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then 'Exists Temperature error (only system damaged)
                         'DL 31/07/2012. End
                         bsFridgeTemperatureLed.StateIndex = bsLed.LedColors.RED
 
                     ElseIf Not reagentscoverFlag Then                                       'DL 21/06/2012 Reagent cover deactivate
                         bsReactionsTemperatureLed.StateIndex = bsLed.LedColors.GRAY         'DL 21/06/2012
 
-                    ElseIf myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR) Then 'Exists Temperature warning or error but not damaged
+                    ElseIf myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN) OrElse myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR) Then 'Exists Temperature warning or error but not damaged
                         bsFridgeTemperatureLed.StateIndex = bsLed.LedColors.ORANGE
 
                     ElseIf myAx00Status = AnalyzerManagerStatus.SLEEPING Then 'Unknown
@@ -1723,12 +1723,12 @@ Public Class UiMonitor
                     End If
 
                     'RH 04/05/2012 Other Temperature alarms simulation for baloons validation
-                    'myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-                    'myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.R1_TEMP_WARN)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.R2_TEMP_WARN)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.WS_TEMP_WARN)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
+                    'myAlarms.Add(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
 
                 Else
                     'The Analyzer is not connected; all LEDs are set to GRAY

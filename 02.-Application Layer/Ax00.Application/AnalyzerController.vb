@@ -101,7 +101,7 @@ Namespace Biosystems.Ax00.App
                 Analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
 
                 Dim activateButtonsFlag As Boolean = False
-                Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
+                Dim myCurrentAlarms As List(Of AlarmEnumerates.Alarms)
                 myCurrentAlarms = Analyzer.Alarms
 
                 Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True

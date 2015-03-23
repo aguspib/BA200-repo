@@ -4,15 +4,12 @@ Option Strict On
 Option Infer On
 
 Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
 Imports DevExpress.XtraEditors.Controls
 Imports DevExpress.Utils
-
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-'Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 
 Partial Public Class UiMonitor
 
@@ -112,7 +109,7 @@ Partial Public Class UiMonitor
                         End Select
 
                         'BT #1355 ==> Special process for Warning Alarm WS_PAUSE_MODE_WARN
-                        If (row.AlarmID = GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN.ToString() AndAlso (Not row.IsAlarmPeriodSECNull)) Then
+                        If (row.AlarmID = Alarms.WS_PAUSE_MODE_WARN.ToString() AndAlso (Not row.IsAlarmPeriodSECNull)) Then
                             If (row.AlarmPeriodSEC > 0) Then
                                 Dim mySeconds As Integer = row.AlarmPeriodSEC
                                 Dim myMinutes As Integer = 0
@@ -197,7 +194,7 @@ Partial Public Class UiMonitor
                                     'DL 11/07/2012 - End.
 
                                     Select Case row.AlarmID
-                                        Case GlobalEnumerates.Alarms.S_NO_VOLUME_WARN.ToString()
+                                        Case Alarms.S_NO_VOLUME_WARN.ToString()
                                             If (String.Equals(adRow.SampleClass, "BLANK")) Then
                                                 additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, SampleClassDict(adRow.SampleClass), _
                                                                                BlankModeDict(name), adRow.RotorPosition)
@@ -206,7 +203,7 @@ Partial Public Class UiMonitor
                                                                                name, adRow.RotorPosition)
                                             End If
 
-                                        Case GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString()
+                                        Case Alarms.PREP_LOCKED_WARN.ToString()
                                             If (String.Equals(adRow.SampleClass, "BLANK")) Then
                                                 additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, SampleClassDict(adRow.SampleClass), _
                                                                                BlankModeDict(name), adRow.TestName) ', adRow.ReplicateNumber) 'AG 18/06/2012 - do not shown the replicate number
@@ -216,8 +213,8 @@ Partial Public Class UiMonitor
                                             End If
 
                                             'AG 25/07/2012
-                                        Case GlobalEnumerates.Alarms.CLOT_DETECTION_ERR.ToString(), _
-                                             GlobalEnumerates.Alarms.CLOT_DETECTION_WARN.ToString()
+                                        Case Alarms.CLOT_DETECTION_ERR.ToString(), _
+                                             Alarms.CLOT_DETECTION_WARN.ToString()
                                             If (String.Equals(adRow.SampleClass, "BLANK")) Then
                                                 additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, SampleClassDict(adRow.SampleClass), _
                                                                                BlankModeDict(name), adRow.TestName, adRow.ReplicateNumber)
@@ -227,8 +224,8 @@ Partial Public Class UiMonitor
                                             End If
                                             'AG 25/07/2012
 
-                                        Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN.ToString(), _
-                                             GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN.ToString()
+                                        Case Alarms.R1_NO_VOLUME_WARN.ToString(), _
+                                             Alarms.R2_NO_VOLUME_WARN.ToString()
                                             'RH 18/05/2012
                                             Select Case adRow.TubeContent
                                                 Case "SPEC_SOL"
@@ -242,7 +239,7 @@ Partial Public Class UiMonitor
                                             End Select
                                             'RH 18/05/2012 - END
 
-                                        Case GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN.ToString() 'TR 01/10/2012 -Case Reagent bottle locked. 
+                                        Case Alarms.BOTTLE_LOCKED_WARN.ToString() 'TR 01/10/2012 -Case Reagent bottle locked. 
                                             additionalInfo = String.Format(BOTTLE_LOCKED_Format, adRow.TestName, adRow.RotorPosition)
                                     End Select
 

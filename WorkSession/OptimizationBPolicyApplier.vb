@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.BL
 
                 Execute_jj_loop(pExecutions, aux_j, aux_j, (aux_j - HighContaminationPersistence - 1), upperLimit)
 
-                If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
+                If contaminations.Count = 0 Then
                     'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.BL
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
                     'Simplication: In this point do not take care about High contamination persistance
-                    If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
+                    If contaminations.Count = 0 Then
                         If aux_j < sortedOTList.Count - 1 Then
                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -111,7 +111,7 @@ Namespace Biosystems.Ax00.BL
                         End If
                     End If
 
-                    If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
+                    If contaminations.Count = 0 Then
                         '(j < i)
                         sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
                         sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL
 
                     If contaminations.Count > 0 Then Exit For
 
-                    If Not ReagentsAreCompatibleType() Then Exit For
+                    If ReagentsAreCompatibleType() Then Exit For
                     
                     'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                     'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)

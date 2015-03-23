@@ -76,10 +76,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 03/05/2012
         ''' </remarks>
-        Public Function SimulateAlarmsManagement(ByVal pAlarmList As List(Of GlobalEnumerates.Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IAnalyzerManager.SimulateAlarmsManagement
+        Public Function SimulateAlarmsManagement(ByVal pAlarmList As List(Of AlarmEnumerates.Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IAnalyzerManager.SimulateAlarmsManagement
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim finalAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim finalAlarmList As New List(Of AlarmEnumerates.Alarms)
                 Dim finalAlarmStatusList As New List(Of Boolean)
 
                 For item As Integer = 0 To pAlarmList.Count - 1

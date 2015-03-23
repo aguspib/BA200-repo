@@ -4,6 +4,7 @@ Option Explicit On
 Imports System.Data.SqlClient
 Imports System.Text
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
@@ -3265,7 +3266,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </remarks>
         Public Function GetDataForAlarmAdditionalInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                                        ByVal pWorkSessionID As String, ByVal pExecutionID As Integer, _
-                                                                       ByVal pAlarmCode As GlobalEnumerates.Alarms, _
+                                                                       ByVal pAlarmCode As Alarms, _
                                                                        ByVal pReagentNumber As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -3280,8 +3281,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = String.Empty
 
                         'Reagents volume missing
-                        If (pAlarmCode = GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN) OrElse (pAlarmCode = GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN) _
-                            OrElse (pAlarmCode = GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) Then
+                        If (pAlarmCode = Alarms.R1_NO_VOLUME_WARN) OrElse (pAlarmCode = Alarms.R2_NO_VOLUME_WARN) _
+                            OrElse (pAlarmCode = Alarms.BOTTLE_LOCKED_WARN) Then
                             cmdText = GetCmdTextForAlarmAdditionalInfo(pAnalyzerID, pWorkSessionID, pExecutionID, pReagentNumber)
 
                             'Samples volume missing or clot detection (error or warning)

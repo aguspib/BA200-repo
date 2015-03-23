@@ -4,6 +4,7 @@ Option Strict On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Data.SqlClient
@@ -105,8 +106,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'AG 28/02/2012 - move this code when the received results generates baseline init err alarm 
                         ''If exits base line alarm delete it before send a new ALIGHT instruction
-                        'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                        '    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                        'If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                        '    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
                         'End If
 
                         Dim query As New List(Of InstructionParameterTO)
@@ -263,35 +264,34 @@ Namespace Biosystems.Ax00.Core.Entities
                                 existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
 
                                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                                    'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR  ... now 
+                                    'ControlAdjustBaseLine only generates myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR  ... now 
                                     'we have to calculate his status = TRUE or FALSE
-                                    Dim alarmStatus As Boolean = False 'By default no alarm
-                                    Dim myAlarm As Alarms = GlobalEnumerates.Alarms.NONE
-                                    myAlarm = CType(myGlobalDataTO.SetDatos, Alarms)
-                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                    Dim alarmStatus As Boolean = False 'By default no alarm                                    
+                                    Dim myAlarm = CType(myGlobalDataTO.SetDatos, AlarmEnumerates.Alarms)
+                                    If myAlarm <> AlarmEnumerates.Alarms.NONE Then
                                         'AG 27/11/2014 BA-2144
                                         'alarmStatus = True
 
                                         ''AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
-                                        'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                        '    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                        'If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                        '    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
                                         'End If
                                         baselineInitializationFailuresAttribute += 1
                                         If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
                                             alarmStatus = True
-                                            If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                            If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                                myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
                                             End If
                                         Else
                                             'No alarm!! Alarm will be generated when the ALIGHT fails the maximum times
-                                            myAlarm = GlobalEnumerates.Alarms.NONE
+                                            myAlarm = AlarmEnumerates.Alarms.NONE
                                             alarmStatus = True
                                             myGlobalDataTO = SendAutomaticALIGHTRerun(dbConnection)
                                         End If
                                         'AG 27/11/2014 BA-2144
 
                                     Else ' Valid alight
-                                        myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                                        myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR
                                         alarmStatus = False
                                         ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                                     End If
@@ -299,11 +299,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim AlarmList As New List(Of Alarms)
                                     Dim AlarmStatusList As New List(Of Boolean)
 
-                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                    If myAlarm <> AlarmEnumerates.Alarms.NONE Then
                                         PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList) 'Baseline_init_err (true or false)
                                         'AG 23/05/2012 - Baseline err excludes methacrylate rotor warn
-                                        If alarmStatus AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                                            myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                                        If alarmStatus AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                            myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
                                         End If
                                         'AG 23/05/2012
 
@@ -423,7 +423,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Dim errorCode As Integer = 0
-                'Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                'Dim alarmID As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
                 'Dim alarmStatus As Boolean = False
                 Dim myAlarms As New List(Of Alarms)
                 Dim myErrorCode As New List(Of Integer)
@@ -476,7 +476,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'AG 02/03/2012 old translation method
                 'AG 28/02/2012 - Evaluate if the fridge is damaged then add the alarm 
-                'alarmID = GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR
+                'alarmID = AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR
                 'alarmStatus = IsFridgeStatusDamaged(myAlarmsReceivedList, myAlarmsStatusList)
                 'PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmsReceivedList, myAlarmsStatusList)
                 'AG 28/02/2012
@@ -488,7 +488,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
-                    If Not myAlarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
+                    If Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                         IsServiceRotorMissingInformed = False
                     End If
                 End If
@@ -879,12 +879,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim myAlarmList As New List(Of Alarms)
                                             Dim myAlarmStatusList As New List(Of Boolean)
 
-                                            If Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
-                                                myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                                            If Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
+                                                myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                                                 myAlarmStatusList.Add(True)
                                             End If
-                                            If Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
-                                                myAlarmList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                                            If Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then
+                                                myAlarmList.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
                                                 myAlarmStatusList.Add(False)
                                             End If
 
@@ -908,7 +908,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ISEAnalyzer.IsISESwitchON = False
                                         If Not ISEAlreadyStarted Then
                                             RefreshISEAlarms()
-                                        End If                                        
+                                        End If
 
                                         'SGM 09/11/2012 - ISE initiation is finished
                                         If Not ISEAlreadyStarted Then
@@ -1897,10 +1897,10 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim validResults As Boolean = True
             Dim myGlobal As New GlobalDataTO
 
-            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim AlarmStatusList As New List(Of Boolean)
             Dim alarmStatus As Boolean = False 'By default no alarm
-            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+            Dim myAlarm As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
 
             '1. Validate results (BA-2081)
             myGlobal = BaseLine.ValidateDynamicBaseLinesResults(Nothing, AnalyzerIDAttribute)
@@ -1922,17 +1922,17 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
                 'Error or  max tentatives -- generate alarm
                 If myGlobal.HasError OrElse dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
-                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                    myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR
                     alarmStatus = True
                 ElseIf Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
-                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
+                    myAlarm = CType(myGlobal.SetDatos, AlarmEnumerates.Alarms)
+                    If myAlarm <> AlarmEnumerates.Alarms.NONE Then alarmStatus = True
                 End If
 
             End If
 
             'If still not active, generate base line alarm (error)
-            If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+            If myAlarm <> AlarmEnumerates.Alarms.NONE Then
                 PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
                 If AlarmList.Count > 0 Then
                     If GlobalBase.IsServiceAssembly Then
@@ -1962,7 +1962,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim AlarmStatusList As New List(Of Boolean)
             Dim myAlarm As Alarms
 
@@ -2009,7 +2009,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO = analyzerReactRotor.ChangeReactionsRotorRecommended(Nothing, AnalyzerIDAttribute, myAnalyzerModel)
                 If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                     If CType(myGlobalDataTO.SetDatos, String) <> "" Then
-                        myAlarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+                        myAlarm = AlarmEnumerates.Alarms.BASELINE_WELL_WARN
                         'Update internal alarm list if exists alarm but not saved it into database!!!
                         'But generate refresh
                         If Not myAlarmListAttribute.Contains(myAlarm) Then
@@ -2024,9 +2024,9 @@ Namespace Biosystems.Ax00.Core.Entities
             'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
             If SensorValuesAttribute.ContainsKey(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) AndAlso SensorValuesAttribute(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 Then
 
-                Dim tempISEAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim tempISEAlarmList As New List(Of AlarmEnumerates.Alarms)
                 Dim tempISEAlarmStatusList As New List(Of Boolean)
-                myGlobalDataTO = ISEAnalyzer.CheckAlarms(MyClass.Connected, tempISEAlarmList, tempISEAlarmStatusList)
+                myGlobalDataTO = ISEAnalyzer.CheckAlarms(Connected, tempISEAlarmList, tempISEAlarmStatusList)
 
                 AlarmList.Clear()
                 AlarmStatusList.Clear()
@@ -3082,10 +3082,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not myGlobalDataTO.HasError Then
 
                     ' Deactivates Alarm begin - BA-1872
-                    Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                    Dim alarmID As Alarms = AlarmEnumerates.Alarms.NONE
                     Dim alarmStatus As Boolean = False
 
-                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
                     alarmStatus = False
                     ISEAnalyzer.IsTimeOut = False
 
@@ -3098,7 +3098,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ElectrodesCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CALB_PDT_WARN)
                         If ElectrodesCalibrationRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3112,7 +3112,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             PumpsCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_PUMP_PDT_WARN)
                         If PumpsCalibrationRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3126,7 +3126,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             CleanRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
                         If CleanRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3154,7 +3154,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End If
 
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR)
                 End If
 
                 'End If'AG 03/07/2012 - Running Cycles lost - Solution!
@@ -3646,7 +3646,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CALB_PDT_WARN)
                         If ElectrodesCalibrationRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3660,7 +3660,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_PUMP_PDT_WARN)
                         If PumpsCalibrationRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3674,7 +3674,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             CleanRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
 
-                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        myAlarmList.Add(AlarmEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
                         If CleanRequired Then
                             myAlarmStatusList.Add(True)
                         Else
@@ -3756,25 +3756,25 @@ Namespace Biosystems.Ax00.Core.Entities
                             Case ISEErrorTO.ErrorCycles.SipCycle : myAlarmOrigin = "SIP"
                         End Select
                         Select Case pISEResult.Errors(0).CancelErrorCode
-                            Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
-                            Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
-                            Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
-                            Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
-                            Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
-                            Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
-                            Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
-                            Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
-                            Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
-                            Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
-                            Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
-                            Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
+                            Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_A
+                            Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_B
+                            Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_C
+                            Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_D
+                            Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_F
+                            Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_M
+                            Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_N
+                            Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_P
+                            Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_R
+                            Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_S
+                            Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_T
+                            Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_W
 
                         End Select
 
                         'myAlarmOrigin = "ISE Error: " & myAlarmOrigi
                         myAdditionalInfo &= GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR & myAlarmOrigin & ":E" & CInt(pISEResult.Errors(0).CancelErrorCode).ToString & ":"
 
-                        If myAlarmID <> GlobalEnumerates.Alarms.NONE Then
+                        If myAlarmID <> AlarmEnumerates.Alarms.NONE Then
                             myAlarmDescriptions.Add(myAdditionalInfo)
                             myAlarmList.Add(myAlarmID)
                         End If
@@ -3812,7 +3812,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Next
 
                         myAlarmDescriptions.Add(myAdditionalInfo)
-                        myAlarmID = GlobalEnumerates.Alarms.ISE_CALIB_ERROR
+                        myAlarmID = AlarmEnumerates.Alarms.ISE_CALIB_ERROR
                         myAlarmList.Add(myAlarmID)
 
                         'myAlarmStatusList.Add(True)
