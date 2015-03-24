@@ -1,8 +1,10 @@
 ﻿Namespace Biosystems.Ax00.Global
-    Module StatusParameters
+    Public Module StatusParameters
+
         Public Structure SavedRotorStatus
-            Public State As RotorStates
-            Public LastSaved As DateTime
+            Public Shared IsActive As Boolean
+            Public Shared State As RotorStates
+            Public Shared LastSaved As DateTime
         End Structure
 
         Public Enum RotorStates

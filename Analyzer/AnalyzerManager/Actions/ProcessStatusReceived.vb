@@ -62,310 +62,35 @@ Namespace Biosystems.Ax00.Core.Entities
                     _analyzerManager.InitializeTimerSTATEControl(WAITING_TIME_OFF)
                 End If
 
-                'Get State field (parameter index 3)
-                If Not GetStateField(_instructionReceived, myStatusValue, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Get Action field (parameter index 4)
                 Dim myActionValue As AnalyzerManagerAx00Actions
-                If Not GetActionField(_instructionReceived, myActionValue, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Get Time field (parameter index 5)
                 Dim myExpectedTime As Integer
                 Dim myExpectedTimeRaw As Integer
-                If Not GetTimeField(_instructionReceived, myExpectedTime, myExpectedTimeRaw, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Get Well field (parameter index 7)
                 Dim myWellValue As Integer
-                If Not GetWellField(_instructionReceived, myWellValue, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Get Request field (parameter index 8)
                 Dim myRequestValue As Integer
-                If Not GetRequestField(_instructionReceived, myStatusValue, myActionValue, myExpectedTime, myRequestValue, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Get Error field (parameter index 9)
                 Dim errorValue As Integer
-                If Not GetErrorField(_instructionReceived, errorValue, myGlobal, myInstParamTo) Then
+
+                If Not GetFieldsFromInstructionRecived(myStatusValue, myGlobal, myInstParamTo, myActionValue, myExpectedTime, myExpectedTimeRaw, myWellValue, myRequestValue, errorValue) Then
                     Return myGlobal
                 End If
 
-                ManageErrorField(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
-
-                ' Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
-                If Not GetIseField(_instructionReceived, myGlobal, myInstParamTo) Then
-                    Return myGlobal
-                End If
-
-                ' Treatment single and multiple errors 
-                TreatmentErrorValue(myGlobal, errorValue)
-
-
-                '-------------------------------------------------------------------------------------                
-                'Finally:
-                'Do business depending the requestvalue, action value, status value, alarms value,....
-                '-------------------------------------------------------------------------------------                
-                'If action say us CONNECTION_ESTABLISHMENT update internal flags
-                If myActionValue = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
-
-                    If GlobalBase.IsServiceAssembly AndAlso errorValue = 0 Then
-                        _analyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.STATUS_RECEIVED
-                        _analyzerManager.ConnectionDoneReceptionEvent()
-                        If Not _analyzerManager.IsFwUpdateInProcess Then _analyzerManager.InfoRefreshFirstTime = True
+                If errorValue = 551 Or errorValue = 552 Then
+                    'State management, ignore alarms
+                    SavedRotorStatus.IsActive = True
+                    SavedRotorStatus.State = DirectCast(errorValue, RotorStates)
+                    SavedRotorStatus.LastSaved = DateTime.Now
+                Else
+                    If SavedRotorStatus.IsActive Then
+                        SavedRotorStatus.IsActive = False
                     End If
+                    'Alarms management
+                    ManageErrorField(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
-                    'When successfully inform the connection results
-                    _analyzerManager.Connected() = True
-                    _analyzerManager.PortName() = _analyzerManager.ConnectedPortName
-                    _analyzerManager.Bauds() = _analyzerManager.ConnectedBauds()
+                    'Treatment single and multiple errors 
+                    TreatmentErrorValue(myGlobal, errorValue)
 
+                    'Do business depending the requestvalue, action value, status value, alarms value,....
+                    DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
                 End If
-
-                'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
-                If Not GlobalBase.IsServiceAssembly Then 'NOT for SERVICE SOFTWARE 01/07/2011
-                    Select Case myStatusValue
-                        Case AnalyzerManagerStatus.SLEEPING
-                            Dim resetFlags As Boolean = True
-                            If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
-                               Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (STANDBY)
-                                myGlobal = ManageSleepStatus(myActionValue)
-                            End If
-
-                            If myActionValue = AnalyzerManagerAx00Actions.STANDBY_START OrElse myActionValue = AnalyzerManagerAx00Actions.SLEEP_END _
-                            OrElse _analyzerManager.SessionFlag(AnalyzerManagerFlags.WaitForAnalyzerReady) = "INI" Then
-                                resetFlags = False
-                            End If
-
-                            If resetFlags AndAlso Not myGlobal.HasError Then
-                                'reset internal flags when analyzer is sleeping and no action has been performed
-                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                                myGlobal = myFlagsDelg.ResetFlags(Nothing, _analyzerManager.ActiveAnalyzer())
-                                _analyzerManager.InitializeAnalyzerFlags(Nothing)
-                            End If
-
-                        Case AnalyzerManagerStatus.STANDBY
-                            If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
-                               Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (STANDBY)
-                                myGlobal = _analyzerManager.ManageStandByStatus(myActionValue, myWellValue)
-                            End If
-
-                        Case AnalyzerManagerStatus.RUNNING
-                            If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
-                               Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (RUNNING)
-                                myGlobal = _analyzerManager.ManageRunningStatus(myActionValue, myWellValue)
-
-                                If myRequestValue = 1 Then startTime = Now
-
-                            End If
-                    End Select
-
-
-                    '(status <> RUNNING) After connection establishment Sw has to wait until BAx00 is ready to receive the remaining instructions of the connection process
-                    '(status = RUNNING) Sound OFF + no more changes (until spec how to know the analyzerID)
-                    Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
-                    If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE AndAlso _
-                        _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
-
-                        'Different connect business when analyzer status <> Running and when is running
-                        If _analyzerManager.AnalyzerStatus() <> AnalyzerManagerStatus.RUNNING Then
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
-
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
-                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status (and waits unitl analyzer becomes ready)
-                        Else
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
-
-                            'when Connecting on RUNNING Session we must ask for Serial Number (POLLSN) 
-
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
-                            _analyzerManager.EndRunInstructionSent() = True 'AG 25/09/2012 - When resultsrecover process starts the Fw implements an automatic END, so add protection in order Sw do not sent this instruction again
-
-                            'in running Sw has to know if analyzer is in normal or paused running before call POLLSN so we has to send STATE instruction
-                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Send STATE instruction
-
-                        End If
-
-                        If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
-                            _analyzerManager.SetAnalyzerNotReady()
-                        End If
-
-                    ElseIf _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
-                           _analyzerManager.SessionFlag(AnalyzerManagerFlags.WaitForAnalyzerReady) = "INI" Then
-
-                        'SGM 21/06/2012 - Protection!! INFO will be activated later, on POLLFW answer reception
-                        If myStatusValue = AnalyzerManagerStatus.STANDBY Then
-                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
-                            Thread.Sleep(1000)
-                        End If
-
-                        If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.NO_ACTION Then
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
-
-                            'Continue with the connection process instructions flow
-                            If myStatusValue <> AnalyzerManagerStatus.RUNNING Then
-                                myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.POLLFW, True, Nothing, POLL_IDs.CPU)
-                            End If
-
-                        Else
-                            If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT
-                            _analyzerManager.InitializeTimerControl(myExpectedTime)
-                            _analyzerManager.MaxWaitTime() = myExpectedTime + SYSTEM_TIME_OFFSET
-                        End If
-
-                    ElseIf _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONFIG_DONE AndAlso _
-                            _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
-                        'Send SOUND OFF instruction
-                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ENDSOUND, True)
-                        If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
-                            _analyzerManager.SetAnalyzerNotReady()
-                        End If
-
-                    ElseIf _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.SOUND_DONE AndAlso _
-                            _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
-                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
-                        _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(_analyzerManager.Connected(), 1, 0)), True) 'Inform connection finished OK
-
-                        'when recovery results finished, Sw call the processConnection method for execute the full connection
-                        If _analyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
-                            _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
-                            _analyzerManager.RecoveryResultsInPause() = False
-                            _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
-                            _analyzerManager.ManageStandByStatus(AnalyzerManagerAx00Actions.STANDBY_END, _analyzerManager.CurrentWell()) 'Call this method with this action code to update ISE consumption if needed
-
-                            'We have to do it now because the normal connection finishes is when action SOUND_DONE is received
-                            If _analyzerManager.AnalyzerIsFreeze() Then
-                                myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
-                                If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
-                                    _analyzerManager.SetAnalyzerNotReady()
-                                End If
-                            End If
-
-                        End If
-
-                        'If no ISE installed LOCK all pending executions in current worksession/analyzer
-                        If Not myGlobal.HasError Then
-                            Dim adjustValue As String
-                            adjustValue = _analyzerManager.ReadAdjustValue(Ax00Adjustsments.ISEINS)
-                            If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
-                                Dim iseInstalledFlag = CType(adjustValue, Boolean)
-                                If Not iseInstalledFlag Then
-                                    Dim myExecutions As New ExecutionsDelegate
-                                    myGlobal = myExecutions.UpdateStatusByExecutionTypeAndStatus(Nothing, _analyzerManager.ActiveWorkSession(), _analyzerManager.ActiveAnalyzer(), "PREP_ISE", "PENDING", "LOCKED")
-                                End If
-                            End If
-                        End If
-
-                        If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
-                            _analyzerManager.InfoActivated() = 0
-                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
-                        End If
-
-                        myGlobal = _analyzerManager.ManageInterruptedProcess(Nothing) 'Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
-
-                    ElseIf _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso Not _analyzerManager.RunningConnectionPollSnSentStatus() AndAlso _
-                        _analyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
-
-                    End If
-
-                    'Update analyzer session flags into DataBase
-                    If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                        myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-                    End If
-
-                End If
-
-
-                If myStatusValue = AnalyzerManagerStatus.SLEEPING Then
-
-                    If _analyzerManager.ISEAnalyzer IsNot Nothing AndAlso _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
-                        _analyzerManager.ISEAnalyzer.IsISEInitiatedDone = False
-                        _analyzerManager.IseIsAlreadyStarted = False
-                    End If
-
-                    If _analyzerManager.IsShutDownRequested() Then
-                        _analyzerManager.Connected() = False
-                        _analyzerManager.InfoRefreshFirstTime = True
-                        _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(_analyzerManager.Connected(), 1, 0)), True)
-                    End If
-                End If
-
-                'AG 28/06/2012 - Launch the parallel threat when Running and Request received and preparation instruction is already sent
-                'Also during running initialization
-
-                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                    SyncLock LockThis
-                        If _analyzerManager.BufferANSPHRReceivedCount() > 0 AndAlso Not _analyzerManager.ProcessingLastANSPHRInstructionStatus() Then
-
-                            Dim startDoWorker As Boolean = False 'Evaluate if first ANSPHR in queue can be processed or not
-                            If Not _analyzerManager.EndRunInstructionSent() AndAlso Not _analyzerManager.AbortInstructionSent() AndAlso Not _analyzerManager.PauseInstructionSent() Then
-                                Select Case _analyzerManager.AnalyzerCurrentAction
-                                    Case AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED, AnalyzerManagerAx00Actions.PREDILUTED_TEST_RECEIVED, _
-                                        AnalyzerManagerAx00Actions.ISE_TEST_RECEIVED, AnalyzerManagerAx00Actions.SKIP_START, _
-                                        AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_START, _
-                                        AnalyzerManagerAx00Actions.START_INSTRUCTION_END, AnalyzerManagerAx00Actions.PAUSE_START, _
-                                        AnalyzerManagerAx00Actions.PAUSE_END, AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED
-
-                                        startDoWorker = True
-
-                                        'AG 19/11/2013 - This case is not possible but we add the protection
-                                        If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED AndAlso Not _analyzerManager.AllowScanInRunning Then
-                                            startDoWorker = False
-                                        End If
-
-                                        'Special cases: ise test and prediluted test appears several cycles (when dummies are performed)
-                                    Case AnalyzerManagerAx00Actions.ISE_TEST_END, AnalyzerManagerAx00Actions.PREDILUTED_TEST_END
-                                        'Activate startDoWorker to process readings only when biochemical Request = 0
-                                        If myRequestValue = 0 Then 'AG 14/09/2012 v052 - If Not AnalyzerManager.AnalyzerIsReady() Then
-                                            startDoWorker = True
-                                        Else
-                                            'When request = 1 the Software the priority is ask the request and send next preparation The readings will treated when preparation will be accepted 
-                                        End If
-
-                                        'SOUND_DONE has not to be taken into account Fw answers with status just receive it (exception of running instructions timming)
-                                    Case AnalyzerManagerAx00Actions.SOUND_DONE
-                                        startDoWorker = True
-                                End Select
-
-                                'When a instruction is rejected (out of time or repeated in cycle)
-                                If Not startDoWorker AndAlso (errorValue = 28 OrElse errorValue = 34) Then
-                                    startDoWorker = True
-                                End If
-
-                            Else 'Leaving RUNNING
-                                startDoWorker = True
-                            End If
-
-                            If startDoWorker Then
-                                'check if create WS executions semaphore is busy or ready If busy we cannot process readings now, so we will evaluate readings next BAx00 cycle
-                                Dim semaphoreFree As Boolean = True
-                                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                                    semaphoreFree = CBool(GlobalSemaphores.createWSExecutionsQueue = 0)
-                                End If
-                                If semaphoreFree Then
-                                    _analyzerManager.ProcessingLastANSPHRInstructionStatus() = True
-                                    _analyzerManager.RunWellBaseLineWorker()
-                                Else
-                                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-                                End If
-                            End If
-                        End If
-                    End SyncLock
-                End If
-
-                If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                    GlobalBase.CreateLogActivity("Treat STATUS received: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-                End If
-
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
@@ -377,6 +102,302 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
+        Private Sub DoActionsDependingFieldValues(ByVal myStatusValue As AnalyzerManagerStatus, ByRef myGlobal As GlobalDataTO, ByVal myActionValue As AnalyzerManagerAx00Actions, ByVal myExpectedTime As Integer, ByVal myWellValue As Integer, ByVal myRequestValue As Integer, ByVal errorValue As Integer, ByVal startTime As Date)
+
+            'If action say us CONNECTION_ESTABLISHMENT update internal flags
+            If myActionValue = AnalyzerManagerAx00Actions.CONNECTION_DONE Then
+
+                If GlobalBase.IsServiceAssembly AndAlso errorValue = 0 Then
+                    _analyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.STATUS_RECEIVED
+                    _analyzerManager.ConnectionDoneReceptionEvent()
+                    If Not _analyzerManager.IsFwUpdateInProcess Then _analyzerManager.InfoRefreshFirstTime = True
+                End If
+
+                'When successfully inform the connection results
+                _analyzerManager.Connected() = True
+                _analyzerManager.PortName() = _analyzerManager.ConnectedPortName
+                _analyzerManager.Bauds() = _analyzerManager.ConnectedBauds()
+
+            End If
+
+            'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
+            If Not GlobalBase.IsServiceAssembly Then 'NOT for SERVICE SOFTWARE 01/07/2011
+                Select Case myStatusValue
+                    Case AnalyzerManagerStatus.SLEEPING
+                        Dim resetFlags As Boolean = True
+                        If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
+                           Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (STANDBY)
+                            myGlobal = ManageSleepStatus(myActionValue)
+                        End If
+
+                        If myActionValue = AnalyzerManagerAx00Actions.STANDBY_START OrElse myActionValue = AnalyzerManagerAx00Actions.SLEEP_END _
+                           OrElse _analyzerManager.SessionFlag(AnalyzerManagerFlags.WaitForAnalyzerReady) = "INI" Then
+                            resetFlags = False
+                        End If
+
+                        If resetFlags AndAlso Not myGlobal.HasError Then
+                            'reset internal flags when analyzer is sleeping and no action has been performed
+                            Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                            myGlobal = myFlagsDelg.ResetFlags(Nothing, _analyzerManager.ActiveAnalyzer())
+                            _analyzerManager.InitializeAnalyzerFlags(Nothing)
+                        End If
+
+                    Case AnalyzerManagerStatus.STANDBY
+                        If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
+                           Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'AG 14/06/2012 - Do not manage instruction by analyzer status if connection process is in course (STANDBY)
+                            myGlobal = _analyzerManager.ManageStandByStatus(myActionValue, myWellValue)
+                        End If
+
+                    Case AnalyzerManagerStatus.RUNNING
+                        If Not _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
+                           Not _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE Then 'Do not manage instruction by analyzer status if connection process is in course (RUNNING)
+                            myGlobal = _analyzerManager.ManageRunningStatus(myActionValue, myWellValue)
+
+                            If myRequestValue = 1 Then startTime = Now
+
+                        End If
+                End Select
+
+
+                '(status <> RUNNING) After connection establishment Sw has to wait until BAx00 is ready to receive the remaining instructions of the connection process
+                '(status = RUNNING) Sound OFF + no more changes (until spec how to know the analyzerID)
+                Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+                If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONNECTION_DONE AndAlso _
+                   _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
+
+                    'Different connect business when analyzer status <> Running and when is running
+                    If _analyzerManager.AnalyzerStatus() <> AnalyzerManagerStatus.RUNNING Then
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
+
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
+                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status (and waits unitl analyzer becomes ready)
+                    Else
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
+
+                        'when Connecting on RUNNING Session we must ask for Serial Number (POLLSN) 
+
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
+                        _analyzerManager.EndRunInstructionSent() = True 'AG 25/09/2012 - When resultsrecover process starts the Fw implements an automatic END, so add protection in order Sw do not sent this instruction again
+
+                        'in running Sw has to know if analyzer is in normal or paused running before call POLLSN so we has to send STATE instruction
+                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Send STATE instruction
+
+                    End If
+
+                    If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
+                        _analyzerManager.SetAnalyzerNotReady()
+                    End If
+
+                ElseIf _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso _
+                       _analyzerManager.SessionFlag(AnalyzerManagerFlags.WaitForAnalyzerReady) = "INI" Then
+
+                    'SGM 21/06/2012 - Protection!! INFO will be activated later, on POLLFW answer reception
+                    If myStatusValue = AnalyzerManagerStatus.STANDBY Then
+                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
+                        Thread.Sleep(1000)
+                    End If
+
+                    If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.NO_ACTION Then
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WaitForAnalyzerReady, "END")
+
+                        'Continue with the connection process instructions flow
+                        If myStatusValue <> AnalyzerManagerStatus.RUNNING Then
+                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.POLLFW, True, Nothing, POLL_IDs.CPU)
+                        End If
+
+                    Else
+                        If myExpectedTime <= 0 Then myExpectedTime = WAITING_TIME_DEFAULT
+                        _analyzerManager.InitializeTimerControl(myExpectedTime)
+                        _analyzerManager.MaxWaitTime() = myExpectedTime + SYSTEM_TIME_OFFSET
+                    End If
+
+                ElseIf _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.CONFIG_DONE AndAlso _
+                       _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
+                    'Send SOUND OFF instruction
+                    myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ENDSOUND, True)
+                    If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
+                        _analyzerManager.SetAnalyzerNotReady()
+                    End If
+
+                ElseIf _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.SOUND_DONE AndAlso _
+                       _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
+                    _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.CONNECTprocess, "CLOSED")
+                    _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(_analyzerManager.Connected(), 1, 0)), True) 'Inform connection finished OK
+
+                    'when recovery results finished, Sw call the processConnection method for execute the full connection
+                    If _analyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
+                        _analyzerManager.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
+                        _analyzerManager.RecoveryResultsInPause() = False
+                        _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True) 'Generate UI refresh for presentation - Inform the recovery results has finished!!
+                        _analyzerManager.ManageStandByStatus(AnalyzerManagerAx00Actions.STANDBY_END, _analyzerManager.CurrentWell()) 'Call this method with this action code to update ISE consumption if needed
+
+                        'We have to do it now because the normal connection finishes is when action SOUND_DONE is received
+                        If _analyzerManager.AnalyzerIsFreeze() Then
+                            myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
+                            If Not myGlobal.HasError AndAlso _analyzerManager.Connected() Then
+                                _analyzerManager.SetAnalyzerNotReady()
+                            End If
+                        End If
+
+                    End If
+
+                    'If no ISE installed LOCK all pending executions in current worksession/analyzer
+                    If Not myGlobal.HasError Then
+                        Dim adjustValue As String
+                        adjustValue = _analyzerManager.ReadAdjustValue(Ax00Adjustsments.ISEINS)
+                        If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
+                            Dim iseInstalledFlag = CType(adjustValue, Boolean)
+                            If Not iseInstalledFlag Then
+                                Dim myExecutions As New ExecutionsDelegate
+                                myGlobal = myExecutions.UpdateStatusByExecutionTypeAndStatus(Nothing, _analyzerManager.ActiveWorkSession(), _analyzerManager.ActiveAnalyzer(), "PREP_ISE", "PENDING", "LOCKED")
+                            End If
+                        End If
+                    End If
+
+                    If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.STANDBY Then
+                        _analyzerManager.InfoActivated() = 0
+                        myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
+                    End If
+
+                    myGlobal = _analyzerManager.ManageInterruptedProcess(Nothing) 'Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
+
+                ElseIf _analyzerManager.SessionFlag(AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" AndAlso Not _analyzerManager.RunningConnectionPollSnSentStatus() AndAlso _
+                       _analyzerManager.SessionFlag(AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
+                    myGlobal = _analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.POLLSN, True) 'Send POLLSN instruction
+
+                End If
+
+                'Update analyzer session flags into DataBase
+                If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                    myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
+                End If
+
+            End If
+
+
+            If myStatusValue = AnalyzerManagerStatus.SLEEPING Then
+
+                If _analyzerManager.ISEAnalyzer IsNot Nothing AndAlso _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
+                    _analyzerManager.ISEAnalyzer.IsISEInitiatedDone = False
+                    _analyzerManager.IseIsAlreadyStarted = False
+                End If
+
+                If _analyzerManager.IsShutDownRequested() Then
+                    _analyzerManager.Connected() = False
+                    _analyzerManager.InfoRefreshFirstTime = True
+                    _analyzerManager.UpdateSensorValuesAttribute(AnalyzerSensors.CONNECTED, CSng(IIf(_analyzerManager.Connected(), 1, 0)), True)
+                End If
+            End If
+
+            'AG 28/06/2012 - Launch the parallel threat when Running and Request received and preparation instruction is already sent
+            'Also during running initialization
+
+            If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
+                SyncLock LockThis
+                    If _analyzerManager.BufferANSPHRReceivedCount() > 0 AndAlso Not _analyzerManager.ProcessingLastANSPHRInstructionStatus() Then
+
+                        Dim startDoWorker As Boolean = False 'Evaluate if first ANSPHR in queue can be processed or not
+                        If Not _analyzerManager.EndRunInstructionSent() AndAlso Not _analyzerManager.AbortInstructionSent() AndAlso Not _analyzerManager.PauseInstructionSent() Then
+                            Select Case _analyzerManager.AnalyzerCurrentAction
+                                Case AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED, AnalyzerManagerAx00Actions.PREDILUTED_TEST_RECEIVED, _
+                                    AnalyzerManagerAx00Actions.ISE_TEST_RECEIVED, AnalyzerManagerAx00Actions.SKIP_START, _
+                                    AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_START, _
+                                    AnalyzerManagerAx00Actions.START_INSTRUCTION_END, AnalyzerManagerAx00Actions.PAUSE_START, _
+                                    AnalyzerManagerAx00Actions.PAUSE_END, AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED
+
+                                    startDoWorker = True
+
+                                    'AG 19/11/2013 - This case is not possible but we add the protection
+                                    If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED AndAlso Not _analyzerManager.AllowScanInRunning Then
+                                        startDoWorker = False
+                                    End If
+
+                                    'Special cases: ise test and prediluted test appears several cycles (when dummies are performed)
+                                Case AnalyzerManagerAx00Actions.ISE_TEST_END, AnalyzerManagerAx00Actions.PREDILUTED_TEST_END
+                                    'Activate startDoWorker to process readings only when biochemical Request = 0
+                                    If myRequestValue = 0 Then 'AG 14/09/2012 v052 - If Not AnalyzerManager.AnalyzerIsReady() Then
+                                        startDoWorker = True
+                                    Else
+                                        'When request = 1 the Software the priority is ask the request and send next preparation The readings will treated when preparation will be accepted 
+                                    End If
+
+                                    'SOUND_DONE has not to be taken into account Fw answers with status just receive it (exception of running instructions timming)
+                                Case AnalyzerManagerAx00Actions.SOUND_DONE
+                                    startDoWorker = True
+                            End Select
+
+                            'When a instruction is rejected (out of time or repeated in cycle)
+                            If Not startDoWorker AndAlso (errorValue = 28 OrElse errorValue = 34) Then
+                                startDoWorker = True
+                            End If
+
+                        Else 'Leaving RUNNING
+                            startDoWorker = True
+                        End If
+
+                        If startDoWorker Then
+                            'check if create WS executions semaphore is busy or ready If busy we cannot process readings now, so we will evaluate readings next BAx00 cycle
+                            Dim semaphoreFree As Boolean = True
+                            If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                                semaphoreFree = CBool(GlobalSemaphores.createWSExecutionsQueue = 0)
+                            End If
+                            If semaphoreFree Then
+                                _analyzerManager.ProcessingLastANSPHRInstructionStatus() = True
+                                _analyzerManager.RunWellBaseLineWorker()
+                            Else
+                                GlobalBase.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                            End If
+                        End If
+                    End If
+                End SyncLock
+            End If
+
+            If _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
+                GlobalBase.CreateLogActivity("Treat STATUS received: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+            End If
+        End Sub
+
+        Private Function GetFieldsFromInstructionRecived(ByRef myStatusValue As AnalyzerManagerStatus, ByRef myGlobal As GlobalDataTO, ByVal myInstParamTo As InstructionParameterTO, ByRef myActionValue As AnalyzerManagerAx00Actions, _
+                                                         ByRef myExpectedTime As Integer, ByRef myExpectedTimeRaw As Integer, ByRef myWellValue As Integer, ByRef myRequestValue As Integer, ByRef errorValue As Integer) As Boolean
+
+            'Get State field (parameter index 3)
+            If Not GetStateField(_instructionReceived, myStatusValue, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get Action field (parameter index 4)
+            If Not GetActionField(_instructionReceived, myActionValue, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get Time field (parameter index 5)
+            If Not GetTimeField(_instructionReceived, myExpectedTime, myExpectedTimeRaw, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get Well field (parameter index 7)
+            If Not GetWellField(_instructionReceived, myWellValue, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get Request field (parameter index 8)
+            If Not GetRequestField(_instructionReceived, myStatusValue, myActionValue, myExpectedTime, myRequestValue, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get Error field (parameter index 9)
+            If Not GetErrorField(_instructionReceived, errorValue, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            ' Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
+            If Not GetIseField(_instructionReceived, myGlobal, myInstParamTo) Then
+                Return False
+            End If
+
+            Return True
+        End Function
 
 
 #Region "RefactMethods"
