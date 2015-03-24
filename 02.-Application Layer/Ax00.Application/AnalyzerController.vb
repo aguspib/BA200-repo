@@ -132,13 +132,14 @@ Namespace Biosystems.Ax00.App
         ''' Modified by:  IT 19/12/2014 - BA-2143
         '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Public Function ChangeRotorStartProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
                     _rotorChangeServices = New RotorChangeServices(Analyzer)
                 End If
 
-                Return _rotorChangeServices.StartService(isInRecovering)
+                Return _rotorChangeServices.StartService()
+
             Catch ex As Exception
                 Throw ex
             End Try
@@ -158,7 +159,11 @@ Namespace Biosystems.Ax00.App
                     _rotorChangeServices = New RotorChangeServices(Analyzer)
                 End If
 
-                Return _rotorChangeServices.ContinueProcess(isInRecovering)
+                If (Not isInRecovering) Then
+                    Return _rotorChangeServices.ContinueProcess()
+                Else
+                    Return _rotorChangeServices.RecoverProcess()
+                End If
             Catch ex As Exception
                 Throw ex
             End Try

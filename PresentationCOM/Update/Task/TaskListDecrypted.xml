@@ -1214,11 +1214,14 @@
   </AppVersion>
   <AppVersion>
     <Version>3.07</Version>
+    <StructureScript>
+      ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
+    </StructureScript>
+
     <UpdateScript>
       --|====================|
       --| BA200: v3.07     	 |
       --|====================|
-      ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
 	  
       IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
       BEGIN
@@ -1233,6 +1236,15 @@
       VALUES ('GLF_BOARD_ERR',560,'2_FATAL_ERROR')
       END
       GO
+      
+    -- BA-2358
+      IF((SELECT COUNT(*) FROM dbo.tfmwGeneralSettings WHERE SettingID LIKE 'FLIGHT_FULL_ROTOR_CADUCITY') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwGeneralSettings (SettingID, FixedItemDesc, CurrentValue, Status)
+      VALUES ('FLIGHT_FULL_ROTOR_CADUCITY','Minutes that a full clean rotor is considered good to be read in a FLIGHT operation','30', 1)
+      END
+      GO
+  
     </UpdateScript>
   </AppVersion>
 </TaskListDS>

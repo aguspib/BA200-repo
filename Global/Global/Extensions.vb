@@ -142,7 +142,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: MI+XB 27/01/2015 BA-2189 
         ''' http://www.codeproject.com/KB/cs/AvoidingInvokeRequired.aspx
         ''' </remarks>
-        <Extension()> _
+        <Extension()>
         Public Sub UIThread(ByVal control As System.Windows.Forms.Control, ByVal code As Action)
             'This method uses async version of UIThread(control, code, async flag) (see method below)
             UIThread(control, code, False)
@@ -169,21 +169,21 @@ Namespace Biosystems.Ax00.Global
 
 
 
-        ''' <summary>
-        ''' Executes UI method from another thread
-        ''' </summary>
-        ''' <remarks>
-        ''' Created by: RH - 26/05/2011
-        ''' http://www.codeproject.com/KB/cs/AvoidingInvokeRequired.aspx
-        ''' </remarks>
-        <Extension()> _
-        Public Sub UIThreadInvoke(ByVal control As System.Windows.Forms.Control, ByVal code As Action)
-            If (control.InvokeRequired) Then
-                control.Invoke(code)
-                Return
-            End If
-            code.Invoke()
-        End Sub
+        ' ''' <summary>
+        ' ''' Executes UI method from another thread
+        ' ''' </summary>
+        ' ''' <remarks>
+        ' ''' Created by: RH - 26/05/2011
+        ' ''' http://www.codeproject.com/KB/cs/AvoidingInvokeRequired.aspx
+        ' ''' </remarks>
+        '<Extension()> <Obsolete("This method duplicates functionality. Use UIThread function instead.")> _
+        'Public Sub UIThreadInvoke(ByVal control As System.Windows.Forms.Control, ByVal code As Action)
+        '    If (control.InvokeRequired) Then
+        '        control.Invoke(code)
+        '        Return
+        '    End If
+        '    code.Invoke()
+        'End Sub
 
         ''' <summary>
         ''' Converts the value of this instance to a System.String using the current Culture Info.

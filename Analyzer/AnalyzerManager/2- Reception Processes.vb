@@ -462,15 +462,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         End If
                         ' XBC 29/10/2012
-
-                        'end SGM 16/10/2012
-
-                        'AG 02/03/2012 old translation method
-                        'Translate the Fw error code into the Sw AlarmID enum code 
-                        'AG 17/02/2012 Activated (AG 19/01/2012 - disable this functionality until fw & sw work together with alarms)
-                        'alarmID = TranslateErrorCodeToAlarmID(errorCode, alarmStatus)
-                        'PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmsReceivedList, myAlarmsStatusList)
-
                     End If
                 Next
 
@@ -494,14 +485,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 'end SGM 09/11/2012
 
-                'AG 04/12/2014 BA-2236
                 Dim index As Integer = 0
                 Dim errorCodeID As String = ""
-                'AG 04/12/2014 BA-2236
 
                 For Each alarmID As Alarms In myAlarms
                     'AG 04/12/2014 BA-2236 - Method 
-                    'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
                     errorCodeID = ""
                     If index <= myErrorCode.Count - 1 Then
                         errorCodeID = myErrorCode(index).ToString
@@ -511,30 +499,20 @@ Namespace Biosystems.Ax00.Core.Entities
                     index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                 Next
 
-                'AG 02/03/2012
-
                 ' XBC 17/10/2012 - Alarms treatment for Service
                 Dim myFwCodeErrorReceivedList As New List(Of String)
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     ' Initialize Error Codes List
                     myErrorCodesAttribute.Clear()
                     ' Prepare error codes List received from Analyzer
                     PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
                 End If
-                ' XBC 17/10/2012
 
                 If Not myGlobal.HasError Then
                     If myAlarmsReceivedList.Count > 0 Then
                         '3- Finally call manage all alarms detected (new or fixed)
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If GlobalBase.IsServiceAssembly Then
-                            ' XBC 16/10/2012 - Alarms treatment for Service
-                            'myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList)
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
-                            ' XBC 16/10/2012
                         Else
                             Dim currentAlarms = New CurrentAlarms(Me)
                             myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
@@ -2784,9 +2762,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Try
                 'AG 03/07/2012 - Running Cycles lost - Solution!
-                'myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
-                'If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
-                '    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
 
                 Dim myPreparationID As Integer = -1
                 Dim myISEResultStr As String = ""
@@ -2798,8 +2773,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myISEResult As New ISEResultTO
                 myISEResult.ReceivedResults = myISEResultStr
 
-
-                'SGM 08/03/11 Get from SWParameters table
                 Dim myISEMode As String = "SimpleMode"
                 Dim myParams As New SwParametersDelegate
                 myGlobalDataTO = myParams.ReadTextValueByParameterName(dbConnection, SwParameters.ISE_MODE.ToString, Nothing)
@@ -2809,10 +2782,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     myISEMode = "SimpleMode"
                 End If
 
-                'XBC 20/01/2012
                 Dim myISEResultsDelegate As New ISEReception(Me)
-                'XBC 20/01/2012
-                'SGM 10/01/2012 choose method depending on instruction type sent (ISECMD or ISETEST)
 
                 If myPreparationID = 0 Then
 
@@ -2852,7 +2822,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                     For Each E As ISEErrorTO In ISEAnalyzer.LastISEResult.Errors
                                         If myCurrentProcedure = ISEManager.ISEProcedures.CalibrateElectrodes Then
-                                            Me.BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                                            BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                         End If
                                     Next
                                 End If
@@ -2874,9 +2844,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Else
                         'USER SOFTWARE
-                        If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString), "INI") Then
+                        If String.Equals(mySessionFlags(AnalyzerManagerFlags.ISEClean.ToString), "INI") Then
                             If Not ISEAnalyzer.LastISEResult.IsCancelError Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "END")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "END")
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEClean, "CANCELED")
                             End If
@@ -2896,29 +2866,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             'The ISE consumption flag is updated in OnISEProcedureFinished event handler
-
-
-                            '    'AG 12/04/2012 - ISE consumption updated
-                            'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption.ToString) = "INI" Then
-                            '    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption, "END")
-
-                            '    'If pause in process mark as closed
-                            '    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString) = "INPROCESS" Then
-                            '        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess, "CLOSED")
-                            '    End If
-
-                            '    'Once the ise consumption is updated activate ansinf
-                            '    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            '        AnalyzerIsInfoActivatedAttribute = 0
-                            '        myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-
-                            '        'This is not required with the INFO because it is an immediate instruction
-                            '        ''When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                            '        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                            '        '    SetAnalyzerNotReady()
-                            '        'End If
-                            '    End If
-                            '    'AG 12/04/2012
 
                         End If
 
@@ -3043,8 +2990,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             myGlobalDataTO = exec_delg.GetExecutionsByStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "INPROCESS", False, "PREP_ISE")
                             If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
 
-                                Dim myExecutionsDS As New ExecutionsDS
-                                myExecutionsDS = CType(myGlobalDataTO.SetDatos, ExecutionsDS)
+                                Dim myExecutionsDS = CType(myGlobalDataTO.SetDatos, ExecutionsDS)
 
                                 If myExecutionsDS.twksWSExecutions.Count > 0 Then
                                     '2on: Lock all pending ISE preparation executions
@@ -3078,22 +3024,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobalDataTO = ISEAnalyzer.CheckAlarms(Me.Connected, myAlarmListTmp, myAlarmStatusListTmp)
+                myGlobalDataTO = ISEAnalyzer.CheckAlarms(Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobalDataTO.HasError Then
 
                     ' Deactivates Alarm begin - BA-1872
-                    Dim alarmID As Alarms = AlarmEnumerates.Alarms.NONE
-                    Dim alarmStatus As Boolean = False
-
-                    alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
-                    alarmStatus = False
+                    Dim alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    Dim alarmStatus = False
                     ISEAnalyzer.IsTimeOut = False
 
                     ' XB 21/01/2015 - BA-1873
-                    If Me.ISEAnalyzer.IsISEModuleInstalled And Me.ISEAnalyzer.IsISEModuleReady Then
+                    If ISEAnalyzer.IsISEModuleInstalled And ISEAnalyzer.IsISEModuleReady Then
                         ' Check if ISE Electrodes calibration is required
                         Dim ElectrodesCalibrationRequired As Boolean = False
-                        myGlobalDataTO = Me.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
+                        myGlobalDataTO = ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
                         If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                             ElectrodesCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
@@ -3107,7 +3050,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         ' Check if ISE Pumps calibration is required
                         Dim PumpsCalibrationRequired As Boolean = False
-                        myGlobalDataTO = Me.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
+                        myGlobalDataTO = ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                         If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                             PumpsCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
@@ -3121,7 +3064,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         ' Check if ISE Clean is required
                         Dim CleanRequired As Boolean = False
-                        myGlobalDataTO = Me.ISEAnalyzer.CheckCleanIsNeeded
+                        myGlobalDataTO = ISEAnalyzer.CheckCleanIsNeeded
                         If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                             CleanRequired = CType(myGlobalDataTO.SetDatos, Boolean)
                         End If
@@ -3185,10 +3128,10 @@ Namespace Biosystems.Ax00.Core.Entities
             If (Not dbConnection Is Nothing) Then
                 If (Not myGlobalDataTO.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
+                    CommitTransaction(dbConnection)
                 Else
                     'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
+                    RollbackTransaction(dbConnection)
                 End If
                 dbConnection.Close()
             End If

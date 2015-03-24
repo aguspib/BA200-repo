@@ -112,6 +112,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
 
+
         Public Structure ErrorCodesDisplayStruct
             Public ErrorDateTime As DateTime
             Public ErrorCode As String
@@ -294,6 +295,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         ' XB 09/01/2014 - Create this new Attribute - BA-2187
         Private LockISEAttr As Boolean = False
+
+        Private IsAlreadyManagedAlarmsAttr As Boolean = False
 #End Region
 
 #Region "Properties"
@@ -1495,6 +1498,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 wellContaminatedWithWashSentAttr = value
             End Set
         End Property
+
+        Public Property CanManageRetryAlarm As Boolean Implements IAnalyzerManager.CanManageRetryAlarm
+            Get
+                Return IsAlreadyManagedAlarmsAttr
+            End Get
+            Set(value As Boolean)
+                IsAlreadyManagedAlarmsAttr = value
+            End Set
+        End Property
 #End Region
 
 #Region "Events definition & methods"
@@ -2582,7 +2594,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = AdjustLightSendEvent(myGlobal, pSwAdditionalParameters, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.ADJUST_FLIGHT
-                                myGlobal = AdjustFLightSendEvent(myGlobal, pSwAdditionalParameters)
+                                myGlobal = AdjustFLightSendEvent(myGlobal, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.INFO
                                 myGlobal = InfoSendEvent(myGlobal, pSwAdditionalParameters)
@@ -4031,7 +4043,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myWsDelegate As New WorkSessionsDelegate
                 Dim mySavedWsDelegate As New SavedWSDelegate
 
-                myGlobal = myWsDelegate.GetOrderTestsForWS(pDbConnection, ActiveWorkSession)
+                myGlobal = WorkSessionsDelegate.GetOrderTestsForWS(pDbConnection, ActiveWorkSession)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim myWorkSessionResultDs As WorkSessionResultDS = DirectCast(myGlobal.SetDatos, WorkSessionResultDS)
 

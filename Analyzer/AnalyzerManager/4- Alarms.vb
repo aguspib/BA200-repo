@@ -76,7 +76,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by XBC 16/10/2012 - Add pErrorCodeList functionality to manage Firmware Alarms into Service Software
         ''' </remarks>
         Public Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
-                                          ByVal pAlarmIDList As List(Of AlarmEnumerates.Alarms), _
+                                          ByVal pAlarmIDList As List(Of Alarms), _
                                           ByVal pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pErrorCodeList As List(Of String) = Nothing, _
                                           Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO _
@@ -291,8 +291,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 06/11/2014 - Add new COMMS Timeour Alarm - BA-1872
         '''              AG 04/12/2014 BA-2236 add new optional parameters ErrorCode and pErrorCodesList
         ''' </remarks>
-        Public Sub PrepareLocalAlarmList(ByVal pAlarmCode As AlarmEnumerates.Alarms, ByVal pAlarmStatus As Boolean, _
-                                          ByRef pAlarmList As List(Of AlarmEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
+        Public Sub PrepareLocalAlarmList(ByVal pAlarmCode As Alarms, ByVal pAlarmStatus As Boolean, _
+                                          ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pAddInfo As String = "", _
                                           Optional ByRef pAdditionalInfoList As List(Of String) = Nothing, _
                                           Optional ByVal pAddAlwaysFlag As Boolean = False) Implements IAnalyzerManager.PrepareLocalAlarmList
@@ -367,13 +367,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Case AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR 'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
                         If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
+
+                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then addFlag = False
                 End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
-                Dim warmUpInProcess As Boolean = False
-                If (String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
-                    String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
-                    warmUpInProcess = True
-                End If
+                Dim warmUpInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
+                                      String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")
 
                 'AG 13/04/2012 - when warm up is in process check if the alarm must be generated or not
                 If warmUpInProcess AndAlso Not pAddAlwaysFlag Then
@@ -387,10 +387,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'AG 18/05/2012 - While shutdown instrument is inprocess only generate the alarms that affect the process
-                Dim sDownInProcess As Boolean = False
-                If (mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS") Then
-                    sDownInProcess = True
-                End If
+                Dim sDownInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString), "INPROCESS")
 
                 If sDownInProcess AndAlso Not pAddAlwaysFlag Then
                     addFlag = False 'By default no alarms generation
@@ -446,31 +443,33 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'AG 15/03/2012 - Special code for AUTOrecove FREEZE alarms - if error code appears add it, but if the warning level already exists then remove it
-                If pAlarmCode = AlarmEnumerates.Alarms.MAIN_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.REACT_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = AlarmEnumerates.Alarms.S_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) Then
-                        pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-                End If
-
+                Select Case pAlarmCode
+                    Case AlarmEnumerates.Alarms.MAIN_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.FRIDGE_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.REACT_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.S_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR)
+                            pAlarmStatusList.Add(False)
+                        End If
+                End Select
             Else
                 'ALARM SOLVED
                 '''''''''''''
@@ -620,7 +619,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddLocalActiveAlarmToList", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -664,7 +662,7 @@ Namespace Biosystems.Ax00.Core.Entities
             'Dim Utilities As New Utilities
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -690,7 +688,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -731,7 +729,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -772,7 +770,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -809,7 +807,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                    tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -844,7 +842,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                    tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -924,7 +922,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As New SqlConnection
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
@@ -950,7 +948,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = GetBottlePercentage(CInt(pHighContaminationContainer), False)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
+                                    myPercentage = FormatToSingle(ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -1025,7 +1023,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = GetBottlePercentage(CInt(pWashSolutionContainer), True)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
+                                    myPercentage = FormatToSingle(ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -1393,9 +1391,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         '((ISEAnalyzer.IsISESwitchedON And ISEAnalyzer.IsInitiatedOK) Or _
                         ' (Not ISEAnalyzer.IsISESwitchedON)) Then
 
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
 
 
                         If Not CheckIfProcessCanContinue() Then
@@ -1608,7 +1606,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = Utilities.FormatToSingle(myValue)
+                        myEmptyLevel = FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.WASHING_SOLUTION.ToString, _
@@ -1616,7 +1614,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = Utilities.FormatToSingle(myValue)
+                        myFullLevel = FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -1629,12 +1627,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_WASHSOLUTION)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_WASHSOLUTION)
 
-                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -1678,7 +1676,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = Utilities.FormatToSingle(myValue)
+                        myEmptyLevel = FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.HIGH_CONTAMINATION.ToString, _
@@ -1686,7 +1684,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = Utilities.FormatToSingle(myValue)
+                        myFullLevel = FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -1699,12 +1697,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
 
-                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -1753,7 +1751,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1764,7 +1762,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1776,7 +1774,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), True)
@@ -1802,7 +1800,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1813,7 +1811,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1825,7 +1823,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), True)
@@ -1850,7 +1848,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1861,7 +1859,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1873,7 +1871,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), True)
@@ -1898,7 +1896,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1909,7 +1907,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1921,7 +1919,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1), True)
@@ -1946,7 +1944,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1957,7 +1955,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -1969,7 +1967,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2), True)
@@ -2525,7 +2523,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If MinAdj <> -1 AndAlso MaxAdj <> -1 AndAlso MinAdj <> MaxAdj Then
                     ''Dim myUtil As New Utilities.
-                    myGlobal = Utilities.CalculatePercent(pCounts, MinAdj, MaxAdj, True)
+                    myGlobal = CalculatePercent(pCounts, MinAdj, MaxAdj, True)
                 Else
                     myGlobal.SetDatos = Nothing
                 End If
@@ -2726,24 +2724,24 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'AG 22/02/2012 - Change bottle confirmation process
-                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS" Then
+                If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS" Then
                     Dim askForStateFlag As Boolean = True
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process, "CLOSED")
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CHANGE_BOTTLES_Process, "CLOSED")
 
                     If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                         readyToSentInstruction = False
 
                     Else
                         'If change bottles confirmation success and there was an ABORT ws wash pending ... send it automatically
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "INPROCESS")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                        If mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "INPROCESS")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
                             askForStateFlag = False 'In this case is not necessary to ask for status, we sent the Wash instruction
 
                             'If change bottles confirmation success and there was an RECOVER ws wash pending ... send it automatically
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "INPROCESS")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "INPROCESS")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
                             askForStateFlag = False 'In this case is not necessary to ask for status, we sent the Wash instruction
 
                         Else 'for other processes activate action button but not send next instruction automatically
@@ -2754,7 +2752,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Finally Sw also ask for status
                     'Send a STATE instruction
                     If askForStateFlag Then
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True)
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
                     End If
 
                 End If
@@ -2766,43 +2764,43 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Some action button process required Wash instruction is bottle level OK before Sw sends it
-                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
+                    If mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "" Then
 
                         'AG 20/02/2012 - abort process
                         'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                                 If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                     readyToSentInstruction = False
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "PAUSED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
 
                                     'Else 'AG 28/02/2012 - when ABORT send the WASH instrucion
                                 Else
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "INPROCESS") 'AG 05/03/2012
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
 
                                     'Send a WASH instruction (Conditioning complete)
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
                                 End If
                             End If
                             'AG 20/02/2012
 
                             'AG 08/03/2012 - recover process
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
 
                             If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                 readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "PAUSED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
 
                                 'Else 'AG 28/02/2012 - when RECOVER finishes send the WASH instrucion only in standby
                             ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "INPROCESS") 'AG 05/03/2012
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
 
                                 'Send a WASH instruction (Conditioning complete)
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
                             End If
 
                         End If
@@ -3023,7 +3021,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -3129,7 +3127,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim returnData As Boolean = False
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
@@ -3299,7 +3297,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  AG 27/03/2012
         ''' Modified by XB 31/10/2014 - add ISE_TIMEOUT_ERR alarm - BA-1872
         ''' </remarks>
-        Private Function IgnoreAlarmWhileWarmUp(ByVal pAlarmID As AlarmEnumerates.Alarms) As Boolean
+        Private Function IgnoreAlarmWhileWarmUp(ByVal pAlarmID As Alarms) As Boolean
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
                 'AG 22/05/2012 - Note the ise alarms will be asked for when the Terminate button is activated

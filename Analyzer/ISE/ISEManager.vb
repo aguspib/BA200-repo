@@ -1565,7 +1565,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
@@ -1578,7 +1578,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
@@ -1670,7 +1670,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If ISEDallasPage00 IsNot Nothing Then 'SGM 13/06/2012
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibAVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibAVolumeSaved = FormatToSingle(CStr(myGlobal.SetDatos))
 
 
                             Dim myDallasCalibAVolume As Single
@@ -1692,7 +1692,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibBVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibBVolumeSaved = FormatToSingle(CStr(myGlobal.SetDatos))
 
                             Dim myDallasCalibBVolume As Single
 
@@ -2415,99 +2415,95 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Else
                     ' XB 30/09/2014 - BA-1872
 
-                    If MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
+                    If LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
 
                         'RESULT TIMEOUT
                         'MyClass.IsISECommsOk = False 'there are communications  ' XB 30/09/2014 - BA-1872
                         'error because of communucations error, timeout
-                        myGlobal = MyClass.AbortCurrentProcedureDueToException
+                        myGlobal = AbortCurrentProcedureDueToException()
                         Exit Try
 
-                    ElseIf MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ERC Then
+                    ElseIf LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ERC Then
 
                         'ISE ERROR
-                        MyClass.IsISECommsOk = True 'there are communications
+                        IsISECommsOk = True 'there are communications
 
                         'SGM 01/08/2012 - Set ISE as not initialized
-                        If MyClass.myAnalyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
-                            If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.R Or _
-                                MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
-                                MyClass.IsISEInitiatedOKAttr = False
-                                MyClass.IsCommErrorDetected = True
+                        If myAnalyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
+                            If LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.R Or _
+                                LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
+                                IsISEInitiatedOKAttr = False
+                                IsCommErrorDetected = True
                             End If
                         Else
-                            If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
-                                MyClass.IsISEInitiatedOKAttr = False
-                                MyClass.IsCommErrorDetected = True
+                            If LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
+                                IsISEInitiatedOKAttr = False
+                                IsCommErrorDetected = True
                             End If
                         End If
                         'end SGM 01/08/2012
 
-                        myGlobal = MyClass.ManageISEProcedureFinished(ISEProcedureResult.CancelError)
+                        myGlobal = ManageISEProcedureFinished(ISEProcedureResult.CancelError)
 
 
 
-                    ElseIf MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.SwError Then 'SGM 11/05/2012
+                    ElseIf LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.SwError Then 'SGM 11/05/2012
 
                         'SW ERROR
-                        MyClass.IsISECommsOk = True 'there are communications
+                        IsISECommsOk = True 'there are communications
                         'error because of software exception
-                        myGlobal = MyClass.AbortCurrentProcedureDueToException
+                        myGlobal = AbortCurrentProcedureDueToException()
                         Exit Try
 
 
                     Else
 
                         'update consumptions
-                        If MyClass.IsISEInitiatedOK Then
-                            If Not myGlobal.HasError Then myGlobal = MyClass.UpdateConsumptions()
+                        If IsISEInitiatedOK Then
+                            If Not myGlobal.HasError Then myGlobal = UpdateConsumptions()
 
                             ' XBC 17/07/2012 
-                            If MyClass.LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.SER OrElse _
-                               MyClass.LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.URN OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.CALB OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.BUBBLE_CAL OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.CLEAN OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.PURGEA OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.PURGEB OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.PRIME_CALA OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.PRIME_CALB OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.DSPA OrElse _
-                               MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.DSPB Then
+                            If LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.SER OrElse _
+                               LastISEResultAttr.ISEResultType = ISEResultTO.ISEResultTypes.URN OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.CALB OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.BUBBLE_CAL OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.CLEAN OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.PURGEA OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.PURGEB OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.PRIME_CALA OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.PRIME_CALB OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.DSPA OrElse _
+                               CurrentCommandTOAttr.ISECommandID = ISECommands.DSPB Then
                                 ' If there are perform any instruction which use liquides
 
-                                If Not MyClass.WorkSessionIsRunningAttr Then
+                                If Not WorkSessionIsRunningAttr Then
                                     ' Update date for the Last ISE operation
-                                    MyClass.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_DATE, DateTime.Now.ToString, True)
+                                    UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_DATE, DateTime.Now.ToString, True)
                                 Else
                                     ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
                                     'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "ISEManager.Manage", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                     ' Update date for the ISE test executed while running
-                                    MyClass.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
+                                    UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                                     ' Update date for the Last registered SIP cycles
-                                    MyClass.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_DATE, DateTime.Now.ToString, True)
+                                    UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_DATE, DateTime.Now.ToString, True)
                                 End If
 
                             End If
                             ' XBC 17/07/2012
 
-                            If Not myGlobal.HasError Then myGlobal = MyClass.CheckElectrodesCalibrationIsNeeded()
-                            If Not myGlobal.HasError Then myGlobal = MyClass.CheckPumpsCalibrationIsNeeded()
-                            If Not myGlobal.HasError Then myGlobal = MyClass.CheckCleanIsNeeded()
-
-                            'If Not myGlobal.HasError Then myGlobal = MyClass.ValidatePreparatiosAllowed()
+                            If Not myGlobal.HasError Then myGlobal = CheckElectrodesCalibrationIsNeeded()
+                            If Not myGlobal.HasError Then myGlobal = CheckPumpsCalibrationIsNeeded()
+                            If Not myGlobal.HasError Then myGlobal = CheckCleanIsNeeded()
 
                             If myGlobal.HasError Then
-                                myGlobal = MyClass.AbortCurrentProcedureDueToException
+                                myGlobal = AbortCurrentProcedureDueToException()
                                 Exit Try
                             End If
 
                         End If
 
                         'get data 
-                        Select Case MyClass.LastISEResult.ISEResultType
+                        Select Case LastISEResult.ISEResultType
                             Case ISEResultTO.ISEResultTypes.OK
                                 'TODO
 
@@ -2538,16 +2534,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                 '        MyClass.ISEDallasPage01 = MyClass.LastISEResult.DallasPage01Data
                                 '    End If
                             Case ISEResultTO.ISEResultTypes.DDT00
-                                If Not MyClass.LastISEResult.DallasSNData Is Nothing And _
-                                   Not MyClass.LastISEResult.DallasPage00Data Is Nothing Then
-                                    MyClass.IsCleanPackInstalled = False
-                                    MyClass.ISEDallasSN = MyClass.LastISEResult.DallasSNData 'SGM 05/06/2012
-                                    MyClass.ISEDallasPage00 = MyClass.LastISEResult.DallasPage00Data
+                                If Not LastISEResult.DallasSNData Is Nothing And _
+                                   Not LastISEResult.DallasPage00Data Is Nothing Then
+                                    IsCleanPackInstalled = False
+                                    ISEDallasSN = LastISEResult.DallasSNData 'SGM 05/06/2012
+                                    ISEDallasPage00 = LastISEResult.DallasPage00Data
                                 End If
 
                             Case ISEResultTO.ISEResultTypes.DDT01
-                                If Not MyClass.LastISEResult.DallasPage01Data Is Nothing Then
-                                    MyClass.ISEDallasPage01 = MyClass.LastISEResult.DallasPage01Data
+                                If Not LastISEResult.DallasPage01Data Is Nothing Then
+                                    ISEDallasPage01 = LastISEResult.DallasPage01Data
                                 End If
                                 ' XBC 21/01/2013
 
@@ -2560,14 +2556,14 @@ Namespace Biosystems.Ax00.Core.Entities
                         End Select
 
                         'in case that an ISE result has been received without requesting a Procedure we create a new one
-                        If MyClass.CurrentCommandTO Is Nothing Then
-                            Select Case MyClass.LastISEResult.ISEResultType
-                                Case ISEResultTO.ISEResultTypes.ERC : MyClass.CurrentProcedure = ISEProcedures.SingleCommand
-                                Case ISEResultTO.ISEResultTypes.SER : MyClass.CurrentProcedure = ISEProcedures.Test
-                                Case ISEResultTO.ISEResultTypes.URN : MyClass.CurrentProcedure = ISEProcedures.Test
-                                Case ISEResultTO.ISEResultTypes.CAL : MyClass.CurrentProcedure = ISEProcedures.CalibrateElectrodes
-                                Case ISEResultTO.ISEResultTypes.PMC : MyClass.CurrentProcedure = ISEProcedures.CalibratePumps
-                                Case ISEResultTO.ISEResultTypes.OK : MyClass.CurrentProcedure = ISEProcedures.SingleCommand
+                        If CurrentCommandTO Is Nothing Then
+                            Select Case LastISEResult.ISEResultType
+                                Case ISEResultTO.ISEResultTypes.ERC : CurrentProcedure = ISEProcedures.SingleCommand
+                                Case ISEResultTO.ISEResultTypes.SER : CurrentProcedure = ISEProcedures.Test
+                                Case ISEResultTO.ISEResultTypes.URN : CurrentProcedure = ISEProcedures.Test
+                                Case ISEResultTO.ISEResultTypes.CAL : CurrentProcedure = ISEProcedures.CalibrateElectrodes
+                                Case ISEResultTO.ISEResultTypes.PMC : CurrentProcedure = ISEProcedures.CalibratePumps
+                                Case ISEResultTO.ISEResultTypes.OK : CurrentProcedure = ISEProcedures.SingleCommand
 
                             End Select
 
@@ -2578,24 +2574,24 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                         'check if the current Procedure is finished and release an event if so
-                        myGlobal = MyClass.ManageISEProcedureFinished()
+                        myGlobal = ManageISEProcedureFinished()
 
                         'update Database data
                         If Not myGlobal.HasError Then
-                            myGlobal = MyClass.UpdateISEInformationTable()
+                            myGlobal = UpdateISEInformationTable()
                         End If
 
                         'update ISE ready
                         If Not myGlobal.HasError Then
-                            If MyClass.IsISEInitiatedOK Then
-                                myGlobal = MyClass.UpdateISEModuleReady()
+                            If IsISEInitiatedOK Then
+                                myGlobal = UpdateISEModuleReady()
                             End If
                         End If
 
                         'refresh monitor data
                         If Not myGlobal.HasError Then
-                            If MyClass.IsISEInitiatedOK Then
-                                myGlobal = MyClass.RefreshMonitorDataTO
+                            If IsISEInitiatedOK Then
+                                myGlobal = RefreshMonitorDataTO()
                             End If
                         End If
 
@@ -2609,9 +2605,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                MyClass.AbortCurrentProcedureDueToException()
+                AbortCurrentProcedureDueToException()
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ManageLastISEResult", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -2641,23 +2636,23 @@ Namespace Biosystems.Ax00.Core.Entities
                 FirmwareErrDetectedAttr = False     ' XB 19/11/2014 - BA-1872
 
                 'catch last command of the Procedure
-                Select Case MyClass.CurrentProcedure
+                Select Case CurrentProcedure
                     Case ISEProcedures.Test
-                        Select Case MyClass.LastISEResult.ISEResultType
-                            Case ISEResultTO.ISEResultTypes.SER : isFinished = True : MyClass.TestsCountSinceLastClean += 1
-                            Case ISEResultTO.ISEResultTypes.URN : isFinished = True : MyClass.TestsCountSinceLastClean += 1
+                        Select Case LastISEResult.ISEResultType
+                            Case ISEResultTO.ISEResultTypes.SER : isFinished = True : TestsCountSinceLastClean += 1
+                            Case ISEResultTO.ISEResultTypes.URN : isFinished = True : TestsCountSinceLastClean += 1
                         End Select
 
                     Case ISEProcedures.SingleCommand
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK)
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK)
 
-                        If MyClass.CurrentCommandTO.ISECommandID = ISECommands.CLEAN Then
-                            MyClass.LastCleanDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                            MyClass.LastCleanError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
+                        If CurrentCommandTO.ISECommandID = ISECommands.CLEAN Then
+                            LastCleanDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                            LastCleanError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
                             If isFinished Then
-                                MyClass.IsCleanNeeded = False
-                                MyClass.TestsCountSinceLastClean = 0
-                                MyClass.IsCalibrationNeeded = True  ' XBC 26/06/2012 - Self-Maintenace
+                                IsCleanNeeded = False
+                                TestsCountSinceLastClean = 0
+                                IsCalibrationNeeded = True  ' XBC 26/06/2012 - Self-Maintenace
 
                                 'JB 30/07/2012 - Insert Cleaning to ISE Historic
                                 If myISECalibHistory IsNot Nothing Then
@@ -2667,7 +2662,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'JB 30/07/2012
                             ElseIf LastISEResult.IsCancelError Then
                                 LastCleanError = LastISEResult.ReceivedResults
-                                MyClass.IsCleanNeeded = True    ' JBL 04/09/2012 - Error: Clean neeeded
+                                IsCleanNeeded = True    ' JBL 04/09/2012 - Error: Clean neeeded
                                 If myISECalibHistory IsNot Nothing Then
                                     'JB 20/09/2012 - Added LiEnabled to history
                                     myISECalibHistory.AddCleaning(Nothing, AnalyzerIDAttr, IsLiEnabledByUser, LastCleanDateAttr, LastCleanErrorAttr)
@@ -2677,13 +2672,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     Case ISEProcedures.SingleReadCommand
-                        Select Case MyClass.CurrentCommandTO.ISECommandID
+                        Select Case CurrentCommandTO.ISECommandID
                             Case ISECommands.CALB
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
-                                MyClass.LastElectrodesCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                                MyClass.LastElectrodesCalibrationResult1 = ""           ' JBL 05/09/2012 - Correction : Always reset last results
-                                MyClass.LastElectrodesCalibrationResult2 = ""           ' JBL 05/09/2012 - Correction : Always reset last results
-                                MyClass.LastElectrodesCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                                LastElectrodesCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                                LastElectrodesCalibrationResult1 = ""           ' JBL 05/09/2012 - Correction : Always reset last results
+                                LastElectrodesCalibrationResult2 = ""           ' JBL 05/09/2012 - Correction : Always reset last results
+                                LastElectrodesCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
                                 If isFinished Then
                                     ToValidateCalB = True
                                 ElseIf pForcedResult = ISEProcedureResult.CancelError Then
@@ -2698,7 +2693,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                     ' XB 30/04/2014 - Task #1629
-                                    MyClass.IsCalibrationNeeded = True
+                                    IsCalibrationNeeded = True
 
                                     ' XB 30/04/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -2715,15 +2710,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                             Case ISECommands.LAST_SLOPES
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
 
                             Case ISECommands.PUMP_CAL, ISECommands.SHOW_PUMP_CAL
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
 
-                                If MyClass.CurrentCommandTO.ISECommandID = ISECommands.PUMP_CAL Then
-                                    MyClass.LastPumpsCalibrationDate = DateTime.Now     ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                                    MyClass.LastPumpsCalibrationResult = ""             ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
-                                    MyClass.LastPumpsCalibrationError = ""              ' JBL 07/09/2012 - Correction : Always reset the last error
+                                If CurrentCommandTO.ISECommandID = ISECommands.PUMP_CAL Then
+                                    LastPumpsCalibrationDate = DateTime.Now     ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                                    LastPumpsCalibrationResult = ""             ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
+                                    LastPumpsCalibrationError = ""              ' JBL 07/09/2012 - Correction : Always reset the last error
                                 End If
 
                                 If isFinished Then
@@ -2739,7 +2734,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                     ' XB 30/04/2014 - Task #1629
-                                    MyClass.IsPumpCalibrationNeeded = True
+                                    IsPumpCalibrationNeeded = True
 
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -2755,15 +2750,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                     ' XB 19/11/2014 - BA-1872
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
 
                             Case ISECommands.BUBBLE_CAL, ISECommands.SHOW_BUBBLE_CAL
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC)
 
-                                If MyClass.CurrentCommandTO.ISECommandID = ISECommands.BUBBLE_CAL Then
-                                    MyClass.LastBubbleCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                                    MyClass.LastBubbleCalibrationResult = ""            ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
-                                    MyClass.LastBubbleCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
+                                If CurrentCommandTO.ISECommandID = ISECommands.BUBBLE_CAL Then
+                                    LastBubbleCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                                    LastBubbleCalibrationResult = ""            ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
+                                    LastBubbleCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset the last error
                                 End If
 
                                 If isFinished Then
@@ -2779,7 +2774,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                     ' XB 30/04/2014 - Task #1629
-                                    MyClass.IsBubbleCalibrationNeeded = True
+                                    IsBubbleCalibrationNeeded = True
 
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -2795,7 +2790,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                             Case ISECommands.READ_mV
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)
 
                                 ' XB 20/05/2014 - Task #1614
                                 If Not isFinished Then
@@ -2814,7 +2809,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XB 20/05/2014 - Task #1614
 
                             Case ISECommands.READ_PAGE_0_DALLAS
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT00)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT00)
 
                                 ' XB 20/05/2014 - Task #1614
                                 If Not isFinished Then
@@ -2832,7 +2827,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XB 20/05/2014 - Task #1614
 
                             Case ISECommands.READ_PAGE_1_DALLAS
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01)
 
                                 ' XB 20/05/2014 - Task #1614
                                 If Not isFinished Then
@@ -2849,11 +2844,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 ' XB 20/05/2014 - Task #1614
 
                             Case ISECommands.VERSION_CHECKSUM
-                                isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ISV)
+                                isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ISV)
                         End Select
 
                     Case ISEProcedures.GeneralCheckings
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And ((MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And _
+                                      ((LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
                         'If Not MyClass.IsLongTermDeactivation Then
                         '    isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And ((MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
                         'Else
@@ -2862,29 +2858,29 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If isFinished Then
 
-                            If Not MyClass.IsLongTermDeactivation Then
-                                If Not MyClass.IsCleanPackInstalled Then
-                                    MyClass.CheckReagentsPackReady()
-                                    MyClass.CheckReagentsPackVolumeEnough()
-                                    MyClass.InitializeReagentsConsumptions()
+                            If Not IsLongTermDeactivation Then
+                                If Not IsCleanPackInstalled Then
+                                    CheckReagentsPackReady()
+                                    CheckReagentsPackVolumeEnough()
+                                    InitializeReagentsConsumptions()
                                 End If
 
-                                MyClass.CheckElectrodesMounted()
-                                MyClass.CheckElectrodesReady()
+                                CheckElectrodesMounted()
+                                CheckElectrodesReady()
 
-                                MyClass.IsISEInitializationDoneAttr = True
-                                MyClass.IsISEInitiatedOKAttr = True
-                                MyClass.IsISEOnceInitiatedOKAttr = True
-                                MyClass.IsPendingToInitializeAfterActivation = False
+                                IsISEInitializationDoneAttr = True
+                                IsISEInitiatedOKAttr = True
+                                IsISEOnceInitiatedOKAttr = True
+                                IsPendingToInitializeAfterActivation = False
                                 RaiseEvent ISEConnectionFinished(True)
 
                                 ' XBC 19/03/2012
-                                If Not myGlobal.HasError Then myGlobal = MyClass.UpdateConsumptions()
+                                If Not myGlobal.HasError Then myGlobal = UpdateConsumptions()
 
-                                If Not myGlobal.HasError Then myGlobal = MyClass.CheckElectrodesCalibrationIsNeeded()
-                                If Not myGlobal.HasError Then myGlobal = MyClass.CheckPumpsCalibrationIsNeeded()
-                                If Not myGlobal.HasError Then myGlobal = MyClass.CheckBubbleCalibrationIsNeeded
-                                If Not myGlobal.HasError Then myGlobal = MyClass.CheckCleanIsNeeded()
+                                If Not myGlobal.HasError Then myGlobal = CheckElectrodesCalibrationIsNeeded()
+                                If Not myGlobal.HasError Then myGlobal = CheckPumpsCalibrationIsNeeded()
+                                If Not myGlobal.HasError Then myGlobal = CheckBubbleCalibrationIsNeeded()
+                                If Not myGlobal.HasError Then myGlobal = CheckCleanIsNeeded()
 
                                 'If Not myGlobal.HasError Then myGlobal = MyClass.ValidatePreparatiosAllowed()
                                 ' XBC 19/03/2012
@@ -2894,10 +2890,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             Else
 
-                                MyClass.IsISEInitializationDoneAttr = True
-                                MyClass.IsISEOnceInitiatedOKAttr = True
-                                MyClass.IsISEInitiatedOKAttr = True
-                                MyClass.IsPendingToInitializeAfterActivation = False
+                                IsISEInitializationDoneAttr = True
+                                IsISEOnceInitiatedOKAttr = True
+                                IsISEInitiatedOKAttr = True
+                                IsPendingToInitializeAfterActivation = False
                                 RaiseEvent ISEConnectionFinished(True)
 
                             End If
@@ -2905,12 +2901,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             MyClass.RefreshMonitorDataTO() 'SGM 06/06/2012
 
                         ElseIf pForcedResult = ISEProcedureResult.CancelError Or pForcedResult = ISEProcedureResult.Exception Then
-                            MyClass.IsISEInitializationDoneAttr = True
-                            MyClass.IsISEInitiatedOKAttr = False
+                            IsISEInitializationDoneAttr = True
+                            IsISEInitiatedOKAttr = False
                             RaiseEvent ISEConnectionFinished(False)
 
                             ' XB 20/05/2014 - Task #1614
-                        ElseIf MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                        ElseIf CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
                             ' XB 19/11/2014 - BA-1872
                             FirmwareErrDetectedAttr = True
@@ -2925,27 +2921,29 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                     Case ISEProcedures.ActivateModule
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And ((MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And _
+                                      ((LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
                         If isFinished Then
 
-                            MyClass.CheckReagentsPackReady()
-                            MyClass.CheckReagentsPackVolumeEnough()
+                            CheckReagentsPackReady()
+                            CheckReagentsPackVolumeEnough()
 
-                            MyClass.CheckElectrodesMounted()
-                            MyClass.CheckElectrodesReady()
+                            CheckElectrodesMounted()
+                            CheckElectrodesReady()
 
-                            MyClass.IsCleanPackInstalled = False
+                            IsCleanPackInstalled = False
 
-                            MyClass.IsISEInitializationDoneAttr = True
+                            IsISEInitializationDoneAttr = True
 
                         End If
 
                     Case ISEProcedures.ActivateReagentsPack
                         'SG 16/01/2012 - Bug #1108
-                        isFinished = ((MyClass.ReagentsPackInstallationDate <> Nothing) And (MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
+                        isFinished = ((ReagentsPackInstallationDate <> Nothing) And _
+                                      (CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
                         If isFinished Then
-                            MyClass.CheckReagentsPackReady()
-                            MyClass.CheckReagentsPackVolumeEnough()
+                            CheckReagentsPackReady()
+                            CheckReagentsPackVolumeEnough()
                         End If
                         'end SG 16/01/2012
 
@@ -2957,21 +2955,22 @@ Namespace Biosystems.Ax00.Core.Entities
                         'End If
 
                     Case ISEProcedures.CheckReagentsPack
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
                         If isFinished Then
-                            MyClass.CheckReagentsPackReady()
-                            MyClass.CheckReagentsPackVolumeEnough()
+                            CheckReagentsPackReady()
+                            CheckReagentsPackVolumeEnough()
                         End If
 
                     Case ISEProcedures.ActivateElectrodes
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And ((MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.READ_mV) And _
+                                      ((LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)))
                         If isFinished Then
                             'SGM 21/09/2012 - force wrong result in case of not mounted or installed
                             Dim resultOk As Boolean = False
-                            myGlobal = MyClass.CheckElectrodesMounted()
+                            myGlobal = CheckElectrodesMounted()
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 resultOk = CBool(myGlobal.SetDatos)
-                                myGlobal = MyClass.CheckElectrodesReady()
+                                myGlobal = CheckElectrodesReady()
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     resultOk = CBool(myGlobal.SetDatos)
                                 End If
@@ -2995,11 +2994,11 @@ Namespace Biosystems.Ax00.Core.Entities
                         ' XB 20/05/2014 - Task #1614
 
                     Case ISEProcedures.CalibrateElectrodes
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
-                        MyClass.LastElectrodesCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                        MyClass.LastElectrodesCalibrationResult1 = ""           ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
-                        MyClass.LastElectrodesCalibrationResult2 = ""           ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
-                        MyClass.LastElectrodesCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset last error
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                        LastElectrodesCalibrationDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                        LastElectrodesCalibrationResult1 = ""           ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
+                        LastElectrodesCalibrationResult2 = ""           ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
+                        LastElectrodesCalibrationError = ""             ' JBL 07/09/2012 - Correction : Always reset last error
                         If isFinished Then
                             ToValidateCalB = True
                         ElseIf pForcedResult = ISEProcedureResult.CancelError Then
@@ -3034,10 +3033,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                     Case ISEProcedures.CalibratePumps
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
-                        MyClass.LastPumpsCalibrationDate = DateTime.Now     ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                        MyClass.LastPumpsCalibrationResult = ""             ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
-                        MyClass.LastPumpsCalibrationError = ""              ' JBL 07/09/2012 - Correction : Always reset last error
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
+                        LastPumpsCalibrationDate = DateTime.Now     ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                        LastPumpsCalibrationResult = ""             ' JBL 05/09/2012 - Correction : Always reset last result (error or not)
+                        LastPumpsCalibrationError = ""              ' JBL 07/09/2012 - Correction : Always reset last error
                         If isFinished Then
                             ToValidatePumpCal = True
                         ElseIf pForcedResult = ISEProcedureResult.CancelError Then
@@ -3051,7 +3050,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             ' XB 30/04/2014 - Task #1629
-                            MyClass.IsPumpCalibrationNeeded = True
+                            IsPumpCalibrationNeeded = True
 
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -3068,10 +3067,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         ' XBC 27/09/2012
                     Case ISEProcedures.CalibrateBubbles
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC)
-                        MyClass.LastBubbleCalibrationDate = DateTime.Now
-                        MyClass.LastBubbleCalibrationResult = ""
-                        MyClass.LastBubbleCalibrationError = ""
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC)
+                        LastBubbleCalibrationDate = DateTime.Now
+                        LastBubbleCalibrationResult = ""
+                        LastBubbleCalibrationError = ""
                         If isFinished Then
                             ToValidateBubbleCal = True
                         ElseIf pForcedResult = ISEProcedureResult.CancelError Then
@@ -3084,7 +3083,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             ' XB 30/04/2014 - Task #1629
-                            MyClass.IsBubbleCalibrationNeeded = True
+                            IsBubbleCalibrationNeeded = True
 
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -3100,15 +3099,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Case ISEProcedures.Clean
                         'isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.CALB) And ((MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV))) ''PDT to optimization: After Clean -> calB
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.CLEAN) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
-                        MyClass.LastCleanDate = DateTime.Now                ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                        MyClass.LastCleanError = ""                         ' JBL 07/09/2012 - Correction : Always reset last error
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.CLEAN) And _
+                                      (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
+                        LastCleanDate = DateTime.Now                ' XBC 04/09/2012 - Correction : Always save date (error or not)
+                        LastCleanError = ""                         ' JBL 07/09/2012 - Correction : Always reset last error
                         If isFinished Then
-                            MyClass.IsCleanNeeded = False
+                            IsCleanNeeded = False
                             'MyClass.LastCleanDate = DateTime.Now    ' XBC 04/09/2012 - Correction : Always save date (error or not)
-                            MyClass.TestsCountSinceLastClean = 0
+                            TestsCountSinceLastClean = 0
                             'ToValidateCalB = True
-                            MyClass.IsCalibrationNeeded = True  ' XBC 26/06/2012 - Self-Maintenace
+                            IsCalibrationNeeded = True  ' XBC 26/06/2012 - Self-Maintenace
                         End If
 
                         'JB 02/08/2012 - Set the Error
@@ -3125,12 +3125,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         'JB 30/07/2012
 
                     Case ISEProcedures.MaintenanceExit
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
 
                     Case ISEProcedures.CheckCleanPackInstalled
-                        isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
+                        isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                         If isFinished Then
-                            MyClass.IsCleanPackInstalled = True
+                            IsCleanPackInstalled = True
                         End If
 
                         ' XBC 04/04/2012
@@ -3151,47 +3151,43 @@ Namespace Biosystems.Ax00.Core.Entities
                         '    End If
 
                     Case ISEProcedures.WriteConsumption
-                        If MyClass.IsCalBUpdateRequiredAttr Then
-                            isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
+                        If IsCalBUpdateRequiredAttr Then
+                            isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                             If isFinished Then
-                                If MyClass.IsCalBUpdateRequiredAttr Then
-                                    MyClass.IsCalBUpdateRequiredAttr = False
+                                If IsCalBUpdateRequiredAttr Then
+                                    IsCalBUpdateRequiredAttr = False
                                     ' update counter Cal B
-                                    MyClass.CountConsumptionToSaveDallasData_CalB -= MyClass.MinConsumptionVolToSaveDallasData_CalB
+                                    CountConsumptionToSaveDallasData_CalB -= MinConsumptionVolToSaveDallasData_CalB
                                 End If
 
-                                If MyClass.IsCalAUpdateRequiredAttr Then
-                                    MyClass.IsCalAUpdateRequiredAttr = False
+                                If IsCalAUpdateRequiredAttr Then
+                                    IsCalAUpdateRequiredAttr = False
                                     ' update counter Cal A
-                                    MyClass.CountConsumptionToSaveDallasData_CalA -= MyClass.MinConsumptionVolToSaveDallasData_CalA
+                                    CountConsumptionToSaveDallasData_CalA -= MinConsumptionVolToSaveDallasData_CalA
                                 End If
                             End If
                         Else
-                            isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
+                            isFinished = ((CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION) And (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                             If isFinished Then
-                                If MyClass.IsCalAUpdateRequiredAttr Then
-                                    MyClass.IsCalAUpdateRequiredAttr = False
+                                If IsCalAUpdateRequiredAttr Then
+                                    IsCalAUpdateRequiredAttr = False
                                     ' update counter Cal A
-                                    MyClass.CountConsumptionToSaveDallasData_CalA -= MyClass.MinConsumptionVolToSaveDallasData_CalA
+                                    CountConsumptionToSaveDallasData_CalA -= MinConsumptionVolToSaveDallasData_CalA
                                 End If
                             End If
                         End If
 
                     Case ISEProcedures.PrimeAndCalibration 'SGM 11/06/2012
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
                         If isFinished Then
                             ToValidateCalB = True
                         End If
 
                     Case ISEProcedures.PrimeX2AndCalibration 'SGM 11/06/2012
-                        isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                        isFinished = (LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
                         If isFinished Then
                             ToValidateCalB = True
                         End If
-
-                    Case Else
-                        'Debug.Print("Caso NONE !")
-                        ' XBC 04/04/2012
 
                 End Select
 
@@ -3784,31 +3780,31 @@ Namespace Biosystems.Ax00.Core.Entities
                     Return myGlobal 'not to show anything in case of not installed
                 End If
 
-                Dim myISEUtilAlarms As New List(Of AlarmEnumerates.Alarms)
+                Dim myISEUtilAlarms As New List(Of Alarms)
 
                 If myAlarms(IseAlarms.LongTermDeactivated) Or MyClass.IsLongTermDeactivation Then
-                    myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                    If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                    myISEUtilAlarms.Add(Alarms.ISE_LONG_DEACT_ERR)
+                    If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(Alarms.ISE_CONNECT_PDT_ERR)
                 Else
                     If Not IsISESwitchON Then
-                        myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
+                        myISEUtilAlarms.Add(Alarms.ISE_OFF_ERR)
                     Else
                         If myAlarms(IseAlarms.CleanPack_Installed) Then
-                            If myAlarms(IseAlarms.CleanPack_Installed) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                            If myAlarms(IseAlarms.CleanPack_Wrong) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR)
+                            If myAlarms(IseAlarms.CleanPack_Installed) Then myISEUtilAlarms.Add(Alarms.ISE_CP_INSTALL_WARN)
+                            If myAlarms(IseAlarms.CleanPack_Wrong) Then myISEUtilAlarms.Add(Alarms.ISE_CP_WRONG_ERR)
                         Else
-                            If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
-                            If myAlarms(IseAlarms.ReagentsPack_Invalid) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                            If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                            If myAlarms(IseAlarms.ReagentsPack_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                            If myAlarms(IseAlarms.ReagentsPack_Depleted) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
+                            If Not IsISEInitiatedOK Then myISEUtilAlarms.Add(Alarms.ISE_CONNECT_PDT_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_Invalid) Then myISEUtilAlarms.Add(Alarms.ISE_RP_INVALID_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then myISEUtilAlarms.Add(Alarms.ISE_RP_NO_INST_ERR)
+                            If myAlarms(IseAlarms.ReagentsPack_Expired) Then myISEUtilAlarms.Add(Alarms.ISE_RP_EXPIRED_WARN)
+                            If myAlarms(IseAlarms.ReagentsPack_Depleted) Then myISEUtilAlarms.Add(Alarms.ISE_RP_DEPLETED_ERR)
 
-                            If myAlarms(IseAlarms.Electrodes_Wrong) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                            If myAlarms(IseAlarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                            If myAlarms(IseAlarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN)
+                            If myAlarms(IseAlarms.Electrodes_Wrong) Then myISEUtilAlarms.Add(Alarms.ISE_ELEC_WRONG_ERR)
+                            If myAlarms(IseAlarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(Alarms.ISE_ELEC_CONS_WARN)
+                            If myAlarms(IseAlarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(Alarms.ISE_ELEC_DATE_WARN)
 
                             ' XB 04/11/2014 - BA-1872
-                            If myAlarms(IseAlarms.Timeout) Then myISEUtilAlarms.Add(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                            If myAlarms(IseAlarms.Timeout) Then myISEUtilAlarms.Add(Alarms.ISE_TIMEOUT_ERR)
 
                             pPendingCalibrations = New List(Of MaintenanceOperations)
                             If IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
@@ -5211,7 +5207,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'X = ([ID4][ID3][ID2][ID1]) 4 Bytes
                 Dim strX As String = mySerialID.Substring(6, 8)
-                myGlobal = Utilities.ConvertHexToUInt32(strX)
+                myGlobal = ConvertHexToUInt32(strX)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     Dim X As UInt32 = Convert.ToUInt32(myGlobal.SetDatos)
 
@@ -5220,7 +5216,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'new way for power to 2 SGM 31/08/2012
                     Dim X2 As UInt64
-                    myGlobal = Utilities.PowUint64To2(X)
+                    myGlobal = PowUint64To2(X)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         X2 = Convert.ToUInt64(myGlobal.SetDatos)
                         'X2 = Convert.ToUInt64((Convert.ToUInt64(X)) * (Convert.ToUInt64(X)))
@@ -5230,7 +5226,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim Low As UInt32 = CType((X2 And LMask), UInt32)
 
                         Dim strHigh As String = ""
-                        myGlobal = Utilities.ConvertUint32ToHex(High)
+                        myGlobal = ConvertUint32ToHex(High)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strHigh = CStr(myGlobal.SetDatos)
 
@@ -5247,7 +5243,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         Dim strLow As String = ""
-                        myGlobal = Utilities.ConvertUint32ToHex(Low)
+                        myGlobal = ConvertUint32ToHex(Low)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strLow = CStr(myGlobal.SetDatos)
 
@@ -5273,7 +5269,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             For c As Integer = 1 To difTo8 Step 1
                                 strHighLow = "0" & strHighLow
                             Next
-                            myGlobal = Utilities.ConvertHexToBinaryString(strHighLow)
+                            myGlobal = ConvertHexToBinaryString(strHighLow)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 Dim myBinary As String = CStr(myGlobal.SetDatos)
                                 If myBinary.Length = 32 Then
@@ -5286,10 +5282,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Y = 0x[MSB][LSB]
                                     Dim strMSBLSB As String = strbMSB & strbLSB
-                                    myGlobal = Utilities.ConvertBinaryStringToDecimal(strMSBLSB)
+                                    myGlobal = ConvertBinaryStringToDecimal(strMSBLSB)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         Dim intY As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
-                                        myGlobal = Utilities.ConvertDecimalToHex(Convert.ToInt64(intY))
+                                        myGlobal = ConvertDecimalToHex(Convert.ToInt64(intY))
                                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
                                             'Security Key Validation:
@@ -6604,20 +6600,20 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function SendISECommand() As GlobalDataTO Implements IISEManager.SendISECommand
             Dim myGlobal As New GlobalDataTO
             Try
-                If MyClass.CurrentCommandTO IsNot Nothing Then
-                    MyClass.CurrentCommandTO.SentDatetime = DateTime.Now
+                If CurrentCommandTO IsNot Nothing Then
+                    CurrentCommandTO.SentDatetime = DateTime.Now
 
-                    If MyClass.CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or _
-                        MyClass.CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
+                    If CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or _
+                        CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
                         ManageISEProcedureFinished(ISEProcedureResult.OK)
                     Else
                         ' XB 23/10/2013
                         ' If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                        If MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Or _
-                           (MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And MyClass.myAnalyzer.AllowScanInRunning) Then
+                        If myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Or _
+                           (myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And myAnalyzer.AllowScanInRunning) Then
                             ' XB 23/10/2013
 
-                            myGlobal = myAnalyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
+                            myGlobal = myAnalyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, CurrentCommandTO)
                             If Not myGlobal.HasError Then
 
                                 ' XBC 05/09/2012 - Start Timeout must emplaced inside ManageAnalyzer
@@ -6638,7 +6634,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SendISECommand", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -7213,7 +7208,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC 26/03/2012
         ''' Modified by XB 04/11/2014 - Add ISE Timeout Alarm - BA-1872
         ''' </remarks>
-        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of AlarmEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEManager.CheckAlarms
+        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEManager.CheckAlarms
             Dim resultData As New GlobalDataTO
             Try
                 Dim treat As Boolean = True
@@ -7234,14 +7229,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
-                Dim alarmID As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
+                Dim alarmID As Alarms = Alarms.NONE
                 Dim alarmStatus As Boolean = False
 
                 If treat Then
 
                     ' Ise module is deativated by longterm
                     If IsLongTermDeactivation Then
-                        alarmID = AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR
+                        alarmID = Alarms.ISE_LONG_DEACT_ERR
                         alarmStatus = True
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
@@ -7254,68 +7249,68 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'ReagentsPack_Invalid
                         myAlarms(IseAlarms.ReagentsPack_Invalid) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
+                        alarmID = Alarms.ISE_RP_INVALID_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_Depleted
                         myAlarms(IseAlarms.ReagentsPack_Depleted) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                        alarmID = Alarms.ISE_RP_DEPLETED_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_Expired
                         myAlarms(IseAlarms.ReagentsPack_Expired) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                        alarmID = Alarms.ISE_RP_EXPIRED_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Wrong
                         myAlarms(IseAlarms.Electrodes_Wrong) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                        alarmID = Alarms.ISE_ELEC_WRONG_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Cons_Expired
                         myAlarms(IseAlarms.Electrodes_Cons_Expired) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                        alarmID = Alarms.ISE_ELEC_CONS_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'Electrodes_Date_Expired
                         myAlarms(IseAlarms.Electrodes_Date_Expired) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                        alarmID = Alarms.ISE_ELEC_DATE_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'CleanPack_Installed
                         myAlarms(IseAlarms.CleanPack_Installed) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                        alarmID = Alarms.ISE_CP_INSTALL_WARN
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'CleanPack_Wrong
                         myAlarms(IseAlarms.CleanPack_Wrong) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
+                        alarmID = Alarms.ISE_CP_WRONG_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'ReagentsPack_DateInstall
                         myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                        alarmID = Alarms.ISE_RP_NO_INST_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
                         'switch off
                         myAlarms(IseAlarms.Switch_Off) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_OFF_ERR
+                        alarmID = Alarms.ISE_OFF_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
                         'SGM 14/06/2012
 
                         'Timeout    XB 04/11/2014 - BA-1872
                         myAlarms(IseAlarms.Timeout) = False
-                        alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
+                        alarmID = Alarms.ISE_TIMEOUT_ERR
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
 
@@ -7323,7 +7318,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myAlarms(IseAlarms.LongTermDeactivated) Then
                             myAlarms(IseAlarms.LongTermDeactivated) = False
                             ' solved
-                            alarmID = AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR
+                            alarmID = Alarms.ISE_LONG_DEACT_ERR
                             alarmStatus = False
                             pAlarmList.Add(alarmID)
                             pAlarmStatusList.Add(alarmStatus)
@@ -7364,7 +7359,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         ' Reagents Pack valid
                                         If Not MyClass.HasBiosystemsCode Then
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                            alarmID = Alarms.ISE_RP_INVALID_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7372,7 +7367,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             myAlarms(IseAlarms.ReagentsPack_Invalid) = True
 
                                         Else
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                            alarmID = Alarms.ISE_RP_NO_INST_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7387,7 +7382,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then
                                         myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
                                         ' solved
-                                        alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                        alarmID = Alarms.ISE_RP_NO_INST_ERR
                                         alarmStatus = False
                                         pAlarmList.Add(alarmID)
                                         pAlarmStatusList.Add(alarmStatus)
@@ -7407,7 +7402,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 MyClass.ISEDallasPage00 IsNot Nothing And _
                                                 MyClass.ISEDallasPage01 IsNot Nothing Then
 
-                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                                alarmID = Alarms.ISE_RP_INVALID_ERR
                                                 alarmStatus = True
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
@@ -7416,7 +7411,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
 
                                         ElseIf MyClass.IsISEInitiatedOK And MyClass.ReagentsPackInstallationDate = Nothing Then
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                            alarmID = Alarms.ISE_RP_NO_INST_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7424,7 +7419,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             myAlarms(IseAlarms.ReagentsPack_DateInstall) = True
 
                                         ElseIf MyClass.IsCleanPackInstalled Then
-                                            alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                            alarmID = Alarms.ISE_CP_INSTALL_WARN
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7438,7 +7433,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If myAlarms(IseAlarms.ReagentsPack_Invalid) Then
                                             myAlarms(IseAlarms.ReagentsPack_Invalid) = False
                                             ' solved
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                            alarmID = Alarms.ISE_RP_INVALID_ERR
                                             alarmStatus = False
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7447,7 +7442,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If myAlarms(IseAlarms.CleanPack_Installed) Then
                                             myAlarms(IseAlarms.CleanPack_Installed) = False
                                             ' solved
-                                            alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                            alarmID = Alarms.ISE_CP_INSTALL_WARN
                                             alarmStatus = False
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7459,7 +7454,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If Not MyClass.MonitorDataTO.RP_IsEnoughVolA Or _
                                            Not MyClass.MonitorDataTO.RP_IsEnoughVolB Then
 
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                            alarmID = Alarms.ISE_RP_DEPLETED_ERR
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7469,7 +7464,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             If myAlarms(IseAlarms.ReagentsPack_Depleted) Then
                                                 myAlarms(IseAlarms.ReagentsPack_Depleted) = False
                                                 ' solved
-                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                                alarmID = Alarms.ISE_RP_DEPLETED_ERR
                                                 alarmStatus = False
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
@@ -7479,7 +7474,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ' Ise Reagents Pack Expired by date
                                         If MyClass.MonitorDataTO.RP_IsExpired Then
 
-                                            alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                            alarmID = Alarms.ISE_RP_EXPIRED_WARN
                                             alarmStatus = True
                                             pAlarmList.Add(alarmID)
                                             pAlarmStatusList.Add(alarmStatus)
@@ -7489,7 +7484,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             If myAlarms(IseAlarms.ReagentsPack_Expired) Then
                                                 myAlarms(IseAlarms.ReagentsPack_Expired) = False
                                                 ' solved
-                                                alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                                alarmID = Alarms.ISE_RP_EXPIRED_WARN
                                                 alarmStatus = False
                                                 pAlarmList.Add(alarmID)
                                                 pAlarmStatusList.Add(alarmStatus)
@@ -7502,7 +7497,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.ReagentsPack_Invalid) Then
                                     myAlarms(IseAlarms.ReagentsPack_Invalid) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR
+                                    alarmID = Alarms.ISE_RP_INVALID_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7510,7 +7505,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.ReagentsPack_Depleted) Then
                                     myAlarms(IseAlarms.ReagentsPack_Depleted) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_DEPLETED_ERR
+                                    alarmID = Alarms.ISE_RP_DEPLETED_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7518,7 +7513,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.ReagentsPack_Expired) Then
                                     myAlarms(IseAlarms.ReagentsPack_Expired) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN
+                                    alarmID = Alarms.ISE_RP_EXPIRED_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7526,7 +7521,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.ReagentsPack_DateInstall) Then
                                     myAlarms(IseAlarms.ReagentsPack_DateInstall) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR
+                                    alarmID = Alarms.ISE_RP_NO_INST_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7537,7 +7532,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Electrodes is wrong installed
                             If Not MyClass.IsElectrodesReady Then
 
-                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                                alarmID = Alarms.ISE_ELEC_WRONG_ERR
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
@@ -7547,7 +7542,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.Electrodes_Wrong) Then
                                     myAlarms(IseAlarms.Electrodes_Wrong) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR
+                                    alarmID = Alarms.ISE_ELEC_WRONG_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7559,7 +7554,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Clean Pack installed
                             If MyClass.IsCleanPackInstalled Then
 
-                                alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                alarmID = Alarms.ISE_CP_INSTALL_WARN
                                 alarmStatus = Not MyClass.IsLongTermDeactivation 'True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
@@ -7569,7 +7564,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.CleanPack_Wrong) Then
                                     myAlarms(IseAlarms.CleanPack_Wrong) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
+                                    alarmID = Alarms.ISE_CP_WRONG_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7578,7 +7573,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.CleanPack_Installed) Then
                                     myAlarms(IseAlarms.CleanPack_Installed) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN
+                                    alarmID = Alarms.ISE_CP_INSTALL_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7590,7 +7585,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim isFinished As Boolean = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                                 If isFinished And Not MyClass.IsCleanPackInstalled Then
 
-                                    alarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR
+                                    alarmID = Alarms.ISE_CP_WRONG_ERR
                                     alarmStatus = True
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7614,7 +7609,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ' Ise Timeout   
                             If MyClass.IsTimeOut Then
 
-                                alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmID = Alarms.ISE_TIMEOUT_ERR
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
@@ -7624,7 +7619,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.Timeout) Then
                                     myAlarms(IseAlarms.Timeout) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                    alarmID = Alarms.ISE_TIMEOUT_ERR
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7641,7 +7636,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                MyClass.MonitorDataTO.CL_Data.IsOverUsed Or _
                                (MyClass.MonitorDataTO.LI_Enabled And MyClass.MonitorDataTO.LI_Data.IsOverUsed) Then
 
-                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                                alarmID = Alarms.ISE_ELEC_CONS_WARN
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
@@ -7651,7 +7646,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.Electrodes_Cons_Expired) Then
                                     myAlarms(IseAlarms.Electrodes_Cons_Expired) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN
+                                    alarmID = Alarms.ISE_ELEC_CONS_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7665,7 +7660,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                MyClass.MonitorDataTO.CL_Data.IsExpired Or _
                                (MyClass.MonitorDataTO.LI_Enabled And MyClass.MonitorDataTO.LI_Data.IsExpired) Then
 
-                                alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                                alarmID = Alarms.ISE_ELEC_DATE_WARN
                                 alarmStatus = True
                                 pAlarmList.Add(alarmID)
                                 pAlarmStatusList.Add(alarmStatus)
@@ -7675,7 +7670,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If myAlarms(IseAlarms.Electrodes_Date_Expired) Then
                                     myAlarms(IseAlarms.Electrodes_Date_Expired) = False
                                     ' solved
-                                    alarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN
+                                    alarmID = Alarms.ISE_ELEC_DATE_WARN
                                     alarmStatus = False
                                     pAlarmList.Add(alarmID)
                                     pAlarmStatusList.Add(alarmStatus)
@@ -7872,20 +7867,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myDescID As String = ""
 
                 If pISEError.IsCancelError Then
-                    Dim myAlarmID As AlarmEnumerates.Alarms
+                    Dim myAlarmID As Alarms
                     Select Case pISEError.CancelErrorCode
-                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_A
-                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_B
-                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_C
-                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_D
-                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_F
-                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_M
-                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_N
-                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_P
-                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_R
-                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_S
-                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_T
-                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_W
+                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = Alarms.ISE_ERROR_A
+                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = Alarms.ISE_ERROR_B
+                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = Alarms.ISE_ERROR_C
+                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = Alarms.ISE_ERROR_D
+                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = Alarms.ISE_ERROR_F
+                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = Alarms.ISE_ERROR_M
+                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = Alarms.ISE_ERROR_N
+                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = Alarms.ISE_ERROR_P
+                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = Alarms.ISE_ERROR_R
+                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = Alarms.ISE_ERROR_S
+                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = Alarms.ISE_ERROR_T
+                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = Alarms.ISE_ERROR_W
 
                     End Select
 
@@ -7893,37 +7888,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Else
 
-                    Dim myRemarkID As AlarmEnumerates.Alarms
+                    Dim myRemarkID As Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutB
+                            myRemarkID = Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutA_SER
+                                myRemarkID = Alarms.ISE_mVOutA_SER
                             Else
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVOutB_URI
+                                myRemarkID = Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseB
+                            myRemarkID = Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseA_SER
+                                myRemarkID = Alarms.ISE_mVNoiseA_SER
                             Else
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_mVNoiseB_URI
+                                myRemarkID = Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_Drift_SER
+                                myRemarkID = Alarms.ISE_Drift_SER
                             Else
-                                myRemarkID = AlarmEnumerates.Alarms.ISE_Drift_CAL
+                                myRemarkID = Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myRemarkID = AlarmEnumerates.Alarms.ISE_OutSlope
+                            myRemarkID = Alarms.ISE_OutSlope
 
                     End Select
 
@@ -8346,7 +8341,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'MyClass.CurrentCommandTO = Nothing
 
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
@@ -9478,7 +9473,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
@@ -9588,7 +9583,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)

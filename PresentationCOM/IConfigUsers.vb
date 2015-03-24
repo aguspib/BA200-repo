@@ -306,9 +306,8 @@ Public Class UiConfigUsers
     Private Sub FillMaxTests()
         Try
             Dim resultData As New GlobalDataTO
-            Dim myGeneralSetting As New GeneralSettingsDelegate
 
-            resultData = myGeneralSetting.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_NEW_TESTS_ALLOWED.ToString)
+            resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_NEW_TESTS_ALLOWED.ToString)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Dim mySettingValue As String = DirectCast(resultData.SetDatos, String)
                 If (mySettingValue <> "") Then

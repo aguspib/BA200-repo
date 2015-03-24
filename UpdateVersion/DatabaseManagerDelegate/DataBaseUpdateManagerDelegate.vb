@@ -182,7 +182,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             'Dim myLogAcciones As New ApplicationLogManager()
             Try
                 'Get installed Database Version
-                Dim InstalledDataBaseVersion As Single = 0
+                Dim InstalledDataBaseVersion As Single '= 0.01
                 Dim PackageID As String = String.Empty
 
                 Dim myVersionsDelegate As New VersionsDelegate

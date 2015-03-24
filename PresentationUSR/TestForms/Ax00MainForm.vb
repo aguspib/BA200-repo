@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.Core.Services
 
 
 Public Class Ax00MainForm
@@ -344,8 +345,10 @@ Public Class Ax00MainForm
         FLS.OnServiceStatusChange =
             Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)
                 Try
-                    Debug.WriteLine(status.Sender.Status.ToString & " " & Now.ToString)
-                    status.Sender.Dispose()
+                    If status.Sender.Status = ServiceStatusEnum.EndSuccess Then
+                        Debug.WriteLine(status.Sender.Status.ToString & " " & Now.ToString)
+                        status.Sender.Dispose()
+                    End If
                 Catch ex As Exception
                     MsgBox(ex.Message)
                 End Try
