@@ -2499,11 +2499,11 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myNewSensorChangeRow As UIRefreshDS.SensorValueChangedRow
 
                             'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
-                            Dim lnqRes As List(Of UIRefreshDS.SensorValueChangedRow)
-                            SyncLock myUI_RefreshDS.SensorValueChanged
-                                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
-                                          Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0 _
-                                          Select a).ToList
+                            Dim lnqRes As IEnumerable(Of UIRefreshDS.SensorValueChangedRow)
+                            SyncLock myUI_RefreshDS.SensorValueChanged  'Este SyncLock no está bien tratado. Objeto no global no readonly!!
+                                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged
+                                          Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0
+                                          Select a)
 
                                 If lnqRes.Count > 0 Then
                                     lnqRes(0).BeginEdit()
@@ -2524,8 +2524,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myUI_RefreshDS.SensorValueChanged.AcceptChanges()
                                 End If
                             End SyncLock
-                            lnqRes = Nothing 'AG 02/08/2012 - free memory
-                            ' XBC 26/10/2011
                         End If
 
                     Case Else
@@ -2539,7 +2537,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 myglobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum2", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "AnalyzerManager.PrepareUIRefreshEventNum2", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function

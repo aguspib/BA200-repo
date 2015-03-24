@@ -1,10 +1,12 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Option Strict On
+Option Infer On
+
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
-
 Namespace Biosystems.Ax00.Core.Services
 
     Public Enum BaseLineStepsEnum
