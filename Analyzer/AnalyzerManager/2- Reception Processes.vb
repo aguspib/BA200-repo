@@ -18,7 +18,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Implements IAnalyzerManager
 
 #Region "Private Reception Methods"
-        
+
         ''' <summary>
         ''' Readings reception process (save readings, update executions tables and trigger calculations when needed)
         ''' 
@@ -98,7 +98,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 'InitializeTimerControl(WAITING_TIME_OFF) 'AG 13/02/2012 - the waiting timer is disabled on every reception process ('AG 18/07/2011)
 
-                myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
+                myGlobalDataTO = GetOpenDBTransaction(Nothing)
                 If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = CType(myGlobalDataTO.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -121,7 +121,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim baseLineWithAdjust As Boolean = False
 
                         'AG 03/01/2011 - Get the instruction type value. to set the offset.
-                        myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
+                        myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 2)
 
                         If Not myGlobalDataTO.HasError Then
                             myInstructionType = DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myBaseLineRow.DateTime = DateTime.Now
 
                                 'Get the Wavelenght
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     myBaseLineRow.Wavelength = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
                                 Else
@@ -182,7 +182,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'MainLine
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -192,7 +192,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'RefLight
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -202,7 +202,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'MainDark
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -212,7 +212,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'RefDark
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -222,7 +222,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'IT
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.IT = CType(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -232,7 +232,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Exit For
                                 End If
                                 'DAC
-                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.DAC = CType(DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -254,7 +254,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If (Not myGlobalDataTO.HasError) Then
                             'Save baseline results into database
-                            myGlobalDataTO = Me.SaveBaseLineResults(dbConnection, myBaseLineDS, baseLineWithAdjust, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                            myGlobalDataTO = Me.SaveBaseLineResults(dbConnection, myBaseLineDS, baseLineWithAdjust, BaseLineType.STATIC.ToString)
 
                             If Not myGlobalDataTO.HasError Then
                                 'Perform ANSBLD results business
@@ -267,7 +267,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'ControlAdjustBaseLine only generates myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR  ... now 
                                     'we have to calculate his status = TRUE or FALSE
                                     Dim alarmStatus As Boolean = False 'By default no alarm                                    
-                                    Dim myAlarm = CType(myGlobalDataTO.SetDatos, AlarmEnumerates.Alarms)
+                                    Dim myAlarm = CType(myGlobalDataTO.SetDatos, Alarms)
                                     If myAlarm <> AlarmEnumerates.Alarms.NONE Then
                                         'AG 27/11/2014 BA-2144
                                         'alarmStatus = True
@@ -372,10 +372,10 @@ Namespace Biosystems.Ax00.Core.Entities
             If (Not dbConnection Is Nothing) Then
                 If (Not myGlobalDataTO.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
+                    CommitTransaction(dbConnection)
                 Else
                     'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
+                    RollbackTransaction(dbConnection)
                 End If
                 dbConnection.Close()
             End If
@@ -403,6 +403,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmsReceivedList As New List(Of Alarms)
                 Dim myAlarmsStatusList As New List(Of Boolean)
                 Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
+                Dim IsAStateError = False
 
                 '1- Read the different instruction fields (implement in the same way as we do for instance at ProcessStatusReceived)
                 '   and fill the internal alarm & alarm status lists using the method PrepareLocalAlarmList 
@@ -448,6 +449,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myErrorCode.Add(errorCode)
                             End If
                         Else
+                            If errorCode = 551 Or errorCode = 552 Then
+                                IsAStateError = True
+                            End If
                             ' User Sw
                             If errorCode <> 20 And errorCode <> 21 And errorCode <> 99 Then
                                 myErrorCode.Add(errorCode)
@@ -456,6 +460,9 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 Next
 
+                If Not IsAStateError AndAlso SavedRotorStatus.IsActive Then
+                    SavedRotorStatus.IsActive = False
+                End If
                 'AG 02/03/2012 old translation method
                 'AG 28/02/2012 - Evaluate if the fridge is damaged then add the alarm 
 
@@ -567,240 +574,20 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-
-
                 'Dim Utilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                Dim myInstParamTo As New InstructionParameterTO
                 Dim mySensors As New Dictionary(Of AnalyzerSensors, Single) 'Local structure
-                Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
+                Dim startTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
                 ' Set Waiting Timer Current Instruction OFF
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                'Get General cover (parameter index 3)
-                Dim myIntValue As Integer = 0
-                myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
+                'Obtain all parameters from the instruction received
+                If Not GetParametersFromInstructionReceived(pInstructionReceived, myGlobal, myInstParamTo, mySensors) Then
+                    Return myGlobal
                 End If
 
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.COVER_GENERAL, CSng(myIntValue))
-                End If
-
-
-                'Get Photometrics (Reaccions) cover (parameter index 4)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.COVER_REACTIONS, CSng(myIntValue))
-                End If
-
-
-                'Get Reagents (Fridge) cover (parameter index 5)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.COVER_FRIDGE, CSng(myIntValue))
-                End If
-
-
-                'Get Samples cover (parameter index 6)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.COVER_SAMPLES, CSng(myIntValue))
-                End If
-
-
-                'Get System liquid sensor (parameter index 7)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.WATER_DEPOSIT, CSng(myIntValue))
-                End If
-
-
-                'Get Waste sensor (parameter index 8)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.WASTE_DEPOSIT, CSng(myIntValue))
-                End If
-
-
-                'Get Weight sensors (wash solution & high contamination waste) (parameter index 9, 10)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
-                End If
-
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE, CSng(myIntValue))
-                End If
-
-
-                'Get Temperature Reactions
-                Dim mySingleValue As Single = 0
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                'If IsNumeric(myInstParamTO.ParameterValue) Then    
-                If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
-                    'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.TEMPERATURE_REACTIONS, mySingleValue)
-                Else
-                    'Dim myLogAcciones2 As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
-                End If
-
-                'Get Temperature fridge
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                'If IsNumeric(myInstParamTO.ParameterValue) Then
-                If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
-                    'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.TEMPERATURE_FRIDGE, mySingleValue)
-                Else
-                    'Dim myLogAcciones2 As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
-                End If
-
-                'Get Temperature Washing station heater
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                'If IsNumeric(myInstParamTO.ParameterValue) Then
-                If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
-                    'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.TEMPERATURE_WASHINGSTATION, mySingleValue)
-                Else
-                    'Dim myLogAcciones2 As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
-                End If
-
-                'Get Temperature R1 probe
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 15)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                'If IsNumeric(myInstParamTO.ParameterValue) Then
-                If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
-                    'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.TEMPERATURE_R1, mySingleValue)
-                Else
-                    'Dim myLogAcciones2 As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
-                End If
-
-                'Get Temperature R2 probe
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 16)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                'If IsNumeric(myInstParamTO.ParameterValue) Then
-                If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
-                    'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.TEMPERATURE_R2, mySingleValue)
-                Else
-                    'Dim myLogAcciones2 As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTO.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
-                End If
-
-                'Get Fridge status (parameter index 12)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
-
-                If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = CInt(myInstParamTO.ParameterValue)
-                    mySensors.Add(AnalyzerSensors.FRIDGE_STATUS, CSng(myIntValue))
-                End If
-
-                'Get ISE status (parameter index 17)
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 17)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                Else
-                    Exit Try
-                End If
+                Dim myIntValue As Integer
 
                 Dim iseCmdSent As Boolean = False  'AG 06/02/2015 BA-2246
 
@@ -808,8 +595,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If myApplicationName.ToUpper.Contains("SERVICE") AndAlso IsStressingAttribute Then
                     ' Nothing to do
                 Else
-                    If IsNumeric(myInstParamTO.ParameterValue) Then
-                        myIntValue = CInt(myInstParamTO.ParameterValue)
+                    If IsNumeric(myInstParamTo.ParameterValue) Then
+                        myIntValue = CInt(myInstParamTo.ParameterValue)
                         mySensors.Add(AnalyzerSensors.ISE_STATUS, CSng(myIntValue))
 
                         ''SGM 17/02/2012 ISE Module is switched On
@@ -915,7 +702,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If Not iseCmdSent Then 'AG 06/02/2015 BA-2246
                     If GlobalBase.IsServiceAssembly Then
                         ServiceSwAnsInfTreatment(mySensors)
@@ -928,9 +714,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                    'Debug.Print("AnalyzerManager.ProcessInformationStatusReceived: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
-                    'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("Treat ANSINF received: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Treat ANSINF received: " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -938,11 +722,239 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessInformationStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
+        End Function
+
+        Private Function GetParametersFromInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myGlobal As GlobalDataTO, ByRef myInstParamTo As InstructionParameterTO, _
+                                                              ByVal mySensors As Dictionary(Of AnalyzerSensors, Single)) As Boolean
+
+            'Get General cover (parameter index 3)
+            Dim myIntValue As Integer = 0
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.COVER_GENERAL, CSng(myIntValue))
+            End If
+
+
+            'Get Photometrics (Reaccions) cover (parameter index 4)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 4)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.COVER_REACTIONS, CSng(myIntValue))
+            End If
+
+
+            'Get Reagents (Fridge) cover (parameter index 5)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 5)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.COVER_FRIDGE, CSng(myIntValue))
+            End If
+
+
+            'Get Samples cover (parameter index 6)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 6)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.COVER_SAMPLES, CSng(myIntValue))
+            End If
+
+
+            'Get System liquid sensor (parameter index 7)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 7)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.WATER_DEPOSIT, CSng(myIntValue))
+            End If
+
+
+            'Get Waste sensor (parameter index 8)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 8)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.WASTE_DEPOSIT, CSng(myIntValue))
+            End If
+
+
+            'Get Weight sensors (wash solution & high contamination waste) (parameter index 9, 10)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 9)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
+            End If
+
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 10)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE, CSng(myIntValue))
+            End If
+
+
+            'Get Temperature Reactions
+            Dim mySingleValue As Single = 0
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 11)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            'If IsNumeric(myInstParamTO.ParameterValue) Then    
+            If Double.TryParse(myInstParamTo.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
+                'mySingleValue = CSng(myInstParamTO.ParameterValue)
+                mySingleValue = FormatToSingle(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.TEMPERATURE_REACTIONS, mySingleValue)
+            Else
+                'Dim myLogAcciones2 As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTo.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+            End If
+
+            'Get Temperature fridge
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 13)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            'If IsNumeric(myInstParamTO.ParameterValue) Then
+            If Double.TryParse(myInstParamTo.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
+                'mySingleValue = CSng(myInstParamTO.ParameterValue)
+                mySingleValue = FormatToSingle(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.TEMPERATURE_FRIDGE, mySingleValue)
+            Else
+                'Dim myLogAcciones2 As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTo.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+            End If
+
+            'Get Temperature Washing station heater
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 14)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            'If IsNumeric(myInstParamTO.ParameterValue) Then
+            If Double.TryParse(myInstParamTo.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
+                'mySingleValue = CSng(myInstParamTO.ParameterValue)
+                mySingleValue = FormatToSingle(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.TEMPERATURE_WASHINGSTATION, mySingleValue)
+            Else
+                'Dim myLogAcciones2 As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTo.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+            End If
+
+            'Get Temperature R1 probe
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 15)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            'If IsNumeric(myInstParamTO.ParameterValue) Then
+            If Double.TryParse(myInstParamTo.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
+                'mySingleValue = CSng(myInstParamTO.ParameterValue)
+                mySingleValue = FormatToSingle(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.TEMPERATURE_R1, mySingleValue)
+            Else
+                'Dim myLogAcciones2 As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTo.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+            End If
+
+            'Get Temperature R2 probe
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 16)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            'If IsNumeric(myInstParamTO.ParameterValue) Then
+            If Double.TryParse(myInstParamTo.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
+                'mySingleValue = CSng(myInstParamTO.ParameterValue)
+                mySingleValue = FormatToSingle(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.TEMPERATURE_R2, mySingleValue)
+            Else
+                'Dim myLogAcciones2 As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Input Temperature value not valid [" & myInstParamTo.ParameterValue & "]", "AnalyzerManager.ProcessInformationStatusReceived ", EventLogEntryType.Error, False)
+            End If
+
+            'Get Fridge status (parameter index 12)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 12)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            If IsNumeric(myInstParamTo.ParameterValue) Then
+                myIntValue = CInt(myInstParamTo.ParameterValue)
+                mySensors.Add(AnalyzerSensors.FRIDGE_STATUS, CSng(myIntValue))
+            End If
+
+            'Get ISE status (parameter index 17)
+            myGlobal = GetItemByParameterIndex(pInstructionReceived, 17)
+            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                myInstParamTo = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+            Else
+                Return False
+            End If
+
+            Return True
         End Function
 
         ''' <summary>
@@ -969,7 +981,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
+                myGlobal = GetOpenDBTransaction(Nothing)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -1010,7 +1022,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Get Reader selector (parameter index 3)
                         Dim rotorSelected As Integer = 0
-                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                        myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1028,7 +1040,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Get Status (parameter index 4)
                         Dim barCodeStatus As Integer = 0
-                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                        myGlobal = GetItemByParameterIndex(pInstructionReceived, 4)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1046,7 +1058,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Get Number of Reads (parameter index 5)
                         Dim readsNumber As Integer = 0
-                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                        myGlobal = GetItemByParameterIndex(pInstructionReceived, 5)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1158,7 +1170,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 For itera As Integer = 0 To readsNumber - 1
                                     'Get Number of Reads (parameter index 6)
                                     Dim readPosition As Integer = 0
-                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
+                                    myGlobal = GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1175,7 +1187,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Get diagnostics (parameter index 7)
                                     Dim diagnostics As Integer = 0
-                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
+                                    myGlobal = GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1192,7 +1204,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Get value (parameter index 8)
                                     Dim value As String = String.Empty
-                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
+                                    myGlobal = GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1363,10 +1375,10 @@ Namespace Biosystems.Ax00.Core.Entities
             If (Not dbConnection Is Nothing) Then
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
+                    CommitTransaction(dbConnection)
                 Else
                     'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
+                    RollbackTransaction(dbConnection)
                 End If
                 dbConnection.Close()
             End If
@@ -1409,7 +1421,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If (Not myGlobal.HasError) Then
                     'Begin TRANSACTION to create the new PreparationID and update all affected Executions
-                    myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
+                    myGlobal = GetOpenDBTransaction(pDBConnection)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                         If (Not dbConnection Is Nothing) Then
@@ -1480,10 +1492,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             If (Not myGlobal.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                                If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
                             Else
                                 'When the Database Connection was opened locally, then the Rollback is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                                If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
                             End If
                         End If
                     End If
@@ -1520,7 +1532,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then RollbackTransaction(dbConnection)
 
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
@@ -1692,7 +1704,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                resultData = GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -1727,18 +1739,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
                             'resultData.SetDatos = <value to return; if any>
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
                         End If
                     End If
                 End If
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
@@ -1813,7 +1825,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If Not resultData.HasError Then
                                 For index As Integer = 0 To myResults.WellUsed.Count - 1
                                     'Get the baseLineID
-                                    resultData = GetNextBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, GlobalEnumerates.BaseLineType.DYNAMIC.ToString, myResults.Wavelength)
+                                    resultData = GetNextBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, BaseLineType.DYNAMIC.ToString, myResults.Wavelength)
                                     If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                         nextBaseLineID = DirectCast(resultData.SetDatos, Integer)
                                     Else
@@ -1834,14 +1846,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                     baseLineRow.IT = myResults.IntegrationTime
                                     baseLineRow.DAC = myResults.DAC
                                     baseLineRow.DateTime = DateTime.Now
-                                    baseLineRow.Type = GlobalEnumerates.BaseLineType.DYNAMIC.ToString 'AG 28/10/2014 BA-2062
+                                    baseLineRow.Type = BaseLineType.DYNAMIC.ToString 'AG 28/10/2014 BA-2062
                                     baseLineRow.EndEdit()
                                     myBaseLineDS.twksWSBaseLines.AddtwksWSBaseLinesRow(baseLineRow)
                                 Next
                                 myBaseLineDS.AcceptChanges()
 
                                 'Save baseline results into database
-                                resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, BaseLineType.DYNAMIC.ToString)
                             End If
 
                         Else
@@ -1853,7 +1865,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
@@ -1877,10 +1889,10 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim validResults As Boolean = True
             Dim myGlobal As New GlobalDataTO
 
-            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim AlarmList As New List(Of Alarms)
             Dim AlarmStatusList As New List(Of Boolean)
             Dim alarmStatus As Boolean = False 'By default no alarm
-            Dim myAlarm As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
+            Dim myAlarm As Alarms = AlarmEnumerates.Alarms.NONE
 
             '1. Validate results (BA-2081)
             myGlobal = BaseLine.ValidateDynamicBaseLinesResults(Nothing, AnalyzerIDAttribute)
@@ -1905,7 +1917,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR
                     alarmStatus = True
                 ElseIf Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myAlarm = CType(myGlobal.SetDatos, AlarmEnumerates.Alarms)
+                    myAlarm = CType(myGlobal.SetDatos, Alarms)
                     If myAlarm <> AlarmEnumerates.Alarms.NONE Then alarmStatus = True
                 End If
 
@@ -1942,7 +1954,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim AlarmList As New List(Of Alarms)
             Dim AlarmStatusList As New List(Of Boolean)
             Dim myAlarm As Alarms
 
@@ -1952,7 +1964,7 @@ Namespace Biosystems.Ax00.Core.Entities
             myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
             With myAnalyzerSettingsRow
                 .AnalyzerID = AnalyzerIDAttribute
-                .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
+                .SettingID = AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
                 .CurrentValue = "1"
             End With
             myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
@@ -1970,18 +1982,18 @@ Namespace Biosystems.Ax00.Core.Entities
             rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
             With rowBarCode
                 .RotorType = "SAMPLES"
-                .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
+                .Action = Ax00CodeBarAction.CONFIG
                 .Position = 0
             End With
             BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
             BarCodeDS.AcceptChanges()
-            myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+            myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
             ' XBC 13/02/2012 - CODEBR Configuration instruction
 
             'AG 23/05/2012
             If wupManeuversFinishFlag Then
                 'Inform the presentation layer to activate the STOP wup button
-                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED, 1, True)
+                UpdateSensorValuesAttribute(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED, 1, True)
                 ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - ISE alarms ready to be shown
 
                 'AG 23/05/2012 - Evaluate if Sw has to recommend to change reactions rotor (remember all alarms are remove when Start Instruments starts)
@@ -1994,7 +2006,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'But generate refresh
                         If Not myAlarmListAttribute.Contains(myAlarm) Then
                             myAlarmListAttribute.Add(myAlarm)
-                            myGlobalDataTO = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                            myGlobalDataTO = PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
                         End If
                     End If
                 End If
@@ -2004,7 +2016,7 @@ Namespace Biosystems.Ax00.Core.Entities
             'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
             If SensorValuesAttribute.ContainsKey(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) AndAlso SensorValuesAttribute(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 Then
 
-                Dim tempISEAlarmList As New List(Of AlarmEnumerates.Alarms)
+                Dim tempISEAlarmList As New List(Of Alarms)
                 Dim tempISEAlarmStatusList As New List(Of Boolean)
                 myGlobalDataTO = ISEAnalyzer.CheckAlarms(Connected, tempISEAlarmList, tempISEAlarmStatusList)
 
@@ -2149,38 +2161,38 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Return
                             End If
 
-                        Case GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine
+                        Case WarmUpProcessFlag.ProcessDynamicBaseLine
                             If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
 
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") And
-                                   (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") And
+                                If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") And
+                                   (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") And
                                    (CurrentInstructionAction = InstructionActions.None) Then
                                     If (CheckIfWashingIsPossible()) Then
                                         'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
                                         CurrentInstructionAction = InstructionActions.FlightFilling
                                         Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                         analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Else
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
 
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "END") And
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") And
+                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "END") And
+                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") And
                                     (CurrentInstructionAction = InstructionActions.None) Then
                                     'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
                                     CurrentInstructionAction = InstructionActions.FlightReading
                                     Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                    ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                    ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                     analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Exit Select
                                 End If
 
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") And
+                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
+                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") And
                                     (CurrentInstructionAction = InstructionActions.None) Then
                                     'AG 27/11/2014 BA-2066
                                     If (CheckIfWashingIsPossible()) Then
@@ -2188,38 +2200,38 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             'AG + IT 10/02/2015 BA-2246 - when MAX tentatives failed set flag DynamicBL_Read = CANCELED
                                             If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
                                             End If
                                             'AG + IT 10/02/2015
 
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
                                             CurrentInstructionAction = InstructionActions.FlightEmptying
                                             Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                            ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                             analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         Else
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = ""
                                             CurrentInstructionAction = InstructionActions.FlightReading
                                             Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                            ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                             analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         End If
                                     Else
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
 
                                 'AG 10/02/2015 BA-2246 when DynamicBL_Read canceled --> send EMPTY ROTOR (scenario: comm lost during empty rotor after MAX tentatives failed!! (add orelse DynamicBL_Read = CANCELED)
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "CANCELED") AndAlso _
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") AndAlso _
+                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "CANCELED") AndAlso _
+                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") AndAlso _
                                     (CurrentInstructionAction = InstructionActions.None) Then
 
                                     If (CheckIfWashingIsPossible()) Then
                                         CurrentInstructionAction = InstructionActions.FlightEmptying
                                         Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
+                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
                                         analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     End If
                                 End If
@@ -2228,25 +2240,25 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         Case WarmUpProcessFlag.ConfigureBarCode
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
                             'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                         Case WarmUpProcessFlag.Finalize
 
                             If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "END") Then
+                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "END") Then
                                     FinalizeWarmUpProcess()
                                     Exit Select
                                 End If
                             Else
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
+                                If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
                                     FinalizeWarmUpProcess()
                                     Exit Select
                                 End If
                             End If
 
-                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
+                            If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
                                 FinalizeWarmUpProcess()
                                 Exit Select
                             End If
@@ -2254,24 +2266,24 @@ Namespace Biosystems.Ax00.Core.Entities
                     End Select
 
 
-                ElseIf (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
+                ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
 
                     Select Case flag
 
-                        Case GlobalEnumerates.WarmUpProcessFlag.Finalize
-                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) <> "INPROCESS") Then
+                        Case WarmUpProcessFlag.Finalize
+                            If (mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString) <> "INPROCESS") Then
                                 If (CheckIfWashingIsPossible()) Then
-                                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
-                                        (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
+                                    If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
+                                        (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
                                         FinalizeWarmUpProcess()
                                         Exit Select
                                     End If
                                 End If
                             End If
                         Case WarmUpProcessFlag.ConfigureBarCode
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
                             'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                     End Select
 
@@ -2321,7 +2333,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
+                myglobal = GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
@@ -3156,7 +3168,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                resultData = GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -3194,7 +3206,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 If Not resultData.HasError Then
                                     resultData = ISEAnalyzer.SendISECommand 'SGM 08/03/2012
-                                    'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, myScreenIseCmdTo)
 
                                     If Not resultData.HasError AndAlso ConnectedAttribute Then
                                         UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISEPumpCalib, "INI")
@@ -3211,7 +3222,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 If Not resultData.HasError Then
                                     resultData = ISEAnalyzer.SendISECommand 'SGM 08/03/2012
-                                    'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, myScreenIseCmdTo)
 
                                     If Not resultData.HasError AndAlso ConnectedAttribute Then
                                         UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ISECalibAB, "INI")
@@ -3225,19 +3235,14 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf mySessionFlags(AnalyzerManagerFlags.ISEConditioningProcess.ToString) = "CLOSED" Then
                             '   Not required: Running
 
-                            ' XB+AG 16/10/2013 - BT #1333
-                            'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "INPROCESS") 'AG 31/08/2012
-                            'resultData = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'Send go to RUNNING
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RUNNINGprocess, "INPROCESS") 'AG 31/08/2012
                                 resultData = ManageAnalyzer(AnalyzerManagerSwActionList.RUNNING, True) 'Send go to RUNNING
                             ElseIf AllowScanInRunning Then
                                 'AG 12/11/2013 - Call manage analyer instead of applayer
-                                'resultData = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.START)
                                 UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartRunning, "INI") 'AG 19/11/2012 - task #1396-e
                                 resultData = ManageAnalyzer(AnalyzerManagerSwActionList.START, True, Nothing)
                             End If
-                            ' XB+AG 16/10/2013 - BT #1333
 
                             If Not resultData.HasError AndAlso ConnectedAttribute Then
                                 endRunAlreadySentFlagAttribute = False
@@ -3262,23 +3267,22 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                            If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
                         End If
                     End If
                 End If
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then RollbackTransaction(dbConnection)
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PerformAutoIseConditioning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3298,9 +3302,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function ProcessISEManagerProcedures() As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-
-            'If My.Computer.Name <> "AREASW1" Then Return myGlobal
-            'If My.Computer.Name <> "AUXSOFTWARE1" Then Return myGlobal
 
             Try
 
@@ -3339,21 +3340,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'End If
                                 End Select
                             End If
-
-                            'Case ISEManager.ISEProcedures.ActivateModule
-                            '    If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
-                            '        Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
-
-                            '            '1- Read Page 01 from Reagents Pack
-                            '            Case ISECommands.READ_PAGE_0_DALLAS
-                            '                myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
-
-                            '            Case ISECommands.READ_PAGE_1_DALLAS
-                            '                'If myISEManager.IsElectrodesReady Then
-                            '                myGlobal = ISEAnalyzer.PrepareDataToSend_READ_mV
-                            '                'End If
-                            '        End Select
-                            '    End If
 
                         Case ISEManager.ISEProcedures.ActivateReagentsPack
                             If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
@@ -3398,36 +3384,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                         myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
                                         myGlobal = ISEAnalyzer.SendISECommand()
                                         Debug.Print("Reading Dallas Page 01 ... confirmation")
-
-
-                                        'Commented SGM 16/01/2013 - Bug #1108                                         
-                                        '    ' XBC 19/03/2012
-                                        '    ''2- Read Page 01 from Reagents Pack
-                                        '    'Case ISECommands.READ_PAGE_0_DALLAS
-                                        '    '    myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
-
-                                        'Case ISECommands.WRITE_DAY_INSTALL
-                                        '    myGlobal = ISEAnalyzer.PrepareDataToSend_WRITE_INSTALL_MONTH(Month(Now))
-                                        '    Debug.Print("Guardant MES Reagents Pack ..." & Month(Now).ToString)
-                                        '    myGlobal = ISEAnalyzer.SendISECommand()
-                                        '    ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.WRITE_MONTH_INSTALL
-                                        '    Debug.Print("Canvi d'estat a WRITE_MONTH_INSTALL ...")
-
-
-                                        'Case ISECommands.WRITE_MONTH_INSTALL
-                                        '    myGlobal = ISEAnalyzer.PrepareDataToSend_WRITE_INSTALL_YEAR(Year(Now))
-                                        '    Debug.Print("Guardant ANY Reagents Pack ..." & Year(Now).ToString)
-                                        '    myGlobal = ISEAnalyzer.SendISECommand()
-                                        '    ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.WRITE_YEAR_INSTALL
-                                        '    Debug.Print("Canvi d'estat a WRITE_YEAR_INSTALL ...")
-
-
-                                        'Case ISECommands.WRITE_YEAR_INSTALL
-                                        '    myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
-                                        '    Debug.Print("Llegint PAG1 Reagents Pack ...")
-                                        '    myGlobal = ISEAnalyzer.SendISECommand()
-                                        '    Debug.Print("Fi d'Activar Reagents Pack !")
-                                        '    ' XBC 19/03/2012
 
                                 End Select
                             End If
@@ -3475,7 +3431,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         myGlobal = ISEAnalyzer.SaveConsumptionCalToDallasData("B")
                                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                             ISEAnalyzer.CurrentCommandTO = CType(myGlobal.SetDatos, ISECommandTO)
-                                            Debug.Print("Guardant Consum Cal B ..." & Microsoft.VisualBasic.DateAndTime.Day(Now).ToString)
+                                            Debug.Print("Guardant Consum Cal B ..." & Day(Now).ToString)
 
                                             myGlobal = ISEAnalyzer.SendISECommand()
                                             ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
@@ -3515,19 +3471,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Case Else
                             Debug.Print("Caso NONE !")
-                            ' XBC 04/04/2012
-
 
                     End Select
 
                     If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
 
-                        ' XBC 23/03/2012
                         If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.ActivateReagentsPack And _
                            ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.WriteConsumption Then
                             myGlobal = ISEAnalyzer.SendISECommand()
                         End If
-                        ' XBC 23/03/2012
 
                     End If
 
@@ -3541,9 +3493,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
 
                             Case ISECommands.READ_PAGE_1_DALLAS
-                                'If myISEManager.IsElectrodesReady Then
                                 myGlobal = ISEAnalyzer.PrepareDataToSend_READ_mV
-                                'End If
                         End Select
                     End If
 
@@ -3557,7 +3507,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEManager.ProcessISEManagerProcedures", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -3579,14 +3528,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobal = ISEAnalyzer.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
+                myGlobal = ISEAnalyzer.CheckAlarms(Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobal.HasError Then
 
                     ' XB 21/01/2015 - BA-1873
-                    If Me.ISEAnalyzer.IsISEModuleInstalled And Me.ISEAnalyzer.IsISEModuleReady Then
+                    If ISEAnalyzer.IsISEModuleInstalled And ISEAnalyzer.IsISEModuleReady Then
                         ' Check if ISE Electrodes calibration is required
                         Dim ElectrodesCalibrationRequired As Boolean = False
-                        myGlobal = Me.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
+                        myGlobal = ISEAnalyzer.CheckElectrodesCalibrationIsNeeded()
                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
@@ -3600,7 +3549,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         ' Check if ISE Pumps calibration is required
                         Dim PumpsCalibrationRequired As Boolean = False
-                        myGlobal = Me.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
+                        myGlobal = ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
@@ -3614,7 +3563,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         ' Check if ISE Clean is required
                         Dim CleanRequired As Boolean = False
-                        myGlobal = Me.ISEAnalyzer.CheckCleanIsNeeded
+                        myGlobal = ISEAnalyzer.CheckCleanIsNeeded
                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             CleanRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
@@ -3626,7 +3575,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             myAlarmStatusList.Add(False)
                         End If
                     End If
-                    ' XB 21/01/2015 - BA-1873
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
@@ -3645,7 +3593,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEManager.RefreshISEAlarms", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -3665,9 +3612,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
-
-            'Return myGlobal 'QUITAR
-
             Try
 
                 If pISEResult.Errors.Count > 0 Then
@@ -3744,10 +3688,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If E.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None Then
                                     myResultAlarm = CInt(E.ResultErrorCode)
 
-                                    ' XB 08/09/2014 - BA-1902
-                                    'Dim myAffected As String = ISEErrorTO.FormatAffected(E.Affected)
                                     Dim myAffected As String = ISEManager.FormatAffected(E.Affected)
-                                    ' XB 08/09/2014 - BA-1902
 
                                     myAdditionalInfo &= GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR & myAlarmOrigin & ":R" & myResultAlarm.ToString & ": (" + myAffected + ")"
                                 End If
@@ -3854,7 +3795,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.BlockISEPreparationByElectrode", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -3877,7 +3817,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Sub SetAnalyzerNotReady() Implements IAnalyzerManager.SetAnalyzerNotReady
             If AnalyzerIsReadyAttribute Then
                 AnalyzerIsReadyAttribute = False
-                'Me.InitializeTimerControl(WAITING_TIME_DEFAULT) 'AG 18/07/2011 - commment this line
             End If
         End Sub
 
@@ -3887,7 +3826,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
             Dim returnedFlag As Boolean = False
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
@@ -3904,7 +3843,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 returnedFlag = CType(myAnSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, Boolean)
                             End If
 
-                        End If 'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
+                        End If
 
                     End If
                 End If
@@ -3915,15 +3854,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadBarCodeRotorSettingEnabled", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 
             End Try
-            'resultData.SetDatos = returnedFlag
-            'Return resultData
             Return returnedFlag
         End Function
 
