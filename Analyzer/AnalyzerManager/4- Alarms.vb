@@ -369,7 +369,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
 
                     Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
-                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then addFlag = False
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then
+                            addFlag = CanManageRetryAlarm
+                        End If
                 End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
                 Dim warmUpInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
@@ -464,11 +466,11 @@ Namespace Biosystems.Ax00.Core.Entities
                             pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
                             pAlarmStatusList.Add(False)
                         End If
-                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
-                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then
-                            pAlarmList.Add(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR)
-                            pAlarmStatusList.Add(False)
-                        End If
+                        'Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        '    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then
+                        '        pAlarmList.Add(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR)
+                        '        pAlarmStatusList.Add(False)
+                        '    End If
                 End Select
             Else
                 'ALARM SOLVED

@@ -266,8 +266,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 newRowFlag = True
             ElseIf _myIseTimeoutErrorFixed AndAlso alarmIdItem = Alarms.ISE_TIMEOUT_ERR Then
                 newRowFlag = True
-            ElseIf _myGlfErrorFixed AndAlso alarmIdItem = Alarms.GLF_BOARD_FBLD_ERR Then
-                newRowFlag = True
             ElseIf _myCommsTimeoutErrorFixed AndAlso alarmIdItem = Alarms.COMMS_TIMEOUT_ERR Then
                 newRowFlag = True
             Else
