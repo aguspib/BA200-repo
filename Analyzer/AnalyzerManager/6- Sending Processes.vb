@@ -1767,7 +1767,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myRow.SetContaminationIDNull()
                                 myRow.SetWashingSolution1Null()
                                 myReturn.searchNext.AddsearchNextRow(myRow)
-
+#If DEBUG Then
+                                Debug.Print(String.Format("Next execution sent: {0}, sample class {1}", myRow.ExecutionID.ToString(), myRow.SampleClass))
+#End If
                             Else
                                 'Contamination (wash has to be sent)
                                 myRow = myReturn.searchNext.NewsearchNextRow
@@ -1776,6 +1778,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myRow.ContaminationID = myContaminationID
                                 myRow.WashingSolution1 = myWashSolutionType
                                 myReturn.searchNext.AddsearchNextRow(myRow)
+
+#If DEBUG Then
+                                Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
+#End If
+
                             End If '(4)
                             resultData.SetDatos = myReturn
 
