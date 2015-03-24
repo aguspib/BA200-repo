@@ -16,14 +16,28 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
 
             'Scenario
             analyzerManager.CommThreadsStarted = True
-            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "INPROCESS")
+
+            GlobalConstants.REAL_DEVELOPMENT_MODE = 2
+
+            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess, "")
             analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WaitForAnalyzerReady, "INI")
             analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
+            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess, "")
+            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "")
+            analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "")
+
+            analyzerManager.InstructionTypeSent = GlobalEnumerates.AppLayerEventList.STATE
+            analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.STANDBY
+
+            Assert.AreEqual(analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "")
 
             Dim instruction = New List(Of InstructionParameterTO)
 
+            'A200;STATUS;S:2;A:46;T:15;C:20;W:20;R:0;E:560;I:0;
+
             instruction.Add(New InstructionParameterTO With {.InstructionType = "A", .ParameterIndex = 1, .ParameterValue = "A200"})
-            instruction.Add(New InstructionParameterTO With {.InstructionType = "TYPE", .ParameterIndex = 2, .ParameterValue = "STATE"})
+            instruction.Add(New InstructionParameterTO With {.InstructionType = "TYPE", .ParameterIndex = 2, .ParameterValue = "STATUS"})
             instruction.Add(New InstructionParameterTO With {.InstructionType = "S", .ParameterIndex = 3, .ParameterValue = "2"})
             instruction.Add(New InstructionParameterTO With {.InstructionType = "A", .ParameterIndex = 4, .ParameterValue = "46"})
             instruction.Add(New InstructionParameterTO With {.InstructionType = "T", .ParameterIndex = 5, .ParameterValue = "195"})
@@ -33,10 +47,23 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             instruction.Add(New InstructionParameterTO With {.InstructionType = "E", .ParameterIndex = 9, .ParameterValue = "560"})
             instruction.Add(New InstructionParameterTO With {.InstructionType = "I", .ParameterIndex = 10, .ParameterValue = "0"})
 
+            Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
+            Assert.IsFalse(analyzerManager.CanSendingRepetitions)
+            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 0)
+
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
-            Dim alarmResults = analyzerManager.Alarms
-            Dim status = analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess)
+            Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
+            Assert.IsTrue(analyzerManager.CanSendingRepetitions)
+            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
+
+            analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
+
+            Assert.IsFalse(analyzerManager.AnalyzerIsReady)
+            Assert.IsFalse(analyzerManager.IsAlarmInfoRequested)
+            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 2)
+            Assert.AreEqual(analyzerManager.InfoActivated(), 0)            
+
         End Sub
     End Class
 

@@ -100,6 +100,10 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function AnsFbldReceivedEvent(ByVal myGlobal As GlobalDataTO, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
             InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+            If CanManageRetryAlarm Then
+                CanManageRetryAlarm = False
+            End If
+
             If Not GlobalBase.IsServiceAssembly Then
                 myGlobal = ProcessANSFBLDReceived(pInstructionReceived)
             End If

@@ -411,7 +411,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 ' Get error number field
                 Dim errorNumber As Integer = 0
-                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -423,13 +423,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Dim errorCode As Integer = 0
-                'Dim alarmID As AlarmEnumerates.Alarms = AlarmEnumerates.Alarms.NONE
-                'Dim alarmStatus As Boolean = False
-                Dim myAlarms As New List(Of Alarms)
                 Dim myErrorCode As New List(Of Integer)
 
                 For i As Integer = 1 To errorNumber
-                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3 + i)
+                    myGlobal = GetItemByParameterIndex(pInstructionReceived, 3 + i)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Else
@@ -445,11 +442,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         'E:99 Multiple
 
                         ' XBC 29/10/2012 - Service Sw no ommit err 21 on ANSERR
-                        'If errorCode <> 20 And errorCode <> 21 And errorCode <> 99 Then
-                        '    myErrorCode.Add(errorCode)
-                        'End If
-                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If GlobalBase.IsServiceAssembly Then
                             ' Service Sw
                             If errorCode <> 20 And errorCode <> 99 Then
@@ -461,23 +453,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myErrorCode.Add(errorCode)
                             End If
                         End If
-                        ' XBC 29/10/2012
                     End If
                 Next
 
                 'AG 02/03/2012 old translation method
                 'AG 28/02/2012 - Evaluate if the fridge is damaged then add the alarm 
-                'alarmID = AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR
-                'alarmStatus = IsFridgeStatusDamaged(myAlarmsReceivedList, myAlarmsStatusList)
-                'PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmsReceivedList, myAlarmsStatusList)
-                'AG 28/02/2012
 
                 'New translation method
-                myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
+                Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
 
                 'SGM 09/11/2012 - reset flag in case of Rotor missing error is not received
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     If Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                         IsServiceRotorMissingInformed = False
@@ -493,6 +479,22 @@ Namespace Biosystems.Ax00.Core.Entities
                     errorCodeID = ""
                     If index <= myErrorCode.Count - 1 Then
                         errorCodeID = myErrorCode(index).ToString
+                    End If
+                    If errorCodeID = "560" Then
+                        CanSendingRepetitions() = True
+                        NumSendingRepetitionsTimeout() += 1
+
+                        If NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsRetry Then
+                            GlobalBase.CreateLogActivity("FLIGHT Error: GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            CanSendingRepetitions() = False
+
+                            ' Activates Alarm begin
+                            CanManageRetryAlarm = True
+                        Else
+                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = SendStartTaskinQueue()
+
+                        End If
                     End If
                     PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
                     'AG 04/12/2014 BA-2236

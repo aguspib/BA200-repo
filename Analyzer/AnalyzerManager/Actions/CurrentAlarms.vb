@@ -80,10 +80,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Dim methodHasToAddInstructionToQueueFlag As Integer = 0
 
-                If _analyzerManager.AnalyzerHasSubStatus Then
-                    'TODO: BA-2358 
-                End If
-
                 'Once one instruction has been sent. The other instructions managed in this method will be added to queue
                 '  0 -> Instruction can be sent
                 '  1 -> One instruction has already been sent. New instructions to be sent in ManageAlarms will be add to queue
