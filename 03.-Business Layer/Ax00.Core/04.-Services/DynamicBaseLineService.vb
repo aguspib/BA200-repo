@@ -808,7 +808,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)
             Dim minutosCaducidadRotorLleno = 30
-            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue("FLIGHT_FULL_ROTOR_CADUCITY")
+            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue(GlobalEnumerates.GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
             If caducityParameter IsNot Nothing AndAlso caducityParameter.HasError = False Then minutosCaducidadRotorLleno = CInt(caducityParameter.SetDatos)
 
             If pAlarmDate < Now.AddMinutes(-minutosCaducidadRotorLleno) Then

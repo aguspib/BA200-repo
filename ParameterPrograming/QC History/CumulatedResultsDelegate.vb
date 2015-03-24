@@ -459,7 +459,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myCumResultNumDAO As New tqcCumulatedResultsDAO
 
                         'Get value of the General Setting for the maximum number of Cumulated Series 
-                        myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES.ToString)
+                        myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_CUMULATED_QCSERIES)
 
                         Dim maxNumber As Integer = 0
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
