@@ -36,7 +36,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property InstructionSent() As String
         Property InstructionReceived() As String
         Property InstructionTypeReceived() As AnalyzerManagerSwActionList
-        ReadOnly Property InstructionTypeSent() As AppLayerEventList
+        Property InstructionTypeSent() As AppLayerEventList
         Property ISEModuleIsReady() As Boolean
         ReadOnly Property Alarms() As List(Of AlarmEnumerates.Alarms)
         ReadOnly Property ErrorCodes() As String

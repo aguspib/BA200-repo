@@ -573,10 +573,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property InstructionTypeSent() As AppLayerEventList Implements IAnalyzerManager.InstructionTypeSent    '27/03/2012 AG
+        Public Property InstructionTypeSent() As AppLayerEventList Implements IAnalyzerManager.InstructionTypeSent    '27/03/2012 AG
             Get
                 Return AppLayer.LastInstructionTypeSent
             End Get
+            Set(value As AppLayerEventList)
+                AppLayer.LastInstructionTypeSent = value
+            End Set
         End Property
 
         Public Property ISEModuleIsReady() As Boolean Implements IAnalyzerManager.ISEModuleIsReady    '18/01/2011 AG

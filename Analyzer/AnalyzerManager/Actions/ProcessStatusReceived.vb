@@ -486,9 +486,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Return False
             End If
 
-            'SGM 29/10/2012 - SERVICE: reset E:20 flag
-            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+            'SGM 29/10/2012 - SERVICE: reset E:20 flag            
             If GlobalBase.IsServiceAssembly Then
                 _analyzerManager.IsInstructionRejected() = False
                 _analyzerManager.IsRecoverFailed() = False
