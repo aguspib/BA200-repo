@@ -587,6 +587,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     Return myGlobal
                 End If
 
+                ResetFBLDAlarms()
+
                 Dim myIntValue As Integer
 
                 Dim iseCmdSent As Boolean = False  'AG 06/02/2015 BA-2246
@@ -608,18 +610,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         ISEAnalyzer.IsISESwitchON = True
 
-                                        'Acabar de revisar con SG una vez el Setup se haya generado
-                                        ''AG 26/03/2012 - start ise initiation only in wup process and in connect process
-                                        'If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS") _
-                                        '  OrElse (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-
-                                        'SGM 14/06/2012
                                         If ISEAnalyzer.IsPendingToInitializeAfterActivation Then
                                             ISEAlreadyStarted = True
                                         End If
 
                                         If Not ISEAlreadyStarted Then
-                                            'SGM 28/03/2012
                                             'this condition must be replaced by the 
                                             'condition that allows the ISE module to start connecting
                                             If ISEAnalyzer.IsISESwitchON And Not ISEAnalyzer.IsLongTermDeactivation Then
@@ -629,13 +624,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     iseCmdSent = True 'AG 06/02/2015 BA-2246
                                                 End If
                                             Else
-                                                'ISEAnalyzer.IsISEInitiatedDone = True
                                                 ISEAlreadyStarted = True
                                             End If
 
-                                            'SGM 21/01/2013 - refresh ISE Alarms when ISE deactivated - Bug #1108
                                             If ISEAnalyzer.IsLongTermDeactivation Then
-                                                MyClass.RefreshISEAlarms()
+                                                RefreshISEAlarms()
                                             End If
 
                                         ElseIf Not ISEAnalyzer.IsISEInitiating And Not ISEAnalyzer.IsLongTermDeactivation Then
@@ -727,6 +720,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Return myGlobal
         End Function
+
+        Private Sub ResetFbldAlarms()
+            '560
+            CanSendingRepetitions() = False
+            NumSendingRepetitionsTimeout() = 0
+            CanManageRetryAlarm = False
+
+            '551 and 552
+            SavedRotorStatus.IsActive = False
+            SavedRotorStatus.LastSaved = Nothing
+            SavedRotorStatus.State = RotorStates.None
+        End Sub
 
         Private Function GetParametersFromInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myGlobal As GlobalDataTO, ByRef myInstParamTo As InstructionParameterTO, _
                                                               ByVal mySensors As Dictionary(Of AnalyzerSensors, Single)) As Boolean
