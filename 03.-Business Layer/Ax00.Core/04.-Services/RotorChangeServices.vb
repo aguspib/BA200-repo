@@ -342,10 +342,12 @@ Namespace Biosystems.Ax00.Core.Services
             'AG 26/03/2012 - Special case: maybe the user was starting the instrument and the process has been
             'paused because there is not reactions rotor ... in this case when a valid alight is received
             'Sw must inform the start instrument process is OK
-            If _analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                _analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDs, WarmUpProcessFlag.Finalize) 'BA-2075
-            End If
+
+            'BA-2288
+            'If _analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
+            '    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+            '    _analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDs, WarmUpProcessFlag.Finalize) 'BA-2075
+            'End If
 
             'Update analyzer session flags into DataBase
             If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then

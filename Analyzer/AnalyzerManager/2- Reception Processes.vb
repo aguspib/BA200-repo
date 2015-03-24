@@ -334,13 +334,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
 
                                             If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                                                ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
+                                                'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
+                                                RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2288
 
                                             ElseIf mySessionFlags(AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
                                                 UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
 
                                             ElseIf mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                                                 RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2143
+
                                             End If
 
                                             'Update analyzer session flags into DataBase
@@ -1126,7 +1128,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
                                             'UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
                                             'myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
-                                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075                                        
+                                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075 
+                                            RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.Barcode) 'BA-2288
                                         End If
                                     End If
                                 End If

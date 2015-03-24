@@ -3339,19 +3339,16 @@ Partial Public Class UiAx00MainMDI
                     'NOTE: This button is disable while the REACT_ROTOR_MISSING alarm exist. In other way we have to implement a new elseIf case
                     'Continue the process on the aborted task (Washing)
                 Else
-                    myGlobal = AnalyzerController.Instance.StartWarmUpProcess() 'BA-2075
 
-                    If Not myGlobal.HasError Then
-                        If AnalyzerController.Instance.Analyzer.Connected Then
+                    Try
+                        If (AnalyzerController.Instance.StartWarmUpProcess()) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
-
                             'Activate only if current screen is monitor
                             WarmUpFinishedAttribute = False
                             BsTimerWUp.Enabled = True
                             If Not ActiveMdiChild Is Nothing Then
                                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                                     Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
-                                    'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
                                     CurrentMdiChild.bsWamUpGroupBox.Visible = True
                                 End If
                             End If
@@ -3359,17 +3356,48 @@ Partial Public Class UiAx00MainMDI
                         Else
                             activateButtonsFlag = True
                         End If
-                    Else
+
+                    Catch ex As Exception
                         ShowMessage("Error", myGlobal.ErrorMessage)
                         activateButtonsFlag = True
-                    End If
+                    End Try
 
                     If activateButtonsFlag Then
                         SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
                         SetEnableMainTab(True) 'DL 26/03/2012 test
                     End If
-                End If
 
+                    'myGlobal = AnalyzerController.Instance.StartWarmUpProcess() 'BA-2075
+
+                    'If Not myGlobal.HasError Then
+                    '    If AnalyzerController.Instance.Analyzer.Connected Then
+                    '        ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
+
+                    '        'Activate only if current screen is monitor
+                    '        WarmUpFinishedAttribute = False
+                    '        BsTimerWUp.Enabled = True
+                    '        If Not ActiveMdiChild Is Nothing Then
+                    '            If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                    '                Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
+                    '                'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
+                    '                CurrentMdiChild.bsWamUpGroupBox.Visible = True
+                    '            End If
+                    '        End If
+                    '        'END DL 09/09/2011
+                    '    Else
+                    '        activateButtonsFlag = True
+                    '    End If
+                    'Else
+                    '    ShowMessage("Error", myGlobal.ErrorMessage)
+                    '    activateButtonsFlag = True
+                    'End If
+
+                    'If activateButtonsFlag Then
+                    '    SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
+                    '    SetEnableMainTab(True) 'DL 26/03/2012 test
+                    'End If
+
+                End If
             End If
 
         Catch ex As Exception

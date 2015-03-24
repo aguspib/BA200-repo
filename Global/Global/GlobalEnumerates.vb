@@ -899,6 +899,7 @@ Namespace Biosystems.Ax00.Global
             StartRunning
             StopRunning
             NewRotor
+            Barcode
 
             'Internal Sw control flags
             ConnectedPortName

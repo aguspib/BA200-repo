@@ -1393,9 +1393,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         '((ISEAnalyzer.IsISESwitchedON And ISEAnalyzer.IsInitiatedOK) Or _
                         ' (Not ISEAnalyzer.IsISESwitchedON)) Then
 
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+                        'BA-2288
+                        'ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
+                        'ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
+                        'ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
 
 
                         If Not CheckIfProcessCanContinue() Then

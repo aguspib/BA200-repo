@@ -1,4 +1,7 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.BL
+
 Namespace Biosystems.Ax00.Core.Services
 
     Public MustInherit Class AsyncService
@@ -58,6 +61,17 @@ Namespace Biosystems.Ax00.Core.Services
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
+#End Region
+
+#Region "Public methods"
+
+        Public Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
+            If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                myFlagsDelg.Update(Nothing, FlagsDS)
+            End If
+        End Sub
+
 #End Region
 
     End Class

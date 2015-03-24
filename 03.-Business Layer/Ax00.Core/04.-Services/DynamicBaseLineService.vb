@@ -84,13 +84,13 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        Private Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
+        'Private Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
 
-            If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, FlagsDS)
-            End If
-        End Sub
+        '    If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+        '        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+        '        myFlagsDelg.Update(Nothing, FlagsDS)
+        '    End If
+        'End Sub
 
         Private Sub PerformAEmptyRotorStep()
 
@@ -206,7 +206,7 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Attributes"
 
         Private _forceEmptyAndFinalize As Boolean = False
-        Private _checkedPreviousAlarms As Boolean = False
+        Private _checkedPreviousAlarms As Boolean = True
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As BaseLineStepsEnum
@@ -810,7 +810,9 @@ Namespace Biosystems.Ax00.Core.Services
                 '551 caducada
                 ExecuteDynamicBaseLineEmptyStep()
             Else
+
                 '551 correcta
+
             End If
         End Sub
 

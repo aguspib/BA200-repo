@@ -718,6 +718,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then 'AG 08/03/2012
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
 
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
+                            RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.Washing) 'BA-2288
                         End If
 
                         'Ax00 STARTS the go to SLEEP process
@@ -841,7 +843,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
                                     SetSessionFlags(AnalyzerManagerFlags.DynamicBL_Empty, "END")
                                     CurrentInstructionAction = InstructionActions.None
-                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize)
+                                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2288
                                     RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.DynamicBL_Empty) 'BA-2143
                                 End If
                         End Select
@@ -1828,7 +1830,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If AnalyzerStatusAttribute = AnalyzerManagerStatus.SLEEPING Then
                             'AG 20/01/2015 BA-2216
                             UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "")
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument)
+                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument) BA-2288
 
                             'AG 20/01/2015 BA-2216 - new conditions
                         ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
