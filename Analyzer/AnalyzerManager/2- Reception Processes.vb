@@ -2516,16 +2516,11 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myNewSensorChangeRow As UIRefreshDS.SensorValueChangedRow
 
                             'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
-<<<<<<< HEAD
-                            SyncLock myUI_RefreshDS.SensorValueChanged
-                                Dim lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
-                                          Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0 _
-=======
+
                             Dim lnqRes As IEnumerable(Of UIRefreshDS.SensorValueChangedRow)
                             SyncLock myUI_RefreshDS.SensorValueChanged  'Este SyncLock no está bien tratado. Objeto no global no readonly!!
                                 lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged
                                           Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0
->>>>>>> b19c68e4a71df2c94a3925d65422dc03fc5e7743
                                           Select a)
 
                                 If lnqRes.Count > 0 Then
@@ -2547,10 +2542,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myUI_RefreshDS.SensorValueChanged.AcceptChanges()
                                 End If
                             End SyncLock
-<<<<<<< HEAD
-                            ' XBC 26/10/2011
-=======
->>>>>>> b19c68e4a71df2c94a3925d65422dc03fc5e7743
                         End If
 
                     Case Else
