@@ -1,10 +1,12 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Option Strict On
+Option Infer On
+
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
-
 Namespace Biosystems.Ax00.Core.Services
 
     Public Enum BaseLineStepsEnum
@@ -787,32 +789,36 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private Sub CheckPreviousAlarms()
             'Previous constraint:
+            _checkedPreviousAlarms = True
             If _analyzer.Connected = False Then Return
 
-            Dim Alarm551Present As Boolean = True
+            'TODO: Replace with actual code from Alarms Cross-Cut being developed
+            Dim Alarm551Present As Boolean = True, Alarm552Present As Boolean = False
             Dim Alarm551Date = Now.AddMinutes(-15)
+            '/TODO
 
-            If Alarm551Present Then
-                ProcessAlarm551(Alarm551Date)
+            If Alarm552Present Then
+                ExecuteDynamicBaseLineEmptyStep()
+            ElseIf Alarm551Present Then
+                ProcessAlarmFullCleanRotor(Alarm551Date)
             Else
-                _checkedPreviousAlarms = True
+                'No alarms to process!
             End If
 
             'Throw New NotImplementedException
         End Sub
 
-        Private Sub ProcessAlarm551(Alarm551Date As Date)
+        Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)
             Dim minutosCaducidadRotorLleno = 30
-            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue("FLIGHT_FULL_ROTOR_CADUCITY")
+            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue(GlobalEnumerates.GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
             If caducityParameter IsNot Nothing AndAlso caducityParameter.HasError = False Then minutosCaducidadRotorLleno = CInt(caducityParameter.SetDatos)
 
-            If Alarm551Date < Now.AddMinutes(-minutosCaducidadRotorLleno) Then
+            If pAlarmDate < Now.AddMinutes(-minutosCaducidadRotorLleno) Then
                 '551 caducada
                 ExecuteDynamicBaseLineEmptyStep()
             Else
                 '551 correcta
 
-                _checkedPreviousAlarms = True
             End If
         End Sub
 

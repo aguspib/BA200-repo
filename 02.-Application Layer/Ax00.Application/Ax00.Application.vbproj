@@ -81,6 +81,7 @@
     <Compile Include="AnalyzerFactory.vb" />
     <Compile Include="IAnalyzerController.vb" />
     <Compile Include="IAnalyzerFactory.vb" />
+    <Compile Include="PersentationLayerListener\IPresentationLayerListener.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -96,6 +97,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="PersentationLayerListener\Requests\Notify.vb" />
+    <Compile Include="PersentationLayerListener\Requests\PresentationRequest.vb" />
+    <Compile Include="PersentationLayerListener\Requests\YesNoCancelQuestion.vb" />
+    <Compile Include="PersentationLayerListener\Requests\YesNoQuestion.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

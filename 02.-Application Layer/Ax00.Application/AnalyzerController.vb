@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.App.PresentationLayerListener
 
 Namespace Biosystems.Ax00.App
 
@@ -50,6 +51,8 @@ Namespace Biosystems.Ax00.App
                 Return (Not _instance.Value.Analyzer Is Nothing)
             End Get
         End Property
+
+        Public Shared Property PresentationLayerInterface As IPresentationLayerListener
 
 #End Region
 

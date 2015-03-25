@@ -1699,23 +1699,25 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
                                                 Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
 
-                                                Dim i As Integer = 0
+                                                Dim aux As Integer = 0
                                                 'Search the proper row in mySentPreparationsDS.sentPreparations
                                                 For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
                                                     'AG 28/03/2014 - #1563 evaluate that ExecutionID is not NULL
                                                     'If previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
                                                     If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
+                                                        aux = i
                                                         Exit For
                                                     ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
                                                         GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
                                                     End If
                                                     'AG 28/03/2014 - #1563 
+                                                    aux = i
                                                 Next
 
                                                 'Search if the proper wash has been already sent or not
                                                 contaminationFound = True
                                                 nextExecutionFound = False
-                                                For i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+                                                For i = aux To mySentPreparationsDS.sentPreparations.Rows.Count - 1
                                                     If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
                                                         mySentPreparationsDS.sentPreparations(i).WashSolution1 = myWashSolutionType Then
 
@@ -1765,7 +1767,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myRow.SetContaminationIDNull()
                                 myRow.SetWashingSolution1Null()
                                 myReturn.searchNext.AddsearchNextRow(myRow)
-
+#If DEBUG Then
+                                Debug.Print(String.Format("Next execution sent: {0}, sample class {1}", myRow.ExecutionID.ToString(), myRow.SampleClass))
+#End If
                             Else
                                 'Contamination (wash has to be sent)
                                 myRow = myReturn.searchNext.NewsearchNextRow
@@ -1774,6 +1778,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myRow.ContaminationID = myContaminationID
                                 myRow.WashingSolution1 = myWashSolutionType
                                 myReturn.searchNext.AddsearchNextRow(myRow)
+
+#If DEBUG Then
+                                Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
+#End If
+
                             End If '(4)
                             resultData.SetDatos = myReturn
 

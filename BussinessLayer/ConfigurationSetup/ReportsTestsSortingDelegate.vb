@@ -115,7 +115,7 @@ Namespace Biosystems.Ax00.BL
                             'Update GeneralSetting LAST_TEST_REPORT_POS with value of the last TestPosition
                             Dim myLastPosition As Integer = pReportsTestsSortingDS.tcfgReportsTestsSorting(pReportsTestsSortingDS.tcfgReportsTestsSorting.Count - 1).TestPosition
 
-                            myGlobalDataTO = GeneralSettingsDelegate.UpdateCurrValBySettingID(dbConnection, GlobalEnumerates.GeneralSettingsEnum.LAST_TEST_REPORT_POS.ToString, myLastPosition.ToString())
+                            myGlobalDataTO = GeneralSettingsDelegate.UpdateCurrValBySettingID(dbConnection, GlobalEnumerates.GeneralSettingsEnum.LAST_TEST_REPORT_POS, myLastPosition.ToString())
                         End If
                     End If
 

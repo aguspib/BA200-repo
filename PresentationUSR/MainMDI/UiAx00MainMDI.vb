@@ -557,6 +557,8 @@ Partial Public Class UiAx00MainMDI
         End Set
     End Property
 
+
+
 #End Region
 
 #Region "Common Forms" 'SG 03/12/10
@@ -8194,6 +8196,9 @@ Partial Public Class UiAx00MainMDI
             CurrentLanguageAttribute = MultilanguageResourcesDelegate.GetCurrentLanguage() 'RH 01/03/2012
 
             BsLoadDefaultReportTemplates.RunWorkerAsync() 'RH 17/02/2012
+
+            'Inyección de dependencias en triple mortal... (MI. Esto es un WIP!!)
+            AnalyzerController.PresentationLayerInterface = New BusinessComLayer(Me)
 
             Application.DoEvents()
 

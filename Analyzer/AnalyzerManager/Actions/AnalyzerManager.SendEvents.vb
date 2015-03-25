@@ -286,13 +286,16 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSwAdditionalParameters"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function AdjustFLightSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object) As GlobalDataTO
+        Private Function AdjustFLightSendEvent(ByVal myGlobal As GlobalDataTO, ByVal pSwAdditionalParameters As Object, ByVal pFwScriptId As String, ByVal pServiceParams As List(Of String)) As GlobalDataTO
 
-            If ConnectedAttribute Then
-                If Not pSwAdditionalParameters Is Nothing Then
-                    Dim myParams = DirectCast(pSwAdditionalParameters, List(Of String))
-                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FLIGHT, myParams, String.Empty, String.Empty, Nothing)
+            If ConnectedAttribute AndAlso Not pSwAdditionalParameters Is Nothing Then
+                If Not sendingRepetitions Then
+                    numRepetitionsTimeout = 0
                 End If
+
+                StoreStartTaskinQueue(AnalyzerManagerSwActionList.ADJUST_FLIGHT, pSwAdditionalParameters, pFwScriptId, pServiceParams)
+                Dim myParams = DirectCast(pSwAdditionalParameters, List(Of String))
+                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.FLIGHT, myParams, String.Empty, String.Empty, Nothing)
             End If
             Return myGlobal
         End Function

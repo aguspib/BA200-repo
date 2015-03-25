@@ -342,6 +342,7 @@ Public Class Ax00MainForm
 
         Dim FLS As New Biosystems.Ax00.Core.Services.BaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
 
+
         FLS.OnServiceStatusChange =
             Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)
                 Try

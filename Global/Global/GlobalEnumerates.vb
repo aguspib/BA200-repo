@@ -142,6 +142,7 @@ Namespace Biosystems.Ax00.Global
             MAX_PATIENT_ORDER_TESTS
             SUPERVISOR_CREATED_TEST_COUNT 'AG 03/09/2014 - complete enum
             MAX_QCRESULTS_TO_ACCUMULATE
+            FLIGHT_FULL_ROTOR_CADUCITY
         End Enum
 
         ''' <summary>
