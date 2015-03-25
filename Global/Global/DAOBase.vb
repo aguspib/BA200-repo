@@ -214,11 +214,12 @@ Namespace Biosystems.Ax00.Global
             'Better implementation:
             Dim connectionSafeDataTo = GetSafeOpenDBConnection(pDBConnection)   'It handles its own exeptions
             Return connectionSafeDataTo.GetCompatibleGlobalDataTO()
+
         End Function
 
 
         'Future implementation that returns typed DataTo:
-        Public Function GetSafeOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of SqlClient.SqlConnection)
+        Public Function GetSafeOpenDBConnection(ByVal pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of SqlClient.SqlConnection)
 
             Dim openConnection As New TypedGlobalDataTo(Of SqlClient.SqlConnection)
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -242,6 +243,7 @@ Namespace Biosystems.Ax00.Global
                 openConnection.ErrorCode = "DB_CONNECTION_ERROR"
                 openConnection.ErrorMessage = ex.Message
 
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex)
             End Try
 

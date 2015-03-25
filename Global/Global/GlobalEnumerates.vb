@@ -2160,6 +2160,8 @@ Namespace Biosystems.Ax00.Global
             SRV_MANAGEMENT_ALARM_TYPE   ' XBC 16/10/2012 - SERVICE : Received alarms Management type  (values : 1.Update Fw; 2.Fatal Error; 3.Recover; 4.Simple Error; 5.Request Info; 6.Ommit Error)
             AUTO_RERUN_ADDED 'AG 14/03/2014 - #1524: 1 rerun added automatically to WS, 0: no
 
+            FLIGHT_ROTOR_ALREADY_FULL   'BA-2358
+
         End Enum
 #End Region
 
