@@ -697,6 +697,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     ' Activates Alarm begin
                     _analyzerManager.CanManageRetryAlarm = True
+
+                    Dim myAlarmList As New List(Of Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+                    _analyzerManager.PrepareLocalAlarmList(Alarms.GLF_BOARD_FBLD_ERR, True, myAlarmList, myAlarmStatusList)
                 Else
                     GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                     myGlobal = _analyzerManager.SendStartTaskinQueue()
