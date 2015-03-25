@@ -215,45 +215,11 @@ Namespace Biosystems.Ax00.Global
             Dim connectionSafeDataTo = GetSafeOpenDBConnection(pDBConnection)   'It handles its own exeptions
             Return connectionSafeDataTo.GetCompatibleGlobalDataTO()
 
-            'Return GetSafeOpenDBConnection(pDBConnection).GetCompatibleGlobalDataTo
-
-            'Old one:
-            'Dim openConnection As New GlobalDataTO
-            ''Dim dbConnection As New SqlClient.SqlConnection
-            'Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            'Try
-            '    If (pDBConnection Is Nothing) Then
-            '        'A local Database Connection is opened
-            '        dbConnection = New SqlClient.SqlConnection
-            '        dbConnection.ConnectionString = GetConnectionString()
-            '        dbConnection.Open()
-            '        Console.Out.WriteLine("SQL connection created!")
-            '    Else
-            '        'The opened Database Connection is used
-            '        dbConnection = pDBConnection
-            '        Console.Out.WriteLine("SQL connection reused!")
-            '    End If
-
-            '    openConnection.HasError = False
-            '    openConnection.SetDatos = dbConnection
-
-            'Catch ex As Exception
-            '    openConnection.HasError = True
-            '    openConnection.ErrorCode = "DB_CONNECTION_ERROR"
-            '    openConnection.ErrorMessage = ex.Message
-
-            '    'Dim myLogAcciones As New ApplicationLogManager()
-            '    GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
-
-            'End Try
-
-            'Return openConnection
         End Function
 
 
         'Future implementation that returns typed DataTo:
-        Public Function GetSafeOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of SqlClient.SqlConnection)
+        Public Function GetSafeOpenDBConnection(ByVal pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of SqlClient.SqlConnection)
 
             Dim openConnection As New TypedGlobalDataTo(Of SqlClient.SqlConnection)
             Dim dbConnection As SqlClient.SqlConnection = Nothing

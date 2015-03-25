@@ -143,10 +143,6 @@ Namespace Biosystems.Ax00.BL
             Return GeneralSettingByStringValue(pDBConnection, pSettingID)
         End Function
 
-
-
-
-
         ''' <summary>
         ''' This function returns General setting value by its enum
         ''' </summary>
