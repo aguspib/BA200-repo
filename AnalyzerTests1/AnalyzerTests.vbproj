@@ -84,6 +84,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalyzerManager\Actions\AnalyzerAlarmsTests.vb" />
     <Compile Include="AnalyzerManager\Error560.vb" />
     <Compile Include="AnalyzerManager\ProcessStatusReceivedTest.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -126,6 +127,10 @@
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
     </ProjectReference>
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>

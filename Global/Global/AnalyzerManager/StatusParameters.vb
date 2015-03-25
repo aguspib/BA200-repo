@@ -9,8 +9,8 @@
 
         Public Enum RotorStates
             None = 0
-            CheckedRotorFull = 551
-            LeeryRotorFull = 552
+            FBLD_ROTOR_FULL = 551
+            UNKNOW_ROTOR_FULL = 552
         End Enum
     End Module
 End Namespace

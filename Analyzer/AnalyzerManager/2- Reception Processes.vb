@@ -308,10 +308,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'AG 23/05/2012
 
                                         If AlarmList.Count > 0 Then
-                                            If GlobalBase.IsServiceAssembly Then
-                                                'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                            Else
-                                                Dim currentAlarms = New CurrentAlarms(Me)
+                                            If Not GlobalBase.IsServiceAssembly Then
+                                                Dim currentAlarms = New AnalyzerAlarms(Me)
                                                 myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                             End If
                                         End If
@@ -523,7 +521,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                         Else
-                            Dim currentAlarms = New CurrentAlarms(Me)
+                            Dim currentAlarms = New AnalyzerAlarms(Me)
                             myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                         End If
                     End If
@@ -653,11 +651,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Next
 
                                             If myAlarmList.Count > 0 Then
-                                                Dim currentAlarms = New CurrentAlarms(Me)
+                                                Dim currentAlarms = New AnalyzerAlarms(Me)
                                                 myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                                                 If Not GlobalBase.IsServiceAssembly Then
-                                                    Dim currentAlarmsRetry = New CurrentAlarms(Me)
+                                                    Dim currentAlarmsRetry = New AnalyzerAlarms(Me)
                                                     myGlobal = currentAlarmsRetry.Manage(myAlarmList, myAlarmStatusList)
                                                 End If
                                             End If
@@ -1936,7 +1934,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Alarms treatment for Service
                     Else
                         Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                         GlobalBase.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
                     End If
@@ -2039,7 +2037,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         ' Not Apply
                         'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
                     Else
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
                     End If
                 End If
@@ -2410,11 +2408,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myUI_RefreshDS.ReceivedAlarms.AddReceivedAlarmsRow(myNewAlarmRow)
                                     myUI_RefreshDS.ReceivedAlarms.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
                                 End SyncLock
-                            Case Else
-
                         End Select
-
-                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
                 End If
@@ -2424,9 +2418,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEvent", EventLogEntryType.Error, False)
-                'Finally
 
             End Try
 
@@ -3104,11 +3096,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Finally call manage all alarms detected (new or solved)
                     If myAlarmList.Count > 0 Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobalDataTO = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                         If Not GlobalBase.IsServiceAssembly Then
-                            Dim currentAlarmsRetry = New CurrentAlarms(Me)
+                            Dim currentAlarmsRetry = New AnalyzerAlarms(Me)
                             myGlobalDataTO = currentAlarmsRetry.Manage(myAlarmList, myAlarmStatusList)
                         End If
 
@@ -3586,7 +3578,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Finally call manage all alarms detected (new or solved)
                     If myAlarmList.Count > 0 Then
                         If Not GlobalBase.IsServiceAssembly Then
-                            Dim currentAlarms = New CurrentAlarms(Me)
+                            Dim currentAlarms = New AnalyzerAlarms(Me)
                             myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                         End If
 
@@ -3718,7 +3710,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If myAlarmList.Count > 0 Then
                             If Not GlobalBase.IsServiceAssembly Then
-                                Dim currentAlarms = New CurrentAlarms(Me)
+                                Dim currentAlarms = New AnalyzerAlarms(Me)
                                 myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                         End If

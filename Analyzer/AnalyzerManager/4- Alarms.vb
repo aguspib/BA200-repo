@@ -1363,7 +1363,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim instrAddedToLogFlag As Boolean = False 'Indicates if the instruction has been added to log file
                 If myAlarmList.Count > 0 Then
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
-                    Dim currentAlarms = New CurrentAlarms(Me)
+                    Dim currentAlarms = New AnalyzerAlarms(Me)
                     myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                     'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
@@ -2309,7 +2309,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count > 0 Then
                                 Dim myGlobal As New GlobalDataTO
-                                Dim currentAlarms = New CurrentAlarms(Me)
+                                Dim currentAlarms = New AnalyzerAlarms(Me)
                                 myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                         End If
@@ -3088,7 +3088,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If Not GlobalBase.IsServiceAssembly Then
-                                Dim currentAlarms = New CurrentAlarms(Me)
+                                Dim currentAlarms = New AnalyzerAlarms(Me)
                                 resultData = currentAlarms.Manage(okAlarmList, okAlarmStatusList)
                             End If
                         End If
@@ -3114,57 +3114,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
-
-        ''' <summary>
-        ''' If some of the alarms in pAlarmList means analyzer FREEZE then return TRUE
-        ''' If none of the alarms in pAlarmList means analyzer FREEZE then return FALSE
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAlarmList"></param>
-        ''' <returns></returns>
-        ''' <remarks>AG 07/03/2012</remarks>
-        Private Function ExistFreezeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAlarmList As List(Of Alarms)) As Boolean
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlConnection = Nothing
-            Dim returnData As Boolean = False
-
-            Try
-                resultData = GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        Dim myLinq As List(Of AlarmsDS.tfmwAlarmsRow)
-
-                        For Each item As Alarms In pAlarmList
-                            myLinq = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
-                                      Where String.Equals(a.AlarmID, item.ToString) AndAlso Not a.IsFreezeNull Select a).ToList
-
-                            If myLinq.Count > 0 Then
-                                returnData = True 'Currently exist some alarm that means analyzer in FREEZE mode
-                                Exit For
-                            End If
-                        Next
-                        myLinq = Nothing
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistFreezeAlarms", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-            Return returnData
-        End Function
 
 #End Region
 
@@ -3407,7 +3356,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -3442,7 +3391,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -3482,7 +3431,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -3524,7 +3473,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -3556,7 +3505,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(AlarmEnumerates.Alarms.R1_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -3588,7 +3537,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 PrepareLocalAlarmList(AlarmEnumerates.Alarms.R2_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
                     If Not GlobalBase.IsServiceAssembly Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
