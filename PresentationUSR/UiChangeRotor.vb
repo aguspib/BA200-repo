@@ -276,24 +276,24 @@ Public Class UiChangeRotor
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Not allow move form and mantain the center location in center parent
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: DL 27/07/2011
-    ''' </remarks>
-    Protected Overrides Sub WndProc(ByRef m As Message)
-        If (m.Msg = WM_WINDOWPOSCHANGING) Then
-            Dim mySize As Size = Me.Parent.Size
-            Dim myLocation As Point = Me.Parent.Location
-            Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
+    ' ''' <summary>
+    ' ''' Not allow move form and mantain the center location in center parent
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by: DL 27/07/2011
+    ' ''' </remarks>
+    'Protected Overrides Sub WndProc(ByRef m As Message)
+    '    If (m.Msg = WM_WINDOWPOSCHANGING) Then
+    '        Dim mySize As Size = Me.Parent.Size
+    '        Dim myLocation As Point = Me.Parent.Location
+    '        Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-            pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
-            pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70
-            Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
-        End If
-        MyBase.WndProc(m)
-    End Sub
+    '        pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
+    '        pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70
+    '        Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
+    '    End If
+    '    MyBase.WndProc(m)
+    'End Sub
 
     Private Sub ExitScreen()
         Try
@@ -361,15 +361,15 @@ Public Class UiChangeRotor
         _processIsPaused = IsProcessPaused()
 
         secondsInPause = dxProgressBar.Position
-        dxProgressBar.Visible = True
-        dxProgressBar.Show()
+        If dxProgressBar.Visible = False Then dxProgressBar.Visible = True
+        'dxProgressBar.Show()
 
         Dim Dt1 As DateTime = DateTime.Now
         Dim Dt2 As DateTime
         Dim Span As TimeSpan
 
         bsContinueButton.Enabled = False
-
+        Dim elapsed = Now.AddSeconds(0.1)
         While ScreenWorkingProcess AndAlso (Not _processIsPaused)
             Dt2 = DateTime.Now
             Span = Dt2.Subtract(Dt1)
@@ -380,15 +380,18 @@ Public Class UiChangeRotor
                 dxProgressBar.Position = CInt(Span.TotalSeconds + secondsInPause)
             End If
 
-            dxProgressBar.Show()
-            Application.DoEvents()
+            If dxProgressBar.Visible = False Then dxProgressBar.Show()
+            If elapsed < Now Then
+                elapsed = Now.AddSeconds(0.1)
+                Application.DoEvents()
+            End If
 
             If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
         End While
 
         If (Not _processIsPaused) AndAlso (Not ScreenWorkingProcess) Then
             dxProgressBar.Position = dxProgressBar.Properties.Maximum
-            dxProgressBar.Show()
+            If dxProgressBar.Visible = False Then dxProgressBar.Show()
             Application.DoEvents()
 
             'dl 26/09/2012

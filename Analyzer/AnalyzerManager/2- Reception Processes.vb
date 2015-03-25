@@ -2475,7 +2475,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                ByVal pScannedPosition As Boolean, ByVal pElementID As Integer, ByVal pMultiTubeNumber As Integer, _
                                                ByVal pTubeType As String, ByVal pTubeContent As String) As GlobalDataTO Implements IAnalyzerManager.PrepareUIRefreshEventNum2
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlConnection = Nothing
+            'Dim dbConnection As SqlConnection = Nothing
 
             Try
                 eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
@@ -2519,11 +2519,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myNewSensorChangeRow As UIRefreshDS.SensorValueChangedRow
 
                             'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
-                            Dim lnqRes As List(Of UIRefreshDS.SensorValueChangedRow)
                             SyncLock myUI_RefreshDS.SensorValueChanged
-                                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
+                                Dim lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
                                           Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0 _
-                                          Select a).ToList
+                                          Select a)
 
                                 If lnqRes.Count > 0 Then
                                     lnqRes(0).BeginEdit()
@@ -2544,7 +2543,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myUI_RefreshDS.SensorValueChanged.AcceptChanges()
                                 End If
                             End SyncLock
-                            lnqRes = Nothing 'AG 02/08/2012 - free memory
                             ' XBC 26/10/2011
                         End If
 
@@ -2691,7 +2689,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function PrepareUIRefreshEventNum4(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
                                                ByVal pAnalyzerID As String, ByVal pWS As String, ByVal pOrderList As List(Of String)) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As SqlConnection = Nothing
+            'Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'If (Not dbConnection Is Nothing) Then
