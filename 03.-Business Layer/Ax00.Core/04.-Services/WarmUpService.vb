@@ -48,11 +48,11 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Event Handlers"
 
-        Public Sub OnReceivedStatusInformationEvent() Handles _analyzer.ReceivedStatusInformationEventHandler
+        Public Sub OnReceivedStatusInformationEvent()
             TryToResume()
         End Sub
 
-        Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
+        Public Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.Washing
                     ValidateProcess()
@@ -80,8 +80,9 @@ Namespace Biosystems.Ax00.Core.Services
 
                 If _analyzer.Connected Then
                     If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "") Then
-                        Initialize()
                         _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                        Initialize()
+                        AddRequiredEventHandlers()
                     End If
 
                     ValidateProcess()
@@ -103,14 +104,8 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Overrides Sub PauseService()
 
-            If (_eventHandlersAdded) Then
-                RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
-                RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
-
-                _baseLineService.PauseService()
-
-                _eventHandlersAdded = False
-            End If
+            RemoveRequiredEventHandlers()
+            _baseLineService.PauseService()
 
         End Sub
 
@@ -120,14 +115,8 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Overrides Sub RestartService()
 
-            If (Not _eventHandlersAdded) Then
-                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
-                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
-
-                _baseLineService.RestartService()
-
-                _eventHandlersAdded = True
-            End If
+            AddRequiredEventHandlers()
+            _baseLineService.RestartService()
 
         End Sub
 
@@ -685,6 +674,32 @@ Namespace Biosystems.Ax00.Core.Services
             End If
             'AG 16/05/2012
 
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub RemoveRequiredEventHandlers()
+            If _eventHandlersAdded Then
+                Try
+                    RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                    RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+                    _eventHandlersAdded = False
+                Catch : End Try
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub AddRequiredEventHandlers()
+            If Not _eventHandlersAdded Then
+                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+                _eventHandlersAdded = True
+            End If
         End Sub
 
 #End Region
