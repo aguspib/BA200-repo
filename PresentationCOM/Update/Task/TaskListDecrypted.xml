@@ -1222,7 +1222,7 @@
       --|====================|
       --| BA200: v3.07     	 |
       --|====================|
-	  
+
       IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
       BEGIN
       INSERT INTO dbo.tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, OKType)
@@ -1236,15 +1236,22 @@
       VALUES ('GLF_BOARD_ERR',560,'2_FATAL_ERROR')
       END
       GO
-      
-    -- BA-2358
+
+      -- BA-2358
       IF((SELECT COUNT(*) FROM dbo.tfmwGeneralSettings WHERE SettingID LIKE 'FLIGHT_FULL_ROTOR_CADUCITY') = 0)
       BEGIN
       INSERT INTO dbo.tfmwGeneralSettings (SettingID, FixedItemDesc, CurrentValue, Status)
       VALUES ('FLIGHT_FULL_ROTOR_CADUCITY','Minutes that a full clean rotor is considered good to be read in a FLIGHT operation','30', 1)
       END
       GO
-  
+
+      -- BA-2406
+      IF((SELECT COUNT(*) FROM dbo.tfmwSwFlags WHERE FlagID LIKE 'Barcode') = 0)
+      BEGIN
+      INSERT INTO [Ax00].[dbo].[tfmwSwFlags] VALUES ('Barcode', 'INI, END, CANCELED or NULL')
+      END
+      GO
+
     </UpdateScript>
   </AppVersion>
 </TaskListDS>
