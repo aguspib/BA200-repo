@@ -690,10 +690,16 @@ Namespace Biosystems.Ax00.Core.Entities
                 analyzerFREEZEModeAttribute = value
             End Set
         End Property
-
         Public Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String Implements IAnalyzerManager.SessionFlag  '19/04/2010 AG
             Get
-                Return mySessionFlags(pFlag.ToString)
+                If mySessionFlags.ContainsKey(pFlag.ToString) Then
+                    Return mySessionFlags(pFlag.ToString)
+                Else
+#If config = "Debug" Then
+                    Debug.WriteLine("Attention!! Session flag " & pFlag & " was not found.")
+#End If
+                    Return String.Empty
+                End If
             End Get
 
             Set(ByVal pValue As String)
