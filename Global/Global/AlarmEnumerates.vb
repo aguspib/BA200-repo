@@ -176,8 +176,8 @@ Namespace Biosystems.Ax00.Global
 
             'FBLD Alerts
             GLF_BOARD_FBLD_ERR              'Photometric board not responding during FBLD       | FW ERROR CODE: 560
-            FBLD_ROTOR_FULL                 'STATUS: GLF METACRILATE ROTOR FULL during FBLD
-            UNKNOW_ROTOR_FULL               'STATUS: GLF METACRILATE ROTOR FULL unknow situation
+            FBLD_ROTOR_FULL                 'STATUS: METACRILATE ROTOR FULL during FBLD         | FW ERROR CODE: 551
+            UNKNOW_ROTOR_FULL               'STATUS: METACRILATE ROTOR FULL unknow situation    | FW ERROR CODE: 552
 
             'Software business alarms
             '========================

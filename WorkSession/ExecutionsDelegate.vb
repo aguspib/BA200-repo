@@ -5928,14 +5928,34 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Protected Function GetActiveAnalyzer(ByVal dbConnection As SqlConnection) As String
+        Public Function GetActiveAnalyzer(ByVal dbConnection As SqlConnection) As String
             Dim resultData As GlobalDataTO = Nothing
-            Dim myAnalyzerDAO As New tcfgAnalyzersDAO            
+            Dim myAnalyzerDAO As New tcfgAnalyzersDAO
             Dim activeAnalyzer As String = ""
-            resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)            
+            resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 Dim myDS = CType(resultData.SetDatos, AnalyzersDS)
                 activeAnalyzer = myDS.tcfgAnalyzers(0).Item("AnalyzerModel").ToString()
+            End If
+            Return activeAnalyzer
+        End Function
+
+        ''' <summary>
+        ''' Gets the active analyzer model
+        ''' </summary>
+        ''' <param name="dbConnection">Connection to db</param>
+        ''' <returns>The analyzer model that is currently connected to</returns>
+        ''' <remarks>
+        ''' Created on 19/03/2015 by AJG
+        ''' </remarks>
+        Public Function GetActiveAnalyzerId(ByVal dbConnection As SqlConnection) As String
+            Dim resultData As GlobalDataTO = Nothing
+            Dim myAnalyzerDAO As New tcfgAnalyzersDAO
+            Dim activeAnalyzer As String = ""
+            resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
+            If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
+                Dim myDS = CType(resultData.SetDatos, AnalyzersDS)
+                activeAnalyzer = myDS.tcfgAnalyzers(0).Item("AnalyzerId").ToString()
             End If
             Return activeAnalyzer
         End Function

@@ -1037,26 +1037,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        'SGM 10/01/2012
-        'Public Property LastISECommand() As ISECommandTO
-        '    Get
-        '        Return LastISECommandAttr
-        '    End Get
-        '    Set(ByVal value As ISECommandTO)
-        '        LastISECommandAttr = value
-        '    End Set
-        'End Property
-
-        'Public Property LastISEResult() As ISEResultTO
-        '    Get
-        '        Return LastISEResultAttr
-        '    End Get
-        '    Set(ByVal value As ISEResultTO)
-        '        LastISEResultAttr = value
-        '    End Set
-        'End Property
-
-
         ' XBC 03/05/2012
         Public Property IsStressing() As Boolean Implements IAnalyzerManager.IsStressing
             Get
@@ -1820,15 +1800,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Next
 
                 If myAlarmList.Count > 0 Then
-                    'myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 17/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'myGlobal = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
@@ -1914,12 +1887,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 myAnalyzerModel = pAnalyzerModel 'SGM 04/03/11
 
                 Dim myAlarmsDelegate As New AlarmsDelegate
-                Dim myGlobalDataTO = myAlarmsDelegate.ReadAll(Nothing)
-                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                    alarmsDefintionTableDS = DirectCast(myGlobalDataTO.SetDatos, AlarmsDS)
+                Dim myGlobalDataTo = myAlarmsDelegate.ReadAll(Nothing)
+                If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
+                    alarmsDefintionTableDS = DirectCast(myGlobalDataTo.SetDatos, AlarmsDS)
                 End If
-
-
+                
                 'AG 20/04/2011 - Define methods who will implement work
                 AddHandler wellBaseLineWorker.DoWork, AddressOf wellBaseLineWorker_DoWork
                 AddHandler wellBaseLineWorker.RunWorkerCompleted, AddressOf wellBaseLineWorker_RunWorkerCompleted
@@ -1932,11 +1904,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 wasteDepositTimer.Interval = 60000 'default interval value 1 minute
                 waterDepositTimer.Interval = 60000 'default interval value 1 minute
 
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    If IsNumeric(myGlobalDataTO.SetDatos) AndAlso CInt(myGlobalDataTO.SetDatos) > 0 Then
-                        wasteDepositTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
-                        waterDepositTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    If IsNumeric(myGlobalDataTo.SetDatos) AndAlso CInt(myGlobalDataTo.SetDatos) > 0 Then
+                        wasteDepositTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
+                        waterDepositTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                     End If
                 End If
                 AddHandler wasteDepositTimer.Elapsed, AddressOf WasteDepositError_Timer
@@ -1949,14 +1921,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 thermoFridgeWarningTimer.Interval = 120000 'default interval value 2 minutes
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    thermoReactionsRotorWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    thermoReactionsRotorWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                 End If
 
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    thermoFridgeWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    thermoFridgeWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                 End If
 
                 AddHandler thermoReactionsRotorWarningTimer.Elapsed, AddressOf ThermoReactionsRotorError_Timer
@@ -1970,49 +1942,77 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    thermoR1ArmWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
-                    thermoR2ArmWarningTimer.Interval = CInt(myGlobalDataTO.SetDatos) * 1000
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    thermoR1ArmWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
+                    thermoR2ArmWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                 End If
 
                 AddHandler thermoR1ArmWarningTimer.Elapsed, AddressOf thermoR1ArmWarningTimer_Timer
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
 
                 ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_OFF.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    WAITING_TIME_OFF = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_OFF.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    WAITING_TIME_OFF = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    SYSTEM_TIME_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    SYSTEM_TIME_OFFSET = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    WAITING_TIME_DEFAULT = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    WAITING_TIME_DEFAULT = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_FAST.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    WAITING_TIME_FAST = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_FAST.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    WAITING_TIME_FAST = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    WAITING_TIME_ISE_FAST = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_FAST = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
-                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                    WAITING_TIME_ISE_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_OFFSET = CInt(myGlobalDataTo.SetDatos)
                 End If
 
                 AdjustmentsFilePath = String.Empty '#REFACTORING
+
+                'Initialization State alarms
+                StatusParameters.IsActive = False
+                StatusParameters.State = StatusParameters.RotorStates.None
+                StatusParameters.LastSaved = DateTime.Now
+
+                Dim currentAlarmsDelg As New WSAnalyzerAlarmsDelegate
+
+                Dim execDelg As New ExecutionsDelegate
+                myGlobalDataTo = currentAlarmsDelg.GetAlarmsMonitor(Nothing, execDelg.GetActiveAnalyzerId(Nothing), "")
+                If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
+                    Dim temporalDs = DirectCast(myGlobalDataTo.SetDatos, WSAnalyzerAlarmsDS)
+
+                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, StatusParameters.RotorStates.FBLD_ROTOR_FULL, True)
+                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, StatusParameters.RotorStates.UNKNOW_ROTOR_FULL, False)
+                End If
 
             Catch ex As Exception
                 classInitializationErrorAttribute = True
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.New", EventLogEntryType.Error, False)
             End Try
         End Sub
-        ' XBC 02/03/2011
+
+        Private Sub SetValuesOnSaveRotorStatusFromActiveAlarms(ByVal temporalDs As WSAnalyzerAlarmsDS, ByVal rotorState As StatusParameters.RotorStates, ByVal isMin As Boolean)
+
+            Dim alarmState = (From a In temporalDs.vwksAlarmsMonitor _
+                    Where (a.AlarmID = rotorState.ToString) _
+                          AndAlso a.AlarmStatus = True _
+                    Select a.AlarmDateTime).ToList()
+            If alarmState.Count > 0 Then
+                StatusParameters.IsActive = True
+                StatusParameters.State = rotorState
+                StatusParameters.LastSaved = If(isMin, alarmState.Min, alarmState.Max)
+            End If
+        End Sub
 
         ''' <summary>
         ''' Initializes the base line calculation object when app is started
@@ -2025,7 +2025,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
@@ -2114,7 +2114,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
         End Sub
-
 
         ''' <summary>
         ''' Read from database and initialize class structures (limits,...)
@@ -2937,7 +2936,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-
         ''' <summary>
         ''' Remove any instruction from the queue
         ''' </summary>
@@ -2963,7 +2961,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
-
         ''' <summary>
         ''' Enables the Sw communications to send new instructions
         ''' </summary>
@@ -2988,7 +2985,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Return myGlobal
         End Function
-
 
         ''' <summary>
         ''' Informs if the instructions queue contains a specific instruction pending to be sent
@@ -3045,7 +3041,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return myGlobal
         End Function
-
 
         ''' <summary>
         ''' SERVICE SOFTWARE
@@ -3140,106 +3135,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateFwAdjustmentsDS", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
-
-
-        '''' <summary>
-        '''' Loads FW Sensors Master Data from DB
-        '''' </summary>
-        '''' <returns>DS with FW Sensors</returns>
-        '''' <remarks>Created by SG 28/02/11</remarks>
-        'Public Function LoadFwSensorsMasterData() As GlobalDataTO
-        '    Dim myGlobal As New GlobalDataTO
-        '    Try
-        '        myGlobal = AppLayer.LoadFwSensorsMasterData
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.LoadFwSensorsMasterData", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' SERVICE
-        '''' Gets the Sensors Master data for a Screen
-        '''' </summary>
-        '''' <returns></returns>
-        '''' <remarks>SGM 28/02/11</remarks>
-        'Public Function GetGlobalSensorsMasterData() As GlobalDataTO
-        '    Dim myGlobal As New GlobalDataTO
-        '    Try
-        '        myGlobal = AppLayer.GetGlobalSensorsMasterData
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.GetGlobalSensorsMasterData", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobal
-        'End Function
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <remarks>Created by SG 28/02/11</remarks>
-        'Public Function ReadSensorsData(ByVal pSensors As SRVSensorsDS) As GlobalDataTO
-        '    Dim myGlobal As New GlobalDataTO
-        '    Try
-        '        Dim mySensorsDS As New SRVSensorsDS
-        '        For Each S As SRVSensorsDS.srv_tfmwSensorsRow In pSensors.srv_tfmwSensors.Rows
-
-        '            myGlobal = AppLayer.GetSensorDataById(S.SensorId)
-
-        '            If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-        '                Dim myRow As SRVSensorsDS.srv_tfmwSensorsRow
-        '                Dim myNewRow As SRVSensorsDS.srv_tfmwSensorsRow
-        '                myRow = CType(myGlobal.SetDatos, SRVSensorsDS.srv_tfmwSensorsRow)
-
-        '                myNewRow = mySensorsDS.srv_tfmwSensors.Newsrv_tfmwSensorsRow
-        '                With myNewRow
-        '                    .SensorId = myRow.SensorId
-        '                    .GroupId = myRow.GroupId
-        '                    .CodeFw = myRow.CodeFw
-        '                    .Type = myRow.Type
-        '                    If Not myRow.IsValueNull And Not myRow.IsTimeStampNull Then
-        '                        .Value = myRow.Value
-        '                        .TimeStamp = myRow.TimeStamp
-        '                    End If
-        '                    .HasError = myRow.HasError
-        '                    .Interval = myRow.Interval
-        '                End With
-        '                mySensorsDS.srv_tfmwSensors.Addsrv_tfmwSensorsRow(myNewRow)
-        '                mySensorsDS.AcceptChanges()
-
-        '            Else
-        '                Exit Try
-        '            End If
-        '        Next
-
-
-        '        myGlobal.SetDatos = mySensorsDS
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobal.ErrorMessage = ex.Message
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadSensorsData", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobal
-        'End Function
-
 
         ''' <summary>
         ''' Returns PhotometryDataTO Data object

@@ -202,14 +202,17 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Public Shared Function CanRotorContentsByDirectlyRead() As Boolean
+
             'Calculate expiration time:
             Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
+            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then caducityMinutesString = "0"
+
             Dim caducityMinutes = CInt(caducityMinutesString)
             Dim expirationTime = Now.AddMinutes(-caducityMinutes)
 
             'Process flags:
             Return StatusParameters.State =
-                StatusParameters.RotorStates.CheckedRotorFull And
+                StatusParameters.RotorStates.FBLD_ROTOR_FULL And
                 StatusParameters.IsActive = True And
                 StatusParameters.LastSaved > expirationTime
         End Function
@@ -813,10 +816,10 @@ Namespace Biosystems.Ax00.Core.Services
 
             If _analyzer.Connected = False Then Return
 
-            Dim alarm551Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.CheckedRotorFull)
+            Dim alarm551Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.FBLD_ROTOR_FULL)
             Dim alarm551Date = StatusParameters.LastSaved
 
-            Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.LeeryRotorFull)
+            Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
 
             If alarm552Present Then
                 ExecuteDynamicBaseLineEmptyStep()

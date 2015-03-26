@@ -854,7 +854,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                     If myAlarmList.Count > 0 Then
                         ' Note that this alarm is common on User and Service !
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                     ' Activates Alarm end
@@ -886,7 +886,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                     If myAlarmList.Count > 0 Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                     ' Activates Alarm end
