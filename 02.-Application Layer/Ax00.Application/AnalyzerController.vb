@@ -23,9 +23,6 @@ Namespace Biosystems.Ax00.App
         Private _rotorChangeServices As RotorChangeServices 'BA-2143
         Private _warmUpServices As WarmUpService
 
-        Private Sub New()
-            AsyncService.AppListener = New CoreListener
-        End Sub
 
 #Region "Properties"
 

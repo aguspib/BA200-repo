@@ -63,7 +63,6 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 #End Region
 
-        Public Shared Property AppListener As IAppLayerListener
 #Region "Public methods"
 
         Public Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
