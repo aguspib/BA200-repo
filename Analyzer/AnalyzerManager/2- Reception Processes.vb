@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Data.SqlClient
-Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+Imports System.Globalization
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
 
@@ -458,52 +458,56 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 Next
 
-                If Not IsAStateError AndAlso SavedRotorStatus.IsActive Then
-                    SavedRotorStatus.IsActive = False
-                End If
-                'AG 02/03/2012 old translation method
-                'AG 28/02/2012 - Evaluate if the fridge is damaged then add the alarm 
-
                 'New translation method
                 Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
 
-                'SGM 09/11/2012 - reset flag in case of Rotor missing error is not received
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 If GlobalBase.IsServiceAssembly Then
                     If Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                         IsServiceRotorMissingInformed = False
                     End If
                 End If
-                'end SGM 09/11/2012
-
+                Dim currentAlarms = New AnalyzerAlarms(Me)
                 Dim index As Integer = 0
-                Dim errorCodeID As String = ""
 
-                For Each alarmID As Alarms In myAlarms
-                    'AG 04/12/2014 BA-2236 - Method 
-                    errorCodeID = ""
+                'Disable state 551 or 552
+                If Not IsAStateError AndAlso StatusParameters.IsActive Then
+                    StatusParameters.IsActive = False
+                    currentAlarms.RemoveAlarmStateAndRefreshUi(StatusParameters.State.ToString())
+                    StatusParameters.State = StatusParameters.RotorStates.None
+                End If
+
+                For Each alarmId As Alarms In myAlarms
+
+                    Dim errorCodeId = ""
                     If index <= myErrorCode.Count - 1 Then
-                        errorCodeID = myErrorCode(index).ToString
+                        errorCodeId = myErrorCode(index).ToString
                     End If
-                    If errorCodeID = "560" Then
-                        CanSendingRepetitions() = True
-                        NumSendingRepetitionsTimeout() += 1
 
-                        If NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsRetry Then
-                            GlobalBase.CreateLogActivity("FLIGHT Error: GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            CanSendingRepetitions() = False
+                    If errorCodeId = "551" Or errorCodeId = "552" Then
+                        StatusParameters.IsActive = True
+                        StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
+                        currentAlarms.AddNewAlarmStateAndRefreshUi(alarmId.ToString())
+                        StatusParameters.LastSaved = DateTime.Now
+                    Else
+                        If errorCodeId = "560" Then
+                            CanSendingRepetitions() = True
+                            NumSendingRepetitionsTimeout() += 1
 
-                            ' Activates Alarm begin
-                            CanManageRetryAlarm = True
-                        Else
-                            GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                            myGlobal = SendStartTaskinQueue()
+                            If NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsRetry Then
+                                GlobalBase.CreateLogActivity("FLIGHT Error: GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                CanSendingRepetitions() = False
 
+                                ' Activates Alarm begin
+                                CanManageRetryAlarm = True
+                            Else
+                                GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                myGlobal = SendStartTaskinQueue()
+
+                            End If
                         End If
+                        PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
                     End If
-                    PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
-                    'AG 04/12/2014 BA-2236
-                    index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
+                    index += 1
                 Next
 
                 ' XBC 17/10/2012 - Alarms treatment for Service
@@ -521,13 +525,11 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                         Else
-                            Dim currentAlarms = New AnalyzerAlarms(Me)
                             myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                         End If
                     End If
 
                 End If
-
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
@@ -585,7 +587,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Return myGlobal
                 End If
 
-                ResetFBLDAlarms()
+                ResetFbldAlarms()
 
                 Dim myIntValue As Integer
 
@@ -726,9 +728,9 @@ Namespace Biosystems.Ax00.Core.Entities
             CanManageRetryAlarm = False
 
             '551 and 552
-            SavedRotorStatus.IsActive = False
-            SavedRotorStatus.LastSaved = Nothing
-            SavedRotorStatus.State = RotorStates.None
+            StatusParameters.IsActive = False
+            StatusParameters.LastSaved = Nothing
+            StatusParameters.State = StatusParameters.RotorStates.None
         End Sub
 
         Private Function GetParametersFromInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef myGlobal As GlobalDataTO, ByRef myInstParamTo As InstructionParameterTO, _

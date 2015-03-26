@@ -7,10 +7,9 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Timers
 Imports System.Data.SqlClient
-'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
-Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+Imports System.Globalization
 Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -2990,6 +2989,17 @@ Namespace Biosystems.Ax00.Core.Entities
             Return (toReturnAlarmList)
         End Function
 
+        Public Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms Implements IAnalyzerManager.SimpleTranslateErrorCodeToAlarmId
+            Dim dbConnection = GetSafeOpenDBConnection(pDbConnection)
+            If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
+                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID).ToList
+                If c.Count = 1 Then
+                    Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
+                End If
+            End If
+            Return AlarmEnumerates.Alarms.NONE
+        End Function
+
         ''' <summary>
         ''' Transforms a string list of Alarm Codes to a list of Alarm Enumerates
         ''' </summary>
@@ -3548,8 +3558,6 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
 #End Region
-
-
     End Class
 
 End Namespace

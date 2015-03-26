@@ -1980,9 +1980,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 AdjustmentsFilePath = String.Empty '#REFACTORING
 
                 'Initialization State alarms
-                SavedRotorStatus.IsActive = False
-                SavedRotorStatus.State = RotorStates.None
-                SavedRotorStatus.LastSaved = DateTime.Now
+                StatusParameters.IsActive = False
+                StatusParameters.State = StatusParameters.RotorStates.None
+                StatusParameters.LastSaved = DateTime.Now
 
                 Dim currentAlarmsDelg As New WSAnalyzerAlarmsDelegate
 
@@ -1991,8 +1991,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
                     Dim temporalDs = DirectCast(myGlobalDataTo.SetDatos, WSAnalyzerAlarmsDS)
 
-                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, RotorStates.FBLD_ROTOR_FULL, True)
-                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, RotorStates.UNKNOW_ROTOR_FULL, False)
+                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, StatusParameters.RotorStates.FBLD_ROTOR_FULL, True)
+                    SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, StatusParameters.RotorStates.UNKNOW_ROTOR_FULL, False)
                 End If
 
             Catch ex As Exception
@@ -2001,16 +2001,16 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
-        Private Sub SetValuesOnSaveRotorStatusFromActiveAlarms(ByVal temporalDs As WSAnalyzerAlarmsDS, ByVal rotorState As RotorStates, ByVal isMin As Boolean)
+        Private Sub SetValuesOnSaveRotorStatusFromActiveAlarms(ByVal temporalDs As WSAnalyzerAlarmsDS, ByVal rotorState As StatusParameters.RotorStates, ByVal isMin As Boolean)
 
             Dim alarmState = (From a In temporalDs.vwksAlarmsMonitor _
                     Where (a.AlarmID = rotorState.ToString) _
                           AndAlso a.AlarmStatus = True _
                     Select a.AlarmDateTime).ToList()
             If alarmState.Count > 0 Then
-                SavedRotorStatus.IsActive = True
-                SavedRotorStatus.State = rotorState
-                SavedRotorStatus.LastSaved = If(isMin, alarmState.Min, alarmState.Max)
+                StatusParameters.IsActive = True
+                StatusParameters.State = rotorState
+                StatusParameters.LastSaved = If(isMin, alarmState.Min, alarmState.Max)
             End If
         End Sub
 

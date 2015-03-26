@@ -77,8 +77,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If errorValue = 551 Or errorValue = 552 Then
                     StateManagementAlarm(errorValue)
                 Else
-                    If SavedRotorStatus.IsActive AndAlso errorValue <> 99 Then
-                        SavedRotorStatus.IsActive = False
+                    If StatusParameters.IsActive AndAlso errorValue <> 99 Then
+                        StatusParameters.IsActive = False
                     End If
                     'Alarms management
                     ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
@@ -116,20 +116,20 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Sub StateManagementAlarm(ByVal errorValue As Integer)
             Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
 
-            Dim errorTranslated = currentAlarms.SimpleTranslateErrorCodeToAlarmId(Nothing, errorValue)
+            Dim errorTranslated = _analyzerManager.SimpleTranslateErrorCodeToAlarmId(Nothing, errorValue)
 
-            If Not SavedRotorStatus.IsActive Then
+            If Not StatusParameters.IsActive Then
                 'Don't have active alarms
-                SavedRotorStatus.IsActive = True
-                SavedRotorStatus.State = DirectCast(errorValue, RotorStates)
-                SavedRotorStatus.LastSaved = DateTime.Now
+                StatusParameters.IsActive = True
+                StatusParameters.State = DirectCast(errorValue, StatusParameters.RotorStates)
+                StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
             ElseIf errorTranslated.Equals(Alarms.UNKNOW_ROTOR_FULL) Then
-                SavedRotorStatus.State = RotorStates.UNKNOW_ROTOR_FULL
-                SavedRotorStatus.LastSaved = DateTime.Now
+                StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL
+                StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
             End If

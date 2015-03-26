@@ -1,4 +1,7 @@
-﻿Imports System.Data.SqlClient
+﻿Option Explicit On
+Option Strict On
+
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
@@ -1240,17 +1243,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
             Return False
-        End Function
-
-        Public Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
-            Dim dbConnection = GetSafeOpenDBConnection(pDbConnection)
-            If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
-                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID).ToList
-                If c.Count = 1 Then
-                    Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
-                End If
-            End If
-            Return Alarms.NONE
         End Function
 #End Region
 

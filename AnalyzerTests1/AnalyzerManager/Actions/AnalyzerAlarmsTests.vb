@@ -3,7 +3,6 @@
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
 Imports Telerik.JustMock
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -18,8 +17,7 @@ Imports Telerik.JustMock
         Public Sub SimpleTranslateErrorCodeToAlarmIdTest()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
 
-            Dim currentAlarm = New AnalyzerAlarms(idAnalyzer)
-            Dim alarmResult = currentAlarm.SimpleTranslateErrorCodeToAlarmId(Nothing, 560)
+            Dim alarmResult = idAnalyzer.SimpleTranslateErrorCodeToAlarmId(Nothing, 560)
             Assert.AreEqual(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR, alarmResult)
         End Sub
     End Class
