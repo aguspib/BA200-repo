@@ -3292,6 +3292,7 @@ Partial Public Class UiAx00MainMDI
     ''' Created by:  AG 01/06/2010 - Tested: ok
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 01/12/2014 - BA-2075
+    '''              IT 26/03/2015 - BA-2406
     ''' </remarks>
     Private Sub bsTSStartInstrumentButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSStartInstrumentButton.Click
         Try
@@ -3341,7 +3342,7 @@ Partial Public Class UiAx00MainMDI
                     'NOTE: This button is disable while the REACT_ROTOR_MISSING alarm exist. In other way we have to implement a new elseIf case
                     'Continue the process on the aborted task (Washing)
                 Else
-
+                    'IT 26/03/2015 - BA-2406 - INI
                     Try
                         If (AnalyzerController.Instance.StartWarmUpProcess(False)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
@@ -3363,6 +3364,7 @@ Partial Public Class UiAx00MainMDI
                         ShowMessage("Error", myGlobal.ErrorMessage)
                         activateButtonsFlag = True
                     End Try
+                    'IT 26/03/2015 - BA-2406 - END
 
                     If activateButtonsFlag Then
                         SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
@@ -7779,16 +7781,23 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>
     ''' Modified by:  IT 30/01/2015 - BA-2216
     '''               IT 13/02/2015 - BA-2266
+    '''               IT 26/03/2015 - BA-2406
     ''' </remarks>
     Private Sub RecoverInterruptedProcesses()
 
         If (AnalyzerController.Instance.Analyzer.Connected) Then
             RecoverInterruptedNewRotorProcess()
-            RecoverInterruptedWarmUpProcess()
+            RecoverInterruptedWarmUpProcess() 'BA-2406
         End If
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 26/03/2014 - BA-2406
+    ''' </remarks>
     Private Sub RecoverInterruptedNewRotorProcess()
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") OrElse _
@@ -7814,6 +7823,12 @@ Partial Public Class UiAx00MainMDI
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 26/03/2014 - BA-2406
+    ''' </remarks>
     Private Sub RecoverInterruptedWarmUpProcess()
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") OrElse _
@@ -8980,6 +8995,8 @@ Partial Public Class UiAx00MainMDI
 
                 End If
 
+                AnalyzerController.Instance.WarmUpCloseProcess() 'IT 26/03/2014 - BA-2406
+
             Else
                 ''WUPCOMPLETEFLAG
                 'myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
@@ -9021,7 +9038,6 @@ Partial Public Class UiAx00MainMDI
                     End If
 
                 End If
-                AnalyzerController.Instance.WarmUpCloseProcess()
             End If
 
 

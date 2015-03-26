@@ -239,7 +239,7 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Attributes"
 
         Private _forceEmptyAndFinalize As Boolean = False
-        Private _checkedPreviousAlarms As Boolean = False
+        Private _checkedPreviousAlarms As Boolean = True
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As BaseLineStepsEnum

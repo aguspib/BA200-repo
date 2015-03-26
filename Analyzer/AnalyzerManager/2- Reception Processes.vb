@@ -1956,6 +1956,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' </remarks>
+        <Obsolete("Use WarmUpService instead")>
         Private Function FinalizeWarmUpProcess() As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -2080,6 +2081,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
         ''' </remarks>
+        <Obsolete("Use WarmUpService instead")>
         Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As WarmUpProcessFlag) Implements IAnalyzerManager.ValidateWarmUpProcess
 
             Dim myGlobal As New GlobalDataTO
