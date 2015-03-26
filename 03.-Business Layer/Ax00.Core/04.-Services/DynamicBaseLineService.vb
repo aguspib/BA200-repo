@@ -29,6 +29,12 @@ Namespace Biosystems.Ax00.Core.Services
             MyBase.New(analyzer)
             _currentStep = BaseLineStepsEnum.NotStarted
         End Sub
+
+        Sub New(analyzer As IAnalyzerManager, ByVal pauseWhenReadErrors As Boolean)
+            Me.New(analyzer)
+            _pauseWhenReadErrors = pauseWhenReadErrors
+        End Sub
+
 #End Region
 
 #Region "Public methods"
@@ -87,13 +93,13 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        Private Sub UpdateFlags(ByVal flagsDs As AnalyzerManagerFlagsDS)
+        'Private Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
 
-            If flagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, flagsDs)
-            End If
-        End Sub
+        '    If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+        '        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+        '        myFlagsDelg.Update(Nothing, FlagsDS)
+        '    End If
+        'End Sub
 
 
         ''' <summary>
@@ -240,6 +246,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private _alreadyFinalized As Boolean = False
         Private _isInRecovering As Boolean = False
         Private _eventHandlersAdded As Boolean = False
+        Private _pauseWhenReadErrors As Boolean = False
 
 #End Region
 
@@ -713,7 +720,17 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function IsEmptyingAllowed() As Boolean
-            Return (_dynamicBaseLineValid Or _forceEmptyAndFinalize)
+
+            If (Not _pauseWhenReadErrors And Not IsReadingAllowed()) Then
+                Return True
+            End If
+
+            If (_dynamicBaseLineValid Or _forceEmptyAndFinalize) Then
+                Return True
+            End If
+
+            Return False
+
         End Function
 
         ''' <summary>

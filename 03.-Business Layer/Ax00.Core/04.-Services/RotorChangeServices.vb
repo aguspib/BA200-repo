@@ -27,11 +27,20 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Constructors"
         Public Sub New(analyzer As IAnalyzerManager)
-            MyBase.New(analyzer)
-            _baseLineService = New BaseLineService(_analyzer)
-            _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
-
+            Me.New(analyzer, Nothing)
         End Sub
+
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As WarmUpService)
+            Me.New(analyzer, warmUpService, New BaseLineService(analyzer, True))
+        End Sub
+
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As WarmUpService, baseLineService As BaseLineService)
+            MyBase.New(analyzer)
+            _baseLineService = baseLineService
+            _warmUpService = warmUpService
+            _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
+        End Sub
+
 #End Region
 
 #Region "Attributes"
@@ -41,6 +50,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private _isInRecovering As Boolean = False
 
         Private _baseLineService As BaseLineService
+        Private _warmUpService As WarmUpService
 
 #End Region
 
@@ -197,10 +207,8 @@ Namespace Biosystems.Ax00.Core.Services
                     PauseProcess()
                 Case ServiceStatusEnum.Running
                     RestartProcess()
-
                 Case ServiceStatusEnum.EndError, ServiceStatusEnum.EndSuccess
                     FinalizeProcess()
-
             End Select
         End Sub
 
@@ -342,9 +350,16 @@ Namespace Biosystems.Ax00.Core.Services
             'AG 26/03/2012 - Special case: maybe the user was starting the instrument and the process has been
             'paused because there is not reactions rotor ... in this case when a valid alight is received
             'Sw must inform the start instrument process is OK
+
+            'BA-2288
+            'If _analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
+            '    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+            '    _analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDs, WarmUpProcessFlag.Finalize) 'BA-2075
+            'End If
             If _analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                _analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDs, WarmUpProcessFlag.Finalize) 'BA-2075
+                If (Not _warmUpService Is Nothing) Then
+                    _warmUpService.FinalizeProcess()
+                End If
             End If
 
             'Update analyzer session flags into DataBase

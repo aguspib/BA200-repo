@@ -44,7 +44,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property IsServiceRotorMissingInformed() As Boolean
         Property IsFwUpdateInProcess() As Boolean
         Property IsConfigGeneralProcess() As Boolean
-        Property AnalyzerIsFreeze() As Boolean        
+        Property AnalyzerIsFreeze() As Boolean
         Property AnalyzerFreezeMode() As String
         Property AnalyzerHasSubStatus() As Boolean
         Property SessionFlag(ByVal pFlag As AnalyzerManagerFlags) As String
