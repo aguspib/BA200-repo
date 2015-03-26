@@ -16,7 +16,8 @@ Namespace Biosystems.Ax00.Core.Services
         Public Property OnServiceStatusChange As Action(Of IServiceStatusCallback) Implements IAsyncService.OnServiceStatusChange
 
         Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
-
+        Public MustOverride Sub PauseService() Implements IAsyncService.PauseService
+        Public MustOverride Sub RestartService() Implements IAsyncService.RestartService
 
         Public Property Status As ServiceStatusEnum Implements IAsyncService.Status
             Get

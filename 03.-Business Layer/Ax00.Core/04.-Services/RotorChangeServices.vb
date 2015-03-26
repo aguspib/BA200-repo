@@ -48,6 +48,7 @@ Namespace Biosystems.Ax00.Core.Services
         'Private WithEvents _analyzer As IAnalyzerManager
         Private _currentStep As RotorChangeStepsEnum
         Private _isInRecovering As Boolean = False
+        Private _eventHandlersAdded As Boolean = False
 
         Private _baseLineService As BaseLineService
         Private _warmUpService As WarmUpService
@@ -120,6 +121,40 @@ Namespace Biosystems.Ax00.Core.Services
         'Public Overrides Function StartService() As Boolean
         '    Return Me.StartService(False)
         'End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub PauseService()
+
+            If (_eventHandlersAdded) Then
+                RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+
+                _baseLineService.PauseService()
+
+                _eventHandlersAdded = False
+            End If
+
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub RestartService()
+
+            If (Not _eventHandlersAdded) Then
+                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+
+                _baseLineService.RestartService()
+
+                _eventHandlersAdded = True
+            End If
+
+        End Sub
 
         ''' <summary>
         ''' 

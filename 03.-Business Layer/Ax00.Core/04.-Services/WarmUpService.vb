@@ -42,6 +42,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private _currentStep As WarmUpStepsEnum
         Private _isInRecovering As Boolean = False
         Private _baseLineService As BaseLineService
+        Private _eventHandlersAdded As Boolean = False
 
 #End Region
 
@@ -95,6 +96,40 @@ Namespace Biosystems.Ax00.Core.Services
             Return True
 
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub PauseService()
+
+            If (_eventHandlersAdded) Then
+                RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+
+                _baseLineService.PauseService()
+
+                _eventHandlersAdded = False
+            End If
+
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub RestartService()
+
+            If (Not _eventHandlersAdded) Then
+                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+
+                _baseLineService.RestartService()
+
+                _eventHandlersAdded = True
+            End If
+
+        End Sub
 
         ''' <summary>
         ''' Recovers the system to a stable point after close and start application during change rotor process 'in course'

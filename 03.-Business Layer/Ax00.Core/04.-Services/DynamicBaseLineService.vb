@@ -76,6 +76,21 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub PauseService()
+            RemoveRequiredEventHandlers()
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub RestartService()
+            AddRequiredEventHandlers()
+        End Sub
 
         Private Sub DirectlyGoToDynamicReadStep()
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS

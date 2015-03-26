@@ -7,8 +7,9 @@
 
         Property Status As ServiceStatusEnum
 
-
         Function StartService() As Boolean
+        Sub PauseService()
+        Sub RestartService()
 
     End Interface
 

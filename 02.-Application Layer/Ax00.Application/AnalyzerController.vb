@@ -88,6 +88,8 @@ Namespace Biosystems.Ax00.App
 
         End Function
 
+#Region "WarmUp Service"
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -114,6 +116,11 @@ Namespace Biosystems.Ax00.App
 
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="isInRecovering"></param>
+        ''' <remarks></remarks>
         Public Sub StartWarmupProcess(ByVal isInRecovering As Boolean)
             UseRotorContentsForFLIGHT(
                 Sub(result As Boolean)
@@ -121,6 +128,59 @@ Namespace Biosystems.Ax00.App
                 End Sub)
 
         End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub PauseWarmUpService()
+            Try
+
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.PauseService()
+                End If
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub ReStartWarmUpService()
+            Try
+
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.StartService()
+                End If
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by:  IT 26/03/2014 - BA-2406
+        ''' </remarks>
+        Public Sub WarmUpCloseProcess()
+            Try
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.Dispose()
+                    _warmUpServices = Nothing
+                End If
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
+#End Region
+
+#Region "Change Rotor Service"
 
         ''' <summary>
         ''' 
@@ -222,6 +282,8 @@ Namespace Biosystems.Ax00.App
             End Try
         End Sub
 
+#End Region
+
         Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
 
             If responseHandler Is Nothing Then Return
@@ -238,23 +300,6 @@ Namespace Biosystems.Ax00.App
             Else
                 responseHandler.Invoke(False)
             End If
-        End Sub
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks>
-        ''' Modified by:  IT 26/03/2014 - BA-2406
-        ''' </remarks>
-        Public Sub WarmUpCloseProcess()
-            Try
-                If _warmUpServices IsNot Nothing Then
-                    _warmUpServices.Dispose()
-                    _warmUpServices = Nothing
-                End If
-            Catch ex As Exception
-                Throw ex
-            End Try
         End Sub
 
 #End Region
