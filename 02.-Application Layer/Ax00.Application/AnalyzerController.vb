@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Types
 Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener
+Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
 Namespace Biosystems.Ax00.App
 
@@ -22,6 +23,7 @@ Namespace Biosystems.Ax00.App
         Private _rotorChangeServices As RotorChangeServices 'BA-2143
 
         Private Sub New()
+            AsyncService.AppListener = New CoreListener
         End Sub
 
 #Region "Properties"
@@ -225,6 +227,19 @@ Namespace Biosystems.Ax00.App
             Catch ex As Exception
                 Throw ex
             End Try
+        End Sub
+
+        Public Sub ReuseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+            If BaseLineService.CanRotorContentsByDirectlyRead Then
+                Dim question As New YesNoQuestion
+                question.Text = "This is a question"
+                question.OnAnswered =
+                    Sub()
+                        responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
+                    End Sub
+            Else
+                responseHandler.Invoke(False)
+            End If
         End Sub
 
 #End Region

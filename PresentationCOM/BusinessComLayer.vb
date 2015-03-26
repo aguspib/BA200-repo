@@ -46,7 +46,7 @@ Public Class BusinessComLayer
     End Sub
 
     Private Sub DispatchNotifyAndChildren(item As Notify)
-        Dim i2 = TryCast(item, Notify)
+        Dim i2 = item
         Dim buttons As MsgBoxStyle
         Select Case item.GetType()
             Case GetType(Notify)

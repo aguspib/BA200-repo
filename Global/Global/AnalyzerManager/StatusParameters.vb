@@ -12,5 +12,12 @@
             CheckedRotorFull = 551
             LeeryRotorFull = 552
         End Enum
+
+
+        Public IsActive As Boolean
+        Public State As RotorStates
+        Public LastSaved As DateTime
+
+
     End Module
 End Namespace

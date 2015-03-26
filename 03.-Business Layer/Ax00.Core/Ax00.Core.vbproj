@@ -105,6 +105,9 @@
     <Compile Include="04.-Services\ServiceStatusCallback.vb" />
     <Compile Include="04.-Services\Enums\ServiceStatusEnum.vb" />
     <Compile Include="04.-Services\Interfaces\IAsyncService.vb" />
+    <Compile Include="AppLayerListener\IAppLayerListener.vb" />
+    <Compile Include="AppLayerListener\Requests\AppRequest.vb" />
+    <Compile Include="AppLayerListener\Requests\AppYesNoQuestion.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

@@ -60,5 +60,7 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 #End Region
 
+        Public Shared Property AppListener As IAppLayerListener
+
     End Class
 End Namespace
