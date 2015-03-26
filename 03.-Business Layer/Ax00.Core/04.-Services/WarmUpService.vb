@@ -270,6 +270,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub ExecuteBaseLineStep()
+            _baseLineService.ReuseRotorContentsIfPossible = ReuseRotorContentsForBaseLine
             _baseLineService.StartService()
         End Sub
 
@@ -651,6 +652,10 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
+#End Region
+
+#Region "Properties"
+        Public Property ReuseRotorContentsForBaseLine As Boolean = False
 #End Region
 
     End Class

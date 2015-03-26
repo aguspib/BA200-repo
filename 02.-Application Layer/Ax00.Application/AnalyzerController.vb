@@ -23,9 +23,6 @@ Namespace Biosystems.Ax00.App
         Private _rotorChangeServices As RotorChangeServices 'BA-2143
         Private _warmUpServices As WarmUpService
 
-        Private Sub New()
-            AsyncService.AppListener = New CoreListener
-        End Sub
 
 #Region "Properties"
 
@@ -98,13 +95,13 @@ Namespace Biosystems.Ax00.App
         ''' <remarks>
         ''' Created by: IT 26/03/2015 - BA-2406
         ''' </remarks>
-        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean, reuseRotorContentsForFlight As Boolean) As Boolean
             Try
 
                 If (_warmUpServices Is Nothing) Then
                     _warmUpServices = New WarmUpService(Analyzer)
                 End If
-
+                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
                     Return _warmUpServices.StartService()
                 Else
@@ -112,10 +109,18 @@ Namespace Biosystems.Ax00.App
                 End If
 
             Catch ex As Exception
-                Throw ex
+                Throw
             End Try
 
         End Function
+
+        Public Sub StartWarmupProcess(ByVal isInRecovering As Boolean)
+            UseRotorContentsForFLIGHT(
+                Sub(result As Boolean)
+                    StartWarmUpProcess(isInRecovering, result)
+                End Sub)
+
+        End Sub
 
         ''' <summary>
         ''' 
@@ -217,14 +222,19 @@ Namespace Biosystems.Ax00.App
             End Try
         End Sub
 
-        Public Sub ReuseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+
+            If responseHandler Is Nothing Then Return
+
+            If IsAnalyzerInstantiated = False Then
+                responseHandler.Invoke(False)
+            End If
+
             If BaseLineService.CanRotorContentsByDirectlyRead Then
                 Dim question As New YesNoQuestion
                 question.Text = "This is a question"
-                question.OnAnswered =
-                    Sub()
-                        responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
-                    End Sub
+                question.OnAnswered = Sub() responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
+                PresentationLayerInterface.QueueRequest(question)
             Else
                 responseHandler.Invoke(False)
             End If

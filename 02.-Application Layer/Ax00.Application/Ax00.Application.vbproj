@@ -79,7 +79,6 @@
     <Compile Include="BA200AnalyzerFactory.vb" />
     <Compile Include="BA400AnalyzerFactory.vb" />
     <Compile Include="AnalyzerFactory.vb" />
-    <Compile Include="CoreListener.vb" />
     <Compile Include="IAnalyzerController.vb" />
     <Compile Include="IAnalyzerFactory.vb" />
     <Compile Include="PersentationLayerListener\IPresentationLayerListener.vb" />

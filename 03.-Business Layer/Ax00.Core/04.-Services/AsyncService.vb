@@ -18,7 +18,6 @@ Namespace Biosystems.Ax00.Core.Services
         Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
 
 
-        'Public MustOverride ReadOnly Property Status As ServiceStatusEnum Implements IAsyncService.Status
         Public Property Status As ServiceStatusEnum Implements IAsyncService.Status
             Get
                 Return _status
@@ -63,7 +62,6 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 #End Region
 
-        Public Shared Property AppListener As IAppLayerListener
 #Region "Public methods"
 
         Public Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
