@@ -807,7 +807,7 @@ Namespace Biosystems.Ax00.Core.Services
                         ' Not Apply
                         'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
                     Else
-                        Dim currentAlarms = New CurrentAlarms(_analyzer)
+                        Dim currentAlarms = New AnalyzerAlarms(_analyzer)
                         myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
                     End If
                 End If

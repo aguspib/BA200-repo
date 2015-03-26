@@ -257,6 +257,7 @@ Namespace Biosystems.Ax00.App
             Else
                 responseHandler.Invoke(False)
             End If
+        End Sub
 
         Public Sub WarmUpCloseProcess()
             Try
