@@ -692,7 +692,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If Not GlobalBase.IsServiceAssembly Then
-                        Dim currentAlarms = New CurrentAlarms(_analyzerManager)
+                        Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
                         myGlobal = currentAlarms.Manage(alarmList, alarmStatusList, alarmAdditionalInfoList)
                     End If
                 End If

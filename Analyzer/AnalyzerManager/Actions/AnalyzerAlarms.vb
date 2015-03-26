@@ -1,4 +1,7 @@
-﻿Imports System.Data.SqlClient
+﻿Option Explicit On
+Option Strict On
+
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
@@ -7,15 +10,15 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.Linq
 
 Namespace Biosystems.Ax00.Core.Entities
-    Public Class CurrentAlarms
+    Public Class AnalyzerAlarms
 
         Private ReadOnly _analyzerManager As IAnalyzerManager
         Private _myGlobal As New GlobalDataTO
         Private _dbConnection As SqlConnection = Nothing
         Private _myIseOffErrorFixed As Boolean = False
         Private _myIseTimeoutErrorFixed As Boolean = False
-        Private _myGlfErrorFixed As Boolean = False
         Private _myCommsTimeoutErrorFixed As Boolean = False
+        Private ReadOnly _alarmsDelg As New WSAnalyzerAlarmsDelegate
 
         ''' <summary>
         ''' 
@@ -24,6 +27,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks></remarks>
         Public Sub New(ByRef analyzerMan As IAnalyzerManager)
             _analyzerManager = analyzerMan
+            _alarmsDelg = New WSAnalyzerAlarmsDelegate()
         End Sub
 
 
@@ -67,9 +71,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function Manage(ByVal pAlarmIdList As List(Of Alarms), _
                                       ByVal pAlarmStatusList As List(Of Boolean), _
                                       Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
-
-
-
             Try
                 Dim index As Integer = 0
                 Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -103,7 +104,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     End Select
 
                 End If
-                Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
 
                 For Each alarmItem As Alarms In pAlarmIdList
                     'General description: Apply special Business depending the alarm code
@@ -158,13 +158,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             InstructionRejected(myAnalyzerFlagsDs)
 
                         Case Alarms.ISE_OFF_ERR
-                            IseSwitchOff(pAlarmStatusList, index, alarmsDelg)
+                            IseSwitchOff(pAlarmStatusList, index)
 
                         Case Alarms.ISE_TIMEOUT_ERR
-                            IseTimeout(alarmsDelg)
+                            IseTimeout()
 
                         Case Alarms.COMMS_TIMEOUT_ERR
-                            CommsTimeout(alarmsDelg)
+                            CommsTimeout()
 
                         Case Alarms.ISE_CONNECT_PDT_ERR
                             IseConnectPdtError(pAlarmStatusList, index)
@@ -178,7 +178,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             InstructionError(myAnalyzerFlagsDs)
 
                         Case Alarms.GLF_BOARD_FBLD_ERR
-                            GlfBoardErrorDuringFBLD(alarmsDelg, methodHasToAddInstructionToQueueFlag)
+                            GlfBoardErrorDuringFBLD()
 
                     End Select
                     index = index + 1
@@ -209,7 +209,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 wsAlarmsDs.AcceptChanges()
 
                 If wsAlarmsDs.twksWSAnalyzerAlarms.Rows.Count > 0 Then
-                    _myGlobal = alarmsDelg.Save(_dbConnection, wsAlarmsDs, alarmsDefintionTableDS) 'AG 24/07/2012 change Create for Save who inserts alarms with status TRUE and updates alarms with status FALSE
+                    _myGlobal = _alarmsDelg.Save(_dbConnection, wsAlarmsDs, alarmsDefintionTableDS) 'AG 24/07/2012 change Create for Save who inserts alarms with status TRUE and updates alarms with status FALSE
                     If Not _myGlobal.HasError AndAlso Not _analyzerManager.Ringing Then
                         SoundActivationByAlarm(methodHasToAddInstructionToQueueFlag)
                     End If
@@ -233,13 +233,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="alarmsDelg"></param>
         ''' <remarks>
         ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
-        Private Sub GlfBoardErrorDuringFBLD(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate, ByRef methodHasToAddInstructionToQueueFlag As Integer)
+        Private Sub GlfBoardErrorDuringFBLD()
             If _analyzerManager.CanManageRetryAlarm Then
-                _myGlfErrorFixed = True
                 _analyzerManager.CanManageRetryAlarm = False
             End If
         End Sub
@@ -518,13 +516,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="alarmsDelg"></param>
         ''' <remarks>
         ''' Search if exists alarm COMMS_TIMEOUT_ERR with status TRUE, in this case set flag myCOMMSTimeoutErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
-        Private Sub CommsTimeout(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate)
+        Private Sub CommsTimeout()
 
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = _alarmsDelg.GetByAlarmID(_dbConnection, Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                 Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
@@ -539,13 +536,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="alarmsDelg"></param>
         ''' <remarks>
         ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
-        Private Sub IseTimeout(ByVal alarmsDelg As WSAnalyzerAlarmsDelegate)
+        Private Sub IseTimeout()
 
-            _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = _alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                 Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
@@ -562,7 +558,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="pAlarmStatusList"></param>
         ''' <param name="index"></param>
-        ''' <param name="alarmsDelg"></param>
         ''' <remarks>
         ''' IF: When this alarm appears in RUNNING: Lock all pending ISE preparations
         ''' 1st: Get all ISE executions pending (required to inform the UI with the locked executions
@@ -572,8 +567,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' ELSE: Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
         ''' Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED) in order to mark it as fixed
         ''' </remarks>
-        Private Sub IseSwitchOff(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer, _
-                                 ByVal alarmsDelg As WSAnalyzerAlarmsDelegate)
+        Private Sub IseSwitchOff(ByVal pAlarmStatusList As List(Of Boolean), ByVal index As Integer)
 
             If pAlarmStatusList(index) Then
                 _analyzerManager.ISEAnalyzer.IsISESwitchON = False
@@ -594,7 +588,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
             Else
-                _myGlobal = alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+                _myGlobal = _alarmsDelg.GetByAlarmID(_dbConnection, Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
                 If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                     Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                     Dim auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
@@ -1172,22 +1166,85 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 #End Region
 
-        Private Sub ApplyActionsForAnalyzerInResetRetryMode(ByRef methodHasToAddInstructionToQueueFlag As Integer)
-            If _analyzerManager.CanManageRetryAlarm Then
-                _myGlobal = _analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
-                _analyzerManager.SetAnalyzerNotReady()
+#Region "Manage Status Alarms and Simple Alarms"
+        Public Sub RemoveAlarmStateAndRefreshUi(ByVal alarmName As String)
+            Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
+            Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
+            Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
 
-                'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                If Not _myGlobal.HasError Then
-                    methodHasToAddInstructionToQueueFlag = 2
+            Dim typedGlobal = GetSafeOpenDBConnection(Nothing)
 
-                    If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                        Dim myWsAnalyzerDelegate As New WSAnalyzersDelegate
-                        _myGlobal = myWsAnalyzerDelegate.UpdateWSStatus(_dbConnection, _analyzerManager.ActiveAnalyzer(), _analyzerManager.ActiveWorkSession(), "ABORTED")
+            Dim dbConnection = typedGlobal.SetDatos
+            If (Not dbConnection Is Nothing) Then
+                alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
+                With alarmRow
+                    .BeginEdit()
+                    .AlarmID = alarmName
+                    .AnalyzerID = _analyzerManager.ActiveAnalyzer()
+                    .AlarmDateTime = Now
+                    If _analyzerManager.ActiveWorkSession() <> "" Then
+                        .WorkSessionID = _analyzerManager.ActiveWorkSession()
+                    Else
+                        .SetWorkSessionIDNull()
                     End If
-                End If
+                    .AlarmStatus = False
+                    .AlarmItem = 1
+                    .SetAdditionalInfoNull()
+                    .EndEdit()
+                End With
+
+                wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
+
+                'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
+                _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, False)
+
+                wsAlarmsDs.AcceptChanges()
+                alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
             End If
         End Sub
+
+        Public Sub AddNewAlarmStateAndRefreshUi(ByVal alarmName As String)
+            Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
+
+            Dim alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
+            With alarmRow
+                .BeginEdit()
+                .AlarmID = alarmName
+                .AnalyzerID = _analyzerManager.ActiveAnalyzer()
+                .AlarmDateTime = Now
+                If _analyzerManager.ActiveWorkSession() <> "" Then
+                    .WorkSessionID = _analyzerManager.ActiveWorkSession()
+                Else
+                    .SetWorkSessionIDNull()
+                End If
+                .AlarmStatus = True
+                .AlarmItem = 1
+                .SetAdditionalInfoNull()
+                .EndEdit()
+            End With
+
+            wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
+            wsAlarmsDs.AcceptChanges()
+
+            'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
+            _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, True)
+
+            _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
+        End Sub
+
+        Public Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean
+
+            _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, activeAlarm, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
+                         Where a.AlarmID = activeAlarm AndAlso a.AlarmStatus = True Select a).ToList.Count > 0 Then
+                    Return True
+                End If
+            End If
+            Return False
+        End Function
+#End Region
 
     End Class
 End Namespace

@@ -1,8 +1,8 @@
-﻿Imports Biosystems.Ax00.Global
+﻿
 Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities
-    Module ConstantParameters
+    Public Module ConstantParameters
         Public WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
         Public SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
         Public WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
@@ -20,5 +20,14 @@ Namespace Biosystems.Ax00.Core.Entities
         Public alarmsDefintionTableDS As New AlarmsDS 'Read the Alarm definition when analyzer manager class is created not in several methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
 
         Public LockThis As New Object() 'AG 28/06/2012
+
+    End Module
+
+    Module ConstantStates
+        Public InProcessState As String = "INPROCESS"
+        Public IniState As String = "INI"
+        Public EndState As String = "END"
+        Public ClosedState As String = "CLOSED"
+        Public VoidState As String = ""
     End Module
 End Namespace

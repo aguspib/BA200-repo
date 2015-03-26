@@ -537,7 +537,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     PrepareLocalAlarmList(AlarmEnumerates.Alarms.WS_PAUSE_MODE_WARN, AllowScanInRunningAttribute, myAlarmList, myAlarmStatusList)
                     If (myAlarmList.Count > 0) Then
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
 
@@ -585,7 +585,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             If AlarmList.Count > 0 Then
                                 If Not GlobalBase.IsServiceAssembly Then
-                                    Dim currentAlarms = New CurrentAlarms(Me)
+                                    Dim currentAlarms = New AnalyzerAlarms(Me)
                                     myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                 End If
                             End If
@@ -767,9 +767,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
-                            If AlarmList.Count > 0 Then                                
+                            If AlarmList.Count > 0 Then
                                 If Not GlobalBase.IsServiceAssembly Then
-                                    Dim currentAlarms = New CurrentAlarms(Me)
+                                    Dim currentAlarms = New AnalyzerAlarms(Me)
                                     myGlobal = currentAlarms.Manage(AlarmList, AlarmStatusList)
                                 End If
                             End If

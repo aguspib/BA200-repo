@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Consutrcutors"
         Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
-            Me._currentStep = BaseLineStepsEnum.NotStarted
+            _currentStep = BaseLineStepsEnum.NotStarted
         End Sub
 
         Sub New(analyzer As IAnalyzerManager, ByVal pauseWhenReadErrors As Boolean)
@@ -44,6 +44,7 @@ Namespace Biosystems.Ax00.Core.Services
         'End Function
 
         Public Overrides Function StartService() As Boolean
+
 
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
@@ -100,9 +101,6 @@ Namespace Biosystems.Ax00.Core.Services
         '    End If
         'End Sub
 
-        Private Sub PerformAEmptyRotorStep()
-
-        End Sub
 
         ''' <summary>
         ''' Set the flags into a stable value for repeat last action and recover the process
@@ -209,18 +207,45 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
+        Public Shared Function CanRotorContentsByDirectlyRead() As Boolean
+
+            'Calculate expiration time:
+            Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
+            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then caducityMinutesString = "0"
+
+            Dim caducityMinutes = CInt(caducityMinutesString)
+            Dim expirationTime = Now.AddMinutes(-caducityMinutes)
+
+            'Process flags:
+            Return StatusParameters.State =
+                StatusParameters.RotorStates.FBLD_ROTOR_FULL And
+                StatusParameters.IsActive = True And
+                StatusParameters.LastSaved > expirationTime
+        End Function
+
+#End Region
+
+#Region "Properties"
+        ''' <summary>
+        ''' If this function is set to True, if the rotor is full of clean water that can be used to perform a FLIGHT, the process starts directly from the Read step.
+        ''' This happens when a 551 status (alarm) is present and rotor contents hasn't lapsed.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property ReuseRotorContentsIfPossible As Boolean = False
 #End Region
 
 #Region "Attributes"
 
         Private _forceEmptyAndFinalize As Boolean = False
-        Private _checkedPreviousAlarms As Boolean = True
+        Private _checkedPreviousAlarms As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As BaseLineStepsEnum
         Private _alreadyFinalized As Boolean = False
         Private _isInRecovering As Boolean = False
-        Private eventHandlersAdded As Boolean = False
+        Private _eventHandlersAdded As Boolean = False
         Private _pauseWhenReadErrors As Boolean = False
 
 #End Region
@@ -513,8 +538,6 @@ Namespace Biosystems.Ax00.Core.Services
                 'Update analyzer session flags into DataBase
                 UpdateFlags(myAnalyzerFlagsDs)
 
-                'TODO: MIC Discuss later
-                '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
             Status = ServiceStatusEnum.Paused
 
@@ -648,7 +671,7 @@ Namespace Biosystems.Ax00.Core.Services
             'Ensure empiting always after a fill operation
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, "")
-            Me.UpdateFlags(myAnalyzerFlagsDs)
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
@@ -785,20 +808,20 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Private Sub RemoveRequiredEventHandlers()
-            If eventHandlersAdded Then
+            If _eventHandlersAdded Then
                 Try
-                    RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
-                    RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
-                    eventHandlersAdded = False
+                    RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                    RemoveHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+                    _eventHandlersAdded = False
                 Catch : End Try
             End If
         End Sub
 
         Private Sub AddRequiredEventHandlers()
-            If Not eventHandlersAdded Then
-                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf Me.OnReceivedStatusInformationEvent
-                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf Me.OnProcessFlagEvent
-                eventHandlersAdded = True
+            If Not _eventHandlersAdded Then
+                AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
+                AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
+                _eventHandlersAdded = True
             End If
         End Sub
 
@@ -807,17 +830,18 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub CheckPreviousAlarms()
             'Previous constraint:
             _checkedPreviousAlarms = True
+
             If _analyzer.Connected = False Then Return
 
-            'TODO: Replace with actual code from Alarms Cross-Cut being developed
-            Dim Alarm551Present As Boolean = True, Alarm552Present As Boolean = False
-            Dim Alarm551Date = Now.AddMinutes(-15)
-            '/TODO
+            Dim alarm551Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.FBLD_ROTOR_FULL)
+            Dim alarm551Date = StatusParameters.LastSaved
 
-            If Alarm552Present Then
+            Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
+
+            If alarm552Present Then
                 ExecuteDynamicBaseLineEmptyStep()
-            ElseIf Alarm551Present Then
-                ProcessAlarmFullCleanRotor(Alarm551Date)
+            ElseIf alarm551Present Then
+                ProcessAlarmFullCleanRotor(alarm551Date)
             Else
                 'No alarms to process!
             End If
@@ -827,15 +851,19 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)
             Dim minutosCaducidadRotorLleno = 30
-            Dim caducityParameter = GeneralSettingsDelegate.GetGeneralSettingValue(GlobalEnumerates.GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
+            Dim caducityParameter = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
             If caducityParameter IsNot Nothing AndAlso caducityParameter.HasError = False Then minutosCaducidadRotorLleno = CInt(caducityParameter.SetDatos)
 
             If pAlarmDate < Now.AddMinutes(-minutosCaducidadRotorLleno) Then
                 '551 caducada
                 ExecuteDynamicBaseLineEmptyStep()
             Else
-
-                '551 correcta
+                '551 usable
+                If ReuseRotorContentsIfPossible Then
+                    DirectlyGoToDynamicReadStep()
+                Else
+                    ExecuteDynamicBaseLineEmptyStep()
+                End If
 
             End If
         End Sub

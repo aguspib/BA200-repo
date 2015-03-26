@@ -4,6 +4,8 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.App.PresentationLayerListener
+Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
 Namespace Biosystems.Ax00.App
 
@@ -22,6 +24,7 @@ Namespace Biosystems.Ax00.App
         Private _warmUpServices As WarmUpService
 
         Private Sub New()
+            AsyncService.AppListener = New CoreListener
         End Sub
 
 #Region "Properties"
@@ -51,6 +54,8 @@ Namespace Biosystems.Ax00.App
                 Return (Not _instance.Value.Analyzer Is Nothing)
             End Get
         End Property
+
+        Public Shared Property PresentationLayerInterface As IPresentationLayerListener
 
 #End Region
 
@@ -240,6 +245,18 @@ Namespace Biosystems.Ax00.App
                 Throw ex
             End Try
         End Sub
+
+        Public Sub ReuseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+            If BaseLineService.CanRotorContentsByDirectlyRead Then
+                Dim question As New YesNoQuestion
+                question.Text = "This is a question"
+                question.OnAnswered =
+                    Sub()
+                        responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
+                    End Sub
+            Else
+                responseHandler.Invoke(False)
+            End If
 
         Public Sub WarmUpCloseProcess()
             Try

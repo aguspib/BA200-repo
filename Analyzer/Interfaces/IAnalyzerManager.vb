@@ -282,6 +282,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                           Optional ByVal pFwEntry As String = "", _
                                           Optional ByVal pFwScriptID As String = "", _
                                           Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO
+
+        Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
         
 #End Region
 

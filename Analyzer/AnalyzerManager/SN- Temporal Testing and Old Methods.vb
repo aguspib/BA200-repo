@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If GlobalBase.IsServiceAssembly Then
                         myGlobal = ManageAlarms_SRV(Nothing, finalAlarmList, finalAlarmStatusList)
                     Else
-                        Dim currentAlarms = New CurrentAlarms(Me)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
                         myGlobal = currentAlarms.Manage(finalAlarmList, finalAlarmStatusList)
                     End If
                 End If
