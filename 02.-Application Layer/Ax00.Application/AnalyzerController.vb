@@ -230,13 +230,18 @@ Namespace Biosystems.Ax00.App
         End Sub
 
         Public Sub ReuseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+
+            If responseHandler Is Nothing Then Return
+
+            If IsAnalyzerInstantiated = False Then
+                responseHandler.Invoke(False)
+            End If
+
             If BaseLineService.CanRotorContentsByDirectlyRead Then
                 Dim question As New YesNoQuestion
                 question.Text = "This is a question"
-                question.OnAnswered =
-                    Sub()
-                        responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
-                    End Sub
+                question.OnAnswered = Sub() responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
+                PresentationLayerInterface.QueueRequest(question)
             Else
                 responseHandler.Invoke(False)
             End If
