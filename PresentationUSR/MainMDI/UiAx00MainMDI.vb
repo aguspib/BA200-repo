@@ -3303,23 +3303,6 @@ Partial Public Class UiAx00MainMDI
             ' XBC 06/07/2012
             isStartInstrumentActivating = True
 
-            'AG 12/09/2011 - move the DL 09/09/2011 code into InitializeStartInstrument method, and also move the code situation
-
-            'Show message (one time) recommend change reactions rotor if needed
-            '
-            'AG 23/05/2012 - Do not inform "Change reactions rotor recommend" because user can not use the change reactions rotor utility"
-            'Dim AnalReactionsRotor As New AnalyzerReactionsRotorDelegate
-            'myGlobal = AnalReactionsRotor.ChangeReactionsRotorRecommended(Nothing, AnalyzerIDAttribute, AnalyzerModelAttribute)
-            'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-            '    Dim messageID As String = ""
-            '    messageID = CType(myGlobal.SetDatos, String)
-            '    If messageID <> "" And ChangeReactionsRotorRecommendedWarning = 0 Then
-            '        ChangeReactionsRotorRecommendedWarning = 1
-            '        ShowMessage("Warning", messageID)
-            '    Else
-            '        ChangeReactionsRotorRecommendedWarning = 0
-            '    End If
-            'End If
             ChangeReactionsRotorRecommendedWarning = 0
             'AG 23/05/2012
 
@@ -3343,7 +3326,10 @@ Partial Public Class UiAx00MainMDI
                 Else
 
                     Try
-                        If (AnalyzerController.Instance.StartWarmUpProcess(False)) Then
+
+
+
+                        If (AnalyzerController.Instance.StartWarmUpProcess(False, AskToUseRotorContentsForFLIGHT)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
                             'Activate only if current screen is monitor
                             WarmUpFinishedAttribute = False
@@ -3369,36 +3355,6 @@ Partial Public Class UiAx00MainMDI
                         SetEnableMainTab(True) 'DL 26/03/2012 test
                     End If
 
-                    'myGlobal = AnalyzerController.Instance.StartWarmUpProcess() 'BA-2075
-
-                    'If Not myGlobal.HasError Then
-                    '    If AnalyzerController.Instance.Analyzer.Connected Then
-                    '        ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
-
-                    '        'Activate only if current screen is monitor
-                    '        WarmUpFinishedAttribute = False
-                    '        BsTimerWUp.Enabled = True
-                    '        If Not ActiveMdiChild Is Nothing Then
-                    '            If (TypeOf ActiveMdiChild Is UiMonitor) Then
-                    '                Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
-                    '                'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
-                    '                CurrentMdiChild.bsWamUpGroupBox.Visible = True
-                    '            End If
-                    '        End If
-                    '        'END DL 09/09/2011
-                    '    Else
-                    '        activateButtonsFlag = True
-                    '    End If
-                    'Else
-                    '    ShowMessage("Error", myGlobal.ErrorMessage)
-                    '    activateButtonsFlag = True
-                    'End If
-
-                    'If activateButtonsFlag Then
-                    '    SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
-                    '    SetEnableMainTab(True) 'DL 26/03/2012 test
-                    'End If
-
                 End If
             End If
 
@@ -3410,6 +3366,25 @@ Partial Public Class UiAx00MainMDI
             isStartInstrumentActivating = False
         End Try
     End Sub
+
+    ''' <summary>
+    ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function AskToUseRotorContentsForFLIGHT() As Boolean
+        Dim returndata As Boolean = False, done = False, timeout = Now.AddMinutes(2)
+        AnalyzerController.Instance.UseRotorContentsForFLIGHT(
+            Sub(result As Boolean)
+                returndata = result
+                done = True
+            End Sub)
+        While Not done And Now < timeout
+            If Me.InvokeRequired = False  Then My.Application.DoEvents()
+        End While
+        Return returndata
+    End Function
+
 
     ''' <summary>
     ''' Shut down the instrument

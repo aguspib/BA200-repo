@@ -95,13 +95,13 @@ Namespace Biosystems.Ax00.App
         ''' <remarks>
         ''' Created by: IT 01/12/2014 - BA-2075
         ''' </remarks>
-        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean, reuseRotorContentsForFlight As Boolean) As Boolean
             Try
 
                 If (_warmUpServices Is Nothing) Then
                     _warmUpServices = New WarmUpService(Analyzer)
                 End If
-
+                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
                     Return _warmUpServices.StartService()
                 Else
@@ -109,39 +109,18 @@ Namespace Biosystems.Ax00.App
                 End If
 
             Catch ex As Exception
-                Throw ex
+                Throw
             End Try
 
-
-            'Dim myGlobal As New GlobalDataTO
-            'Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
-            'If (IsAnalyzerInstantiated) Then
-            '    Analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
-
-            '    'Dim activateButtonsFlag As Boolean = False
-            '    'Dim myCurrentAlarms As List(Of AlarmEnumerates.Alarms)
-            '    'myCurrentAlarms = Analyzer.Alarms
-
-            '    Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
-            '    'DL 17/05/2012
-
-            '    If (CheckStatusWarmUp()) Then
-            '        Analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
-
-            '        'If (Not myGlobal.HasError) Then
-            '        If Analyzer.Connected Then
-            '            'Start instrument instruction send OK (initialize wup UI flags)
-            '            myGlobal = InitializeStartInstrument()
-            '        Else
-            '            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = ""
-            '        End If
-            '    End If
-            'End If
-
-            'Return myGlobal
-
         End Function
+
+        Public Sub StartWarmupProcess(ByVal isInRecovering As Boolean)
+            UseRotorContentsForFLIGHT(
+                Sub(result As Boolean)
+                    StartWarmUpProcess(isInRecovering, result)
+                End Sub)
+
+        End Sub
 
         ''' <summary>
         ''' 
@@ -243,7 +222,7 @@ Namespace Biosystems.Ax00.App
             End Try
         End Sub
 
-        Public Sub ReuseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
 
             If responseHandler Is Nothing Then Return
 
@@ -260,6 +239,7 @@ Namespace Biosystems.Ax00.App
                 responseHandler.Invoke(False)
             End If
         End Sub
+
 
         Public Sub WarmUpCloseProcess()
             Try
