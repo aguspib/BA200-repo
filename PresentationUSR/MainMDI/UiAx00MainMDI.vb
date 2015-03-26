@@ -3341,7 +3341,7 @@ Partial Public Class UiAx00MainMDI
                 Else
 
                     Try
-                        If (AnalyzerController.Instance.StartWarmUpProcess()) Then
+                        If (AnalyzerController.Instance.StartWarmUpProcess(False)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
                             'Activate only if current screen is monitor
                             WarmUpFinishedAttribute = False
@@ -7781,26 +7781,42 @@ Partial Public Class UiAx00MainMDI
     Private Sub RecoverInterruptedProcesses()
 
         If (AnalyzerController.Instance.Analyzer.Connected) Then
-            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") OrElse _
-                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
+            RecoverInterruptedNewRotorProcess()
+            RecoverInterruptedWarmUpProcess()
+        End If
 
-                'AG 04/02/2015 BA-2246 ERROR2
-                If Not ActiveMdiChild Is Nothing Then
+    End Sub
 
-                    If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                        CloseActiveMdiChild()
-                        OpenMDIChildForm(UiChangeRotor)
-                    End If
+    Private Sub RecoverInterruptedNewRotorProcess()
 
-                    If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                        Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
-                        CurrentMdiChild.RecoverProcess()
-                    End If
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") OrElse _
+            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
 
+            'AG 04/02/2015 BA-2246 ERROR2
+            If Not ActiveMdiChild Is Nothing Then
+
+                If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                    CloseActiveMdiChild()
+                    OpenMDIChildForm(UiChangeRotor)
                 End If
-                'AG 04/02/2015 BA-2246 ERROR2
+
+                If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                    Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
+                    CurrentMdiChild.RecoverProcess()
+                End If
 
             End If
+            'AG 04/02/2015 BA-2246 ERROR2
+
+        End If
+
+    End Sub
+
+    Private Sub RecoverInterruptedWarmUpProcess()
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") OrElse _
+            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
+            AnalyzerController.Instance.StartWarmUpProcess(True)
         End If
 
     End Sub
@@ -8285,13 +8301,13 @@ Partial Public Class UiAx00MainMDI
                         WorkSessionIDAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionID
                         WSStatusAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionStatus
 
-                            'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
-                            If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                'Dim myLogAcciones As New ApplicationLogManager()
-                                GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
-                            End If
+                        'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
+                        If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
                         End If
                     End If
+                End If
 
                 SetWSActiveDataFromDB()
             End If
@@ -8299,26 +8315,26 @@ Partial Public Class UiAx00MainMDI
             ' XB 22/11/2013 - Task #1394
             DisplayISELockedPreparationsWarningAttribute = False
 
-                UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
-                UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
-                UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
-                UiWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute
-                UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
+            UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
+            UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
+            UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
+            UiWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute
+            UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
 
-                ' XB 17/07/2013 - Auto WS process
-                'XB 23/07/2013 - auto HQ
-                'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
-                UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+            ' XB 17/07/2013 - Auto WS process
+            'XB 23/07/2013 - auto HQ
+            'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
+            UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+            'XB 23/07/2013
+
+            'AG 09/07/2013
+            UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
+            'XB 23/07/2013 - auto HQ
+            ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
+            If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
                 'XB 23/07/2013
-
-                'AG 09/07/2013
-                UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
-                'XB 23/07/2013 - auto HQ
-                ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
-                If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
-                    'XB 23/07/2013
-                    SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
-                End If
+                SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
+            End If
 
             'AG 09/07/2013
 
@@ -8914,8 +8930,6 @@ Partial Public Class UiAx00MainMDI
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-
-
             If Not isAlarm Then
                 ShowStatus(Messages.STANDBY) 'RH 21/03/2012
                 AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 16/05/2012 '#REFACTORING
@@ -9002,7 +9016,9 @@ Partial Public Class UiAx00MainMDI
                     End If
 
                 End If
+                AnalyzerController.Instance.WarmUpCloseProcess()
             End If
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishWarmUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

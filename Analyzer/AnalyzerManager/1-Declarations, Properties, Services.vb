@@ -112,6 +112,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
 
+
         Public Structure ErrorCodesDisplayStruct
             Public ErrorDateTime As DateTime
             Public ErrorCode As String
@@ -294,6 +295,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         ' XB 09/01/2014 - Create this new Attribute - BA-2187
         Private LockISEAttr As Boolean = False
+
+        Private IsAlreadyManagedAlarmsAttr As Boolean = False
 #End Region
 
 #Region "Properties"
@@ -570,10 +573,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public ReadOnly Property InstructionTypeSent() As AppLayerEventList Implements IAnalyzerManager.InstructionTypeSent    '27/03/2012 AG
+        Public Property InstructionTypeSent() As AppLayerEventList Implements IAnalyzerManager.InstructionTypeSent    '27/03/2012 AG
             Get
                 Return AppLayer.LastInstructionTypeSent
             End Get
+            Set(value As AppLayerEventList)
+                AppLayer.LastInstructionTypeSent = value
+            End Set
         End Property
 
         Public Property ISEModuleIsReady() As Boolean Implements IAnalyzerManager.ISEModuleIsReady    '18/01/2011 AG
@@ -1493,6 +1499,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(value As Integer)
                 wellContaminatedWithWashSentAttr = value
+            End Set
+        End Property
+
+        Public Property CanManageRetryAlarm As Boolean Implements IAnalyzerManager.CanManageRetryAlarm
+            Get
+                Return IsAlreadyManagedAlarmsAttr
+            End Get
+            Set(value As Boolean)
+                IsAlreadyManagedAlarmsAttr = value
             End Set
         End Property
 #End Region
@@ -2582,7 +2597,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = AdjustLightSendEvent(myGlobal, pSwAdditionalParameters, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.ADJUST_FLIGHT
-                                myGlobal = AdjustFLightSendEvent(myGlobal, pSwAdditionalParameters)
+                                myGlobal = AdjustFLightSendEvent(myGlobal, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.INFO
                                 myGlobal = InfoSendEvent(myGlobal, pSwAdditionalParameters)

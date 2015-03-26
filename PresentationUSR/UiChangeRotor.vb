@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class UiChangeRotor
@@ -734,11 +735,10 @@ Public Class UiChangeRotor
 
             'AG 12/03/2012 - Reactions rotor missing alarm
             If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
-                Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
-                linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
+                Dim linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
                             Where a.AlarmID = AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString _
                           AndAlso a.AlarmStatus = True _
-                           Select a).ToList
+                           Select a)
 
                 If (linQAlarm.Count > 0) Then
                     ScreenWorkingProcess = False 'Process finished
@@ -748,7 +748,6 @@ Public Class UiChangeRotor
                     bsCancelButton.Enabled = True
                     RefreshDoneField = True 'RH 28/03/2012
                 End If
-                linQAlarm = Nothing
 
                 'AG 02/04/2012 - Raise WashStation is active once the ISE initialization finished
                 If (bsChangeRotortButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
@@ -934,5 +933,6 @@ Public Class UiChangeRotor
     End Sub
 
 #End Region
+
 
 End Class

@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.BL
                     End If
                 End If
 
-                SetExpectedTypeReagent()
+                'SetExpectedTypeReagent()
 
                 'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i) up until becomes no contaminated
                 If contaminations.Count > 0 Then
@@ -98,7 +98,7 @@ Namespace Biosystems.Ax00.BL
                                                 Where a.OrderTestID = sortedOTList(indexI + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, ContaminDS)
-                        typeResult = GetTypeReagentInTest(dbConnection, newContaminatedID)
+                        'typeResult = GetTypeReagentInTest(dbConnection, newContaminatedID)
                     End If
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.BL
                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                             Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                    typeResult = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
+                    'typeResult = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
 
                     If aux_jj = indexJ Then 'search for contamination (low or high level)
                         contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)
@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL
 
                     If contaminations.Count > 0 Then Exit For
 
-                    If ReagentsAreCompatibleType() Then Exit For
+                    'If ReagentsAreCompatibleType() Then Exit For
                     
                     'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                     'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)

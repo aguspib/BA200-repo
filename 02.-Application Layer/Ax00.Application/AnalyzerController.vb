@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.App
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
         Private _rotorChangeServices As RotorChangeServices 'BA-2143
-        Private _warmUpServices As WarmUpServices
+        Private _warmUpServices As WarmUpService
 
         Private Sub New()
         End Sub
@@ -93,14 +93,18 @@ Namespace Biosystems.Ax00.App
         ''' <remarks>
         ''' Created by: IT 01/12/2014 - BA-2075
         ''' </remarks>
-        Public Function StartWarmUpProcess() As Boolean
+        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
 
                 If (_warmUpServices Is Nothing) Then
-                    _warmUpServices = New WarmUpServices(Analyzer)
+                    _warmUpServices = New WarmUpService(Analyzer)
                 End If
 
-                Return _warmUpServices.StartService()
+                If (Not isInRecovering) Then
+                    Return _warmUpServices.StartService()
+                Else
+                    Return _warmUpServices.RecoverProcess()
+                End If
 
             Catch ex As Exception
                 Throw ex
@@ -148,7 +152,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
                 End If
 
                 Return _rotorChangeServices.StartService()
@@ -169,7 +173,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
                 End If
 
                 If (Not isInRecovering) Then
@@ -192,7 +196,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
@@ -211,7 +215,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorFinalizeProcess()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.EmptyAndFinalizeProcess()
@@ -231,6 +235,17 @@ Namespace Biosystems.Ax00.App
                 If _rotorChangeServices IsNot Nothing Then
                     _rotorChangeServices.Dispose()
                     _rotorChangeServices = Nothing
+                End If
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
+        Public Sub WarmUpCloseProcess()
+            Try
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.Dispose()
+                    _warmUpServices = Nothing
                 End If
             Catch ex As Exception
                 Throw ex

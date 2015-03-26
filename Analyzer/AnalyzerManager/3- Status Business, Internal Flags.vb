@@ -1815,7 +1815,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myGlobal As GlobalDataTO
 
                 'Warm Up in course
-                If mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
+                If mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" OrElse
+                   mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
                     '1.	StartInstrument = 'INI'
                     '2.	Washing         = 'INI'
                     '3.	BaseLine        = 'INI'
@@ -1823,65 +1824,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     '5. DynamicBL_Read  = 'INI'
                     '6. DynamicBL_Empty = 'INI'
 
-                    Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
-                    If mySessionFlags(AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
-                        '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.SLEEPING Then
-                            'AG 20/01/2015 BA-2216
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument) BA-2288
-
-                            'AG 20/01/2015 BA-2216 - new conditions
-                        ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                            'AG 20/01/2015 BA-2216
-                        End If
-
-                        'AG 20/01/2015 BA-2216 - changes conditions
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "INI" Then
-                        '2.	Re-send WASH instruction. Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                        End If
-
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
-                        '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                        End If
-
-                        'AG 06/02/2015 BA-2246 previous step is set to END using instruction <> STATUS. Add also case new step flag = ""
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" OrElse mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "" Then
-                        '3.	Re-send FLIGHT instruction in mode fill
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Fill, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                        End If
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                        '3.	Re-send FLIGHT instruction in mode read
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Read, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                        End If
-                    ElseIf mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-                        '3.	Re-send FLIGHT instruction in mode empty
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Empty, "")
-                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
-                        End If
-                    End If
-
+                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERING_INTERRUPTED_PROCESSES, 1, True) 'IT 25/03/2015 - BA-2288
 
                     'Shut Down in course
                 ElseIf mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS" Then

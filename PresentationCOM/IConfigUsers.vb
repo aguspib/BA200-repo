@@ -307,7 +307,7 @@ Public Class UiConfigUsers
         Try
             Dim resultData As New GlobalDataTO
 
-            resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_NEW_TESTS_ALLOWED.ToString)
+            resultData = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.MAX_NEW_TESTS_ALLOWED)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Dim mySettingValue As String = DirectCast(resultData.SetDatos, String)
                 If (mySettingValue <> "") Then

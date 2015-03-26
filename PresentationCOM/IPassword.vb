@@ -242,7 +242,7 @@ Public Class UiPassword
         Try
             Dim myGlobalDataTO As GlobalDataTO
 
-            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INITIAL_KEY.ToString())
+            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INITIAL_KEY)
 
             If Not myGlobalDataTO.HasError Then
                 If bsNewPasswordTextBox.Text = myGlobalDataTO.SetDatos.ToString() Then

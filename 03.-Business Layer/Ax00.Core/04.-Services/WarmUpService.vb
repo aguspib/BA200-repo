@@ -25,7 +25,7 @@ Namespace Biosystems.Ax00.Core.Services
     ''' Created by:  IT 19/12/2014 - BA-2143
     ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
-    Public Class WarmUpServices
+    Public Class WarmUpService
         Inherits AsyncService
 
 #Region "Constructors"
@@ -72,6 +72,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Overrides Function StartService() As Boolean
 
+
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
             If (Not _analyzer Is Nothing) Then
@@ -79,22 +80,30 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
                 'DL 17/05/2012
 
-                If (CheckStatusWarmUp()) Then
-                    '_analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
+                'If (CheckStatusWarmUp()) Then
+                '_analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
+                'If (Not myGlobal.HasError) Then
 
-                    'If (Not myGlobal.HasError) Then
-                    If _analyzer.Connected Then
-                        ValidateProcess()
-                        'Start instrument instruction send OK (initialize wup UI flags)
-                        'myGlobal = InitializeStartInstrument()
+                If _analyzer.Connected Then
+
+                    If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "") Then
                         Initialize()
-                    Else
-                        _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = StepStringStatus.Empty
-                        Return False
+                        _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
                     End If
 
+                    ValidateProcess()
+
+                    'Start instrument instruction send OK (initialize wup UI flags)
+                    'myGlobal = InitializeStartInstrument()
+                Else
+                    '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = StepStringStatus.Empty
+                    Return False
                 End If
+
+                'End If
             End If
+
+            UpdateFlags(myAnalyzerFlagsDS)
 
             Return True
 
@@ -109,20 +118,6 @@ Namespace Biosystems.Ax00.Core.Services
         '    Return Me.StartService(False)
         'End Function
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function ContinueProcess() As Boolean
-            If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
-                ValidateProcess()
-            Else
-                Return False
-            End If
-
-            Return True
-        End Function
 
         ''' <summary>
         ''' 
@@ -154,27 +149,25 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </remarks>
         Public Function RecoverProcess() As Boolean
             Try
-                '_isInRecovering = True
+                _isInRecovering = True
 
-                'InitializeRecover()
+                InitializeRecover()
                 ''_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
 
-                'Dim nextStep As WarmUpStepsEnum
-                'nextStep = GetNextStep()
+                Dim nextStep As WarmUpStepsEnum
+                nextStep = GetNextStep()
 
-                'Select Case nextStep
-                '    Case RotorChangeStepsEnum.NewRotor,
-                '        RotorChangeStepsEnum.Finalize   'RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE,
-                '        ValidateProcess()
-                '        'Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-                '        '   ProcessDynamicBaseLine()
-                '    Case Else
+                Select Case nextStep
+                    Case WarmUpStepsEnum.StartInstrument,
+                        WarmUpStepsEnum.Washing,
+                        WarmUpStepsEnum.Barcode,
+                        WarmUpStepsEnum.Finalize
+                        ValidateProcess()
+                    Case Else
+                        _baseLineService.RecoverProcess()
+                End Select
 
-                '        _baseLineService.RecoverProcess()
-                '        '_baseLineService.RecoverProcess()
-                'End Select
-                ''_baseLineService.RecoverProcess()
-                '_isInRecovering = False
+                _isInRecovering = False
 
                 Return True
 
@@ -195,10 +188,8 @@ Namespace Biosystems.Ax00.Core.Services
                     PauseProcess()
                 Case ServiceStatusEnum.Running
                     RestartProcess()
-
                 Case ServiceStatusEnum.EndError, ServiceStatusEnum.EndSuccess
                     FinalizeProcess()
-
             End Select
         End Sub
 
@@ -209,18 +200,17 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub TryToResume()
 
-            'If (Not _isInRecovering) Then
-            Dim nextStep As WarmUpStepsEnum
-            nextStep = GetNextStep()
+            If (Not _isInRecovering) Then
+                Dim nextStep As WarmUpStepsEnum
+                nextStep = GetNextStep()
 
-            Select Case nextStep
-                Case WarmUpStepsEnum.Washing
-                    ValidateProcess()
-                Case WarmUpStepsEnum.BaseLine
-                    ValidateProcess()
-
-            End Select
-            'End If
+                Select Case nextStep
+                    Case WarmUpStepsEnum.Washing
+                        ValidateProcess()
+                    Case WarmUpStepsEnum.BaseLine
+                        ValidateProcess()
+                End Select
+            End If
 
         End Sub
 
@@ -238,12 +228,10 @@ Namespace Biosystems.Ax00.Core.Services
                     ExecuteStartInstrumentStep()
 
                 Case WarmUpStepsEnum.Washing
-
                     If (_analyzer.CheckIfWashingIsPossible()) Then
                         RestartProcess()
                         ExecuteWashingStep()
                     Else
-                        ExecuteConfigStep()
                         PauseProcess()
                         WashingStepPaused()
                     End If
@@ -259,7 +247,6 @@ Namespace Biosystems.Ax00.Core.Services
 
             End Select
 
-            Return
         End Sub
 
         Private Sub ExecuteStartInstrumentStep()
@@ -352,8 +339,16 @@ Namespace Biosystems.Ax00.Core.Services
         End Function
 
         Private Function GetNextStepWhilePaused() As WarmUpStepsEnum
+
             Dim nextStep As WarmUpStepsEnum = WarmUpStepsEnum.None
+
+            Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
+                Case StepStringStatus.Canceled
+                    nextStep = WarmUpStepsEnum.Washing
+            End Select
+
             Return nextStep
+
         End Function
 
         Private Function GetNextStepWhileInProcess() As WarmUpStepsEnum
@@ -414,19 +409,19 @@ Namespace Biosystems.Ax00.Core.Services
                     _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
                 End If
 
-                If _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END" AndAlso
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED" Then
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = ""
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
+                'If _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END" AndAlso
+                ' _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED" Then
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = ""
+                'analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
+                'End If
 
-                If _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END" AndAlso
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED" Then
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = ""
-                    _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
+                'If _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END" AndAlso
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED" Then
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = ""
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
+                'End If
 
                 Return False
 
@@ -447,16 +442,13 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub FinalizeProcess()
+        Public Sub FinalizeProcess()
 
+            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
-
-            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
-            Dim AlarmStatusList As New List(Of Boolean)
             Dim myAlarm As Alarms
-
             Dim wupManeuversFinishFlag As Boolean = False 'AG 23/05/2012
 
             'WUPCOMPLETEFLAG
@@ -473,21 +465,11 @@ Namespace Biosystems.Ax00.Core.Services
 
             wupManeuversFinishFlag = True
 
-            ' XBC 13/02/2012 - CODEBR Configuration instruction
-            'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process FINISH sent again the config instruction (maybe user has changed something)
-
-            Dim BarCodeDS As New AnalyzerManagerDS
-            Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
-            rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
-            With rowBarCode
-                .RotorType = "SAMPLES"
-                .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
-                .Position = 0
-            End With
-            BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
-            BarCodeDS.AcceptChanges()
-            myGlobalDataTO = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
-            ' XBC 13/02/2012 - CODEBR Configuration instruction
+            '' XBC 13/02/2012 - CODEBR Configuration instruction
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.Barcode) = StepStringStatus.Empty) Then
+                ExecuteBarcodeStep()
+            End If
+            '' XBC 13/02/2012 - CODEBR Configuration instruction
 
             'AG 23/05/2012
             If wupManeuversFinishFlag Then
@@ -512,36 +494,47 @@ Namespace Biosystems.Ax00.Core.Services
             End If
             'AG 23/05/2012
 
-            'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
-            If ((_analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) <> Nothing) AndAlso _analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1) Then
+            CheckIseAlarms()
 
-                Dim tempISEAlarmList As New List(Of AlarmEnumerates.Alarms)
-                Dim tempISEAlarmStatusList As New List(Of Boolean)
-                myGlobalDataTO = _analyzer.ISEAnalyzer.CheckAlarms(_analyzer.Connected, tempISEAlarmList, tempISEAlarmStatusList)
-
-                AlarmList.Clear()
-                AlarmStatusList.Clear()
-                For i As Integer = 0 To tempISEAlarmList.Count - 1
-                    _analyzer.PrepareLocalAlarmList(tempISEAlarmList(i), tempISEAlarmStatusList(i), AlarmList, AlarmStatusList)
-                Next
-
-                If AlarmList.Count > 0 Then
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                    Else
-                        Dim currentAlarms = New CurrentAlarms(_analyzer)
-                        myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
-                    End If
-                End If
-            End If
-            'AG 16/05/2012
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "CLOSED")
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
+        'Private Function StartProcess() As Boolean
+
+        '    Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
+        '    If (Not _analyzer Is Nothing) Then
+        '        _analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
+        '        _analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
+        '        'DL 17/05/2012
+
+        '        'If (CheckStatusWarmUp()) Then
+        '        '_analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
+        '        'If (Not myGlobal.HasError) Then
+
+        '        If _analyzer.Connected Then
+
+        '            _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+        '            Initialize()
+        '            'ValidateProcess()
+        '            'Start instrument instruction send OK (initialize wup UI flags)
+        '            'myGlobal = InitializeStartInstrument()
+        '        Else
+        '            '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = StepStringStatus.Empty
+        '            Return False
+        '        End If
+
+        '        'End If
+        '    End If
+
+        '    UpdateFlags(myAnalyzerFlagsDS)
+
+        '    Return True
+
+
+        'End Function
 
         ''' <summary>
         ''' 
@@ -553,6 +546,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "PAUSED") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                Status = ServiceStatusEnum.Running
 
                 'Update analyzer session flags into DataBase
                 UpdateFlags(myAnalyzerFlagsDs)
@@ -643,18 +637,79 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub InitializeRecover()
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+            'Dim stableSetupAchieved As Boolean = True   '/True means that is not necessary any action to reachs a stable setup 
+            '/False means that some actions to reach stable setup has been started
 
             Initialize()
 
-            'NEWROTORprocess in INPROCESS status
-            If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Initialized) Then
-                _analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Empty
+            '-----------------------------------------------------------------------------------
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.StartInstrument) = StepStringStatus.Initialized) Then
+                '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
+                If (_analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING) Then
+                    'AG 20/01/2015 BA-2216
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Ended)
+
+                    'AG 20/01/2015 BA-2216 - new conditions
+                ElseIf _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    'stableSetupAchieved = False
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Empty)
+                    '_analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Empty)
+                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                    'AG 20/01/2015 BA-2216
+                End If
+
+                'AG 20/01/2015 BA-2216 - changes conditions
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = StepStringStatus.Initialized) Then
+                '2.	Re-send WASH instruction. Requires analyzer status STANDBY
+                If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    'stableSetupAchieved = False
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Empty)
+                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                End If
+
+            ElseIf (_analyzer.SessionFlag(AnalyzerManagerFlags.Barcode) = StepStringStatus.Initialized) Then
+                '2.	Re-send WASH instruction. Requires analyzer status STANDBY
+                If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    'stableSetupAchieved = False
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Barcode, StepStringStatus.Empty)
+                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                End If
+
+                'ElseIf _analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = StepStringStatus.Initialized Then
+                '    '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
+                '    If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                '        'stableSetupAchieved = False
+                '        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Empty)
+                '        'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                '    End If
+
+                '    'AG 06/02/2015 BA-2246 previous step is set to END using instruction <> STATUS. Add also case new step flag = ""
+                'ElseIf _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = StepStringStatus.Initialized OrElse _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = StepStringStatus.Empty Then
+                '    '3.	Re-send FLIGHT instruction in mode fill
+                '    If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                '        'stableSetupAchieved = False
+                '        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Empty)
+                '        'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                '    End If
+                'ElseIf _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = StepStringStatus.Initialized Then
+                '    '3.	Re-send FLIGHT instruction in mode read
+                '    If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                '        'stableSetupAchieved = False
+                '        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Empty)
+                '        'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                '    End If
+                'ElseIf _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = StepStringStatus.Initialized Then
+                '    '3.	Re-send FLIGHT instruction in mode empty
+                '    If _analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                '        'stableSetupAchieved = False
+                '        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Empty, StepStringStatus.Empty)
+                '        'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'AG 06/02/2015 This step will be called during liquid levels validation in the ANSINF treatment, method UserSwANSINFTreatment
+                '    End If
+
+
             End If
 
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
@@ -688,6 +743,8 @@ Namespace Biosystems.Ax00.Core.Services
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
+            ExecuteConfigStep()
+
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Barcode, "END")
             UpdateFlags(myAnalyzerFlagsDs)
 
@@ -695,12 +752,15 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private Sub PauseProcess()
 
-            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+            If (_analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) <> "PAUSED") Then
+                Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                Status = ServiceStatusEnum.Paused
 
-            'Update analyzer session flags into DataBase
-            UpdateFlags(myAnalyzerFlagsDs)
+                'Update analyzer session flags into DataBase
+                UpdateFlags(myAnalyzerFlagsDs)
+            End If
 
         End Sub
 
@@ -709,11 +769,50 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) <> "CANCELED") Then
+
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "CANCELED")
+                ExecuteConfigStep()
 
                 'Update analyzer session flags into DataBase
                 UpdateFlags(myAnalyzerFlagsDs)
             End If
+
+        End Sub
+
+
+        Private Sub CheckIseAlarms()
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim AlarmStatusList As New List(Of Boolean)
+
+            'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
+            If ((_analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) <> Nothing) AndAlso _analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1) Then
+
+                Dim tempISEAlarmList As New List(Of AlarmEnumerates.Alarms)
+                Dim tempISEAlarmStatusList As New List(Of Boolean)
+                myGlobalDataTO = _analyzer.ISEAnalyzer.CheckAlarms(_analyzer.Connected, tempISEAlarmList, tempISEAlarmStatusList)
+
+                AlarmList.Clear()
+                AlarmStatusList.Clear()
+                For i As Integer = 0 To tempISEAlarmList.Count - 1
+                    _analyzer.PrepareLocalAlarmList(tempISEAlarmList(i), tempISEAlarmStatusList(i), AlarmList, AlarmStatusList)
+                Next
+
+                If AlarmList.Count > 0 Then
+                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                    If GlobalBase.IsServiceAssembly Then
+                        ' XBC 16/10/2012 - Alarms treatment for Service
+                        ' Not Apply
+                        'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                    Else
+                        Dim currentAlarms = New CurrentAlarms(_analyzer)
+                        myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
+                    End If
+                End If
+            End If
+            'AG 16/05/2012
 
         End Sub
 
