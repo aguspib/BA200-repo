@@ -153,7 +153,7 @@ Namespace Biosystems.Ax00.App
             Try
 
                 If _warmUpServices IsNot Nothing Then
-                    _warmUpServices.StartService()
+                    _warmUpServices.RestartService()
                 End If
 
             Catch ex As Exception

@@ -272,6 +272,9 @@ Public Class UiChangeRotor
             dxProgressBar.Visible = False
             dxProgressBar.Properties.Minimum = 0
             dxProgressBar.Properties.Maximum = DefaultLightAdjustTime
+
+            AnalyzerController.Instance.PauseWarmUpService() 'IT 26/03/2015 - BA-2406
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -307,15 +310,18 @@ Public Class UiChangeRotor
                 End If
 
                 'Open the WS Monitor form and close this one
-                If (Not Me.Tag Is Nothing) Then
-                    'A PerformClick() method was executed
-                    Me.Close()
-                Else
-                    'Normal button click
-                    'Open the WS Monitor form and close this one
-                    UiAx00MainMDI.OpenMonitorForm(Me)
-                End If
+                'If (Not Me.Tag Is Nothing) Then
+                'A PerformClick() method was executed
+                'Me.Close()
+                'Else
+                'Normal button click
+                'Open the WS Monitor form and close this one
+                UiAx00MainMDI.OpenMonitorForm(Me)
+                'End If
             End If
+
+            AnalyzerController.Instance.ReStartWarmUpService() 'IT 26/03/2015 - BA-2406
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".ExitScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

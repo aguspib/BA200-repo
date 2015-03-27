@@ -3327,9 +3327,6 @@ Partial Public Class UiAx00MainMDI
                 Else
                     'IT 26/03/2015 - BA-2406 - INI
                     Try
-
-
-
                         If (AnalyzerController.Instance.StartWarmUpProcess(False, AskToUseRotorContentsForFLIGHT)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
                             'Activate only if current screen is monitor
@@ -3340,6 +3337,11 @@ Partial Public Class UiAx00MainMDI
                                     Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                     CurrentMdiChild.bsWamUpGroupBox.Visible = True
                                 End If
+                                'IT 26/03/2015 - BA-2406 (INI)
+                                If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                                    CloseActiveMdiChild()
+                                End If
+                                'IT 26/03/2015 - BA-2406 (END)
                             End If
                             'END DL 09/09/2011
                         Else

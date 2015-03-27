@@ -81,6 +81,7 @@ Namespace Biosystems.Ax00.Core.Services
                 If _analyzer.Connected Then
                     If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "") Then
                         _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                        Status = ServiceStatusEnum.Running
                         Initialize()
                         AddRequiredEventHandlers()
                     End If
@@ -104,8 +105,10 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Overrides Sub PauseService()
 
-            RemoveRequiredEventHandlers()
-            _baseLineService.PauseService()
+            If (Status <> ServiceStatusEnum.Running) Then
+                RemoveRequiredEventHandlers()
+                _baseLineService.PauseService()
+            End If
 
         End Sub
 
@@ -188,7 +191,9 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Select Case nextStep
                     Case WarmUpStepsEnum.Washing
-                        ValidateProcess()
+                        If Status <> ServiceStatusEnum.Paused Then
+                            ValidateProcess()
+                        End If
                     Case WarmUpStepsEnum.BaseLine
                         ValidateProcess()
                 End Select
