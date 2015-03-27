@@ -242,7 +242,7 @@ Partial Public Class UiAx00MainMDI
                        mainCoverAlarm OrElse reactionsCoverAlarm OrElse fridgeCoverAlarm OrElse samplesCoverAlarm OrElse iSEUtilitiesActiveFlag Then
                         myStatus = False
                     Else
-                        myStatus = True
+                        myStatus = IsActivatedStartInstrumentButton() 'IT 26/03/2015 - BA-2406
                     End If
 
                     'SHUT DOWN INSTRUMENT button
@@ -664,9 +664,9 @@ Partial Public Class UiAx00MainMDI
                 End If
                 'AG 04/09/2012
 
-            ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
+                'IT 26/03/2015 - BA-2406
+                'ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then 
                 '    'Do nothing, no activate buttons until the ISE initialitazion finishes
-
             ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
                 'AG 27/08/2012 - STANDBY: All buttons Disabled | RUNNING: Abort button enabled
                 SetActionButtonsEnableProperty(False)
@@ -1422,6 +1422,25 @@ Partial Public Class UiAx00MainMDI
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 26/03/2015 - BA-2406
+    ''' </remarks>
+    Private Function IsActivatedStartInstrumentButton() As Boolean
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") Then
+            Return False
+        Else
+            Return (AnalyzerController.Instance.Analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = String.Empty)
+        End If
+
+    End Function
+
+
 
 #End Region
 

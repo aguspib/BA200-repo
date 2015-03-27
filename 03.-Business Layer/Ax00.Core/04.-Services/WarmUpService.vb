@@ -287,6 +287,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Barcode, "INI")
             _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+            _analyzer.SetAnalyzerNotReady()
             ' XBC 13/02/2012 - CODEBR Configuration instruction
 
             'Update analyzer session flags into DataBase
