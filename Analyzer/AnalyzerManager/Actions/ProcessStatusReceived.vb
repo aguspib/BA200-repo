@@ -73,35 +73,34 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not GetFieldsFromInstructionRecived(myStatusValue, myGlobal, myInstParamTo, myActionValue, myExpectedTime, myExpectedTimeRaw, myWellValue, myRequestValue, errorValue) Then
                     Return myGlobal
                 End If
-
-                If errorValue = 551 Or errorValue = 552 Then
-                    StateManagementAlarm(errorValue)
-                Else
-                    If StatusParameters.IsActive AndAlso errorValue <> 99 Then
-                        StatusParameters.IsActive = False
-                    End If
+                If StatusParameters.IsActive AndAlso errorValue <> 99 AndAlso errorValue <> 551 AndAlso errorValue <> 552 Then
+                    StatusParameters.IsActive = False
+                End If
                     'Alarms management
                     ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
-                    If errorValue <> 0 Then
-                        TreatmentSingleAndMultipleErrors(myGlobal, errorValue)
+                If errorValue <> 0 Then
+                    If errorValue = 551 Or errorValue = 552 Then
+                        StateManagementAlarm(errorValue)
                     Else
-                        If GlobalBase.IsServiceAssembly Then
-                            'Solve all previous alarms
-                            If _analyzerManager.ErrorCodesDisplay.Count > 0 Then _analyzerManager.SolveErrorCodesToDisplay(New List(Of String)({"0"}))
-                            _analyzerManager.MyErrorCodesClear()
-                        End If
-
-                        'Reset the freeze flags information
-                        If _analyzerManager.AnalyzerIsFreeze() AndAlso Not GlobalBase.IsServiceAssembly Then
-                            'Clear all alarms with error code
-                            myGlobal = _analyzerManager.RemoveErrorCodeAlarms(Nothing, _analyzerManager.AnalyzerCurrentAction())
-                        End If
+                        TreatmentSingleAndMultipleErrors(myGlobal, errorValue)
                     End If
+                Else
+                    If GlobalBase.IsServiceAssembly Then
+                        'Solve all previous alarms
+                        If _analyzerManager.ErrorCodesDisplay.Count > 0 Then _analyzerManager.SolveErrorCodesToDisplay(New List(Of String)({"0"}))
+                        _analyzerManager.MyErrorCodesClear()
+                    End If
+
+                    'Reset the freeze flags information
+                    If _analyzerManager.AnalyzerIsFreeze() AndAlso Not GlobalBase.IsServiceAssembly Then
+                        'Clear all alarms with error code
+                        myGlobal = _analyzerManager.RemoveErrorCodeAlarms(Nothing, _analyzerManager.AnalyzerCurrentAction())
+                    End If
+                End If
 
                     'Do business depending the requestvalue, action value, status value, alarms value,....
                     DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
-                End If
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
@@ -125,6 +124,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
+                Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
             ElseIf errorTranslated.Equals(Alarms.UNKNOW_ROTOR_FULL) Then

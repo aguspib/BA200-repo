@@ -1,9 +1,12 @@
 ﻿Option Strict Off
 
+Imports System.Text
 Imports System.Timers
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
 Imports CommunicationsAx00
+#Const TRACECOM = False
+
 Namespace Biosystems.Ax00.CommunicationsSwFw
     'Adapted from Enlace.vb (iPRO User Sw)
 
@@ -180,6 +183,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             '    Throw 'ex
             'End Try
 
+#If TRACECOM Then
+            Dim SB As New StringBuilder(in_datosByte.Length)
+            For Each B As Byte In in_datosByte
+                SB.Append(ChrW(B))
+            Next
+            Debug.WriteLine("PC --> BA200: " & SB.ToString)
+#End If
         End Function
 
         'Public Function Parar() As Boolean
@@ -329,6 +339,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ActivateReception()
                 Application.DoEvents()
             End If
+
+#If TRACECOM Then
+            Debug.WriteLine("BA200 <<-- PC " & dataReceived)
+#End If
             'AG 10/07/2012
         End Sub
 

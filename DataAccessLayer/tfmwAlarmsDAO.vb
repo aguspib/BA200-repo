@@ -91,7 +91,9 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'cmdText &= "SELECT * " & vbCrLf
                         'cmdText &= "FROM tfmwAlarms " & vbCrLf
-                        cmdText = " SELECT a.*, aec.ErrorCode " & vbCrLf
+
+                        'AJG AÑADIDO EL ISNULL OJO!!!!!
+                        cmdText = " SELECT a.*, ISNULL(aec.ErrorCode,0) AS ERRORCODE " & vbCrLf
                         cmdText &= " FROM tfmwAlarms a LEFT OUTER JOIN tfmwAlarmErrorCodes aec " & vbCrLf
                         cmdText &= " ON a.AlarmID = aec.AlarmID "
 

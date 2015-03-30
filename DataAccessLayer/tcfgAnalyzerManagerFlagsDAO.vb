@@ -287,7 +287,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         Public Function ResetFlags(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pLeaveConnectFlag As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
-                If (pDBConnection Is Nothing) Then
+                If (pDBConnection Is Nothing OrElse pDBConnection.State = ConnectionState.Closed) Then
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
