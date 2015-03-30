@@ -1223,17 +1223,47 @@
       --| BA200: v3.07     	 |
       --|====================|
 
-      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
+      -- BA-2396 ERR560
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_FBLD_ERR') = 0)
       BEGIN
-      INSERT INTO dbo.tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, OKType)
-      VALUES ('GLF_BOARD_ERR','INS','ERROR','GLF  error during FBLD','GLF_BOARD_ERR','GLF  error during FBLD','ALM_GLF_BOARD_ERR','Switch off the analyzer and the application, wait 30 seconds and then switch them on both again. Then press the Connect button','SOL_RECOVER_ERR',0,0,0)
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('GLF_BOARD_FBLD_ERR','INS','ERROR','Photometric board error during FBLD','GLF_BOARD_ERR','Photometric board does not respond','ALM_GLF_BOARD_ERR','Switch off the analyzer and the application, wait 30 seconds and then switch them on both again. Then press the Connect button','SOL_RECOVER_ERR',0,0,'RESET',1,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'GLF_BOARD_FBLD_ERR') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('GLF_BOARD_FBLD_ERR',560,'3_RECOVER_ERROR')
       END
       GO
 
-      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'GLF_BOARD_ERR') = 0)
+      -- BA-2358 ERR551
+
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'FBLD_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('FBLD_ROTOR_FULL','INS','REMARK','Photometric Rotor full','FBLD_ROTOR_FULL','Photometric Rotor is full','ALM_FBLD_ROTOR_FULL',NULL,NULL,0,0,NULL,0,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'FBLD_ROTOR_FULL') = 0)
       BEGIN
       INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
-      VALUES ('GLF_BOARD_ERR',560,'2_FATAL_ERROR')
+      VALUES ('FBLD_ROTOR_FULL',551,'6_OMMIT_ERROR')
+      END
+      GO
+
+      -- BA-2358 ERR552
+
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'UNKNOW_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('UNKNOW_ROTOR_FULL','INS','REMARK','Unknow Photometric rotor state','UNKNOW_ROTOR_FULL','Photometric Rotor has some wells full','ALM_UNKNOW_ROTOR_FULL',NULL,NULL,0,0,NULL,0,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'UNKNOW_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('UNKNOW_ROTOR_FULL',552,'2_FATAL_ERROR')
       END
       GO
 
