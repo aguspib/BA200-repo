@@ -252,7 +252,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property ReuseRotorContentsIfPossible As Action(Of ReuseRotorResponse) 'Boolean = False
+        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse)
 #End Region
 
 #Region "Attributes"
@@ -882,7 +882,7 @@ Namespace Biosystems.Ax00.Core.Services
             Else
                 '551 usable
                 Dim result As New ReuseRotorResponse
-                ReuseRotorContentsIfPossible.Invoke(result)
+                If DecideToReuseRotorContents IsNot Nothing Then DecideToReuseRotorContents.Invoke(result)
                 If result.Reuse Then
                     DirectlyGoToDynamicReadStep()
                     'ExecuteDynamicBaseLineReadStep()

@@ -145,7 +145,7 @@ Namespace Biosystems.Ax00.Core.Services
                         ValidateProcess()
                     Case Else
                         If (nextStep <> WarmUpStepsEnum.Washing) Then
-                            _baseLineService.ReuseRotorContentsIfPossible = ReuseRotorContentsForBaseLine
+                            _baseLineService.DecideToReuseRotorContents = ReuseRotorContentsForBaseLine
                             _baseLineService.RecoverProcess()
                         End If
                 End Select
@@ -301,7 +301,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub ExecuteBaseLineStep()
-            _baseLineService.ReuseRotorContentsIfPossible = ReuseRotorContentsForBaseLine
+            _baseLineService.DecideToReuseRotorContents = ReuseRotorContentsForBaseLine
             _baseLineService.StartService()
         End Sub
 
