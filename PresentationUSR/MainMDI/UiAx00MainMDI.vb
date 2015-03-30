@@ -21,6 +21,7 @@ Imports System.IO
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.Core.Services
 
 Partial Public Class UiAx00MainMDI
 
@@ -3327,7 +3328,7 @@ Partial Public Class UiAx00MainMDI
                 Else
                     'IT 26/03/2015 - BA-2406 - INI
                     Try
-                        If (AnalyzerController.Instance.StartWarmUpProcess(False, AskToUseRotorContentsForFLIGHT)) Then
+                        If (AnalyzerController.Instance.StartWarmUpProcess(False, AddressOf AskToUseRotorContentsForFLIGHT)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
                             'Activate only if current screen is monitor
                             WarmUpFinishedAttribute = False
@@ -3376,18 +3377,21 @@ Partial Public Class UiAx00MainMDI
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function AskToUseRotorContentsForFLIGHT() As Boolean
-        Dim returndata As Boolean = False, done = False, timeout = Now.AddMinutes(2)
+    Private Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse) 'As BaseLineService.ReuseRotorResponse
+        Dim returndata As Boolean = False
+        Dim done = False, timeout = Now.AddMinutes(2), obj2 As BaseLineService.ReuseRotorResponse = Nothing
+
         AnalyzerController.Instance.UseRotorContentsForFLIGHT(
-            Sub(result As Boolean)
-                returndata = result
+            Sub(obj3)
+                obj2 = obj3
                 done = True
             End Sub)
         While Not done And Now < timeout
-            If Me.InvokeRequired = False  Then My.Application.DoEvents()
+            If Me.InvokeRequired = False Then My.Application.DoEvents()
         End While
-        Return returndata
-    End Function
+        If obj IsNot Nothing AndAlso obj2 IsNot Nothing Then obj.Reuse = obj2.Reuse
+        'Return obj2
+    End Sub
 
 
     ''' <summary>
@@ -7810,7 +7814,7 @@ Partial Public Class UiAx00MainMDI
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") OrElse _
             AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
-            AnalyzerController.Instance.StartWarmUpProcess(True)
+            AnalyzerController.Instance.StartWarmUpProcess(True, AddressOf AskToUseRotorContentsForFLIGHT)
         End If
 
     End Sub

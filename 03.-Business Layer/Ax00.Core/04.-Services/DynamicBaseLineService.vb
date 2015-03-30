@@ -105,6 +105,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             'We set propper internal flags, it's treated the same as a recover process that goes directly to the reading
             InitializeRecover()
+            _checkedPreviousAlarms = True
 
         End Sub
 
@@ -226,7 +227,10 @@ Namespace Biosystems.Ax00.Core.Services
 
             'Calculate expiration time:
             Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
-            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then caducityMinutesString = "0"
+            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then
+                caducityMinutesString = "0"
+                Debug.WriteLine("Rotor contentes Caducity was not found in the DB!!")
+            End If
 
             Dim caducityMinutes = CInt(caducityMinutesString)
             Dim expirationTime = Now.AddMinutes(-caducityMinutes)
@@ -248,7 +252,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property ReuseRotorContentsIfPossible As Boolean = False
+        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse)
 #End Region
 
 #Region "Attributes"
@@ -268,15 +272,11 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Event Handlers"
 
         Private Sub OnReceivedStatusInformationEvent()
-            'Handles _analyzer.ReceivedStatusInformationEventHandler
-            'Debug.WriteLine("Hello 1")
             If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             TryToResume()
         End Sub
 
         Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
-            'Handles _analyzer.ProcessFlagEventHandler
-            'Debug.WriteLine("Hello 2")
             If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
@@ -325,7 +325,9 @@ Namespace Biosystems.Ax00.Core.Services
                      BaseLineStepsEnum.StaticBaseLine,
                      BaseLineStepsEnum.DynamicBaseLineFill,
                      BaseLineStepsEnum.DynamicBaseLineEmpty,
-                     BaseLineStepsEnum.CheckPreviousAlarms
+                     BaseLineStepsEnum.CheckPreviousAlarms,
+                     BaseLineStepsEnum.DynamicBaseLineRead
+
                     ValidateProcess()
             End Select
 
@@ -411,7 +413,7 @@ Namespace Biosystems.Ax00.Core.Services
                             End If
 
                             If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
-                                nextStep = BaseLineStepsEnum.Finalize
+                                If CurrentStep() <> BaseLineStepsEnum.CheckPreviousAlarms Then nextStep = BaseLineStepsEnum.Finalize
                             End If
 
                         Else
@@ -424,7 +426,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
             End Select
             If nextStep <> BaseLineStepsEnum.None Then
-                Debug.Print("Currently doing: " & nextStep.ToString)
+                Debug.WriteLine("Currently doing: " & nextStep.ToString)
             End If
             Return nextStep
         End Function
@@ -759,7 +761,6 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, myParams, String.Empty, Nothing)
             _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
             _forceEmptyAndFinalize = False
-
         End Sub
 
         ''' <summary>
@@ -852,15 +853,14 @@ Namespace Biosystems.Ax00.Core.Services
             Dim alarm551Date = StatusParameters.LastSaved
 
             Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
-            Debug.WriteLine("Processed previous alarms: Error551=" & alarm551Present & " with date = " & alarm551Date)
-            Debug.WriteLine("Processed previous alarms: Error552=" & alarm552Present)
+            Debug.WriteLine("Alarms: 551=" & alarm551Present & " date = " & alarm551Date & " " & " 552=" & alarm552Present)
 
             If alarm552Present Then
                 ExecuteDynamicBaseLineEmptyStep()
             ElseIf alarm551Present Then
                 ProcessAlarmFullCleanRotor(alarm551Date)
             Else
-                'No alarms to process!
+                'No alarms to process. Do nothing
             End If
 
         End Sub
@@ -875,8 +875,11 @@ Namespace Biosystems.Ax00.Core.Services
                 ExecuteDynamicBaseLineEmptyStep()
             Else
                 '551 usable
-                If ReuseRotorContentsIfPossible Then
+                Dim result As New ReuseRotorResponse
+                If DecideToReuseRotorContents IsNot Nothing Then DecideToReuseRotorContents.Invoke(result)
+                If result.Reuse Then
                     DirectlyGoToDynamicReadStep()
+                    'ExecuteDynamicBaseLineReadStep()
                 Else
                     ExecuteDynamicBaseLineEmptyStep()
                 End If
@@ -884,6 +887,10 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
+
+        Public Class ReuseRotorResponse
+            Public Property Reuse As Boolean = False
+        End Class
     End Class
 
 End Namespace
