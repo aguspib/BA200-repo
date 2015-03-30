@@ -272,15 +272,11 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Event Handlers"
 
         Private Sub OnReceivedStatusInformationEvent()
-            'Handles _analyzer.ReceivedStatusInformationEventHandler
-            'Debug.WriteLine("Hello 1")
             If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             TryToResume()
         End Sub
 
         Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
-            'Handles _analyzer.ProcessFlagEventHandler
-            'Debug.WriteLine("Hello 2")
             If _currentStep = BaseLineStepsEnum.NotStarted Then Return
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
@@ -430,7 +426,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
             End Select
             If nextStep <> BaseLineStepsEnum.None Then
-                Debug.Print("Currently doing: " & nextStep.ToString)
+                Debug.WriteLine("Currently doing: " & nextStep.ToString)
             End If
             Return nextStep
         End Function
@@ -857,16 +853,14 @@ Namespace Biosystems.Ax00.Core.Services
             Dim alarm551Date = StatusParameters.LastSaved
 
             Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
-            Debug.WriteLine("Processed previous alarms: Error551=" & alarm551Present & " with date = " & alarm551Date)
-            Debug.WriteLine("Processed previous alarms: Error552=" & alarm552Present)
+            Debug.WriteLine("Alarms: 551=" & alarm551Present & " date = " & alarm551Date & " " & " 552=" & alarm552Present)
 
             If alarm552Present Then
-                'DirectlyGoToDynamicReadStep()
                 ExecuteDynamicBaseLineEmptyStep()
             ElseIf alarm551Present Then
                 ProcessAlarmFullCleanRotor(alarm551Date)
             Else
-                'No alarms to process!
+                'No alarms to process. Do nothing
             End If
 
         End Sub

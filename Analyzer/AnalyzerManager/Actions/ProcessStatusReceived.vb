@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
-                Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
+                'Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
             ElseIf errorTranslated.Equals(Alarms.UNKNOW_ROTOR_FULL) Then
