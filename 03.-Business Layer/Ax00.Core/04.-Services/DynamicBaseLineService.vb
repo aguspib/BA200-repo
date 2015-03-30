@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Services
         '''          Modified by: IT 16/02/2015 BA-2266
         '''  </remarks>
         Private Sub InitializeRecover()
-
+            _checkedPreviousAlarms = False
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             Initialize()
@@ -254,7 +254,7 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Attributes"
 
         Private _forceEmptyAndFinalize As Boolean = False
-        Private _checkedPreviousAlarms As Boolean = True
+        Private _checkedPreviousAlarms As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
         Private _currentStep As BaseLineStepsEnum
@@ -304,7 +304,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
             _alreadyFinalized = False
-
+            _checkedPreviousAlarms = False
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
             End If
@@ -852,6 +852,8 @@ Namespace Biosystems.Ax00.Core.Services
             Dim alarm551Date = StatusParameters.LastSaved
 
             Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
+            Debug.WriteLine("Processed previous alarms: Error551=" & alarm551Present & " with date = " & alarm551Date)
+            Debug.WriteLine("Processed previous alarms: Error552=" & alarm552Present)
 
             If alarm552Present Then
                 ExecuteDynamicBaseLineEmptyStep()
@@ -861,7 +863,6 @@ Namespace Biosystems.Ax00.Core.Services
                 'No alarms to process!
             End If
 
-            'Throw New NotImplementedException
         End Sub
 
         Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)

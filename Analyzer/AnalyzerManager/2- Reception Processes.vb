@@ -451,6 +451,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else
                             If errorCode = 551 Or errorCode = 552 Then
                                 IsAStateError = True
+                                Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError TRUE")
                             End If
                             ' User Sw
                             If errorCode <> 20 And errorCode <> 21 And errorCode <> 99 Then
@@ -476,6 +477,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     StatusParameters.IsActive = False
                     currentAlarms.RemoveAlarmStateAndRefreshUi(StatusParameters.State.ToString())
                     StatusParameters.State = StatusParameters.RotorStates.None
+                    Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError FALSE")
                 End If
 
                 For Each alarmId As Alarms In myAlarms
@@ -589,7 +591,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Return myGlobal
                 End If
 
-                ResetFbldAlarms()
+                'ResetFbldAlarms()
 
                 Dim myIntValue As Integer
 
