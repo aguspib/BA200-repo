@@ -708,6 +708,11 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            RemoveRequiredEventHandlers()
+            MyBase.Dispose(disposing)
+        End Sub
+
 #End Region
 
 #Region "Properties"
