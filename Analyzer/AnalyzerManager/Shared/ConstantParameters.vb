@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public alarmsDefintionTableDS As New AlarmsDS 'Read the Alarm definition when analyzer manager class is created not in several methods as now (SoundActivationByAlarm, TranslateErrorCodeToAlarmID, RemoveErrorCodeAlarms, ExistFreezeAlarms
 
-        Public LockThis As New Object() 'AG 28/06/2012
+        Public ReadOnly LockThis As New Object() 'AG 28/06/2012
 
     End Module
 

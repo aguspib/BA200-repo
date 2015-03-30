@@ -76,8 +76,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If StatusParameters.IsActive AndAlso errorValue <> 99 AndAlso errorValue <> 551 AndAlso errorValue <> 552 Then
                     StatusParameters.IsActive = False
                 End If
-                    'Alarms management
-                    ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
+                'Alarms management
+                ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
                 If errorValue <> 0 Then
                     If errorValue = 551 Or errorValue = 552 Then
@@ -99,8 +99,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                    'Do business depending the requestvalue, action value, status value, alarms value,....
-                    DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
+                'Do business depending the requestvalue, action value, status value, alarms value,....
+                DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"

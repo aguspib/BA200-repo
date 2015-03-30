@@ -311,6 +311,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub ExecuteConfigStep()
             _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
+            _analyzer.SetAnalyzerNotReady()
         End Sub
 
         ''' <summary>
@@ -633,7 +634,6 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) <> "CANCELED") Then
-
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "CANCELED")
                 ExecuteConfigStep()
 
@@ -707,6 +707,11 @@ Namespace Biosystems.Ax00.Core.Services
                 AddHandler _analyzer.ProcessFlagEventHandler, AddressOf OnProcessFlagEvent
                 _eventHandlersAdded = True
             End If
+        End Sub
+
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            RemoveRequiredEventHandlers()
+            MyBase.Dispose(disposing)
         End Sub
 
 #End Region
