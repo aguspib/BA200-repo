@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{912D0293-2407-4617-8E23-7CC7F3CAA736}</revnumber>
+		<revnumber>{BF1170E6-C25B-4FA9-A4C2-0E3936A5C1C0}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -432,7 +432,8 @@
 		<row><td>Digiface.ttf1</td><td>{1CEB55BF-9219-41E9-BFB4-35FCC73D22BC}</td><td>FontsFolder</td><td>8</td><td/><td>digiface.ttf</td><td>17</td><td>This component consists of font files to be registered on the target system.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll</td><td>{908B97F9-C114-4A41-9E9E-AAC15D47CF02}</td><td>SERVICE_SW</td><td>8</td><td/><td>framework.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll1</td><td>{A1947093-F8B8-4D7E-BD3E-09C8CD322ED5}</td><td>USER_SW</td><td>8</td><td/><td>framework.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>FwBA200v013</td><td>{9E6BA227-6ACC-4A64-B1ED-D84BE794F4E4}</td><td>FIRMWARE</td><td>8</td><td/><td>ba200v013.ba2</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FwBA200v013</td><td>{9E6BA227-6ACC-4A64-B1ED-D84BE794F4E4}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FwBA200v044r02</td><td>{7A8D135A-FE9C-4216-B48F-9BD37870700B}</td><td>FIRMWARE</td><td>8</td><td/><td>ba200v044r02.ba2</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll</td><td>{376E6721-8833-4097-934F-3DFFD2E81F1A}</td><td>SERVICE_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll1</td><td>{0306CEFC-42F8-4602-8395-BE9B13F56DF6}</td><td>USER_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>History.dll</td><td>{F035BCB4-5080-444B-BD84-DFC07660BFA7}</td><td>SERVICE_SW</td><td>8</td><td/><td>history.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2098,6 +2099,7 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>Firmware</td><td>FwBA200v013</td></row>
+		<row><td>Firmware</td><td>FwBA200v044r02</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
 		<row><td>Service_Sw</td><td>Analyzer.dll</td></row>
@@ -2284,42 +2286,25 @@
 		<row><td>_sd.png</td><td>ServiceSw_Images</td><td>1SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\1SD.png</td><td>1</td><td/></row>
 		<row><td>_sd.png1</td><td>ServiceSw_Images</td><td>2SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\2SD.png</td><td>1</td><td/></row>
 		<row><td>_sd.png2</td><td>ServiceSw_Images</td><td>3SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\3SD.png</td><td>1</td><td/></row>
-		<row><td>_sd.png3</td><td>UserSw_Images</td><td>1SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\1SD.png</td><td>1</td><td/></row>
-		<row><td>_sd.png4</td><td>UserSw_Images</td><td>2SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\2SD.png</td><td>1</td><td/></row>
-		<row><td>_sd.png5</td><td>UserSw_Images</td><td>3SD.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\3SD.png</td><td>1</td><td/></row>
 		<row><td>aboutba4.png</td><td>ServiceSw_Images</td><td>AboutBA4.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AboutBA4.png</td><td>1</td><td/></row>
-		<row><td>aboutba4.png1</td><td>UserSw_Images</td><td>AboutBA4.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AboutBA4.png</td><td>1</td><td/></row>
 		<row><td>aboutba4srv.png</td><td>ServiceSw_Images</td><td>ABOUTB~1.PNG|AboutBA4SRV.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AboutBA4SRV.png</td><td>1</td><td/></row>
-		<row><td>aboutba4srv.png1</td><td>UserSw_Images</td><td>ABOUTB~1.PNG|AboutBA4SRV.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AboutBA4SRV.png</td><td>1</td><td/></row>
 		<row><td>aboutlogo.png</td><td>ServiceSw_Images</td><td>ABOUTL~1.PNG|AboutLogo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AboutLogo.png</td><td>1</td><td/></row>
-		<row><td>aboutlogo.png1</td><td>UserSw_Images</td><td>ABOUTL~1.PNG|AboutLogo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AboutLogo.png</td><td>1</td><td/></row>
 		<row><td>accept.png</td><td>ServiceSw_Images</td><td>Accept.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Accept.png</td><td>1</td><td/></row>
-		<row><td>accept.png1</td><td>UserSw_Images</td><td>Accept.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Accept.png</td><td>1</td><td/></row>
 		<row><td>acceptf.png</td><td>ServiceSw_Images</td><td>AcceptF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AcceptF.png</td><td>1</td><td/></row>
-		<row><td>acceptf.png1</td><td>UserSw_Images</td><td>AcceptF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AcceptF.png</td><td>1</td><td/></row>
 		<row><td>acceptfbn.png</td><td>ServiceSw_Images</td><td>ACCEPT~1.PNG|AcceptFBN.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AcceptFBN.png</td><td>1</td><td/></row>
-		<row><td>acceptfbn.png1</td><td>UserSw_Images</td><td>ACCEPT~1.PNG|AcceptFBN.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AcceptFBN.png</td><td>1</td><td/></row>
 		<row><td>acropdf.dll</td><td>AcroPDF.dll</td><td>AcroPDF.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CommonFilesFolder&gt;\Adobe\Acrobat\ActiveX\AcroPDF.dll</td><td>1</td><td/></row>
 		<row><td>actionclick.png</td><td>ServiceSw_Images</td><td>ACTION~1.PNG|ActionClick.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ActionClick.png</td><td>1</td><td/></row>
-		<row><td>actionclick.png1</td><td>UserSw_Images</td><td>ACTION~1.PNG|ActionClick.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ActionClick.png</td><td>1</td><td/></row>
 		<row><td>additionalsolution.png</td><td>ServiceSw_Images</td><td>ADDITI~1.PNG|AdditionalSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AdditionalSolution.png</td><td>1</td><td/></row>
-		<row><td>additionalsolution.png1</td><td>UserSw_Images</td><td>ADDITI~1.PNG|AdditionalSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AdditionalSolution.png</td><td>1</td><td/></row>
 		<row><td>addsolsamples.png</td><td>ServiceSw_Images</td><td>ADDSOL~1.PNG|AddSolSamples.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AddSolSamples.png</td><td>1</td><td/></row>
-		<row><td>addsolsamples.png1</td><td>UserSw_Images</td><td>ADDSOL~1.PNG|AddSolSamples.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AddSolSamples.png</td><td>1</td><td/></row>
 		<row><td>adjustment.png</td><td>ServiceSw_Images</td><td>ADJUST~1.PNG|Adjustment.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Adjustment.png</td><td>1</td><td/></row>
-		<row><td>adjustment.png1</td><td>UserSw_Images</td><td>ADJUST~1.PNG|Adjustment.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Adjustment.png</td><td>1</td><td/></row>
 		<row><td>adjustments_eng.xps</td><td>ServiceSw_InfoDocs</td><td>ADJUST~1.XPS|Adjustments_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Adjustments_ENG.xps</td><td>1</td><td/></row>
 		<row><td>adjustments_spa.xps</td><td>ServiceSw_InfoDocs</td><td>ADJUST~1.XPS|Adjustments_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Adjustments_SPA.xps</td><td>1</td><td/></row>
 		<row><td>alarm.png</td><td>ServiceSw_Images</td><td>Alarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Alarm.png</td><td>1</td><td/></row>
-		<row><td>alarm.png1</td><td>UserSw_Images</td><td>Alarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Alarm.png</td><td>1</td><td/></row>
 		<row><td>alertwarning.png</td><td>ServiceSw_Images</td><td>ALERTW~1.PNG|AlertWarning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AlertWarning.png</td><td>1</td><td/></row>
-		<row><td>alertwarning.png1</td><td>UserSw_Images</td><td>ALERTW~1.PNG|AlertWarning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AlertWarning.png</td><td>1</td><td/></row>
 		<row><td>alertwarningdisable.png</td><td>ServiceSw_Images</td><td>ALERTW~1.PNG|AlertWarningDisable.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\AlertWarningDisable.png</td><td>1</td><td/></row>
-		<row><td>alertwarningdisable.png1</td><td>UserSw_Images</td><td>ALERTW~1.PNG|AlertWarningDisable.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\AlertWarningDisable.png</td><td>1</td><td/></row>
 		<row><td>analyzer.dll</td><td>Analyzer.dll</td><td>Analyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Analyzer.dll</td><td>1</td><td/></row>
 		<row><td>analyzer.dll1</td><td>Analyzer.dll1</td><td>Analyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Analyzer.dll</td><td>1</td><td/></row>
 		<row><td>animatedwait.gif</td><td>ServiceSw_Images_Embedded</td><td>ANIMAT~1.GIF|AnimatedWait.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\AnimatedWait.gif</td><td>1</td><td/></row>
-		<row><td>animatedwait.gif1</td><td>UserSw_Images_Embedded</td><td>ANIMAT~1.GIF|AnimatedWait.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\AnimatedWait.gif</td><td>1</td><td/></row>
 		<row><td>armpositions_eng.xps</td><td>ServiceSw_InfoDocs</td><td>ARMPOS~1.XPS|ArmPositions_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\ArmPositions_ENG.xps</td><td>1</td><td/></row>
 		<row><td>armpositions_spa.xps</td><td>ServiceSw_InfoDocs</td><td>ARMPOS~1.XPS|ArmPositions_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\ArmPositions_SPA.xps</td><td>1</td><td/></row>
 		<row><td>ax00.bak</td><td>ServiceSw_Update_bak</td><td>Ax00.bak</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;bak1&gt;\Ax00.bak</td><td>1</td><td/></row>
@@ -2333,39 +2318,25 @@
 		<row><td>axinterop.acropdflib.dll</td><td>AxInterop.AcroPDFLib.dll</td><td>AXINTE~1.DLL|AxInterop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\AxInterop.AcroPDFLib.dll</td><td>1</td><td/></row>
 		<row><td>ba200service.exe</td><td>BA200Service.exe</td><td>BA200S~1.EXE|BA200Service.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>1</td><td/></row>
 		<row><td>ba200user.exe</td><td>BA200User.exe</td><td>BA200U~1.EXE|BA200User.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>1</td><td/></row>
-		<row><td>ba200v013.ba2</td><td>FwBA200v013</td><td>BA200V~1.BA2|BA200v013.ba2</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA200 Fw\BA200v013.ba2</td><td>1</td><td/></row>
+		<row><td>ba200v013.ba4</td><td>FwBA200v013</td><td>BA200V~1.BA4|BA200v013.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA200\BA200v013.ba4</td><td>1</td><td/></row>
+		<row><td>ba200v044r02.ba2</td><td>FwBA200v044r02</td><td>BA200V~1.BA2|BA200v044r02.ba2</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA200 Fw\BA200v044r02.ba2</td><td>1</td><td/></row>
 		<row><td>ba400srv.ico</td><td>ServiceSw_Images_Embedded</td><td>BA400SRV.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA400SRV.ico</td><td>1</td><td/></row>
-		<row><td>ba400srv.ico1</td><td>UserSw_Images_Embedded</td><td>BA400SRV.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA400SRV.ico</td><td>1</td><td/></row>
 		<row><td>ba400user.ico</td><td>ServiceSw_Images_Embedded</td><td>BA400U~1.ICO|BA400USER.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA400USER.ico</td><td>1</td><td/></row>
-		<row><td>ba400user.ico1</td><td>UserSw_Images_Embedded</td><td>BA400U~1.ICO|BA400USER.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA400USER.ico</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
-		<row><td>ba4svr_login.png1</td><td>UserSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
 		<row><td>ba4usr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4USR~1.PNG|BA4USR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4USR_Login.png</td><td>1</td><td/></row>
-		<row><td>ba4usr_login.png1</td><td>UserSw_Images_Embedded</td><td>BA4USR~1.PNG|BA4USR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA4USR_Login.png</td><td>1</td><td/></row>
 		<row><td>backgroundmainmonitor.png</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundMainMonitor.png</td><td>1</td><td/></row>
-		<row><td>backgroundmainmonitor.png1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundMainMonitor.png</td><td>1</td><td/></row>
 		<row><td>backgroundmainmonitor_dis.pn</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundMainMonitor_DIS.png</td><td>1</td><td/></row>
-		<row><td>backgroundmainmonitor_dis.pn1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundMainMonitor_DIS.png</td><td>1</td><td/></row>
 		<row><td>backgroundmainmonitor_start.</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor-Start.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundMainMonitor-Start.png</td><td>1</td><td/></row>
-		<row><td>backgroundmainmonitor_start.1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundMainMonitor-Start.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundMainMonitor-Start.png</td><td>1</td><td/></row>
 		<row><td>backgroundreactionrotor.png</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundReactionRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundReactionRotor.png</td><td>1</td><td/></row>
-		<row><td>backgroundreactionrotor.png1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundReactionRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundReactionRotor.png</td><td>1</td><td/></row>
 		<row><td>backgroundreagentsrotor.png</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundReagentsRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundReagentsRotor.png</td><td>1</td><td/></row>
-		<row><td>backgroundreagentsrotor.png1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundReagentsRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundReagentsRotor.png</td><td>1</td><td/></row>
 		<row><td>backgroundsamplesrotor.png</td><td>ServiceSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundSamplesRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BackgroundSamplesRotor.png</td><td>1</td><td/></row>
-		<row><td>backgroundsamplesrotor.png1</td><td>UserSw_Images_Embedded</td><td>BACKGR~1.PNG|BackgroundSamplesRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BackgroundSamplesRotor.png</td><td>1</td><td/></row>
 		<row><td>backupdb.png</td><td>ServiceSw_Images</td><td>BackUpDB.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BackUpDB.png</td><td>1</td><td/></row>
-		<row><td>backupdb.png1</td><td>UserSw_Images</td><td>BackUpDB.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BackUpDB.png</td><td>1</td><td/></row>
 		<row><td>backward.png</td><td>ServiceSw_Images</td><td>Backward.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Backward.png</td><td>1</td><td/></row>
-		<row><td>backward.png1</td><td>UserSw_Images</td><td>Backward.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Backward.png</td><td>1</td><td/></row>
 		<row><td>backwardl.png</td><td>ServiceSw_Images</td><td>BACKWA~1.PNG|BackwardL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BackwardL.png</td><td>1</td><td/></row>
-		<row><td>backwardl.png1</td><td>UserSw_Images</td><td>BACKWA~1.PNG|BackwardL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BackwardL.png</td><td>1</td><td/></row>
 		<row><td>barcode.png</td><td>ServiceSw_Images</td><td>Barcode.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Barcode.png</td><td>1</td><td/></row>
-		<row><td>barcode.png1</td><td>UserSw_Images</td><td>Barcode.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Barcode.png</td><td>1</td><td/></row>
 		<row><td>barcode_eng.xps</td><td>ServiceSw_InfoDocs</td><td>BARCOD~1.XPS|Barcode_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Barcode_ENG.xps</td><td>1</td><td/></row>
 		<row><td>barcode_spa.xps</td><td>ServiceSw_InfoDocs</td><td>BARCOD~1.XPS|Barcode_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Barcode_SPA.xps</td><td>1</td><td/></row>
 		<row><td>barcodewarning256.png</td><td>ServiceSw_Images</td><td>BARCOD~1.PNG|barcodewarning256.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\barcodewarning256.png</td><td>1</td><td/></row>
-		<row><td>barcodewarning256.png1</td><td>UserSw_Images</td><td>BARCOD~1.PNG|barcodewarning256.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\barcodewarning256.png</td><td>1</td><td/></row>
 		<row><td>baseline_eng.xps</td><td>ServiceSw_InfoDocs</td><td>BASELI~1.XPS|BaseLine_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\BaseLine_ENG.xps</td><td>1</td><td/></row>
 		<row><td>baseline_spa.xps</td><td>ServiceSw_InfoDocs</td><td>BASELI~1.XPS|BaseLine_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\BaseLine_SPA.xps</td><td>1</td><td/></row>
 		<row><td>biosystems.ax00.app.dll</td><td>Biosystems.Ax00.App.dll</td><td>BIOSYS~1.DLL|Biosystems.Ax00.App.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Biosystems.Ax00.App.dll</td><td>1</td><td/></row>
@@ -2375,238 +2346,119 @@
 		<row><td>biosystemssetupscript.exe</td><td>BioSystemsSetupScript.exe</td><td>BIOSYS~1.EXE|BioSystemsSetupScript.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\BioSystemsSetupScript.exe</td><td>1</td><td/></row>
 		<row><td>biosystemssetupscript.exe.co</td><td>SetScripts2</td><td>BIOSYS~1.CON|BioSystemsSetupScript.exe.config</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\BioSystemsSetupScript.exe.config</td><td>1</td><td/></row>
 		<row><td>blank.png</td><td>ServiceSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Blank.png</td><td>1</td><td/></row>
-		<row><td>blank.png1</td><td>UserSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Blank.png</td><td>1</td><td/></row>
 		<row><td>bluecircle.png</td><td>ServiceSw_Images</td><td>BLUECI~1.PNG|BlueCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BlueCircle.png</td><td>1</td><td/></row>
-		<row><td>bluecircle.png1</td><td>UserSw_Images</td><td>BLUECI~1.PNG|BlueCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BlueCircle.png</td><td>1</td><td/></row>
 		<row><td>bluestart.png</td><td>ServiceSw_Images</td><td>BLUEST~1.PNG|BlueStart.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BlueStart.png</td><td>1</td><td/></row>
-		<row><td>bluestart.png1</td><td>UserSw_Images</td><td>BLUEST~1.PNG|BlueStart.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BlueStart.png</td><td>1</td><td/></row>
 		<row><td>bottle.png</td><td>ServiceSw_Images_Embedded</td><td>Bottle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\Bottle.png</td><td>1</td><td/></row>
-		<row><td>bottle.png1</td><td>UserSw_Images_Embedded</td><td>Bottle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\Bottle.png</td><td>1</td><td/></row>
 		<row><td>bottle2_clear.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle2_CLEAR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle2_CLEAR.png</td><td>1</td><td/></row>
-		<row><td>bottle2_clear.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle2_CLEAR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle2_CLEAR.png</td><td>1</td><td/></row>
 		<row><td>bottle2_nothing.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle2_NOTHING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle2_NOTHING.png</td><td>1</td><td/></row>
-		<row><td>bottle2_nothing.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle2_NOTHING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle2_NOTHING.png</td><td>1</td><td/></row>
 		<row><td>bottle2_r2__selected.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle2(R2)_SELECTED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle2(R2)_SELECTED.png</td><td>1</td><td/></row>
-		<row><td>bottle2_r2__selected.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle2(R2)_SELECTED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle2(R2)_SELECTED.png</td><td>1</td><td/></row>
 		<row><td>bottle2_selected.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle2_SELECTED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle2_SELECTED.png</td><td>1</td><td/></row>
-		<row><td>bottle2_selected.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle2_SELECTED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle2_SELECTED.png</td><td>1</td><td/></row>
 		<row><td>bottle3_clear.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle3_CLEAR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle3_CLEAR.png</td><td>1</td><td/></row>
-		<row><td>bottle3_clear.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle3_CLEAR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle3_CLEAR.png</td><td>1</td><td/></row>
 		<row><td>bottle3_nothing.png</td><td>ServiceSw_Images</td><td>BOTTLE~1.PNG|bottle3_NOTHING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\bottle3_NOTHING.png</td><td>1</td><td/></row>
-		<row><td>bottle3_nothing.png1</td><td>UserSw_Images</td><td>BOTTLE~1.PNG|bottle3_NOTHING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\bottle3_NOTHING.png</td><td>1</td><td/></row>
 		<row><td>bottom.png</td><td>ServiceSw_Images</td><td>Bottom.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Bottom.png</td><td>1</td><td/></row>
-		<row><td>bottom.png1</td><td>UserSw_Images</td><td>Bottom.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Bottom.png</td><td>1</td><td/></row>
 		<row><td>bscontrol_library.dll</td><td>BSControl_Library.dll</td><td>BSCONT~1.DLL|BSControl_Library.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\BSControl_Library.dll</td><td>1</td><td/></row>
 		<row><td>bscontrol_library.dll1</td><td>BSControl_Library.dll1</td><td>BSCONT~1.DLL|BSControl_Library.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BSControl_Library.dll</td><td>1</td><td/></row>
 		<row><td>bscsharpcontrol_library.dll</td><td>BSCSharpControl_Library.dll</td><td>BSCSHA~1.DLL|BSCSharpControl_Library.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\BSCSharpControl_Library.dll</td><td>1</td><td/></row>
 		<row><td>bscsharpcontrol_library.dll1</td><td>BSCSharpControl_Library.dll1</td><td>BSCSHA~1.DLL|BSCSharpControl_Library.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BSCSharpControl_Library.dll</td><td>1</td><td/></row>
 		<row><td>btladdsolbigr2.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolBigR2.png</td><td>1</td><td/></row>
-		<row><td>btladdsolbigr2.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolBigR2.png</td><td>1</td><td/></row>
 		<row><td>btladdsolbigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btladdsolbigr2_sel.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btladdsolsmallr1.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btladdsolsmallr1.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btladdsolsmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btladdsolsmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btladdsolsmallr2.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btladdsolsmallr2.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btladdsolsmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlAddSolSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btladdsolsmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLADD~1.PNG|BtlAddSolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlAddSolSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrbigr2.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrbigr2.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrBigR2.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrbigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrbigr2_sel.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrsmallr1.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrsmallr1.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrsmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrsmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrsmallr2.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrsmallr2.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btlbarcodeerrsmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlBarcodeErrSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlbarcodeerrsmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLBAR~1.PNG|BtlBarcodeErrSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlBarcodeErrSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btldepletedbigr2.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedBigR2.png</td><td>1</td><td/></row>
-		<row><td>btldepletedbigr2.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedBigR2.png</td><td>1</td><td/></row>
 		<row><td>btldepletedbigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btldepletedbigr2_sel.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btldepletedsmallr1.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btldepletedsmallr1.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btldepletedsmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btldepletedsmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btldepletedsmallr2.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btldepletedsmallr2.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btldepletedsmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlDepletedSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btldepletedsmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLDEP~1.PNG|BtlDepletedSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlDepletedSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolbigr2.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolbigr2.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolBigR2.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolbigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolbigr2_sel.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolsmallr1.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolsmallr1.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolsmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolsmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolsmallr2.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolsmallr2.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btlfewvolsmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlFewVolSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlfewvolsmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLFEW~1.PNG|BtlFewVolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlFewVolSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolbigr2.png</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolbigr2_sel.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolsmallr1.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolsmallr1_se</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolsmallr2.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessaddsolsmallr2_se</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessAddSolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessAddSolSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedbigr2.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedbigr2_se</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedsmallr1.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedsmallr1_</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedsmallr2.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessdepletedsmallr2_</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessDepletedSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessDepletedSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolbigr2.png</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolbigr2_sel.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolsmallr1.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolsmallr1_se</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolsmallr2.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessfewvolsmallr2_se</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessFewVolSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessFewVolSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagbigr2.png</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagbigr2_sel.pn</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagsmallr1.png</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagsmallr1_sel.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagsmallr2.png</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlinprocessreagsmallr2_sel.</td><td>UserSw_Images</td><td>BTLINP~1.PNG|BtlInProcessReagSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlInProcessReagSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlnotusebigr2.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlnotusebigr2.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseBigR2.png</td><td>1</td><td/></row>
 		<row><td>btlnotusebigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlnotusebigr2_sel.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlnotusesmallr1.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlnotusesmallr1.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btlnotusesmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlnotusesmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlnotusesmallr2.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlnotusesmallr2.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btlnotusesmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlNotUseSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlnotusesmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLNOT~1.PNG|BtlNotUseSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlNotUseSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlreagbigd2.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagBigD2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagBigD2.png</td><td>1</td><td/></row>
-		<row><td>btlreagbigd2.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagBigD2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagBigD2.png</td><td>1</td><td/></row>
 		<row><td>btlreagbigd2_sel.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagBigD2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagBigD2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlreagbigd2_sel.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagBigD2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagBigD2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlreagsmalld1.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagSmallD1.png</td><td>1</td><td/></row>
-		<row><td>btlreagsmalld1.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagSmallD1.png</td><td>1</td><td/></row>
 		<row><td>btlreagsmalld1_sel.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagSmallD1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlreagsmalld1_sel.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagSmallD1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlreagsmalld2.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagSmallD2.png</td><td>1</td><td/></row>
-		<row><td>btlreagsmalld2.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagSmallD2.png</td><td>1</td><td/></row>
 		<row><td>btlreagsmalld2_sel.png</td><td>ServiceSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlReagSmallD2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlreagsmalld2_sel.png1</td><td>UserSw_Images</td><td>BTLREA~1.PNG|BtlReagSmallD2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlReagSmallD2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsamplebarcodeerror.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleBarCodeError.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleBarCodeError.png</td><td>1</td><td/></row>
-		<row><td>btlsamplebarcodeerror.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleBarCodeError.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleBarCodeError.png</td><td>1</td><td/></row>
 		<row><td>btlsamplebarcodeerror_sel.pn</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleBarCodeError_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleBarCodeError_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsamplebarcodeerror_sel.pn1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleBarCodeError_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleBarCodeError_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsampledepleted_sel.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleDepleted_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleDepleted_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsampledepleted_sel.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleDepleted_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleDepleted_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsamplefinished_sel.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleFinished_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleFinished_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsamplefinished_sel.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleFinished_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleFinished_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsampleinprocess_sel.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleInProcess_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleInProcess_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsampleinprocess_sel.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleInProcess_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleInProcess_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsamplenoinuse_sel.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSampleNoInUse_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSampleNoInUse_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsamplenoinuse_sel.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSampleNoInUse_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSampleNoInUse_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlsamplepending_sel.png</td><td>ServiceSw_Images</td><td>BTLSAM~1.PNG|BtlSamplePending_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlSamplePending_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlsamplepending_sel.png1</td><td>UserSw_Images</td><td>BTLSAM~1.PNG|BtlSamplePending_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlSamplePending_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlunkownbigr2.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownBigR2.png</td><td>1</td><td/></row>
-		<row><td>btlunkownbigr2.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownBigR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownBigR2.png</td><td>1</td><td/></row>
 		<row><td>btlunkownbigr2_sel.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownBigR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlunkownbigr2_sel.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownBigR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownBigR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlunkownsmallr1.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownSmallR1.png</td><td>1</td><td/></row>
-		<row><td>btlunkownsmallr1.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownSmallR1.png</td><td>1</td><td/></row>
 		<row><td>btlunkownsmallr1_sel.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownSmallR1_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlunkownsmallr1_sel.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR1_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownSmallR1_Sel.png</td><td>1</td><td/></row>
 		<row><td>btlunkownsmallr2.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownSmallR2.png</td><td>1</td><td/></row>
-		<row><td>btlunkownsmallr2.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownSmallR2.png</td><td>1</td><td/></row>
 		<row><td>btlunkownsmallr2_sel.png</td><td>ServiceSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BtlUnkownSmallR2_Sel.png</td><td>1</td><td/></row>
-		<row><td>btlunkownsmallr2_sel.png1</td><td>UserSw_Images</td><td>BTLUNK~1.PNG|BtlUnkownSmallR2_Sel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BtlUnkownSmallR2_Sel.png</td><td>1</td><td/></row>
 		<row><td>btn_excelexport.png</td><td>ServiceSw_Images</td><td>BTN_EX~1.PNG|BTN_EXCELEXPORT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BTN_EXCELEXPORT.png</td><td>1</td><td/></row>
-		<row><td>btn_excelexport.png1</td><td>UserSw_Images</td><td>BTN_EX~1.PNG|BTN_EXCELEXPORT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\BTN_EXCELEXPORT.png</td><td>1</td><td/></row>
 		<row><td>calculatedtest.png</td><td>ServiceSw_Images</td><td>CALCUL~1.PNG|CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\CalculatedTest.png</td><td>1</td><td/></row>
-		<row><td>calculatedtest.png1</td><td>UserSw_Images</td><td>CALCUL~1.PNG|CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CalculatedTest.png</td><td>1</td><td/></row>
 		<row><td>calculations.dll</td><td>Calculations.dll</td><td>CALCUL~1.DLL|Calculations.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Calculations.dll</td><td>1</td><td/></row>
 		<row><td>calculations.dll1</td><td>Calculations.dll1</td><td>CALCUL~1.DLL|Calculations.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Calculations.dll</td><td>1</td><td/></row>
 		<row><td>calibrator.png</td><td>ServiceSw_Images</td><td>CALIBR~1.PNG|Calibrator.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Calibrator.png</td><td>1</td><td/></row>
-		<row><td>calibrator.png1</td><td>UserSw_Images</td><td>CALIBR~1.PNG|Calibrator.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Calibrator.png</td><td>1</td><td/></row>
 		<row><td>cancel.png</td><td>ServiceSw_Images</td><td>Cancel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Cancel.png</td><td>1</td><td/></row>
-		<row><td>cancel.png1</td><td>UserSw_Images</td><td>Cancel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Cancel.png</td><td>1</td><td/></row>
 		<row><td>cancelf.png</td><td>ServiceSw_Images</td><td>CancelF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\CancelF.png</td><td>1</td><td/></row>
-		<row><td>cancelf.png1</td><td>UserSw_Images</td><td>CancelF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CancelF.png</td><td>1</td><td/></row>
 		<row><td>cancelg.png</td><td>ServiceSw_Images</td><td>CancelG.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\CancelG.png</td><td>1</td><td/></row>
-		<row><td>cancelg.png1</td><td>UserSw_Images</td><td>CancelG.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CancelG.png</td><td>1</td><td/></row>
 		<row><td>cdm_2.02.04.exe</td><td>CDM_2.02.04.exe</td><td>CDM202~1.EXE|CDM 2.02.04.exe</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\CDM 2.02.04.exe</td><td>1</td><td/></row>
 		<row><td>changerotorbtn.png</td><td>ServiceSw_Images</td><td>CHANGE~1.PNG|ChangeRotorBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ChangeRotorBtn.png</td><td>1</td><td/></row>
-		<row><td>changerotorbtn.png1</td><td>UserSw_Images</td><td>CHANGE~1.PNG|ChangeRotorBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ChangeRotorBtn.png</td><td>1</td><td/></row>
 		<row><td>check.png</td><td>ServiceSw_Images</td><td>Check.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Check.png</td><td>1</td><td/></row>
-		<row><td>check.png1</td><td>UserSw_Images</td><td>Check.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Check.png</td><td>1</td><td/></row>
 		<row><td>chgpw.png</td><td>ServiceSw_Images</td><td>ChgPW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ChgPW.png</td><td>1</td><td/></row>
-		<row><td>chgpw.png1</td><td>UserSw_Images</td><td>ChgPW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ChgPW.png</td><td>1</td><td/></row>
 		<row><td>clear.png</td><td>ServiceSw_Images</td><td>Clear.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Clear.png</td><td>1</td><td/></row>
-		<row><td>clear.png1</td><td>UserSw_Images</td><td>Clear.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Clear.png</td><td>1</td><td/></row>
 		<row><td>clear1.png</td><td>ServiceSw_Images</td><td>clear1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\clear1.png</td><td>1</td><td/></row>
-		<row><td>clear1.png1</td><td>UserSw_Images</td><td>clear1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\clear1.png</td><td>1</td><td/></row>
 		<row><td>collapse.png</td><td>ServiceSw_Images</td><td>collapse.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\collapse.png</td><td>1</td><td/></row>
-		<row><td>collapse.png1</td><td>UserSw_Images</td><td>collapse.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\collapse.png</td><td>1</td><td/></row>
 		<row><td>collisiontest_eng.xps</td><td>ServiceSw_InfoDocs</td><td>COLLIS~1.XPS|CollisionTest_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\CollisionTest_ENG.xps</td><td>1</td><td/></row>
 		<row><td>collisiontest_spa.xps</td><td>ServiceSw_InfoDocs</td><td>COLLIS~1.XPS|CollisionTest_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\CollisionTest_SPA.xps</td><td>1</td><td/></row>
 		<row><td>commax00.exe</td><td>CommAx00.exe</td><td>CommAx00.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\CommAx00.exe</td><td>1</td><td/></row>
 		<row><td>commax00.exe1</td><td>CommAx00.exe1</td><td>CommAx00.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\CommAx00.exe</td><td>1</td><td/></row>
-		<row><td>compactprint.png</td><td>UserSw_Images</td><td>COMPAC~1.PNG|CompactPrint.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CompactPrint.png</td><td>1</td><td/></row>
 		<row><td>compactprint.png1</td><td>ServiceSw_Images</td><td>COMPAC~1.PNG|CompactPrint.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CompactPrint.png</td><td>1</td><td/></row>
 		<row><td>conditioningbtn.png</td><td>ServiceSw_Images</td><td>CONDIT~1.PNG|ConditioningBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ConditioningBtn.png</td><td>1</td><td/></row>
-		<row><td>conditioningbtn.png1</td><td>UserSw_Images</td><td>CONDIT~1.PNG|ConditioningBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ConditioningBtn.png</td><td>1</td><td/></row>
 		<row><td>configurationsetup.dll</td><td>ConfigurationSetup.dll</td><td>CONFIG~1.DLL|ConfigurationSetup.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\ConfigurationSetup.dll</td><td>1</td><td/></row>
 		<row><td>configurationsetup.dll1</td><td>ConfigurationSetup.dll1</td><td>CONFIG~1.DLL|ConfigurationSetup.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\ConfigurationSetup.dll</td><td>1</td><td/></row>
 		<row><td>connect.png</td><td>ServiceSw_Images_Embedded</td><td>Connect.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\Connect.png</td><td>1</td><td/></row>
-		<row><td>connect.png1</td><td>UserSw_Images_Embedded</td><td>Connect.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\Connect.png</td><td>1</td><td/></row>
 		<row><td>consola.ttf</td><td>CONSOLA.TTF1</td><td>CONSOLA.TTF</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PresentationSRV&gt;\Fonts\CONSOLA.TTF</td><td>1</td><td/></row>
 		<row><td>consolab.ttf</td><td>CONSOLAB.TTF1</td><td>CONSOLAB.TTF</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PresentationSRV&gt;\Fonts\CONSOLAB.TTF</td><td>1</td><td/></row>
 		<row><td>continue.png</td><td>ServiceSw_Images_Embedded</td><td>Continue.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\Continue.png</td><td>1</td><td/></row>
-		<row><td>continue.png1</td><td>UserSw_Images_Embedded</td><td>Continue.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\Continue.png</td><td>1</td><td/></row>
 		<row><td>continuesessionbtn.png</td><td>ServiceSw_Images</td><td>CONTIN~1.PNG|ContinueSessionBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ContinueSessionBtn.png</td><td>1</td><td/></row>
-		<row><td>continuesessionbtn.png1</td><td>UserSw_Images</td><td>CONTIN~1.PNG|ContinueSessionBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ContinueSessionBtn.png</td><td>1</td><td/></row>
 		<row><td>control.png</td><td>ServiceSw_Images</td><td>Control.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Control.png</td><td>1</td><td/></row>
-		<row><td>control.png1</td><td>UserSw_Images</td><td>Control.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Control.png</td><td>1</td><td/></row>
 		<row><td>copy.png</td><td>ServiceSw_Images</td><td>Copy.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Copy.png</td><td>1</td><td/></row>
-		<row><td>copy.png1</td><td>UserSw_Images</td><td>Copy.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Copy.png</td><td>1</td><td/></row>
 		<row><td>coveranalyzeroff.png</td><td>ServiceSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOff.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverAnalyzerOff.png</td><td>1</td><td/></row>
-		<row><td>coveranalyzeroff.png1</td><td>UserSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOff.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverAnalyzerOff.png</td><td>1</td><td/></row>
 		<row><td>coveranalyzeroff_dis.png</td><td>ServiceSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOff_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverAnalyzerOff_DIS.png</td><td>1</td><td/></row>
-		<row><td>coveranalyzeroff_dis.png1</td><td>UserSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOff_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverAnalyzerOff_DIS.png</td><td>1</td><td/></row>
 		<row><td>coveranalyzeron.png</td><td>ServiceSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverAnalyzerOn.png</td><td>1</td><td/></row>
-		<row><td>coveranalyzeron.png1</td><td>UserSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverAnalyzerOn.png</td><td>1</td><td/></row>
 		<row><td>coveranalyzeron_dis.png</td><td>ServiceSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOn_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverAnalyzerOn_DIS.png</td><td>1</td><td/></row>
-		<row><td>coveranalyzeron_dis.png1</td><td>UserSw_Images_Embedded</td><td>COVERA~1.PNG|CoverAnalyzerOn_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverAnalyzerOn_DIS.png</td><td>1</td><td/></row>
 		<row><td>coverreactions.png</td><td>ServiceSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReactions.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverReactions.png</td><td>1</td><td/></row>
-		<row><td>coverreactions.png1</td><td>UserSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReactions.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverReactions.png</td><td>1</td><td/></row>
 		<row><td>coverreactions_dis.png</td><td>ServiceSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReactions_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverReactions_DIS.png</td><td>1</td><td/></row>
-		<row><td>coverreactions_dis.png1</td><td>UserSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReactions_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverReactions_DIS.png</td><td>1</td><td/></row>
 		<row><td>coverreagents.png</td><td>ServiceSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReagents.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverReagents.png</td><td>1</td><td/></row>
-		<row><td>coverreagents.png1</td><td>UserSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReagents.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverReagents.png</td><td>1</td><td/></row>
 		<row><td>coverreagents_dis.png</td><td>ServiceSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReagents_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverReagents_DIS.png</td><td>1</td><td/></row>
-		<row><td>coverreagents_dis.png1</td><td>UserSw_Images_Embedded</td><td>COVERR~1.PNG|CoverReagents_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverReagents_DIS.png</td><td>1</td><td/></row>
 		<row><td>coversamples.png</td><td>ServiceSw_Images_Embedded</td><td>COVERS~1.PNG|CoverSamples.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverSamples.png</td><td>1</td><td/></row>
-		<row><td>coversamples.png1</td><td>UserSw_Images_Embedded</td><td>COVERS~1.PNG|CoverSamples.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverSamples.png</td><td>1</td><td/></row>
 		<row><td>coversamples_dis.png</td><td>ServiceSw_Images_Embedded</td><td>COVERS~1.PNG|CoverSamples_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CoverSamples_DIS.png</td><td>1</td><td/></row>
-		<row><td>coversamples_dis.png1</td><td>UserSw_Images_Embedded</td><td>COVERS~1.PNG|CoverSamples_DIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CoverSamples_DIS.png</td><td>1</td><td/></row>
 		<row><td>cumulatedqc.png</td><td>ServiceSw_Images_Embedded</td><td>CUMULA~1.PNG|CumulatedQC.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\CumulatedQC.png</td><td>1</td><td/></row>
-		<row><td>cumulatedqc.png1</td><td>UserSw_Images_Embedded</td><td>CUMULA~1.PNG|CumulatedQC.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\CumulatedQC.png</td><td>1</td><td/></row>
 		<row><td>dataaccesslayer.dll</td><td>DataAccessLayer.dll</td><td>DATAAC~1.DLL|DataAccessLayer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\DataAccessLayer.dll</td><td>1</td><td/></row>
 		<row><td>dataaccesslayer.dll1</td><td>DataAccessLayer.dll1</td><td>DATAAC~1.DLL|DataAccessLayer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\DataAccessLayer.dll</td><td>1</td><td/></row>
 		<row><td>decrease.png</td><td>ServiceSw_Images</td><td>Decrease.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Decrease.png</td><td>1</td><td/></row>
-		<row><td>decrease.png1</td><td>UserSw_Images</td><td>Decrease.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Decrease.png</td><td>1</td><td/></row>
 		<row><td>decreasebutt.png</td><td>ServiceSw_Images</td><td>DECREA~1.PNG|DecreaseButt.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\DecreaseButt.png</td><td>1</td><td/></row>
-		<row><td>decreasebutt.png1</td><td>UserSw_Images</td><td>DECREA~1.PNG|DecreaseButt.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DecreaseButt.png</td><td>1</td><td/></row>
 		<row><td>delete.png</td><td>ServiceSw_Images</td><td>Delete.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Delete.png</td><td>1</td><td/></row>
-		<row><td>delete.png1</td><td>UserSw_Images</td><td>Delete.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Delete.png</td><td>1</td><td/></row>
 		<row><td>delkey.png</td><td>ServiceSw_Images</td><td>DelKey.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\DelKey.png</td><td>1</td><td/></row>
-		<row><td>delkey.png1</td><td>UserSw_Images</td><td>DelKey.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DelKey.png</td><td>1</td><td/></row>
 		<row><td>demo_eng.xps</td><td>ServiceSw_InfoDocs</td><td>Demo_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Demo_ENG.xps</td><td>1</td><td/></row>
 		<row><td>demo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>Demo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Demo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>depleted.png</td><td>ServiceSw_Images</td><td>Depleted.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Depleted.png</td><td>1</td><td/></row>
-		<row><td>depleted.png1</td><td>UserSw_Images</td><td>Depleted.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Depleted.png</td><td>1</td><td/></row>
 		<row><td>devexpress.bonusskins.v14.2.</td><td>DevExpress.BonusSkins.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.BonusSkins.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.BonusSkins.v14.2.dll</td><td>1</td><td/></row>
 		<row><td>devexpress.bonusskins.v14.2.1</td><td>DevExpress.BonusSkins.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.BonusSkins.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.BonusSkins.v14.2.dll</td><td>1</td><td/></row>
 		<row><td>devexpress.charts.v14.2.core</td><td>DevExpress.Charts.v14.2.Core.dll</td><td>DEVEXP~1.DLL|DevExpress.Charts.v14.2.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.Charts.v14.2.Core.dll</td><td>1</td><td/></row>
@@ -2664,61 +2516,36 @@
 		<row><td>devexpress.xtraverticalgrid.</td><td>DevExpress.XtraVerticalGrid.v14.2.dll</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraVerticalGrid.v14.2.dll</td><td>1</td><td/></row>
 		<row><td>devexpress.xtraverticalgrid.1</td><td>DevExpress.XtraVerticalGrid.v14.2.dll1</td><td>DEVEXP~1.DLL|DevExpress.XtraVerticalGrid.v14.2.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\DevExpress 14.2\Components\Bin\Framework\DevExpress.XtraVerticalGrid.v14.2.dll</td><td>1</td><td/></row>
 		<row><td>diamondred.png</td><td>ServiceSw_Images</td><td>DIAMON~1.PNG|DiamondRed.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\DiamondRed.png</td><td>1</td><td/></row>
-		<row><td>diamondred.png1</td><td>UserSw_Images</td><td>DIAMON~1.PNG|DiamondRed.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DiamondRed.png</td><td>1</td><td/></row>
 		<row><td>digiface.ttf</td><td>Digiface.ttf1</td><td>Digiface.ttf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PresentationSRV&gt;\Fonts\Digiface.ttf</td><td>1</td><td/></row>
 		<row><td>dilutions.png</td><td>ServiceSw_Images</td><td>DILUTI~1.PNG|Dilutions.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Dilutions.png</td><td>1</td><td/></row>
-		<row><td>dilutions.png1</td><td>UserSw_Images</td><td>DILUTI~1.PNG|Dilutions.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Dilutions.png</td><td>1</td><td/></row>
 		<row><td>down.png</td><td>ServiceSw_Images</td><td>Down.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Down.png</td><td>1</td><td/></row>
-		<row><td>down.png1</td><td>UserSw_Images</td><td>Down.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Down.png</td><td>1</td><td/></row>
-		<row><td>dynamicbaselineempty.png</td><td>UserSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineEmpty.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineEmpty.png</td><td>1</td><td/></row>
 		<row><td>dynamicbaselineempty.png1</td><td>ServiceSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineEmpty.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineEmpty.png</td><td>1</td><td/></row>
-		<row><td>dynamicbaselineread.png</td><td>UserSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineRead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineRead.png</td><td>1</td><td/></row>
 		<row><td>dynamicbaselineread.png1</td><td>ServiceSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineRead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineRead.png</td><td>1</td><td/></row>
 		<row><td>edit.png</td><td>ServiceSw_Images</td><td>Edit.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Edit.png</td><td>1</td><td/></row>
-		<row><td>edit.png1</td><td>UserSw_Images</td><td>Edit.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Edit.png</td><td>1</td><td/></row>
 		<row><td>editreport.png</td><td>ServiceSw_Images</td><td>EDITRE~1.PNG|EditReport.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\EditReport.png</td><td>1</td><td/></row>
-		<row><td>editreport.png1</td><td>UserSw_Images</td><td>EDITRE~1.PNG|EditReport.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\EditReport.png</td><td>1</td><td/></row>
 		<row><td>emergencystop.png</td><td>ServiceSw_Images</td><td>EMERGE~1.PNG|EmergencyStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\EmergencyStop.png</td><td>1</td><td/></row>
-		<row><td>emergencystop.png1</td><td>UserSw_Images</td><td>EMERGE~1.PNG|EmergencyStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\EmergencyStop.png</td><td>1</td><td/></row>
 		<row><td>emptyimage.png</td><td>ServiceSw_Images</td><td>EMPTYI~1.PNG|EmptyImage.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\EmptyImage.png</td><td>1</td><td/></row>
-		<row><td>emptyimage.png1</td><td>UserSw_Images</td><td>EMPTYI~1.PNG|EmptyImage.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\EmptyImage.png</td><td>1</td><td/></row>
 		<row><td>enter.png</td><td>ServiceSw_Images</td><td>Enter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Enter.png</td><td>1</td><td/></row>
-		<row><td>enter.png1</td><td>UserSw_Images</td><td>Enter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Enter.png</td><td>1</td><td/></row>
 		<row><td>equal.png</td><td>ServiceSw_Images</td><td>Equal.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Equal.png</td><td>1</td><td/></row>
-		<row><td>equal.png1</td><td>UserSw_Images</td><td>Equal.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Equal.png</td><td>1</td><td/></row>
 		<row><td>eraser.png</td><td>ServiceSw_Images</td><td>Eraser.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Eraser.png</td><td>1</td><td/></row>
-		<row><td>eraser.png1</td><td>UserSw_Images</td><td>Eraser.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Eraser.png</td><td>1</td><td/></row>
 		<row><td>espiral.png</td><td>ServiceSw_Images</td><td>Espiral.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Espiral.png</td><td>1</td><td/></row>
-		<row><td>espiral.png1</td><td>UserSw_Images</td><td>Espiral.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Espiral.png</td><td>1</td><td/></row>
 		<row><td>estress_eng.xps</td><td>ServiceSw_InfoDocs</td><td>ESTRES~1.XPS|Estress_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Estress_ENG.xps</td><td>1</td><td/></row>
 		<row><td>estress_spa.xps</td><td>ServiceSw_InfoDocs</td><td>ESTRES~1.XPS|Estress_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Estress_SPA.xps</td><td>1</td><td/></row>
 		<row><td>exec_paused.png</td><td>ServiceSw_Images</td><td>EXEC_P~1.PNG|Exec_Paused.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Exec_Paused.png</td><td>1</td><td/></row>
-		<row><td>exec_paused.png1</td><td>UserSw_Images</td><td>EXEC_P~1.PNG|Exec_Paused.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Exec_Paused.png</td><td>1</td><td/></row>
 		<row><td>expand.png</td><td>ServiceSw_Images</td><td>expand.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\expand.png</td><td>1</td><td/></row>
-		<row><td>expand.png1</td><td>UserSw_Images</td><td>expand.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\expand.png</td><td>1</td><td/></row>
 		<row><td>export.png</td><td>ServiceSw_Images</td><td>Export.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Export.png</td><td>1</td><td/></row>
-		<row><td>export.png1</td><td>UserSw_Images</td><td>Export.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Export.png</td><td>1</td><td/></row>
 		<row><td>exporthead.png</td><td>ServiceSw_Images</td><td>EXPORT~1.PNG|ExportHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ExportHead.png</td><td>1</td><td/></row>
-		<row><td>exporthead.png1</td><td>UserSw_Images</td><td>EXPORT~1.PNG|ExportHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ExportHead.png</td><td>1</td><td/></row>
 		<row><td>exportscript.png</td><td>ServiceSw_Images</td><td>EXPORT~1.PNG|ExportScript.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ExportScript.png</td><td>1</td><td/></row>
-		<row><td>exportscript.png1</td><td>UserSw_Images</td><td>EXPORT~1.PNG|ExportScript.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ExportScript.png</td><td>1</td><td/></row>
 		<row><td>factory.png</td><td>ServiceSw_Images</td><td>Factory.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Factory.png</td><td>1</td><td/></row>
-		<row><td>factory.png1</td><td>UserSw_Images</td><td>Factory.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Factory.png</td><td>1</td><td/></row>
 		<row><td>factoryfwscriptsdata.xml</td><td>ServiceSw_FwScripts_Factory</td><td>FACTOR~1.XML|FactoryFwScriptsData.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\FwScripts\Factory\FactoryFwScriptsData.xml</td><td>1</td><td/></row>
 		<row><td>fewvolume.png</td><td>ServiceSw_Images</td><td>FEWVOL~1.PNG|FewVolume.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\FewVolume.png</td><td>1</td><td/></row>
-		<row><td>fewvolume.png1</td><td>UserSw_Images</td><td>FEWVOL~1.PNG|FewVolume.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\FewVolume.png</td><td>1</td><td/></row>
 		<row><td>filter.png</td><td>ServiceSw_Images</td><td>Filter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Filter.png</td><td>1</td><td/></row>
-		<row><td>filter.png1</td><td>UserSw_Images</td><td>Filter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Filter.png</td><td>1</td><td/></row>
 		<row><td>finalprint.png</td><td>ServiceSw_Images</td><td>FINALP~1.PNG|FinalPrint.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\FinalPrint.png</td><td>1</td><td/></row>
-		<row><td>finalprint.png1</td><td>UserSw_Images</td><td>FINALP~1.PNG|FinalPrint.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\FinalPrint.png</td><td>1</td><td/></row>
 		<row><td>find.png</td><td>ServiceSw_Images</td><td>Find.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Find.png</td><td>1</td><td/></row>
-		<row><td>find.png1</td><td>UserSw_Images</td><td>Find.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Find.png</td><td>1</td><td/></row>
 		<row><td>firmwareupdate_eng.xps</td><td>ServiceSw_InfoDocs</td><td>FIRMWA~1.XPS|FirmwareUpdate_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\FirmwareUpdate_ENG.xps</td><td>1</td><td/></row>
 		<row><td>firmwareupdate_spa.xps</td><td>ServiceSw_InfoDocs</td><td>FIRMWA~1.XPS|FirmwareUpdate_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\FirmwareUpdate_SPA.xps</td><td>1</td><td/></row>
 		<row><td>forward.png</td><td>ServiceSw_Images</td><td>Forward.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Forward.png</td><td>1</td><td/></row>
-		<row><td>forward.png1</td><td>UserSw_Images</td><td>Forward.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Forward.png</td><td>1</td><td/></row>
 		<row><td>forwardl.png</td><td>ServiceSw_Images</td><td>ForwardL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ForwardL.png</td><td>1</td><td/></row>
-		<row><td>forwardl.png1</td><td>UserSw_Images</td><td>ForwardL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ForwardL.png</td><td>1</td><td/></row>
 		<row><td>framework.dll</td><td>Framework.dll</td><td>FRAMEW~1.DLL|Framework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Framework.dll</td><td>1</td><td/></row>
 		<row><td>framework.dll1</td><td>Framework.dll1</td><td>FRAMEW~1.DLL|Framework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Framework.dll</td><td>1</td><td/></row>
 		<row><td>fwadjustments.txt</td><td>ServiceSw_Adjustments</td><td>FWADJU~1.TXT|FWAdjustments.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Adjustments\FWAdjustments.txt</td><td>1</td><td/></row>
@@ -2726,33 +2553,21 @@
 		<row><td>fwscriptsmanagement.dll</td><td>FwScriptsManagement.dll</td><td>FWSCRI~1.DLL|FwScriptsManagement.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\FwScriptsManagement.dll</td><td>1</td><td/></row>
 		<row><td>fwscriptsmanagement.dll1</td><td>FwScriptsManagement.dll1</td><td>FWSCRI~1.DLL|FwScriptsManagement.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\FwScriptsManagement.dll</td><td>1</td><td/></row>
 		<row><td>gear1.png</td><td>ServiceSw_Images</td><td>Gear1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Gear1.png</td><td>1</td><td/></row>
-		<row><td>gear1.png1</td><td>UserSw_Images</td><td>Gear1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Gear1.png</td><td>1</td><td/></row>
 		<row><td>grafico.png</td><td>ServiceSw_Images</td><td>Grafico.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Grafico.png</td><td>1</td><td/></row>
-		<row><td>grafico.png1</td><td>UserSw_Images</td><td>Grafico.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Grafico.png</td><td>1</td><td/></row>
 		<row><td>grafico2.png</td><td>ServiceSw_Images</td><td>Grafico2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Grafico2.png</td><td>1</td><td/></row>
-		<row><td>grafico2.png1</td><td>UserSw_Images</td><td>Grafico2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Grafico2.png</td><td>1</td><td/></row>
 		<row><td>greencircle.png</td><td>ServiceSw_Images</td><td>GREENC~1.PNG|Greencircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Greencircle.png</td><td>1</td><td/></row>
-		<row><td>greencircle.png1</td><td>UserSw_Images</td><td>GREENC~1.PNG|Greencircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Greencircle.png</td><td>1</td><td/></row>
 		<row><td>grid_16.png</td><td>ServiceSw_Images</td><td>Grid_16.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Grid_16.png</td><td>1</td><td/></row>
-		<row><td>grid_16.png1</td><td>UserSw_Images</td><td>Grid_16.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Grid_16.png</td><td>1</td><td/></row>
 		<row><td>history.dll</td><td>History.dll</td><td>History.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\History.dll</td><td>1</td><td/></row>
 		<row><td>history.dll1</td><td>History.dll1</td><td>History.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\History.dll</td><td>1</td><td/></row>
 		<row><td>home.png</td><td>ServiceSw_Images</td><td>Home.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Home.png</td><td>1</td><td/></row>
-		<row><td>home.png1</td><td>UserSw_Images</td><td>Home.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Home.png</td><td>1</td><td/></row>
 		<row><td>home2.png</td><td>ServiceSw_Images</td><td>Home2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Home2.png</td><td>1</td><td/></row>
-		<row><td>home2.png1</td><td>UserSw_Images</td><td>Home2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Home2.png</td><td>1</td><td/></row>
-		<row><td>hq.png1</td><td>UserSw_Images</td><td>HQ.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\HQ.png</td><td>1</td><td/></row>
 		<row><td>hq.png2</td><td>ServiceSw_Images</td><td>HQ.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\HQ.png</td><td>1</td><td/></row>
 		<row><td>icsharpcode.sharpziplib.dll</td><td>ICSharpCode.SharpZipLib.dll</td><td>ICSHAR~1.DLL|ICSharpCode.SharpZipLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\ICSharpCode.SharpZipLib.dll</td><td>1</td><td/></row>
 		<row><td>icsharpcode.sharpziplib.dll1</td><td>ICSharpCode.SharpZipLib.dll1</td><td>ICSHAR~1.DLL|ICSharpCode.SharpZipLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\ICSharpCode.SharpZipLib.dll</td><td>1</td><td/></row>
 		<row><td>import.png</td><td>ServiceSw_Images</td><td>Import.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Import.png</td><td>1</td><td/></row>
-		<row><td>import.png1</td><td>UserSw_Images</td><td>Import.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Import.png</td><td>1</td><td/></row>
 		<row><td>importscript.png</td><td>ServiceSw_Images</td><td>IMPORT~1.PNG|ImportScript.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ImportScript.png</td><td>1</td><td/></row>
-		<row><td>importscript.png1</td><td>UserSw_Images</td><td>IMPORT~1.PNG|ImportScript.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ImportScript.png</td><td>1</td><td/></row>
 		<row><td>increase.png</td><td>ServiceSw_Images</td><td>Increase.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Increase.png</td><td>1</td><td/></row>
-		<row><td>increase.png1</td><td>UserSw_Images</td><td>Increase.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Increase.png</td><td>1</td><td/></row>
 		<row><td>info.png</td><td>ServiceSw_Images</td><td>Info.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Info.png</td><td>1</td><td/></row>
-		<row><td>info.png1</td><td>UserSw_Images</td><td>Info.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Info.png</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll</td><td>InfoAnalyzer.dll</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll1</td><td>InfoAnalyzer.dll1</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
 		<row><td>installcustomaction_udctraci</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td>INSTAL~1.JS|InstallCustomAction_UDCTracing_COMPlusApp.js</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\InstallCustomAction_UDCTracing_COMPlusApp.js</td><td>1</td><td/></row>
@@ -2763,19 +2578,12 @@
 		<row><td>interop.communicationsax00.d1</td><td>Interop.CommunicationsAx00.dll1</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
 		<row><td>interop.wmplib.dll</td><td>Interop.WMPLib.dll</td><td>INTERO~1.DLL|Interop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\SRV\Interop.WMPLib.dll</td><td>1</td><td/></row>
 		<row><td>inuse_calculatedtest.png</td><td>ServiceSw_Images</td><td>INUSE_~1.PNG|InUse_CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse_CalculatedTest.png</td><td>1</td><td/></row>
-		<row><td>inuse_calculatedtest.png1</td><td>UserSw_Images</td><td>INUSE_~1.PNG|InUse_CalculatedTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUse_CalculatedTest.png</td><td>1</td><td/></row>
 		<row><td>inuse_isetest.png</td><td>ServiceSw_Images</td><td>INUSE_~1.PNG|InUse_ISETest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse_ISETest.png</td><td>1</td><td/></row>
-		<row><td>inuse_isetest.png1</td><td>UserSw_Images</td><td>INUSE_~1.PNG|InUse_ISETest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUse_ISETest.png</td><td>1</td><td/></row>
 		<row><td>inuse_test.png</td><td>ServiceSw_Images</td><td>INUSE-~1.PNG|InUse-Test.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse-Test.png</td><td>1</td><td/></row>
-		<row><td>inuse_test.png1</td><td>UserSw_Images</td><td>INUSE-~1.PNG|InUse-Test.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUse-Test.png</td><td>1</td><td/></row>
 		<row><td>inuse_usertest.png</td><td>ServiceSw_Images</td><td>INUSE-~1.PNG|InUse-UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUse-UserTest.png</td><td>1</td><td/></row>
-		<row><td>inuse_usertest.png1</td><td>UserSw_Images</td><td>INUSE-~1.PNG|InUse-UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUse-UserTest.png</td><td>1</td><td/></row>
 		<row><td>inusecontrol.png</td><td>ServiceSw_Images</td><td>INUSEC~1.PNG|InUseControl.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUseControl.png</td><td>1</td><td/></row>
-		<row><td>inusecontrol.png1</td><td>UserSw_Images</td><td>INUSEC~1.PNG|InUseControl.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUseControl.png</td><td>1</td><td/></row>
 		<row><td>inuseoffstest.png</td><td>ServiceSw_Images</td><td>INUSEO~1.PNG|InUseOFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUseOFFSTest.png</td><td>1</td><td/></row>
-		<row><td>inuseoffstest.png1</td><td>UserSw_Images</td><td>INUSEO~1.PNG|InUseOFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUseOFFSTest.png</td><td>1</td><td/></row>
 		<row><td>inuseprofile.png</td><td>ServiceSw_Images</td><td>INUSEP~1.PNG|InUseProfile.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\InUseProfile.png</td><td>1</td><td/></row>
-		<row><td>inuseprofile.png1</td><td>UserSw_Images</td><td>INUSEP~1.PNG|InUseProfile.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\InUseProfile.png</td><td>1</td><td/></row>
 		<row><td>isemodule_eng.xps</td><td>ServiceSw_InfoDocs</td><td>ISEMOD~1.XPS|ISEModule_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\ISEModule_ENG.xps</td><td>1</td><td/></row>
 		<row><td>isemodule_spa.xps</td><td>ServiceSw_InfoDocs</td><td>ISEMOD~1.XPS|ISEModule_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\ISEModule_SPA.xps</td><td>1</td><td/></row>
 		<row><td>isemoduleparammeters.xml</td><td>ServiceSw_XMLFiles</td><td>ISEMOD~1.XML|ISEModuleParammeters.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;XmlFiles1&gt;\ISEModuleParammeters.xml</td><td>1</td><td/></row>
@@ -2783,48 +2591,26 @@
 		<row><td>iseresultsdebugmode.xml</td><td>ServiceSw_XMLFiles</td><td>ISERES~1.XML|ISEResultsDebugMode.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;XmlFiles1&gt;\ISEResultsDebugMode.xml</td><td>1</td><td/></row>
 		<row><td>iseresultsdebugmode.xml1</td><td>UserSw_XmlFiles</td><td>ISERES~1.XML|ISEResultsDebugMode.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;XmlFiles&gt;\ISEResultsDebugMode.xml</td><td>1</td><td/></row>
 		<row><td>isetest.png</td><td>ServiceSw_Images</td><td>ISETest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ISETest.png</td><td>1</td><td/></row>
-		<row><td>isetest.png1</td><td>UserSw_Images</td><td>ISETest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ISETest.png</td><td>1</td><td/></row>
 		<row><td>left.png</td><td>ServiceSw_Images</td><td>Left.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Left.png</td><td>1</td><td/></row>
-		<row><td>left.png1</td><td>UserSw_Images</td><td>Left.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Left.png</td><td>1</td><td/></row>
 		<row><td>leg_barcoderr.png</td><td>ServiceSw_Images</td><td>LEG_BA~1.PNG|LEG_BARCODERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BARCODERR.png</td><td>1</td><td/></row>
-		<row><td>leg_barcoderr.png1</td><td>UserSw_Images</td><td>LEG_BA~1.PNG|LEG_BARCODERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BARCODERR.png</td><td>1</td><td/></row>
 		<row><td>leg_bc_err.png</td><td>ServiceSw_Images</td><td>LEG_BC~1.PNG|LEG_BC_ERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BC_ERR.png</td><td>1</td><td/></row>
-		<row><td>leg_bc_err.png1</td><td>UserSw_Images</td><td>LEG_BC~1.PNG|LEG_BC_ERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BC_ERR.png</td><td>1</td><td/></row>
 		<row><td>leg_bc_ukn.png</td><td>ServiceSw_Images</td><td>LEG_BC~1.PNG|LEG_BC_UKN.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BC_UKN.png</td><td>1</td><td/></row>
-		<row><td>leg_bc_ukn.png1</td><td>UserSw_Images</td><td>LEG_BC~1.PNG|LEG_BC_UKN.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BC_UKN.png</td><td>1</td><td/></row>
 		<row><td>leg_bdepleted.png</td><td>ServiceSw_Images</td><td>LEG_BD~1.PNG|LEG_BDEPLETED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BDEPLETED.png</td><td>1</td><td/></row>
-		<row><td>leg_bdepleted.png1</td><td>UserSw_Images</td><td>LEG_BD~1.PNG|LEG_BDEPLETED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BDEPLETED.png</td><td>1</td><td/></row>
-		<row><td>leg_binprocess.png</td><td>UserSw_Images</td><td>LEG_BI~1.PNG|LEG_BINPROCESS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BINPROCESS.png</td><td>1</td><td/></row>
 		<row><td>leg_blower.png</td><td>ServiceSw_Images</td><td>LEG_BL~1.PNG|LEG_BLOWER.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BLOWER.png</td><td>1</td><td/></row>
-		<row><td>leg_blower.png1</td><td>UserSw_Images</td><td>LEG_BL~1.PNG|LEG_BLOWER.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BLOWER.png</td><td>1</td><td/></row>
 		<row><td>leg_bnoinuse.png</td><td>ServiceSw_Images</td><td>LEG_BN~1.PNG|LEG_BNOINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BNOINUSE.png</td><td>1</td><td/></row>
-		<row><td>leg_bnoinuse.png1</td><td>UserSw_Images</td><td>LEG_BN~1.PNG|LEG_BNOINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BNOINUSE.png</td><td>1</td><td/></row>
 		<row><td>leg_breagent.png</td><td>ServiceSw_Images</td><td>LEG_BR~1.PNG|LEG_BREAGENT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BREAGENT.png</td><td>1</td><td/></row>
-		<row><td>leg_breagent.png1</td><td>UserSw_Images</td><td>LEG_BR~1.PNG|LEG_BREAGENT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BREAGENT.png</td><td>1</td><td/></row>
 		<row><td>leg_bselect.png</td><td>ServiceSw_Images</td><td>LEG_BS~1.PNG|LEG_BSELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BSELECT.png</td><td>1</td><td/></row>
-		<row><td>leg_bselect.png1</td><td>UserSw_Images</td><td>LEG_BS~1.PNG|LEG_BSELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BSELECT.png</td><td>1</td><td/></row>
 		<row><td>leg_bwash.png</td><td>ServiceSw_Images</td><td>LEG_BW~1.PNG|LEG_BWASH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_BWASH.png</td><td>1</td><td/></row>
-		<row><td>leg_bwash.png1</td><td>UserSw_Images</td><td>LEG_BW~1.PNG|LEG_BWASH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_BWASH.png</td><td>1</td><td/></row>
 		<row><td>leg_depleted.png</td><td>ServiceSw_Images</td><td>LEG_DE~1.PNG|LEG_DEPLETED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_DEPLETED.png</td><td>1</td><td/></row>
-		<row><td>leg_depleted.png1</td><td>UserSw_Images</td><td>LEG_DE~1.PNG|LEG_DEPLETED.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_DEPLETED.png</td><td>1</td><td/></row>
 		<row><td>leg_finish.png</td><td>ServiceSw_Images</td><td>LEG_FI~1.PNG|LEG_FINISH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_FINISH.png</td><td>1</td><td/></row>
-		<row><td>leg_finish.png1</td><td>UserSw_Images</td><td>LEG_FI~1.PNG|LEG_FINISH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_FINISH.png</td><td>1</td><td/></row>
 		<row><td>leg_inprogress.png</td><td>ServiceSw_Images</td><td>LEG_IN~1.PNG|LEG_INPROGRESS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_INPROGRESS.png</td><td>1</td><td/></row>
-		<row><td>leg_inprogress.png1</td><td>UserSw_Images</td><td>LEG_IN~1.PNG|LEG_INPROGRESS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_INPROGRESS.png</td><td>1</td><td/></row>
 		<row><td>leg_noinuse.png</td><td>ServiceSw_Images</td><td>LEG_NO~1.PNG|LEG_NOINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_NOINUSE.png</td><td>1</td><td/></row>
-		<row><td>leg_noinuse.png1</td><td>UserSw_Images</td><td>LEG_NO~1.PNG|LEG_NOINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_NOINUSE.png</td><td>1</td><td/></row>
 		<row><td>leg_pending.png</td><td>ServiceSw_Images</td><td>LEG_PE~1.PNG|LEG_PENDING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_PENDING.png</td><td>1</td><td/></row>
-		<row><td>leg_pending.png1</td><td>UserSw_Images</td><td>LEG_PE~1.PNG|LEG_PENDING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_PENDING.png</td><td>1</td><td/></row>
 		<row><td>leg_select.png</td><td>ServiceSw_Images</td><td>LEG_SE~1.PNG|LEG_SELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LEG_SELECT.png</td><td>1</td><td/></row>
-		<row><td>leg_select.png1</td><td>UserSw_Images</td><td>LEG_SE~1.PNG|LEG_SELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LEG_SELECT.png</td><td>1</td><td/></row>
 		<row><td>lis.dll</td><td>LIS.dll</td><td>LIS.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\LIS.dll</td><td>1</td><td/></row>
-		<row><td>lisrequest.png1</td><td>UserSw_Images</td><td>LISREQ~1.PNG|LISRequest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LISRequest.png</td><td>1</td><td/></row>
 		<row><td>loadadj.png</td><td>ServiceSw_Images</td><td>LoadAdj.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\LoadAdj.png</td><td>1</td><td/></row>
-		<row><td>loadadj.png1</td><td>UserSw_Images</td><td>LoadAdj.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\LoadAdj.png</td><td>1</td><td/></row>
 		<row><td>locked.png</td><td>ServiceSw_Images</td><td>Locked.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Locked.png</td><td>1</td><td/></row>
-		<row><td>locked.png1</td><td>UserSw_Images</td><td>Locked.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Locked.png</td><td>1</td><td/></row>
 		<row><td>manual_repeat.png</td><td>ServiceSw_Images</td><td>MANUAL~1.PNG|Manual_Repeat.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Manual_Repeat.png</td><td>1</td><td/></row>
-		<row><td>manual_repeat.png1</td><td>UserSw_Images</td><td>MANUAL~1.PNG|Manual_Repeat.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Manual_Repeat.png</td><td>1</td><td/></row>
 		<row><td>mastertemplate.gif</td><td>ServiceSw_Reports_Templates</td><td>MASTER~1.GIF|MASTERTEMPLATE.GIF</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Templates1&gt;\MASTERTEMPLATE.GIF</td><td>1</td><td/></row>
 		<row><td>mastertemplate.gif1</td><td>UserSw_Reports_Templates</td><td>MASTER~1.GIF|MASTERTEMPLATE.GIF</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Templates&gt;\MASTERTEMPLATE.GIF</td><td>1</td><td/></row>
 		<row><td>mastertemplate.repx</td><td>ServiceSw_Reports_Templates</td><td>MASTER~1.REP|MASTERTEMPLATE.repx</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Templates1&gt;\MASTERTEMPLATE.repx</td><td>1</td><td/></row>
@@ -2838,78 +2624,46 @@
 		<row><td>mastertemplatels_empty.gif</td><td>ServiceSw_Reports_Templates</td><td>MASTER~1.GIF|MASTERTEMPLATELS_Empty.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Templates1&gt;\MASTERTEMPLATELS_Empty.gif</td><td>1</td><td/></row>
 		<row><td>mastertemplatels_empty.gif1</td><td>UserSw_Reports_Templates</td><td>MASTER~1.GIF|MASTERTEMPLATELS_Empty.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Templates&gt;\MASTERTEMPLATELS_Empty.gif</td><td>1</td><td/></row>
 		<row><td>mdihorizalarm.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizAlarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizAlarm.png</td><td>1</td><td/></row>
-		<row><td>mdihorizalarm.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizAlarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizAlarm.png</td><td>1</td><td/></row>
 		<row><td>mdihorizanalyzer.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizAnalyzer.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizAnalyzer.png</td><td>1</td><td/></row>
-		<row><td>mdihorizanalyzer.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizAnalyzer.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizAnalyzer.png</td><td>1</td><td/></row>
 		<row><td>mdihorizinfo.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizInfo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizInfo.png</td><td>1</td><td/></row>
-		<row><td>mdihorizinfo.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizInfo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizInfo.png</td><td>1</td><td/></row>
 		<row><td>mdihorizmonitor.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizMonitor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizMonitor.png</td><td>1</td><td/></row>
-		<row><td>mdihorizmonitor.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizMonitor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizMonitor.png</td><td>1</td><td/></row>
 		<row><td>mdihorizpositioning.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizPositioning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizPositioning.png</td><td>1</td><td/></row>
-		<row><td>mdihorizpositioning.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizPositioning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizPositioning.png</td><td>1</td><td/></row>
 		<row><td>mdihorizprofiles.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizProfiles.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizProfiles.png</td><td>1</td><td/></row>
-		<row><td>mdihorizprofiles.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizProfiles.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizProfiles.png</td><td>1</td><td/></row>
 		<row><td>mdihorizqccum.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizQCCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizQCCum.png</td><td>1</td><td/></row>
-		<row><td>mdihorizqccum.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizQCCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizQCCum.png</td><td>1</td><td/></row>
 		<row><td>mdihorizreset.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizReset.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizReset.png</td><td>1</td><td/></row>
-		<row><td>mdihorizreset.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizReset.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizReset.png</td><td>1</td><td/></row>
 		<row><td>mdihorizresults.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizResults.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizResults.png</td><td>1</td><td/></row>
-		<row><td>mdihorizresults.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizResults.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizResults.png</td><td>1</td><td/></row>
 		<row><td>mdihorizsample.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizSample.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizSample.png</td><td>1</td><td/></row>
-		<row><td>mdihorizsample.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizSample.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizSample.png</td><td>1</td><td/></row>
 		<row><td>mdihorizsupport.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizSupport.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizSupport.png</td><td>1</td><td/></row>
-		<row><td>mdihorizsupport.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizSupport.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizSupport.png</td><td>1</td><td/></row>
 		<row><td>mdihoriztests.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizTests.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizTests.png</td><td>1</td><td/></row>
-		<row><td>mdihoriztests.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizTests.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizTests.png</td><td>1</td><td/></row>
 		<row><td>mdihoriztool.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizTool.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizTool.png</td><td>1</td><td/></row>
-		<row><td>mdihoriztool.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizTool.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizTool.png</td><td>1</td><td/></row>
 		<row><td>mdihorizwestgard.png</td><td>ServiceSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizWestgard.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIHorizWestgard.png</td><td>1</td><td/></row>
-		<row><td>mdihorizwestgard.png1</td><td>UserSw_Images_Embedded</td><td>MDIHOR~1.PNG|MDIHorizWestgard.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIHorizWestgard.png</td><td>1</td><td/></row>
 		<row><td>mdivertpause.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPause.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertPause.png</td><td>1</td><td/></row>
-		<row><td>mdivertpause.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPause.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertPause.png</td><td>1</td><td/></row>
 		<row><td>mdivertplay.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPlay.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertPlay.png</td><td>1</td><td/></row>
-		<row><td>mdivertplay.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPlay.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertPlay.png</td><td>1</td><td/></row>
 		<row><td>mdivertpoweroff.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPowerOff.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertPowerOff.png</td><td>1</td><td/></row>
-		<row><td>mdivertpoweroff.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertPowerOff.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertPowerOff.png</td><td>1</td><td/></row>
 		<row><td>mdivertrecover.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertRecover.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertRecover.png</td><td>1</td><td/></row>
-		<row><td>mdivertrecover.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertRecover.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertRecover.png</td><td>1</td><td/></row>
 		<row><td>mdivertsound.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertSound.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertSound.png</td><td>1</td><td/></row>
-		<row><td>mdivertsound.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertSound.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertSound.png</td><td>1</td><td/></row>
 		<row><td>mdivertstart.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertStart.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertStart.png</td><td>1</td><td/></row>
-		<row><td>mdivertstart.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertStart.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertStart.png</td><td>1</td><td/></row>
 		<row><td>mdivertstop.png</td><td>ServiceSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\MDIVertStop.png</td><td>1</td><td/></row>
-		<row><td>mdivertstop.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertStop.png</td><td>1</td><td/></row>
 		<row><td>metrology_eng.xps</td><td>ServiceSw_InfoDocs</td><td>METROL~1.XPS|Metrology_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Metrology_ENG.xps</td><td>1</td><td/></row>
 		<row><td>metrology_spa.xps</td><td>ServiceSw_InfoDocs</td><td>METROL~1.XPS|Metrology_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Metrology_SPA.xps</td><td>1</td><td/></row>
 		<row><td>microsoft.visualbasic.powerp</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
 		<row><td>microsoft.visualbasic.powerp1</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\SRV\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
 		<row><td>mon_leg_bcerr.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_BCERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_BCERR.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_bcerr.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_BCERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_BCERR.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_deplet.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_DEPLET.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_DEPLET.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_deplet.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_DEPLET.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_DEPLET.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_finish.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_FINISH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_FINISH.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_finish.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_FINISH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_FINISH.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_inprogress.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_INPROGRESS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_INPROGRESS.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_inprogress.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_INPROGRESS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_INPROGRESS.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_notinuse.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_NOTINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_NOTINUSE.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_notinuse.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_NOTINUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_NOTINUSE.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_pending.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_PENDING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_PENDING.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_pending.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_PENDING.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_PENDING.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_select.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_SELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_SELECT.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_select.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_SELECT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_SELECT.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_white.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_WHITE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_WHITE.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_white.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_WHITE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_WHITE.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_yellow.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_YELLOW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_YELLOW.png</td><td>1</td><td/></row>
-		<row><td>mon_leg_yellow.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_YELLOW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_YELLOW.png</td><td>1</td><td/></row>
 		<row><td>motorpumpsvalves_eng.xps</td><td>ServiceSw_InfoDocs</td><td>MOTORP~1.XPS|MotorPumpsValves_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\MotorPumpsValves_ENG.xps</td><td>1</td><td/></row>
 		<row><td>motorpumpsvalves_spa.xps</td><td>ServiceSw_InfoDocs</td><td>MOTORP~1.XPS|MotorPumpsValves_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\MotorPumpsValves_SPA.xps</td><td>1</td><td/></row>
 		<row><td>mpr.dll</td><td>MPR.dll</td><td>MPR.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\MPR.dll</td><td>1</td><td/></row>
 		<row><td>needlestermo_eng.xps</td><td>ServiceSw_InfoDocs</td><td>NEEDLE~1.XPS|NeedlesTermo_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\NeedlesTermo_ENG.xps</td><td>1</td><td/></row>
 		<row><td>needlestermo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>NEEDLE~1.XPS|NeedlesTermo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\NeedlesTermo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>new.png</td><td>ServiceSw_Images</td><td>New.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\New.png</td><td>1</td><td/></row>
-		<row><td>new.png1</td><td>UserSw_Images</td><td>New.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\New.png</td><td>1</td><td/></row>
 		<row><td>no_inuse.png</td><td>ServiceSw_Images</td><td>NO_INUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\NO_INUSE.png</td><td>1</td><td/></row>
-		<row><td>no_inuse.png1</td><td>UserSw_Images</td><td>NO_INUSE.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\NO_INUSE.png</td><td>1</td><td/></row>
 		<row><td>ntecommunicationastm1394modu</td><td>NteCommunicationASTM1394Module.dll</td><td>NTECOM~1.DLL|NteCommunicationASTM1394Module.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationASTM1394Module.dll</td><td>1</td><td/></row>
 		<row><td>ntecommunicationcdfmodule.dl</td><td>NteCommunicationCDFModule.dll</td><td>NTECOM~1.DLL|NteCommunicationCDFModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationCDFModule.dll</td><td>1</td><td/></row>
 		<row><td>ntecommunicationcoremodule.d</td><td>NteCommunicationCoreModule.dll</td><td>NTECOM~1.DLL|NteCommunicationCoreModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteCommunicationCoreModule.dll</td><td>1</td><td/></row>
@@ -2919,27 +2673,18 @@
 		<row><td>ntetraceeventmodule.dll</td><td>NteTraceEventModule.dll</td><td>NTETRA~1.DLL|NteTraceEventModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteTraceEventModule.dll</td><td>1</td><td/></row>
 		<row><td>ntetracesubscriberoseventlog</td><td>NteTraceSubscriberOSEventLogModule.dll</td><td>NTETRA~1.DLL|NteTraceSubscriberOSEventLogModule.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\NteTraceSubscriberOSEventLogModule.dll</td><td>1</td><td/></row>
 		<row><td>offstest.png</td><td>ServiceSw_Images</td><td>OFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OFFSTest.png</td><td>1</td><td/></row>
-		<row><td>offstest.png1</td><td>UserSw_Images</td><td>OFFSTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\OFFSTest.png</td><td>1</td><td/></row>
 		<row><td>offstestbutton.png</td><td>ServiceSw_Images</td><td>OFFSTE~1.PNG|OFFSTestButton.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OFFSTestButton.png</td><td>1</td><td/></row>
-		<row><td>offstestbutton.png1</td><td>UserSw_Images</td><td>OFFSTE~1.PNG|OFFSTestButton.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\OFFSTestButton.png</td><td>1</td><td/></row>
 		<row><td>open.png</td><td>ServiceSw_Images</td><td>Open.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Open.png</td><td>1</td><td/></row>
-		<row><td>open.png1</td><td>UserSw_Images</td><td>Open.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Open.png</td><td>1</td><td/></row>
 		<row><td>opticcentering_eng.xps</td><td>ServiceSw_InfoDocs</td><td>OPTICC~1.XPS|OpticCentering_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\OpticCentering_ENG.xps</td><td>1</td><td/></row>
 		<row><td>opticcentering_spa.xps</td><td>ServiceSw_InfoDocs</td><td>OPTICC~1.XPS|OpticCentering_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\OpticCentering_SPA.xps</td><td>1</td><td/></row>
 		<row><td>orangecircle.png</td><td>ServiceSw_Images</td><td>ORANGE~1.PNG|OrangeCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OrangeCircle.png</td><td>1</td><td/></row>
-		<row><td>orangecircle.png1</td><td>UserSw_Images</td><td>ORANGE~1.PNG|OrangeCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\OrangeCircle.png</td><td>1</td><td/></row>
 		<row><td>panel.png</td><td>ServiceSw_Images_Embedded</td><td>Panel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\Panel.png</td><td>1</td><td/></row>
-		<row><td>panel.png1</td><td>UserSw_Images_Embedded</td><td>Panel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\Panel.png</td><td>1</td><td/></row>
 		<row><td>parameterprograming.dll</td><td>ParameterPrograming.dll</td><td>PARAME~1.DLL|ParameterPrograming.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\ParameterPrograming.dll</td><td>1</td><td/></row>
 		<row><td>parameterprograming.dll1</td><td>ParameterPrograming.dll1</td><td>PARAME~1.DLL|ParameterPrograming.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\ParameterPrograming.dll</td><td>1</td><td/></row>
 		<row><td>patientroutine.gif</td><td>ServiceSw_Images</td><td>PATIEN~1.GIF|PatientRoutine.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PatientRoutine.gif</td><td>1</td><td/></row>
-		<row><td>patientroutine.gif1</td><td>UserSw_Images</td><td>PATIEN~1.GIF|PatientRoutine.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PatientRoutine.gif</td><td>1</td><td/></row>
 		<row><td>patientroutine.png</td><td>ServiceSw_Images</td><td>PATIEN~1.PNG|PatientRoutine.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PatientRoutine.png</td><td>1</td><td/></row>
-		<row><td>patientroutine.png1</td><td>UserSw_Images</td><td>PATIEN~1.PNG|PatientRoutine.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PatientRoutine.png</td><td>1</td><td/></row>
 		<row><td>patientstat.gif</td><td>ServiceSw_Images</td><td>PATIEN~1.GIF|PatientStat.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PatientStat.gif</td><td>1</td><td/></row>
-		<row><td>patientstat.gif1</td><td>UserSw_Images</td><td>PATIEN~1.GIF|PatientStat.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PatientStat.gif</td><td>1</td><td/></row>
 		<row><td>patientstat.png</td><td>ServiceSw_Images</td><td>PATIEN~1.PNG|PatientStat.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PatientStat.png</td><td>1</td><td/></row>
-		<row><td>patientstat.png1</td><td>UserSw_Images</td><td>PATIEN~1.PNG|PatientStat.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PatientStat.png</td><td>1</td><td/></row>
 		<row><td>perpetuumsoft.framework.dll</td><td>PerpetuumSoft.Framework.dll</td><td>PERPET~1.DLL|PerpetuumSoft.Framework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\PerpetuumSoft.Framework.dll</td><td>1</td><td/></row>
 		<row><td>perpetuumsoft.framework.dll1</td><td>PerpetuumSoft.Framework.dll1</td><td>PERPET~1.DLL|PerpetuumSoft.Framework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\PerpetuumSoft.Framework.dll</td><td>1</td><td/></row>
 		<row><td>perpetuumsoft.framework.expo</td><td>PerpetuumSoft.Framework.Export.dll</td><td>PERPET~1.DLL|PerpetuumSoft.Framework.Export.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\PerpetuumSoft.Framework.Export.dll</td><td>1</td><td/></row>
@@ -2953,194 +2698,114 @@
 		<row><td>perpetuumsoft.writers.svg.dl</td><td>PerpetuumSoft.Writers.Svg.dll</td><td>PERPET~1.DLL|PerpetuumSoft.Writers.Svg.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\PerpetuumSoft.Writers.Svg.dll</td><td>1</td><td/></row>
 		<row><td>perpetuumsoft.writers.svg.dl1</td><td>PerpetuumSoft.Writers.Svg.dll1</td><td>PERPET~1.DLL|PerpetuumSoft.Writers.Svg.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\PerpetuumSoft.Writers.Svg.dll</td><td>1</td><td/></row>
 		<row><td>plus_16.png</td><td>ServiceSw_Images</td><td>plus_16.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\plus_16.png</td><td>1</td><td/></row>
-		<row><td>plus_16.png1</td><td>UserSw_Images</td><td>plus_16.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\plus_16.png</td><td>1</td><td/></row>
 		<row><td>positioning.png</td><td>ServiceSw_Images</td><td>POSITI~1.PNG|Positioning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Positioning.png</td><td>1</td><td/></row>
-		<row><td>positioning.png1</td><td>UserSw_Images</td><td>POSITI~1.PNG|Positioning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Positioning.png</td><td>1</td><td/></row>
 		<row><td>presentationcom.dll</td><td>PresentationCOM.dll</td><td>PRESEN~1.DLL|PresentationCOM.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\PresentationCOM.dll</td><td>1</td><td/></row>
 		<row><td>presentationcom.dll1</td><td>PresentationCOM.dll1</td><td>PRESEN~1.DLL|PresentationCOM.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\PresentationCOM.dll</td><td>1</td><td/></row>
 		<row><td>print.png</td><td>ServiceSw_Images</td><td>Print.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Print.png</td><td>1</td><td/></row>
-		<row><td>print.png1</td><td>UserSw_Images</td><td>Print.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Print.png</td><td>1</td><td/></row>
 		<row><td>printhead.png</td><td>ServiceSw_Images</td><td>PRINTH~1.PNG|PrintHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PrintHead.png</td><td>1</td><td/></row>
-		<row><td>printhead.png1</td><td>UserSw_Images</td><td>PRINTH~1.PNG|PrintHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PrintHead.png</td><td>1</td><td/></row>
 		<row><td>printl.png</td><td>ServiceSw_Images</td><td>PrintL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PrintL.png</td><td>1</td><td/></row>
-		<row><td>printl.png1</td><td>UserSw_Images</td><td>PrintL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PrintL.png</td><td>1</td><td/></row>
 		<row><td>profile.png</td><td>ServiceSw_Images</td><td>Profile.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Profile.png</td><td>1</td><td/></row>
-		<row><td>profile.png1</td><td>UserSw_Images</td><td>Profile.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Profile.png</td><td>1</td><td/></row>
 		<row><td>reaccontam.png</td><td>ServiceSw_Images</td><td>REACCO~1.PNG|ReacContam.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacContam.png</td><td>1</td><td/></row>
-		<row><td>reaccontam.png1</td><td>UserSw_Images</td><td>REACCO~1.PNG|ReacContam.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacContam.png</td><td>1</td><td/></row>
 		<row><td>reacdilution.png</td><td>ServiceSw_Images</td><td>REACDI~1.PNG|ReacDilution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacDilution.png</td><td>1</td><td/></row>
-		<row><td>reacdilution.png1</td><td>UserSw_Images</td><td>REACDI~1.PNG|ReacDilution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacDilution.png</td><td>1</td><td/></row>
 		<row><td>reacfinish.png</td><td>ServiceSw_Images</td><td>REACFI~1.PNG|ReacFinish.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacFinish.png</td><td>1</td><td/></row>
-		<row><td>reacfinish.png1</td><td>UserSw_Images</td><td>REACFI~1.PNG|ReacFinish.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacFinish.png</td><td>1</td><td/></row>
 		<row><td>reacnotinuse.png</td><td>ServiceSw_Images</td><td>REACNO~1.PNG|ReacNotInUse.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacNotInUse.png</td><td>1</td><td/></row>
-		<row><td>reacnotinuse.png1</td><td>UserSw_Images</td><td>REACNO~1.PNG|ReacNotInUse.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacNotInUse.png</td><td>1</td><td/></row>
 		<row><td>reacoptic.png</td><td>ServiceSw_Images</td><td>REACOP~1.PNG|ReacOptic.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacOptic.png</td><td>1</td><td/></row>
-		<row><td>reacoptic.png1</td><td>UserSw_Images</td><td>REACOP~1.PNG|ReacOptic.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacOptic.png</td><td>1</td><td/></row>
 		<row><td>reacposcont.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSCONT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSCONT.png</td><td>1</td><td/></row>
-		<row><td>reacposcont.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSCONT.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSCONT.png</td><td>1</td><td/></row>
 		<row><td>reacposconts.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSCONTS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSCONTS.png</td><td>1</td><td/></row>
-		<row><td>reacposconts.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSCONTS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSCONTS.png</td><td>1</td><td/></row>
 		<row><td>reacposdil.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSDIL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSDIL.png</td><td>1</td><td/></row>
-		<row><td>reacposdil.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSDIL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSDIL.png</td><td>1</td><td/></row>
 		<row><td>reacposdils.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSDILS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSDILS.png</td><td>1</td><td/></row>
-		<row><td>reacposdils.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSDILS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSDILS.png</td><td>1</td><td/></row>
 		<row><td>reacposelec.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSELEC.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSELEC.png</td><td>1</td><td/></row>
-		<row><td>reacposelec.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSELEC.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSELEC.png</td><td>1</td><td/></row>
 		<row><td>reacposfini.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSFINI.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSFINI.png</td><td>1</td><td/></row>
-		<row><td>reacposfini.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSFINI.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSFINI.png</td><td>1</td><td/></row>
 		<row><td>reacposfinis.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSFINIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSFINIS.png</td><td>1</td><td/></row>
-		<row><td>reacposfinis.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSFINIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSFINIS.png</td><td>1</td><td/></row>
 		<row><td>reacposnius.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSNIUS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSNIUS.png</td><td>1</td><td/></row>
-		<row><td>reacposnius.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSNIUS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSNIUS.png</td><td>1</td><td/></row>
 		<row><td>reacposniuss.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSNIUSS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSNIUSS.png</td><td>1</td><td/></row>
-		<row><td>reacposniuss.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSNIUSS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSNIUSS.png</td><td>1</td><td/></row>
 		<row><td>reacposopti.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSOPTI.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSOPTI.png</td><td>1</td><td/></row>
-		<row><td>reacposopti.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSOPTI.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSOPTI.png</td><td>1</td><td/></row>
 		<row><td>reacposoptis.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSOPTIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSOPTIS.png</td><td>1</td><td/></row>
-		<row><td>reacposoptis.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSOPTIS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSOPTIS.png</td><td>1</td><td/></row>
 		<row><td>reacposr1.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1.png</td><td>1</td><td/></row>
-		<row><td>reacposr1.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1.png</td><td>1</td><td/></row>
 		<row><td>reacposr1r2.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1R2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1R2.png</td><td>1</td><td/></row>
-		<row><td>reacposr1r2.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1R2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1R2.png</td><td>1</td><td/></row>
 		<row><td>reacposr1r2s.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1R2S.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1R2S.png</td><td>1</td><td/></row>
-		<row><td>reacposr1r2s.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1R2S.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1R2S.png</td><td>1</td><td/></row>
 		<row><td>reacposr1s.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1S.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1S.png</td><td>1</td><td/></row>
-		<row><td>reacposr1s.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1S.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1S.png</td><td>1</td><td/></row>
 		<row><td>reacposr1sl.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1SL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1SL.png</td><td>1</td><td/></row>
-		<row><td>reacposr1sl.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1SL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1SL.png</td><td>1</td><td/></row>
 		<row><td>reacposr1sls.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSR1SLS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSR1SLS.png</td><td>1</td><td/></row>
-		<row><td>reacposr1sls.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSR1SLS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSR1SLS.png</td><td>1</td><td/></row>
 		<row><td>reacposwash.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSWASH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSWASH.png</td><td>1</td><td/></row>
-		<row><td>reacposwash.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSWASH.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSWASH.png</td><td>1</td><td/></row>
 		<row><td>reacposwashs.png</td><td>ServiceSw_Images</td><td>REACPO~1.PNG|REACPOSWASHS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\REACPOSWASHS.png</td><td>1</td><td/></row>
-		<row><td>reacposwashs.png1</td><td>UserSw_Images</td><td>REACPO~1.PNG|REACPOSWASHS.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\REACPOSWASHS.png</td><td>1</td><td/></row>
 		<row><td>reacr1.png</td><td>ServiceSw_Images</td><td>ReacR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacR1.png</td><td>1</td><td/></row>
-		<row><td>reacr1.png1</td><td>UserSw_Images</td><td>ReacR1.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacR1.png</td><td>1</td><td/></row>
 		<row><td>reacr1sample.png</td><td>ServiceSw_Images</td><td>REACR1~1.PNG|ReacR1Sample.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacR1Sample.png</td><td>1</td><td/></row>
-		<row><td>reacr1sample.png1</td><td>UserSw_Images</td><td>REACR1~1.PNG|ReacR1Sample.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacR1Sample.png</td><td>1</td><td/></row>
 		<row><td>reacr1sampler2.png</td><td>ServiceSw_Images</td><td>REACR1~1.PNG|ReacR1SampleR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacR1SampleR2.png</td><td>1</td><td/></row>
-		<row><td>reacr1sampler2.png1</td><td>UserSw_Images</td><td>REACR1~1.PNG|ReacR1SampleR2.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacR1SampleR2.png</td><td>1</td><td/></row>
 		<row><td>reacwashing.png</td><td>ServiceSw_Images</td><td>REACWA~1.PNG|ReacWashing.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReacWashing.png</td><td>1</td><td/></row>
-		<row><td>reacwashing.png1</td><td>UserSw_Images</td><td>REACWA~1.PNG|ReacWashing.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReacWashing.png</td><td>1</td><td/></row>
 		<row><td>readadj.png</td><td>ServiceSw_Images</td><td>ReadAdj.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReadAdj.png</td><td>1</td><td/></row>
-		<row><td>readadj.png1</td><td>UserSw_Images</td><td>ReadAdj.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReadAdj.png</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ServiceSw_Import</td><td>ReadMe.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Import1&gt;\ReadMe.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt1</td><td>UserSw_Data</td><td>ReadMe.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Data&gt;\ReadMe.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt2</td><td>UserSw_Import</td><td>ReadMe.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Import&gt;\ReadMe.txt</td><td>1</td><td/></row>
 		<row><td>reagentpos.png</td><td>ServiceSw_Images</td><td>REAGEN~1.PNG|ReagentPos.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ReagentPos.png</td><td>1</td><td/></row>
-		<row><td>reagentpos.png1</td><td>UserSw_Images</td><td>REAGEN~1.PNG|ReagentPos.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ReagentPos.png</td><td>1</td><td/></row>
 		<row><td>refill.png</td><td>ServiceSw_Images</td><td>Refill.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Refill.png</td><td>1</td><td/></row>
-		<row><td>refill.png1</td><td>UserSw_Images</td><td>Refill.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Refill.png</td><td>1</td><td/></row>
 		<row><td>removefilter.png</td><td>ServiceSw_Images</td><td>REMOVE~1.PNG|RemoveFilter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RemoveFilter.png</td><td>1</td><td/></row>
-		<row><td>removefilter.png1</td><td>UserSw_Images</td><td>REMOVE~1.PNG|RemoveFilter.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RemoveFilter.png</td><td>1</td><td/></row>
 		<row><td>required.png</td><td>ServiceSw_Images</td><td>Required.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Required.png</td><td>1</td><td/></row>
-		<row><td>required.png1</td><td>UserSw_Images</td><td>Required.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Required.png</td><td>1</td><td/></row>
 		<row><td>rerundcr.png</td><td>ServiceSw_Images</td><td>RerunDcr.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunDcr.png</td><td>1</td><td/></row>
-		<row><td>rerundcr.png1</td><td>UserSw_Images</td><td>RerunDcr.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunDcr.png</td><td>1</td><td/></row>
 		<row><td>rerundcr_sent.png</td><td>ServiceSw_Images</td><td>RERUND~1.PNG|RerunDcr_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunDcr_Sent.png</td><td>1</td><td/></row>
-		<row><td>rerundcr_sent.png1</td><td>UserSw_Images</td><td>RERUND~1.PNG|RerunDcr_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunDcr_Sent.png</td><td>1</td><td/></row>
 		<row><td>rerunequ.png</td><td>ServiceSw_Images</td><td>RerunEqu.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunEqu.png</td><td>1</td><td/></row>
-		<row><td>rerunequ.png1</td><td>UserSw_Images</td><td>RerunEqu.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunEqu.png</td><td>1</td><td/></row>
 		<row><td>rerunequ_sent.png</td><td>ServiceSw_Images</td><td>RERUNE~1.PNG|RerunEqu_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunEqu_Sent.png</td><td>1</td><td/></row>
-		<row><td>rerunequ_sent.png1</td><td>UserSw_Images</td><td>RERUNE~1.PNG|RerunEqu_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunEqu_Sent.png</td><td>1</td><td/></row>
 		<row><td>reruninc.png</td><td>ServiceSw_Images</td><td>RerunInc.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunInc.png</td><td>1</td><td/></row>
-		<row><td>reruninc.png1</td><td>UserSw_Images</td><td>RerunInc.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunInc.png</td><td>1</td><td/></row>
 		<row><td>reruninc_sent.png</td><td>ServiceSw_Images</td><td>RERUNI~1.PNG|RerunInc_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunInc_Sent.png</td><td>1</td><td/></row>
-		<row><td>reruninc_sent.png1</td><td>UserSw_Images</td><td>RERUNI~1.PNG|RerunInc_Sent.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunInc_Sent.png</td><td>1</td><td/></row>
 		<row><td>rerunnew.png</td><td>ServiceSw_Images</td><td>RerunNew.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\RerunNew.png</td><td>1</td><td/></row>
-		<row><td>rerunnew.png1</td><td>UserSw_Images</td><td>RerunNew.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\RerunNew.png</td><td>1</td><td/></row>
 		<row><td>resetrotor.png</td><td>ServiceSw_Images</td><td>RESETR~1.PNG|ResetRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ResetRotor.png</td><td>1</td><td/></row>
-		<row><td>resetrotor.png1</td><td>UserSw_Images</td><td>RESETR~1.PNG|ResetRotor.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ResetRotor.png</td><td>1</td><td/></row>
 		<row><td>resultspatientroutine.gif</td><td>ServiceSw_Images</td><td>RESULT~1.GIF|ResultsPatientRoutine.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ResultsPatientRoutine.gif</td><td>1</td><td/></row>
-		<row><td>resultspatientroutine.gif1</td><td>UserSw_Images</td><td>RESULT~1.GIF|ResultsPatientRoutine.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ResultsPatientRoutine.gif</td><td>1</td><td/></row>
 		<row><td>resultspatientstat.gif</td><td>ServiceSw_Images</td><td>RESULT~1.GIF|ResultsPatientStat.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ResultsPatientStat.gif</td><td>1</td><td/></row>
-		<row><td>resultspatientstat.gif1</td><td>UserSw_Images</td><td>RESULT~1.GIF|ResultsPatientStat.gif</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ResultsPatientStat.gif</td><td>1</td><td/></row>
 		<row><td>right.png</td><td>ServiceSw_Images</td><td>Right.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Right.png</td><td>1</td><td/></row>
-		<row><td>right.png1</td><td>UserSw_Images</td><td>Right.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Right.png</td><td>1</td><td/></row>
 		<row><td>rotortermo_eng.xps</td><td>ServiceSw_InfoDocs</td><td>ROTORT~1.XPS|RotorTermo_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\RotorTermo_ENG.xps</td><td>1</td><td/></row>
 		<row><td>rotortermo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>ROTORT~1.XPS|RotorTermo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\RotorTermo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>samplepos.png</td><td>ServiceSw_Images</td><td>SAMPLE~1.PNG|SamplePos.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\SamplePos.png</td><td>1</td><td/></row>
-		<row><td>samplepos.png1</td><td>UserSw_Images</td><td>SAMPLE~1.PNG|SamplePos.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\SamplePos.png</td><td>1</td><td/></row>
 		<row><td>samplesnode.png</td><td>ServiceSw_Images</td><td>SAMPLE~1.PNG|SamplesNode.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\SamplesNode.png</td><td>1</td><td/></row>
-		<row><td>samplesnode.png1</td><td>UserSw_Images</td><td>SAMPLE~1.PNG|SamplesNode.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\SamplesNode.png</td><td>1</td><td/></row>
 		<row><td>save.png</td><td>ServiceSw_Images</td><td>Save.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Save.png</td><td>1</td><td/></row>
-		<row><td>save.png1</td><td>UserSw_Images</td><td>Save.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Save.png</td><td>1</td><td/></row>
 		<row><td>saveall.png</td><td>ServiceSw_Images</td><td>SaveAll.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\SaveAll.png</td><td>1</td><td/></row>
-		<row><td>saveall.png1</td><td>UserSw_Images</td><td>SaveAll.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\SaveAll.png</td><td>1</td><td/></row>
 		<row><td>scales_eng.xps</td><td>ServiceSw_InfoDocs</td><td>SCALES~1.XPS|Scales_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Scales_ENG.xps</td><td>1</td><td/></row>
 		<row><td>scales_spa.xps</td><td>ServiceSw_InfoDocs</td><td>SCALES~1.XPS|Scales_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Scales_SPA.xps</td><td>1</td><td/></row>
 		<row><td>servicesplash.png</td><td>ServiceSw_Images_Embedded</td><td>SERVIC~1.PNG|ServiceSplash.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\ServiceSplash.png</td><td>1</td><td/></row>
-		<row><td>servicesplash.png1</td><td>UserSw_Images_Embedded</td><td>SERVIC~1.PNG|ServiceSplash.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\ServiceSplash.png</td><td>1</td><td/></row>
 		<row><td>servicestop.png</td><td>ServiceSw_Images</td><td>SERVIC~1.PNG|ServiceStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ServiceStop.png</td><td>1</td><td/></row>
-		<row><td>servicestop.png1</td><td>UserSw_Images</td><td>SERVIC~1.PNG|ServiceStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ServiceStop.png</td><td>1</td><td/></row>
 		<row><td>solvedalarm.png</td><td>ServiceSw_Images</td><td>SOLVED~1.PNG|SolvedAlarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\SolvedAlarm.png</td><td>1</td><td/></row>
-		<row><td>solvedalarm.png1</td><td>UserSw_Images</td><td>SOLVED~1.PNG|SolvedAlarm.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\SolvedAlarm.png</td><td>1</td><td/></row>
 		<row><td>stus_finish.png</td><td>ServiceSw_Images</td><td>STUS_F~1.PNG|Stus_Finish.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Stus_Finish.png</td><td>1</td><td/></row>
-		<row><td>stus_finish.png1</td><td>UserSw_Images</td><td>STUS_F~1.PNG|Stus_Finish.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Stus_Finish.png</td><td>1</td><td/></row>
 		<row><td>stus_locked.png</td><td>ServiceSw_Images</td><td>STUS_L~1.PNG|Stus_Locked.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Stus_Locked.png</td><td>1</td><td/></row>
-		<row><td>stus_locked.png1</td><td>UserSw_Images</td><td>STUS_L~1.PNG|Stus_Locked.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Stus_Locked.png</td><td>1</td><td/></row>
 		<row><td>stus_witherrs.png</td><td>ServiceSw_Images</td><td>STUS_W~1.PNG|Stus_WithErrs.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Stus_WithErrs.png</td><td>1</td><td/></row>
-		<row><td>stus_witherrs.png1</td><td>UserSw_Images</td><td>STUS_W~1.PNG|Stus_WithErrs.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Stus_WithErrs.png</td><td>1</td><td/></row>
 		<row><td>tasklist.xml</td><td>ServiceSw_Update_Task</td><td>TaskList.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Task1&gt;\TaskList.xml</td><td>1</td><td/></row>
 		<row><td>tasklist.xml1</td><td>UserSw_Update_Task</td><td>TaskList.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Task&gt;\TaskList.xml</td><td>1</td><td/></row>
 		<row><td>tese000012_01_esp.pdf</td><td>ServiceSw_HelpFiles</td><td>TESE00~1.PDF|TESE000012-01-ESP.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\HelpFiles\TESE000012-01-ESP.pdf</td><td>1</td><td/></row>
 		<row><td>tese000012_01_ing.pdf</td><td>ServiceSw_HelpFiles</td><td>TESE00~1.PDF|TESE000012-01-ING.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\HelpFiles\TESE000012-01-ING.pdf</td><td>1</td><td/></row>
 		<row><td>test.png</td><td>ServiceSw_Images</td><td>Test.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Test.png</td><td>1</td><td/></row>
-		<row><td>test.png1</td><td>UserSw_Images</td><td>Test.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Test.png</td><td>1</td><td/></row>
 		<row><td>teus00048_01_esp.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-ESP.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-ESP.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_fra.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-FRA.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-FRA.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_ing.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-ING.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-ING.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_ita.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-ITA.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-ITA.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_por.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-POR.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-POR.pdf</td><td>1</td><td/></row>
 		<row><td>top.png</td><td>ServiceSw_Images</td><td>Top.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Top.png</td><td>1</td><td/></row>
-		<row><td>top.png1</td><td>UserSw_Images</td><td>Top.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Top.png</td><td>1</td><td/></row>
 		<row><td>tubeadditionalsolution.png</td><td>ServiceSw_Images</td><td>TUBEAD~1.PNG|TubeAdditionalSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\TubeAdditionalSolution.png</td><td>1</td><td/></row>
-		<row><td>tubeadditionalsolution.png1</td><td>UserSw_Images</td><td>TUBEAD~1.PNG|TubeAdditionalSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\TubeAdditionalSolution.png</td><td>1</td><td/></row>
 		<row><td>uncheck.png</td><td>ServiceSw_Images</td><td>Uncheck.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Uncheck.png</td><td>1</td><td/></row>
-		<row><td>uncheck.png1</td><td>UserSw_Images</td><td>Uncheck.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Uncheck.png</td><td>1</td><td/></row>
 		<row><td>undo.png</td><td>ServiceSw_Images</td><td>Undo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Undo.png</td><td>1</td><td/></row>
-		<row><td>undo.png1</td><td>UserSw_Images</td><td>Undo.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Undo.png</td><td>1</td><td/></row>
 		<row><td>uninstallcustomaction_udctra</td><td>SetupScripts_Data_EsEngine_ComonFilesFolder_Systelab_Synapse_Core</td><td>UNINST~1.JS|UninstallCustomAction_UDCTracing_COMPlusApp.js</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\UninstallCustomAction_UDCTracing_COMPlusApp.js</td><td>1</td><td/></row>
 		<row><td>up.png</td><td>ServiceSw_Images</td><td>Up.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Up.png</td><td>1</td><td/></row>
-		<row><td>up.png1</td><td>UserSw_Images</td><td>Up.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Up.png</td><td>1</td><td/></row>
 		<row><td>updatefw.png</td><td>ServiceSw_Images</td><td>UpdateFw.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\UpdateFw.png</td><td>1</td><td/></row>
-		<row><td>updatefw.png1</td><td>UserSw_Images</td><td>UpdateFw.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\UpdateFw.png</td><td>1</td><td/></row>
 		<row><td>updateversion.dll</td><td>UpdateVersion.dll</td><td>UPDATE~1.DLL|UpdateVersion.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\UpdateVersion.dll</td><td>1</td><td/></row>
 		<row><td>updateversion.dll1</td><td>UpdateVersion.dll1</td><td>UPDATE~1.DLL|UpdateVersion.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\UpdateVersion.dll</td><td>1</td><td/></row>
 		<row><td>updown.png</td><td>ServiceSw_Images</td><td>UpDown.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\UpDown.png</td><td>1</td><td/></row>
-		<row><td>updown.png1</td><td>UserSw_Images</td><td>UpDown.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\UpDown.png</td><td>1</td><td/></row>
 		<row><td>usersplash.png</td><td>ServiceSw_Images_Embedded</td><td>USERSP~1.PNG|UserSplash.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\UserSplash.png</td><td>1</td><td/></row>
-		<row><td>usersplash.png1</td><td>UserSw_Images_Embedded</td><td>USERSP~1.PNG|UserSplash.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\UserSplash.png</td><td>1</td><td/></row>
 		<row><td>usertest.png</td><td>ServiceSw_Images</td><td>UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\UserTest.png</td><td>1</td><td/></row>
-		<row><td>usertest.png1</td><td>UserSw_Images</td><td>UserTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\UserTest.png</td><td>1</td><td/></row>
 		<row><td>version.dll</td><td>VERSION.dll</td><td>VERSION.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\VERSION.dll</td><td>1</td><td/></row>
 		<row><td>violetcircle.png</td><td>ServiceSw_Images</td><td>VIOLET~1.PNG|VioletCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\VioletCircle.png</td><td>1</td><td/></row>
-		<row><td>violetcircle.png1</td><td>UserSw_Images</td><td>VIOLET~1.PNG|VioletCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\VioletCircle.png</td><td>1</td><td/></row>
 		<row><td>volume.png</td><td>ServiceSw_Images</td><td>Volume.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Volume.png</td><td>1</td><td/></row>
-		<row><td>volume.png1</td><td>UserSw_Images</td><td>Volume.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Volume.png</td><td>1</td><td/></row>
 		<row><td>volumetest.png</td><td>ServiceSw_Images</td><td>VOLUME~1.PNG|VolumeTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\VolumeTest.png</td><td>1</td><td/></row>
-		<row><td>volumetest.png1</td><td>UserSw_Images</td><td>VOLUME~1.PNG|VolumeTest.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\VolumeTest.png</td><td>1</td><td/></row>
 		<row><td>warning.png</td><td>ServiceSw_Images</td><td>Warning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Warning.png</td><td>1</td><td/></row>
-		<row><td>warning.png1</td><td>UserSw_Images</td><td>Warning.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Warning.png</td><td>1</td><td/></row>
 		<row><td>warningdisable.png</td><td>ServiceSw_Images</td><td>WARNIN~1.PNG|WarninGDisable.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WarninGDisable.png</td><td>1</td><td/></row>
-		<row><td>warningdisable.png1</td><td>UserSw_Images</td><td>WARNIN~1.PNG|WarninGDisable.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WarninGDisable.png</td><td>1</td><td/></row>
 		<row><td>warningf.png</td><td>ServiceSw_Images</td><td>WarningF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WarningF.png</td><td>1</td><td/></row>
-		<row><td>warningf.png1</td><td>UserSw_Images</td><td>WarningF.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WarningF.png</td><td>1</td><td/></row>
 		<row><td>warningg.png</td><td>ServiceSw_Images</td><td>WarningG.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WarningG.png</td><td>1</td><td/></row>
-		<row><td>warningg.png1</td><td>UserSw_Images</td><td>WarningG.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WarningG.png</td><td>1</td><td/></row>
 		<row><td>washingsolution.png</td><td>ServiceSw_Images</td><td>WASHIN~1.PNG|WashingSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WashingSolution.png</td><td>1</td><td/></row>
-		<row><td>washingsolution.png1</td><td>UserSw_Images</td><td>WASHIN~1.PNG|WashingSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WashingSolution.png</td><td>1</td><td/></row>
 		<row><td>washstationposition_eng.xps</td><td>ServiceSw_InfoDocs</td><td>WASHST~1.XPS|WashStationPosition_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\WashStationPosition_ENG.xps</td><td>1</td><td/></row>
 		<row><td>washstationposition_spa.xps</td><td>ServiceSw_InfoDocs</td><td>WASHST~1.XPS|WashStationPosition_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\WashStationPosition_SPA.xps</td><td>1</td><td/></row>
 		<row><td>washstationtermo_eng.xps</td><td>ServiceSw_InfoDocs</td><td>WASHST~1.XPS|WashStationTermo_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\WashStationTermo_ENG.xps</td><td>1</td><td/></row>
 		<row><td>washstationtermo_spa.xps</td><td>ServiceSw_InfoDocs</td><td>WASHST~1.XPS|WashStationTermo_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\WashStationTermo_SPA.xps</td><td>1</td><td/></row>
 		<row><td>westgardcum.png</td><td>ServiceSw_Images</td><td>WESTGA~1.PNG|WestgardCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\WestgardCum.png</td><td>1</td><td/></row>
-		<row><td>westgardcum.png1</td><td>UserSw_Images</td><td>WESTGA~1.PNG|WestgardCum.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\WestgardCum.png</td><td>1</td><td/></row>
 		<row><td>wininet.dll</td><td>WININET.dll</td><td>WININET.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;C Drive&gt;\Users\Albert Guillen\Documents\Scripting System For InstallShield\PostSetupTool\bin\Release\Data\Es Engine\Common Files Folder\Systelab\Synapse\Core\WININET.dll</td><td>1</td><td/></row>
 		<row><td>worksession.dll</td><td>WorkSession.dll</td><td>WORKSE~1.DLL|WorkSession.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\WorkSession.dll</td><td>1</td><td/></row>
 		<row><td>worksession.dll1</td><td>WorkSession.dll1</td><td>WORKSE~1.DLL|WorkSession.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\WorkSession.dll</td><td>1</td><td/></row>
 		<row><td>xtraverticalbar.png</td><td>ServiceSw_Images</td><td>XTRAVE~1.PNG|XtraVerticalBar.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\XtraVerticalBar.png</td><td>1</td><td/></row>
-		<row><td>xtraverticalbar.png1</td><td>UserSw_Images</td><td>XTRAVE~1.PNG|XtraVerticalBar.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\XtraVerticalBar.png</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -3494,6 +3159,7 @@
 		<row><td>Framework.dll</td><td/><td/><td>_9970581E_5041_4E7D_B2B7_C509EE09927D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Framework.dll1</td><td/><td/><td>_4C0AFB0B_AF76_41F7_A93B_0F121C6FBF1D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwBA200v013</td><td/><td/><td>_07F24AA2_A342_4C4C_9D7C_A6F035B828D5_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>FwBA200v044r02</td><td/><td/><td>_FFFA1845_CD03_4CDB_9CD2_345A2380E213_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll</td><td/><td/><td>_1B0991FB_8116_43AC_B249_F54AC0AEABAB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll1</td><td/><td/><td>_CA61D457_E380_4058_89A8_0A5919602B49_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>History.dll</td><td/><td/><td>_9A2FC4E6_C727_4A3C_A5DA_463F19D659EE_FILTER</td><td/><td/><td/><td/></row>
@@ -3666,6 +3332,8 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>UserSw_Images</td><td>&lt;Ax00 v1&gt;\PresentationCOM\bin\x86\Release\Images</td><td>4</td><td/><td/><td>8</td></row>
+		<row><td>UserSw_Images_Embedded</td><td>&lt;Ax00 v1&gt;\PresentationCOM\bin\x86\Release\Images\Embedded</td><td>4</td><td/><td/><td>8</td></row>
 	</table>
 
 	<table name="ISFeatureDIMReferences">
@@ -6124,7 +5792,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
 		<row><td>ProductName</td><td>BA200</td><td/></row>
-		<row><td>ProductVersion</td><td>3.0.6</td><td/></row>
+		<row><td>ProductVersion</td><td>3.0.7</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
