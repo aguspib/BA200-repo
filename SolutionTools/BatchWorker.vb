@@ -8,13 +8,13 @@ Module BatchWorker
     Private _fileToEncrypt As String
     Private _fileEncrypted As String
 
-    Sub Main()
+    Sub Main()        
         Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
-        _fileEncrypted = appDirect.Replace("SolutionTools\bin\Debug\", "PresentationCOM\Update\Task\TaskList.xml")
-        _fileToEncrypt = appDirect.Replace("SolutionTools\bin\Debug\", "PresentationCOM\Update\Task\TaskListDecrypted.xml")
+        _fileEncrypted = appDirect.Replace("Tools\", "PresentationCOM\Update\Task\TaskList.xml")
+        _fileToEncrypt = appDirect.Replace("Tools\", "PresentationCOM\Update\Task\TaskListDecrypted.xml")
         EncryptFile(_fileToEncrypt, _fileEncrypted)
 
-        Dim piStart = New ProcessStartInfo(appDirect.Replace("SolutionTools\bin\Debug\", "Analyzer\CommAx00.exe"), " /REGSERVER")
+        Dim piStart = New ProcessStartInfo(appDirect + "CommAx00.exe", " /REGSERVER")
         piStart.CreateNoWindow = True
         Process.Start(piStart)
     End Sub
