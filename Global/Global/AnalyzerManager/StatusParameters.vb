@@ -9,7 +9,7 @@
             Set(value As Boolean)
                 If _isActive <> value Then
                     _isActive = value
-                    Debug.WriteLine("StatusParameters.IsActive = " & _isActive)
+                    'Debug.WriteLine("StatusParameters.IsActive = " & _isActive)
                 End If
             End Set
         End Property
@@ -24,7 +24,7 @@
             Set(value As RotorStates)
                 If _state <> value Then
                     _state = value
-                    Debug.WriteLine("StatusParameters.State = " & _state)
+                    'Debug.WriteLine("StatusParameters.State = " & _state)
                 End If
             End Set
         End Property

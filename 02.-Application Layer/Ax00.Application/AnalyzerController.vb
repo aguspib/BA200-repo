@@ -97,13 +97,13 @@ Namespace Biosystems.Ax00.App
         ''' <remarks>
         ''' Created by: IT 26/03/2015 - BA-2406
         ''' </remarks>
-        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean, reuseRotorContentsForFlight As Boolean) As Boolean
+        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean, reuseRotorContentsForFlight As Action(Of BaseLineService.ReuseRotorResponse)) As Boolean
             Try
 
                 If (_warmUpServices Is Nothing) Then
                     _warmUpServices = New WarmUpService(Analyzer)
                 End If
-                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight
+                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
                     Return _warmUpServices.StartService()
                 Else
@@ -116,18 +116,7 @@ Namespace Biosystems.Ax00.App
 
         End Function
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="isInRecovering"></param>
-        ''' <remarks></remarks>
-        Public Sub StartWarmupProcess(ByVal isInRecovering As Boolean)
-            UseRotorContentsForFLIGHT(
-                Sub(result As Boolean)
-                    StartWarmUpProcess(isInRecovering, result)
-                End Sub)
-
-        End Sub
+ 
 
         ''' <summary>
         ''' 
@@ -284,23 +273,32 @@ Namespace Biosystems.Ax00.App
 
 #End Region
 
-        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of Boolean))
+        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of BaseLineService.ReuseRotorResponse))
 
             If responseHandler Is Nothing Then Return
-
+            Dim response = New BaseLineService.ReuseRotorResponse
             If IsAnalyzerInstantiated = False Then
-                responseHandler.Invoke(False)
+                responseHandler.Invoke(response)
             End If
 
             If BaseLineService.CanRotorContentsByDirectlyRead Then
                 Dim question As New YesNoQuestion
-                question.Text = "This is a question"
-                question.OnAnswered = Sub() responseHandler.Invoke(question.Result = MsgBoxResult.Yes)
+                question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
+                'worst case scenario:
+                If question.Text = "" Then question.Text = "Reuse rotor contents to perform light adjustment?"
+
+                response.Reuse = question.Result = MsgBoxResult.Yes
+                question.OnAnswered = Sub()
+                                          response.Reuse = question.Result = MsgBoxResult.Yes
+                                          responseHandler.Invoke(response)
+                                      End Sub
                 PresentationLayerInterface.QueueRequest(question)
             Else
-                responseHandler.Invoke(False)
+                responseHandler.Invoke(response)
             End If
         End Sub
+
+
 
 #End Region
 

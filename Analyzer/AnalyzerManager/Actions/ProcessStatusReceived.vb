@@ -75,8 +75,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If StatusParameters.IsActive AndAlso errorValue <> 99 AndAlso errorValue <> 551 AndAlso errorValue <> 552 Then
                     StatusParameters.IsActive = False
                 End If
-                    'Alarms management
-                    ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
+                'Alarms management
+                ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
                 If errorValue <> 0 Then
                     If errorValue = 551 Or errorValue = 552 Then
@@ -98,8 +98,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                    'Do business depending the requestvalue, action value, status value, alarms value,....
-                    DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
+                'Do business depending the requestvalue, action value, status value, alarms value,....
+                DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
@@ -123,7 +123,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
-                Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
+                'Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
             ElseIf errorTranslated.Equals(Alarms.UNKNOW_ROTOR_FULL) Then
