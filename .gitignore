@@ -180,3 +180,8 @@ DropLocalDB/Resources/Thumbs.db
 *.bak
 Analyzer/AnalyzerManager/6- Sending Processes - Modificado con ReFactoring.vb
 Analyzer/AnalyzerManager/PreparationFinder(No sirve).vb
+Tools/SolutionTools.exe
+Tools/SolutionTools.exe.config
+Tools/SolutionTools.vshost.exe
+Tools/SolutionTools.vshost.exe.config
+Tools/SolutionTools.xml

@@ -32,9 +32,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PresentationSRV", "PresentationSRV\PresentationSRV.vbproj", "{9020DEA1-7692-4CC7-9BE8-A1CF129CD1C2}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PresentationUSR", "PresentationUSR\PresentationUSR.vbproj", "{64905D6A-E7B9-4798-AD76-2A0BC58A9AF6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E} = {AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}
-	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "InfoAnalyzer", "InfoAnalyzer\InfoAnalyzer.vbproj", "{6471EE6C-C00C-4DB6-881C-BFCA99ABA928}"
 EndProject
