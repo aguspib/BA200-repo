@@ -81,8 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
 
             Assert.IsFalse(analyzerManager.AnalyzerIsReady)
             Assert.IsFalse(analyzerManager.IsAlarmInfoRequested)
-            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 2)
-            Assert.AreEqual(analyzerManager.InfoActivated(), 0)
+            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 2)            
 
         End Sub
 
@@ -123,11 +122,11 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             Assert.IsTrue(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
 
-            'A200;ANSINF;GC:0;PC:0;RC:0;SC:0;HS:1;WS:1;SW:1469;WW:983;PT:37.5;FS:0;FT:0.0;HT:45.1;R1T:37.0;R2T:37.0;IS:0;HSV:454;WSV:554
-            instruction = GetInstructionBuilt("A200", "ANSINF", "GC:0;PC:0;RC:0;SC:0;HS:1;WS:1;SW:1469;WW:983;PT:37.5;FS:0;FT:0.0;HT:45.1;R1T:37.0;R2T:37.0;IS:0;HSV:454;WSV:554")
+            'A200;STATUS;S:2;A:47;T:15;C:20;W:20;R:0;E:0;I:0;
+            instruction = GetInstructionBuilt("A200", "STATUS", "S:2;A:47;T:15;C:20;W:20;R:0;E:0;I:0")
 
-            'Failed retry and Reset system
-            analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED, False, instruction)
+            'Finish Flight reads without problems
+            analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
             Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
             Assert.IsFalse(analyzerManager.CanSendingRepetitions)
