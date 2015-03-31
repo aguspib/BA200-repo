@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     StatusParameters.IsActive = False
                     currentAlarms.RemoveAlarmStateAndRefreshUi(StatusParameters.State.ToString())
                     StatusParameters.State = StatusParameters.RotorStates.None
-                    Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError FALSE")
+                    'Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError FALSE")
                 End If
 
                 For Each alarmId As Alarms In myAlarms

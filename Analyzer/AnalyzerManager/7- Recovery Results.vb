@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -85,7 +84,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '''''''
                 ' Get the preparation identifier ID) field (parameter index 3)
                 Dim recoveryMode As Integer = 0
-                myGlobal = utilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -120,19 +119,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case GlobalEnumerates.Ax00PollRDAction.ISE
                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ResRecoverISE, "END")
 
-                        'AG 03/09/2012- Previous version: Recovery instructions POLLRD were sent in STANDBY
-                        'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess, "CLOSED")
-
-                        ''Mark work session as aborted
-                        'Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                        'myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
-
-                        ' ''Evaluate if ISE consumption must be updated. After activate ANSINF
-                        ''myGlobal = ManageStandByStatus(GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_END, CurrentWellAttribute)
-
-                        ''Generate UI refresh for presentation - Inform the recovery results has finished!!
-                        'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS, 0, True)
-
                         'Correction: Recovery instruction POLLRD are sent in RUNNING
                         myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
                         'AG 03/09/2012
@@ -150,7 +136,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPRDReceived", EventLogEntryType.Error, False)
 
             End Try
@@ -178,7 +163,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case GlobalEnumerates.Ax00PollRDAction.ISE
                             myGlobal = ProcessRecivedISEResult(bufferInstructionsRESULTSRECOVERYProcess(i))
                     End Select
-                    'If myglobal.HasError  Then Exit For 'If error not exit. Treat all recovered results
                 Next
 
                 If pMode = GlobalEnumerates.Ax00PollRDAction.Biochemical Then
@@ -191,7 +175,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessResultsRecoveryInstructions", EventLogEntryType.Error, False)
 
             End Try
@@ -274,7 +257,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkContaminatedWellsAfterRecoveryResults", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -330,7 +312,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSTINInstructionReceived", EventLogEntryType.Error, False)
 
             End Try
@@ -514,7 +495,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             '3.1) Get the preparationID with problems field (parameter index 4)
                             Dim prepID As Integer = 0
-                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + index * loopOffset)
+                            myGlobal = GetItemByParameterIndex(pInstructionReceived, 4 + index * loopOffset)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -529,7 +510,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             '3.2) Get the error code field (parameter index 5)
                             Dim errorCode As Long = 0
-                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + index * loopOffset)
+                            myGlobal = GetItemByParameterIndex(pInstructionReceived, 5 + index * loopOffset)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 

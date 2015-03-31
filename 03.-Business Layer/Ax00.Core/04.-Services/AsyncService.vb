@@ -47,7 +47,7 @@ Namespace Biosystems.Ax00.Core.Services
                     ' TODO: dispose managed state (managed objects).
                 End If
                 _analyzer = Nothing
-                Debug.WriteLine("Service has been disposed")
+                'Debug.WriteLine("Service has been disposed")
                 ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
                 ' TODO: set large fields to null.
             End If

@@ -1,5 +1,4 @@
-﻿Imports System.Data.SqlClient
-Imports System.Globalization
+﻿Imports System.Globalization
 Imports System.Threading
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
@@ -76,8 +75,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If StatusParameters.IsActive AndAlso errorValue <> 99 AndAlso errorValue <> 551 AndAlso errorValue <> 552 Then
                     StatusParameters.IsActive = False
                 End If
-                    'Alarms management
-                    ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
+                'Alarms management
+                ManageErrorFieldAndStates(myGlobal, errorValue, myActionValue, myExpectedTimeRaw)
 
                 If errorValue <> 0 Then
                     If errorValue = 551 Or errorValue = 552 Then
@@ -99,8 +98,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                 End If
 
-                    'Do business depending the requestvalue, action value, status value, alarms value,....
-                    DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
+                'Do business depending the requestvalue, action value, status value, alarms value,....
+                DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
@@ -124,7 +123,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.LastSaved = DateTime.Now
 
                 currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
-                Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
+                'Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
             ElseIf errorTranslated.Equals(Alarms.UNKNOW_ROTOR_FULL) Then
@@ -157,6 +156,8 @@ Namespace Biosystems.Ax00.Core.Entities
             If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
                 If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmStateAndRefreshUi(Alarms.GLF_BOARD_FBLD_ERR.ToString())
+                _analyzerManager.CanSendingRepetitions() = False
+                _analyzerManager.NumSendingRepetitionsTimeout() = 0
             End If
 
             'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112

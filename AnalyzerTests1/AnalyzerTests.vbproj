@@ -85,8 +85,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalyzerManager\Actions\AnalyzerAlarmsTests.vb" />
-    <Compile Include="AnalyzerManager\Error560.vb" />
-    <Compile Include="AnalyzerManager\ProcessStatusReceivedTest.vb" />
+    <Compile Include="AnalyzerManager\Alarms\Error560.vb" />
+    <Compile Include="AnalyzerManager\Actions\ProcessStatusReceivedTest.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
