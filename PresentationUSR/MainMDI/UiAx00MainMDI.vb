@@ -3375,8 +3375,6 @@ Partial Public Class UiAx00MainMDI
     ''' <summary>
     ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
     Private Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse) 'As BaseLineService.ReuseRotorResponse
         Dim returndata As Boolean = False
         Dim done = False, timeout = Now.AddMinutes(2), obj2 As BaseLineService.ReuseRotorResponse = Nothing
