@@ -185,3 +185,4 @@ Tools/SolutionTools.exe.config
 Tools/SolutionTools.vshost.exe
 Tools/SolutionTools.vshost.exe.config
 Tools/SolutionTools.xml
+Tools/SolutionTools.vshost.exe.manifest
