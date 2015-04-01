@@ -6,7 +6,6 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
-'Namespace Biosystems.Ax00.PresentationCOM
 Public Class AppComLayer
     Implements IPresentationLayerListener
 
@@ -22,10 +21,10 @@ Public Class AppComLayer
     End Sub
 
 #Region "Private"
-    Dim requestsQueue As New ConcurrentQueue(Of PresentationRequest)
-    Dim _managerForm As System.Windows.Forms.Form
+    Private requestsQueue As New ConcurrentQueue(Of PresentationRequest)
+    Private _managerForm As System.Windows.Forms.Form
 
-    Sub DispatchQueue()
+    Private Sub DispatchQueue()
         While requestsQueue.Count > 0
             Dim item As New PresentationRequest
             If requestsQueue.TryDequeue(item) Then
@@ -34,7 +33,7 @@ Public Class AppComLayer
         End While
     End Sub
 
-    Sub Dispatch(item As PresentationRequest)
+    Private Sub Dispatch(item As PresentationRequest)
         Select Case item.GetType
             Case GetType(Notify), GetType(YesNoQuestion), GetType(YesNoCancelQuestion)
                 DispatchNotifyAndChildren(TryCast(item, Notify))
@@ -65,4 +64,3 @@ Public Class AppComLayer
 
 End Class
 
-'End Namespace
