@@ -3375,20 +3375,26 @@ Partial Public Class UiAx00MainMDI
     ''' <summary>
     ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
     ''' </summary>
-    Private Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse) 'As BaseLineService.ReuseRotorResponse
-        Dim returndata As Boolean = False
-        Dim done = False, timeout = Now.AddMinutes(2), obj2 As BaseLineService.ReuseRotorResponse = Nothing
+    ''' <remarks>This function will store the results into a field inside the passed obj</remarks>
+    Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
-        AnalyzerController.Instance.UseRotorContentsForFLIGHT(
-            Sub(obj3)
-                obj2 = obj3
-                done = True
-            End Sub)
+        'Prepare a "done" flag and a timeout counter for the async operation:
+        Dim done = False, timeout = Now.AddMinutes(2)
+
+        'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
+        Dim callback = Sub(callbackResults As BaseLineService.ReuseRotorResponse)
+                           If obj IsNot Nothing AndAlso callbackResults IsNot Nothing Then obj.Reuse = callbackResults.Reuse
+                           done = True  'This variable is used outside the lambda. Do not trust ReSharper!
+                       End Sub
+
+        'This is an syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
+        AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
+
+        'We make a nasty active waiting here. (something better should be implemented when possible). 
         While Not done And Now < timeout
             If Me.InvokeRequired = False Then My.Application.DoEvents()
         End While
-        If obj IsNot Nothing AndAlso obj2 IsNot Nothing Then obj.Reuse = obj2.Reuse
-        'Return obj2
+
     End Sub
 
 
@@ -8236,7 +8242,7 @@ Partial Public Class UiAx00MainMDI
             BsLoadDefaultReportTemplates.RunWorkerAsync() 'RH 17/02/2012
 
             'Inyección de dependencias en triple mortal... (MI. Esto es un WIP!!)
-            AnalyzerController.PresentationLayerInterface = New BusinessComLayer(Me)
+            AnalyzerController.PresentationLayerInterface = New AppComLayer(Me)
 
             Application.DoEvents()
 

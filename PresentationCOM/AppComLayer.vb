@@ -6,8 +6,10 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
-'Namespace Biosystems.Ax00.PresentationCOM
-Public Class BusinessComLayer
+''' <summary>
+''' This class is an implementation of the IPresentationLayerListener interface. This class can be used to attend requests from the application layer.
+''' </summary>
+Public Class AppComLayer
     Implements IPresentationLayerListener
 
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
@@ -22,10 +24,10 @@ Public Class BusinessComLayer
     End Sub
 
 #Region "Private"
-    Dim requestsQueue As New ConcurrentQueue(Of PresentationRequest)
-    Dim _managerForm As System.Windows.Forms.Form
+    Private requestsQueue As New ConcurrentQueue(Of PresentationRequest)
+    Private _managerForm As System.Windows.Forms.Form
 
-    Sub DispatchQueue()
+    Private Sub DispatchQueue()
         While requestsQueue.Count > 0
             Dim item As New PresentationRequest
             If requestsQueue.TryDequeue(item) Then
@@ -34,7 +36,7 @@ Public Class BusinessComLayer
         End While
     End Sub
 
-    Sub Dispatch(item As PresentationRequest)
+    Private Sub Dispatch(item As PresentationRequest)
         Select Case item.GetType
             Case GetType(Notify), GetType(YesNoQuestion), GetType(YesNoCancelQuestion)
                 DispatchNotifyAndChildren(TryCast(item, Notify))
@@ -65,4 +67,3 @@ Public Class BusinessComLayer
 
 End Class
 
-'End Namespace

@@ -31,7 +31,6 @@ Namespace Biosystems.Ax00.App
         ''' 
         ''' </summary>
         ''' <param name="analyzer"></param>
-        ''' <returns></returns>
         ''' <remarks></remarks>
         Public Sub LoadAnalyzerConfiguration(analyzer As IAnalyzerManager)
 
