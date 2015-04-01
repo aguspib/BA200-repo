@@ -52,6 +52,9 @@ Namespace Biosystems.Ax00.App
             End Get
         End Property
 
+        ''' <summary>
+        ''' This property contains the PresentationLayerInterface that can be used to send async notifications to the presentation layer in a clean and abstracted way.
+        ''' </summary>
         Public Shared Property PresentationLayerInterface As IPresentationLayerListener
 
 #End Region
@@ -287,7 +290,6 @@ Namespace Biosystems.Ax00.App
                 'worst case scenario:
                 If question.Text = "" Then question.Text = "Reuse rotor contents to perform light adjustment?"
 
-                response.Reuse = question.Result = MsgBoxResult.Yes
                 question.OnAnswered = Sub()
                                           response.Reuse = question.Result = MsgBoxResult.Yes
                                           responseHandler.Invoke(response)
@@ -297,8 +299,6 @@ Namespace Biosystems.Ax00.App
                 responseHandler.Invoke(response)
             End If
         End Sub
-
-
 
 #End Region
 

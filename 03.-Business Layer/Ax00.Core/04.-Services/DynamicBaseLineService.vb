@@ -890,6 +890,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Public Class ReuseRotorResponse
             Public Property Reuse As Boolean = False
+
         End Class
     End Class
 

@@ -7,5 +7,4 @@
         Public Property OnAnswered As Action(Of Notify)
     End Class
 
-
 End Namespace

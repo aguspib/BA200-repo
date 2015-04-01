@@ -2,6 +2,7 @@
 Option Strict On
 Option Infer On
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.App
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global

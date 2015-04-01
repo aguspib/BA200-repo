@@ -1,6 +1,4 @@
 ﻿
-'This document is a WIP.
-
 Namespace Biosystems.Ax00.App.PresentationLayerListener
     Public Interface IPresentationLayerListener
         ''' <summary>
@@ -10,9 +8,5 @@ Namespace Biosystems.Ax00.App.PresentationLayerListener
         Sub QueueRequest(request As Requests.PresentationRequest)
 
     End Interface
-
-
-
-
 
 End Namespace

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
 'Namespace Biosystems.Ax00.PresentationCOM
-Public Class BusinessComLayer
+Public Class AppComLayer
     Implements IPresentationLayerListener
 
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
