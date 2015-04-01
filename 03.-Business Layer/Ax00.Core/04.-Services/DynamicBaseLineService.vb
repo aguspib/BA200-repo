@@ -24,7 +24,7 @@ Namespace Biosystems.Ax00.Core.Services
     Public Class BaseLineService
         Inherits AsyncService
 
-#Region "Consutrcutors"
+#Region "Constructors"
         Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
             _currentStep = BaseLineStepsEnum.NotStarted
@@ -108,15 +108,6 @@ Namespace Biosystems.Ax00.Core.Services
             _checkedPreviousAlarms = True
 
         End Sub
-
-        'Private Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
-
-        '    If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-        '        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-        '        myFlagsDelg.Update(Nothing, FlagsDS)
-        '    End If
-        'End Sub
-
 
         ''' <summary>
         ''' Set the flags into a stable value for repeat last action and recover the process
