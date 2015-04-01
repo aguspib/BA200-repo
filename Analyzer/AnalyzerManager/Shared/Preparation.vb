@@ -1174,10 +1174,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 contaminNumber = 1 + myExDlgte.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
                                 If contaminNumber > 0 Then '(5)
-                                    Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
+                                    'Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
                                     Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                    Dim bestContaminationNumber As Integer = 0
-                                    Dim currentContaminationNumber As Integer = 0
+                                    'Dim bestContaminationNumber As Integer = 0
+                                    'Dim currentContaminationNumber As Integer = 0
 
                                     'AG 19/12/2011
                                     Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 

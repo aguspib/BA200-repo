@@ -1,5 +1,4 @@
-﻿Imports System.Data.SqlClient
-Imports System.Globalization
+﻿Imports System.Globalization
 Imports System.Threading
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Interfaces
@@ -157,6 +156,8 @@ Namespace Biosystems.Ax00.Core.Entities
             If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
                 If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmStateAndRefreshUi(Alarms.GLF_BOARD_FBLD_ERR.ToString())
+                _analyzerManager.CanSendingRepetitions() = False
+                _analyzerManager.NumSendingRepetitionsTimeout() = 0
             End If
 
             'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112

@@ -1222,6 +1222,8 @@
       --|====================|
       --| BA200: v3.07     	 |
       --|====================|
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.7', ServiceSoftware = '1.2.4', FirmwareScripts = '1.3.0', Firmware = '0.44.2'
+      GO
 
       -- BA-2396 ERR560
       IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_FBLD_ERR') = 0)

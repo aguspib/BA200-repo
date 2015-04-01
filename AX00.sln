@@ -63,6 +63,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Testing", "Unit Testin
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AnalyzerTests", "AnalyzerTests1\AnalyzerTests.vbproj", "{2A561AD6-B78E-42BE-9DB3-BD8B9CBF43E0}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SolutionTools", "SolutionTools\SolutionTools.vbproj", "{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -447,6 +449,18 @@ Global
 		{2A561AD6-B78E-42BE-9DB3-BD8B9CBF43E0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2A561AD6-B78E-42BE-9DB3-BD8B9CBF43E0}.Release|x64.ActiveCfg = Release|Any CPU
 		{2A561AD6-B78E-42BE-9DB3-BD8B9CBF43E0}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|x64.ActiveCfg = Release|Any CPU
+		{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
