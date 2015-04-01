@@ -58,6 +58,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -120,6 +123,14 @@
     <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
       <Project>{BD38761F-269A-428A-A15E-9D40B387F992}</Project>
       <Name>Ax00.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
+      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

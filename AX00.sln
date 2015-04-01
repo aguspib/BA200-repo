@@ -63,9 +63,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Testing", "Unit Testin
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SolutionTools", "SolutionTools\SolutionTools.vbproj", "{AC7D6638-DFBF-46BE-AF8C-A78CDD43361E}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Ax00.CoreTests", "Ax00.CoreTests\Ax00.CoreTests.vbproj", "{19D0D733-D967-4013-8642-5BAA91EEABF8}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Ax00.Core.Tests", "Ax00.CoreTests\Ax00.Core.Tests.vbproj", "{19D0D733-D967-4013-8642-5BAA91EEABF8}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AnalyzerTests", "AnalyzerTests\AnalyzerTests.vbproj", "{D84217F0-03D7-4ED7-BD18-88E97DC90B0F}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Analyzer.Tests", "AnalyzerTests\Analyzer.Tests.vbproj", "{D84217F0-03D7-4ED7-BD18-88E97DC90B0F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1D8B3A94-3DF1-4352-977D-F01998CDEAFF}"
 EndProject

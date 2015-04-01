@@ -12,65 +12,70 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <summary>
         ''' Test End_run_end state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_END_RUN_END()
+        <Test()> Public Sub EvaluateActionCodeValueTest_EndRunEnd_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
+
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "10"
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim processStatusReceived = New ProcessStatusReceived(idAnalyzer, Nothing)
+            processStatusReceived.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsFalse(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
         ''' Test SOUND_DONE state
         ''' </summary>
-        ''' <remarks></remarks>        
         <Test()>
-        <Obsolete("Not working")>
-        Public Sub EvaluateActionCodeValueTest_SOUND_DONE()
+        Public Sub EvaluateActionCodeValueTest_SoundDone_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+
+            'scenario
+            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS"
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "60"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS"
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsFalse(idAnalyzer.Ringing)
         End Sub
 
         ''' <summary>
         ''' Test END_RUN_START state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_END_RUN_START()
+        <Test()> Public Sub EvaluateActionCodeValueTest_EndRunStart_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "9"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsTrue(idAnalyzer.EndRunInstructionSent)
         End Sub
 
         ''' <summary>
         ''' Test ABORT_START state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_ABORT_START()
+        <Test()> Public Sub EvaluateActionCodeValueTest_AbortStart_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "15"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsTrue(idAnalyzer.AbortInstructionSent)
             Assert.IsTrue(idAnalyzer.EndRunInstructionSent)
         End Sub
@@ -78,16 +83,17 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <summary>
         ''' Test ABORT_END state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_ABORT_END()
+        <Test()> Public Sub EvaluateActionCodeValueTest_AbortEnd_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "16"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsFalse(idAnalyzer.PauseInstructionSent)
             Assert.IsFalse(idAnalyzer.AbortInstructionSent)
             Assert.IsFalse(idAnalyzer.EndRunInstructionSent)
@@ -96,49 +102,52 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <summary>
         ''' Test PAUSE_START state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_PAUSE_START()
+        <Test()> Public Sub EvaluateActionCodeValueTest_PauseStart_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
+            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS"
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "96"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            idAnalyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS"
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsTrue(idAnalyzer.PauseInstructionSent)
         End Sub
 
         ''' <summary>
         ''' Test PAUSE_END state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_PAUSE_END()
+        <Test()> Public Sub EvaluateActionCodeValueTest_PauseEnd_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "97"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsFalse(idAnalyzer.PauseInstructionSent)
         End Sub
 
         ''' <summary>
         ''' Test RECOVER_INSTRUMENT_START state
         ''' </summary>
-        ''' <remarks></remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_START()
+        <Test()> Public Sub EvaluateActionCodeValueTest_RecoverInstrumentStart_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "70"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsTrue(idAnalyzer.RecoverInstructionSent)
         End Sub
 
@@ -148,20 +157,21 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         ''' <remarks>
         ''' WARNING!! This case has a possible access to database, the immutability of the scenario is not guaranteed
         ''' </remarks>
-        <Test()> Public Sub EvaluateActionCodeValueTest_RECOVER_INSTRUMENT_END()
+        <Test()> Public Sub EvaluateActionCodeValueTest_RecoverInstrumentEnd_OK()
             Dim idAnalyzer = Mock.Create(Of IAnalyzerManager)()
-            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
 
+            'scenario
             Dim instruction As New InstructionParameterTO
             instruction.ParameterValue = "71"
-            Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions
-            Dim myGlobal As New GlobalDataTO
-            target.EvaluateActionCodeValue(myActionValue, instruction, myGlobal)
+
+            Dim target = New ProcessStatusReceived(idAnalyzer, Nothing)
+            target.EvaluateActionCodeValue(New GlobalEnumerates.AnalyzerManagerAx00Actions, instruction, New GlobalDataTO)
+
+            'output
             Assert.IsFalse(idAnalyzer.RecoverInstructionSent)
         End Sub
 
     End Class
-
 
 End Namespace
 
