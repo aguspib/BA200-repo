@@ -64,7 +64,6 @@ Namespace Biosystems.Ax00.App
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="model"></param>
         ''' <param name="assemblyName"></param>
         ''' <param name="analyzerModel"></param>
         ''' <param name="startingApplication"></param>
