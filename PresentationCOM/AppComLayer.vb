@@ -6,6 +6,9 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
+''' <summary>
+''' This class is an implementation of the IPresentationLayerListener interface. This class can be used to attend requests from the application layer.
+''' </summary>
 Public Class AppComLayer
     Implements IPresentationLayerListener
 
