@@ -7,18 +7,20 @@ Namespace Biosystems.Ax00.Core.Services
     Public MustInherit Class AsyncService
         Implements IAsyncService
 
-        Protected WithEvents _analyzer As IAnalyzerManager
-
         Sub New(analyzer As IAnalyzerManager)
             _analyzer = analyzer
         End Sub
 
+#Region "Attributes"
+
+        Protected WithEvents _analyzer As IAnalyzerManager
+        Protected _status As ServiceStatusEnum = ServiceStatusEnum.NotYetStarted
+
+#End Region
+
+#Region "Properties"
+
         Public Property OnServiceStatusChange As Action(Of IServiceStatusCallback) Implements IAsyncService.OnServiceStatusChange
-
-        Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
-        Public MustOverride Sub PauseService() Implements IAsyncService.PauseService
-        Public MustOverride Sub RestartService() Implements IAsyncService.RestartService
-
         Public Property Status As ServiceStatusEnum Implements IAsyncService.Status
             Get
                 Return _status
@@ -33,16 +35,15 @@ Namespace Biosystems.Ax00.Core.Services
             End Set
         End Property
 
-#Region "attributes"
-        Protected _status As ServiceStatusEnum = ServiceStatusEnum.NotYetStarted
 #End Region
 
 #Region "IDisposable Support"
-        Private disposedValue As Boolean ' To detect redundant calls
+
+        Private _disposedValue As Boolean ' To detect redundant calls
 
         ' IDisposable
         Protected Overridable Sub Dispose(disposing As Boolean)
-            If Not Me.disposedValue Then
+            If Not Me._disposedValue Then
                 If disposing Then
                     ' TODO: dispose managed state (managed objects).
                 End If
@@ -51,7 +52,7 @@ Namespace Biosystems.Ax00.Core.Services
                 ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
                 ' TODO: set large fields to null.
             End If
-            Me.disposedValue = True
+            Me._disposedValue = True
         End Sub
 
 
@@ -61,9 +62,14 @@ Namespace Biosystems.Ax00.Core.Services
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
+
 #End Region
 
-#Region "Public methods"
+#Region "Public Methods"
+
+        Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
+        Public MustOverride Sub PauseService() Implements IAsyncService.PauseService
+        Public MustOverride Sub RestartService() Implements IAsyncService.RestartService
 
         Public Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
             If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
