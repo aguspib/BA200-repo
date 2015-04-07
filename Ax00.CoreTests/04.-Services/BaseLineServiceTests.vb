@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         ''' <summary>
         ''' StartService: Normal execution test, check session flags and BL status
         ''' </summary> 
-        <Test()> Public Sub StartService_InitTest_OK()
+        <Test()> Public Sub StartService_TestStartup_OK()
             Dim analyzerManager = Mock.Create(Of IAnalyzerManager)()
 
             'scenario
@@ -95,7 +95,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         ''' <summary>
         ''' Current Step: Verify the init value
         ''' </summary>
-        <Test()> Public Sub CurrentStep_Init_OK()
+        <Test()> Public Sub CurrentStep_Startup_OK()
             Dim analyzerManager = Mock.Create(Of IAnalyzerManager)()
 
             'scenario
@@ -111,7 +111,6 @@ Namespace Biosystems.Ax00.Core.Services.Tests
 
         ''' <summary>
         ''' BAD TEST!
-        ''' PROBLEM WITH 
         ''' </summary>
         <Obsolete("Comment with MI")>
         <Test()> Public Sub RecoverProcessTest_ReSendWashing_OK()

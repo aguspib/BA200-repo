@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Data.SqlClient
 Imports System.Windows.Forms
-Imports System.Globalization
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Core.Interfaces
 
