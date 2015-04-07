@@ -100,7 +100,7 @@
   <ItemGroup>
     <Compile Include="04.-Services\AsyncService.vb" />
     <Compile Include="04.-Services\WarmUpService.vb" />
-    <Compile Include="04.-Services\DynamicBaseLineService.vb" />
+    <Compile Include="04.-Services\BaseLineService.vb" />
     <Compile Include="04.-Services\Enums\StringStepStatus.vb" />
     <Compile Include="04.-Services\Interfaces\IServiceStatusCallback.vb" />
     <Compile Include="04.-Services\RotorChangeServices.vb" />
