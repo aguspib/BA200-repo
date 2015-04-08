@@ -67,7 +67,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Analyzer.Tests", "AnalyzerT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1D8B3A94-3DF1-4352-977D-F01998CDEAFF}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Global.Tests", "GlobalTests1\Global.Tests.vbproj", "{EDF338BB-0B40-4CFA-9089-393663D8C507}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Global.Tests", "Global.Tests\Global.Tests.vbproj", "{EDF338BB-0B40-4CFA-9089-393663D8C507}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
