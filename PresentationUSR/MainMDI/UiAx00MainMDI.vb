@@ -3378,8 +3378,8 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>This function will store the results into a field inside the passed obj</remarks>
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
-        'Prepare a "done" flag and a timeout counter for the async operation:
-        Dim done = False, timeout = Now.AddMinutes(2)
+        'Prepare a "done" flag 
+        Dim done = False
 
         'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
         Dim callback = Sub(callbackResults As BaseLineService.ReuseRotorResponse)
@@ -3391,7 +3391,7 @@ Partial Public Class UiAx00MainMDI
         AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
 
         'We make a nasty active waiting here. (something better should be implemented when possible). 
-        While Not done And Now < timeout
+        While Not done
             If Me.InvokeRequired = False Then My.Application.DoEvents()
         End While
 

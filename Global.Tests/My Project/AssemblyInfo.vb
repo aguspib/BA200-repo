@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("GlobalTests")> 
+<Assembly: AssemblyTitle("GlobalTests1")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("Microsoft")> 
-<Assembly: AssemblyProduct("GlobalTests")> 
+<Assembly: AssemblyProduct("GlobalTests1")> 
 <Assembly: AssemblyCopyright("Copyright © Microsoft 2015")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("b2662a7c-aa5c-41f5-a072-ea0feb782edc")> 
+<Assembly: Guid("5b93718a-b324-44b7-82a8-b66c91fdd64a")> 
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.0.7.0")> 
-<Assembly: AssemblyFileVersion("3.0.7.0")> 
+<Assembly: AssemblyVersion("1.0.0.0")> 
+<Assembly: AssemblyFileVersion("1.0.0.0")> 

@@ -1,27 +1,26 @@
-﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
-Imports Biosystems.Ax00.Global
+﻿Imports Biosystems.Ax00.Global
+Imports NUnit.Framework
 
 
 Namespace Biosystems.Ax00.Global.Tests
 
-    <TestClass()> Public Class TypedGlobalDataToTests
+    <TestFixture()> Public Class TypedGlobalDataToTests
 
-        <TestMethod()> Public Sub GetCompatibleGlobalDataTOTest()
+        <Test()> Public Sub GetCompatibleGlobalDataTo_HelloWorld_OK()
             Dim i = New TypedGlobalDataTo(Of String)
             i.SetDatos = "Hello world!"
             Dim j = i.GetCompatibleGlobalDataTO
             Assert.AreEqual(i.SetDatos, j.SetDatos)
         End Sub
 
-        <TestMethod()> Public Sub GetCompatibleGlobalDataTOTestObject()
+        <Test()> Public Sub GetCompatibleGlobalDataTo_CompareObject_AreEqual()
             Dim i = New TypedGlobalDataTo(Of Object)
             i.SetDatos = New List(Of String)
             Dim j = i.GetCompatibleGlobalDataTO
             Assert.AreEqual(i.SetDatos, j.SetDatos)
         End Sub
 
-        <TestMethod()> Public Sub GetCompatibleGlobalDataTOCompleteList()
+        <Test()> Public Sub GetCompatibleGlobalDataTo_CompleteListCompare_AreEqual()
             Dim i = New TypedGlobalDataTo(Of List(Of String))
             i.SetDatos = New List(Of String)
             i.AffectedRecords = 34
