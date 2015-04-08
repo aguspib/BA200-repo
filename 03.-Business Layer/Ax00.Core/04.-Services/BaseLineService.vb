@@ -403,7 +403,9 @@ Namespace Biosystems.Ax00.Core.Services
 
                             End If
 
-                            If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
+                            If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END") And
+                                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END") And
+                                (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then 'IT 30/01/2015 - BA-2358
                                 If CurrentStep() <> BaseLineStepsEnum.CheckPreviousAlarms Then nextStep = BaseLineStepsEnum.Finalize
                             End If
 
