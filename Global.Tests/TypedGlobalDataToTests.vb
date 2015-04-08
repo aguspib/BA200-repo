@@ -6,6 +6,9 @@ Namespace Biosystems.Ax00.Global.Tests
 
     <TestFixture()> Public Class TypedGlobalDataToTests
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
         <Test()> Public Sub GetCompatibleGlobalDataTo_HelloWorld_OK()
             Dim i = New TypedGlobalDataTo(Of String)
             i.SetDatos = "Hello world!"
@@ -13,6 +16,9 @@ Namespace Biosystems.Ax00.Global.Tests
             Assert.AreEqual(i.SetDatos, j.SetDatos)
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
         <Test()> Public Sub GetCompatibleGlobalDataTo_CompareObject_AreEqual()
             Dim i = New TypedGlobalDataTo(Of Object)
             i.SetDatos = New List(Of String)
@@ -20,6 +26,9 @@ Namespace Biosystems.Ax00.Global.Tests
             Assert.AreEqual(i.SetDatos, j.SetDatos)
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
         <Test()> Public Sub GetCompatibleGlobalDataTo_CompleteListCompare_AreEqual()
             Dim i = New TypedGlobalDataTo(Of List(Of String))
             i.SetDatos = New List(Of String)
