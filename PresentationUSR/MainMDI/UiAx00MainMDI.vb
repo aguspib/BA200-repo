@@ -3378,7 +3378,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>This function will store the results into a field inside the passed obj</remarks>
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
-        'Prepare a "done" flag 
+
         Dim done = False
 
         'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
@@ -3390,9 +3390,10 @@ Partial Public Class UiAx00MainMDI
         'This is an syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
         AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
 
-        'We make a nasty active waiting here. (something better should be implemented when possible). 
+        'Antipattern! We make a nasty active waiting here. (something better should be implemented when possible). 
+        'TODO: This could be avoided by using the appropiate presentation thread for the call, and adding a synchronic request processor on the listener.
         While Not done
-            If Me.InvokeRequired = False Then My.Application.DoEvents()
+            If Not InvokeRequired Then My.Application.DoEvents()
         End While
 
     End Sub

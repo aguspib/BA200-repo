@@ -32,6 +32,7 @@ Namespace Biosystems.Ax00.BL
                 Dim auxIndex = i
                 ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                             Where a.OrderTestID = sortedOTList(auxIndex - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+
                 MainContaminatorID = ReagentContaminatorID
 
                 contaminatedOrderTest = sortedOTList(i)

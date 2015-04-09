@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
 
                 If _analyzer.Connected Then
-                    If ((_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = String.Empty) OrElse (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "CLOSED")) Then
+                    If ((_analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = String.Empty) OrElse (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "CLOSED")) Then
 
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
                         _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Empty)
@@ -493,29 +493,25 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub Initialize()
 
             Dim myGlobal As GlobalDataTO = Nothing
-            'Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 'DL 09/09/2011
                 'Set Enable (or set visible meeting 12/09/2011 ??) frame time W-Up in common Monitor
-                'IMonitor.bsWamUpGroupBox.Enabled = True
                 Dim swParams As New SwParametersDelegate
 
                 ' Read W-Up full time configuration
                 myGlobal = swParams.ReadByAnalyzerModel(Nothing, _analyzer.Model)
 
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    Dim myParametersDS As New ParametersDS
 
-                    myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
-                    Dim myList As New List(Of ParametersDS.tfmwSwParametersRow)
+                    Dim myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
 
-                    myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                              Where String.Equals(a.ParameterName, GlobalEnumerates.SwParameters.WUPFULLTIME.ToString) _
+                    Dim myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
+                              Where String.Equals(a.ParameterName, SwParameters.WUPFULLTIME.ToString) _
                               Select a).ToList
 
                     Dim WUPFullTime As Single
-                    If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric '= DateTime.Now.ToString("yyyyMMdd hh-mm") & "_" & myList(0).ValueText
+                    If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric
                 End If
 
                 ' Save initial states when press over w-up
@@ -527,7 +523,7 @@ Namespace Biosystems.Ax00.Core.Services
                     myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                     With myAnalyzerSettingsRow
                         .AnalyzerID = _analyzer.ActiveAnalyzer
-                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
+                        .SettingID = AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
                         .CurrentValue = "0"
                     End With
                     myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
@@ -536,9 +532,7 @@ Namespace Biosystems.Ax00.Core.Services
                     myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                     With myAnalyzerSettingsRow
                         .AnalyzerID = _analyzer.ActiveAnalyzer
-                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString()
-                        ''.CurrentValue = Now.ToString 'AG + SA 05/10/2012
-                        '.CurrentValue = Now.ToString("yyyy/MM/dd HH:mm:ss")
+                        .SettingID = AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString()
                         .CurrentValue = Now.ToString(CultureInfo.InvariantCulture)
                     End With
                     myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
@@ -725,6 +719,11 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Properties"
         Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse)
+        Public ReadOnly Property NextStep As WarmUpStepsEnum
+            Get
+                Return _currentStep
+            End Get
+        End Property
 #End Region
 
     End Class

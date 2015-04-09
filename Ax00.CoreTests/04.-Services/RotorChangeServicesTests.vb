@@ -6,8 +6,10 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports NUnit.Framework
 Imports Telerik.JustMock
 
-Namespace Biosystems.Ax00.Core.Services.Tests
-    <TestFixture()> Public Class RotorChangeServicesTests
+
+Namespace Biosystems.Ax00.Core.Services.Tests
+
+    <TestFixture()> Public Class RotorChangeServicesTests
 
         ''' <summary>
         ''' 
