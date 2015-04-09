@@ -10473,20 +10473,20 @@ Namespace Biosystems.Ax00.BL
 
             Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-            'Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
             'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
-            'myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
+            myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
             'myContaminationManager.BacktrackingOptimization(OrderTests)
             currentContaminationNumber = myContaminationManager.currentContaminationNumber

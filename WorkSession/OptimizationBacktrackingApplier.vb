@@ -8,6 +8,7 @@ Namespace Biosystems.Ax00.BL
     Public Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier
 
         Private bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        Private lastBireactiveID As New List(Of Integer)
 
         Public Sub New()
             MyBase.New()
@@ -53,50 +54,136 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         Private Sub BacktrackingOptimization(ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
-            Dim SolutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim solutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim Tests = OrderTests.ToList()
 
-            Dim result = BacktrackingAlgorithm(0, Tests, SolutionSet)
+            Dim result = BacktrackingAlgorithm(0, Tests, solutionSet)
             'currentContaminationNumber = New ExecutionsDelegate().GetContaminationNumber(ContDS, result, highContaminationPersistance)
-            bestResult = result
+
+            If result.Count = 0 Then
+                bestResult = OrderTests
+            Else
+                bestResult = result
+            End If
         End Sub
 
-        Private Function BacktrackingAlgorithm(ByVal Level As Integer, ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
+        Private Function BacktrackingAlgorithm(ByVal Level As Integer, ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Static foundSolution As Boolean = False
             For Each elem In Tests
-                If IsViable(SolutionSet, elem) Then
+                If IsViable(solutionSet, elem) Then
                     Dim auxTests = Tests.ToList()
                     auxTests.Remove(elem)
-                    If Level = SolutionSet.Count Then
-                        SolutionSet.Add(elem)
+
+                    If Level = solutionSet.Count Then
+                        solutionSet.Add(elem)
                     Else
-                        SolutionSet.Item(Level) = elem
+                        solutionSet.Item(Level) = elem
                     End If
-                    If IsSolution(SolutionSet) Then
-                        Return SolutionSet
+
+                    If IsSolution(solutionSet) Then
+                        foundSolution = True
+                        Return solutionSet
                     End If
+
                     If auxTests.Count > 0 Then
-                        BacktrackingAlgorithm(Level + 1, auxTests, SolutionSet)
+                        BacktrackingAlgorithm(Level + 1, auxTests, solutionSet)
                     End If
-                    If IsSolution(SolutionSet) Then
+
+                    If foundSolution Then
                         Exit For
                     Else
-                        SolutionSet.Remove(elem)
+                        solutionSet.Remove(elem)
+                        lastBireactiveID.Remove(elem.ReagentID)
                     End If
                 End If
             Next
             Return SolutionSet
         End Function
 
-        Private Function IsViable(ByVal SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal elem As ExecutionsDS.twksWSExecutionsRow) As Boolean
-            Dim aux = SolutionSet.ToList()
+        Private Function IsViable(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal elem As ExecutionsDS.twksWSExecutionsRow) As Boolean
+            Dim aux = solutionSet.ToList()
             aux.Add(elem)
 
-            Return (New ExecutionsDelegate().GetContaminationNumber(ContaminDS, aux, HighContaminationPersistence) = 0)
+            Return (GetContaminationNumberWithBireagents(aux, HighContaminationPersistence) = 0)
         End Function
 
-        Private Function IsSolution(ByVal SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
-            Return (SolutionSet.Count = bestResult.Count AndAlso New ExecutionsDelegate().GetContaminationNumber(ContaminDS, SolutionSet, HighContaminationPersistence) = 0)
+        Private Function IsSolution(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
+            Return (solutionSet.Count = bestResult.Count)
         End Function
 
+        Private Function GetContaminationNumberWithBireagents(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
+            'As a solution set, this doesn't have to contain any contamination. So, only it's needed to check contaminations between:
+            ' - the last reagent and the newly inserted
+            ' - the last pHighContaminationPersistence reagents and the newly inserted
+            ' - if the newly is bi-reactive, check if there's contamination between it and the previous bi-reactive
+
+            Dim contamNumber As Integer = 0
+            Dim previousReagent = pExecutions.Count - 2
+            Dim currentReagent = pExecutions.Count - 1
+            Dim contaminatorType As TypeReagent
+
+            If previousReagent >= 0 AndAlso currentReagent >= 0 Then
+                Dim contam = (From wse In ContaminDS.tparContaminations _
+                                          Where wse.ReagentContaminatorID = pExecutions(previousReagent).ReagentID _
+                                            AndAlso wse.ReagentContaminatedID = pExecutions(currentReagent).ReagentID _
+                                            AndAlso pExecutions(currentReagent).ExecutionStatus = "PENDING" _
+                                            AndAlso pExecutions(currentReagent).ExecutionType = "PREP_STD" _
+                                            AndAlso pExecutions(previousReagent).ExecutionStatus = "PENDING" _
+                                            AndAlso pExecutions(previousReagent).ExecutionType = "PREP_STD" _
+                                          Select wse).ToList()
+
+                If contam.Count = 0 Then
+                    contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                    If contaminatorType = TypeReagent.BiReactive Then
+                        If lastBireactiveID.Count > 0 Then
+                            contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS)
+                        End If
+                        If contam.Count = 0 Then
+                            lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
+                        End If
+                    End If
+                End If
+
+                If contam.Count > 0 Then
+                    contamNumber += 1
+                ElseIf pHighContaminationPersistance > 0 Then
+                    For j = previousReagent To previousReagent - pHighContaminationPersistance Step -1
+                        Dim auxj = j
+                        If (j >= 0) Then
+                            contam = (From wse In ContaminDS.tparContaminations _
+                                                  Where wse.ReagentContaminatorID = pExecutions(auxj).ReagentID _
+                                                  AndAlso wse.ReagentContaminatedID = pExecutions(currentReagent).ReagentID _
+                                                  AndAlso Not wse.IsWashingSolutionR1Null _
+                                                  AndAlso pExecutions(auxj).ExecutionStatus = "PENDING" _
+                                                  AndAlso pExecutions(auxj).ExecutionType = "PREP_STD" _
+                                                  AndAlso pExecutions(currentReagent).ExecutionStatus = "PENDING" _
+                                                  AndAlso pExecutions(currentReagent).ExecutionType = "PREP_STD" _
+                                                  Select wse).ToList()
+
+                            If contam.Count > 0 Then
+                                contamNumber += 1
+                            End If
+                        End If
+                    Next
+                    If contam.Count = 0 AndAlso contaminatorType = TypeReagent.BiReactive Then
+                        For j = lastBireactiveID.Count - 1 To lastBireactiveID.Count - (1 + pHighContaminationPersistance) Step -1
+                            If (j >= 0) Then
+                                contam = GetHardContaminationBetweenReagents(lastBireactiveID.Item(j), pExecutions(currentReagent).ReagentID, ContaminDS)
+                                If contam.Count > 0 Then
+                                    contamNumber += 1
+                                End If
+                            End If
+                        Next
+                    End If
+                End If
+            Else
+                contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                If contaminatorType = TypeReagent.BiReactive Then
+                    lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
+                End If
+            End If
+
+            Return contamNumber
+        End Function
     End Class
 End Namespace

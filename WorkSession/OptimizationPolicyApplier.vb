@@ -598,6 +598,7 @@ Namespace Biosystems.Ax00.BL
             End If
 
         End Sub
+
 #End Region
     End Class
 End Namespace

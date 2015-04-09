@@ -59,10 +59,13 @@ Namespace Biosystems.Ax00.BL
 
             Dim result = BacktrackingAlgorithm(0, Tests, SolutionSet)
             currentContaminationNumber = New ExecutionsDelegate().GetContaminationNumber(ContDS, result, highContaminationPersistance)
-            bestResult = result
+            If result.Count <> 0 Then
+                bestResult = result
+            End If
         End Sub
 
         Private Function BacktrackingAlgorithm(ByVal Level As Integer, ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Static foundSolution As Boolean = False
             For Each elem In Tests
                 If IsViable(SolutionSet, elem) Then
                     Dim auxTests = Tests.ToList()
@@ -73,12 +76,13 @@ Namespace Biosystems.Ax00.BL
                         SolutionSet.Item(Level) = elem
                     End If
                     If IsSolution(SolutionSet) Then
+                        foundSolution = True
                         Return SolutionSet
                     End If
                     If auxTests.Count > 0 Then
                         BacktrackingAlgorithm(Level + 1, auxTests, SolutionSet)
                     End If
-                    If IsSolution(SolutionSet) Then
+                    If foundSolution Then
                         Exit For
                     Else
                         SolutionSet.Remove(elem)
@@ -96,7 +100,7 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         Private Function IsSolution(ByVal SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
-            Return (SolutionSet.Count = bestResult.Count AndAlso New ExecutionsDelegate().GetContaminationNumber(ContDS, SolutionSet, highContaminationPersistance) = 0)
+            Return (SolutionSet.Count = bestResult.Count)
         End Function
     End Class
 End Namespace
