@@ -593,6 +593,7 @@ Partial Public Class UiAx00MainMDI
     ''' <param name="myAx00Ready"></param>
     ''' <remarks>AG 09/01/2014 - refactoring
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 09/04/2015 - BA-2382
     ''' </remarks>
     Private Sub ApplyRulesStandByWithOutALIGHT(ByVal myAx00Ready As Boolean)
         Try
@@ -604,24 +605,23 @@ Partial Public Class UiAx00MainMDI
                 ' XBC 04/07/2012
                 If Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
                     If Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
-                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
-                            If Not isStartInstrumentActivating Then
+                        'If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then 'BA-2382
+                        If Not isStartInstrumentActivating Then
+                            bsTSStartInstrumentButton.Enabled = True
+                            bsTSStartInstrumentButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_INSTRUMENT) 'AG 12/03/2012
+                            WarmUpFinishedAttribute = False
 
-                                bsTSStartInstrumentButton.Enabled = True
-                                bsTSStartInstrumentButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_INSTRUMENT) 'AG 12/03/2012
-                                WarmUpFinishedAttribute = False
-
-                                ' XBC 04/07/2012
-                                If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
-                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
-                                        CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
-                                        ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
-                                        ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.ALIGHT_REQUIRED.ToString)
-                                    End If
+                            ' XBC 04/07/2012
+                            If Not ActiveMdiChild Is Nothing Then
+                                If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
+                                    CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
+                                    ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
+                                    ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.ALIGHT_REQUIRED.ToString)
                                 End If
                             End If
                         End If
+                        'End If
                     End If
                 End If
 
@@ -663,9 +663,7 @@ Partial Public Class UiAx00MainMDI
                     bsTSAbortSessionButton.Enabled = False
                 End If
                 'AG 04/09/2012
-
-                'IT 26/03/2015 - BA-2406
-                'ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then 
+            ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                 '    'Do nothing, no activate buttons until the ISE initialitazion finishes
             ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
                 'AG 27/08/2012 - STANDBY: All buttons Disabled | RUNNING: Abort button enabled
@@ -1056,19 +1054,19 @@ Partial Public Class UiAx00MainMDI
 
                             'IT 17/02/2015 - BA-2266 (INI)
                             'AG 22/02/2012 - Update button in change rotor utility
-                        'ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                        '    Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
-                        '    If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
-                        '        bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
-                        '        'AG 28/03/2012
-                        '        'CurrentMdiChild.bsChangeRotortButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
-                        '        If Not bsTSChangeBottlesConfirm.Enabled Then
-                        '            CurrentMdiChild.bsChangeRotortButton.Enabled = ActivateButtonWithAlarms(ActionButton.CHANGE_REACTIONS_ROTOR)
-                        '            'CurrentMdiChild.bsChangeRotortButton.Enabled = False
-                        '        End If
+                            'ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                            '    Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
+                            '    If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
+                            '        bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
+                            '        'AG 28/03/2012
+                            '        'CurrentMdiChild.bsChangeRotortButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
+                            '        If Not bsTSChangeBottlesConfirm.Enabled Then
+                            '            CurrentMdiChild.bsChangeRotortButton.Enabled = ActivateButtonWithAlarms(ActionButton.CHANGE_REACTIONS_ROTOR)
+                            '            'CurrentMdiChild.bsChangeRotortButton.Enabled = False
+                            '        End If
 
-                        '    End If
-                        '    'AG 22/02/2012
+                            '    End If
+                            '    'AG 22/02/2012
                             'IT 17/02/2015 - BA-2266 (END)
 
                         End If
@@ -1429,17 +1427,23 @@ Partial Public Class UiAx00MainMDI
     ''' <returns></returns>
     ''' <remarks>
     ''' Modified by: IT 26/03/2015 - BA-2406
+    '''              IT 09/04/2015 - BA-2382
     ''' </remarks>
     Private Function IsActivatedStartInstrumentButton() As Boolean
 
         If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") Then
             Return False
         Else
-            Return (AnalyzerController.Instance.Analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = String.Empty)
+            If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso Not AnalyzerController.Instance.Analyzer.ExistsALIGHT) Then
+                Return True
+            Else
+                Return (AnalyzerController.Instance.Analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) = String.Empty)
+            End If
         End If
 
-    End Function
+        Return False
 
+    End Function
 
 
 #End Region

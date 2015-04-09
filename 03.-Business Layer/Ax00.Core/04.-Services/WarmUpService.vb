@@ -79,8 +79,16 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
 
                 If _analyzer.Connected Then
-                    If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "") Then
-                        _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                    If ((_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = String.Empty) OrElse (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "CLOSED")) Then
+
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Empty)
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, StepStringStatus.Empty)
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Barcode, StepStringStatus.Empty)
+
+                        'Update analyzer session flags into DataBase
+                        UpdateFlags(myAnalyzerFlagsDS)
+
                         Status = ServiceStatusEnum.Running
                         Initialize()
                         AddRequiredEventHandlers()
@@ -92,8 +100,6 @@ Namespace Biosystems.Ax00.Core.Services
                 End If
 
             End If
-
-            UpdateFlags(myAnalyzerFlagsDS)
 
             Return True
 
@@ -151,6 +157,7 @@ Namespace Biosystems.Ax00.Core.Services
                 End Select
 
                 _isInRecovering = False
+                AddRequiredEventHandlers()
 
                 Return True
 
