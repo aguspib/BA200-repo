@@ -1,6 +1,9 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports NUnit.Framework
 Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Types
 Imports Telerik.JustMock
 
 
@@ -13,12 +16,16 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         ''' </summary>
         <Test()> Public Sub StartService_DefaultStartupMode_StatusRunningOK()
             Dim analyzerManager = Mock.Create(Of IAnalyzerManager)()
+            Dim sut = New WarmUpService(analyzerManager)
 
             'scenario
             analyzerManager.Connected = True
             analyzerManager.Model = "A200"
+            Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.WUPprocess, "INPROCESS")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.WUPprocess) = "INPROCESS")
+            Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.StartInstrument, "")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.StartInstrument) = "")
+            Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.Washing, "")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.Washing) = "")
+            Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.Barcode, "")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.Barcode) = "")
 
-            Dim sut = New WarmUpService(analyzerManager)
             Dim result = sut.StartService()
 
             'output
@@ -29,15 +36,15 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         End Sub
 
         <Test()> Public Sub PauseServiceTest()
-            Assert.Fail()
+            Assert.Inconclusive("TODO")
         End Sub
 
         <Test()> Public Sub RestartServiceTest()
-            Assert.Fail()
+            Assert.Inconclusive("TODO")
         End Sub
 
         <Test()> Public Sub RecoverProcessTest()
-            Assert.Fail()
+            Assert.Inconclusive("TODO")
         End Sub
     End Class
 
