@@ -1,6 +1,5 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports NUnit.Framework
-
 Imports Biosystems.Ax00.Core.Services
 Imports Telerik.JustMock
 
@@ -27,6 +26,18 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             Assert.AreEqual(sut.Status, ServiceStatusEnum.Running)
             Assert.AreEqual(sut.NextStep, WarmUpStepsEnum.StartInstrument)
             Assert.IsTrue(result)
+        End Sub
+
+        <Test()> Public Sub PauseServiceTest()
+            Assert.Fail()
+        End Sub
+
+        <Test()> Public Sub RestartServiceTest()
+            Assert.Fail()
+        End Sub
+
+        <Test()> Public Sub RecoverProcessTest()
+            Assert.Fail()
         End Sub
     End Class
 
