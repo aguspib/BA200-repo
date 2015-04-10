@@ -103,7 +103,7 @@
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
     <Compile Include="Services\Interfaces\IRotorChangeServices.vb" />
     <Compile Include="Services\Interfaces\IWarmUpService.vb" />
-    <Compile Include="Services\RotorChangeStepsEnum.vb" />
+    <Compile Include="Services\Enums\RotorChangeStepsEnum.vb" />
     <Compile Include="Services\WarmUpService.vb" />
     <Compile Include="Services\BaseLineService.vb" />
     <Compile Include="Services\Enums\StringStepStatus.vb" />

@@ -18,9 +18,9 @@ Namespace Biosystems.Ax00.Core.Services
             If service Is Nothing OrElse service.OnServiceStatusChange Is Nothing Then
                 Return
             Else
-                Dim SSC As New ServiceStatusCallback
-                SSC.Sender = service
-                service.OnServiceStatusChange.Invoke(SSC)
+                Dim ssc As New ServiceStatusCallback
+                ssc.Sender = service
+                service.OnServiceStatusChange.Invoke(ssc)
             End If
         End Sub
 

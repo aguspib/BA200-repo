@@ -98,10 +98,7 @@ Namespace Biosystems.Ax00.Core.Services
             End If
 
             'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
             Return True
 
@@ -170,11 +167,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub RepeatDynamicBaseLineReadStep() Implements IRotorChangeServices.RepeatDynamicBaseLineReadStep
-
-            'RestartProcess()
-
             _baseLineService.RepeatDynamicBaseLineReadStep()
-
         End Sub
 
         ''' <summary>
@@ -205,22 +198,18 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Select Case nextStep
                     Case RotorChangeStepsEnum.NewRotor,
-                        RotorChangeStepsEnum.Finalize   'RotorChangeStepsEnum.DynamicBaseLineRead_TODELETE,
+                        RotorChangeStepsEnum.Finalize
                         ValidateProcess()
-                        'Case RotorChangeStepsEnum.DynamicBaseLineEmpty_TODELETE
-                        '   ProcessDynamicBaseLine()
-                    Case Else
 
+                    Case Else
                         _baseLineService.RecoverProcess()
-                        '_baseLineService.RecoverProcess()
                 End Select
-                '_baseLineService.RecoverProcess()
+
                 _isInRecovering = False
 
                 Return True
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "RotorChangeServices.RecoverProcess", EventLogEntryType.Error, False)
                 Return False
             End Try
@@ -248,10 +237,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
 
             'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
             _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
         End Sub
@@ -327,8 +313,7 @@ Namespace Biosystems.Ax00.Core.Services
         End Function
 
         Private Function GetNextStepWhilePaused() As RotorChangeStepsEnum
-            Dim nextStep As RotorChangeStepsEnum = RotorChangeStepsEnum.None
-            Return nextStep
+            Return RotorChangeStepsEnum.None
         End Function
 
         Private Function GetNextStepWhileInProcess() As RotorChangeStepsEnum
@@ -391,10 +376,7 @@ Namespace Biosystems.Ax00.Core.Services
             End If
 
             'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
@@ -411,10 +393,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
 
                 'Update analyzer session flags into DataBase
-                If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-                End If
+                UpdateFlags(myAnalyzerFlagsDs)
 
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
@@ -454,10 +433,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) = StepStringStatus.Empty
             End If
 
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
@@ -466,6 +442,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks>AG 20/01/2015 BA-2216</remarks>
         Private Sub ExecuteNewRotorStep()
+
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
@@ -480,10 +457,7 @@ Namespace Biosystems.Ax00.Core.Services
             End If
 
             'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, myAnalyzerFlagsDs)
-            End If
+            UpdateFlags(myAnalyzerFlagsDs)
 
         End Sub
 
