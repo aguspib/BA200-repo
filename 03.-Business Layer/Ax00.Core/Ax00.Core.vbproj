@@ -98,20 +98,20 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="04.-Services\AsyncService.vb" />
-    <Compile Include="04.-Services\Enums\BaseLineStepsEnum.vb" />
-    <Compile Include="04.-Services\Interfaces\IBaseLineService.vb" />
-    <Compile Include="04.-Services\Interfaces\IRotorChangeServices.vb" />
-    <Compile Include="04.-Services\Interfaces\IWarmUpService.vb" />
-    <Compile Include="04.-Services\WarmUpService.vb" />
-    <Compile Include="04.-Services\BaseLineService.vb" />
-    <Compile Include="04.-Services\Enums\StringStepStatus.vb" />
-    <Compile Include="04.-Services\Interfaces\IServiceStatusCallback.vb" />
-    <Compile Include="04.-Services\RotorChangeServices.vb" />
-    <Compile Include="04.-Services\ServiceStatusCallback.vb" />
-    <Compile Include="04.-Services\Enums\ServiceStatusEnum.vb" />
-    <Compile Include="04.-Services\Interfaces\IAsyncService.vb" />
-    <Compile Include="04.-Services\Enums\WarmUpStepsEnum.vb" />
+    <Compile Include="Services\AsyncService.vb" />
+    <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
+    <Compile Include="Services\Interfaces\IBaseLineService.vb" />
+    <Compile Include="Services\Interfaces\IRotorChangeServices.vb" />
+    <Compile Include="Services\Interfaces\IWarmUpService.vb" />
+    <Compile Include="Services\WarmUpService.vb" />
+    <Compile Include="Services\BaseLineService.vb" />
+    <Compile Include="Services\Enums\StringStepStatus.vb" />
+    <Compile Include="Services\Interfaces\IServiceStatusCallback.vb" />
+    <Compile Include="Services\RotorChangeServices.vb" />
+    <Compile Include="Services\ServiceStatusCallback.vb" />
+    <Compile Include="Services\Enums\ServiceStatusEnum.vb" />
+    <Compile Include="Services\Interfaces\IAsyncService.vb" />
+    <Compile Include="Services\Enums\WarmUpStepsEnum.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -191,8 +191,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="01.-Interfaces\" />
-    <Folder Include="02.-Entities\" />
+    <Folder Include="Entities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
