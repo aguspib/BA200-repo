@@ -8,15 +8,6 @@ Imports Biosystems.Ax00.Core.Services.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.Core.Services
-
-    Public Enum RotorChangeStepsEnum
-        WashStationControl
-        NewRotor
-        BaseLine
-        Finalize
-        None
-    End Enum
-
     ''' <summary>
     ''' 
     ''' </summary>
@@ -33,11 +24,11 @@ Namespace Biosystems.Ax00.Core.Services
             Me.New(analyzer, Nothing)
         End Sub
 
-        Public Sub New(analyzer As IAnalyzerManager, warmUpService As WarmUpService)
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService)
             Me.New(analyzer, warmUpService, New BaseLineService(analyzer, True))
         End Sub
 
-        Public Sub New(analyzer As IAnalyzerManager, warmUpService As WarmUpService, baseLineService As BaseLineService)
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService, baseLineService As IBaseLineService)
             MyBase.New(analyzer)
             _baseLineService = baseLineService
             _warmUpService = warmUpService
@@ -53,8 +44,8 @@ Namespace Biosystems.Ax00.Core.Services
         Private _isInRecovering As Boolean = False
         Private _eventHandlersAdded As Boolean = False
 
-        Private _baseLineService As BaseLineService
-        Private _warmUpService As WarmUpService
+        Private _baseLineService As IBaseLineService
+        Private _warmUpService As IWarmUpService
 
 #End Region
 
@@ -77,7 +68,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function StartService() As Boolean Implements IRotorChangeServices.StartService
+        Public Overrides Function StartService() As Boolean
             'Public Overloads Function StartService(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -129,7 +120,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService() Implements IRotorChangeServices.PauseService
+        Public Overrides Sub PauseService()
 
             If (_eventHandlersAdded) Then
                 RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
@@ -146,7 +137,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService() Implements IRotorChangeServices.RestartService
+        Public Overrides Sub RestartService()
 
             If (Not _eventHandlersAdded) Then
                 AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
@@ -310,7 +301,6 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Private Sub ExecuteBaseLineStep()
-            '_baseLineService.StartService(_isInRecovering)
             _baseLineService.StartService()
         End Sub
 

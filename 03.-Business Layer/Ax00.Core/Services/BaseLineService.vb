@@ -34,7 +34,7 @@ Namespace Biosystems.Ax00.Core.Services
         '    Return StartService(False)
         'End Function
 
-        Public Overrides Function StartService() As Boolean Implements IBaseLineService.StartService
+        Public Overrides Function StartService() As Boolean
 
 
             'Previous conditions: (no flow here)
@@ -71,7 +71,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService() Implements IBaseLineService.PauseService
+        Public Overrides Sub PauseService()
             RemoveRequiredEventHandlers()
         End Sub
 
@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService() Implements IBaseLineService.RestartService
+        Public Overrides Sub RestartService()
             AddRequiredEventHandlers()
         End Sub
 

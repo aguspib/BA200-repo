@@ -6,6 +6,7 @@ Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.App
 
@@ -21,7 +22,7 @@ Namespace Biosystems.Ax00.App
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
         Private _rotorChangeServices As RotorChangeServices 'BA-2143
-        Private _warmUpServices As WarmUpService
+        Private _warmUpServices As IWarmUpService
 
 
 #Region "Properties"
@@ -118,7 +119,7 @@ Namespace Biosystems.Ax00.App
 
         End Function
 
- 
+
 
         ''' <summary>
         ''' 

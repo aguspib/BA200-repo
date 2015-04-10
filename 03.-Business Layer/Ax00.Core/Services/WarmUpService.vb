@@ -23,8 +23,12 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Constructors"
 
         Public Sub New(analyzer As IAnalyzerManager)
+            Me.New(analyzer, New BaseLineService(analyzer))
+        End Sub
+
+        Public Sub New(analyzer As IAnalyzerManager, baseLineService As IBaseLineService)
             MyBase.New(analyzer)
-            _baseLineService = New BaseLineService(_analyzer)
+            _baseLineService = baseLineService
             _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
         End Sub
 
@@ -34,7 +38,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private _currentStep As WarmUpStepsEnum
         Private _isInRecovering As Boolean = False
-        Private _baseLineService As BaseLineService
+        Private _baseLineService As IBaseLineService
         Private _eventHandlersAdded As Boolean = False
 
 #End Region
@@ -63,7 +67,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function StartService() As Boolean Implements IWarmUpService.StartService
+        Public Overrides Function StartService() As Boolean
 
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -102,7 +106,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService() Implements IWarmUpService.PauseService
+        Public Overrides Sub PauseService()
 
             If (Status <> ServiceStatusEnum.Running) Then
                 RemoveRequiredEventHandlers()
@@ -115,7 +119,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService() Implements IWarmUpService.RestartService
+        Public Overrides Sub RestartService()
 
             AddRequiredEventHandlers()
             _baseLineService.RestartService()
