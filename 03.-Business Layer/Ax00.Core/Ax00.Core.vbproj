@@ -99,6 +99,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="04.-Services\AsyncService.vb" />
+    <Compile Include="04.-Services\Enums\BaseLineStepsEnum.vb" />
+    <Compile Include="04.-Services\Interfaces\IBaseLineService.vb" />
+    <Compile Include="04.-Services\Interfaces\IRotorChangeServices.vb" />
+    <Compile Include="04.-Services\Interfaces\IWarmUpService.vb" />
     <Compile Include="04.-Services\WarmUpService.vb" />
     <Compile Include="04.-Services\BaseLineService.vb" />
     <Compile Include="04.-Services\Enums\StringStepStatus.vb" />
@@ -107,6 +111,7 @@
     <Compile Include="04.-Services\ServiceStatusCallback.vb" />
     <Compile Include="04.-Services\Enums\ServiceStatusEnum.vb" />
     <Compile Include="04.-Services\Interfaces\IAsyncService.vb" />
+    <Compile Include="04.-Services\Enums\WarmUpStepsEnum.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

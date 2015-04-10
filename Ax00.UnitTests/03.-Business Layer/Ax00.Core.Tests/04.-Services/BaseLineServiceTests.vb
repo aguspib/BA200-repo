@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports NUnit.Framework
 Imports Telerik.JustMock
+Imports Biosystems.Ax00.Core.Services.Enums
 
 
 Namespace Biosystems.Ax00.Core.Services.Tests

@@ -6,18 +6,10 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Entities
 Imports System.Globalization
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.Core.Services
-
-    Public Enum WarmUpStepsEnum
-        StartInstrument
-        Washing
-        Barcode
-        BaseLine
-        Finalize
-        None
-    End Enum
-
     ''' <summary>
     ''' 
     ''' </summary>
@@ -26,6 +18,7 @@ Namespace Biosystems.Ax00.Core.Services
     ''' </remarks>
     Public Class WarmUpService
         Inherits AsyncService
+        Implements IWarmUpService
 
 #Region "Constructors"
 
@@ -70,7 +63,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function StartService() As Boolean
+        Public Overrides Function StartService() As Boolean Implements IWarmUpService.StartService
 
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -109,7 +102,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService()
+        Public Overrides Sub PauseService() Implements IWarmUpService.PauseService
 
             If (Status <> ServiceStatusEnum.Running) Then
                 RemoveRequiredEventHandlers()
@@ -122,7 +115,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService()
+        Public Overrides Sub RestartService() Implements IWarmUpService.RestartService
 
             AddRequiredEventHandlers()
             _baseLineService.RestartService()
@@ -135,7 +128,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns>TRUE process recovered | FALSE process could not be recovered</returns>
         ''' <remarks>
         ''' </remarks>
-        Public Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean Implements IWarmUpService.RecoverProcess
             Try
                 _isInRecovering = True
 
@@ -409,7 +402,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub FinalizeProcess()
+        Public Sub FinalizeProcess() Implements IWarmUpService.FinalizeProcess
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
             Dim myGlobalDataTO As New GlobalDataTO
@@ -718,8 +711,9 @@ Namespace Biosystems.Ax00.Core.Services
 #End Region
 
 #Region "Properties"
-        Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse)
-        Public ReadOnly Property NextStep As WarmUpStepsEnum
+        Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse) Implements IWarmUpService.ReuseRotorContentsForBaseLine
+
+        Public ReadOnly Property NextStep As WarmUpStepsEnum Implements IWarmUpService.NextStep
             Get
                 Return _currentStep
             End Get

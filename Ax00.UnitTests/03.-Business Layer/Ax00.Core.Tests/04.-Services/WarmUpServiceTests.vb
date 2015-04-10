@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Telerik.JustMock
+Imports Biosystems.Ax00.Core.Services.Enums
 
 
 Namespace Biosystems.Ax00.Core.Services.Tests
