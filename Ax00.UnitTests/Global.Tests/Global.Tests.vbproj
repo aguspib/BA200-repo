@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{19D0D733-D967-4013-8642-5BAA91EEABF8}</ProjectGuid>
+    <ProjectGuid>{7AB498E6-B54C-4635-94BF-D3D3ABAF1761}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Ax00.CoreTests</RootNamespace>
-    <AssemblyName>Ax00.CoreTests</AssemblyName>
+    <RootNamespace>GlobalTests1</RootNamespace>
+    <AssemblyName>GlobalTests1</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Ax00.CoreTests.xml</DocumentationFile>
+    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Ax00.CoreTests.xml</DocumentationFile>
+    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -50,7 +50,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -58,9 +58,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Telerik.JustMock">
-      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -68,7 +65,11 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise />
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+      </ItemGroup>
+    </Otherwise>
   </Choose>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -80,11 +81,9 @@
     <Import Include="System.Linq" />
     <Import Include="System.Xml.Linq" />
     <Import Include="System.Threading.Tasks" />
+    <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="04.-Services\BaseLineServiceTests.vb" />
-    <Compile Include="04.-Services\RotorChangeServicesTests.vb" />
-    <Compile Include="04.-Services\WarmUpServiceTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -100,6 +99,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="TypedGlobalDataToTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -119,22 +119,9 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
-      <Project>{BD38761F-269A-428A-A15E-9D40B387F992}</Project>
-      <Name>Ax00.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
-      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
-      <Name>Analyzer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
-      <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
-      <Name>AX00Types</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Global\Global\Global.vbproj">
+    <ProjectReference Include="..\..\Global\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>
