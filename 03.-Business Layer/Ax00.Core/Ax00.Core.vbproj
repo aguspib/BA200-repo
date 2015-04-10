@@ -151,7 +151,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
-      <Name>Analyzer</Name>
+      <Name>Analyzer %28Ax00\Analyzer%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
