@@ -1,4 +1,6 @@
-﻿Namespace Biosystems.Ax00.Core.Services
+﻿Imports Biosystems.Ax00.Core.Services.Interfaces
+
+Namespace Biosystems.Ax00.Core.Services
     Public Class ServiceStatusCallback
         Implements IServiceStatusCallback
 

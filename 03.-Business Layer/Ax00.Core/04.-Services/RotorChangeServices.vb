@@ -4,6 +4,8 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.Core.Services
 
@@ -24,6 +26,7 @@ Namespace Biosystems.Ax00.Core.Services
     ''' </remarks>
     Public Class RotorChangeServices
         Inherits AsyncService
+        Implements IRotorChangeServices
 
 #Region "Constructors"
         Public Sub New(analyzer As IAnalyzerManager)
@@ -74,7 +77,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function StartService() As Boolean
+        Public Overrides Function StartService() As Boolean Implements IRotorChangeServices.StartService
             'Public Overloads Function StartService(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As GlobalDataTO
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -126,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService()
+        Public Overrides Sub PauseService() Implements IRotorChangeServices.PauseService
 
             If (_eventHandlersAdded) Then
                 RemoveHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
@@ -143,7 +146,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService()
+        Public Overrides Sub RestartService() Implements IRotorChangeServices.RestartService
 
             If (Not _eventHandlersAdded) Then
                 AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
@@ -161,7 +164,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ContinueProcess() As Boolean
+        Public Function ContinueProcess() As Boolean Implements IRotorChangeServices.ContinueProcess
             If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
                 ValidateProcess()
             Else
@@ -175,7 +178,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub RepeatDynamicBaseLineReadStep()
+        Public Sub RepeatDynamicBaseLineReadStep() Implements IRotorChangeServices.RepeatDynamicBaseLineReadStep
 
             'RestartProcess()
 
@@ -187,7 +190,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub EmptyAndFinalizeProcess()
+        Public Sub EmptyAndFinalizeProcess() Implements IRotorChangeServices.EmptyAndFinalizeProcess
             _baseLineService.EmptyAndFinalizeProcess()
         End Sub
 
@@ -199,7 +202,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks>
         ''' Modified by:  AG 20/01/2015 - BA-2216
         ''' </remarks>
-        Public Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean Implements IRotorChangeServices.RecoverProcess
             Try
                 _isInRecovering = True
 

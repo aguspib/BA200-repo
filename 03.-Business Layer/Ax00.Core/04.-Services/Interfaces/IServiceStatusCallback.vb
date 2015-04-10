@@ -1,4 +1,4 @@
-﻿Namespace Biosystems.Ax00.Core.Services
+﻿Namespace Biosystems.Ax00.Core.Services.Interfaces
 
     Public Interface IServiceStatusCallback
 

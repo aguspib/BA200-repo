@@ -7,22 +7,13 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
+
 Namespace Biosystems.Ax00.Core.Services
-
-    Public Enum BaseLineStepsEnum
-        NotStarted
-        CheckPreviousAlarms
-        ConditioningWashing
-        StaticBaseLine
-        DynamicBaseLineFill
-        DynamicBaseLineRead
-        DynamicBaseLineEmpty
-        Finalize
-        None
-    End Enum
-
     Public Class BaseLineService
         Inherits AsyncService
+        Implements IBaseLineService
 
 #Region "Constructors"
         Sub New(analyzer As IAnalyzerManager)
@@ -43,7 +34,7 @@ Namespace Biosystems.Ax00.Core.Services
         '    Return StartService(False)
         'End Function
 
-        Public Overrides Function StartService() As Boolean
+        Public Overrides Function StartService() As Boolean Implements IBaseLineService.StartService
 
 
             'Previous conditions: (no flow here)
@@ -80,7 +71,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub PauseService()
+        Public Overrides Sub PauseService() Implements IBaseLineService.PauseService
             RemoveRequiredEventHandlers()
         End Sub
 
@@ -88,7 +79,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Sub RestartService()
+        Public Overrides Sub RestartService() Implements IBaseLineService.RestartService
             AddRequiredEventHandlers()
         End Sub
 
@@ -164,17 +155,17 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        Public Function CurrentStep() As BaseLineStepsEnum
+        Public Function CurrentStep() As BaseLineStepsEnum Implements IBaseLineService.CurrentStep
             Return _currentStep
         End Function
 
-        Public Sub EmptyAndFinalizeProcess()
+        Public Sub EmptyAndFinalizeProcess() Implements IBaseLineService.EmptyAndFinalizeProcess
             _forceEmptyAndFinalize = True
             Status = ServiceStatusEnum.Running
         End Sub
 
 
-        Public Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
             Try
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
@@ -200,7 +191,7 @@ Namespace Biosystems.Ax00.Core.Services
             End Try
         End Function
 
-        Public Sub RepeatDynamicBaseLineReadStep()
+        Public Sub RepeatDynamicBaseLineReadStep() Implements IBaseLineService.RepeatDynamicBaseLineReadStep
 
             _analyzer.DynamicBaselineInitializationFailures = 0
 
@@ -243,7 +234,8 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse)
+        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
+
 #End Region
 
 #Region "Attributes"

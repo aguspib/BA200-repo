@@ -2,6 +2,7 @@
 Imports NUnit.Framework
 Imports Biosystems.Ax00.Core.Services
 Imports Telerik.JustMock
+Imports Biosystems.Ax00.Core.Services.Enums
 
 
 Namespace Biosystems.Ax00.Core.Services.Tests
