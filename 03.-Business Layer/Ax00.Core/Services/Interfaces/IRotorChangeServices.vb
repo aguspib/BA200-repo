@@ -1,24 +1,6 @@
 Namespace Biosystems.Ax00.Core.Services.Interfaces
     Public Interface IRotorChangeServices
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Function StartService() As Boolean
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Sub PauseService()
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Sub RestartService()
-
+        Inherits IAsyncService
         ''' <summary>
         ''' 
         ''' </summary>

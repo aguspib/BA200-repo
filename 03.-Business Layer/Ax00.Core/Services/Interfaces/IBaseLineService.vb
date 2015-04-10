@@ -2,20 +2,7 @@ Imports Biosystems.Ax00.Core.Services.Enums
 
 Namespace Biosystems.Ax00.Core.Services.Interfaces
     Public Interface IBaseLineService
-        Function StartService() As Boolean
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Sub PauseService()
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Sub RestartService()
-
+        Inherits IAsyncService
         Function CurrentStep() As BaseLineStepsEnum
         Sub EmptyAndFinalizeProcess()
         Function RecoverProcess() As Boolean
