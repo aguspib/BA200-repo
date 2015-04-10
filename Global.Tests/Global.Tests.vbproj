@@ -121,6 +121,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{BD38761F-269A-428A-A15E-9D40B387F992}</Project>
+      <Name>Ax00.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Global\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
