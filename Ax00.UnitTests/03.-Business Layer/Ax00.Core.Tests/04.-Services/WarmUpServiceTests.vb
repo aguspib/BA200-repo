@@ -1,7 +1,6 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports NUnit.Framework
 Imports Biosystems.Ax00.Core.Services
-Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Telerik.JustMock

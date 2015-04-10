@@ -87,7 +87,7 @@ Public Class UiResultsAbsCurve
     'RH 19/03/2012
     Private refreshScreenResults As GlobalDataTO
     Private GettingDataForAbsCurve As Boolean = False
-    Private Executions As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow)
+    Private Executions As List(Of vwksWSAbsorbanceRow)
     Private ReadOnly myResultsFileDelegate As New ResultsFileDelegate()
     'END RH 19/03/2012
 #End Region
@@ -1461,14 +1461,14 @@ Public Class UiResultsAbsCurve
             mySerie.Label.Antialiasing = False
             mySerie.ValueDataMembers.AddRange(New String() {pDataMember})  'Absorbance
 
-            Dim myView As XtraCharts.LineSeriesView
-            myView = TryCast(mySerie.View, XtraCharts.LineSeriesView)
+            Dim myView As LineSeriesView
+            myView = TryCast(mySerie.View, LineSeriesView)
             myView.LineMarkerOptions.Size = SizeMarker
             myView.MarkerVisibility = DefaultBoolean.True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateSerie ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".CreateSerie ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            ShowMessage(Name & ".CreateSerie ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
         Return mySerie
@@ -1534,7 +1534,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateDiagram ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".CreateDiagram ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            ShowMessage(Name & ".CreateDiagram ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
     End Sub
@@ -1553,7 +1553,7 @@ Public Class UiResultsAbsCurve
             'Get value of General Setting containing the maximum number of Patient Order Tests that can be created
 
             Dim myGlobalDataTO As GlobalDataTO
-            myGlobalDataTO = GeneralSettingsDelegate.GetGeneralSettingValue(Nothing, GlobalEnumerates.GeneralSettingsEnum.INTERVAL_ABS_T)
+            myGlobalDataTO = GetGeneralSettingValue(Nothing, GeneralSettingsEnum.INTERVAL_ABS_T)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 'Save value in global variable maxPatientOrderTests
                 Dim myNewValue As String = DirectCast(myGlobalDataTO.SetDatos, String)
@@ -1578,7 +1578,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeABSInterval", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitializeABSInterval", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            ShowMessage(Name & ".InitializeABSInterval", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1636,7 +1636,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
@@ -1675,11 +1675,8 @@ Public Class UiResultsAbsCurve
             bsGraphToolTips.SetToolTip(bsLastButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_GoToLast", LanguageID))
 
             'EF 29/08/2013 - Bugtracking 1272 - Change label text by 'Sample' in v2.1.1
-            'PATIENTID_Label = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", LanguageID) + _
-            '                    "/" + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RotorPos_SampleID", LanguageID) + ":"
             PATIENTID_Label = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", LanguageID) + _
                                "/" + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SampleVolume", LanguageID) + ":"
-            'EF 29/08/2013
 
             CTRL_Label = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Control_Name", LanguageID) + ":"
             CALIB_Label = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibratorName", LanguageID) + ":"
@@ -1767,7 +1764,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            ShowMessage(Name & ".PrepareButtons ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1808,22 +1805,11 @@ Public Class UiResultsAbsCurve
             ReplicatesGridView.Appearance.Row.TextOptions.VAlignment = VertAlignment.Center
             ReplicatesGridView.Appearance.Row.TextOptions.HAlignment = HorzAlignment.Far
 
-            'GridView1.Appearance.FocusedRow.ForeColor = Color.White
-            'GridView1.Appearance.FocusedRow.BackColor = Color.LightSlateGray
-            'SamplesXtraGridView.Appearance.GroupRow.BackColor = Color.WhiteSmoke
-            'SamplesXtraGridView.Appearance.GroupRow.ForeColor = Color.Black
-            'SamplesXtraGridView.Appearance.FocusedCell.BackColor = Color.Transparent
-            'SamplesXtraGridView.Appearance.GroupButton.BackColor = Color.Transparent
-
             ReplicatesGridView.OptionsHint.ShowColumnHeaderHints = False
             ReplicatesGridView.OptionsBehavior.Editable = False
             ReplicatesGridView.OptionsBehavior.ReadOnly = True
             ReplicatesGridView.OptionsCustomization.AllowFilter = False
             ReplicatesGridView.OptionsCustomization.AllowSort = False
-
-            'GridView1.OptionsSelection.EnableAppearanceFocusedRow = True
-            'GridView1.OptionsSelection.MultiSelect = False
-            'ReplicatesGridView.ColumnPanelRowHeight = 30
 
             ReplicatesGridView.GroupCount = 1
 
@@ -1864,11 +1850,9 @@ Public Class UiResultsAbsCurve
             PauseColumn.FieldName = "Pause"
             PauseColumn.Name = "Pause"
 
-
-
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "InitializeGridControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
     End Sub
@@ -2053,7 +2037,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ShowHeaderdata", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
     End Sub
@@ -2214,16 +2198,6 @@ Public Class UiResultsAbsCurve
                     bsClassPictureBox.ImageLocation = IconsPath & CTRL_IconName
             End Select
 
-            ''myReadingMode = rowExecution.ReadingMode
-            'ReplicateDS = New GraphDS
-
-            ''DL 13/02/2012
-            'If Not ReplicateDS Is Nothing AndAlso ReplicateDS.tReplicates.Rows.Count > 0 Then
-            '    ReplicatesGridControl.DataSource = ReplicateDS.tReplicates
-            '    RefreshGraphType()
-            'End If
-            ''DL 13/02/2012
-
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "ShowHeaderdata", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2260,7 +2234,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "RefreshaGraphType", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
@@ -2288,28 +2262,14 @@ Public Class UiResultsAbsCurve
 
             ResultChartControl.Series.Clear()
 
-            Dim qExecutions As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow)
+            Dim qExecutions As List(Of vwksWSAbsorbanceRow)
 
-            'DL 15/05/2012
-            'Select Case SourceFormAttribute
-            '    Case GlobalEnumerates.ScreenCallsGraphical.RESULTSFRM
-            'qExecutions = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
-            '               Where row.OrderTestID = pOrderTestID _
-            '               AndAlso row.RerunNumber = pRerunNumber _
-            '               AndAlso row.MultiItemNumber = pMultiItemNumber _
-            '               AndAlso (row.ExecutionStatus = "CLOSED" OrElse row.ExecutionStatus = "CLOSEDNOK") _
-            '               Select row).ToList()
-
-            'Case ScreenCallsGraphical.WS_STATES
-            'Case Else
-            qExecutions = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+            qExecutions = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                            Where row.OrderTestID = pOrderTestID _
                            AndAlso row.RerunNumber = pRerunNumber _
                            AndAlso row.MultiItemNumber = pMultiItemNumber _
                            AndAlso (row.ExecutionStatus = "CLOSED" OrElse row.ExecutionStatus = "CLOSEDNOK" OrElse row.ExecutionStatus = "INPROCESS") _
                            Select row).ToList()
-            'End Select
-            'DL 15/05/2012
 
             myGlobalDataTO = myResultsFileDelegate.GetDataForAbsCurve(Nothing, pOrderTestID, pRerunNumber, _
                                                                       pMultiItemNumber, qExecutions, AllowDecimals, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString())
@@ -2326,21 +2286,19 @@ Public Class UiResultsAbsCurve
                 'DL 18/07/2013
 
                 If myGlobalDataTO.HasError AndAlso myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString Then
-                    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorMessage.ToString)
+                    ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorMessage.ToString)
                 End If
 
             End If
             '//Changes for TASK + BUGS Tracking  #1331
             '//14/10/2013 - CF - v3.0.0 -Call this method to get the X Axis MAX value
             GetMaxValueForXAxisFromReplicatesDS(ReplicateDS)
-            'Dim ElapsedTime As Double = Now.Subtract(StartTime).TotalMilliseconds
-            'MessageBox.Show("ShowData Elapsed Time: " & ElapsedTime.ToStringWithDecimals(0))
 
         Catch ex As Exception
             Cursor = Cursors.Default
 
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ShowData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage(Name & ".ShowData", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
     ''' <summary>
@@ -2375,7 +2333,7 @@ Public Class UiResultsAbsCurve
         Try
             'Search in ds the information about saved ordesrtestid
             Dim DataFound As Boolean = False
-            Dim RowList As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow)
+            Dim RowList As List(Of vwksWSAbsorbanceRow)
 
             Dim OrderTestID As Integer = OrderTestGrouped(CurrentID).OrderTestID
             Dim MultiItemNumber As Integer = OrderTestGrouped(CurrentID).MultiItemNumber
@@ -2384,7 +2342,7 @@ Public Class UiResultsAbsCurve
             Select Case SourceFormAttribute
                 Case ScreenCallsGraphical.RESULTSFRM
 
-                    RowList = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                    RowList = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                Where row.OrderTestID = OrderTestID _
                                AndAlso row.MultiItemNumber = MultiItemNumber _
                                AndAlso row.RerunNumber = RerunNumber _
@@ -2392,7 +2350,7 @@ Public Class UiResultsAbsCurve
 
                 Case ScreenCallsGraphical.WS_STATES, ScreenCallsGraphical.CURVEFRM
 
-                    RowList = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                    RowList = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                Where row.OrderTestID = OrderTestID _
                                AndAlso row.MultiItemNumber = MultiItemNumber _
                                AndAlso row.RerunNumber = RerunNumber _
@@ -2400,7 +2358,7 @@ Public Class UiResultsAbsCurve
 
                 Case Else
 
-                    RowList = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                    RowList = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                Where row.OrderTestID = OrderTestID _
                                AndAlso row.MultiItemNumber = MultiItemNumber _
                                Select row).ToList()
@@ -2424,7 +2382,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "FindData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
@@ -2452,7 +2410,7 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "FindWithOutData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
@@ -2484,7 +2442,7 @@ Public Class UiResultsAbsCurve
                     Select Case SourceFormAttribute
                         Case ScreenCallsGraphical.RESULTSFRM
 
-                            Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                            Rows = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                     Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
                                     Into grp = Group Select grp Distinct).ToList()
 
@@ -2498,7 +2456,7 @@ Public Class UiResultsAbsCurve
                             'DL 15/05/2012
                         Case ScreenCallsGraphical.CURVEFRM
 
-                            Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                            Rows = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                     Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
                                     Into grp = Group Select grp Distinct).ToList()
 
@@ -2506,7 +2464,7 @@ Public Class UiResultsAbsCurve
 
                         Case Else
 
-                            Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+                            Rows = (From row As vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
                                     Where row.OrderTestID = OrderTestIDAttribute _
                                     Group row By row.OrderTestID, row.MultiItemNumber _
                                     Into grp = Group Select grp Distinct).ToList()
@@ -2518,7 +2476,7 @@ Public Class UiResultsAbsCurve
                     'Search in DS the source data
                     For i As Integer = 0 To Rows.Count - 1
 
-                        Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
+                        Dim castRow = TryCast(Rows(i), DataRow())
                         If castRow Is Nothing Then Continue For
                         Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
                         Dim newRow As New strOrderTest
@@ -2548,102 +2506,10 @@ Public Class UiResultsAbsCurve
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "GetData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
     End Sub
-
-
-
-    'Private Sub GetData()
-    '    Try
-    '        Dim myGlobalDataTO As GlobalDataTO
-    '        Dim myExecutionsDelegate As New ExecutionsDelegate
-
-    '        'Get all different order testid with executions closed
-    '        myGlobalDataTO = myExecutionsDelegate.GetOrderTestWithExecutionStatus( _
-    '                                Nothing, SourceFormAttribute, RerunAttribute, _
-    '                                OrderTestIDAttribute, AnalyzerIDAttribute, WorkSessionIDAttribute)
-
-    '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-    '            AbsDS = CType(myGlobalDataTO.SetDatos, vwksWSAbsorbanceDS)
-
-    '            If AbsDS.vwksWSAbsorbance.Count > 0 Then
-    '                'Group ds in lists by ordertestid, rerunnumber, multitemnumber
-
-    '                Dim Rows As IList = Nothing
-
-    '                Select Case SourceFormAttribute
-    '                    Case ScreenCallsGraphical.RESULTSFRM
-
-    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
-    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
-    '                                Into grp = Group Select grp Distinct).ToList()
-
-    '                    Case ScreenCallsGraphical.WS_STATES
-
-    '                        Rows = (From row As ExecutionsDS.vwksWSExecutionsMonitorRow In ExecutionsAttribute _
-    '                                Where row.ExecutionType = "PREP_STD" AndAlso row.TestType = "STD" _
-    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
-    '                                Into grp = Group Select grp Distinct).ToList()
-
-    '                        'DL 15/05/2012
-    '                    Case ScreenCallsGraphical.CURVEFRM
-
-    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
-    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
-    '                                Into grp = Group Select grp Distinct).ToList()
-
-    '                        'DL 15/05/2012
-
-    '                    Case Else
-
-    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
-    '                                Where row.OrderTestID = OrderTestIDAttribute _
-    '                                Group row By row.OrderTestID, row.MultiItemNumber _
-    '                                Into grp = Group Select grp Distinct).ToList()
-
-    '                End Select
-
-    '                OrderTestGrouped = New List(Of strOrderTest)
-
-    '                'Search in DS the source data
-    '                For i As Integer = 0 To Rows.Count - 1
-
-    '                    Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
-    '                    If castRow Is Nothing Then Continue For
-    '                    Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
-    '                    Dim newRow As New strOrderTest
-    '                    If castColumn IsNot Nothing Then
-    '                        newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
-    '                        newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
-    '                        newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
-    '                    End If
-
-    '                    OrderTestGrouped.Add(newRow)
-
-    '                    If (newRow.OrderTestID = OrderTestIDAttribute) AndAlso _
-    '                       (newRow.MultiItemNumber = MultiItemNumberAttribute) AndAlso _
-    '                       (newRow.RerunNumber = RerunAttribute) Then
-
-    '                        CurrentID = OrderTestGrouped.Count - 1
-
-    '                    End If
-    '                Next
-
-    '                FindData()
-
-    '            Else
-    '                FindWithOutData()
-    '            End If
-    '        End If
-
-    '    Catch ex As Exception
-    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "GetData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-    '    End Try
-
-    'End Sub
 
 #End Region
 
@@ -2681,10 +2547,10 @@ Public Class UiResultsAbsCurve
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Me.SetStyle(ControlStyles.ResizeRedraw, True)
-        Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.AllPaintingInWmPaint, True)
-        Me.SetStyle(ControlStyles.UserPaint, True)
-        Me.SetStyle(ControlStyles.AllPaintingInWmPaint, True)
+        SetStyle(ControlStyles.ResizeRedraw, True)
+        SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.AllPaintingInWmPaint, True)
+        SetStyle(ControlStyles.UserPaint, True)
+        SetStyle(ControlStyles.AllPaintingInWmPaint, True)
 
     End Sub
 End Class
