@@ -990,7 +990,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
-      <Name>Analyzer %28Ax00\Analyzer%29</Name>
+      <Name>Analyzer</Name>
     </ProjectReference>
     <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>

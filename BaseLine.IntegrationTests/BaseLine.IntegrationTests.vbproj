@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{92740A39-2507-48C3-B8D7-8E570BFCEA19}</ProjectGuid>
+    <ProjectGuid>{04314343-F400-45DC-A4BF-51B118FC6851}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Analyzer.IntegrationTests</RootNamespace>
-    <AssemblyName>Analyzer.IntegrationTests</AssemblyName>
+    <RootNamespace>BaseLine.IntegrationTests</RootNamespace>
+    <AssemblyName>BaseLine.IntegrationTests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Analyzer.IntegrationTests.xml</DocumentationFile>
+    <DocumentationFile>BaseLine.IntegrationTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Analyzer.IntegrationTests.xml</DocumentationFile>
+    <DocumentationFile>BaseLine.IntegrationTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -56,6 +56,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -91,7 +94,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SpecificAlarms\Error560.vb" />
+    <Compile Include="Services\BaseLineServiceTests.vb" />
     <Compile Include="Utils.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +117,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
-      <Name>Analyzer</Name>
+      <Name>Analyzer %28Ax00\Analyzer%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
