@@ -10,6 +10,10 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.Linq
 
 Namespace Biosystems.Ax00.Core.Entities
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>Created By AC</remarks>
     Public Class AnalyzerAlarms
 
         Private ReadOnly _analyzerManager As IAnalyzerManager
@@ -1196,7 +1200,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
 
                 'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, False)
+                '_myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, False)
 
                 wsAlarmsDs.AcceptChanges()
                 alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
@@ -1219,6 +1223,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 .AlarmStatus = True
                 .AlarmItem = 1
+                .AdditionalInfo = "SILENT_ALARM"
                 .SetAdditionalInfoNull()
                 .EndEdit()
             End With
@@ -1227,7 +1232,7 @@ Namespace Biosystems.Ax00.Core.Entities
             wsAlarmsDs.AcceptChanges()
 
             'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-            _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, True)
+            '_myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, True)
 
             _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
         End Sub

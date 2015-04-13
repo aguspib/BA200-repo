@@ -1,6 +1,5 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
@@ -46,6 +45,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private _baseLineService As IBaseLineService
         Private _warmUpService As IWarmUpService
+        Public Property CurrentStepForTest As RotorChangeStepsEnum
 
 #End Region
 
@@ -252,6 +252,7 @@ Namespace Biosystems.Ax00.Core.Services
             If (Not _isInRecovering) Then
                 Dim nextStep As RotorChangeStepsEnum
                 nextStep = GetNextStep()
+                CurrentStepForTest = nextStep
 
                 Select Case nextStep
                     Case RotorChangeStepsEnum.BaseLine
