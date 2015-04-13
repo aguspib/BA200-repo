@@ -40,8 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
 
         <Test()> Public Sub ManageAnalyzerReceivedStatus_StatusErr560RetryWithReset_OK()
 
-            Dim analyzerManager As IAnalyzerManager
-            analyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
+            Dim analyzerManager As IAnalyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
 
             'Scenario
             analyzerManager.CommThreadsStarted = True
@@ -55,28 +54,27 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "")
             analyzerManager.InstructionTypeSent = GlobalEnumerates.AppLayerEventList.STATE
             analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.STANDBY
-
             'A200;STATUS;S:2;A:46;T:15;C:20;W:20;R:0;E:560;I:0;
             Dim instruction = GetInstructionBuilt("A200", "STATUS", "S:2;A:46;T:15;C:20;W:20;R:0;E:560;I:0")
 
-            'pre condition
+            'preconditions
             Assert.AreEqual(analyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "")
             Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
             Assert.IsFalse(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 0)
 
-            'Not connected and Retry
+            'act : Not connected and Retry
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
-            'output and precondition for reset
+            'result and precondition for reset
             Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
             Assert.IsTrue(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
 
-            'Failed retry and Reset system
+            'act : Failed retry and Reset system
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
-            'output
+            'result
             Assert.IsFalse(analyzerManager.AnalyzerIsReady)
             Assert.IsFalse(analyzerManager.IsAlarmInfoRequested)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 2)
@@ -85,8 +83,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
 
         <Test()> Public Sub ManageAnalyzerReceivedStatus_StatusErr560Retry_OK()
 
-            Dim analyzerManager As IAnalyzerManager
-            analyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
+            Dim analyzerManager As IAnalyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
 
             'Scenario
             analyzerManager.CommThreadsStarted = True
@@ -100,7 +97,6 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             analyzerManager.SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "")
             analyzerManager.InstructionTypeSent = GlobalEnumerates.AppLayerEventList.STATE
             analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.STANDBY
-
             'A200;STATUS;S:2;A:46;T:15;C:20;W:20;R:0;E:560;I:0;
             Dim instruction = GetInstructionBuilt("A200", "STATUS", "S:2;A:46;T:15;C:20;W:20;R:0;E:560;I:0")
 
@@ -110,21 +106,21 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             Assert.IsFalse(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 0)
 
-            'Not connected and Retry
+            'act : Not connected and Retry
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
-            'output
+            'result
             Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
             Assert.IsTrue(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
 
-            'A200;STATUS;S:2;A:47;T:15;C:20;W:20;R:0;E:0;I:0;
+            'preconditions: A200;STATUS;S:2;A:47;T:15;C:20;W:20;R:0;E:0;I:0;
             instruction = GetInstructionBuilt("A200", "STATUS", "S:2;A:47;T:15;C:20;W:20;R:0;E:0;I:0")
 
-            'Finish Flight reads without problems
+            'act : Finish Flight reads without problems
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
-            'output
+            'result
             Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
             Assert.IsFalse(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 0)
