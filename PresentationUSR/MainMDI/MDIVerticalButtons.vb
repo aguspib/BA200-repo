@@ -177,8 +177,10 @@ Partial Public Class UiAx00MainMDI
             Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
             Dim reactionsCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN), 1, 0), Boolean)
             Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
-            Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
-
+            Dim samplesCoverAlarm = If(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), True, False) 'CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
+#If config = "Debug" Then
+            samplesCoverAlarm = False 'If(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), True, False) 'CType(IIf(myAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
+#End If
             resultData = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 'Dim myAdjDS As SRVAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS) 'Causes system error in develop mode
