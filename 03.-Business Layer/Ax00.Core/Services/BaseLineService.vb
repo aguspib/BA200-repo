@@ -7,22 +7,13 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
+
 Namespace Biosystems.Ax00.Core.Services
-
-    Public Enum BaseLineStepsEnum
-        NotStarted
-        CheckPreviousAlarms
-        ConditioningWashing
-        StaticBaseLine
-        DynamicBaseLineFill
-        DynamicBaseLineRead
-        DynamicBaseLineEmpty
-        Finalize
-        None
-    End Enum
-
     Public Class BaseLineService
         Inherits AsyncService
+        Implements IBaseLineService
 
 #Region "Constructors"
         Sub New(analyzer As IAnalyzerManager)
@@ -39,10 +30,6 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Public methods"
 
-        'Public Overrides Function StartService() As Boolean
-        '    Return StartService(False)
-        'End Function
-
         Public Overrides Function StartService() As Boolean
 
 
@@ -53,9 +40,6 @@ Namespace Biosystems.Ax00.Core.Services
             'Method flow:
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
-            'If isInRecover Then
-            'InitializeRecover()
-            'Else
             Initialize()
 
             _analyzer.StopAnalyzerRinging()
@@ -66,8 +50,6 @@ Namespace Biosystems.Ax00.Core.Services
 
             'Update analyzer session flags into DataBase
             UpdateFlags(myAnalyzerFlagsDs)
-
-            'End If
 
             Status = ServiceStatusEnum.Running
             AddRequiredEventHandlers()
@@ -164,17 +146,17 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        Public Function CurrentStep() As BaseLineStepsEnum
+        Public Function CurrentStep() As BaseLineStepsEnum Implements IBaseLineService.CurrentStep
             Return _currentStep
         End Function
 
-        Public Sub EmptyAndFinalizeProcess()
+        Public Sub EmptyAndFinalizeProcess() Implements IBaseLineService.EmptyAndFinalizeProcess
             _forceEmptyAndFinalize = True
             Status = ServiceStatusEnum.Running
         End Sub
 
 
-        Public Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
             Try
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
@@ -194,13 +176,12 @@ Namespace Biosystems.Ax00.Core.Services
                 Return True
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex)
                 Return False
             End Try
         End Function
 
-        Public Sub RepeatDynamicBaseLineReadStep()
+        Public Sub RepeatDynamicBaseLineReadStep() Implements IBaseLineService.RepeatDynamicBaseLineReadStep
 
             _analyzer.DynamicBaselineInitializationFailures = 0
 
@@ -243,7 +224,8 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse)
+        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
+
 #End Region
 
 #Region "Attributes"
@@ -338,7 +320,6 @@ Namespace Biosystems.Ax00.Core.Services
                 ElseIf Status = ServiceStatusEnum.Paused Then
 
                     'If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) <> "INI") Then
-
 
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
                         nextStep = BaseLineStepsEnum.ConditioningWashing
@@ -544,10 +525,8 @@ Namespace Biosystems.Ax00.Core.Services
             If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) <> "CANCELED") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, "CANCELED")
 
-
                 'Update analyzer session flags into DataBase
                 UpdateFlags(myAnalyzerFlagsDs)
-
             End If
             Status = ServiceStatusEnum.Paused
 
@@ -616,6 +595,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             End If
             Status = ServiceStatusEnum.Paused
+
         End Sub
 
         ''' <summary>
@@ -624,6 +604,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function IsValidStaticBaseLine() As Boolean
+
             If (_staticBaseLineFinished) Then
                 Return (_analyzer.SessionFlag(AnalyzerManagerFlags.BaseLine) <> "CANCELED")
             Else
@@ -650,7 +631,6 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub NotifyProcessResult()
 
             'We provide results callback
-            'Dim status = ServiceStatusEnum.EndError
             If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
                 If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
                     Status = ServiceStatusEnum.EndSuccess
@@ -699,7 +679,6 @@ Namespace Biosystems.Ax00.Core.Services
 
                 'Update analyzer session flags into DataBase
                 UpdateFlags(myAnalyzerFlagsDs)
-
                 '_analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
             Status = ServiceStatusEnum.Paused
@@ -754,6 +733,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, myParams, String.Empty, Nothing)
             _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
             _forceEmptyAndFinalize = False
+
         End Sub
 
         ''' <summary>
@@ -774,6 +754,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
             Status = ServiceStatusEnum.Paused
+
         End Sub
 
         ''' <summary>
@@ -804,7 +785,6 @@ Namespace Biosystems.Ax00.Core.Services
 
                 UpdateFlags(myAnalyzerFlagsDs)
 
-                'FinalizeProcess()   'MI
                 _analyzer.UpdateSensorValuesAttribute(AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
             Status = ServiceStatusEnum.Paused

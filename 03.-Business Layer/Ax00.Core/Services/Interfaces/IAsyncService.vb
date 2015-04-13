@@ -1,4 +1,6 @@
-﻿Namespace Biosystems.Ax00.Core.Services
+﻿Imports Biosystems.Ax00.Core.Services.Enums
+
+Namespace Biosystems.Ax00.Core.Services.Interfaces
 
     Public Interface IAsyncService
         Inherits IDisposable

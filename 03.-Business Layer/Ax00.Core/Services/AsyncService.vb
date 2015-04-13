@@ -1,6 +1,8 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.Core.Services
 
@@ -71,7 +73,7 @@ Namespace Biosystems.Ax00.Core.Services
         Public MustOverride Sub PauseService() Implements IAsyncService.PauseService
         Public MustOverride Sub RestartService() Implements IAsyncService.RestartService
 
-        Public Sub UpdateFlags(ByVal FlagsDS As AnalyzerManagerFlagsDS)
+        Public Sub UpdateFlags(ByVal flagsDs As AnalyzerManagerFlagsDS)
             If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                 Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                 myFlagsDelg.Update(Nothing, FlagsDS)

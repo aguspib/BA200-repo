@@ -6,18 +6,10 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Entities
 Imports System.Globalization
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.Core.Services
-
-    Public Enum WarmUpStepsEnum
-        StartInstrument
-        Washing
-        Barcode
-        BaseLine
-        Finalize
-        None
-    End Enum
-
     ''' <summary>
     ''' 
     ''' </summary>
@@ -26,12 +18,17 @@ Namespace Biosystems.Ax00.Core.Services
     ''' </remarks>
     Public Class WarmUpService
         Inherits AsyncService
+        Implements IWarmUpService
 
 #Region "Constructors"
 
         Public Sub New(analyzer As IAnalyzerManager)
+            Me.New(analyzer, New BaseLineService(analyzer))
+        End Sub
+
+        Public Sub New(analyzer As IAnalyzerManager, baseLineService As IBaseLineService)
             MyBase.New(analyzer)
-            _baseLineService = New BaseLineService(_analyzer)
+            _baseLineService = baseLineService
             _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
         End Sub
 
@@ -41,7 +38,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Private _currentStep As WarmUpStepsEnum
         Private _isInRecovering As Boolean = False
-        Private _baseLineService As BaseLineService
+        Private _baseLineService As IBaseLineService
         Private _eventHandlersAdded As Boolean = False
 
 #End Region
@@ -72,7 +69,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Overrides Function StartService() As Boolean
 
-            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
 
             If (Not _analyzer Is Nothing) Then
                 _analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
@@ -81,13 +78,13 @@ Namespace Biosystems.Ax00.Core.Services
                 If _analyzer.Connected Then
                     If ((_analyzer.SessionFlag(AnalyzerManagerFlags.WUPprocess) = String.Empty) OrElse (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "CLOSED")) Then
 
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, StepStringStatus.Empty)
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Barcode, StepStringStatus.Empty)
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.StartInstrument, StepStringStatus.Empty)
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Empty)
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Barcode, StepStringStatus.Empty)
 
                         'Update analyzer session flags into DataBase
-                        UpdateFlags(myAnalyzerFlagsDS)
+                        UpdateFlags(myAnalyzerFlagsDs)
 
                         Status = ServiceStatusEnum.Running
                         Initialize()
@@ -135,7 +132,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns>TRUE process recovered | FALSE process could not be recovered</returns>
         ''' <remarks>
         ''' </remarks>
-        Public Function RecoverProcess() As Boolean
+        Public Function RecoverProcess() As Boolean Implements IWarmUpService.RecoverProcess
             Try
                 _isInRecovering = True
 
@@ -282,19 +279,19 @@ Namespace Biosystems.Ax00.Core.Services
             ' XBC 13/02/2012 - CODEBR Configuration instruction
             'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process FINISH sent again the config instruction (maybe user has changed something)
 
-            Dim BarCodeDS As New AnalyzerManagerDS
+            Dim barCodeDs As New AnalyzerManagerDS
             Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
-            rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
+            rowBarCode = barCodeDs.barCodeRequests.NewbarCodeRequestsRow
             With rowBarCode
                 .RotorType = "SAMPLES"
                 .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
                 .Position = 0
             End With
-            BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
-            BarCodeDS.AcceptChanges()
+            barCodeDs.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
+            barCodeDs.AcceptChanges()
 
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Barcode, "INI")
-            _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+            _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, barCodeDs)
             _analyzer.SetAnalyzerNotReady()
             ' XBC 13/02/2012 - CODEBR Configuration instruction
 
@@ -409,26 +406,26 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub FinalizeProcess()
+        Public Sub FinalizeProcess() Implements IWarmUpService.FinalizeProcess
 
             Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
+            Dim myGlobalDataTo As New GlobalDataTO
+            Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
             Dim myAlarm As Alarms
             Dim wupManeuversFinishFlag As Boolean = False 'AG 23/05/2012
 
             'WUPCOMPLETEFLAG
-            myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+            myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
             With myAnalyzerSettingsRow
                 .AnalyzerID = _analyzer.ActiveAnalyzer
                 .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
                 .CurrentValue = "1"
             End With
-            myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+            myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
             Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-            myGlobalDataTO = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDS, Nothing)
+            myGlobalDataTo = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
             wupManeuversFinishFlag = True
 
@@ -446,15 +443,15 @@ Namespace Biosystems.Ax00.Core.Services
 
                 'AG 23/05/2012 - Evaluate if Sw has to recommend to change reactions rotor (remember all alarms are remove when Start Instruments starts)
                 Dim analyzerReactRotor As New AnalyzerReactionsRotorDelegate
-                myGlobalDataTO = analyzerReactRotor.ChangeReactionsRotorRecommended(Nothing, _analyzer.ActiveAnalyzer, _analyzer.Model)
-                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                    If CType(myGlobalDataTO.SetDatos, String) <> "" Then
+                myGlobalDataTo = analyzerReactRotor.ChangeReactionsRotorRecommended(Nothing, _analyzer.ActiveAnalyzer, _analyzer.Model)
+                If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
+                    If CType(myGlobalDataTo.SetDatos, String) <> "" Then
                         myAlarm = AlarmEnumerates.Alarms.BASELINE_WELL_WARN
                         'Update internal alarm list if exists alarm but not saved it into database!!!
                         'But generate refresh
                         If Not _analyzer.Alarms.Contains(myAlarm) Then
                             _analyzer.Alarms.Add(myAlarm)
-                            myGlobalDataTO = _analyzer.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                            myGlobalDataTo = _analyzer.PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
                         End If
                     End If
                 End If
@@ -504,41 +501,41 @@ Namespace Biosystems.Ax00.Core.Services
 
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
 
-                    Dim myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
+                    Dim myParametersDs = CType(myGlobal.SetDatos, ParametersDS)
 
-                    Dim myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
+                    Dim myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDs.tfmwSwParameters _
                               Where String.Equals(a.ParameterName, SwParameters.WUPFULLTIME.ToString) _
                               Select a).ToList
 
-                    Dim WUPFullTime As Single
-                    If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric
+                    Dim wUpFullTime As Single
+                    If myList.Count > 0 Then wUpFullTime = myList(0).ValueNumeric
                 End If
 
                 ' Save initial states when press over w-up
                 If Not myGlobal.HasError Then
-                    Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
+                    Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
                     Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
                     'WUPCOMPLETEFLAG
-                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+                    myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                     With myAnalyzerSettingsRow
                         .AnalyzerID = _analyzer.ActiveAnalyzer
                         .SettingID = AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
                         .CurrentValue = "0"
                     End With
-                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+                    myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
                     'WUPCOMPLETEFLAG
-                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+                    myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                     With myAnalyzerSettingsRow
                         .AnalyzerID = _analyzer.ActiveAnalyzer
                         .SettingID = AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString()
                         .CurrentValue = Now.ToString(CultureInfo.InvariantCulture)
                     End With
-                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+                    myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
                     Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDS, Nothing)
+                    myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
                 End If
 
@@ -650,24 +647,24 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub CheckIseAlarms()
 
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim AlarmList As New List(Of AlarmEnumerates.Alarms)
-            Dim AlarmStatusList As New List(Of Boolean)
+
+            Dim alarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim alarmStatusList As New List(Of Boolean)
 
             'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
             If ((_analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) <> Nothing) AndAlso _analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1) Then
 
-                Dim tempISEAlarmList As New List(Of AlarmEnumerates.Alarms)
-                Dim tempISEAlarmStatusList As New List(Of Boolean)
-                myGlobalDataTO = _analyzer.ISEAnalyzer.CheckAlarms(_analyzer.Connected, tempISEAlarmList, tempISEAlarmStatusList)
+                Dim tempIseAlarmList As New List(Of AlarmEnumerates.Alarms)
+                Dim tempIseAlarmStatusList As New List(Of Boolean)
+                _analyzer.ISEAnalyzer.CheckAlarms(_analyzer.Connected, tempIseAlarmList, tempIseAlarmStatusList)
 
-                AlarmList.Clear()
-                AlarmStatusList.Clear()
-                For i As Integer = 0 To tempISEAlarmList.Count - 1
-                    _analyzer.PrepareLocalAlarmList(tempISEAlarmList(i), tempISEAlarmStatusList(i), AlarmList, AlarmStatusList)
+                alarmList.Clear()
+                alarmStatusList.Clear()
+                For i As Integer = 0 To tempIseAlarmList.Count - 1
+                    _analyzer.PrepareLocalAlarmList(tempIseAlarmList(i), tempIseAlarmStatusList(i), alarmList, alarmStatusList)
                 Next
 
-                If AlarmList.Count > 0 Then
+                If alarmList.Count > 0 Then
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -676,7 +673,7 @@ Namespace Biosystems.Ax00.Core.Services
                         'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
                     Else
                         Dim currentAlarms = New AnalyzerAlarms(_analyzer)
-                        myGlobalDataTO = currentAlarms.Manage(AlarmList, AlarmStatusList)
+                        currentAlarms.Manage(alarmList, alarmStatusList)
                     End If
                 End If
             End If
@@ -718,8 +715,9 @@ Namespace Biosystems.Ax00.Core.Services
 #End Region
 
 #Region "Properties"
-        Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse)
-        Public ReadOnly Property NextStep As WarmUpStepsEnum
+        Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse) Implements IWarmUpService.ReuseRotorContentsForBaseLine
+
+        Public ReadOnly Property NextStep As WarmUpStepsEnum Implements IWarmUpService.NextStep
             Get
                 Return _currentStep
             End Get
