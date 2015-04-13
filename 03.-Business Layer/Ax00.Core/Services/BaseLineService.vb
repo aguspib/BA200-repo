@@ -28,10 +28,81 @@ Namespace Biosystems.Ax00.Core.Services
 
 #End Region
 
+#Region "Properties"
+
+        ''' <summary>
+        ''' If this function is set to True, if the rotor is full of clean water that can be used to perform a FLIGHT, the process starts directly from the Read step.
+        ''' This happens when a 551 status (alarm) is present and rotor contents hasn't lapsed.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property CurrentStep As BaseLineStepsEnum Implements IBaseLineService.CurrentStep
+            Get
+                Return _currentStep
+            End Get
+            Set(ByVal value As BaseLineStepsEnum)
+                _currentStep = value
+            End Set
+        End Property
+
+#End Region
+
+#Region "Attributes"
+
+        Private _forceEmptyAndFinalize As Boolean = False
+        Private _checkedPreviousAlarms As Boolean = False
+        Private _staticBaseLineFinished As Boolean = False
+        Private _dynamicBaseLineValid As Boolean = False
+        Private _currentStep As BaseLineStepsEnum
+        Private _alreadyFinalized As Boolean = False
+        Private _isInRecovering As Boolean = False
+        Private _eventHandlersAdded As Boolean = False
+        Private _pauseWhenReadErrors As Boolean = False
+
+#End Region
+
+#Region "Event Handlers"
+
+        Private Sub OnReceivedStatusInformationEvent()
+            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
+            TryToResume()
+        End Sub
+
+        Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
+            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
+            Select Case pFlagCode
+                Case AnalyzerManagerFlags.BaseLine
+                    ProcessStaticBaseLine()
+
+                Case AnalyzerManagerFlags.DynamicBL_Fill,
+                    AnalyzerManagerFlags.DynamicBL_Empty
+                    ValidateProcess()
+
+                Case AnalyzerManagerFlags.DynamicBL_Read
+                    ProcessDynamicBaseLine()
+
+            End Select
+        End Sub
+
+#End Region
+
 #Region "Public methods"
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Overrides Function StartService() As Boolean
-
 
             'Previous conditions: (no flow here)
             If _analyzer.Connected = False Then Return False
@@ -74,20 +145,104 @@ Namespace Biosystems.Ax00.Core.Services
             AddRequiredEventHandlers()
         End Sub
 
-        Private Sub DirectlyGoToDynamicReadStep()
-            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub EmptyAndFinalizeProcess() Implements IBaseLineService.EmptyAndFinalizeProcess
+            _forceEmptyAndFinalize = True
+            Status = ServiceStatusEnum.Running
+        End Sub
 
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Ended) 'Re-send Washing
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Ended) 'Re-send ALIGHT
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Ended) 'Re-send FLIGHT mode fill
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Initialized)
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
+            Try
+                _isInRecovering = True
+                '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
+                InitializeRecover()
 
-            UpdateFlags(myAnalyzerFlagsDs)
-            'Re-send FLIGHT mode read
+                Dim nextStep = GetNextStep()
+                Select Case nextStep
+                    Case BaseLineStepsEnum.Finalize,
+                        BaseLineStepsEnum.DynamicBaseLineRead
+                        ValidateProcess()
+                    Case BaseLineStepsEnum.DynamicBaseLineEmpty
+                        ProcessDynamicBaseLine()
+                End Select
 
-            'We set propper internal flags, it's treated the same as a recover process that goes directly to the reading
-            InitializeRecover()
-            _checkedPreviousAlarms = True
+                _isInRecovering = False
+                AddRequiredEventHandlers()
+                Return True
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub RepeatDynamicBaseLineReadStep() Implements IBaseLineService.RepeatDynamicBaseLineReadStep
+
+            _analyzer.DynamicBaselineInitializationFailures = 0
+
+            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
+            End If
+
+            RestartProcess()
+
+            ExecuteDynamicBaseLineReadStep()
+
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function CanRotorContentsByDirectlyRead() As Boolean
+
+            'Calculate expiration time:
+            Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
+            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then
+                caducityMinutesString = "0"
+                Debug.WriteLine("Rotor contentes Caducity was not found in the DB!!")
+            End If
+
+            Dim caducityMinutes = CInt(caducityMinutesString)
+            Dim expirationTime = Now.AddMinutes(-caducityMinutes)
+
+            'Process flags:
+            Return StatusParameters.State =
+                StatusParameters.RotorStates.FBLD_ROTOR_FULL And
+                StatusParameters.IsActive = True And
+                StatusParameters.LastSaved > expirationTime
+        End Function
+
+#End Region
+
+#Region "Private methods"
+
+        Private Sub Initialize()
+            _currentStep = BaseLineStepsEnum.None
+            _forceEmptyAndFinalize = False
+            _staticBaseLineFinished = False
+            _dynamicBaseLineValid = False
+            _analyzer.DynamicBaselineInitializationFailures = 0
+            _analyzer.CurrentInstructionAction = InstructionActions.None
+            _alreadyFinalized = False
+            _checkedPreviousAlarms = False
+            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
+            End If
+            Status = ServiceStatusEnum.Running
 
         End Sub
 
@@ -146,145 +301,6 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
-        Public Function CurrentStep() As BaseLineStepsEnum Implements IBaseLineService.CurrentStep
-            Return _currentStep
-        End Function
-
-        Public Sub EmptyAndFinalizeProcess() Implements IBaseLineService.EmptyAndFinalizeProcess
-            _forceEmptyAndFinalize = True
-            Status = ServiceStatusEnum.Running
-        End Sub
-
-
-        Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
-            Try
-                _isInRecovering = True
-                '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
-                InitializeRecover()
-
-                Dim nextStep = GetNextStep()
-                Select Case nextStep
-                    Case BaseLineStepsEnum.Finalize,
-                        BaseLineStepsEnum.DynamicBaseLineRead
-                        ValidateProcess()
-                    Case BaseLineStepsEnum.DynamicBaseLineEmpty
-                        ProcessDynamicBaseLine()
-                End Select
-
-                _isInRecovering = False
-                AddRequiredEventHandlers()
-                Return True
-
-            Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex)
-                Return False
-            End Try
-        End Function
-
-        Public Sub RepeatDynamicBaseLineReadStep() Implements IBaseLineService.RepeatDynamicBaseLineReadStep
-
-            _analyzer.DynamicBaselineInitializationFailures = 0
-
-            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
-                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
-            End If
-
-            RestartProcess()
-
-            ExecuteDynamicBaseLineReadStep()
-
-        End Sub
-
-        Public Shared Function CanRotorContentsByDirectlyRead() As Boolean
-
-            'Calculate expiration time:
-            Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
-            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then
-                caducityMinutesString = "0"
-                Debug.WriteLine("Rotor contentes Caducity was not found in the DB!!")
-            End If
-
-            Dim caducityMinutes = CInt(caducityMinutesString)
-            Dim expirationTime = Now.AddMinutes(-caducityMinutes)
-
-            'Process flags:
-            Return StatusParameters.State =
-                StatusParameters.RotorStates.FBLD_ROTOR_FULL And
-                StatusParameters.IsActive = True And
-                StatusParameters.LastSaved > expirationTime
-        End Function
-
-#End Region
-
-#Region "Properties"
-        ''' <summary>
-        ''' If this function is set to True, if the rotor is full of clean water that can be used to perform a FLIGHT, the process starts directly from the Read step.
-        ''' This happens when a 551 status (alarm) is present and rotor contents hasn't lapsed.
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
-
-#End Region
-
-#Region "Attributes"
-
-        Private _forceEmptyAndFinalize As Boolean = False
-        Private _checkedPreviousAlarms As Boolean = False
-        Private _staticBaseLineFinished As Boolean = False
-        Private _dynamicBaseLineValid As Boolean = False
-        Private _currentStep As BaseLineStepsEnum
-        Private _alreadyFinalized As Boolean = False
-        Private _isInRecovering As Boolean = False
-        Private _eventHandlersAdded As Boolean = False
-        Private _pauseWhenReadErrors As Boolean = False
-
-#End Region
-
-#Region "Event Handlers"
-
-        Private Sub OnReceivedStatusInformationEvent()
-            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
-            TryToResume()
-        End Sub
-
-        Private Sub OnProcessFlagEvent(ByVal pFlagCode As AnalyzerManagerFlags)
-            If _currentStep = BaseLineStepsEnum.NotStarted Then Return
-            Select Case pFlagCode
-                Case AnalyzerManagerFlags.BaseLine
-                    ProcessStaticBaseLine()
-
-                Case AnalyzerManagerFlags.DynamicBL_Fill,
-                    AnalyzerManagerFlags.DynamicBL_Empty
-                    ValidateProcess()
-
-                Case AnalyzerManagerFlags.DynamicBL_Read
-                    ProcessDynamicBaseLine()
-
-            End Select
-        End Sub
-
-#End Region
-
-#Region "Private methods"
-
-        Private Sub Initialize()
-            _currentStep = BaseLineStepsEnum.None
-            _forceEmptyAndFinalize = False
-            _staticBaseLineFinished = False
-            _dynamicBaseLineValid = False
-            _analyzer.DynamicBaselineInitializationFailures = 0
-            _analyzer.CurrentInstructionAction = InstructionActions.None
-            _alreadyFinalized = False
-            _checkedPreviousAlarms = False
-            If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
-                _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
-            End If
-            Status = ServiceStatusEnum.Running
-
-        End Sub
-
         ''' <summary>
         ''' This method will try to resume from pause mode and continue the FLIGHT process
         ''' </summary>
@@ -306,6 +322,11 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function GetNextStep() As BaseLineStepsEnum
             Dim nextStep = BaseLineStepsEnum.None
             If Not _checkedPreviousAlarms Then
@@ -347,6 +368,12 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="nextStep"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function GetNextStepWhileInProcess(ByVal nextStep As BaseLineStepsEnum) As BaseLineStepsEnum
 
             Select Case _analyzer.SessionFlag(AnalyzerManagerFlags.Washing)
@@ -404,15 +431,6 @@ Namespace Biosystems.Ax00.Core.Services
             End If
             Return nextStep
         End Function
-
-
-        Private Sub ProcessStaticBaseLine()
-            _staticBaseLineFinished = True
-
-            If (_analyzer.BaseLineTypeForCalculations <> BaseLineType.DYNAMIC) Then
-                ValidateProcess()
-            End If
-        End Sub
 
         ''' <summary>
         ''' 
@@ -488,11 +506,27 @@ Namespace Biosystems.Ax00.Core.Services
             Return
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub RestartProcess()
 
             AddRequiredEventHandlers()
             Status = ServiceStatusEnum.Running
 
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub ProcessStaticBaseLine()
+            _staticBaseLineFinished = True
+
+            If (_analyzer.BaseLineTypeForCalculations <> BaseLineType.DYNAMIC) Then
+                ValidateProcess()
+            End If
         End Sub
 
         ''' <summary>
@@ -791,11 +825,41 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub DirectlyGoToDynamicReadStep()
+            Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
+
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.Washing, StepStringStatus.Ended) 'Re-send Washing
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.BaseLine, StepStringStatus.Ended) 'Re-send ALIGHT
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Fill, StepStringStatus.Ended) 'Re-send FLIGHT mode fill
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDs, AnalyzerManagerFlags.DynamicBL_Read, StepStringStatus.Initialized)
+
+            UpdateFlags(myAnalyzerFlagsDs)
+            'Re-send FLIGHT mode read
+
+            'We set propper internal flags, it's treated the same as a recover process that goes directly to the reading
+            InitializeRecover()
+            _checkedPreviousAlarms = True
+
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="disposing"></param>
+        ''' <remarks></remarks>
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
             RemoveRequiredEventHandlers()
             MyBase.Dispose(disposing)
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub RemoveRequiredEventHandlers()
             If _eventHandlersAdded Then
                 Try
@@ -806,6 +870,10 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub AddRequiredEventHandlers()
             If Not _eventHandlersAdded Then
                 AddHandler _analyzer.ReceivedStatusInformationEventHandler, AddressOf OnReceivedStatusInformationEvent
@@ -814,8 +882,10 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
-#End Region
-
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub CheckPreviousAlarms()
             'Previous constraint:
             _checkedPreviousAlarms = True
@@ -838,6 +908,11 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pAlarmDate"></param>
+        ''' <remarks></remarks>
         Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)
             Dim minutosCaducidadRotorLleno = 30
             Dim caducityParameter = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
@@ -860,11 +935,12 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
+#End Region
 
         Public Class ReuseRotorResponse
             Public Property Reuse As Boolean = False
-
         End Class
+
     End Class
 
 End Namespace

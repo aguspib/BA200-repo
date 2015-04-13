@@ -3,7 +3,7 @@ Imports Biosystems.Ax00.Core.Services.Enums
 Namespace Biosystems.Ax00.Core.Services.Interfaces
     Public Interface IBaseLineService
         Inherits IAsyncService
-        Function CurrentStep() As BaseLineStepsEnum
+
         Sub EmptyAndFinalizeProcess()
         Function RecoverProcess() As Boolean
         Sub RepeatDynamicBaseLineReadStep()
@@ -16,5 +16,7 @@ Namespace Biosystems.Ax00.Core.Services.Interfaces
         ''' <returns></returns>
         ''' <remarks></remarks>
         Property DecideToReuseRotorContents As Action(Of BaseLineService.ReuseRotorResponse)
+        Property CurrentStep As BaseLineStepsEnum
+
     End Interface
 End Namespace

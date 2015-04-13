@@ -302,6 +302,9 @@ Public Class UiChangeRotor
 
     Private Sub ExitScreen()
         Try
+
+            AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
+
             If (bsCancelButton.Enabled) Then
                 If (statusMDIChangedFlag) Then
                     UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
@@ -821,7 +824,6 @@ Public Class UiChangeRotor
 #Region "Events"
 
     Private Sub bsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelButton.Click
-        AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
         ExitScreen()
     End Sub
 
