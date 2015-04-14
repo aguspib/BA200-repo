@@ -10488,7 +10488,6 @@ Namespace Biosystems.Ax00.BL
             'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
             'myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'myContaminationManager.BacktrackingOptimization(OrderTests)
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult
 
