@@ -17,7 +17,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             Dim analyzerManager As IAnalyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
             Dim baseLine = New BaseLineService(analyzerManager)
             Dim warmUp = New WarmUpService(analyzerManager, baseLine)
-            Dim rotorChange = New RotorChangeServices(analyzerManager, warmUp, baseLine)
+            Dim rotorChange = New RotorChangeService(analyzerManager, warmUp, baseLine)
             Dim testGlobal = New GlobalDataTO()
 
             'scenario
