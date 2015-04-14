@@ -15,18 +15,22 @@ Public Class AppComLayer
 
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
         requestsQueue.Enqueue(request)
-        _managerForm.BeginInvoke(Sub()
-                                     DispatchQueue()
-                                 End Sub)
+        _contextControl.BeginInvoke(Sub()
+                                        DispatchQueue()
+                                    End Sub)
     End Sub
 
-    Sub New(managerForm As Windows.Forms.Form)
-        _managerForm = managerForm
+    Sub New(contextControl As Control)
+        If contextControl.InvokeRequired Then
+            contextControl.Invoke(Sub() _contextControl = New Control(""))
+        Else
+            _contextControl = New Control("")
+        End If
     End Sub
 
 #Region "Private"
     Private requestsQueue As New ConcurrentQueue(Of PresentationRequest)
-    Private _managerForm As System.Windows.Forms.Form
+    Private _contextControl As Control 'System.Windows.Forms.Form
 
     Private Sub DispatchQueue()
         While requestsQueue.Count > 0
@@ -67,8 +71,8 @@ Public Class AppComLayer
 #End Region
 
     Public Sub InvokeSynchronizedRequest(request As PresentationRequest) Implements IPresentationLayerListener.InvokeSynchronizedRequest
-        If _managerForm.InvokeRequired Then
-            _managerForm.Invoke(Sub() InvokeSynchronizedRequest(request))
+        If _contextControl.InvokeRequired Then
+            _contextControl.Invoke(Sub() InvokeSynchronizedRequest(request))
         Else
             Dispatch(request)
         End If

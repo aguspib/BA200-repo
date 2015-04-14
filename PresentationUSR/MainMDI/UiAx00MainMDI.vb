@@ -627,7 +627,6 @@ Partial Public Class UiAx00MainMDI
         If e.KeyData = Keys.F1 Then
             SetHelpProvider()
         End If
-        AnalyzerController.Instance.UseRotorContentsForFLIGHT(AddressOf AskToUseRotorContentsForFLIGHT)
     End Sub
 
     ''' <summary>
