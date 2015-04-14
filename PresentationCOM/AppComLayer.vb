@@ -12,12 +12,29 @@ Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 Public Class AppComLayer
     Implements IPresentationLayerListener
 
-
+    ''' <summary>
+    ''' This method allows a request to be sent from any thread to the presentation layer
+    ''' </summary>
+    ''' <param name="request" >This is the request to be enqueued</param>
+    ''' <remarks>This method is thread-safe and asynchronic</remarks>
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
         requestsQueue.Enqueue(request)
         _contextControl.BeginInvoke(Sub()
                                         DispatchQueue()
                                     End Sub)
+    End Sub
+
+    ''' <summary>
+    ''' This method allows a request to be sent and processed from any thread to the presentation layer
+    ''' </summary>
+    ''' <param name="request" >This is the request to be sent and processed</param>
+    ''' <remarks>This method is thread-safe</remarks>
+    Public Sub InvokeSynchronizedRequest(request As PresentationRequest) Implements IPresentationLayerListener.InvokeSynchronizedRequest
+        If _contextControl.InvokeRequired Then
+            _contextControl.Invoke(Sub() InvokeSynchronizedRequest(request))
+        Else
+            Dispatch(request)
+        End If
     End Sub
 
     Sub New(contextControl As Control)
@@ -29,7 +46,15 @@ Public Class AppComLayer
     End Sub
 
 #Region "Private"
+    ''' <summary>
+    ''' This is a concurrent queue that to synchroniously process requests
+    ''' </summary>
     Private requestsQueue As New ConcurrentQueue(Of PresentationRequest)
+
+
+    ''' <summary>
+    ''' This is an internal control used to store thread execution context
+    ''' </summary>
     Private _contextControl As Control 'System.Windows.Forms.Form
 
     Private Sub DispatchQueue()
@@ -70,12 +95,5 @@ Public Class AppComLayer
 
 #End Region
 
-    Public Sub InvokeSynchronizedRequest(request As PresentationRequest) Implements IPresentationLayerListener.InvokeSynchronizedRequest
-        If _contextControl.InvokeRequired Then
-            _contextControl.Invoke(Sub() InvokeSynchronizedRequest(request))
-        Else
-            Dispatch(request)
-        End If
-    End Sub
 End Class
 

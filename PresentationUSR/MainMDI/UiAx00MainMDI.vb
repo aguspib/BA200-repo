@@ -3375,16 +3375,15 @@ Partial Public Class UiAx00MainMDI
     ''' <summary>
     ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
     ''' </summary>
-    ''' <remarks>This function will store the results into a field inside the passed obj</remarks>
+    ''' <remarks>This function will store the results into a field inside the passed obj. This is done this way to allow cross-thread calls.</remarks>
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
-
 
         'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
         Dim callback = Sub(callbackResults As BaseLineService.ReuseRotorResponse)
                            If obj IsNot Nothing AndAlso callbackResults IsNot Nothing Then obj.Reuse = callbackResults.Reuse
                        End Sub
 
-        'This is an syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
+        'This is syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
         AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
 
     End Sub
