@@ -22,6 +22,7 @@ Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
 Partial Public Class UiAx00MainMDI
 
@@ -627,6 +628,7 @@ Partial Public Class UiAx00MainMDI
         If e.KeyData = Keys.F1 Then
             SetHelpProvider()
         End If
+
     End Sub
 
     ''' <summary>
@@ -3375,16 +3377,19 @@ Partial Public Class UiAx00MainMDI
     ''' <summary>
     ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
     ''' </summary>
-    ''' <remarks>This function will store the results into a field inside the passed obj. This is done this way to allow cross-thread calls.</remarks>
+    ''' <remarks>This function will store the results into a field inside the passed obj.
+    ''' This is done this way to allow cross-thread calls.</remarks>
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
-        'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
-        Dim callback = Sub(callbackResults As BaseLineService.ReuseRotorResponse)
-                           If obj IsNot Nothing AndAlso callbackResults IsNot Nothing Then obj.Reuse = callbackResults.Reuse
-                       End Sub
+        If BaseLineService.CanRotorContentsByDirectlyRead Then
+            Dim question As New YesNoQuestion
+            question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
 
-        'This is syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
-        AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
+            AnalyzerController.PresentationLayerInterface.InvokeSynchronizedRequest(question)
+            obj.Reuse = (question.Result = MsgBoxResult.Yes)
+        Else
+            obj.Reuse = False
+        End If
 
     End Sub
 
