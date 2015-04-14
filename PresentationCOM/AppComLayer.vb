@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 Public Class AppComLayer
     Implements IPresentationLayerListener
 
+
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
         requestsQueue.Enqueue(request)
         _managerForm.BeginInvoke(Sub()
@@ -65,5 +66,12 @@ Public Class AppComLayer
 
 #End Region
 
+    Public Sub InvokeSynchronizedRequest(request As PresentationRequest) Implements IPresentationLayerListener.InvokeSynchronizedRequest
+        If _managerForm.InvokeRequired Then
+            _managerForm.Invoke(Sub() InvokeSynchronizedRequest(request))
+        Else
+            Dispatch(request)
+        End If
+    End Sub
 End Class
 

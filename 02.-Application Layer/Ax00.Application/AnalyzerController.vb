@@ -290,11 +290,9 @@ Namespace Biosystems.Ax00.App
                 'worst case scenario:
                 If question.Text = "" Then question.Text = "Reuse rotor contents to perform light adjustment?"
 
-                question.OnAnswered = Sub()
-                                          response.Reuse = question.Result = MsgBoxResult.Yes
-                                          responseHandler.Invoke(response)
-                                      End Sub
-                PresentationLayerInterface.QueueRequest(question)
+                PresentationLayerInterface.InvokeSynchronizedRequest(question)
+                response.Reuse = (question.Result = MsgBoxResult.Yes)
+                responseHandler.Invoke(response)
             Else
                 responseHandler.Invoke(response)
             End If

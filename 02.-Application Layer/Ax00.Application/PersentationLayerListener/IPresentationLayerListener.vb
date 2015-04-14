@@ -7,6 +7,8 @@ Namespace Biosystems.Ax00.App.PresentationLayerListener
         ''' <remarks></remarks>
         Sub QueueRequest(request As Requests.PresentationRequest)
 
+        Sub InvokeSynchronizedRequest(request As Requests.PresentationRequest)
+
     End Interface
 
 End Namespace

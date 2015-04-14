@@ -627,6 +627,7 @@ Partial Public Class UiAx00MainMDI
         If e.KeyData = Keys.F1 Then
             SetHelpProvider()
         End If
+        AnalyzerController.Instance.UseRotorContentsForFLIGHT(AddressOf AskToUseRotorContentsForFLIGHT)
     End Sub
 
     ''' <summary>
@@ -3379,22 +3380,13 @@ Partial Public Class UiAx00MainMDI
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
 
-        Dim done = False
-
         'This callback will be called whenever the AnalyzerController answer wheter the rotor has to be reused or not
         Dim callback = Sub(callbackResults As BaseLineService.ReuseRotorResponse)
                            If obj IsNot Nothing AndAlso callbackResults IsNot Nothing Then obj.Reuse = callbackResults.Reuse
-                           done = True  'This variable is used outside the lambda. Do not trust ReSharper!
                        End Sub
 
         'This is an syncronous operation. We ask the AnalyzerController if we need to reuse rotor contents and we pass it a callback to store its response:
         AnalyzerController.Instance.UseRotorContentsForFLIGHT(callback)
-
-        'Antipattern! We make a nasty active waiting here. (something better should be implemented when possible). 
-        'TODO: This could be avoided by using the appropiate presentation thread for the call, and adding a synchronic request processor on the listener.
-        While Not done
-            If Not InvokeRequired Then My.Application.DoEvents()
-        End While
 
     End Sub
 
