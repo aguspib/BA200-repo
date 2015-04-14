@@ -276,29 +276,7 @@ Namespace Biosystems.Ax00.App
 
 #End Region
 
-        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of BaseLineService.ReuseRotorResponse))
 
-            If responseHandler Is Nothing Then Return
-            Dim response = New BaseLineService.ReuseRotorResponse
-            If IsAnalyzerInstantiated = False Then
-                responseHandler.Invoke(response)
-            End If
-
-            If BaseLineService.CanRotorContentsByDirectlyRead Then
-                Dim question As New YesNoQuestion
-                question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
-                'worst case scenario:
-                If question.Text = "" Then question.Text = "Reuse rotor contents to perform light adjustment?"
-
-                question.OnAnswered = Sub()
-                                          response.Reuse = question.Result = MsgBoxResult.Yes
-                                          responseHandler.Invoke(response)
-                                      End Sub
-                PresentationLayerInterface.QueueRequest(question)
-            Else
-                responseHandler.Invoke(response)
-            End If
-        End Sub
 
 #End Region
 

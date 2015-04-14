@@ -12,20 +12,50 @@ Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 Public Class AppComLayer
     Implements IPresentationLayerListener
 
+    ''' <summary>
+    ''' This method allows a request to be sent from any thread to the presentation layer
+    ''' </summary>
+    ''' <param name="request" >This is the request to be enqueued</param>
+    ''' <remarks>This method is thread-safe and asynchronic</remarks>
     Public Sub QueueRequest(request As PresentationRequest) Implements IPresentationLayerListener.QueueRequest
         requestsQueue.Enqueue(request)
-        _managerForm.BeginInvoke(Sub()
-                                     DispatchQueue()
-                                 End Sub)
+        _contextControl.BeginInvoke(Sub()
+                                        DispatchQueue()
+                                    End Sub)
     End Sub
 
-    Sub New(managerForm As Windows.Forms.Form)
-        _managerForm = managerForm
+    ''' <summary>
+    ''' This method allows a request to be sent and processed from any thread to the presentation layer
+    ''' </summary>
+    ''' <param name="request" >This is the request to be sent and processed</param>
+    ''' <remarks>This method is thread-safe</remarks>
+    Public Sub InvokeSynchronizedRequest(request As PresentationRequest) Implements IPresentationLayerListener.InvokeSynchronizedRequest
+        If _contextControl.InvokeRequired Then
+            _contextControl.Invoke(Sub() InvokeSynchronizedRequest(request))
+        Else
+            Dispatch(request)
+        End If
+    End Sub
+
+    Sub New(contextControl As Control)
+        If contextControl.InvokeRequired Then
+            contextControl.Invoke(Sub() _contextControl = New Control(""))
+        Else
+            _contextControl = New Control("")
+        End If
     End Sub
 
 #Region "Private"
+    ''' <summary>
+    ''' This is a concurrent queue that to synchroniously process requests
+    ''' </summary>
     Private requestsQueue As New ConcurrentQueue(Of PresentationRequest)
-    Private _managerForm As System.Windows.Forms.Form
+
+
+    ''' <summary>
+    ''' This is an internal control used to store thread execution context
+    ''' </summary>
+    Private _contextControl As Control 'System.Windows.Forms.Form
 
     Private Sub DispatchQueue()
         While requestsQueue.Count > 0

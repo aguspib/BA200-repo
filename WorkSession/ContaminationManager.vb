@@ -52,55 +52,5 @@ Namespace Biosystems.Ax00.BL
                 End If
             End If
         End Sub
-
-        Public Sub BacktrackingOptimization(ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
-            Dim SolutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
-            Dim Tests = OrderTests.ToList()
-
-            Dim result = BacktrackingAlgorithm(0, Tests, SolutionSet)
-            currentContaminationNumber = New ExecutionsDelegate().GetContaminationNumber(ContDS, result, highContaminationPersistance)
-            If result.Count <> 0 Then
-                bestResult = result
-            End If
-        End Sub
-
-        Private Function BacktrackingAlgorithm(ByVal Level As Integer, ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
-            Static foundSolution As Boolean = False
-            For Each elem In Tests
-                If IsViable(SolutionSet, elem) Then
-                    Dim auxTests = Tests.ToList()
-                    auxTests.Remove(elem)
-                    If Level = SolutionSet.Count Then
-                        SolutionSet.Add(elem)
-                    Else
-                        SolutionSet.Item(Level) = elem
-                    End If
-                    If IsSolution(SolutionSet) Then
-                        foundSolution = True
-                        Return SolutionSet
-                    End If
-                    If auxTests.Count > 0 Then
-                        BacktrackingAlgorithm(Level + 1, auxTests, SolutionSet)
-                    End If
-                    If foundSolution Then
-                        Exit For
-                    Else
-                        SolutionSet.Remove(elem)
-                    End If
-                End If
-            Next
-            Return SolutionSet
-        End Function
-
-        Private Function IsViable(ByVal SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal elem As ExecutionsDS.twksWSExecutionsRow) As Boolean
-            Dim aux = SolutionSet.ToList()
-            aux.Add(elem)
-
-            Return (New ExecutionsDelegate().GetContaminationNumber(ContDS, aux, highContaminationPersistance) = 0)
-        End Function
-
-        Private Function IsSolution(ByVal SolutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
-            Return (SolutionSet.Count = bestResult.Count)
-        End Function
     End Class
 End Namespace
