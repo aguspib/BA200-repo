@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.App
 
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
-        Private _rotorChangeServices As RotorChangeServices 'BA-2143
+        Private _rotorChangeServices As RotorChangeService 'BA-2143
         Private _warmUpServices As IWarmUpService
 
 
@@ -185,7 +185,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 Return _rotorChangeServices.StartService()
@@ -206,7 +206,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 If (Not isInRecovering) Then
@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
@@ -248,7 +248,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorFinalizeProcess()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.EmptyAndFinalizeProcess()

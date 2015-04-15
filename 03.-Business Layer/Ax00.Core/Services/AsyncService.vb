@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Services.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Core.Services
 
@@ -73,12 +74,41 @@ Namespace Biosystems.Ax00.Core.Services
         Public MustOverride Sub PauseService() Implements IAsyncService.PauseService
         Public MustOverride Sub RestartService() Implements IAsyncService.RestartService
 
-        Public Sub UpdateFlags(ByVal flagsDs As AnalyzerManagerFlagsDS)
-            If FlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="flagsDs"></param>
+        ''' <remarks></remarks>
+        Public Sub UpdateFlags(ByVal flagsDs As AnalyzerManagerFlagsDS) Implements IAsyncService.UpdateFlags
+            If flagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                 Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, FlagsDS)
+                myFlagsDelg.Update(Nothing, flagsDs)
             End If
         End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function ExistsBottleAlarmsOrRotorIsMissing() As Boolean Implements IAsyncService.ExistsBottleAlarmsOrRotorIsMissing
+
+            Dim existsAlarms As Boolean = False
+            Dim bottleErrAlarm As Boolean = False
+            Dim reactRotorMissingAlarm As Boolean = _analyzer.Alarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
+
+            If _analyzer.ExistBottleAlarms() Then
+                bottleErrAlarm = True
+            End If
+
+            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
+                existsAlarms = True
+            End If
+
+            Return existsAlarms
+
+        End Function
+
 
 #End Region
 

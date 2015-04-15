@@ -2736,31 +2736,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return readyToSentInstruction
         End Function
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
-        ''' </remarks>
-        Public Function CheckIfWashingIsPossible() As Boolean Implements IAnalyzerManager.CheckIfWashingIsPossible
-
-            Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
-            Dim bottleErrAlarm As Boolean = False
-            Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
-
-            If ExistBottleAlarms() Then
-                bottleErrAlarm = True
-            End If
-
-            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                readyToSentInstruction = False
-            End If
-
-            Return readyToSentInstruction
-
-        End Function
-
 #End Region
 
 #Region "Freeze alarms methods"

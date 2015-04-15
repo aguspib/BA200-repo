@@ -1,5 +1,5 @@
 Namespace Biosystems.Ax00.Core.Services.Interfaces
-    Public Interface IRotorChangeServices
+    Public Interface IRotorChangeService
         Inherits IAsyncService
         ''' <summary>
         ''' 
