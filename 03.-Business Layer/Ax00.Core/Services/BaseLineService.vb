@@ -446,7 +446,7 @@ Namespace Biosystems.Ax00.Core.Services
                     CheckPreviousAlarms()
 
                 Case BaseLineStepsEnum.ConditioningWashing
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteWashingStep()
                     Else
@@ -455,7 +455,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case BaseLineStepsEnum.StaticBaseLine
                     If (Not _staticBaseLineFinished) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                        If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                             RestartProcess()
                             ExecuteStaticBaseLineStep()
                         Else
@@ -470,7 +470,7 @@ Namespace Biosystems.Ax00.Core.Services
 
 
                 Case BaseLineStepsEnum.DynamicBaseLineFill
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteDynamicBaseLineFillStep()
                     Else
@@ -483,7 +483,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case BaseLineStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                        If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                             RestartProcess()
                             ExecuteDynamicBaseLineEmptyStep()
                         Else

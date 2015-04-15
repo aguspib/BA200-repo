@@ -225,11 +225,9 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub ClearLastExportedResults()
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
         Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO
-        Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As WarmUpProcessFlag)
         Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String)
         Sub ResetBaseLineFailuresCounters()
         Sub SetAnalyzerNotReady()
-        Function CheckIfWashingIsPossible() As Boolean
         Function UpdateSensorValuesAttribute(ByVal pSensor As AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean
         Function ProcessFlightReadAction() As Boolean
         Function RemoveErrorCodeAlarms(ByVal pDbConnection As SqlConnection, ByVal pAction As AnalyzerManagerAx00Actions) As GlobalDataTO

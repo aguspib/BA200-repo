@@ -220,7 +220,7 @@ Namespace Biosystems.Ax00.Core.Services
                     ExecuteStartInstrumentStep()
 
                 Case WarmUpStepsEnum.Washing
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteWashingStep()
                     Else
