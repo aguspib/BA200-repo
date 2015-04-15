@@ -9,6 +9,7 @@ Namespace Biosystems.Ax00.BL
 
         Private bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
         Private lastBireactiveID As New List(Of Integer)
+        Private ContaminLimit As Integer
 
         Public Sub New()
             MyBase.New()
@@ -56,9 +57,17 @@ Namespace Biosystems.Ax00.BL
         Private Sub BacktrackingOptimization(ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
             Dim solutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim Tests = OrderTests.ToList()
+            Dim result As New List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim currentContaminationNumber = New ExecutionsDelegate().GetContaminationNumber(ContaminDS, result, HighContaminationPersistence)
 
-            Dim result = BacktrackingAlgorithm(0, Tests, solutionSet)
-            'currentContaminationNumber = New ExecutionsDelegate().GetContaminationNumber(ContDS, result, highContaminationPersistance)
+            ContaminLimit = 0
+
+            While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
+                result = BacktrackingAlgorithm(0, Tests, solutionSet)
+                If result.Count = 0 Then
+                    ContaminLimit += 1
+                End If
+            End While
 
             If result.Count = 0 Then
                 bestResult = OrderTests
@@ -104,7 +113,7 @@ Namespace Biosystems.Ax00.BL
             Dim aux = solutionSet.ToList()
             aux.Add(elem)
 
-            Return (GetContaminationNumberWithBireagents(aux, HighContaminationPersistence) = 0)
+            Return (GetContaminationNumberWithBireagents(aux, HighContaminationPersistence) <= ContaminLimit)
         End Function
 
         Private Function IsSolution(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
