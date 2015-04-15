@@ -3381,15 +3381,11 @@ Partial Public Class UiAx00MainMDI
     ''' This is done this way to allow cross-thread calls.</remarks>
     Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
 
-        If BaseLineService.CanRotorContentsByDirectlyRead Then
-            Dim question As New YesNoQuestion
-            question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
+        Dim question As New YesNoQuestion
+        question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
 
-            AnalyzerController.PresentationLayerInterface.InvokeSynchronizedRequest(question)
-            obj.Reuse = (question.Result = MsgBoxResult.Yes)
-        Else
-            obj.Reuse = False
-        End If
+        AnalyzerController.PresentationLayerInterface.InvokeSynchronizedRequest(question)
+        obj.Reuse = (question.Result = MsgBoxResult.Yes)
 
     End Sub
 

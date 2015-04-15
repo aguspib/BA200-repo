@@ -18,7 +18,7 @@ Namespace Biosystems.Ax00.Core.Services.Interfaces
         ''' <remarks></remarks>
         Sub FinalizeProcess()
 
-        Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse)
+        Property ReuseContentsForBaseLineCallback As Action(Of BaseLineService.ReuseRotorResponse)
         ReadOnly Property NextStep As WarmUpStepsEnum
     End Interface
 End Namespace
