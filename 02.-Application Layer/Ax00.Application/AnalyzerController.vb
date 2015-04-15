@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.App
                 If (_warmUpServices Is Nothing) Then
                     _warmUpServices = New WarmUpService(Analyzer)
                 End If
-                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
+                _warmUpServices.ReuseContentsForBaseLineCallback = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
                     Return _warmUpServices.StartService()
                 Else
