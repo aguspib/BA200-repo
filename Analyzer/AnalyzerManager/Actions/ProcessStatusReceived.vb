@@ -909,9 +909,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="errorValue"></param>
+        ''' <remarks></remarks>
         Private Sub TreatmentSingleAndMultipleErrors(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer)
-
-
 
             If Not _analyzerManager.IgnoreErrorCodes(_analyzerManager.InstructionTypeSent(), _analyzerManager.InstructionSent(), errorValue) Then
                 If errorValue = MULTIPLE_ERROR_CODE Then 'If multiple alarm error code ask for details
@@ -945,10 +949,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     ' ISE TIMEOUT
                     If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
-                        IseTimeoutErrorTreatment(myGlobal, myAlarms)
+                        'BA-2384 (INI)
+                        If IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) Then
+                            myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
+                        End If
+                        'BA-2384 (END)
                     End If
-
-                    myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
 
                     If GlobalBase.IsServiceAssembly Then
                         ' Initialize Error Codes List
@@ -1009,7 +1015,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myAlarmsReceivedList
         End Function
 
-        Private Sub IseTimeoutErrorTreatment(ByRef myGlobal As GlobalDataTO, ByVal myAlarms As List(Of Alarms))
+        Private Function IseTimeoutErrorTreatment(ByRef myGlobal As GlobalDataTO, ByVal myAlarms As List(Of Alarms), ByVal pAddInfo As Integer, ByRef pAdditionalInfoList As List(Of String)) As Boolean
+
+            Dim addAlarm = True 'BA-2384
 
             If _analyzerManager.ISEAnalyzer IsNot Nothing Then
                 If Not _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
@@ -1042,17 +1050,19 @@ Namespace Biosystems.Ax00.Core.Entities
                         Const alarmId As Alarms = Alarms.ISE_TIMEOUT_ERR
                         alarmStatus = True
                         _analyzerManager.ISEAnalyzer.IsTimeOut = True
+                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList, pAddInfo.ToString(), pAdditionalInfoList, True) 'BA-2384
 
-                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                         If myAlarmList.Count > 0 Then
                             ' Note that this alarm is common on User and Service !
                             Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList, pAdditionalInfoList)  'BA-2384
                         End If
                         ' Activates Alarm end
 
                         _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+
                     Else
+
                         If _analyzerManager.StartTaskInstructionsQueueCount() > 0 Then
                             Debug.Print("Deactivate waiting time control (2) ...")
                             _analyzerManager.NumRepetitionsStateInstruction() = 0
@@ -1072,9 +1082,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End If
 
+                    addAlarm = False  'BA-2384
+
                 End If
             End If
-        End Sub
+
+            Return addAlarm
+
+        End Function
 
         ''' <summary>
         ''' Sleep business logic
