@@ -1008,11 +1008,11 @@
       <Project>{053CFFD3-17B1-4A95-AF8C-FF4B6DE08809}</Project>
       <Name>Calculations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Controls\UserControls\BSControl_Library\BSControls.vbproj">
+    <ProjectReference Include="..\bax00framework\Controls\UserControls\BSControl_Library\BSControls.vbproj">
       <Project>{24D4D868-1885-4710-A105-9095FE79A2FB}</Project>
       <Name>BSControls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj">
+    <ProjectReference Include="..\bax00framework\Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj">
       <Project>{D205362A-E6D6-4904-B146-8427E2BFD146}</Project>
       <Name>BSCSharpControls</Name>
     </ProjectReference>

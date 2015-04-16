@@ -5,9 +5,9 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AX00Types", "AX00Types\AX00
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Global", "Global\Global\Global.vbproj", "{5D65020C-C2D7-4AC3-B557-223FC290E526}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BSControls", "Controls\UserControls\BSControl_Library\BSControls.vbproj", "{24D4D868-1885-4710-A105-9095FE79A2FB}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BSControls", "bax00framework\Controls\UserControls\BSControl_Library\BSControls.vbproj", "{24D4D868-1885-4710-A105-9095FE79A2FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSCSharpControls", "Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj", "{D205362A-E6D6-4904-B146-8427E2BFD146}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSCSharpControls", "bax00framework\Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj", "{D205362A-E6D6-4904-B146-8427E2BFD146}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.vbproj", "{51863CF3-A3E9-4E41-8924-C69704796FB9}"
 EndProject
