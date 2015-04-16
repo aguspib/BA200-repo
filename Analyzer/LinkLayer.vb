@@ -13,6 +13,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
     'Public Class Enlace
     Public Class LinkLayer
 
+
 #Region "Events definition"
 
         'Event that relates LinkLayer with ApplicationLayer (owner)

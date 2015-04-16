@@ -70,6 +70,8 @@ Namespace Biosystems.Ax00.Core.Services
 
 #End Region
 
+
+
 #Region "Event Handlers"
 
         Private Sub OnReceivedStatusInformationEvent()
