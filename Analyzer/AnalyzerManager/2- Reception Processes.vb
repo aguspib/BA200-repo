@@ -2100,7 +2100,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="errorCodesList"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function GetFwErrorCodes(ByVal alarmId As Integer, ByVal errorCodesList As List(Of Integer)) As String
+        Private Function GetFwErrorCodes(ByVal alarmId As Alarms, ByVal errorCodesList As List(Of Integer)) As String
 
             Dim myFwErrorCode = String.Empty
             Dim myFwErrorCodeList As List(Of AlarmsDS.tfmwAlarmsRow)
