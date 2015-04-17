@@ -485,7 +485,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Disable state 551 or 552
                 If Not IsAStateError AndAlso StatusParameters.IsActive Then
                     StatusParameters.IsActive = False
-                    currentAlarms.RemoveAlarmStateAndRefreshUi(StatusParameters.State.ToString())
+                    currentAlarms.RemoveAlarmState(StatusParameters.State.ToString())
                     StatusParameters.State = StatusParameters.RotorStates.None
                     'Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError FALSE")
                 End If
@@ -503,7 +503,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             StatusParameters.IsActive = True
                             StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
-                            currentAlarms.AddNewAlarmStateAndRefreshUi(alarmId.ToString())
+                            currentAlarms.AddNewAlarmState(alarmId.ToString())
                             StatusParameters.LastSaved = DateTime.Now
 
                         Case "560"
@@ -2216,14 +2216,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                         .WorkSessionID = WorkSessionIDAttribute
                                         .AnalyzerID = AnalyzerIDAttribute
                                         .AlarmID = pAlarmID
-                                        .AlarmStatus = pAlarmStatus
+                                        .AlarmStatus = pAlarmStatus                                        
                                         .EndEdit()
                                     End With
                                     myUI_RefreshDS.ReceivedAlarms.AddReceivedAlarmsRow(myNewAlarmRow)
                                     myUI_RefreshDS.ReceivedAlarms.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
                                 End SyncLock
-                        End Select
-
+                        End Select                            
                     End If
                 End If
 

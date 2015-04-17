@@ -180,6 +180,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 SB.Append(ChrW(B))
             Next
             Debug.WriteLine("   PC>>> : " & SB.ToString)
+            DebugLogger.AddLog("   PC>>> : " & SB.ToString)
 #End If
 
 
@@ -337,6 +338,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 #If TRACECOM Then
+            DebugLogger.AddLog("   PC<<< : " & dataReceived)
             Debug.WriteLine("   PC<<< : " & dataReceived)
 #End If
 

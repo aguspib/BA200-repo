@@ -318,7 +318,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
 
-                'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
+                'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed                
                 _myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmIdItem.ToString, pAlarmStatusList(index))
 
                 If _myIseOffErrorFixed Then
@@ -1171,7 +1171,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #End Region
 
 #Region "Manage Status Alarms and Simple Alarms"
-        Public Sub RemoveAlarmStateAndRefreshUi(ByVal alarmName As String)
+        Public Sub RemoveAlarmState(ByVal alarmName As String)
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
             Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
@@ -1199,15 +1199,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
 
-                'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                '_myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, False)
-
                 wsAlarmsDs.AcceptChanges()
                 alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
             End If
         End Sub
 
-        Public Sub AddNewAlarmStateAndRefreshUi(ByVal alarmName As String)
+        Public Sub AddNewAlarmState(ByVal alarmName As String)
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
 
             Dim alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
@@ -1224,15 +1221,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 .AlarmStatus = True
                 .AlarmItem = 1
                 .AdditionalInfo = "SILENT_ALARM"
-                .SetAdditionalInfoNull()
                 .EndEdit()
             End With
 
             wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
             wsAlarmsDs.AcceptChanges()
-
-            'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-            '_myGlobal = _analyzerManager.PrepareUIRefreshEvent(_dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmName, True)
 
             _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
         End Sub

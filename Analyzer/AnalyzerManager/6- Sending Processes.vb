@@ -222,6 +222,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'The next instruction to be sent has not been found yet by Software. It has to Search + Send
                         'CASE (example the 1st request received in RUNNING)
                         myGlobal = Me.SearchNextPreparation(Nothing, pNextWell, ISEModuleIsReadyAttribute) 'Search for next instruction to be sent ... and sent it!!
+                        GlobalBase.CreateLogActivity("Other: " + pNextWell.ToString, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Information, False)
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                             myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
                             '' PROVA XB !!!
@@ -795,6 +796,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
 
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (Check if exist reagents contaminations): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+
                                 Else 'STD execution or NO_PENDING_PREPARATION_FOUND
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.ExecutionType = "PREP_STD"
@@ -808,6 +811,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.SetWashSolution2Null()
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                                 End If '(4.2)
                             End If '(4.1)
                         End If '(4.0

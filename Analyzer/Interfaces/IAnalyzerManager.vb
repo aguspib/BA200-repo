@@ -132,6 +132,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property NextPreparationsAnalyzerManagerDS As AnalyzerManagerDS
         Property wellContaminatedWithWashSent As Integer
         Property CanManageRetryAlarm As Boolean
+        Property StartingRunningFirstTime As Boolean
 
 #End Region
 
