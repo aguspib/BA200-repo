@@ -503,7 +503,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             StatusParameters.IsActive = True
                             StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
-                            currentAlarms.AddNewAlarmStateAndRefreshUi(alarmId.ToString())
+                            currentAlarms.AddNewAlarmState(alarmId.ToString())
                             StatusParameters.LastSaved = DateTime.Now
 
                         Case "560"
