@@ -122,6 +122,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'This flag is required because if reconnect in running sometimes firmware sends 2 STATUS instruction, depends on the cycle machine moment where the connection is received
         Private runningConnectionPollSnSent As Boolean = False
+        Private startingRunningFirstTimeAttr As Boolean = False
 #End Region
 
 #Region "Attributes definition"
@@ -1496,6 +1497,16 @@ Namespace Biosystems.Ax00.Core.Entities
                 IsAlreadyManagedAlarmsAttr = value
             End Set
         End Property
+
+        Public Property StartingRunningFirstTime As Boolean Implements IAnalyzerManager.StartingRunningFirstTime
+            Get
+                Return startingRunningFirstTimeAttr
+            End Get
+            Set(value As Boolean)
+                startingRunningFirstTimeAttr = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1612,7 +1623,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 InitializeTimerStartTaskControl(WAITING_TIME_OFF)
                 ClearQueueToSend()
 
-                Debug.Print("SALTA TIMER START_TASK_TIMEOUT !!!!")
                 ManageAnalyzer(AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
 
             Catch ex As Exception

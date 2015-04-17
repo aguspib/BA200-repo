@@ -132,128 +132,129 @@ Partial Public Class UiMonitor
                                 additionalInfo = String.Format("[{0}:{1}:{2}]", myHours.ToString("#00"), myMinutes.ToString("00"), mySeconds.ToString("00"))
                                 row.Description &= " " & additionalInfo
                             End If
-                        End If
-
+                        End If                        
                         'Decode field Additional Info
                         If (Not String.IsNullOrEmpty(row.AdditionalInfo)) Then
                             'Decode field Additional Info for ISE Alarms
-                            If (row.AlarmID = Alarms.ISE_CALIB_ERROR.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_A.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_B.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_C.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_D.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_S.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_F.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_M.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_N.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_R.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_W.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_P.ToString OrElse _
-                                row.AlarmID = Alarms.ISE_ERROR_T.ToString) Then
+                            If String.Equals(row.AdditionalInfo, "SILENT_ALARM") Then
+                                row.Delete()
+                            ElseIf (row.AlarmID = Alarms.ISE_CALIB_ERROR.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_A.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_B.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_C.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_D.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_S.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_F.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_M.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_N.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_R.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_W.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_P.ToString OrElse _
+                                    row.AlarmID = Alarms.ISE_ERROR_T.ToString) Then
 
-                                myGloblaData = myWSAlarmsDelegate.DecodeISEAdditionalInfo(row.AlarmID, row.AdditionalInfo, row.AnalyzerID)
-                                If (Not myGloblaData.HasError AndAlso Not myGloblaData.SetDatos Is Nothing) Then
-                                    additionalISEInfoDS = DirectCast(myGloblaData.SetDatos, WSAnalyzerAlarmsDS)
+                                    myGloblaData = myWSAlarmsDelegate.DecodeISEAdditionalInfo(row.AlarmID, row.AdditionalInfo, row.AnalyzerID)
+                                    If (Not myGloblaData.HasError AndAlso Not myGloblaData.SetDatos Is Nothing) Then
+                                        additionalISEInfoDS = DirectCast(myGloblaData.SetDatos, WSAnalyzerAlarmsDS)
 
-                                    For Each adISERow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In additionalISEInfoDS.twksWSAnalyzerAlarms.Rows
-                                        If (adISERow.AdditionalInfo.Trim.Length > 0) Then
-                                            additionalInfo = adISERow.AlarmID & " " & adISERow.AdditionalInfo
-                                            row.Description &= Environment.NewLine & additionalInfo
+                                        For Each adISERow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In additionalISEInfoDS.twksWSAnalyzerAlarms.Rows
+                                            If (adISERow.AdditionalInfo.Trim.Length > 0) Then
+                                                additionalInfo = adISERow.AlarmID & " " & adISERow.AdditionalInfo
+                                                row.Description &= Environment.NewLine & additionalInfo
+                                            Else
+                                                row.Description = adISERow.AlarmID
+                                            End If
+                                        Next
+                                    End If
+                                Else
+                                    'Decode field Additional Info for other Alarms
+                                    myGloblaData = myWSAlarmsDelegate.DecodeAdditionalInfo(row.AlarmID, row.AdditionalInfo)
+                                    If (Not myGloblaData.HasError AndAlso Not myGloblaData.SetDatos Is Nothing) Then
+                                        additionalInfoDS = DirectCast(myGloblaData.SetDatos, WSAnalyzerAlarmsDS)
+
+                                        adRow = additionalInfoDS.AdditionalInfoPrepLocked(0)
+                                        If (String.Equals(adRow.SampleClass, "CALIB")) Then
+                                            If (String.Equals(adRow.NumberOfCalibrators, "1")) Then
+                                                name = adRow.Name
+                                            Else
+                                                name = String.Format("{0}-{1}", adRow.Name, adRow.MultiItemNumber)
+                                            End If
                                         Else
-                                            row.Description = adISERow.AlarmID
-                                        End If
-                                    Next
-                                End If
-                            Else
-                                'Decode field Additional Info for other Alarms
-                                myGloblaData = myWSAlarmsDelegate.DecodeAdditionalInfo(row.AlarmID, row.AdditionalInfo)
-                                If (Not myGloblaData.HasError AndAlso Not myGloblaData.SetDatos Is Nothing) Then
-                                    additionalInfoDS = DirectCast(myGloblaData.SetDatos, WSAnalyzerAlarmsDS)
-
-                                    adRow = additionalInfoDS.AdditionalInfoPrepLocked(0)
-                                    If (String.Equals(adRow.SampleClass, "CALIB")) Then
-                                        If (String.Equals(adRow.NumberOfCalibrators, "1")) Then
                                             name = adRow.Name
-                                        Else
-                                            name = String.Format("{0}-{1}", adRow.Name, adRow.MultiItemNumber)
                                         End If
-                                    Else
-                                        name = adRow.Name
+                                        additionalInfo = String.Empty
+
+                                        'DL 11/07/2012. In any case arrives here without load values for variable. Ensure that variables always has values
+                                        'TR 01/10/2012 -Added the bottle locked validation.
+                                        If (S_NO_VOLUME_BLANK_Format Is Nothing OrElse S_NO_VOLUME_Format Is Nothing OrElse _
+                                            PREP_LOCKED_BLANK_Format Is Nothing OrElse PREP_LOCKED_Format Is Nothing OrElse _
+                                            SPEC_SOL_Format Is Nothing OrElse WASH_SOL_Format Is Nothing OrElse _
+                                            PREP_WITH_CLOT_Format Is Nothing OrElse PREP_WITH_CLOT_BLANK_Format Is Nothing OrElse _
+                                            R_NO_VOLUME_Format Is Nothing OrElse BOTTLE_LOCKED_Format Is Nothing) Then
+                                            GetAlarmsTabLabels()
+                                        End If
+                                        'DL 11/07/2012 - End.
+
+                                        Select Case row.AlarmID
+                                            Case Alarms.S_NO_VOLUME_WARN.ToString()
+                                                If (String.Equals(adRow.SampleClass, "BLANK")) Then
+                                                    additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   BlankModeDict(name), adRow.RotorPosition)
+                                                Else
+                                                    additionalInfo = String.Format(S_NO_VOLUME_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   name, adRow.RotorPosition)
+                                                End If
+
+                                            Case Alarms.PREP_LOCKED_WARN.ToString()
+                                                If (String.Equals(adRow.SampleClass, "BLANK")) Then
+                                                    additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   BlankModeDict(name), adRow.TestName) ', adRow.ReplicateNumber) 'AG 18/06/2012 - do not shown the replicate number
+                                                Else
+                                                    additionalInfo = String.Format(PREP_LOCKED_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   name, adRow.TestName) ', adRow.ReplicateNumber)'AG 18/06/2012 - do not shown the replicate number
+                                                End If
+
+                                                'AG 25/07/2012
+                                            Case Alarms.CLOT_DETECTION_ERR.ToString(), _
+                                                 Alarms.CLOT_DETECTION_WARN.ToString()
+                                                If (String.Equals(adRow.SampleClass, "BLANK")) Then
+                                                    additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   BlankModeDict(name), adRow.TestName, adRow.ReplicateNumber)
+                                                Else
+                                                    additionalInfo = String.Format(PREP_WITH_CLOT_Format, SampleClassDict(adRow.SampleClass), _
+                                                                                   name, adRow.TestName, adRow.ReplicateNumber)
+                                                End If
+                                                'AG 25/07/2012
+
+                                            Case Alarms.R1_NO_VOLUME_WARN.ToString(), _
+                                                 Alarms.R2_NO_VOLUME_WARN.ToString()
+                                                'RH 18/05/2012
+                                                Select Case adRow.TubeContent
+                                                    Case "SPEC_SOL"
+                                                        additionalInfo = String.Format(SPEC_SOL_Format, SolutionCodeDict(adRow.SolutionCode), adRow.RotorPosition)
+
+                                                    Case "WASH_SOL"
+                                                        additionalInfo = String.Format(WASH_SOL_Format, SolutionCodeDict(adRow.SolutionCode), adRow.RotorPosition)
+
+                                                    Case Else
+                                                        additionalInfo = String.Format(R_NO_VOLUME_Format, adRow.TestName, adRow.RotorPosition)
+                                                End Select
+                                                'RH 18/05/2012 - END
+
+                                            Case Alarms.BOTTLE_LOCKED_WARN.ToString() 'TR 01/10/2012 -Case Reagent bottle locked. 
+                                                additionalInfo = String.Format(BOTTLE_LOCKED_Format, adRow.TestName, adRow.RotorPosition)
+                                        End Select
+
+                                        row.Description &= Environment.NewLine & additionalInfo
+
+                                        'AG 09/12/2014 BA-2236 - AdditionalInfo = ErrorCode
+                                    ElseIf Not myGloblaData.HasError AndAlso IsNumeric(row.AdditionalInfo) Then
+                                        row.Description &= " - [" & row.AdditionalInfo.ToString & "]"
+                                        'AG 09/12/2014 BA-2236
+
                                     End If
-                                    additionalInfo = String.Empty
-
-                                    'DL 11/07/2012. In any case arrives here without load values for variable. Ensure that variables always has values
-                                    'TR 01/10/2012 -Added the bottle locked validation.
-                                    If (S_NO_VOLUME_BLANK_Format Is Nothing OrElse S_NO_VOLUME_Format Is Nothing OrElse _
-                                        PREP_LOCKED_BLANK_Format Is Nothing OrElse PREP_LOCKED_Format Is Nothing OrElse _
-                                        SPEC_SOL_Format Is Nothing OrElse WASH_SOL_Format Is Nothing OrElse _
-                                        PREP_WITH_CLOT_Format Is Nothing OrElse PREP_WITH_CLOT_BLANK_Format Is Nothing OrElse _
-                                        R_NO_VOLUME_Format Is Nothing OrElse BOTTLE_LOCKED_Format Is Nothing) Then
-                                        GetAlarmsTabLabels()
-                                    End If
-                                    'DL 11/07/2012 - End.
-
-                                    Select Case row.AlarmID
-                                        Case Alarms.S_NO_VOLUME_WARN.ToString()
-                                            If (String.Equals(adRow.SampleClass, "BLANK")) Then
-                                                additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               BlankModeDict(name), adRow.RotorPosition)
-                                            Else
-                                                additionalInfo = String.Format(S_NO_VOLUME_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               name, adRow.RotorPosition)
-                                            End If
-
-                                        Case Alarms.PREP_LOCKED_WARN.ToString()
-                                            If (String.Equals(adRow.SampleClass, "BLANK")) Then
-                                                additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               BlankModeDict(name), adRow.TestName) ', adRow.ReplicateNumber) 'AG 18/06/2012 - do not shown the replicate number
-                                            Else
-                                                additionalInfo = String.Format(PREP_LOCKED_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               name, adRow.TestName) ', adRow.ReplicateNumber)'AG 18/06/2012 - do not shown the replicate number
-                                            End If
-
-                                            'AG 25/07/2012
-                                        Case Alarms.CLOT_DETECTION_ERR.ToString(), _
-                                             Alarms.CLOT_DETECTION_WARN.ToString()
-                                            If (String.Equals(adRow.SampleClass, "BLANK")) Then
-                                                additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               BlankModeDict(name), adRow.TestName, adRow.ReplicateNumber)
-                                            Else
-                                                additionalInfo = String.Format(PREP_WITH_CLOT_Format, SampleClassDict(adRow.SampleClass), _
-                                                                               name, adRow.TestName, adRow.ReplicateNumber)
-                                            End If
-                                            'AG 25/07/2012
-
-                                        Case Alarms.R1_NO_VOLUME_WARN.ToString(), _
-                                             Alarms.R2_NO_VOLUME_WARN.ToString()
-                                            'RH 18/05/2012
-                                            Select Case adRow.TubeContent
-                                                Case "SPEC_SOL"
-                                                    additionalInfo = String.Format(SPEC_SOL_Format, SolutionCodeDict(adRow.SolutionCode), adRow.RotorPosition)
-
-                                                Case "WASH_SOL"
-                                                    additionalInfo = String.Format(WASH_SOL_Format, SolutionCodeDict(adRow.SolutionCode), adRow.RotorPosition)
-
-                                                Case Else
-                                                    additionalInfo = String.Format(R_NO_VOLUME_Format, adRow.TestName, adRow.RotorPosition)
-                                            End Select
-                                            'RH 18/05/2012 - END
-
-                                        Case Alarms.BOTTLE_LOCKED_WARN.ToString() 'TR 01/10/2012 -Case Reagent bottle locked. 
-                                            additionalInfo = String.Format(BOTTLE_LOCKED_Format, adRow.TestName, adRow.RotorPosition)
-                                    End Select
-
-                                    row.Description &= Environment.NewLine & additionalInfo
-
-                                    'AG 09/12/2014 BA-2236 - AdditionalInfo = ErrorCode
-                                ElseIf Not myGloblaData.HasError AndAlso IsNumeric(row.AdditionalInfo) Then
-                                    row.Description &= " - [" & row.AdditionalInfo.ToString & "]"
-                                    'AG 09/12/2014 BA-2236
-
                                 End If
                             End If
-                        End If
-                        'END RH 30/01/2012
+                            'END RH 30/01/2012
 
                     Next
 

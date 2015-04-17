@@ -9,8 +9,7 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Namespace Biosystems.Ax00.Core.Entities
     Public Class ProcessStatusReceived
 
-        Private _analyzerManager As IAnalyzerManager
-        Private _startingRunningFirstTime As Boolean
+        Private _analyzerManager As IAnalyzerManager        
         Private ReadOnly _instructionReceived As List(Of InstructionParameterTO)
 
         ''' <summary>
@@ -122,7 +121,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.State = DirectCast(errorValue, StatusParameters.RotorStates)
                 StatusParameters.LastSaved = DateTime.Now
 
-                currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
+                currentAlarms.AddNewAlarmState(errorTranslated.ToString())
                 'Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
@@ -130,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL
                 StatusParameters.LastSaved = DateTime.Now
 
-                currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
+                currentAlarms.AddNewAlarmState(errorTranslated.ToString())
             End If
 
         End Sub
@@ -155,7 +154,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmStateAndRefreshUi(Alarms.GLF_BOARD_FBLD_ERR.ToString())
+                If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmState(Alarms.GLF_BOARD_FBLD_ERR.ToString())
                 _analyzerManager.CanSendingRepetitions() = False
                 _analyzerManager.NumSendingRepetitionsTimeout() = 0
             End If
@@ -872,13 +871,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
                 _analyzerManager.InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
                 _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
-                _startingRunningFirstTime = True
+                _analyzerManager.StartingRunningFirstTime = True
             End If
 
             If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END Or _
                _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                If _startingRunningFirstTime Then
-                    _startingRunningFirstTime = False
+                If _analyzerManager.StartingRunningFirstTime Then
+                    _analyzerManager.StartingRunningFirstTime = False
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
                     _analyzerManager.RunningLostState() = False
                     _analyzerManager.CanSendingRepetitions() = False
