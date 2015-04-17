@@ -14,9 +14,9 @@ Namespace Biosystems.Ax00.Core.Services
     ''' Created by:  IT 19/12/2014 - BA-2143
     ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
-    Public Class RotorChangeServices
+    Public Class RotorChangeService
         Inherits AsyncService
-        Implements IRotorChangeServices
+        Implements IRotorChangeService
 
 #Region "Constructors"
         Public Sub New(analyzer As IAnalyzerManager)
@@ -152,7 +152,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ContinueProcess() As Boolean Implements IRotorChangeServices.ContinueProcess
+        Public Function ContinueProcess() As Boolean Implements IRotorChangeService.ContinueProcess
             If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
                 ValidateProcess()
             Else
@@ -166,7 +166,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub RepeatDynamicBaseLineReadStep() Implements IRotorChangeServices.RepeatDynamicBaseLineReadStep
+        Public Sub RepeatDynamicBaseLineReadStep() Implements IRotorChangeService.RepeatDynamicBaseLineReadStep
             _baseLineService.RepeatDynamicBaseLineReadStep()
         End Sub
 
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub EmptyAndFinalizeProcess() Implements IRotorChangeServices.EmptyAndFinalizeProcess
+        Public Sub EmptyAndFinalizeProcess() Implements IRotorChangeService.EmptyAndFinalizeProcess
             _baseLineService.EmptyAndFinalizeProcess()
         End Sub
 
@@ -186,7 +186,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks>
         ''' Modified by:  AG 20/01/2015 - BA-2216
         ''' </remarks>
-        Public Function RecoverProcess() As Boolean Implements IRotorChangeServices.RecoverProcess
+        Public Function RecoverProcess() As Boolean Implements IRotorChangeService.RecoverProcess
             Try
                 _isInRecovering = True
 

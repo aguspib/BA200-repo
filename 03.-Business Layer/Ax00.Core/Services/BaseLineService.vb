@@ -37,7 +37,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property DecideToReuseRotorContents As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
+        Public Property DecideToReuseRotorContentsCallback As Action(Of ReuseRotorResponse) Implements IBaseLineService.DecideToReuseRotorContents
 
         ''' <summary>
         ''' 
@@ -203,7 +203,7 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         ''' <summary>
-        ''' 
+        ''' This function returns TRUE if current ractions rotor is full of clean water that can be used to perform directly a FLIGHT read step.
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
@@ -211,19 +211,17 @@ Namespace Biosystems.Ax00.Core.Services
 
             'Calculate expiration time:
             Dim caducityMinutesString = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY).SetDatos
-            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then
-                caducityMinutesString = "0"
-                Debug.WriteLine("Rotor contentes Caducity was not found in the DB!!")
-            End If
+
+            If caducityMinutesString Is Nothing OrElse caducityMinutesString = String.Empty Then caducityMinutesString = "0"
 
             Dim caducityMinutes = CInt(caducityMinutesString)
-            Dim expirationTime = Now.AddMinutes(-caducityMinutes)
+            Dim expirationTime = StatusParameters.LastSaved.AddMinutes(caducityMinutes)
 
             'Process flags:
             Return StatusParameters.State =
                 StatusParameters.RotorStates.FBLD_ROTOR_FULL And
                 StatusParameters.IsActive = True And
-                StatusParameters.LastSaved > expirationTime
+                Now < expirationTime
         End Function
 
 #End Region
@@ -446,7 +444,7 @@ Namespace Biosystems.Ax00.Core.Services
                     CheckPreviousAlarms()
 
                 Case BaseLineStepsEnum.ConditioningWashing
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteWashingStep()
                     Else
@@ -455,7 +453,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case BaseLineStepsEnum.StaticBaseLine
                     If (Not _staticBaseLineFinished) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                        If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                             RestartProcess()
                             ExecuteStaticBaseLineStep()
                         Else
@@ -470,7 +468,7 @@ Namespace Biosystems.Ax00.Core.Services
 
 
                 Case BaseLineStepsEnum.DynamicBaseLineFill
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteDynamicBaseLineFillStep()
                     Else
@@ -483,7 +481,7 @@ Namespace Biosystems.Ax00.Core.Services
 
                 Case BaseLineStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                        If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                             RestartProcess()
                             ExecuteDynamicBaseLineEmptyStep()
                         Else
@@ -893,15 +891,13 @@ Namespace Biosystems.Ax00.Core.Services
             If _analyzer.Connected = False Then Return
 
             Dim alarm551Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.FBLD_ROTOR_FULL)
-            Dim alarm551Date = StatusParameters.LastSaved
 
             Dim alarm552Present = StatusParameters.IsActive And (StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL)
-            Debug.WriteLine("Alarms: 551=" & alarm551Present & " date = " & alarm551Date & " " & " 552=" & alarm552Present)
 
             If alarm552Present Then
                 ExecuteDynamicBaseLineEmptyStep()
             ElseIf alarm551Present Then
-                ProcessAlarmFullCleanRotor(alarm551Date)
+                ProcessAlarmFullCleanRotor()
             Else
                 'No alarms to process. Do nothing
             End If
@@ -911,28 +907,21 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="pAlarmDate"></param>
         ''' <remarks></remarks>
-        Private Sub ProcessAlarmFullCleanRotor(pAlarmDate As Date)
-            Dim minutosCaducidadRotorLleno = 30
-            Dim caducityParameter = GetGeneralSettingValue(GeneralSettingsEnum.FLIGHT_FULL_ROTOR_CADUCITY)
-            If caducityParameter IsNot Nothing AndAlso caducityParameter.HasError = False Then minutosCaducidadRotorLleno = CInt(caducityParameter.SetDatos)
+        Private Sub ProcessAlarmFullCleanRotor()
 
-            If pAlarmDate < Now.AddMinutes(-minutosCaducidadRotorLleno) Then
-                '551 caducada
-                ExecuteDynamicBaseLineEmptyStep()
-            Else
-                '551 usable
+            If CanRotorContentsByDirectlyRead() Then
                 Dim result As New ReuseRotorResponse
-                If DecideToReuseRotorContents IsNot Nothing Then DecideToReuseRotorContents.Invoke(result)
+                If DecideToReuseRotorContentsCallback IsNot Nothing Then DecideToReuseRotorContentsCallback.Invoke(result)
                 If result.Reuse Then
                     DirectlyGoToDynamicReadStep()
-                    'ExecuteDynamicBaseLineReadStep()
                 Else
                     ExecuteDynamicBaseLineEmptyStep()
                 End If
-
+            Else
+                ExecuteDynamicBaseLineEmptyStep()
             End If
+
         End Sub
 
 #End Region

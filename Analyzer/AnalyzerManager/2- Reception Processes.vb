@@ -393,6 +393,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  AG 14/03/2011
         ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
         '''                              due to the first one is redundant and produces building warnings
+        '''              SA 31/03/2015 - BA-2384 ==> Based in implementation of BA-2236 for BA-200. Added changes to allow inform the FW Error Code as 
+        '''                                          Additional Information for each Alarm. Removed use of dbConnection variable and the code to Commit/Rollback 
+        '''                                          a DB Transaction due to no DB Connection is opened by this function. Removed old commented code. Removed all 
+        '''                                          Exit Try sentences. Added Comments. 
+        '''              IT 16/04/2015 - BA-2441 Code review related with BA-2384
         ''' </remarks>
         Private Function ProcessHwAlarmDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
@@ -424,7 +429,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Dim errorCode As Integer = 0
-                Dim myErrorCode As New List(Of Integer)
+                Dim myErrorCodes As New List(Of Integer)
+
 
                 For i As Integer = 1 To errorNumber
                     myGlobal = GetItemByParameterIndex(pInstructionReceived, 3 + i)
@@ -446,7 +452,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             ' Service Sw
                             If errorCode <> 20 And errorCode <> 99 Then
-                                myErrorCode.Add(errorCode)
+                                myErrorCodes.Add(errorCode)
                             End If
                         Else
                             If errorCode = 551 Or errorCode = 552 Then
@@ -455,22 +461,26 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             ' User Sw
                             If errorCode <> 20 And errorCode <> 21 And errorCode <> 99 Then
-                                myErrorCode.Add(errorCode)
+                                myErrorCodes.Add(errorCode)
                             End If
                         End If
                     End If
                 Next
 
                 'New translation method
-                Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
+                Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCodes)
 
                 If GlobalBase.IsServiceAssembly Then
                     If Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                         IsServiceRotorMissingInformed = False
                     End If
                 End If
+
                 Dim currentAlarms = New AnalyzerAlarms(Me)
                 Dim index As Integer = 0
+
+                'BA-2384: Changed the way of calling function PrepareLocalAlarmList to allow inform the FW Error Code as Additional Information for each Alarm 
+                Dim myFwErrorCode = String.Empty
 
                 'Disable state 551 or 552
                 If Not IsAStateError AndAlso StatusParameters.IsActive Then
@@ -483,17 +493,21 @@ Namespace Biosystems.Ax00.Core.Entities
                 For Each alarmId As Alarms In myAlarms
 
                     Dim errorCodeId = ""
-                    If index <= myErrorCode.Count - 1 Then
-                        errorCodeId = myErrorCode(index).ToString
+                    If index <= myErrorCodes.Count - 1 Then
+                        errorCodeId = myErrorCodes(index).ToString
                     End If
 
-                    If errorCodeId = "551" Or errorCodeId = "552" Then
-                        StatusParameters.IsActive = True
-                        StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
-                        currentAlarms.AddNewAlarmState(alarmId.ToString())
-                        StatusParameters.LastSaved = DateTime.Now
-                    Else
-                        If errorCodeId = "560" Then
+                    Select Case errorCodeId
+
+                        Case "551", "552"
+
+                            StatusParameters.IsActive = True
+                            StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
+                            currentAlarms.AddNewAlarmStateAndRefreshUi(alarmId.ToString())
+                            StatusParameters.LastSaved = DateTime.Now
+
+                        Case "560"
+
                             CanSendingRepetitions() = True
                             NumSendingRepetitionsTimeout() += 1
 
@@ -508,9 +522,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = SendStartTaskinQueue()
 
                             End If
-                        End If
-                        PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
-                    End If
+
+                            myFwErrorCode = GetFwErrorCodes(alarmId, myErrorCodes) 'BA-2441
+                            PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, myFwErrorCode, myAlarmsAdditionalInfoList, True) 'BA-2384
+
+                        Case Else
+
+                            myFwErrorCode = GetFwErrorCodes(alarmId, myErrorCodes) 'BA-2441
+                            PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, myFwErrorCode, myAlarmsAdditionalInfoList, True) 'BA-2384
+
+                    End Select
+
                     index += 1
                 Next
 
@@ -520,7 +542,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ' Initialize Error Codes List
                     myErrorCodesAttribute.Clear()
                     ' Prepare error codes List received from Analyzer
-                    PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
+                    PrepareLocalAlarmList_SRV(myErrorCodes, myFwCodeErrorReceivedList)
                 End If
 
                 If Not myGlobal.HasError Then
@@ -529,6 +551,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                         Else
+                            'BA-2384: Inform optional parameter pAdditionalInfoList = myAlarmsAdditionalInfoList
                             myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                         End If
                     End If
@@ -2070,252 +2093,34 @@ Namespace Biosystems.Ax00.Core.Entities
             dynamicbaselineInitializationFailuresAttribute = 0 'Reset FLIGHT failures counter
         End Sub
 
-
-#End Region
-
-#Region "Public Methods"
-
         ''' <summary>
-        ''' Method to validate and manage the Warm up process.
+        ''' 
         ''' </summary>
-        ''' <param name="myAnalyzerFlagsDS"></param>
-        ''' <remarks>
-        ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
-        ''' AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
-        ''' </remarks>
-        <Obsolete("Use WarmUpService instead")>
-        Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As WarmUpProcessFlag) Implements IAnalyzerManager.ValidateWarmUpProcess
+        ''' <param name="alarmId"></param>
+        ''' <param name="errorCodesList"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function GetFwErrorCodes(ByVal alarmId As Integer, ByVal errorCodesList As List(Of Integer)) As String
 
-            Dim myGlobal As New GlobalDataTO
+            Dim myFwErrorCode = String.Empty
+            Dim myFwErrorCodeList As List(Of AlarmsDS.tfmwAlarmsRow)
 
-            Try
-                Dim analyzerReadyFlagMustBeSetToFALSE As Boolean = False 'AG 16/01/2015 BA-2170
-                If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+            'Search in the global DataSet alarmsDefinitionTableDS, the FW Error Code for the Alarm; the FW Error Code has to exists in myErrorCodes List
+            'to avoid errors due to an AlarmID can be linked to several FW Error Codes
+            myFwErrorCodeList = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
+                                Where a.AlarmID = alarmId.ToString() AndAlso errorCodesList.Contains(a.ErrorCode) _
+                                Select a).ToList()
 
-                    Select Case flag
-                        Case WarmUpProcessFlag.StartInstrument
+            'If an Alarm is linked to several FW Error Codes and more than one of them is in the ANSERR Instruction, then they are 
+            'saved in AdditionalInfo field divided by commas
+            For Each fwCode As AlarmsDS.tfmwAlarmsRow In myFwErrorCodeList
+                If (myFwErrorCode <> String.Empty) Then myFwErrorCode &= ","
+                myFwErrorCode &= fwCode.ErrorCode.ToString()
+            Next
 
-                            If (mySessionFlags(AnalyzerManagerFlags.StartInstrument.ToString) = "") Then
-                                ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True)
-                                Exit Select
-                            End If
+            Return myFwErrorCode
 
-                        Case WarmUpProcessFlag.Wash
-
-                            If mySessionFlags(AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
-                                mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "" Then
-
-                                If (Not CheckIfWashingIsPossible()) Then
-                                    'If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
-
-                                    ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-                                    'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-                                    Exit Select
-                                Else
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
-
-                                    ' XBC 01/10/2012 - correction : When Washing process into WUPprocess is starting, previous StartInstrument process must set as END
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
-                                    ' XBC 01/10/2012
-
-                                    'Send a WASH instruction (Conditioning complete)
-                                    ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
-                                    analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                    Exit Select
-                                End If
-
-                            End If
-
-                        Case WarmUpProcessFlag.ProcessStaticBaseLine
-
-                            'Some action button process required Alight instruction is bottle level OK before Sw sends it
-                            If mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso _
-                               mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "" Then 'If alight instruction has been not already sent
-
-                                If (Not CheckIfWashingIsPossible()) Then
-                                    'If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "CANCELED")
-
-                                    ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-                                    'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-
-                                Else
-                                    'Send the ALIGHT instruction
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "INI")
-
-                                    ' XBC 01/10/2012 - correction : When BaseLine process into WUPprocess is starting, previous StartInstrument and Washing processes must set as END
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.StartInstrument, "END")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "END")
-                                    ' XBC 01/10/2012
-
-                                    'Before send ALIGHT in wup process ... delete the all ALIGHT/FLIGHT results
-                                    Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.DeleteBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "", BaseLineTypeForCalculations.ToString) 'AG 15/01/2015 BA-2212 inform new parameter BaseLineTypeForCalculations
-                                    If Not myGlobal.HasError Then
-                                        'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                        ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-
-                                        'When a process involves an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "INI")
-                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                        End If
-                                    End If
-
-                                End If
-
-                                Return
-                            End If
-
-                        Case WarmUpProcessFlag.ProcessDynamicBaseLine
-                            If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-
-                                If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") And
-                                   (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") And
-                                   (CurrentInstructionAction = InstructionActions.None) Then
-                                    If (CheckIfWashingIsPossible()) Then
-                                        'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
-                                        CurrentInstructionAction = InstructionActions.FlightFilling
-                                        Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
-                                        analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                    Else
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
-                                    End If
-                                    Exit Select
-                                End If
-
-                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "END") And
-                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") And
-                                    (CurrentInstructionAction = InstructionActions.None) Then
-                                    'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
-                                    CurrentInstructionAction = InstructionActions.FlightReading
-                                    Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                    ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
-                                    analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                    Exit Select
-                                End If
-
-                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
-                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") And
-                                    (CurrentInstructionAction = InstructionActions.None) Then
-                                    'AG 27/11/2014 BA-2066
-                                    If (CheckIfWashingIsPossible()) Then
-                                        If (ProcessFlightReadAction()) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
-
-                                            'AG + IT 10/02/2015 BA-2246 - when MAX tentatives failed set flag DynamicBL_Read = CANCELED
-                                            If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
-                                            End If
-                                            'AG + IT 10/02/2015
-
-                                            'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
-                                            CurrentInstructionAction = InstructionActions.FlightEmptying
-                                            Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                            ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
-                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                        Else
-                                            'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = ""
-                                            CurrentInstructionAction = InstructionActions.FlightReading
-                                            Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                            ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
-                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                        End If
-                                    Else
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
-                                    End If
-                                    Exit Select
-                                End If
-
-                                'AG 10/02/2015 BA-2246 when DynamicBL_Read canceled --> send EMPTY ROTOR (scenario: comm lost during empty rotor after MAX tentatives failed!! (add orelse DynamicBL_Read = CANCELED)
-                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Read.ToString) = "CANCELED") AndAlso _
-                                    (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") AndAlso _
-                                    (CurrentInstructionAction = InstructionActions.None) Then
-
-                                    If (CheckIfWashingIsPossible()) Then
-                                        CurrentInstructionAction = InstructionActions.FlightEmptying
-                                        Dim mySwParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                        ManageAnalyzer(AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, mySwParams, String.Empty, Nothing)
-                                        analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
-                                    End If
-                                End If
-                                'AG 10/02/2015
-
-                            End If
-
-                        Case WarmUpProcessFlag.ConfigureBarCode
-                            ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
-                            'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
-
-                        Case WarmUpProcessFlag.Finalize
-
-                            If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-                                If (mySessionFlags(AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "END") Then
-                                    FinalizeWarmUpProcess()
-                                    Exit Select
-                                End If
-                            Else
-                                If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
-                                    FinalizeWarmUpProcess()
-                                    Exit Select
-                                End If
-                            End If
-
-                            If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
-                                FinalizeWarmUpProcess()
-                                Exit Select
-                            End If
-
-                    End Select
-
-
-                ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
-
-                    Select Case flag
-
-                        Case WarmUpProcessFlag.Finalize
-                            If (mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString) <> "INPROCESS") Then
-                                If (CheckIfWashingIsPossible()) Then
-                                    If (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
-                                        (mySessionFlags(AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
-                                        FinalizeWarmUpProcess()
-                                        Exit Select
-                                    End If
-                                End If
-                            End If
-                        Case WarmUpProcessFlag.ConfigureBarCode
-                            ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
-                            'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
-                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
-
-                    End Select
-
-                End If
-
-                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-                End If
-
-                'AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
-                If Not myGlobal.HasError AndAlso analyzerReadyFlagMustBeSetToFALSE AndAlso ConnectedAttribute Then
-                    SetAnalyzerNotReady()
-                End If
-                'AG 16/01/2015
-
-            Catch ex As Exception
-                Throw ex
-            End Try
-        End Sub
+        End Function
 
 #End Region
 

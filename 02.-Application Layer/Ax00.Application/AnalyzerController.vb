@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.App
 
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
-        Private _rotorChangeServices As RotorChangeServices 'BA-2143
+        Private _rotorChangeServices As RotorChangeService 'BA-2143
         Private _warmUpServices As IWarmUpService
 
 
@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.App
                 If (_warmUpServices Is Nothing) Then
                     _warmUpServices = New WarmUpService(Analyzer)
                 End If
-                _warmUpServices.ReuseRotorContentsForBaseLine = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
+                _warmUpServices.ReuseContentsForBaseLineCallback = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
                     Return _warmUpServices.StartService()
                 Else
@@ -185,7 +185,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 Return _rotorChangeServices.StartService()
@@ -206,7 +206,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 If (Not isInRecovering) Then
@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
@@ -248,7 +248,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorFinalizeProcess()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.EmptyAndFinalizeProcess()
@@ -276,29 +276,7 @@ Namespace Biosystems.Ax00.App
 
 #End Region
 
-        Public Sub UseRotorContentsForFLIGHT(responseHandler As Action(Of BaseLineService.ReuseRotorResponse))
 
-            If responseHandler Is Nothing Then Return
-            Dim response = New BaseLineService.ReuseRotorResponse
-            If IsAnalyzerInstantiated = False Then
-                responseHandler.Invoke(response)
-            End If
-
-            If BaseLineService.CanRotorContentsByDirectlyRead Then
-                Dim question As New YesNoQuestion
-                question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
-                'worst case scenario:
-                If question.Text = "" Then question.Text = "Reuse rotor contents to perform light adjustment?"
-
-                question.OnAnswered = Sub()
-                                          response.Reuse = question.Result = MsgBoxResult.Yes
-                                          responseHandler.Invoke(response)
-                                      End Sub
-                PresentationLayerInterface.QueueRequest(question)
-            Else
-                responseHandler.Invoke(response)
-            End If
-        End Sub
 
 #End Region
 

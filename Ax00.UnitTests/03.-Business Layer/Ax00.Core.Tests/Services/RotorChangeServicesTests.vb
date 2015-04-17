@@ -26,7 +26,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS")
             Mock.Arrange(Sub() analyzerManager.UpdateSessionFlags(Arg.IsAny(Of AnalyzerManagerFlagsDS), AnalyzerManagerFlags.NewRotor, "")).DoInstead(Sub() analyzerManager.SessionFlag(AnalyzerManagerFlags.NewRotor) = "")
 
-            Dim rotorChange = New RotorChangeServices(analyzerManager)
+            Dim rotorChange = New RotorChangeService(analyzerManager)
             Dim result = rotorChange.StartService()
 
             'output
@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             testGlobal.ErrorCode = "Not Connected"
             Mock.Arrange(Function() analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")).Returns(testGlobal)
 
-            Dim rotorChange = New RotorChangeServices(analyzerManager)
+            Dim rotorChange = New RotorChangeService(analyzerManager)
             Dim result = rotorChange.StartService()
 
             'output
@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                 testGlobal.ErrorCode = "AnalyzerManagerError"
                 Mock.Arrange(Function() analyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, Ax00WashStationControlModes.UP, "")).Returns(testGlobal)
 
-                Dim rotorChange = New RotorChangeServices(analyzerManager)
+                Dim rotorChange = New RotorChangeService(analyzerManager)
                 rotorChange.StartService()
 
                 'Something wrong with the exception.. then

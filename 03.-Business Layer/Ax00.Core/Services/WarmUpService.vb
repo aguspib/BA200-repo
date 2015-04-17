@@ -148,7 +148,7 @@ Namespace Biosystems.Ax00.Core.Services
                         ValidateProcess()
                     Case Else
                         If (nextStep <> WarmUpStepsEnum.Washing) Then
-                            _baseLineService.DecideToReuseRotorContents = ReuseRotorContentsForBaseLine
+                            _baseLineService.DecideToReuseRotorContents = ReuseContentsForBaseLineCallback
                             _baseLineService.RecoverProcess()
                         End If
                 End Select
@@ -220,7 +220,7 @@ Namespace Biosystems.Ax00.Core.Services
                     ExecuteStartInstrumentStep()
 
                 Case WarmUpStepsEnum.Washing
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                    If (Not ExistsBottleAlarmsOrRotorIsMissing()) Then
                         RestartProcess()
                         ExecuteWashingStep()
                     Else
@@ -318,7 +318,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub ExecuteBaseLineStep()
-            _baseLineService.DecideToReuseRotorContents = ReuseRotorContentsForBaseLine
+            _baseLineService.DecideToReuseRotorContents = ReuseContentsForBaseLineCallback
             _baseLineService.StartService()
         End Sub
 
@@ -728,7 +728,7 @@ Namespace Biosystems.Ax00.Core.Services
 #End Region
 
 #Region "Properties"
-        Public Property ReuseRotorContentsForBaseLine As Action(Of BaseLineService.ReuseRotorResponse) Implements IWarmUpService.ReuseRotorContentsForBaseLine
+        Public Property ReuseContentsForBaseLineCallback As Action(Of BaseLineService.ReuseRotorResponse) Implements IWarmUpService.ReuseContentsForBaseLineCallback
 
         Public ReadOnly Property NextStep As WarmUpStepsEnum Implements IWarmUpService.NextStep
             Get
