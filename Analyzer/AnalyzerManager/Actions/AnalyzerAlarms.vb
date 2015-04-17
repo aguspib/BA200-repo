@@ -310,7 +310,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     .SetAdditionalInfoNull()
                     If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
                        pAdditionalInfoList(index) IsNot Nothing AndAlso
-                       String.Equals(pAdditionalInfoList(index), String.Empty) Then
+                       Not String.Equals(pAdditionalInfoList(index), String.Empty) Then
                         .AdditionalInfo = pAdditionalInfoList(index)
                     End If
                     .EndEdit()
