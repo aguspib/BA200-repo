@@ -1184,8 +1184,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                     If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
                         For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
-                            alarmToUpdate.AlarmStatus = False
-                            alarmToUpdate.OKDateTime = Date.Now
+                            If alarmToUpdate.AlarmStatus Then
+                                alarmToUpdate.AlarmStatus = False
+                                alarmToUpdate.OKDateTime = Date.Now
+                            End If
                         Next
                         _myGlobal = _alarmsDelg.Update(Nothing, temporalDs)
                     End If
