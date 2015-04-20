@@ -2,13 +2,13 @@
 Imports System.Text
 Imports System.Security
 
-Module BatchWorker
+Module PreBuildBatch
 
     Private Const CryptKey As String = "Ax00Bios"  '// Key de encriptacion (deben ser 8 chars pq sino falla el algoritmo que usamos)
     Private _fileToEncrypt As String
     Private _fileEncrypted As String
 
-    Sub Main()        
+    Sub Main()
         Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
         _fileEncrypted = appDirect.Replace("Tools\", "PresentationCOM\Update\Task\TaskList.xml")
         _fileToEncrypt = appDirect.Replace("Tools\", "PresentationCOM\Update\Task\TaskListDecrypted.xml")
