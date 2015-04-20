@@ -87,8 +87,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Ax00.IntegrationTests", "Ax
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BAx00.Framework", "BAx00.Framework", "{7BD7FDBF-5C8D-445B-AF57-58CBCB108C0E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8AB937E2-1B4B-43A3-B9D2-663384D99F42}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "InstallFramework", "InstallFramework\InstallFramework.vbproj", "{B566F937-2EAF-48ED-A0C8-0A4DD2D712F6}"
 EndProject
 Global
