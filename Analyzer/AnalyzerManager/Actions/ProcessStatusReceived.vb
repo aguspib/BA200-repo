@@ -152,9 +152,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End If
 
-            If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
+            If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmState(Alarms.GLF_BOARD_FBLD_ERR.ToString())
+                If currentAlarms.ExistsActiveAlarm(Alarms.FBLD_ROTOR_FULL.ToString()) AndAlso errorValue <> 551 Then currentAlarms.RemoveAlarmState(Alarms.FBLD_ROTOR_FULL.ToString())
+                If currentAlarms.ExistsActiveAlarm(Alarms.UNKNOW_ROTOR_FULL.ToString()) AndAlso errorValue <> 552 Then currentAlarms.RemoveAlarmState(Alarms.UNKNOW_ROTOR_FULL.ToString())
                 _analyzerManager.CanSendingRepetitions() = False
                 _analyzerManager.NumSendingRepetitionsTimeout() = 0
             End If

@@ -388,7 +388,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </remarks>
         Public Function GetByAlarmID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAlarmID As String, _
                                      Optional ByVal pInitialDate As Date = Nothing, Optional ByVal pFinalDate As Date = Nothing, _
-                                     Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                     Optional ByVal pAnalyzerID As String = Nothing, Optional ByVal pWorkSessionID As String = Nothing) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -410,11 +410,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " AND AlarmDateTime <= '" & pFinalDate.ToString("yyyyMMdd 23:59:00") & "' "
                         End If
 
-                        If (pAnalyzerID.Trim <> "") Then
+                        If (Not IsNothing(pAnalyzerID) AndAlso pAnalyzerID.Trim <> "") Then
                             cmdText &= String.Format(" AND AnalyzerID = '{0}' ", pAnalyzerID.Trim)
                         End If
 
-                        If (pWorkSessionID.Trim <> "") Then
+                        If (Not IsNothing(pWorkSessionID) AndAlso pWorkSessionID.Trim <> "") Then
                             cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim & "' "
                         End If
 

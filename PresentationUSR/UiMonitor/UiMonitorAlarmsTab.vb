@@ -95,17 +95,20 @@ Partial Public Class UiMonitor
                         'BA-1355: Special process for Warning Alarm WS_PAUSE_MODE_WARN
                         If (row.AlarmID = Alarms.WS_PAUSE_MODE_WARN.ToString()) Then
                             GetDescriptionForAlarmWS_PAUSE_MODE_WARN(row)
-                        Else
-                            'For the rest of Alarms, decode field Additional Info when it is informed
-                            If (Not String.IsNullOrEmpty(row.AdditionalInfo)) Then
-                                'Decode field Additional Info for ISE Alarms
-                                If (row.AlarmID = Alarms.ISE_CALIB_ERROR.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_A.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_B.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_C.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_D.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_S.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_F.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_M.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_N.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_R.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_W.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_P.ToString OrElse _
-                                    row.AlarmID = Alarms.ISE_ERROR_T.ToString) Then
+                            Else
+                                'For the rest of Alarms, decode field Additional Info when it is informed
+                                If (Not String.IsNullOrEmpty(row.AdditionalInfo)) Then
+
+                                If String.Equals(row.AdditionalInfo, "SILENT_ALARM") Then
+                                    row.Delete()
+                                    'Decode field Additional Info for ISE Alarms
+                                ElseIf (row.AlarmID = Alarms.ISE_CALIB_ERROR.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_A.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_B.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_C.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_D.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_S.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_F.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_M.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_N.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_R.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_W.ToString OrElse row.AlarmID = Alarms.ISE_ERROR_P.ToString OrElse _
+                                                row.AlarmID = Alarms.ISE_ERROR_T.ToString) Then
                                     myGlobalData = GetDescriptionForISEAlarms(row)
                                 Else
                                     'BA-2384: When field AdditionalInfo is NUMERIC, it contains the FW Error Code for the Alarm (field can contain
@@ -118,8 +121,8 @@ Partial Public Class UiMonitor
                                         myGlobalData = GetDescriptionForOtherAlarms(row)
                                     End If
                                 End If
+                                End If
                             End If
-                        End If
                     Next
                     AlarmsXtraGrid.DataSource = myWSAnalyzerAlarmsDS.vwksAlarmsMonitor
                 End If
