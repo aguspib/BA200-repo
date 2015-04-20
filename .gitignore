@@ -189,3 +189,9 @@ Tools/SolutionTools.vshost.exe.manifest
 Tools/SolutionTools.exe.CodeAnalysisLog.xml
 Tools/SolutionTools.exe.lastcodeanalysissucceeded
 bax00framework/
+InstallFramework/downloadFramework.vshost.exe
+InstallFramework/downloadFramework.exe.config
+InstallFramework/downloadFramework.vshost.exe.config
+InstallFramework/downloadFramework.vshost.exe.manifest
+InstallFramework/DownloadFramework.exe
+InstallFramework/DownloadFramework.xml
