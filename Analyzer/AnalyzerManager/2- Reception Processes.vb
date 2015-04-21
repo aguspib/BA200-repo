@@ -111,9 +111,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'End If
 
                         Dim query As New List(Of InstructionParameterTO)
-                        'Const myRowIndex As Integer = 0
                         Dim myOffset As Integer = -1
-                        'Dim Utilities As New Utilities()
                         Dim nextBaseLineID As Integer = 0
                         Dim myInstructionType As String = ""
                         Dim myWell As Integer = 0
@@ -129,7 +127,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else
                             Exit Try
                         End If
-                        'AG 03/01/2011
 
                         'Get the well used from pInstructionReceived and initialize myWell variable
                         query = (From a In pInstructionReceived Where a.ParameterIndex = 3 Select a).ToList()
@@ -159,8 +156,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             myTotalResults = CInt(query.Count / myOffset)
                             Dim myIteration As Integer
                             Dim myBaseLineRow As BaseLinesDS.twksWSBaseLinesRow
-                            'Const myTempIndexMD As Integer = 0
-                            'Const myTempIndexRD As Integer = 0
 
                             For i As Integer = 1 To myTotalResults Step 1
                                 myIteration = i
@@ -269,13 +264,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim alarmStatus As Boolean = False 'By default no alarm                                    
                                     Dim myAlarm = CType(myGlobalDataTO.SetDatos, Alarms)
                                     If myAlarm <> AlarmEnumerates.Alarms.NONE Then
-                                        'AG 27/11/2014 BA-2144
-                                        'alarmStatus = True
 
-                                        ''AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
-                                        'If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                        '    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
-                                        'End If
                                         baselineInitializationFailuresAttribute += 1
                                         If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
                                             alarmStatus = True
@@ -288,7 +277,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                             alarmStatus = True
                                             myGlobalDataTO = SendAutomaticALIGHTRerun(dbConnection)
                                         End If
-                                        'AG 27/11/2014 BA-2144
 
                                     Else ' Valid alight
                                         myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR
@@ -305,7 +293,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If alarmStatus AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
                                             myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
                                         End If
-                                        'AG 23/05/2012
 
                                         If AlarmList.Count > 0 Then
                                             If Not GlobalBase.IsServiceAssembly Then
@@ -319,7 +306,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'If no alarm or all ALIGHT has been rejected ... inform presentation depending the current Sw process
                                     If Not myGlobalDataTO.HasError Then
                                         'AG 28/02/2012
-                                        'If AlarmList.Count = 0 Or baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES Then
                                         If validALIGHTAttribute Or baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
 
                                             'Inform flag for alight is finished
@@ -332,7 +318,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
 
                                             If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                                                'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
                                                 RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2288
 
                                             ElseIf mySessionFlags(AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
@@ -351,12 +336,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         End If
                                     End If
-                                    'IT 26/11/2014 - BA-2075 END
                                 End If
                             End If
                         End If
                         query = Nothing 'AG 02/08/2012 - free memory
-
                     End If
                 End If
 
