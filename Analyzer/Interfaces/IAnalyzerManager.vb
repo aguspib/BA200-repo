@@ -56,6 +56,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
         ReadOnly Property ValidALIGHT() As Boolean
         ReadOnly Property ExistsALIGHT() As Boolean
+        ReadOnly Property ValidFLIGHT() As Boolean
+        ReadOnly Property ExistsFLIGHT() As Boolean
         Property CurrentWell() As Integer
         Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String

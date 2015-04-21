@@ -1916,6 +1916,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 27/11/2014 BA-2066
         ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
         ''' IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' AC BA-2437
         ''' </remarks>
         Public Function ProcessFlightReadAction() As Boolean Implements IAnalyzerManager.ProcessFlightReadAction
 
@@ -1971,6 +1972,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
 
+            validFLIGHTAttribute = validResults
             Return validResults
 
         End Function
