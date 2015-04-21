@@ -1030,7 +1030,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
         ''' </remarks>
         Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
-                                                ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+                                                ByVal pExecutions As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
 
             Dim ContaminationNumber As Integer = 0
@@ -5696,9 +5696,16 @@ Namespace Biosystems.Ax00.BL
                                         'Dim startTime As DateTime = Now
 
                                         'Sort by Contamination
-                                        resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                        Dim sorter = New WSSorter(executionDataDS, activeAnalyzer)
+                                        If sorter.SortWSExecutionsByContamination(dbConnection) Then
+                                            resultData.SetDatos = sorter.Executions
+                                            executionDataDS = sorter.Executions
+                                        Else
+                                            resultData.SetDatos = Nothing
+                                            resultData.HasError = True
+                                        End If
+
+                                        If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
                                             'Sort Orders by ReadingCycle
                                             resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
@@ -6763,18 +6770,26 @@ Namespace Biosystems.Ax00.BL
                                                 'Dim startTime As DateTime = Now
 
                                                 'Sort by Contamination
-                                                resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
-                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+                                                'MANEL
+                                                Dim sorter = New WSSorter(executionDataDS, activeAnalyzer)
+                                                If sorter.SortWSExecutionsByContamination(dbConnection) Then
+                                                    resultData.SetDatos = sorter.Executions
+                                                    executionDataDS = sorter.Executions
+                                                Else
+                                                    resultData.SetDatos = Nothing
+                                                    resultData.HasError = True
+                                                End If
+                                                '/MANEL
+
+                                                If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
+                                                    'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS) 'Already done
 
                                                     'Sort Orders by ReadingCycle
                                                     resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
                                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                         executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                                                        'Sort Orders by Contamination
-                                                        'AG 07/11/2011
-                                                        'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
                                                         resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
                                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -6976,6 +6991,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 27/05/2013 - Add the new sample types LIQ, SEM
         '''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
         ''' </remarks>
+        <Obsolete("Use the new WSSorter class instead.")>
         Public Function SortWSExecutionsByContamination(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing

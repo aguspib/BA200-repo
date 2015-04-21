@@ -343,5 +343,7 @@ Public Class Ax00MainForm
         For Each str As String In hola
             Debug.WriteLine(str)
         Next
+        Dim hola2 = MasterDataDelegate.GetSampleTypes(Nothing)
+        Debug.WriteLine(hola2.SetDatos.ToString)
     End Sub
 End Class
