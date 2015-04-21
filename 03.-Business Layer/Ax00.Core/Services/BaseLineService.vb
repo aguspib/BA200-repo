@@ -160,7 +160,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
-            Try
+            Try                
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
                 InitializeRecover()
@@ -233,6 +233,7 @@ Namespace Biosystems.Ax00.Core.Services
             _forceEmptyAndFinalize = False
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
+            _analyzer.ValidFLIGHT = False
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
             _alreadyFinalized = False

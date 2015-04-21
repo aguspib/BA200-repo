@@ -950,13 +950,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     ' ISE TIMEOUT
-                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
-                        'BA-2384 (INI)
-                        If IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) Then
-                            myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                        End If
-                        'BA-2384 (END)
+                    Dim addAlarm = True
+                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then                        
+                        addAlarm = IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) 'BA-2384
                     End If
+
+                    If addAlarm Then myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
 
                     If GlobalBase.IsServiceAssembly Then
                         ' Initialize Error Codes List

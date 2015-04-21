@@ -168,6 +168,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
+
+        Private validFLIGHTAttribute As Boolean = False 'AC - inform if exist an valid FLIGHT results
+
         Private baselineInitializationFailuresAttribute As Integer = 0 'Alight base line initialization failures (used for repeat instructions or show messages)
         Private dynamicbaselineInitializationFailuresAttribute As Integer = 0 'AG 27/11/2014 BA-2066 Flight base line initialization failures (used for repeat instructions or show messages)
         Private WELLbaselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
@@ -812,6 +815,15 @@ Namespace Biosystems.Ax00.Core.Entities
             Get
                 Return existsALIGHTAttribute
             End Get
+        End Property
+
+        Public Property ValidFLIGHT() As Boolean Implements IAnalyzerManager.ValidFLIGHT
+            Get
+                Return validFLIGHTAttribute
+            End Get
+            Set(value As Boolean)
+                validFLIGHTAttribute = value
+            End Set
         End Property
 
         Public Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
