@@ -160,6 +160,7 @@
     <Compile Include="WSAnalyzerAlarmsDelegate.vb" />
     <Compile Include="WSBLinesByWellDelegate.vb" />
     <Compile Include="WSExecutionAlarmsDelegate.vb" />
+    <Compile Include="WSExecutionCreator.vb" />
     <Compile Include="WSPausedOrderTestsDelegate.vb" />
     <Compile Include="WSPreparationsDelegate.vb" />
     <Compile Include="WSReadingsDelegate.vb" />

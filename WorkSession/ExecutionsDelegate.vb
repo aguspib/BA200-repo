@@ -7175,7 +7175,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 09/02/2011
         ''' Modified by: TR 29/08/2011 - Declarations moved outside the loops
         ''' </remarks>
-        Public Function CreateBlankExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateBlankExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                               ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                               Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7315,7 +7315,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: TR 29/08/2011 - Declarations moved outside the loops
         '''              SA 18/04/2012 - Filter required Elements by TubeContent = CALIB to avoid returning also Reagents
         ''' </remarks>
-        Public Function CreateCalibratorExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateCalibratorExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                    ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                    Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7469,7 +7469,7 @@ Namespace Biosystems.Ax00.BL
         '''                                         sorted by OrderTestID, but this is not true in all cases, and when Order Tests are disordered, as 
         '''                                         many Executions as required Elements are created for each Order Test and this is not correct  
         ''' </remarks>
-        Public Function CreateControlExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateControlExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                 ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                 Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7651,7 +7651,7 @@ Namespace Biosystems.Ax00.BL
         '''                                         sorted by OrderTestID, but this is not true in all cases, and when Order Tests are disordered, as 
         '''                                         many Executions as required Elements are created for each Order Test and this is not correct 
         ''' </remarks>
-        Public Function CreatePatientExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreatePatientExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                 ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                 Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -10409,20 +10409,20 @@ Namespace Biosystems.Ax00.BL
                 currentResult = OrderTests.ToList()
                 bestResult = ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-                'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                If currentContaminationNumber > 0 Then
-                    If OrderTests.Count = 2 Then
-                        'Okay, if there are contaminations, why not to try interchange them?
-                        currentResult.Clear()
-                        For z = OrderTests.Count - 1 To 0 Step -1
-                            currentResult.Add(OrderTests(z))
-                        Next
-                        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                        If currentContaminationNumber = 0 Then
-                            bestResult = currentResult
-                        End If
-                    End If
-                End If
+                ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
+                'If currentContaminationNumber > 0 Then
+                '    If OrderTests.Count = 2 Then
+                '        'Okay, if there are contaminations, why not to try interchange them?
+                '        currentResult.Clear()
+                '        For z = OrderTests.Count - 1 To 0 Step -1
+                '            currentResult.Add(OrderTests(z))
+                '        Next
+                '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
+                '        If currentContaminationNumber = 0 Then
+                '            bestResult = currentResult
+                '        End If
+                '    End If
+                'End If
 
                 Dim stdPrepFlag As Boolean = False
                 For Each wse In AllTestTypeOrderTests
@@ -10473,20 +10473,20 @@ Namespace Biosystems.Ax00.BL
 
             Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-            'Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            ''Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
-            'myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
+            'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
+            myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult
