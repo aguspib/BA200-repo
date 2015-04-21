@@ -872,8 +872,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminationsDataDs As ContaminationsDS = Nothing
                                 Dim highContaminationPersitance As Integer = 0
 
-                                Dim myContaminationsDelegate As New ContaminationsDelegate
-                                resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                                resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     contaminationsDataDs = DirectCast(resultData.SetDatos, ContaminationsDS)
                                     highContaminationPersitance = REAGENT_CONTAMINATION_PERSISTANCE
@@ -1171,7 +1170,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminNumber As Integer = 0
 
                                 '2.1) Calculate contaminations number with current executions sort
-                                contaminNumber = 1 + myExDlgte.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
+                                contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDs, toSendList, pHighContaminationPersitance)
 
                                 If contaminNumber > 0 Then '(5)
                                     'Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -1206,7 +1205,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'and choose the best solution
 
                                     currentResultList = toSendList.ToList() 'Initial order                                    
-                                    toSendList = myExDlgte.ManageContaminationsForRunningAndStatic(_analyzerManager.ActiveAnalyzer, dbConnection, pContaminationsDs, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+                                    toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(_analyzerManager.ActiveAnalyzer, dbConnection, pContaminationsDs, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
                                     '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
                                     'If contamination sent Wash, else sent toSendList(0).ExecutionID

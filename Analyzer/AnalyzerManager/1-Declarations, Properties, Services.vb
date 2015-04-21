@@ -168,6 +168,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
+
+        Private validFLIGHTAttribute As Boolean = False 'AC - inform if exist an valid FLIGHT results
+
         Private baselineInitializationFailuresAttribute As Integer = 0 'Alight base line initialization failures (used for repeat instructions or show messages)
         Private dynamicbaselineInitializationFailuresAttribute As Integer = 0 'AG 27/11/2014 BA-2066 Flight base line initialization failures (used for repeat instructions or show messages)
         Private WELLbaselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
@@ -812,6 +815,15 @@ Namespace Biosystems.Ax00.Core.Entities
             Get
                 Return existsALIGHTAttribute
             End Get
+        End Property
+
+        Public Property ValidFLIGHT() As Boolean Implements IAnalyzerManager.ValidFLIGHT
+            Get
+                Return validFLIGHTAttribute
+            End Get
+            Set(value As Boolean)
+                validFLIGHTAttribute = value
+            End Set
         End Property
 
         Public Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
@@ -1920,7 +1932,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 wasteDepositTimer.Interval = 60000 'default interval value 1 minute
                 waterDepositTimer.Interval = 60000 'default interval value 1 minute
 
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_DEPOSIT_WARN.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     If IsNumeric(myGlobalDataTo.SetDatos) AndAlso CInt(myGlobalDataTo.SetDatos) > 0 Then
                         wasteDepositTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
@@ -1937,12 +1949,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 thermoFridgeWarningTimer.Interval = 120000 'default interval value 2 minutes
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_REACTIONS_WARN.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     thermoReactionsRotorWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                 End If
 
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_FRIDGE_WARN.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     thermoFridgeWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                 End If
@@ -1958,7 +1970,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'Read the maximum time allowed for pass form warning to alarm (reactions rotor)
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.MAX_TIME_THERMO_ARM_REAGENTS_WARN.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     thermoR1ArmWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
                     thermoR2ArmWarningTimer.Interval = CInt(myGlobalDataTo.SetDatos) * 1000
@@ -1968,27 +1980,27 @@ Namespace Biosystems.Ax00.Core.Entities
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
 
                 ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_OFF.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_OFF.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     WAITING_TIME_OFF = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     SYSTEM_TIME_OFFSET = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     WAITING_TIME_DEFAULT = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_FAST.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_FAST.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     WAITING_TIME_FAST = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     WAITING_TIME_ISE_FAST = CInt(myGlobalDataTo.SetDatos)
                 End If
-                myGlobalDataTo = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
+                myGlobalDataTo = SwParametersDelegate.ReadNumValueByParameterName(Nothing, SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
                 If Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing Then
                     WAITING_TIME_ISE_OFFSET = CInt(myGlobalDataTo.SetDatos)
                 End If

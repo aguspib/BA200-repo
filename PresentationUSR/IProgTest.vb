@@ -10237,9 +10237,8 @@ Public Class UiProgTest
         Try
             'SGM 08/03/11 Get from SWParameters table
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myParams As New SwParametersDelegate
             'TR 14/03/2011 -Set the Analyzer Model
-            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModel())
+            myGlobalDataTO = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModel())
             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                 myVolume = CSng(myGlobalDataTO.SetDatos)
             Else

@@ -1174,13 +1174,34 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Sub RemoveAlarmState(ByVal alarmName As String)
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
-            Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
 
             Dim typedGlobal = GetSafeOpenDBConnection(Nothing)
 
             Dim dbConnection = typedGlobal.SetDatos
             If (Not dbConnection Is Nothing) Then
-                alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
+                _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+                If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                    Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                    If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                        For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
+                            If alarmToUpdate.AlarmStatus Then
+                                alarmToUpdate.AlarmStatus = False
+                                alarmToUpdate.OKDateTime = Date.Now
+                            End If
+                        Next
+                        _myGlobal = _alarmsDelg.Update(Nothing, temporalDs)
+                    End If
+                End If
+
+                wsAlarmsDs.AcceptChanges()
+                alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
+            End If
+        End Sub
+
+        Public Sub AddNewAlarmState(ByVal alarmName As String)
+            Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
+            If Not ExistsActiveAlarm(alarmName) Then
+                Dim alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
                 With alarmRow
                     .BeginEdit()
                     .AlarmID = alarmName
@@ -1191,54 +1212,46 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         .SetWorkSessionIDNull()
                     End If
-                    .AlarmStatus = False
+                    .AlarmStatus = True
                     .AlarmItem = 1
-                    .SetAdditionalInfoNull()
+                    .AdditionalInfo = "SILENT_ALARM"
                     .EndEdit()
                 End With
-
                 wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-
                 wsAlarmsDs.AcceptChanges()
-                alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
+
+                _myGlobal = _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
+                'Else
+                '    _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+                '    If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                '        Dim updateAlarmsDS = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+                '        If (updateAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                '            For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In updateAlarmsDS.twksWSAnalyzerAlarms.Rows
+                '                alarmToUpdate.AlarmStatus = True
+                '                alarmToUpdate.AdditionalInfo = "SILENT_ALARM"
+                '                alarmToUpdate.AlarmDateTime = Now
+                '            Next
+                '            updateAlarmsDS.AcceptChanges()
+
+                '            _myGlobal = _alarmsDelg.Update(Nothing, updateAlarmsDS)
+
+                '        End If
+                '    End If
             End If
         End Sub
 
-        Public Sub AddNewAlarmState(ByVal alarmName As String)
-            Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
-
-            Dim alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
-            With alarmRow
-                .BeginEdit()
-                .AlarmID = alarmName
-                .AnalyzerID = _analyzerManager.ActiveAnalyzer()
-                .AlarmDateTime = Now
-                If _analyzerManager.ActiveWorkSession() <> "" Then
-                    .WorkSessionID = _analyzerManager.ActiveWorkSession()
-                Else
-                    .SetWorkSessionIDNull()
-                End If
-                .AlarmStatus = True
-                .AlarmItem = 1
-                .AdditionalInfo = "SILENT_ALARM"
-                .EndEdit()
-            End With
-
-            wsAlarmsDs.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-            wsAlarmsDs.AcceptChanges()
-
-            _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
-        End Sub
-
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="activeAlarm"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean
-
-            _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, activeAlarm, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+            _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, activeAlarm)
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-                If (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms _
-                         Where a.AlarmID = activeAlarm AndAlso a.AlarmStatus = True Select a).ToList.Count > 0 Then
-                    Return True
-                End If
+                Return (From a In temporalDs.twksWSAnalyzerAlarms Where a.AlarmStatus = True).ToList().Count > 0
             End If
             Return False
         End Function

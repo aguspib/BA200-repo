@@ -188,12 +188,12 @@ Public Class ReagentsOnBoardDelegate
                                         Select Case myDataSet.DecodedReagentsFields(0).BottleType
                                             Case "BOTTLE3" '60ml
                                                 'Get the Max Refill for 60 ml
-                                                myGlobalDataTO = mySWParametersDelegate.ReadNumValueByParameterName(dbConnection, _
+                                                myGlobalDataTO = SwParametersDelegate.ReadNumValueByParameterName(dbConnection, _
                                                                                         GlobalEnumerates.SwParameters.REFILL_VOL_60ML.ToString(), Nothing)
                                                 Exit Select
                                             Case "BOTTLE2" '20ml
                                                 'Get the Max Refill for 20 ml
-                                                myGlobalDataTO = mySWParametersDelegate.ReadNumValueByParameterName(dbConnection, _
+                                                myGlobalDataTO = SwParametersDelegate.ReadNumValueByParameterName(dbConnection, _
                                                                                         GlobalEnumerates.SwParameters.REFILL_VOL_20ML.ToString(), Nothing)
                                                 Exit Select
                                         End Select

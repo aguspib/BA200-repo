@@ -152,11 +152,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End If
 
-            If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
+            If errorValue <> 20 AndAlso errorValue <> 21 AndAlso myStatusValue <> AnalyzerManagerStatus.SLEEPING Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmState(Alarms.GLF_BOARD_FBLD_ERR.ToString())
-                _analyzerManager.CanSendingRepetitions() = False
-                _analyzerManager.NumSendingRepetitionsTimeout() = 0
+                If currentAlarms.ExistsActiveAlarm(Alarms.FBLD_ROTOR_FULL.ToString()) AndAlso errorValue <> 551 Then currentAlarms.RemoveAlarmState(Alarms.FBLD_ROTOR_FULL.ToString())
+                If currentAlarms.ExistsActiveAlarm(Alarms.UNKNOW_ROTOR_FULL.ToString()) AndAlso errorValue <> 552 Then
+                    currentAlarms.RemoveAlarmState(Alarms.UNKNOW_ROTOR_FULL.ToString())
+                    _analyzerManager.CanSendingRepetitions() = False
+                    _analyzerManager.NumSendingRepetitionsTimeout() = 0
+                End If
             End If
 
             'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
@@ -947,13 +950,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     ' ISE TIMEOUT
-                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
-                        'BA-2384 (INI)
-                        If IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) Then
-                            myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                        End If
-                        'BA-2384 (END)
+                    Dim addAlarm = True
+                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then                        
+                        addAlarm = IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) 'BA-2384
                     End If
+
+                    If addAlarm Then myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
 
                     If GlobalBase.IsServiceAssembly Then
                         ' Initialize Error Codes List
