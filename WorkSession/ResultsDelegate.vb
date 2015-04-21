@@ -5498,9 +5498,9 @@ Namespace Biosystems.Ax00.BL
 
                                             'TR 27/05/2013 -Get a list of sample types separated by commas
                                             Dim SampleTypes() As String = Nothing
-                                            Dim myMasterDataDelegate As New MasterDataDelegate
+                                            'Dim myMasterDataDelegate As New MasterDataDelegate
 
-                                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                                             If Not resultData.HasError Then
                                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                                             End If

@@ -818,9 +818,8 @@ Public Class UiRestPointUpdateProc
                 Else
                     'DL 31/05/2013
                     Dim myLogMaxDays As Integer = 30
-                    Dim myParams As New SwParametersDelegate
 
-                    myGlobal = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
+                    myGlobal = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
                     If Not myGlobal.HasError Then myLogMaxDays = CInt(myGlobal.SetDatos)
                     'DL 31/05/2013
 

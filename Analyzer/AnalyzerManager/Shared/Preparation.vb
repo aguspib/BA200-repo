@@ -872,8 +872,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminationsDataDs As ContaminationsDS = Nothing
                                 Dim highContaminationPersitance As Integer = 0
 
-                                Dim myContaminationsDelegate As New ContaminationsDelegate
-                                resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                                resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     contaminationsDataDs = DirectCast(resultData.SetDatos, ContaminationsDS)
                                     highContaminationPersitance = REAGENT_CONTAMINATION_PERSISTANCE
