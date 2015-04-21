@@ -228,7 +228,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SG 08/03/2011
         ''' Modified by: SA 11/11/2014 - BA-1885 ==> Some code improvements
         ''' </remarks>
-        Public Function ReadNumValueByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterName As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+        Public Shared Function ReadNumValueByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterName As String, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 

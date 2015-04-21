@@ -5,35 +5,35 @@ Imports Biosystems.Ax00.BL
 
 Public Class WSSorter
 
-    Public Function SortWSExecutionsByContamination(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
+    Public Function SortWSExecutionsByContamination(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlConnection, ByVal pExecutions As ExecutionsDS) As TypedGlobalDataTo(Of ExecutionsDS)
 
-        Dim resultData As GlobalDataTO = Nothing
+        'Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
         Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
         Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-        'Dim bestContaminationNumber As Integer = Integer.MaxValue
-        'Dim currentContaminationNumber As Integer
         Dim contaminationsDataDS As ContaminationsDS = Nothing
 
+        Dim ReturnData As New TypedGlobalDataTo(Of ExecutionsDS)
+
         Try
-            resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+            Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+            If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                dbConnection = connection.SetDatos
                 If (Not dbConnection Is Nothing) Then
                     'Get all R1 Contaminations 
-                    Dim myContaminationsDelegate As New ContaminationsDelegate
-                    resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                    'Dim myContaminationsDelegate As New ContaminationsDelegate
 
-                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
+                    Dim contaminationsByType = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+
+                    If (Not contaminationsByType.HasError AndAlso Not contaminationsByType.SetDatos Is Nothing) Then
+                        contaminationsDataDS = DirectCast(contaminationsByType.SetDatos, ContaminationsDS)
 
                         Dim highContaminationPersitance As Integer = 0
 
-                        Dim swParametersDlg As New SwParametersDelegate
-                        resultData = swParametersDlg.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            highContaminationPersitance = CInt(resultData.SetDatos)
+                        Dim contaminationPersistenceData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+                        If Not contaminationPersistenceData.HasError AndAlso Not contaminationPersistenceData.SetDatos Is Nothing Then
+                            highContaminationPersitance = CInt(contaminationPersistenceData.SetDatos)
                         End If
 
                         Dim Stats() As Boolean = {True, False}
@@ -41,13 +41,12 @@ Public Class WSSorter
 
                         'TR 27/05/2013 -Get a list of sample types separated by commas
                         Dim SampleTypes() As String = Nothing
-                        Dim myMasterDataDelegate As New MasterDataDelegate
-                        resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
-                        If Not resultData.HasError Then
-                            SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
+
+                        Dim SampleTypesString = MasterDataDelegate.GetSampleTypes(dbConnection)
+                        If Not SampleTypesString.HasError Then
+                            SampleTypes = SampleTypesString.SetDatos.ToString.Split((","c))
                         End If
 
-                        'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
                         Dim stdOrderTestsCount As Integer = 0
 
                         'Different Stat, SampleClasses and SampleTypes in WorkSession
@@ -166,20 +165,19 @@ Public Class WSSorter
                         differentSampleTypeValues = Nothing
                         'AG 19/02/2014 - #1514
 
-                        resultData.SetDatos = returnDS
+                        ReturnData.SetDatos = returnDS
                     End If
 
                 End If
             End If
 
         Catch ex As Exception
-            resultData = New GlobalDataTO()
-            resultData.HasError = True
-            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-            resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+            ReturnData.HasError = True
+            ReturnData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+            ReturnData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
             'Dim myLogAcciones As New ApplicationLogManager()
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByContamination", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex)
 
         End Try
 
@@ -188,7 +186,7 @@ Public Class WSSorter
         currentResult = Nothing
         'AG 19/02/2014 - #1514
 
-        Return resultData
+        Return ReturnData
     End Function
 
     Private Sub ManageContaminations(ByVal activeAnalyzer As String,

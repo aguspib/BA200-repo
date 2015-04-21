@@ -105,7 +105,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' CREATED BY: TR 27/05/2013
         ''' </remarks>
-        Public Function GetSampleTypes(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Shared Function GetSampleTypes(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -120,17 +120,30 @@ Namespace Biosystems.Ax00.BL
 
                     If Not resultData.HasError Then
                         myMasteDataDS = CType(resultData.SetDatos, MasterDataDS)
-                        Dim SampleTypeSeparatedByCommas As String = String.Empty
+                        'TODO: Use a StringBuilder for the love of god instead of string concatenation
+                        'Dim SampleTypeSeparatedByCommas As String = String.Empty
+                        'For Each masterDataRow As MasterDataDS.tcfgMasterDataRow In myMasteDataDS.tcfgMasterData.Rows
+                        '    SampleTypeSeparatedByCommas &= masterDataRow.ItemID & ","
+                        'Next
+
+                        ''Remove the last comma
+                        'SampleTypeSeparatedByCommas = SampleTypeSeparatedByCommas.Remove(SampleTypeSeparatedByCommas.Length - 1, 1)
+
+
+                        'resultData.SetDatos = SampleTypeSeparatedByCommas
+
+
+                        Dim SampleTypeBuilder As New Text.StringBuilder(1024)
+                        Dim first As Boolean = True
                         For Each masterDataRow As MasterDataDS.tcfgMasterDataRow In myMasteDataDS.tcfgMasterData.Rows
-                            SampleTypeSeparatedByCommas &= masterDataRow.ItemID & ","
+                            If first Then
+                                first = False
+                            Else
+                                SampleTypeBuilder.Append(","c)
+                            End If
+                            SampleTypeBuilder.Append(masterDataRow.ItemID)
                         Next
-
-                        'Remove the last comma
-                        SampleTypeSeparatedByCommas = SampleTypeSeparatedByCommas.Remove(SampleTypeSeparatedByCommas.Length - 1, 1)
-
-
-                        resultData.SetDatos = SampleTypeSeparatedByCommas
-
+                        resultData.SetDatos = SampleTypeBuilder.ToString
                     End If
                 End If
             Catch ex As Exception
