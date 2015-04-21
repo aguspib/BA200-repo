@@ -3278,9 +3278,8 @@ Namespace Biosystems.Ax00.BL
 
                             'Get value of the SW Parameter for the allowed maximum number of non cumulated QC Results for the Control/Lot and the Test/SampleType
                             Dim myMaxQCResults As Integer = 0
-                            Dim mySWParametersDelegate As New SwParametersDelegate
 
-                            resultData = mySWParametersDelegate.ReadNumValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.MAX_QCRESULTS_TO_ACCUMULATE.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.MAX_QCRESULTS_TO_ACCUMULATE.ToString, Nothing)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 myMaxQCResults = Convert.ToInt32(DirectCast(resultData.SetDatos, Single))
 

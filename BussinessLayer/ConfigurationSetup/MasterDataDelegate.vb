@@ -7,7 +7,6 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
-
     Public Class MasterDataDelegate
 
 #Region "Public Methods"
@@ -104,15 +103,16 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>
         ''' CREATED BY: TR 27/05/2013
+        ''' MODIFIED BY: MI Made thread safe.
         ''' </remarks>
-        Public Function GetSampleTypes(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Shared Function GetSampleTypes(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    Dim myMasteDataDS As New MasterDataDS()
+                    Dim myMasteDataDS As MasterDataDS
                     Dim myMasterDataDelegate As New MasterDataDelegate()
                     'Dim qSampleType As New List(Of MasterDataDS.tcfgMasterDataRow)
 
@@ -120,17 +120,19 @@ Namespace Biosystems.Ax00.BL
 
                     If Not resultData.HasError Then
                         myMasteDataDS = CType(resultData.SetDatos, MasterDataDS)
-                        Dim SampleTypeSeparatedByCommas As String = String.Empty
+
+                        <ThreadStatic()> Static sampleTypeBuilder As New Text.StringBuilder(1024)
+                        sampleTypeBuilder.Clear()
+                        Dim first As Boolean = True
                         For Each masterDataRow As MasterDataDS.tcfgMasterDataRow In myMasteDataDS.tcfgMasterData.Rows
-                            SampleTypeSeparatedByCommas &= masterDataRow.ItemID & ","
+                            If first Then
+                                first = False
+                            Else
+                                SampleTypeBuilder.Append(","c)
+                            End If
+                            SampleTypeBuilder.Append(masterDataRow.ItemID)
                         Next
-
-                        'Remove the last comma
-                        SampleTypeSeparatedByCommas = SampleTypeSeparatedByCommas.Remove(SampleTypeSeparatedByCommas.Length - 1, 1)
-
-
-                        resultData.SetDatos = SampleTypeSeparatedByCommas
-
+                        resultData.SetDatos = SampleTypeBuilder.ToString
                     End If
                 End If
             Catch ex As Exception
@@ -140,15 +142,51 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "MasterDataDelegate.GetList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
 
+        End Function
+
+
+        Public Shared Function GetSampleTypesDataTable(ByVal pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of MasterDataDS.tcfgMasterDataDataTable)
+            Dim resultData As New TypedGlobalDataTo(Of MasterDataDS.tcfgMasterDataDataTable)
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+                If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                    dbConnection = connection.SetDatos
+
+                    Dim myMasterDataDelegate As New MasterDataDelegate()
+
+                    Dim untypedData = myMasterDataDelegate.GetList(Nothing, "SAMPLE_TYPES")
+
+                    If Not untypedData.HasError Then
+                        Dim intermediate = CType(untypedData.SetDatos, MasterDataDS)
+                        resultData.SetDatos = intermediate.tcfgMasterData
+                    Else
+                        Throw New Exception("Data was not found")
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
 
             Return resultData
+
         End Function
+
+
+
 #End Region
     End Class
 End Namespace

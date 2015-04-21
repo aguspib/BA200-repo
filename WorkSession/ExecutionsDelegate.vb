@@ -1029,7 +1029,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 25/11/2011 - add the high contamination persistance functionality
         ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
         ''' </remarks>
-        Public Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
+        Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
                                                 ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
 
@@ -6993,15 +6993,14 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Get all R1 Contaminations 
                         Dim myContaminationsDelegate As New ContaminationsDelegate
-                        resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                        resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
 
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
                             Dim highContaminationPersitance As Integer = 0
 
-                            Dim swParametersDlg As New SwParametersDelegate
-                            resultData = swParametersDlg.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 highContaminationPersitance = CInt(resultData.SetDatos)
                             End If
@@ -7012,7 +7011,7 @@ Namespace Biosystems.Ax00.BL
                             'TR 27/05/2013 -Get a list of sample types separated by commas
                             Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
-                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                             End If
@@ -7865,16 +7864,14 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get all R1 Contaminations 
-                        Dim myContaminationsDelegate As New ContaminationsDelegate
-                        resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                        resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
 
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
                             Dim highContaminationPersitance As Integer = 0
 
-                            Dim swParametersDlg As New SwParametersDelegate
-                            resultData = swParametersDlg.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 highContaminationPersitance = CInt(resultData.SetDatos)
                             End If
@@ -7885,7 +7882,7 @@ Namespace Biosystems.Ax00.BL
                             Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
 
-                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                             End If
@@ -10461,7 +10458,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Public Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
+        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
                                                                 ByVal pConn As SqlConnection,
                                                                 ByVal contaminationsDataDS As ContaminationsDS,
                                                                 ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),

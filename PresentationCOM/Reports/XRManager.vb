@@ -2405,9 +2405,8 @@ Public Class XRManager
                      Select row).ToList()
 
         Dim SampleTypes() As String = Nothing
-        Dim myMasterDataDelegate As New MasterDataDelegate
 
-        resultData = myMasterDataDelegate.GetSampleTypes(Nothing)
+        resultData = MasterDataDelegate.GetSampleTypes(Nothing)
         If Not resultData.HasError Then
             SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
 
@@ -2675,10 +2674,9 @@ Public Class XRManager
         If (results Is Nothing) Then Return Nothing
 
         Dim SampleTypes() As String = Nothing
-        Dim myMasterDataDelegate As New MasterDataDelegate
         Dim resultData As GlobalDataTO = Nothing
 
-        resultData = myMasterDataDelegate.GetSampleTypes(Nothing)
+        resultData = MasterDataDelegate.GetSampleTypes(Nothing)
 
         If Not resultData.HasError Then
 

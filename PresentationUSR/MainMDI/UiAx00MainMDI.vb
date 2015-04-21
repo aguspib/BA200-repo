@@ -1465,7 +1465,7 @@ Partial Public Class UiAx00MainMDI
                                 Dim myLogMaxDays As Integer = 30
                                 Dim myParams As New SwParametersDelegate
 
-                                resultData = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
+                                resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
                                 If (Not resultData.HasError) Then myLogMaxDays = CInt(resultData.SetDatos)
 
                                 resultData = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
