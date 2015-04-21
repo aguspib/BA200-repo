@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
@@ -94,7 +95,7 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
-        
+
 
         ''' <summary>
         ''' Get value of the specified Software Parameter. If value of Parameter depends on an Analyzer Model, then the function
@@ -263,6 +264,43 @@ Namespace Biosystems.Ax00.BL
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadNumValueByParameterName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        Public Shared Function ReadIntValue(ByVal pDBConnection As SqlClient.SqlConnection, parameter As GlobalEnumerates.SwParameters, pAnalyzerModel As String) As TypedGlobalDataTo(Of Integer)
+            Dim resultData As New TypedGlobalDataTo(Of Integer)
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+            Try
+                connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)   'Database connections are pulled.
+                If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                    If (Not connection.SetDatos Is Nothing) Then
+                        Dim mySwParametersDAO As New tfmwSwParametersDAO
+
+                        Dim parameterValuesDS = mySwParametersDAO.ReadByParameterName(connection.SetDatos, parameter.ToString, pAnalyzerModel)
+                        If (Not parameterValuesDS.HasError AndAlso Not parameterValuesDS.SetDatos Is Nothing) Then
+                            Dim myParamsDS As ParametersDS = DirectCast(parameterValuesDS.SetDatos, ParametersDS)
+                            If (myParamsDS.tfmwSwParameters.Rows.Count > 0) Then
+                                resultData.SetDatos = CInt(myParamsDS.tfmwSwParameters.First.ValueNumeric)
+                            Else
+                                'If the SW Parameter does not exist in the table, it is an error
+                                resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                resultData.HasError = True
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex)
+            Finally
+                If connection IsNot Nothing AndAlso pDBConnection Is Nothing Then connection.SetDatos.Close()
             End Try
             Return resultData
         End Function
