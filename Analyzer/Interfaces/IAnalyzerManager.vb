@@ -56,7 +56,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
         ReadOnly Property ValidALIGHT() As Boolean
         ReadOnly Property ExistsALIGHT() As Boolean
-        Property ValidFLIGHT() As Boolean
+        ReadOnly Property ValidFLIGHT() As Boolean        
         Property CurrentWell() As Integer
         Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
@@ -284,7 +284,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                           Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO
 
         Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
-        
+        Sub ResetFLIGHT()
 #End Region
 
     End Interface

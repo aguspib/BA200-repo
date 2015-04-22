@@ -817,13 +817,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
-        Public Property ValidFLIGHT() As Boolean Implements IAnalyzerManager.ValidFLIGHT
+        Public ReadOnly Property ValidFLIGHT() As Boolean Implements IAnalyzerManager.ValidFLIGHT
             Get
                 Return validFLIGHTAttribute
             End Get
-            Set(value As Boolean)
-                validFLIGHTAttribute = value
-            End Set
         End Property
 
         Public Property CurrentWell() As Integer Implements IAnalyzerManager.CurrentWell
@@ -2089,6 +2086,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             validALIGHTAttribute = False
                             resultData = BaseLine.GetLatestBaseLines(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myAnalyzerModel)
+                            validFLIGHTAttribute = BaseLine.validFLight
                             validALIGHTAttribute = BaseLine.validALight
                             existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
 
@@ -4265,6 +4263,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                       Implements IAnalyzerManager.ActivateProtocolWrapper
             Return AppLayer.ActivateProtocol(pEvent, pSwEntry, pFwEntry, pFwScriptID, pServiceParams)
         End Function
+
+        Public Sub ResetFLIGHT() Implements IAnalyzerManager.ResetFLIGHT
+            validFLIGHTAttribute = False            
+        End Sub
 #End Region
 
     End Class
