@@ -49,7 +49,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Private pValueSensorsAttr As String
 
-        'Protected Friend AnalyzerIdAttr As String = "" 'SGM 20/01/2012     'MANEL
 #End Region
 
 #Region "Properties"

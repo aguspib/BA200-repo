@@ -246,4 +246,71 @@ Public Class WSSorter
     End Sub
 
 
+    Public Function SortWSExecutionsByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
+        Dim returnDataSet As New ExecutionsDS
+        Dim success As Boolean = False
+
+        Try
+            Dim qOrders As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim index = 0
+
+            While index < Executions.twksWSExecutions.Rows.Count
+                Dim statFlag = Executions.twksWSExecutions(index).StatFlag
+                Dim sampleClass = Executions.twksWSExecutions(index).SampleClass
+
+                qOrders = (From wse In Executions.twksWSExecutions _
+                       Where wse.StatFlag = statFlag AndAlso wse.SampleClass = sampleClass _
+                       Select wse).ToList()
+
+                index += qOrders.Count
+
+                If sampleClass <> "PATIENT" Then
+                    OrderByExecutionTime(qOrders, returnDataSet)
+                Else
+                    'When SampleClass = 'PATIENT' do not sort
+                    For Each wse In qOrders
+                        returnDataSet.twksWSExecutions.ImportRow(wse)
+                    Next
+                End If
+            End While
+
+            Executions = returnDataSet
+
+            success = True
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+
+        End Try
+
+        Return success
+    End Function
+
+    Private Sub OrderByExecutionTime(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
+        While pExecutions.Count > 0
+
+            'AG 16/09/2011 - add order criteria first by ExecutionStatus
+            'Dim wseMaxReadingCycle = (From wse In pExecutions _
+            '       Order By wse.ReadingCycle Descending _
+            '       Select wse).ToList()(0)
+
+            Dim wseMaxReadingCycle = (From wse In pExecutions _
+                                      Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending _
+                                      Select wse).ToList()(0)
+            'AG 16/09/2011
+
+            Dim wseSelected = (From wse In pExecutions _
+                   Where wse.ElementID = wseMaxReadingCycle.ElementID _
+                   Select wse).ToList()
+
+            For Each wse In wseSelected
+                returnDS.twksWSExecutions.ImportRow(wse)
+            Next
+
+            For Each wse In wseSelected
+                pExecutions.Remove(wse)
+            Next
+        End While
+    End Sub
+
 End Class

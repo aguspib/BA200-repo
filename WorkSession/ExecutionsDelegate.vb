@@ -6771,7 +6771,6 @@ Namespace Biosystems.Ax00.BL
 
                                                 'Sort by Contamination
 
-                                                'MANEL
                                                 Dim sorter = New WSSorter(executionDataDS, activeAnalyzer)
                                                 If sorter.SortWSExecutionsByContamination(dbConnection) Then
                                                     resultData.SetDatos = sorter.Executions
@@ -6780,7 +6779,6 @@ Namespace Biosystems.Ax00.BL
                                                     resultData.SetDatos = Nothing
                                                     resultData.HasError = True
                                                 End If
-                                                '/MANEL
 
                                                 If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
                                                     'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS) 'Already done
