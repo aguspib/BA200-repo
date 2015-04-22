@@ -276,7 +276,29 @@ Namespace Biosystems.Ax00.App
 
 #End Region
 
-
+#Region "Baseline Service"
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AC BA-2437
+        ''' </remarks>
+        Public Function IsValidBaseline() As Boolean
+            Try
+                If AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A200.ToString AndAlso _
+                    Analyzer.ValidALIGHT AndAlso Analyzer.ValidFLIGHT Then
+                    Return True
+                ElseIf AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A400.ToString AndAlso _
+                    Analyzer.ValidALIGHT Then
+                    Return True
+                End If
+                Return False
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Function
+#End Region
 
 #End Region
 

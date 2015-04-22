@@ -339,11 +339,6 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        Dim hola = WSSorter.GetSampleTypesStringsCollection(Nothing)
-        For Each str As String In hola
-            Debug.WriteLine(str)
-        Next
-        Dim hola2 = MasterDataDelegate.GetSampleTypes(Nothing)
-        Debug.WriteLine(hola2.SetDatos.ToString)
+
     End Sub
 End Class

@@ -648,6 +648,9 @@ Namespace Biosystems.Ax00.Global
                     Dim exceptionCompleteMessage = exceptionDesc.ToString
 
                     GlobalBase.CreateLogActivity(exceptionCompleteMessage, sourceOfException, EventLogEntryType.Error, False)
+#If config = "Debug" Then
+                    Debug.WriteLine("EXCEPTION LOGGED: " & exceptionCompleteMessage)
+#End If
 
                 Else
                     GlobalBase.CreateLogActivity(
