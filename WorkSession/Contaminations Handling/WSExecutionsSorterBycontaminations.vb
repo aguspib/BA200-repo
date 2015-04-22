@@ -47,7 +47,6 @@ Public Class WSSorter
 
     End Sub
 
-
     Public Function SortWSExecutionsByContamination(ByVal pDBConnection As SqlConnection) As Boolean
 
         Dim dbConnection As SqlConnection = Nothing
