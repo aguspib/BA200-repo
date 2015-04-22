@@ -48,6 +48,7 @@ Namespace Biosystems.Ax00.BL
         Private allOrderTestsDS As OrderTestsForExecutionsDS
 
         Private pendingExecutionsDS As ExecutionsDS
+        Private activeAnalyzer As String
 
         ''' <summary>
         ''' Default constructor
@@ -76,7 +77,7 @@ Namespace Biosystems.Ax00.BL
             End Get
         End Property
 
-        Public Function CreateWS(ByVal ppDBConnection As SqlClient.SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
+        Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
@@ -95,39 +96,55 @@ Namespace Biosystems.Ax00.BL
             pManualRerunFlag = ppManualRerunFlag
 
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlConnection = Nothing
+            Try
+                pDBConnection = ResolveConnection()
+                SetSemaphoreToBusy()
+                calledForRerun = (pOrderTestID <> -1)
+                orderTestLockedByLISList = GetOrderTestsLockedByLIS()
+                activeAnalyzer = GetActiveAnalyzer(pDBConnection)
 
-            SetSemaphoreToBusy()
+                If Not pWorkInRunningMode Then
+                    resultData = SearchNotInCourseExecutionsToDelete()
+                End If
 
-            dbConnection = ResolveConnection()
+                If Not calledForRerun Then
+                    resultData = RecalculateStatusForNotDeletedExecutions()
+                End If
 
-            calledForRerun = (pOrderTestID <> -1)
-            Dim StartTime = Now '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                'Now we can create executions for all ordertests not started (with no executions in twksWSExecutions table) ... <the initial process>
+                If (Not resultData.HasError) Then
+                    resultData = CreateExecutionsOrderTestsNotStarted()
+                End If
 
-            orderTestLockedByLISList = GetOrderTestsLockedByLIS()
+                If (Not resultData.HasError AndAlso Not calledForRerun) Then
+                    resultData = UpdatePositionsRotorSample()
+                End If
 
-            'AJG ADDED BECAUSE THE ANALYZER MODEL IS NEEDED BECAUSE MANAGING CONTAMINATIONS IS ANALYZER DEPENDANT
-            Dim activeAnalyzer As String = GetActiveAnalyzer(dbConnection)
+                If (Not resultData.HasError) Then
+                    resultData = UpdateStatus()
+                End If
 
-            If Not pWorkInRunningMode Then
-                resultData = SearchNotInCourseExecutionsToDelete()
-            End If
+                FinishTransaction(resultData, ppDBConnection)
 
-            If Not calledForRerun Then
-                StartTime = Now
-                resultData = New ExecutionsDelegate().RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, ppWorkInRunningMode, pPauseMode)
+                orderTestLockedByLISList = Nothing
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                    If (ppDBConnection Is Nothing AndAlso Not pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(pDBConnection)
+                End If
+                
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-            End If
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
+            Finally
+                If (ppDBConnection Is Nothing AndAlso Not pDBConnection Is Nothing) Then pDBConnection.Close()
 
-            'Now we can create executions for all ordertests not started (with no executions in twksWSExecutions table) ... <the initial process>
-            If (Not resultData.HasError) Then
-                resultData = CreateExecutionsOrderTestsNotStarted()
-            End If
-
-            'OJO!!! pendiente terminar método (cuando llegue de refactorizar)
+                ReleaseSemaphoreToAvailable()
+            End Try
+            Return resultData
         End Function
 
         Private Function GetOrderTestsLockedByLIS() As List(Of Integer)
@@ -191,7 +208,7 @@ Namespace Biosystems.Ax00.BL
             End If
         End Sub
 
-        Private Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecution As ExecutionsDS) As GlobalDataTO
+        Private Function Create(ByVal pDBConnection As SqlConnection, ByVal pExecution As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -331,11 +348,26 @@ Namespace Biosystems.Ax00.BL
                             MarkAllTestsSTAT()
                         End If
                         pendingExecutionsDS = MovePendingAndLockedExecutions()
+                        If (Not calledForRerun) Then
+                            resultData = SortAndManageContaminations()
+                        Else
+                            resultData = SavePendingExecutions()
+                        End If
+                        If (Not resultData.HasError) Then
+                            resultData = UpdatePausedFlag()
+                        End If
+                        If (Not resultData.HasError) Then
+                            If (calledForRerun) Then
+                                resultData = New OrderTestsDelegate().UpdateStatusByOrderTestID(pDBConnection, pOrderTestID, "PENDING")
+                            End If
+                            If (Not resultData.HasError AndAlso orderTestLockedByLISList.Count > 0) Then
+                                resultData = UpdateLocksByLIS()
+                            End If
+                        End If
                     End If
-
-
                 End If
             End If
+            Return resultData
         End Function
 
         Private Sub GetExecutionsForBlanks()  'ByRef myBlankExecutionsDS As ExecutionsDS, ByVal allOrderTestsDS As OrderTestsForExecutionsDS)
@@ -359,13 +391,12 @@ Namespace Biosystems.Ax00.BL
                     rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
                     rowBlank.ReagentID = blankInfo(0).ReagentID
                     rowBlank.OrderID = blankInfo(0).OrderID
-                    rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
+                    rowBlank.ElementID = NullElementID
                     rowBlank.EndEdit()
                 End If
             Next
             myBlankExecutionsDS.AcceptChanges()
-            blankInfo = Nothing 'AG 19/02/2014 - #1514
-            'End If
+
             GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
 
@@ -752,6 +783,229 @@ Namespace Biosystems.Ax00.BL
 
             Return auxPending
         End Function
+
+        Private Function SortAndManageContaminations() As GlobalDataTO
+            Dim StartTime = Now
+            Dim resultData As New GlobalDataTO()
+            If (pendingExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
+                pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
+                                                                        "ExecutionType, ExecutionStatus DESC, ReadingCycle DESC"
+
+                Dim executionDataDS = CType(pendingExecutionsDS, ExecutionsDS)
+
+                'Sort by Contamination
+
+                Dim sorter = New WSSorter(executionDataDS, activeAnalyzer)
+                If sorter.SortWSExecutionsByContamination(pDBConnection) Then
+                    resultData.SetDatos = sorter.Executions
+                    executionDataDS = sorter.Executions
+                Else
+                    resultData.SetDatos = Nothing
+                    resultData.HasError = True
+                End If
+
+                If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
+                    'Sort Orders by ReadingCycle
+                    If sorter.SortWSExecutionsByElementGroupTime() Then
+                        resultData.SetDatos = sorter.Executions
+                        executionDataDS = sorter.Executions
+                    Else
+                        resultData.SetDatos = Nothing
+                        resultData.HasError = True
+                    End If
+
+                    If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
+
+                        If sorter.SortWSExecutionsByElementGroupContaminationNew() Then
+                            resultData.SetDatos = sorter.Executions
+                            executionDataDS = sorter.Executions
+                        Else
+                            resultData.SetDatos = Nothing
+                            resultData.HasError = True
+                        End If
+                    End If
+                End If
+
+                'Finally, save the sorted PENDING executions
+                If (Not resultData.HasError) Then
+                    If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                        resultData = Create(pDBConnection, executionDataDS)
+                    Else
+                        resultData = myDao.Create(pDBConnection, executionDataDS)
+                    End If
+                End If
+            End If
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+            Return resultData
+        End Function
+
+        Private Function UpdatePausedFlag() As GlobalDataTO
+            ' - Update of the Paused flag is performed only when no Running mode
+            ' - When working in Running mode, no pending executions are deleted, then SW has only to update status 
+            '   (business already performed)
+            Dim resultData As New GlobalDataTO
+
+            If (Not calledForRerun AndAlso Not pWorkInRunningMode) Then
+                Dim myWSPausedOrderTestsDS As WSPausedOrderTestsDS
+                Dim myWSPausedOrderTestsDelegate As New WSPausedOrderTestsDelegate
+
+                resultData = myWSPausedOrderTestsDelegate.ReadByAnalyzerAndWorkSession(pDBConnection, pAnalyzerID, pWorkSessionID)
+                If (Not resultData.HasError) Then
+                    myWSPausedOrderTestsDS = DirectCast(resultData.SetDatos, WSPausedOrderTestsDS)
+
+                    If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                        resultData = UpdatePausedWithMultiTransaction(myWSPausedOrderTestsDS)
+                    Else
+                        resultData = UpdatePausedWithoutTransaction(myWSPausedOrderTestsDS)
+                    End If
+                End If
+            End If
+
+            Return resultdata
+        End Function
+
+        Private Function UpdatePositionsRotorSample() As GlobalDataTO
+            Dim resultData As GlobalDataTO
+            'Read the current content of all positions in Samples Rotor
+            Dim rcp_del As New WSRotorContentByPositionDelegate
+            resultData = rcp_del.ReadByCellNumber(pDBConnection, pAnalyzerID, pWorkSessionID, "SAMPLES", -1)
+
+            If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                Dim samplesRotorDS As WSRotorContentByPositionDS = DirectCast(resultData.SetDatos, WSRotorContentByPositionDS)
+
+                'Get only positions with tubes for required WorkSession Elements not marked as Depleted or with not enough volume                
+                Dim linqRes = (From a In samplesRotorDS.twksWSRotorContentByPosition _
+                      Where Not a.IsElementIDNull _
+                        AndAlso a.Status <> "DEPLETED" _
+                        AndAlso a.Status <> "FEW" _
+                         Select a).ToList
+
+                Dim newStatus As String = ""
+                For Each row In linqRes
+                    newStatus = row.Status
+                    resultData = rcp_del.UpdateSamplePositionStatus(pDBConnection, -1, pWorkSessionID, pAnalyzerID, row.ElementID, _
+                                                                    row.TubeContent, 1, newStatus, row.CellNumber)
+                Next
+            End If
+
+            Return resultData
+        End Function
+
+        Private Function UpdateStatus() As GlobalDataTO
+            Dim StartTime = Now
+            Dim resultData As New GlobalDataTO
+            'check if there are Electrodes with wrong Calibration
+            If (Not pISEElectrodesList Is Nothing AndAlso pISEElectrodesList.Count > 0) Then
+                For Each electrode As String In pISEElectrodesList
+                    resultData = New ExecutionsDelegate().UpdateStatusByISETestType(pDBConnection, pWorkSessionID, pAnalyzerID, electrode, "PENDING", "LOCKED")
+                    If (resultData.HasError) Then Exit For
+                Next
+            ElseIf (Not pIsISEModuleReady) Then
+                'ISE Module cannot be used; all pending ISE Preparations are LOCKED
+                resultData = New ExecutionsDelegate().UpdateStatusByExecutionTypeAndStatus(pDBConnection, pWorkSessionID, pAnalyzerID, "PREP_ISE", "PENDING", "LOCKED")
+            End If
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+
+            Return resultData
+        End Function
+
+        Private Function RecalculateStatusForNotDeletedExecutions() As GlobalDataTO
+            Dim StartTime = Now
+            Dim resultData = New ExecutionsDelegate().RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+
+            Return resultData
+        End Function
+
+        Private Function SavePendingExecutions() As GlobalDataTO
+            Dim resultData As GlobalDataTO
+            If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                resultData = Create(pDBConnection, pendingExecutionsDS)
+            Else
+                resultData = myDao.Create(pDBConnection, pendingExecutionsDS)
+            End If
+
+            Return resultData
+        End Function
+
+        Private Function UpdatePausedWithMultiTransaction(ByVal myWSPausedOrderTestsDS As WSPausedOrderTestsDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim myOT As New List(Of Integer)
+            Dim myRerun As New List(Of Integer)
+            For Each auxRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In myWSPausedOrderTestsDS.twksWSPausedOrderTests
+                If Not auxRow.IsOrderTestIDNull AndAlso Not myOT.Contains(auxRow.OrderTestID) Then
+                    myOT.Add(auxRow.OrderTestID)
+                    myRerun.Add(auxRow.RerunNumber)
+                End If
+            Next
+            If myOT.Count > 0 AndAlso myOT.Count = myRerun.Count Then
+                resultData = New ExecutionsDelegate().UpdatePaused(pDBConnection, myOT, myRerun, True, pAnalyzerID, pWorkSessionID)
+            End If
+            myOT.Clear()
+            myRerun.Clear()
+            Return resultData
+        End Function
+
+        Private Function UpdatePausedWithoutTransaction(ByVal myWSPausedOrderTestsDS As WSPausedOrderTestsDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim tempExecutionDS As ExecutionsDS
+
+            For Each pausedOTRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In myWSPausedOrderTestsDS.twksWSPausedOrderTests.Rows
+                resultData = myDao.ReadByOrderTestIDAndRerunNumber(pDBConnection, pausedOTRow.OrderTestID, pausedOTRow.RerunNumber)
+                If resultData.HasError Then Exit For
+
+                tempExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                If (tempExecutionDS.twksWSExecutions.Count > 0) Then
+                    'If found, then update
+                    For Each executionRow As ExecutionsDS.twksWSExecutionsRow In tempExecutionDS.twksWSExecutions.Rows
+                        resultData = myDao.UpdatePaused(pDBConnection, True, executionRow.ExecutionID)
+                        If (resultData.HasError) Then Exit For
+                    Next
+                End If
+            Next
+            Return resultData
+        End Function
+
+        Private Function UpdateLocksByLIS() As GlobalDataTO
+            Dim resultData As GlobalDataTO
+
+            If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                resultData = New ExecutionsDelegate().UpdateLockedByLIS(pDBConnection, orderTestLockedByLISList, True)
+            Else
+                resultData = myDao.UpdateLockedByLIS(pDBConnection, orderTestLockedByLISList, True)
+            End If
+
+            Return resultData
+        End Function
+
+        Private Sub FinishTransaction(ByVal resultData As GlobalDataTO, ByVal ppDBConnection As SqlConnection)
+            If (Not GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                If (Not resultData.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    If (ppDBConnection Is Nothing) Then CommitTransaction(pDBConnection)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    If (ppDBConnection Is Nothing) Then RollbackTransaction(pDBConnection)
+                End If
+            End If
+        End Sub
+
+        Private Sub ReleaseSemaphoreToAvailable()
+            If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+            End If
+        End Sub
+
     End Class
 End Namespace
 
