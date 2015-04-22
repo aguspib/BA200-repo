@@ -233,7 +233,7 @@ Namespace Biosystems.Ax00.Core.Services
             _forceEmptyAndFinalize = False
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
-            _analyzer.ValidFLIGHT = False
+            _analyzer.ResetFLIGHT
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
             _alreadyFinalized = False
