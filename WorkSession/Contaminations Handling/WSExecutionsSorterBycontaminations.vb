@@ -68,7 +68,7 @@ Public Class WSSorter
                             'ElementID es el ID del tipo de cosa. ID del calibrador, ID del blanco (-1) y en caso de no ser blancos y calibradores, es el number de row en pacientes dentro del grid de tests... ??
                             Dim elements = (From wse In Executions.twksWSExecutions Where wse.SampleClass = sampleClassString Select wse.ElementID Distinct)
                             For Each elementID In elements
-                                returnDS = AppendExecutionsIntoResults(dbConnection, SampleClass, StatFlag, elementID, contaminationsDataDS, returnDS)
+                                returnDS = AppendExecutionsIntoResults(dbConnection, SampleClass, StatFlag, elementID, returnDS)
                             Next elementID
                         Next SampleClass
                     Next StatFlag
@@ -92,7 +92,7 @@ Public Class WSSorter
 
     End Function
 
-    Private Function AppendExecutionsIntoResults(ByVal dbConnection As SqlConnection, ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer, ByVal contaminationsDataDS As ContaminationsDS, ByVal returnDS As ExecutionsDS) As ExecutionsDS
+    Private Function AppendExecutionsIntoResults(ByVal dbConnection As SqlConnection, ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer, ByVal returnDS As ExecutionsDS) As ExecutionsDS
         'Dim stdExecutionTypeOrderTestsCount As Integer
 
         For Each sortedSampleType In allPossibleSampleTypes
@@ -122,7 +122,7 @@ Public Class WSSorter
                     orderContaminationNumber = ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, standardExecutionTypeOrderTests, highContaminationPersitance)
                 End If
 
-                ManageContaminations(activeAnalyzer, dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, standardExecutionTypeOrderTests, allTestTypeOrderTests, orderContaminationNumber)
+                returnDS = ManageContaminations(dbConnection, returnDS, standardExecutionTypeOrderTests, allTestTypeOrderTests, orderContaminationNumber)
 
                 If sampleClass <> "PATIENT" AndAlso sampleClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
 
@@ -188,16 +188,13 @@ Public Class WSSorter
 
     End Function
 
-    Private Sub ManageContaminations(ByVal activeAnalyzer As String,
-                                 ByVal pConn As SqlConnection,
-                                 ByRef returnDS As ExecutionsDS,
-                                 ByVal contaminationsDataDS As ContaminationsDS,
-                                 ByVal highContaminationPersitance As Integer,
-                                 ByVal OrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
+    Private Function ManageContaminations(ByVal pDbConnection As SqlConnection,
+                                 ByVal executionsDS As ExecutionsDS,
+                                 ByVal StandardOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
                                  ByVal AllTestTypeOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
                                  ByVal OrderContaminationNumber As Integer,
                                  Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
-                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
+                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As ExecutionsDS
 
         Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
         Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -207,16 +204,18 @@ Public Class WSSorter
         If (OrderContaminationNumber > 0) Then
 
             currentContaminationNumber = OrderContaminationNumber
-            currentResult = OrderTests.ToList()
-            bestResult = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            currentResult = StandardOrderTests.ToList()
+            bestResult = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(activeAnalyzer, pDbConnection, contaminationsDataDS, currentResult,
+                                                                                    highContaminationPersitance, currentContaminationNumber,
+                                                                                    pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
             'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
             If currentContaminationNumber > 0 Then
-                If OrderTests.Count = 2 Then
+                If StandardOrderTests.Count = 2 Then
                     'Okay, if there are contaminations, why not to try interchange them?
                     currentResult.Clear()
-                    For z = OrderTests.Count - 1 To 0 Step -1
-                        currentResult.Add(OrderTests(z))
+                    For z = StandardOrderTests.Count - 1 To 0 Step -1
+                        currentResult.Add(StandardOrderTests(z))
                     Next
                     currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
                     If currentContaminationNumber = 0 Then
@@ -228,39 +227,38 @@ Public Class WSSorter
             Dim stdPrepFlag As Boolean = False
             For Each wse In AllTestTypeOrderTests
                 If wse.ExecutionType <> "PREP_STD" Then
-                    returnDS.twksWSExecutions.ImportRow(wse)
+                    executionsDS.twksWSExecutions.ImportRow(wse)
                 ElseIf Not stdPrepFlag Then
                     stdPrepFlag = True
                     'Add all std test executions using bestResult
                     For Each wseStdTest In bestResult
-                        returnDS.twksWSExecutions.ImportRow(wseStdTest)
+                        executionsDS.twksWSExecutions.ImportRow(wseStdTest)
                     Next
                 End If
             Next
         Else
             For Each wse In AllTestTypeOrderTests
-                returnDS.twksWSExecutions.ImportRow(wse)
+                executionsDS.twksWSExecutions.ImportRow(wse)
             Next
         End If
-
-    End Sub
-
+        Return executionsDS
+    End Function
 
     Public Function SortWSExecutionsByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
         Dim returnDataSet As New ExecutionsDS
         Dim success As Boolean = False
 
         Try
-            Dim qOrders As List(Of ExecutionsDS.twksWSExecutionsRow)
+            'Dim qOrders As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)
             Dim index = 0
 
             While index < Executions.twksWSExecutions.Rows.Count
                 Dim statFlag = Executions.twksWSExecutions(index).StatFlag
                 Dim sampleClass = Executions.twksWSExecutions(index).SampleClass
 
-                qOrders = (From wse In Executions.twksWSExecutions _
+                Dim qOrders = (From wse In Executions.twksWSExecutions _
                        Where wse.StatFlag = statFlag AndAlso wse.SampleClass = sampleClass _
-                       Select wse).ToList()
+                       Select wse)
 
                 index += qOrders.Count
 
@@ -286,30 +284,24 @@ Public Class WSSorter
         Return success
     End Function
 
-    Private Sub OrderByExecutionTime(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
-        While pExecutions.Count > 0
+    Private Sub OrderByExecutionTime(ByVal executionsToOrder As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
 
-            'AG 16/09/2011 - add order criteria first by ExecutionStatus
-            'Dim wseMaxReadingCycle = (From wse In pExecutions _
-            '       Order By wse.ReadingCycle Descending _
-            '       Select wse).ToList()(0)
+        Dim executionsList = executionsToOrder.ToList()
+        While executionsList.Count > 0
 
-            Dim wseMaxReadingCycle = (From wse In pExecutions _
-                                      Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending _
-                                      Select wse).ToList()(0)
-            'AG 16/09/2011
 
-            Dim wseSelected = (From wse In pExecutions _
-                   Where wse.ElementID = wseMaxReadingCycle.ElementID _
-                   Select wse).ToList()
+            Dim wseMaxReadingCycle = (From wse In executionsList
+                                      Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending
+                                      Select wse).First
+
+            'We need to calculate all items at once! Do not use IEnumerable here or a "collection modified" exception will happen
+            Dim wseSelected = (From wse In executionsList Where wse.ElementID = wseMaxReadingCycle.ElementID Select wse).ToArray
 
             For Each wse In wseSelected
                 returnDS.twksWSExecutions.ImportRow(wse)
+                executionsList.Remove(wse)
             Next
 
-            For Each wse In wseSelected
-                pExecutions.Remove(wse)
-            Next
         End While
     End Sub
 

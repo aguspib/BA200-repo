@@ -4747,14 +4747,10 @@ Namespace Biosystems.Ax00.BL
         Private Sub SortByExecutionTime(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
             While pExecutions.Count > 0
 
-                'AG 16/09/2011 - add order criteria first by ExecutionStatus
-                'Dim wseMaxReadingCycle = (From wse In pExecutions _
-                '       Order By wse.ReadingCycle Descending _
-                '       Select wse).ToList()(0)
 
                 Dim wseMaxReadingCycle = (From wse In pExecutions _
                                           Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending _
-                                          Select wse).ToList()(0)
+                                          Select wse).First
                 'AG 16/09/2011
 
                 Dim wseSelected = (From wse In pExecutions _
@@ -5708,13 +5704,15 @@ Namespace Biosystems.Ax00.BL
                                         If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
                                             'Sort Orders by ReadingCycle
-                                            resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                            If sorter.SortWSExecutionsByElementGroupTime() Then
+                                                resultData.SetDatos = sorter.Executions
 
-                                                'Sort Orders by Contamination
-                                                'AG 07/11/2011
-                                                'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
+                                            Else
+                                                resultData.HasError = True
+                                            End If
+
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                executionDataDS = sorter.Executions
                                                 resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
                                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -6780,13 +6778,17 @@ Namespace Biosystems.Ax00.BL
                                                     resultData.HasError = True
                                                 End If
 
-                                                If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
-                                                    'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS) 'Already done
+                                                If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
                                                     'Sort Orders by ReadingCycle
-                                                    resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
-                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                    If sorter.SortWSExecutionsByElementGroupTime() Then
+                                                        executionDataDS = sorter.Executions
+                                                    Else
+                                                        resultData.HasError = True
+                                                    End If
+
+
+                                                    If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
                                                         resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
