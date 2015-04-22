@@ -3,7 +3,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 
-Public Class WSSorter
+Public Class WSExecutionsSorter
 
     Sub New(executions As ExecutionsDS, activeAnalyzer As String)
         Me.Executions = executions

@@ -339,7 +339,7 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        Dim hola = WSSorter.GetSampleTypesStringsCollection(Nothing)
+        Dim hola = WSExecutionsSorter.GetSampleTypesStringsCollection(Nothing)
         For Each str As String In hola
             Debug.WriteLine(str)
         Next
