@@ -795,7 +795,7 @@ Namespace Biosystems.Ax00.BL
 
                 'Sort by Contamination
 
-                Dim sorter = New WSSorter(executionDataDS, activeAnalyzer)
+                Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
                 If sorter.SortWSExecutionsByContamination(pDBConnection) Then
                     resultData.SetDatos = sorter.Executions
                     executionDataDS = sorter.Executions
