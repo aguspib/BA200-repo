@@ -2,16 +2,15 @@
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-
+''' <summary>
+''' This class handles the worksession sorting, by processing execution times and contaminations
+''' </summary>
+''' <remarks></remarks>
 Public Class WSExecutionsSorter
 
     Sub New(executions As ExecutionsDS, activeAnalyzer As String)
         Me.Executions = executions
         Me.activeAnalyzer = activeAnalyzer
-    End Sub
-
-    Sub New(executions As ExecutionsDS)
-        Me.New(executions, "")
     End Sub
 
     Public Property Executions As ExecutionsDS
@@ -27,25 +26,7 @@ Public Class WSExecutionsSorter
     Dim contaminationsDataDS As ContaminationsDS = Nothing
 #End Region
 
-    Private Sub InitializeAttributes(dbconnection As SqlConnection)
-        highContaminationPersitance = SwParametersDelegate.ReadIntValue(dbconnection, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
-
-        allPossibleSampleClasses = {"BLANK", "CALIB", "CTRL", "PATIENT"}
-        allPossibleSampleTypes = GetSampleTypesStringsCollection(dbconnection)
-
-
-        'Different Stat, SampleClasses and SampleTypes in WorkSession
-        ExecutionsStatValues = (From wse In Executions.twksWSExecutions Select wse.StatFlag Distinct Order By StatFlag Ascending)
-        ExecutionsSampleClasses = (From wse In Executions.twksWSExecutions Select wse.SampleClass Distinct)
-        ExecutionsSampleTypes = (From wse In Executions.twksWSExecutions Select wse.SampleType Distinct)
-
-        'Get contaminationsDataDS
-        Dim contaminationsByType = ContaminationsDelegate.GetContaminationsByType(dbconnection, "R1")
-        If (Not contaminationsByType.HasError AndAlso Not contaminationsByType.SetDatos Is Nothing) Then
-            contaminationsDataDS = DirectCast(contaminationsByType.SetDatos, ContaminationsDS)
-        End If
-
-    End Sub
+#Region "Public methods"
 
     Public Function SortWSExecutionsByContamination(ByVal pDBConnection As SqlConnection) As Boolean
 
@@ -90,6 +71,71 @@ Public Class WSExecutionsSorter
         Return ReturnData
 
     End Function
+
+
+    Public Function SortWSExecutionsByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
+        Dim returnDataSet As New ExecutionsDS
+        Dim success As Boolean = False
+
+        Try
+            'Dim qOrders As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim index = 0
+
+            While index < Executions.twksWSExecutions.Rows.Count
+                Dim statFlag = Executions.twksWSExecutions(index).StatFlag
+                Dim sampleClass = Executions.twksWSExecutions(index).SampleClass
+
+                Dim qOrders = (From wse In Executions.twksWSExecutions _
+                       Where wse.StatFlag = statFlag AndAlso wse.SampleClass = sampleClass _
+                       Select wse)
+
+                index += qOrders.Count
+
+                If sampleClass <> "PATIENT" Then
+                    OrderByExecutionTime(qOrders, returnDataSet)
+                Else
+                    'When SampleClass = 'PATIENT' do not sort
+                    For Each wse In qOrders
+                        returnDataSet.twksWSExecutions.ImportRow(wse)
+                    Next
+                End If
+            End While
+
+            Executions = returnDataSet
+
+            success = True
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+
+        End Try
+
+        Return success
+    End Function
+
+#End Region
+
+#Region "Private methods"
+
+    Private Sub InitializeAttributes(dbconnection As SqlConnection)
+        highContaminationPersitance = SwParametersDelegate.ReadIntValue(dbconnection, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+
+        allPossibleSampleClasses = {"BLANK", "CALIB", "CTRL", "PATIENT"}
+        allPossibleSampleTypes = GetSampleTypesStringsCollection(dbconnection)
+
+
+        'Different Stat, SampleClasses and SampleTypes in WorkSession
+        ExecutionsStatValues = (From wse In Executions.twksWSExecutions Select wse.StatFlag Distinct Order By StatFlag Ascending)
+        ExecutionsSampleClasses = (From wse In Executions.twksWSExecutions Select wse.SampleClass Distinct)
+        ExecutionsSampleTypes = (From wse In Executions.twksWSExecutions Select wse.SampleType Distinct)
+
+        'Get contaminationsDataDS
+        Dim contaminationsByType = ContaminationsDelegate.GetContaminationsByType(dbconnection, "R1")
+        If (Not contaminationsByType.HasError AndAlso Not contaminationsByType.SetDatos Is Nothing) Then
+            contaminationsDataDS = DirectCast(contaminationsByType.SetDatos, ContaminationsDS)
+        End If
+
+    End Sub
 
     Private Function AppendExecutionsIntoResults(ByVal dbConnection As SqlConnection, ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer, ByVal returnDS As ExecutionsDS) As ExecutionsDS
         'Dim stdExecutionTypeOrderTestsCount As Integer
@@ -178,15 +224,6 @@ Public Class WSExecutionsSorter
             Select wse Order By wse.ExecutionType)
         Return allTestTypeOrderTests
     End Function
-
-    Public Shared Function GetSampleTypesStringsCollection(ByVal dbConnection As SqlConnection) As IEnumerable(Of String)
-
-        Dim sampleTypesTable = MasterDataDelegate.GetSampleTypesDataTable(dbConnection)
-        Dim lista = (From sampleType In sampleTypesTable.SetDatos Select sampleType.ItemID)
-        Return lista
-
-    End Function
-
     Private Function ManageContaminations(ByVal pDbConnection As SqlConnection,
                                  ByVal executionsDS As ExecutionsDS,
                                  ByVal StandardOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
@@ -242,47 +279,6 @@ Public Class WSExecutionsSorter
         End If
         Return executionsDS
     End Function
-
-    Public Function SortWSExecutionsByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
-        Dim returnDataSet As New ExecutionsDS
-        Dim success As Boolean = False
-
-        Try
-            'Dim qOrders As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)
-            Dim index = 0
-
-            While index < Executions.twksWSExecutions.Rows.Count
-                Dim statFlag = Executions.twksWSExecutions(index).StatFlag
-                Dim sampleClass = Executions.twksWSExecutions(index).SampleClass
-
-                Dim qOrders = (From wse In Executions.twksWSExecutions _
-                       Where wse.StatFlag = statFlag AndAlso wse.SampleClass = sampleClass _
-                       Select wse)
-
-                index += qOrders.Count
-
-                If sampleClass <> "PATIENT" Then
-                    OrderByExecutionTime(qOrders, returnDataSet)
-                Else
-                    'When SampleClass = 'PATIENT' do not sort
-                    For Each wse In qOrders
-                        returnDataSet.twksWSExecutions.ImportRow(wse)
-                    Next
-                End If
-            End While
-
-            Executions = returnDataSet
-
-            success = True
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
-
-        End Try
-
-        Return success
-    End Function
-
     Private Sub OrderByExecutionTime(ByVal executionsToOrder As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
 
         Dim executionsList = executionsToOrder.ToList()
@@ -303,5 +299,15 @@ Public Class WSExecutionsSorter
 
         End While
     End Sub
+
+    Private Function GetSampleTypesStringsCollection(ByVal dbConnection As SqlConnection) As IEnumerable(Of String)
+
+        Dim sampleTypesTable = MasterDataDelegate.GetSampleTypesDataTable(dbConnection)
+        Dim lista = (From sampleType In sampleTypesTable.SetDatos Select sampleType.ItemID)
+        Return lista
+
+    End Function
+
+#End Region
 
 End Class
