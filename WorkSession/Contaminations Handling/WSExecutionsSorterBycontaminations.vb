@@ -12,7 +12,9 @@ Public Class WSExecutionsSorter
         Me.Executions = executions
         Me.activeAnalyzer = activeAnalyzer
     End Sub
-
+    ''' <summary>
+    ''' This attribute contains the WSexecutions dataset.
+    ''' </summary>
     Public Property Executions As ExecutionsDS
     Public Property activeAnalyzer As String = ""
 
@@ -27,8 +29,13 @@ Public Class WSExecutionsSorter
 #End Region
 
 #Region "Public methods"
-
-    Public Function SortWSExecutionsByContamination(ByVal pDBConnection As SqlConnection) As Boolean
+    ''' <summary>
+    ''' This method will sort the twksWSExecutions datatable in the ExecutionsDS dataset reducing contaminations as much as possible. This sorting is done by order
+    ''' </summary>
+    ''' <param name="pDBConnection"></param>
+    ''' <returns>True if the sort could be performed without errors</returns>
+    ''' <remarks>After calling this method, the ExecutionsDS property will contain sorted results</remarks>
+    Public Function SortByContamination(ByVal pDBConnection As SqlConnection) As Boolean
 
         Dim dbConnection As SqlConnection = Nothing
         Dim ReturnData As Boolean = True
@@ -72,8 +79,13 @@ Public Class WSExecutionsSorter
 
     End Function
 
-
-    Public Function SortWSExecutionsByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
+    ''' <summary>
+    ''' This method will sort the twksWSExecutions datatable in the ExecutionsDS dataset reducing contaminations as much as possible. This sorting is done by "group time"", in blanks and callibrators, controls, etc..
+    ''' </summary>
+    ''' <param name="pDBConnection"></param>
+    ''' <returns>True if the sort could be performed without errors</returns>
+    ''' <remarks>After calling this method, the ExecutionsDS property will contain sorted results</remarks>
+    Public Function SortByElementGroupTime() As Boolean 'ByVal Executions As ExecutionsDS) As GlobalDataTO
         Dim returnDataSet As New ExecutionsDS
         Dim success As Boolean = False
 
@@ -107,6 +119,86 @@ Public Class WSExecutionsSorter
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex)
+
+        End Try
+
+        Return success
+    End Function
+
+    ''' <summary>
+    ''' This method will sort the twksWSExecutions datatable in the ExecutionsDS dataset reducing contaminations as much as possible. This sort takes into account contaminations between groups.
+    ''' </summary>
+    ''' <param name="pDBConnection"></param>
+    ''' <returns>True if the sort could be performed without errors</returns>
+    ''' <remarks>After calling this method, the ExecutionsDS property will contain sorted results</remarks>
+
+    Public Function SortByGroupContamination(ByVal pDBConnection As SqlClient.SqlConnection) As Boolean
+        'Dim resultData As GlobalDataTO = Nothing
+        Dim success As Boolean = False
+        Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        'Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        'Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        'Dim contaminationsDataDS As ContaminationsDS = Nothing
+        Try
+            Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+            If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                dbConnection = connection.SetDatos
+                If (Not dbConnection Is Nothing) Then
+                    'Get all R1 Contaminations 
+                    InitializeAttributes(dbConnection)
+
+                    'Dim Stats() As Boolean = {True, False}
+                    Dim stdOrderTestsCount As Integer
+
+
+                    Dim returnDS As New ExecutionsDS
+                    Dim previousElementLastReagentID As Integer = -1
+                    Dim PreviousReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
+                    '                                                   remember this information in order to check the high contamination persistance
+                    '                                                   (One Item for each different OrderTest)
+
+                    Dim previousElementLastMaxReplicates As Integer = 1
+                    Dim previousOrderTestMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
+
+                    Dim OrderContaminationNumber As Integer
+
+                    For Each StatFlag In ExecutionsStatValues 'Stats
+
+                        For Each SampleClass In allPossibleSampleClasses
+                            If ExecutionsSampleClasses.Contains(SampleClass) Then
+
+                                Dim Elements = (From wse In Executions.twksWSExecutions _
+                                                Where wse.SampleClass = SampleClass _
+                                                Select wse.ElementID Distinct)
+                                'AG 27/04/2012
+
+                                For Each elementID In Elements
+                                    ProcessElementSampleTypes(dbConnection, SampleClass, StatFlag, elementID, previousElementLastReagentID,
+                                                              previousElementLastMaxReplicates, PreviousReagentsIDList, returnDS,
+                                                              previousOrderTestMaxReplicatesList)
+                                Next 'For each elementID
+
+
+                            End If
+                        Next 'For each SampleClass
+
+                    Next 'For each StatFlag
+
+                    'resultData.SetDatos = returnDS
+                    Executions = returnDS
+                    success = True
+                End If
+            End If
+
+        Catch ex As Exception
+            'resultData = New GlobalDataTO()
+            'resultData.HasError = True
+            'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+            'resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex) '.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
 
         End Try
 
@@ -310,79 +402,6 @@ Public Class WSExecutionsSorter
 
     End Function
 
-    Public Function SortWSExecutionsByElementGroupContaminationNew(ByVal pDBConnection As SqlClient.SqlConnection) As Boolean
-        'Dim resultData As GlobalDataTO = Nothing
-        Dim success As Boolean = False
-        Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        'Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-        'Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-        'Dim contaminationsDataDS As ContaminationsDS = Nothing
-        Try
-            Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
-            If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
-                dbConnection = connection.SetDatos
-                If (Not dbConnection Is Nothing) Then
-                    'Get all R1 Contaminations 
-                    InitializeAttributes(dbConnection)
-
-                    'Dim Stats() As Boolean = {True, False}
-                    Dim stdOrderTestsCount As Integer
-
-
-                    Dim returnDS As New ExecutionsDS
-                    Dim previousElementLastReagentID As Integer = -1
-                    Dim PreviousReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
-                    '                                                   remember this information in order to check the high contamination persistance
-                    '                                                   (One Item for each different OrderTest)
-
-                    Dim previousElementLastMaxReplicates As Integer = 1
-                    Dim previousOrderTestMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
-
-                    Dim OrderContaminationNumber As Integer
-
-                    For Each StatFlag In ExecutionsStatValues 'Stats
-
-                        For Each SampleClass In allPossibleSampleClasses
-                            If ExecutionsSampleClasses.Contains(SampleClass) Then
-
-                                Dim Elements = (From wse In Executions.twksWSExecutions _
-                                                Where wse.SampleClass = SampleClass _
-                                                Select wse.ElementID Distinct)
-                                'AG 27/04/2012
-
-                                For Each elementID In Elements
-                                    ProcessElementSampleTypes(dbConnection, SampleClass, StatFlag, elementID, previousElementLastReagentID,
-                                                              previousElementLastMaxReplicates, PreviousReagentsIDList, returnDS,
-                                                              previousOrderTestMaxReplicatesList)
-                                Next 'For each elementID
-
-
-                            End If
-                        Next 'For each SampleClass
-
-                    Next 'For each StatFlag
-
-                    'resultData.SetDatos = returnDS
-                    Executions = returnDS
-                    success = True
-                End If
-            End If
-
-        Catch ex As Exception
-            'resultData = New GlobalDataTO()
-            'resultData.HasError = True
-            'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-            'resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-            'Dim myLogAcciones As New ApplicationLogManager()
-            GlobalBase.CreateLogActivity(ex) '.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
-
-        End Try
-
-        Return success
-    End Function
-
     Private Function ProcessElementSampleTypes(ByVal dbConnection As SqlConnection, ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer, ByVal previousElementLastReagentID As Integer, ByVal previousElementLastMaxReplicates As Integer, ByVal PreviousReagentsIDList As List(Of Integer), ByVal returnDS As ExecutionsDS, ByVal previousOrderTestMaxReplicatesList As List(Of Integer)) As ExecutionsDS
 
         For Each sortedSampleType In allPossibleSampleTypes
@@ -555,9 +574,5 @@ Public Class WSExecutionsSorter
     End Function
 
 #End Region
-
-    Function SortWSExecutionsByElementGroupContaminationNew() As Boolean
-        Return True
-    End Function
 
 End Class

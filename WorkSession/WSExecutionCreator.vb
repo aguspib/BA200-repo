@@ -796,7 +796,7 @@ Namespace Biosystems.Ax00.BL
                 'Sort by Contamination
 
                 Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                If sorter.SortWSExecutionsByContamination(pDBConnection) Then
+                If sorter.SortByContamination(pDBConnection) Then
                     resultData.SetDatos = sorter.Executions
                     executionDataDS = sorter.Executions
                 Else
@@ -806,7 +806,7 @@ Namespace Biosystems.Ax00.BL
 
                 If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
                     'Sort Orders by ReadingCycle
-                    If sorter.SortWSExecutionsByElementGroupTime() Then
+                    If sorter.SortByElementGroupTime() Then
                         resultData.SetDatos = sorter.Executions
                         executionDataDS = sorter.Executions
                     Else
@@ -816,7 +816,7 @@ Namespace Biosystems.Ax00.BL
 
                     If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
-                        If sorter.SortWSExecutionsByElementGroupContaminationNew() Then
+                        If sorter.SortByGroupContamination(pDBConnection) Then
                             resultData.SetDatos = sorter.Executions
                             executionDataDS = sorter.Executions
                         Else

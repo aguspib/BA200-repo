@@ -5693,7 +5693,7 @@ Namespace Biosystems.Ax00.BL
 
                                         'Sort by Contamination
                                         Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                                        If sorter.SortWSExecutionsByContamination(dbConnection) Then
+                                        If sorter.SortByContamination(dbConnection) Then
                                             resultData.SetDatos = sorter.Executions
                                             executionDataDS = sorter.Executions
                                         Else
@@ -5704,7 +5704,7 @@ Namespace Biosystems.Ax00.BL
                                         If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
                                             'Sort Orders by ReadingCycle
-                                            If sorter.SortWSExecutionsByElementGroupTime() Then
+                                            If sorter.SortByElementGroupTime() Then
                                                 resultData.SetDatos = sorter.Executions
 
                                             Else
@@ -6770,7 +6770,7 @@ Namespace Biosystems.Ax00.BL
                                                 'Sort by Contamination
 
                                                 Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                                                If sorter.SortWSExecutionsByContamination(dbConnection) Then
+                                                If sorter.SortByContamination(dbConnection) Then
                                                     resultData.SetDatos = sorter.Executions
                                                     executionDataDS = sorter.Executions
                                                 Else
@@ -6781,7 +6781,7 @@ Namespace Biosystems.Ax00.BL
                                                 If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
                                                     'Sort Orders by ReadingCycle
-                                                    If sorter.SortWSExecutionsByElementGroupTime() Then
+                                                    If sorter.SortByElementGroupTime() Then
                                                         executionDataDS = sorter.Executions
                                                     Else
                                                         resultData.HasError = True
@@ -6790,7 +6790,7 @@ Namespace Biosystems.Ax00.BL
 
                                                     If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
-                                                        If sorter.SortWSExecutionsByElementGroupContaminationNew(dbConnection) Then
+                                                        If sorter.SortByGroupContamination(dbConnection) Then
                                                             executionDataDS = sorter.Executions
                                                         End If
 
