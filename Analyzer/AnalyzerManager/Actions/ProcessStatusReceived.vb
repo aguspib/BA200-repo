@@ -9,8 +9,7 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Namespace Biosystems.Ax00.Core.Entities
     Public Class ProcessStatusReceived
 
-        Private _analyzerManager As IAnalyzerManager
-        Private _startingRunningFirstTime As Boolean
+        Private _analyzerManager As IAnalyzerManager        
         Private ReadOnly _instructionReceived As List(Of InstructionParameterTO)
 
         ''' <summary>
@@ -122,7 +121,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.State = DirectCast(errorValue, StatusParameters.RotorStates)
                 StatusParameters.LastSaved = DateTime.Now
 
-                currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
+                currentAlarms.AddNewAlarmState(errorTranslated.ToString())
                 'Debug.WriteLine("Entro en StateManagementAlarm con errorcode:" + errorValue.ToString())
 
                 'If exists some active AlarmState and recibe a 551 state -> do nothing (552 is priority and the first 551 is the valid state)
@@ -130,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 StatusParameters.State = StatusParameters.RotorStates.UNKNOW_ROTOR_FULL
                 StatusParameters.LastSaved = DateTime.Now
 
-                currentAlarms.AddNewAlarmStateAndRefreshUi(errorTranslated.ToString())
+                currentAlarms.AddNewAlarmState(errorTranslated.ToString())
             End If
 
         End Sub
@@ -153,11 +152,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End If
 
-            If myActionValue = AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE AndAlso errorValue = 0 Then
+            If errorValue <> 20 AndAlso errorValue <> 21 AndAlso myStatusValue <> AnalyzerManagerStatus.SLEEPING Then
                 Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                If currentAlarms.ExistsActiveAlarm(Alarms.GLF_BOARD_FBLD_ERR.ToString()) Then currentAlarms.RemoveAlarmStateAndRefreshUi(Alarms.GLF_BOARD_FBLD_ERR.ToString())
-                _analyzerManager.CanSendingRepetitions() = False
-                _analyzerManager.NumSendingRepetitionsTimeout() = 0
+                If currentAlarms.ExistsActiveAlarm(Alarms.FBLD_ROTOR_FULL.ToString()) AndAlso errorValue <> 551 Then currentAlarms.RemoveAlarmState(Alarms.FBLD_ROTOR_FULL.ToString())
+                If currentAlarms.ExistsActiveAlarm(Alarms.UNKNOW_ROTOR_FULL.ToString()) AndAlso errorValue <> 552 Then
+                    currentAlarms.RemoveAlarmState(Alarms.UNKNOW_ROTOR_FULL.ToString())
+                    _analyzerManager.CanSendingRepetitions() = False
+                    _analyzerManager.NumSendingRepetitionsTimeout() = 0
+                End If
             End If
 
             'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
@@ -872,13 +874,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & _analyzerManager.MaxWaitTime().ToString & "] seconds")
                 _analyzerManager.InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
                 _analyzerManager.InitializeTimerStartTaskControl(_analyzerManager.MaxWaitTime())
-                _startingRunningFirstTime = True
+                _analyzerManager.StartingRunningFirstTime = True
             End If
 
             If _analyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.RUNNING_END Or _
                _analyzerManager.AnalyzerStatus() = AnalyzerManagerStatus.RUNNING Then
-                If _startingRunningFirstTime Then
-                    _startingRunningFirstTime = False
+                If _analyzerManager.StartingRunningFirstTime Then
+                    _analyzerManager.StartingRunningFirstTime = False
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
                     _analyzerManager.RunningLostState() = False
                     _analyzerManager.CanSendingRepetitions() = False
@@ -909,9 +911,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="errorValue"></param>
+        ''' <remarks></remarks>
         Private Sub TreatmentSingleAndMultipleErrors(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer)
-
-
 
             If Not _analyzerManager.IgnoreErrorCodes(_analyzerManager.InstructionTypeSent(), _analyzerManager.InstructionSent(), errorValue) Then
                 If errorValue = MULTIPLE_ERROR_CODE Then 'If multiple alarm error code ask for details
@@ -944,11 +950,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     ' ISE TIMEOUT
-                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then
-                        IseTimeoutErrorTreatment(myGlobal, myAlarms)
+                    Dim addAlarm = True
+                    If myAlarms.Contains(Alarms.ISE_TIMEOUT_ERR) Then                        
+                        addAlarm = IseTimeoutErrorTreatment(myGlobal, myAlarms, errorValue, myAlarmsAdditionalInfoList) 'BA-2384
                     End If
 
-                    myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
+                    If addAlarm Then myAlarmsReceivedList = PrepareLocalAlarms(myErrorCode, myAlarms, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
 
                     If GlobalBase.IsServiceAssembly Then
                         ' Initialize Error Codes List
@@ -1009,7 +1016,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myAlarmsReceivedList
         End Function
 
-        Private Sub IseTimeoutErrorTreatment(ByRef myGlobal As GlobalDataTO, ByVal myAlarms As List(Of Alarms))
+        Private Function IseTimeoutErrorTreatment(ByRef myGlobal As GlobalDataTO, ByVal myAlarms As List(Of Alarms), ByVal pAddInfo As Integer, ByRef pAdditionalInfoList As List(Of String)) As Boolean
+
+            Dim addAlarm = True 'BA-2384
 
             If _analyzerManager.ISEAnalyzer IsNot Nothing Then
                 If Not _analyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
@@ -1042,17 +1051,19 @@ Namespace Biosystems.Ax00.Core.Entities
                         Const alarmId As Alarms = Alarms.ISE_TIMEOUT_ERR
                         alarmStatus = True
                         _analyzerManager.ISEAnalyzer.IsTimeOut = True
+                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList, pAddInfo.ToString(), pAdditionalInfoList, True) 'BA-2384
 
-                        _analyzerManager.PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                         If myAlarmList.Count > 0 Then
                             ' Note that this alarm is common on User and Service !
                             Dim currentAlarms = New AnalyzerAlarms(_analyzerManager)
-                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList, pAdditionalInfoList)  'BA-2384
                         End If
                         ' Activates Alarm end
 
                         _analyzerManager.ActionToSendEvent(AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+
                     Else
+
                         If _analyzerManager.StartTaskInstructionsQueueCount() > 0 Then
                             Debug.Print("Deactivate waiting time control (2) ...")
                             _analyzerManager.NumRepetitionsStateInstruction() = 0
@@ -1072,9 +1083,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End If
 
+                    addAlarm = False  'BA-2384
+
                 End If
             End If
-        End Sub
+
+            Return addAlarm
+
+        End Function
 
         ''' <summary>
         ''' Sleep business logic

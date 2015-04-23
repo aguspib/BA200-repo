@@ -2234,9 +2234,8 @@ Public Class Ax00ServiceMainMDI
             Dim myGlobalDataTO As New GlobalDataTO
             'Dim myLogAcciones As New ApplicationLogManager()
             Dim myLogMaxDays As Integer = 30
-            Dim myParams As New SwParametersDelegate
 
-            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
+            myGlobalDataTO = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
             If Not myGlobalDataTO.HasError Then myLogMaxDays = CInt(myGlobalDataTO.SetDatos)
 
             myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)

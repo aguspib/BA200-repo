@@ -1029,8 +1029,8 @@ Namespace Biosystems.Ax00.BL
         ''' AG 25/11/2011 - add the high contamination persistance functionality
         ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
         ''' </remarks>
-        Public Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
-                                                ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
+        Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
+                                                ByVal pExecutions As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
 
             Dim ContaminationNumber As Integer = 0
@@ -4747,14 +4747,10 @@ Namespace Biosystems.Ax00.BL
         Private Sub SortByExecutionTime(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
             While pExecutions.Count > 0
 
-                'AG 16/09/2011 - add order criteria first by ExecutionStatus
-                'Dim wseMaxReadingCycle = (From wse In pExecutions _
-                '       Order By wse.ReadingCycle Descending _
-                '       Select wse).ToList()(0)
 
                 Dim wseMaxReadingCycle = (From wse In pExecutions _
                                           Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending _
-                                          Select wse).ToList()(0)
+                                          Select wse).First
                 'AG 16/09/2011
 
                 Dim wseSelected = (From wse In pExecutions _
@@ -5696,18 +5692,27 @@ Namespace Biosystems.Ax00.BL
                                         'Dim startTime As DateTime = Now
 
                                         'Sort by Contamination
-                                        resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                        Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
+                                        If sorter.SortByContamination(dbConnection) Then
+                                            resultData.SetDatos = sorter.Executions
+                                            executionDataDS = sorter.Executions
+                                        Else
+                                            resultData.SetDatos = Nothing
+                                            resultData.HasError = True
+                                        End If
+
+                                        If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
                                             'Sort Orders by ReadingCycle
-                                            resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                            If sorter.SortByElementGroupTime() Then
+                                                resultData.SetDatos = sorter.Executions
 
-                                                'Sort Orders by Contamination
-                                                'AG 07/11/2011
-                                                'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
+                                            Else
+                                                resultData.HasError = True
+                                            End If
+
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                executionDataDS = sorter.Executions
                                                 resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
                                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -6763,23 +6768,37 @@ Namespace Biosystems.Ax00.BL
                                                 'Dim startTime As DateTime = Now
 
                                                 'Sort by Contamination
-                                                resultData = SortWSExecutionsByContamination(activeAnalyzer, dbConnection, executionDataDS)
-                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+                                                Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
+                                                If sorter.SortByContamination(dbConnection) Then
+                                                    resultData.SetDatos = sorter.Executions
+                                                    executionDataDS = sorter.Executions
+                                                Else
+                                                    resultData.SetDatos = Nothing
+                                                    resultData.HasError = True
+                                                End If
+
+                                                If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
                                                     'Sort Orders by ReadingCycle
-                                                    resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
-                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                    If sorter.SortByElementGroupTime() Then
+                                                        executionDataDS = sorter.Executions
+                                                    Else
+                                                        resultData.HasError = True
+                                                    End If
 
-                                                        'Sort Orders by Contamination
-                                                        'AG 07/11/2011
-                                                        'resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS) 'RH 29092011
-                                                        resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
 
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                    If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
+
+                                                        If sorter.SortByGroupContamination(dbConnection) Then
+                                                            executionDataDS = sorter.Executions
                                                         End If
+
+                                                        'resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
+
+                                                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                        'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                        'End If
 
                                                     End If
                                                 End If
@@ -6976,6 +6995,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 27/05/2013 - Add the new sample types LIQ, SEM
         '''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
         ''' </remarks>
+        <Obsolete("Use the new WSSorter class instead.")>
         Public Function SortWSExecutionsByContamination(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -6993,15 +7013,14 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Get all R1 Contaminations 
                         Dim myContaminationsDelegate As New ContaminationsDelegate
-                        resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                        resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
 
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
                             Dim highContaminationPersitance As Integer = 0
 
-                            Dim swParametersDlg As New SwParametersDelegate
-                            resultData = swParametersDlg.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 highContaminationPersitance = CInt(resultData.SetDatos)
                             End If
@@ -7012,7 +7031,7 @@ Namespace Biosystems.Ax00.BL
                             'TR 27/05/2013 -Get a list of sample types separated by commas
                             Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
-                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                             End If
@@ -7175,7 +7194,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 09/02/2011
         ''' Modified by: TR 29/08/2011 - Declarations moved outside the loops
         ''' </remarks>
-        Public Function CreateBlankExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateBlankExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                               ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                               Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7315,7 +7334,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: TR 29/08/2011 - Declarations moved outside the loops
         '''              SA 18/04/2012 - Filter required Elements by TubeContent = CALIB to avoid returning also Reagents
         ''' </remarks>
-        Public Function CreateCalibratorExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateCalibratorExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                    ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                    Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7469,7 +7488,7 @@ Namespace Biosystems.Ax00.BL
         '''                                         sorted by OrderTestID, but this is not true in all cases, and when Order Tests are disordered, as 
         '''                                         many Executions as required Elements are created for each Order Test and this is not correct  
         ''' </remarks>
-        Public Function CreateControlExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreateControlExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                 ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                 Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7651,7 +7670,7 @@ Namespace Biosystems.Ax00.BL
         '''                                         sorted by OrderTestID, but this is not true in all cases, and when Order Tests are disordered, as 
         '''                                         many Executions as required Elements are created for each Order Test and this is not correct 
         ''' </remarks>
-        Public Function CreatePatientExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Shared Function CreatePatientExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                 ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
                                                 Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -7865,16 +7884,14 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get all R1 Contaminations 
-                        Dim myContaminationsDelegate As New ContaminationsDelegate
-                        resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                        resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
 
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
                             Dim highContaminationPersitance As Integer = 0
 
-                            Dim swParametersDlg As New SwParametersDelegate
-                            resultData = swParametersDlg.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 highContaminationPersitance = CInt(resultData.SetDatos)
                             End If
@@ -7885,7 +7902,7 @@ Namespace Biosystems.Ax00.BL
                             Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
 
-                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                             End If
@@ -10409,20 +10426,20 @@ Namespace Biosystems.Ax00.BL
                 currentResult = OrderTests.ToList()
                 bestResult = ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-                'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                If currentContaminationNumber > 0 Then
-                    If OrderTests.Count = 2 Then
-                        'Okay, if there are contaminations, why not to try interchange them?
-                        currentResult.Clear()
-                        For z = OrderTests.Count - 1 To 0 Step -1
-                            currentResult.Add(OrderTests(z))
-                        Next
-                        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                        If currentContaminationNumber = 0 Then
-                            bestResult = currentResult
-                        End If
-                    End If
-                End If
+                ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
+                'If currentContaminationNumber > 0 Then
+                '    If OrderTests.Count = 2 Then
+                '        'Okay, if there are contaminations, why not to try interchange them?
+                '        currentResult.Clear()
+                '        For z = OrderTests.Count - 1 To 0 Step -1
+                '            currentResult.Add(OrderTests(z))
+                '        Next
+                '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
+                '        If currentContaminationNumber = 0 Then
+                '            bestResult = currentResult
+                '        End If
+                '    End If
+                'End If
 
                 Dim stdPrepFlag As Boolean = False
                 For Each wse In AllTestTypeOrderTests
@@ -10461,7 +10478,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Public Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
+        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
                                                                 ByVal pConn As SqlConnection,
                                                                 ByVal contaminationsDataDS As ContaminationsDS,
                                                                 ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
@@ -10473,20 +10490,20 @@ Namespace Biosystems.Ax00.BL
 
             Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-            'Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-            myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
+            'myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-            myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
+            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
+            'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            ''Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
-            'myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
+            'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
+            myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult

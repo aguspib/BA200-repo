@@ -111,9 +111,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'End If
 
                         Dim query As New List(Of InstructionParameterTO)
-                        'Const myRowIndex As Integer = 0
                         Dim myOffset As Integer = -1
-                        'Dim Utilities As New Utilities()
                         Dim nextBaseLineID As Integer = 0
                         Dim myInstructionType As String = ""
                         Dim myWell As Integer = 0
@@ -129,7 +127,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else
                             Exit Try
                         End If
-                        'AG 03/01/2011
 
                         'Get the well used from pInstructionReceived and initialize myWell variable
                         query = (From a In pInstructionReceived Where a.ParameterIndex = 3 Select a).ToList()
@@ -159,8 +156,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             myTotalResults = CInt(query.Count / myOffset)
                             Dim myIteration As Integer
                             Dim myBaseLineRow As BaseLinesDS.twksWSBaseLinesRow
-                            'Const myTempIndexMD As Integer = 0
-                            'Const myTempIndexRD As Integer = 0
 
                             For i As Integer = 1 To myTotalResults Step 1
                                 myIteration = i
@@ -269,13 +264,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim alarmStatus As Boolean = False 'By default no alarm                                    
                                     Dim myAlarm = CType(myGlobalDataTO.SetDatos, Alarms)
                                     If myAlarm <> AlarmEnumerates.Alarms.NONE Then
-                                        'AG 27/11/2014 BA-2144
-                                        'alarmStatus = True
 
-                                        ''AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
-                                        'If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                        '    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
-                                        'End If
                                         baselineInitializationFailuresAttribute += 1
                                         If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
                                             alarmStatus = True
@@ -288,7 +277,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                             alarmStatus = True
                                             myGlobalDataTO = SendAutomaticALIGHTRerun(dbConnection)
                                         End If
-                                        'AG 27/11/2014 BA-2144
 
                                     Else ' Valid alight
                                         myAlarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR
@@ -305,7 +293,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If alarmStatus AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
                                             myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
                                         End If
-                                        'AG 23/05/2012
 
                                         If AlarmList.Count > 0 Then
                                             If Not GlobalBase.IsServiceAssembly Then
@@ -319,7 +306,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'If no alarm or all ALIGHT has been rejected ... inform presentation depending the current Sw process
                                     If Not myGlobalDataTO.HasError Then
                                         'AG 28/02/2012
-                                        'If AlarmList.Count = 0 Or baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES Then
                                         If validALIGHTAttribute Or baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
 
                                             'Inform flag for alight is finished
@@ -332,7 +318,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
 
                                             If (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                                                'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
                                                 RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2288
 
                                             ElseIf mySessionFlags(AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
@@ -351,12 +336,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         End If
                                     End If
-                                    'IT 26/11/2014 - BA-2075 END
                                 End If
                             End If
                         End If
                         query = Nothing 'AG 02/08/2012 - free memory
-
                     End If
                 End If
 
@@ -393,6 +376,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  AG 14/03/2011
         ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
         '''                              due to the first one is redundant and produces building warnings
+        '''              SA 31/03/2015 - BA-2384 ==> Based in implementation of BA-2236 for BA-200. Added changes to allow inform the FW Error Code as 
+        '''                                          Additional Information for each Alarm. Removed use of dbConnection variable and the code to Commit/Rollback 
+        '''                                          a DB Transaction due to no DB Connection is opened by this function. Removed old commented code. Removed all 
+        '''                                          Exit Try sentences. Added Comments. 
+        '''              IT 16/04/2015 - BA-2441 Code review related with BA-2384
         ''' </remarks>
         Private Function ProcessHwAlarmDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
@@ -424,7 +412,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Dim errorCode As Integer = 0
-                Dim myErrorCode As New List(Of Integer)
+                Dim myErrorCodes As New List(Of Integer)
+
 
                 For i As Integer = 1 To errorNumber
                     myGlobal = GetItemByParameterIndex(pInstructionReceived, 3 + i)
@@ -446,7 +435,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             ' Service Sw
                             If errorCode <> 20 And errorCode <> 99 Then
-                                myErrorCode.Add(errorCode)
+                                myErrorCodes.Add(errorCode)
                             End If
                         Else
                             If errorCode = 551 Or errorCode = 552 Then
@@ -455,27 +444,31 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             ' User Sw
                             If errorCode <> 20 And errorCode <> 21 And errorCode <> 99 Then
-                                myErrorCode.Add(errorCode)
+                                myErrorCodes.Add(errorCode)
                             End If
                         End If
                     End If
                 Next
 
                 'New translation method
-                Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
+                Dim myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCodes)
 
                 If GlobalBase.IsServiceAssembly Then
                     If Not myAlarms.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) Then
                         IsServiceRotorMissingInformed = False
                     End If
                 End If
+
                 Dim currentAlarms = New AnalyzerAlarms(Me)
                 Dim index As Integer = 0
+
+                'BA-2384: Changed the way of calling function PrepareLocalAlarmList to allow inform the FW Error Code as Additional Information for each Alarm 
+                Dim myFwErrorCode = String.Empty
 
                 'Disable state 551 or 552
                 If Not IsAStateError AndAlso StatusParameters.IsActive Then
                     StatusParameters.IsActive = False
-                    currentAlarms.RemoveAlarmStateAndRefreshUi(StatusParameters.State.ToString())
+                    currentAlarms.RemoveAlarmState(StatusParameters.State.ToString())
                     StatusParameters.State = StatusParameters.RotorStates.None
                     'Debug.WriteLine("ProcessHwAlarmDetailsReceived.IsAStateError FALSE")
                 End If
@@ -483,17 +476,21 @@ Namespace Biosystems.Ax00.Core.Entities
                 For Each alarmId As Alarms In myAlarms
 
                     Dim errorCodeId = ""
-                    If index <= myErrorCode.Count - 1 Then
-                        errorCodeId = myErrorCode(index).ToString
+                    If index <= myErrorCodes.Count - 1 Then
+                        errorCodeId = myErrorCodes(index).ToString
                     End If
 
-                    If errorCodeId = "551" Or errorCodeId = "552" Then
-                        StatusParameters.IsActive = True
-                        StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
-                        currentAlarms.AddNewAlarmStateAndRefreshUi(alarmId.ToString())
-                        StatusParameters.LastSaved = DateTime.Now
-                    Else
-                        If errorCodeId = "560" Then
+                    Select Case errorCodeId
+
+                        Case "551", "552"
+
+                            StatusParameters.IsActive = True
+                            StatusParameters.RotorStates.TryParse(alarmId.ToString(), StatusParameters.State)
+                            currentAlarms.AddNewAlarmState(alarmId.ToString())
+                            StatusParameters.LastSaved = DateTime.Now
+
+                        Case "560"
+
                             CanSendingRepetitions() = True
                             NumSendingRepetitionsTimeout() += 1
 
@@ -508,9 +505,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = SendStartTaskinQueue()
 
                             End If
-                        End If
-                        PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeId, myAlarmsAdditionalInfoList, True)
-                    End If
+
+                            myFwErrorCode = GetFwErrorCodes(alarmId, myErrorCodes) 'BA-2441
+                            PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, myFwErrorCode, myAlarmsAdditionalInfoList, True) 'BA-2384
+
+                        Case Else
+
+                            myFwErrorCode = GetFwErrorCodes(alarmId, myErrorCodes) 'BA-2441
+                            PrepareLocalAlarmList(alarmId, True, myAlarmsReceivedList, myAlarmsStatusList, myFwErrorCode, myAlarmsAdditionalInfoList, True) 'BA-2384
+
+                    End Select
+
                     index += 1
                 Next
 
@@ -520,7 +525,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     ' Initialize Error Codes List
                     myErrorCodesAttribute.Clear()
                     ' Prepare error codes List received from Analyzer
-                    PrepareLocalAlarmList_SRV(myErrorCode, myFwCodeErrorReceivedList)
+                    PrepareLocalAlarmList_SRV(myErrorCodes, myFwCodeErrorReceivedList)
                 End If
 
                 If Not myGlobal.HasError Then
@@ -529,6 +534,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If GlobalBase.IsServiceAssembly Then
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                         Else
+                            'BA-2384: Inform optional parameter pAdditionalInfoList = myAlarmsAdditionalInfoList
                             myGlobal = currentAlarms.Manage(myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
                         End If
                     End If
@@ -1893,6 +1899,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 27/11/2014 BA-2066
         ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
         ''' IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' AC BA-2437
         ''' </remarks>
         Public Function ProcessFlightReadAction() As Boolean Implements IAnalyzerManager.ProcessFlightReadAction
 
@@ -1948,6 +1955,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
 
+            validFLIGHTAttribute = validResults
             Return validResults
 
         End Function
@@ -2070,6 +2078,34 @@ Namespace Biosystems.Ax00.Core.Entities
             dynamicbaselineInitializationFailuresAttribute = 0 'Reset FLIGHT failures counter
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="alarmId"></param>
+        ''' <param name="errorCodesList"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function GetFwErrorCodes(ByVal alarmId As Alarms, ByVal errorCodesList As List(Of Integer)) As String
+
+            Dim myFwErrorCode = String.Empty
+            Dim myFwErrorCodeList As List(Of AlarmsDS.tfmwAlarmsRow)
+
+            'Search in the global DataSet alarmsDefinitionTableDS, the FW Error Code for the Alarm; the FW Error Code has to exists in myErrorCodes List
+            'to avoid errors due to an AlarmID can be linked to several FW Error Codes
+            myFwErrorCodeList = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
+                                Where a.AlarmID = alarmId.ToString() AndAlso errorCodesList.Contains(a.ErrorCode) _
+                                Select a).ToList()
+
+            'If an Alarm is linked to several FW Error Codes and more than one of them is in the ANSERR Instruction, then they are 
+            'saved in AdditionalInfo field divided by commas
+            For Each fwCode As AlarmsDS.tfmwAlarmsRow In myFwErrorCodeList
+                If (myFwErrorCode <> String.Empty) Then myFwErrorCode &= ","
+                myFwErrorCode &= fwCode.ErrorCode.ToString()
+            Next
+
+            Return myFwErrorCode
+
+        End Function
 
 #End Region
 
@@ -2165,14 +2201,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                         .WorkSessionID = WorkSessionIDAttribute
                                         .AnalyzerID = AnalyzerIDAttribute
                                         .AlarmID = pAlarmID
-                                        .AlarmStatus = pAlarmStatus
+                                        .AlarmStatus = pAlarmStatus                                        
                                         .EndEdit()
                                     End With
                                     myUI_RefreshDS.ReceivedAlarms.AddReceivedAlarmsRow(myNewAlarmRow)
                                     myUI_RefreshDS.ReceivedAlarms.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
                                 End SyncLock
-                        End Select
-
+                        End Select                            
                     End If
                 End If
 

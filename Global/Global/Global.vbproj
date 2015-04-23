@@ -140,6 +140,7 @@
     <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
     <Compile Include="DAOBase.vb" />
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
+    <Compile Include="DebugLogManager\DebugLogger.vb" />
     <Compile Include="Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Enums\BarcodeWorksessionActionsEnum.vb" />
     <Compile Include="Enums\StringStepStatus.vb" />

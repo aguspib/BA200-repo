@@ -234,6 +234,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1 + wellOffset, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
                                 myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
                                     myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
                                 End If
@@ -265,6 +266,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
                                 myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.WASHING_RUN_START: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
                                     myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
                                 End If
@@ -411,6 +413,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
                                     myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                    GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.SOUND_DONE: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
                                         myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
                                     End If
@@ -2060,7 +2063,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Sub InitializeTimerControl(ByVal pInterval As Integer) Implements IAnalyzerManager.InitializeTimerControl
             Try
                 'Warning: pInterval most be greater than 0
-                If pInterval > 0 Then
+                If pInterval > 0 Then                    
                     pInterval = pInterval + SYSTEM_TIME_OFFSET
                 Else
                     pInterval = WAITING_TIME_OFF
@@ -2086,7 +2089,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     waitingTimer.Enabled = True
                 End If
-
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerControl", EventLogEntryType.Error, False)
             End Try
@@ -2173,8 +2175,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     AnalyzerIsReadyAttribute = False
 
                     waitingStartTaskTimer.Enabled = True
-                End If
-
+                End If                
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerStartTaskControl", EventLogEntryType.Error, False)
             End Try

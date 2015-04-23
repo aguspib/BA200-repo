@@ -415,31 +415,33 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 28/02/2012
 
                 'Get the alarms defined with OKType = False (never are marked as solved)
-                Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
+                Dim alarmsWithOkTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
                                                                Where a.OKType = False Select a.AlarmID).ToList
 
                 If (addFlag) Then
-                    'New alarm exists ... add to list with TRUE status only if alarm doesnt exists
-                    If Not myAlarmListAttribute.Contains(pAlarmCode) Then
-                        'AG 04/12/2014 BA-2236
+                    'New alarm exists ... add to the list with TRUE status but only if the AlarmID doesn't exist in it
+                    'BA-2384: call new function AddLocalActiveAlarmToList to add the new Alarm to the Alarms List
+                    If (Not myAlarmListAttribute.Contains(pAlarmCode)) Then
                         AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
-
-                        'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicated in pAlarmList
-                    ElseIf alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString) Then
-                        'AG 29/08/2012 - exception BASELINE_WELL_WARN (change reactions rotor recommend). It can appear several times in the same WS but the alarm is generated once
-                        If pAlarmCode <> AlarmEnumerates.Alarms.BASELINE_WELL_WARN Then
-                            'AG 04/12/2014 BA-2236
-                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                    Else
+                        'BA-2384: If the Alarm already exists but one or more FW Error Codes have been received for it, check if field AdditionalInfo needs to be
+                        '         updated (by adding new FW Error Codes) and in this case, execute the UPDATE
+                        If (Not String.IsNullOrEmpty(pAddInfo) AndAlso IsNumeric(pAddInfo.Replace(",", ""))) Then
+                            Dim myGlobal = UpdateAdditionalInfoField(Nothing, pAlarmCode.ToString, pAddInfo)
                         End If
 
-                        'AG 07/09/2012 - base line init can appear several times in Running, for these alarm repetitions a flag defines when stop WS
-                    ElseIf pAlarmCode = AlarmEnumerates.Alarms.BASELINE_INIT_ERR Then
-                        If wellBaseLineAutoPausesSession <> 0 Then
-                            'AG 04/12/2014 BA-2236
-                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
-                        End If
-                        'AG 07/09/2012
+                        If (alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString)) Then
+                            'Exception: BASELINE_WELL_WARN (Change Reactions Rotor recommended). It can appear several times in the same WS but the alarm is generated just once
+                            If (pAlarmCode <> AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                            End If
 
+                            'Base Line Init Error can appear several times in Running. For these Alarm repetitions, a flag defines when stop WS
+                        ElseIf (pAlarmCode = AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                            If (wellBaseLineAutoPausesSession <> 0) Then
+                                AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                            End If
+                        End If
                     End If
                 End If
 
@@ -595,33 +597,114 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
         ''' <summary>
-        ''' Inform in a local alarm list the new active alarms. This list will be use for alarms treatment
+        ''' Add to a local Alarms list the informed Alarm. This list will be used for Alarms treatment
         ''' </summary>
-        ''' <param name="pAlarmCode"></param>
-        ''' <param name="pAlarmList"></param>
-        ''' <param name="pAlarmStatusList"></param>
-        ''' <param name="pAddInfo"></param>
-        ''' <param name="pAdditionalInfoList"></param>
-        ''' <remarks>AG 04/12/2014 BA-2236
-        ''' AG 09/12/2014 BA-2236 remove parameters pErrorCode and pErrorCodeList. We will use the AdditionalInfo field also for store the error codes</remarks>
-        Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As Alarms, _
-                                  ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
-                                  Optional ByVal pAddInfo As String = "", _
-                                  Optional ByRef pAdditionalInfoList As List(Of String) = Nothing)
+        ''' <param name="pAlarmCode">Alarm Identifier</param>
+        ''' <param name="pAlarmList">List to return all Alarms</param>
+        ''' <param name="pAlarmStatusList">List containing the Status of all Alarms</param>
+        ''' <param name="pAddInfo">Additional information to save for the Alarm. Optional parameter.</param>
+        ''' <param name="pAdditionalInfoList">List of Strings to store the additional information for the Alarm</param>
+        ''' <remarks>
+        ''' Created by:  SA 31/03/2015 - BA-2384 (Created in BA200 for implementation of BA-2236)
+        ''' </remarks>
+        Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As Alarms, ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
+                                              Optional ByVal pAddInfo As String = "", Optional ByRef pAdditionalInfoList As List(Of String) = Nothing)
             Try
                 pAlarmList.Add(pAlarmCode)
                 pAlarmStatusList.Add(True)
 
-                'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                'AG 09/12/2014 BA-2236 now also for store the error codes
-                If Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> "" Then
-                    pAdditionalInfoList.Add(pAddInfo)
-                End If
-
+                'Additional Information is used to save information for Alarms related with Volume Missing, Clot Warnings, Blocked Preparations
+                'and also the FW Error Code when an instruction ANSERR is received
+                If (Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> String.Empty) Then pAdditionalInfoList.Add(pAddInfo)
             Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddLocalActiveAlarmToList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
             End Try
         End Sub
+
+        ''' <summary>
+        ''' For Alarms that already exist for the Analyzer Work Session and having one or more FW Error Codes as additional information, if the Alarm is received again, this 
+        ''' function verifies if the FW Error Codes received are already registered as additional information and for those not registered, add them to the additional information
+        ''' field and update the Alarm in table twksWSAnalyzerAlarms
+        ''' </summary>
+        ''' <param name="pDbConnection">Open DB Connection</param>
+        ''' <param name="pAlarmID">Alarm Identifier</param>
+        ''' <param name="pAdditionalInfo">Additional information to save for the Alarm</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 13/04/2015 - BA-2384
+        ''' </remarks>
+        Private Function UpdateAdditionalInfoField(ByVal pDbConnection As SqlConnection, ByVal pAlarmId As String, ByVal pAdditionalInfo As String) As GlobalDataTO
+            Dim myGlobal As New GlobalDataTO
+            Dim dbConnection As SqlConnection = Nothing
+
+            Try
+                myGlobal = DAOBase.GetOpenDBTransaction(pDbConnection)
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim updateRowFlag = False
+                        Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
+
+                        myGlobal = alarmsDelg.GetByAlarmID(dbConnection, pAlarmID, Nothing, Nothing, AnalyzerIDAttribute, String.Empty)
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                            Dim temporalDs = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+                            If (temporalDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                                If (Not String.IsNullOrEmpty(temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo)) Then
+                                    Dim existingFwCodes = temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo.Split(","c)
+
+                                    Dim codeExist = False
+                                    Dim receivedFwCodes = pAdditionalInfo.Split(","c)
+                                    For Each receivedCode As String In receivedFWCodes
+                                        For Each existingCode As String In existingFWCodes
+                                            codeExist = (receivedCode = existingCode)
+                                            If (codeExist) Then Exit For
+                                        Next
+
+                                        If (Not codeExist) Then
+                                            temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
+                                            temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo &= "," & receivedCode
+                                            temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                            updateRowFlag = True
+                                        End If
+                                    Next
+                                Else
+                                    temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
+                                    temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo = pAdditionalInfo
+                                    temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                    updateRowFlag = True
+                                End If
+
+                                If (updateRowFlag) Then
+                                    myGlobal = alarmsDelg.Update(dbConnection, temporalDS)
+                                End If
+                            End If
+                        End If
+
+                        If (Not myGlobal.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobal = New GlobalDataTO()
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex)
+            Finally
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobal
+        End Function
 
         ''' <summary>
         ''' Verify if there are Temperature Warning Alarms

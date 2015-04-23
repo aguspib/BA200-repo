@@ -222,6 +222,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'The next instruction to be sent has not been found yet by Software. It has to Search + Send
                         'CASE (example the 1st request received in RUNNING)
                         myGlobal = Me.SearchNextPreparation(Nothing, pNextWell, ISEModuleIsReadyAttribute) 'Search for next instruction to be sent ... and sent it!!
+                        GlobalBase.CreateLogActivity("Other: " + pNextWell.ToString, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Information, False)
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                             myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
                             '' PROVA XB !!!
@@ -795,6 +796,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
 
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (Check if exist reagents contaminations): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+
                                 Else 'STD execution or NO_PENDING_PREPARATION_FOUND
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.ExecutionType = "PREP_STD"
@@ -808,6 +811,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.SetWashSolution2Null()
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                                 End If '(4.2)
                             End If '(4.1)
                         End If '(4.0
@@ -1139,8 +1143,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminationsDataDS As ContaminationsDS = Nothing
                                 Dim highContaminationPersitance As Integer = 0
 
-                                Dim myContaminationsDelegate As New ContaminationsDelegate
-                                resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                                resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
@@ -1626,7 +1629,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminNumber As Integer = 0
 
                                 '2.1) Calculate contaminations number with current executions sort
-                                contaminNumber = 1 + myExDlgte.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
+                                contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
                                 If contaminNumber > 0 Then '(5)
                                     'Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -1663,7 +1666,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                                     currentResultList = toSendList.ToList() 'Initial order                                    
-                                    toSendList = myExDlgte.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+                                    toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
                                     '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
                                     'If contamination sent Wash, else sent toSendList(0).ExecutionID

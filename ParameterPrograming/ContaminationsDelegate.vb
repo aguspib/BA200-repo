@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  DL 10/02/2010
         ''' Modified by: SA 22/02/2010 - Parameter ContaminationType was changed from Integer to String
         ''' </remarks>
-        Public Function GetContaminationsByType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationType As String) As GlobalDataTO
+        Public Shared Function GetContaminationsByType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 

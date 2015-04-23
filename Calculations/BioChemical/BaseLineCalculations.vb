@@ -134,7 +134,9 @@ Namespace Biosystems.Ax00.Core.Entities
         Private swParametersAttribute As New ParametersDS
         Private instrumentAdjustments As New SRVAdjustmentsDS
         Private validAlightAttribute As Boolean = False
+        Private validFlightAttribute As Boolean = False
         Private existsAlightResultsAttribute As Boolean = False 'AG 20/06/2012
+        Private existsFlightResultsAttribute As Boolean = False
 
         Private adjustBL As New AdjustBaseLine
         Private wellBL As New wellBaseLine
@@ -180,6 +182,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(ByVal value As Boolean)
                 validAlightAttribute = value
+            End Set
+        End Property
+
+        Public Property validFLight() As Boolean Implements IBaseLineEntity.validFLight
+            Get
+                Return validFlightAttribute
+            End Get
+            Set(ByVal value As Boolean)
+                validFlightAttribute = value
             End Set
         End Property
 
@@ -265,6 +276,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'AG 28/11/2014 BA-2081
                                     If myAlarm = Alarms.NONE Then
                                         ' 2. Last DYNAMIC base lines calculated with FLIGHT
+                                        validFlightAttribute = False
                                         resultData = ValidateDynamicBaseLinesResults(dbConnection, pAnalyzerID)
                                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
@@ -1318,6 +1330,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Inform dat to return
                         resultData.SetDatos = validValuesFlag
+                        validFlightAttribute = validValuesFlag
 
                         'Release memory
                         listOfLeds = Nothing

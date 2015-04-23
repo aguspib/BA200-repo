@@ -232,7 +232,26 @@ Namespace Biosystems.Ax00.Core.Services
                     ExecuteBarcodeStep()
 
                 Case WarmUpStepsEnum.BaseLine
+#If DEBUG Then
+                    If Not StatusParameters.IsActive Then
+                        Dim result = System.Windows.Forms.MessageBox.Show("Do want to do the complete base line?", "Baseline shortcut question", System.Windows.Forms.MessageBoxButtons.YesNo)
+                        If result = System.Windows.Forms.DialogResult.Yes Then
+                            ExecuteBaseLineStep()
+                        Else
+                            _baseLineService.EmptyAndFinalizeProcess()
+                            _baseLineService.Status = ServiceStatusEnum.EndSuccess
+                            _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Fill) = "END"
+                            _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Read) = "END"
+                            _analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END"
+                            _currentStep = WarmUpStepsEnum.Finalize
+                            FinalizeProcess()
+                        End If
+                    Else
+                        ExecuteBaseLineStep()
+                    End If
+#Else
                     ExecuteBaseLineStep()
+#End If
 
                 Case WarmUpStepsEnum.Finalize
                     FinalizeProcess()
