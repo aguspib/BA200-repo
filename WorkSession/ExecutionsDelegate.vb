@@ -6790,11 +6790,15 @@ Namespace Biosystems.Ax00.BL
 
                                                     If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
 
-                                                        resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
-
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                        If sorter.SortWSExecutionsByElementGroupContaminationNew(dbConnection) Then
+                                                            executionDataDS = sorter.Executions
                                                         End If
+
+                                                        'resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
+
+                                                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                        'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                        'End If
 
                                                     End If
                                                 End If
