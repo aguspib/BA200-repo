@@ -1725,6 +1725,10 @@
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\DAL\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{052cf005-d448-4768-a25a-48ff53644469}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
       <Name>ConfigurationSetup</Name>
@@ -1760,10 +1764,6 @@
     <ProjectReference Include="..\FwScriptsManagement\FwScriptsManagement.vbproj">
       <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
       <Name>FwScriptsManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
-      <Project>{052CF005-D448-4768-A25A-48FF53644469}</Project>
-      <Name>UpdateVersion</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

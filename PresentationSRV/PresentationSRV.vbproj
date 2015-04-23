@@ -717,6 +717,10 @@
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\DAL\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{052cf005-d448-4768-a25a-48ff53644469}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
       <Name>ConfigurationSetup</Name>
@@ -760,10 +764,6 @@
     <ProjectReference Include="..\PresentationCOM\PresentationCOM.vbproj">
       <Project>{A139D1D6-0C60-4DA2-B073-E73E2F2893D8}</Project>
       <Name>PresentationCOM</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
-      <Project>{052CF005-D448-4768-A25A-48FF53644469}</Project>
-      <Name>UpdateVersion</Name>
     </ProjectReference>
     <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
       <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
