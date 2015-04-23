@@ -260,7 +260,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' AG 19/03/2014 - create the delegate - #1545
         ''' </remarks>
-        Public Function DeleteNotInCourseExecutionsNEW(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Private Function DeleteNotInCourseExecutionsNEW(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                       ByVal pOrderTestsListDS As OrderTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1024,7 +1024,7 @@ Namespace Biosystems.Ax00.BL
         '''                             the final result is OK the sort by contaminations can be affected
         ''' AG 30/05/2014 - #1644 add parameter pPauseMode
         ''' </remarks>
-        Public Function RecalculateStatusForNotDeletedExecutionsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function RecalculateStatusForNotDeletedExecutionsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                                     ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1430,7 +1430,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pNewLockedValue"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/03/2013</remarks>
-        Public Function UpdateLockedByLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAffectedOrderTests As List(Of Integer), ByVal pNewLockedValue As Boolean) As GlobalDataTO
+        Private Function UpdateLockedByLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAffectedOrderTests As List(Of Integer), ByVal pNewLockedValue As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 

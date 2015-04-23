@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.BL
             Dim solutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim Tests = OrderTests.ToList()
             Dim result As New List(Of ExecutionsDS.twksWSExecutionsRow)
-            Dim currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(ContaminDS, result, HighContaminationPersistence)
+            Dim currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(ContaminDS, OrderTests, HighContaminationPersistence)
 
             ContaminLimit = 0
 
