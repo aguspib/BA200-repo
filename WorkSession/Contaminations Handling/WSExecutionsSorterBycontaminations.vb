@@ -556,4 +556,8 @@ Public Class WSExecutionsSorter
 
 #End Region
 
+    Function SortWSExecutionsByElementGroupContaminationNew() As Boolean
+        Return True
+    End Function
+
 End Class
