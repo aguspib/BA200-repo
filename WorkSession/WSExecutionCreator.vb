@@ -804,14 +804,14 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
-                    'Sort Orders by ReadingCycle
-                    If sorter.SortByElementGroupTime() Then
-                        resultData.SetDatos = sorter.Executions
-                        executionDataDS = sorter.Executions
-                    Else
-                        resultData.SetDatos = Nothing
-                        resultData.HasError = True
-                    End If
+                    ''Sort Orders by ReadingCycle
+                    'If sorter.SortByElementGroupTime() Then
+                    '    resultData.SetDatos = sorter.Executions
+                    '    executionDataDS = sorter.Executions
+                    'Else
+                    '    resultData.SetDatos = Nothing
+                    '    resultData.HasError = True
+                    'End If
 
                     If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 

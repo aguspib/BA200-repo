@@ -347,23 +347,6 @@ Public Class WSExecutionsSorter
                                                                                     currentResult, highContaminationPersitance, currentContaminationNumber,
                                                                                     pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-            'A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-            If currentContaminationNumber > 0 Then
-                If StandardOrderTests.Count = 2 Then
-                    'Okay, if there are contaminations, why not to try interchange them?
-                    currentResult.Clear()
-                    For z = StandardOrderTests.Count - 1 To 0 Step -1
-                        currentResult.Add(StandardOrderTests(z))
-                    Next
-                    currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS,
-                                                                                           currentResult,
-                                                                                           highContaminationPersitance)
-                    If currentContaminationNumber = 0 Then
-                        bestResult = currentResult
-                    End If
-                End If
-            End If
-
             Dim stdPrepFlag As Boolean = False
             For Each wse In AllTestTypeOrderTests
                 If wse.ExecutionType <> "PREP_STD" Then
