@@ -61,6 +61,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private CurrentChannel As String 'SGM 06/07/2012
         Private CurrentSettings As String 'SGM 06/07/2012
 
+        ReadOnly _debugLogger As DebugLogger = New DebugLogger()
 #End Region
 
 #Region "Methods"
@@ -180,7 +181,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 SB.Append(ChrW(B))
             Next
             Debug.WriteLine("   PC>>> : " & SB.ToString)
-            DebugLogger.AddLog("   PC>>> : " & SB.ToString)
+            _debugLogger.AddLog("   PC>>> : " & SB.ToString)
 #End If
 
 
@@ -338,7 +339,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 #If TRACECOM Then
-            DebugLogger.AddLog("   PC<<< : " & dataReceived)
+            _debugLogger.AddLog("   PC<<< : " & dataReceived)
             Debug.WriteLine("   PC<<< : " & dataReceived)
 #End If
 
