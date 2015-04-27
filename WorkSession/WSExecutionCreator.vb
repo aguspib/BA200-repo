@@ -263,7 +263,7 @@ Namespace Biosystems.Ax00.BL
         Private Function DeleteNotInCourseExecutionsNEW(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                       ByVal pOrderTestsListDS As OrderTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = GetOpenDBTransaction(pDBConnection)
@@ -276,7 +276,6 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
@@ -292,7 +291,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.DeleteNotInCourseExecutionsNEW", EventLogEntryType.Error, False)
 
             Finally
@@ -1019,10 +1017,6 @@ Namespace Biosystems.Ax00.BL
         '''                                  It is not necessary just now, but it is defined for future use if it is finally needed</param>
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 03/07/2012 - Based in RecalculateStatusForNotDeletedExecutions; changes to improve the function perfomance
-        ''' Modified by AG 25/03/2013 - When the ordertest has been locked by lis assign LOCKED value instead of PENDING, otherwise although 
-        '''                             the final result is OK the sort by contaminations can be affected
-        ''' AG 30/05/2014 - #1644 add parameter pPauseMode
         ''' </remarks>
         Private Function RecalculateStatusForNotDeletedExecutionsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                                     ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
@@ -1041,200 +1035,19 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                            Dim newExecStatus As String
-                            Dim noPOSElements As Integer
-                            Dim myWSOrderTests As New WSOrderTestsDelegate
-                            Dim reqElementsDS As New WSOrderTestsForExecutionsDS
-                            Dim lstSampleClassExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-                            Dim lstToPENDING As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                            Dim lstToLOCKED As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                            resultData = New WSStatusRecalculatorForBlanks(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
 
-                            If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                'Get all BLANK Order Tests having Pending and/or Locked Executions
-                                lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                           Where a.SampleClass = "BLANK" _
-                                                          Select a).ToList()
-
-                                If (lstSampleClassExecutions.Count > 0) Then
-                                    For Each blankOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                        'Get the list of Elements required for the Blank Order Test 
-                                        resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, blankOT.SampleClass, blankOT.OrderTestID)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                            'Verify if at least one of the required Elements is not positioned
-                                            noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                            Where b.ElementStatus = "NOPOS" _
-                                                           Select b).ToList.Count()
-
-                                            'The Executions for the Blank Order Test will be marked as LOCKED if there are not positioned elements
-                                            blankOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
-                                        Else
-                                            Exit For
-                                        End If
-                                    Next
-
-                                    'Finally, update the status of the Executions for each Blank OrderTest
-                                    'AG 19/02/2014 - #1514
-                                    'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                    lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                    lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                    If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                    'AG 19/02/2014 - #1514
-
-                                End If
-
-                                If (Not resultData.HasError) Then
-                                    'Get all CALIBRATOR Order Tests having Pending and/or Locked Executions
-                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                               Where a.SampleClass = "CALIB" _
-                                                              Select a).ToList()
-
-                                    If (lstSampleClassExecutions.Count > 0) Then
-                                        For Each calibOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                            'Get the list of Elements required for the Calibrator Order Test 
-                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, calibOT.SampleClass, calibOT.OrderTestID)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                'Verify if at least one of the required Elements is not positioned
-                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                Where b.ElementStatus = "NOPOS" _
-                                                               Select b).ToList.Count()
-
-                                                newExecStatus = "PENDING"
-                                                If (noPOSElements > 0) Then
-                                                    'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
-                                                    newExecStatus = "LOCKED"
-                                                Else
-                                                    'Elements required for the Calibrator are positioned, verify if the elements needed for the Blank are also positioned
-                                                    resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                   reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                    Else
-                                                        Exit For
-                                                    End If
-                                                End If
-                                                calibOT.ExecutionStatus = newExecStatus
-                                            Else
-                                                Exit For
-                                            End If
-                                        Next
-
-                                        'Finally, update the status of the Executions for each Calibrator OrderTest
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
-                                    End If
-                                End If
-
-                                If (Not resultData.HasError) Then
-                                    'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for ISE Tests 
-                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                               Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
-                                                             AndAlso a.ExecutionType = "PREP_ISE" _
-                                                              Select a).ToList()
-
-                                    If (lstSampleClassExecutions.Count > 0) Then
-                                        For Each sampleIseOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                            'Get the list of Elements required for the Control or Patient ISE Order Test 
-                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleIseOT.SampleClass, sampleIseOT.OrderTestID)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                'Verify if at least one of the required Elements is not positioned
-                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                Where b.ElementStatus = "NOPOS" _
-                                                               Select b).ToList.Count()
-
-                                                'The Executions for the Control or Patient ISE Order Test will be marked as LOCKED if there are not positioned elements
-                                                sampleIseOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
-                                                If Not sampleIseOT.IsLockedByLISNull AndAlso sampleIseOT.LockedByLIS Then sampleIseOT.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                            Else
-                                                Exit For
-                                            End If
-                                        Next
-
-                                        'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
-                                    End If
-
-                                    If (Not resultData.HasError) Then
-                                        'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for STANDARD Tests 
-                                        lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                                   Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
-                                                                 AndAlso a.ExecutionType = "PREP_STD" _
-                                                                  Select a).ToList()
-
-                                        If (lstSampleClassExecutions.Count > 0) Then
-                                            For Each sampleStdOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                                'Get the list of Elements required for the Control or Patient STANDARD Order Test 
-                                                resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleStdOT.SampleClass, sampleStdOT.OrderTestID)
-                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                    reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                    'Verify if at least one of the required Elements is not positioned
-                                                    noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                    Where b.ElementStatus = "NOPOS" _
-                                                                   Select b).ToList.Count()
-
-                                                    newExecStatus = "PENDING"
-                                                    If Not sampleStdOT.IsLockedByLISNull AndAlso sampleStdOT.LockedByLIS Then newExecStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-
-                                                    If (noPOSElements > 0) Then
-                                                        'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
-                                                        newExecStatus = "LOCKED"
-                                                    ElseIf newExecStatus = "PENDING" Then 'Else 'AG 25/03/2013 - improve change Else for Else PENDING and reduce queries
-                                                        'Elements required for the Control or Patient are positioned, verify if the elements needed for the Calibrator are also positioned
-                                                        resultData = VerifyLockedCalibrator(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                            reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then
-                                                                newExecStatus = "LOCKED"
-                                                            Else
-                                                                'Verify if the elements needed for the Blank are also positioned
-                                                                resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                               reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-
-                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                    If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                                Else
-                                                                    Exit For
-                                                                End If
-                                                            End If
-                                                        Else
-                                                            Exit For
-                                                        End If
-                                                    End If
-                                                    sampleStdOT.ExecutionStatus = newExecStatus
-                                                Else
-                                                    Exit For
-                                                End If
-                                            Next
-
-                                            'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                            'AG 19/02/2014 - #1514
-                                            'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                            lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                            lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                            If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                            'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
-                                End If
+                            If Not resultData.HasError Then
+                                resultData = New WSStatusRecalculatorForCalibs(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
                             End If
-                            lstSampleClassExecutions = Nothing
-                            lstToPENDING = Nothing  'AG 19/02/2014 - #1514
-                            lstToLOCKED = Nothing 'AG 19/02/2014 - #1514
+
+                            If Not resultData.HasError Then
+                                resultData = New WSStatusRecalculatorForCtrlPatientsWithISE(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
+                            End If
+
+                            If Not resultData.HasError Then
+                                resultData = New WSStatusRecalculatorForCtrlPatientsSTD(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
+                            End If
 
                             If (Not resultData.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
@@ -1259,163 +1072,6 @@ Namespace Biosystems.Ax00.BL
                 GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' For the specified Test and SampleType, verify the type of the needed Calibrator and if it is  locked or not:
-        ''' ** If CalibratorType = EXPERIMENTAL, verify if the Calibrator defined for the Test and SampleType is locked
-        ''' ** If CalibratorType = FACTOR, returns the Calibrator is unlocked 
-        ''' ** If CalibratorType = ALTERNATIVE:
-        '''       If the Calibrator needed for the Test and the Alternative SampleType is EXPERIMENTAL, verify if it is locked 
-        '''       If the Calibrator needed for the Test and the Alternative SampleType is FACTOR, returns that it is unlocked 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <param name="pAlternativeST">When the Calibrator needed for the specified Test and SampleType is an Alternative one,
-        '''                              the Alternative SampleType is returned in this parameter. Optional parameter needed only
-        '''                              when the verification is done to set the status of Executions for Patient Samples</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if the Calibrator needed for the specified Test and 
-        '''          SampleType is locked; otherwise, False</returns>
-        ''' <remarks>
-        ''' Created by:  SA 10/05/2010
-        ''' Modified by: SA 01/09/2010 - Before verify if the needed Calibrator is positioned in the Analyzer Rotor, verify if it
-        '''                              has to be executed in the active WS or if a previous result will be used; in case of reusing
-        '''                              a result, it is not needed verifying if the Calibrator is positioned                            
-        ''' </remarks>
-        Private Function VerifyLockedCalibrator(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
-                                                ByVal pTestID As Integer, ByVal pSampleType As String, Optional ByRef pAlternativeST As String = "") As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        '...Verify the type of Calibrator required for the Test and SampleType
-                        Dim sampleTypeToVerify As String = ""
-                        Dim verifyCalibLocked As Boolean = False
-                        Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
-
-                        resultData = myTestCalibratorDelegate.GetTestCalibratorData(dbConnection, pTestID, pSampleType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myTestSampleCalibratorDS As TestSampleCalibratorDS
-                            myTestSampleCalibratorDS = DirectCast(resultData.SetDatos, TestSampleCalibratorDS)
-
-                            If (myTestSampleCalibratorDS.tparTestCalibrators.Rows.Count = 1) Then
-                                verifyCalibLocked = (myTestSampleCalibratorDS.tparTestCalibrators(0).CalibratorType = "EXPERIMENT")
-                                sampleTypeToVerify = pSampleType
-                            ElseIf (myTestSampleCalibratorDS.tparTestCalibrators.Rows.Count > 1) Then
-                                'Calibrator is Alternative...verify if the SampleType Alternative needs an Experimental Calibrator
-                                verifyCalibLocked = (myTestSampleCalibratorDS.tparTestCalibrators(0).CalibratorType = "EXPERIMENT")
-                                sampleTypeToVerify = myTestSampleCalibratorDS.tparTestCalibrators(0).SampleType
-
-                                'Set value of the parameter used to return the Alternative SampleType
-                                pAlternativeST = myTestSampleCalibratorDS.tparTestCalibrators(0).SampleType
-                            End If
-
-                            '...If the Calibrator needed is Experimental, first verify it has to be executed in the current WorkSession
-                            '(if a previous result was selected to be used it is not needed verify if the Calibrator is positioned)
-                            Dim reqElemNoPos As Boolean = False
-                            If (verifyCalibLocked) Then
-                                Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-                                resultData = myWSOrderTestsDelegate.VerifyToSendFlag(dbConnection, pAnalyzerID, pWorkSessionID, "CALIB", _
-                                                                                     pTestID, sampleTypeToVerify)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    verifyCalibLocked = Convert.ToBoolean(resultData.SetDatos)
-
-                                    '...If the Calibrator needed is Experimental and has to be executed,then verify if it is Locked
-                                    If (verifyCalibLocked) Then
-                                        Dim myExecutionsDAO As New twksWSExecutionsDAO
-                                        resultData = myExecutionsDAO.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "CALIB", _
-                                                                                             pTestID, sampleTypeToVerify)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            reqElemNoPos = (Not Convert.ToBoolean(resultData.SetDatos))
-                                        End If
-                                    End If
-                                End If
-                            End If
-
-                            If (Not resultData.HasError) Then resultData.SetDatos = reqElemNoPos
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedCalibrator", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' For the specified Test and SampleType, verify if it is required or not
-        ''' When required verify if it is locked or not:
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if the Calibrator needed for the specified Test and 
-        '''          SampleType is locked; otherwise, False</returns>
-        ''' <remarks>
-        ''' Created by:  AG 20/04/2012 - Based on VerifyLockedCalibrator
-        ''' </remarks>
-        Private Function VerifyLockedBlank(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
-                                                ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        Dim verifyBlankLocked As Boolean = False
-
-                        '...BLANK, first verify it has to be executed in the current WorkSession
-                        '(if a previous result was selected to be used it is not needed verify if the Blank is positioned)
-                        Dim reqElemNoPos As Boolean = False
-                        Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-                        resultData = myWSOrderTestsDelegate.VerifyToSendFlag(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                                             pTestID, pSampleType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            verifyBlankLocked = Convert.ToBoolean(resultData.SetDatos)
-
-                            '...If the Calibrator needed is Experimental and has to be executed,then verify if it is Locked
-                            If (verifyBlankLocked) Then
-                                Dim myExecutionsDAO As New twksWSExecutionsDAO
-                                resultData = myExecutionsDAO.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                                                     pTestID, pSampleType)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    reqElemNoPos = (Not Convert.ToBoolean(resultData.SetDatos))
-                                End If
-                            End If
-                        End If
-
-                        If (Not resultData.HasError) Then resultData.SetDatos = reqElemNoPos
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedBlank", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function

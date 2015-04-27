@@ -197,6 +197,11 @@
     <Compile Include="WSRequiredElementsTubesDelegate.vb" />
     <Compile Include="WSRotorContentByPositionDelegate.vb" />
     <Compile Include="WSRotorPositionsInProcessDelegate.vb" />
+    <Compile Include="WSStatusRecalculatorForBlanks.vb" />
+    <Compile Include="WSStatusRecalculatorForCalibs.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsSTD.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsWithISE.vb" />
+    <Compile Include="WSStatusRecalculatorForNotDeletedExecutions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
