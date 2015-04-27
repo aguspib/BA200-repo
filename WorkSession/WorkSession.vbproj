@@ -197,6 +197,8 @@
     <Compile Include="WSRequiredElementsTubesDelegate.vb" />
     <Compile Include="WSRotorContentByPositionDelegate.vb" />
     <Compile Include="WSRotorPositionsInProcessDelegate.vb" />
+    <Compile Include="WSStatusRecalculatorForBlanks.vb" />
+    <Compile Include="WSStatusRecalculatorForNotDeletedExecutions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

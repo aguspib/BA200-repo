@@ -160,6 +160,7 @@ Public Class WSExecutionsSorter
 
                     Dim returnDS As New ExecutionsDS
                     Dim previousElementLastReagentID As Integer = -1
+                    'TODO: Fill previousReagentsIDList
                     Dim PreviousReagentsIDList As New List(Of Integer) _
                     'List of previous reagents sent before the current previousElementLastReagentID,
                     '                                                   remember this information in order to check the high contamination persistance

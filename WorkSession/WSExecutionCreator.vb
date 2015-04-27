@@ -263,7 +263,7 @@ Namespace Biosystems.Ax00.BL
         Private Function DeleteNotInCourseExecutionsNEW(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                       ByVal pOrderTestsListDS As OrderTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = GetOpenDBTransaction(pDBConnection)
@@ -276,7 +276,6 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then RollbackTransaction(dbConnection)
@@ -292,7 +291,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.DeleteNotInCourseExecutionsNEW", EventLogEntryType.Error, False)
 
             Finally
@@ -815,13 +813,22 @@ Namespace Biosystems.Ax00.BL
 
                     If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
 
-                        If sorter.SortByGroupContamination(pDBConnection) Then
-                            resultData.SetDatos = sorter.Executions
-                            executionDataDS = sorter.Executions
-                        Else
-                            resultData.SetDatos = Nothing
-                            resultData.HasError = True
+
+                        Dim myExecutionsDelegate = New ExecutionsDelegate
+                        resultData = myExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, pDBConnection, executionDataDS) 'AG 07/11/2011
+
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
                         End If
+
+
+                        'If sorter.SortByGroupContamination(pDBConnection) Then
+                        '    resultData.SetDatos = sorter.Executions
+                        '    executionDataDS = sorter.Executions
+                        'Else
+                        '    resultData.SetDatos = Nothing
+                        '    resultData.HasError = True
+                        'End If
                     End If
                 End If
 
@@ -1068,19 +1075,16 @@ Namespace Biosystems.Ax00.BL
                                                            Select b).ToList.Count()
 
                                             'The Executions for the Blank Order Test will be marked as LOCKED if there are not positioned elements
-                                            blankOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
+                                            blankOT.ExecutionStatus = If(noPOSElements > 0, "LOCKED", "PENDING").ToString
                                         Else
                                             Exit For
                                         End If
                                     Next
 
                                     'Finally, update the status of the Executions for each Blank OrderTest
-                                    'AG 19/02/2014 - #1514
-                                    'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
                                     lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
                                     lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
                                     If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                    'AG 19/02/2014 - #1514
 
                                 End If
 
@@ -1123,12 +1127,9 @@ Namespace Biosystems.Ax00.BL
                                         Next
 
                                         'Finally, update the status of the Executions for each Calibrator OrderTest
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
                                         lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
                                         lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
                                         If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
                                     End If
                                 End If
 
@@ -1160,12 +1161,9 @@ Namespace Biosystems.Ax00.BL
                                         Next
 
                                         'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
                                         lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
                                         lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
                                         If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
                                     End If
 
                                     If (Not resultData.HasError) Then
@@ -1222,19 +1220,16 @@ Namespace Biosystems.Ax00.BL
                                             Next
 
                                             'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                            'AG 19/02/2014 - #1514
-                                            'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
                                             lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
                                             lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
                                             If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                            'AG 19/02/2014 - #1514
                                         End If
                                     End If
                                 End If
                             End If
                             lstSampleClassExecutions = Nothing
-                            lstToPENDING = Nothing  'AG 19/02/2014 - #1514
-                            lstToLOCKED = Nothing 'AG 19/02/2014 - #1514
+                            lstToPENDING = Nothing
+                            lstToLOCKED = Nothing
 
                             If (Not resultData.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
