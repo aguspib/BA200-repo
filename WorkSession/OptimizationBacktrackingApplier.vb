@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.BL
             Dim contamNumber As Integer = 0
             Dim previousReagent = pExecutions.Count - 2
             Dim currentReagent = pExecutions.Count - 1
-            Dim contaminatorType As TypeReagent
+            Dim contaminatorType As AnalysisMode
 
             If previousReagent >= 0 AndAlso currentReagent >= 0 Then
                 Dim contam = (From wse In ContaminDS.tparContaminations _
@@ -143,7 +143,7 @@ Namespace Biosystems.Ax00.BL
 
                 If contam.Count = 0 Then
                     contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
-                    If contaminatorType = TypeReagent.BiReactive Then
+                    If contaminatorType = AnalysisMode.BiReactive Then
                         If lastBireactiveID.Count > 0 Then
                             contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS)
                         End If
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.BL
                             End If
                         End If
                     Next
-                    If contam.Count = 0 AndAlso contaminatorType = TypeReagent.BiReactive Then
+                    If contam.Count = 0 AndAlso contaminatorType = AnalysisMode.BiReactive Then
                         For j = lastBireactiveID.Count - 1 To lastBireactiveID.Count - (1 + pHighContaminationPersistance) Step -1
                             If (j >= 0) Then
                                 contam = GetHardContaminationBetweenReagents(lastBireactiveID.Item(j), pExecutions(currentReagent).ReagentID, ContaminDS)
@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Else
                 contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
-                If contaminatorType = TypeReagent.BiReactive Then
+                If contaminatorType = AnalysisMode.BiReactive Then
                     lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
                 End If
             End If

@@ -31,15 +31,15 @@ Namespace Biosystems.Ax00.BL
         Protected Property contaminatorOrderTest As Integer
         Protected Property MainContaminatedID As Integer
         Protected Property dbConnection As SqlConnection
-        Protected Property TypeContaminator As TypeReagent
-        Protected Property TypeContaminated As TypeReagent
-        Protected Property typeExpectedResult As TypeReagent
-        Protected Property typeResult As TypeReagent
+        Protected Property TypeContaminator As AnalysisMode
+        Protected Property TypeContaminated As AnalysisMode
+        Protected Property typeExpectedResult As AnalysisMode
+        Protected Property typeResult As AnalysisMode
         Protected Property AnalyzerModel As AnalyzerModelEnum
 #End Region
 
 #Region "Enums"
-        Protected Enum TypeReagent As Integer
+        Public Enum AnalysisMode As Integer
             MonoReactive = 1
             BiReactive = 2
         End Enum
@@ -59,8 +59,8 @@ Namespace Biosystems.Ax00.BL
             contaminations = New List(Of ContaminationsDS.tparContaminationsRow)
             contaminatorOrderTest = -1
             MainContaminatedID = -1
-            typeExpectedResult = TypeReagent.MonoReactive
-            typeResult = TypeReagent.MonoReactive
+            typeExpectedResult = AnalysisMode.MonoReactive
+            typeResult = AnalysisMode.MonoReactive
         End Sub
 
         Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
@@ -213,13 +213,13 @@ Namespace Biosystems.Ax00.BL
             TypeContaminator = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
             TypeContaminated = GetTypeReagentInTest(dbConnection, ReagentContaminatedID)
 
-            If TypeContaminator = TypeReagent.BiReactive AndAlso TypeContaminated = TypeReagent.BiReactive Then
-                typeExpectedResult = TypeReagent.BiReactive
+            If TypeContaminator = AnalysisMode.BiReactive AndAlso TypeContaminated = AnalysisMode.BiReactive Then
+                typeExpectedResult = AnalysisMode.BiReactive
             Else
-                typeExpectedResult = TypeReagent.MonoReactive
+                typeExpectedResult = AnalysisMode.MonoReactive
             End If
 
-            typeResult = TypeReagent.MonoReactive
+            typeResult = AnalysisMode.MonoReactive
         End Sub
 
         ''' <summary>
@@ -244,7 +244,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created on 19/03/2015
         ''' </remarks>
         Private Function ReagentsAreCompatibleType200() As Boolean
-            If (typeExpectedResult = typeResult OrElse typeExpectedResult = TypeReagent.MonoReactive) Then
+            If (typeExpectedResult = typeResult OrElse typeExpectedResult = AnalysisMode.MonoReactive) Then
                 Return True
             End If
             Return False
@@ -274,7 +274,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Private Function GetTypeReagentInTest200(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
+        Private Function GetTypeReagentInTest200(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
             Static testReagentsDataDS As TestReagentsDS
 
             If testReagentsDataDS Is Nothing Then
@@ -284,7 +284,7 @@ Namespace Biosystems.Ax00.BL
             Dim result = (From a In testReagentsDataDS.tparTestReagents
                           Where a.ReagentID = reagentID Select a.ReagentsNumber).First
 
-            Return CType(result, TypeReagent)
+            Return CType(result, AnalysisMode)
         End Function
 
         ''' <summary>
@@ -296,12 +296,12 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 18/03/2015 by AJG
         ''' </remarks>
-        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As TypeReagent
+        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
             If AnalyzerModel = AnalyzerModelEnum.BA200 Then
                 Return GetTypeReagentInTest200(pDBConnection, reagentID)
             End If
 
-            Return TypeReagent.MonoReactive
+            Return AnalysisMode.MonoReactive
         End Function
 
         ''' <summary>
