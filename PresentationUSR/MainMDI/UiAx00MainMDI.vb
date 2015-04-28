@@ -5120,7 +5120,9 @@ Partial Public Class UiAx00MainMDI
                 Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
 
                 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter AllowScanInRunning)
-                myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
+                myGlobal = WSExecutionCreator.Instance.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
                 ' XB 16/04/2014 - #1599
 

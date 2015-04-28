@@ -2530,8 +2530,10 @@ Public Class UiISEUtilities
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                                     End If
                                     GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
-                                    myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                                    'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                                    '                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                                    myGlobal = WSExecutionCreator.Instance.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                                     'end SGM 25/09/2012
                                     myAffectedElectrodes = Nothing 'AG 19/02/2014 - #1514
@@ -4658,8 +4660,10 @@ Public Class UiISEUtilities
                         If isReady Then ' XBC 15/04/2013 - if ISE still Not Ready, is no need re-generate executions because there no changes and it is long time process
                             GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                             Dim myExecutionDelegate As New ExecutionsDelegate
-                            myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                            'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                            '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                            myGlobal = WSExecutionCreator.Instance.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                         End If
                         If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                         'end SGM 25/09/2012

@@ -3631,7 +3631,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     Dim runningFlag As Boolean = (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING)
 
                                                     'Create the Executions
-                                                    resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    '                                                String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
+                                                    resultData = WSExecutionCreator.Instance.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
                                                                                                     String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
                                                     'AG 30/05/2014 #1644
 
