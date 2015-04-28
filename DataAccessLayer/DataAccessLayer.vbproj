@@ -108,33 +108,33 @@
     <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.Smo, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.SmoExtended, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SmoExtended.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.SmoExtended.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlEnum.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlEnum.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.SqlWmiManagement, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlWmiManagement.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlWmiManagement.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.WmiEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.WmiEnum, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.WmiEnum.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.WmiEnum.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
