@@ -5,8 +5,6 @@ Public Class Context
     ''' <summary>
     ''' We will define a context range from [-Persistence to + Persitence] we'll considere index 0 the current reagent, that is, the context "center"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks></remarks>
     Public ReadOnly ContextRange As Range(Of Integer)
 
