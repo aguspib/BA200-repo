@@ -199,9 +199,12 @@
     <Compile Include="WSRotorContentByPositionDelegate.vb" />
     <Compile Include="WSRotorPositionsInProcessDelegate.vb" />
     <Compile Include="WSStatusRecalculatorForBlanks.vb" />
+<<<<<<< HEAD
     <Compile Include="WSStatusRecalculatorForCalibs.vb" />
     <Compile Include="WSStatusRecalculatorForCtrlPatientsSTD.vb" />
     <Compile Include="WSStatusRecalculatorForCtrlPatientsWithISE.vb" />
+=======
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
     <Compile Include="WSStatusRecalculatorForNotDeletedExecutions.vb" />
   </ItemGroup>
   <ItemGroup>

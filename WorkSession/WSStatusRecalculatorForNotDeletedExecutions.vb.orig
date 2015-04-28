@@ -1,4 +1,4 @@
-Option Explicit On
+﻿Option Explicit On
 Option Strict On
 
 Imports System.Data.SqlClient
@@ -13,10 +13,17 @@ Namespace Biosystems.Ax00.BL
     Public MustInherit Class WSStatusRecalculatorForNotDeletedExecutions
         Protected myExecutionsDS As ExecutionsDS
         Protected reqElementsDS As WSOrderTestsForExecutionsDS
+<<<<<<< HEAD
         Protected dbConnection As SqlConnection
         Protected AnalyzerID As String
         Protected WorkSessionID As String
         Protected myExecutionsDAO As twksWSExecutionsDAO
+=======
+        Private dbConnection As SqlConnection
+        Private AnalyzerID As String
+        Private WorkSessionID As String
+        Private myExecutionsDAO As twksWSExecutionsDAO
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
 
         Public Sub New(ByVal pMyExecutionsDAO As twksWSExecutionsDAO, ByVal pMyExecutionsDS As ExecutionsDS, ByVal pDbConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String)
             myExecutionsDS = pMyExecutionsDS
@@ -48,12 +55,16 @@ Namespace Biosystems.Ax00.BL
                     noPOSElements = GetNumberElements()
 
                     'The Executions for the Blank Order Test will be marked as LOCKED if there are not positioned elements
+<<<<<<< HEAD
                     Dim aux = FinalStatus(noPOSElements, element)
                     If (aux <> "EXIT") Then
                         element.ExecutionStatus = aux
                     Else
                         Exit For 
                     End If
+=======
+                    element.ExecutionStatus = FinalStatus(noPOSElements)
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
                 Else
                     Exit For
                 End If
@@ -67,6 +78,7 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+<<<<<<< HEAD
         ''' <summary>
         ''' For the specified Test and SampleType, verify if it is required or not
         ''' When required verify if it is locked or not:
@@ -229,6 +241,11 @@ Namespace Biosystems.Ax00.BL
         Protected MustOverride Function GetExecutions() As List(Of ExecutionsDS.twksWSExecutionsRow)
         Protected MustOverride Function GetNumberElements() As Integer
         Protected MustOverride Function FinalStatus(ByVal numElem As Integer, ByVal elem As ExecutionsDS.twksWSExecutionsRow) As String
+=======
+        Protected MustOverride Function GetExecutions() As List(Of ExecutionsDS.twksWSExecutionsRow)
+        Protected MustOverride Function GetNumberElements() As Integer
+        Protected MustOverride Function FinalStatus(ByVal numElem As Integer) As String
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
 
     End Class
 End Namespace

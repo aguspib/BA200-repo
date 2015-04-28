@@ -1,4 +1,4 @@
-Option Explicit On
+﻿Option Explicit On
 Option Strict On
 
 Imports System.Data.SqlClient
@@ -27,7 +27,11 @@ Namespace Biosystems.Ax00.BL
                                                            Select b).ToList.Count()
         End Function
 
+<<<<<<< HEAD
         Protected Overrides Function FinalStatus(ByVal numElem As Integer, ByVal elem As ExecutionsDS.twksWSExecutionsRow) As String
+=======
+        Protected Overrides Function FinalStatus(ByVal numElem As Integer) As String
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
             Return If(numElem > 0, "LOCKED", "PENDING").ToString
         End Function
     End Class

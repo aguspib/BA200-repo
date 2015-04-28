@@ -1016,6 +1016,7 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
+<<<<<<< HEAD
                             resultData = New WSStatusRecalculatorForBlanks(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
 
                             If Not resultData.HasError Then
@@ -1029,6 +1030,190 @@ Namespace Biosystems.Ax00.BL
                             If Not resultData.HasError Then
                                 resultData = New WSStatusRecalculatorForCtrlPatientsSTD(myExecutionsDAO, myExecutionsDS, dbConnection, pAnalyzerID, pWorkSessionID).Recalculate()
                             End If
+=======
+                            Dim newExecStatus As String
+                            Dim noPOSElements As Integer
+                            Dim myWSOrderTests As New WSOrderTestsDelegate
+                            Dim reqElementsDS As New WSOrderTestsForExecutionsDS
+                            Dim lstSampleClassExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
+                            Dim lstToPENDING As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+                            Dim lstToLOCKED As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
+
+                            If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
+                                'Get all BLANK Order Tests having Pending and/or Locked Executions
+                                lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
+                                                           Where a.SampleClass = "BLANK" _
+                                                          Select a).ToList()
+
+                                If (lstSampleClassExecutions.Count > 0) Then
+                                    For Each blankOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
+                                        'Get the list of Elements required for the Blank Order Test 
+                                        resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, blankOT.SampleClass, blankOT.OrderTestID)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
+
+                                            'Verify if at least one of the required Elements is not positioned
+                                            noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
+                                                            Where b.ElementStatus = "NOPOS" _
+                                                           Select b).ToList.Count()
+
+                                            'The Executions for the Blank Order Test will be marked as LOCKED if there are not positioned elements
+                                            blankOT.ExecutionStatus = If(noPOSElements > 0, "LOCKED", "PENDING").ToString
+                                        Else
+                                            Exit For
+                                        End If
+                                    Next
+
+                                    'Finally, update the status of the Executions for each Blank OrderTest
+                                    lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
+                                    lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
+                                    If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
+
+                                End If
+
+                                If (Not resultData.HasError) Then
+                                    'Get all CALIBRATOR Order Tests having Pending and/or Locked Executions
+                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
+                                                               Where a.SampleClass = "CALIB" _
+                                                              Select a).ToList()
+
+                                    If (lstSampleClassExecutions.Count > 0) Then
+                                        For Each calibOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
+                                            'Get the list of Elements required for the Calibrator Order Test 
+                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, calibOT.SampleClass, calibOT.OrderTestID)
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
+
+                                                'Verify if at least one of the required Elements is not positioned
+                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
+                                                                Where b.ElementStatus = "NOPOS" _
+                                                               Select b).ToList.Count()
+
+                                                newExecStatus = "PENDING"
+                                                If (noPOSElements > 0) Then
+                                                    'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
+                                                    newExecStatus = "LOCKED"
+                                                Else
+                                                    'Elements required for the Calibrator are positioned, verify if the elements needed for the Blank are also positioned
+                                                    resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
+                                                                                   reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
+                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                        If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+                                                    Else
+                                                        Exit For
+                                                    End If
+                                                End If
+                                                calibOT.ExecutionStatus = newExecStatus
+                                            Else
+                                                Exit For
+                                            End If
+                                        Next
+
+                                        'Finally, update the status of the Executions for each Calibrator OrderTest
+                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
+                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
+                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
+                                    End If
+                                End If
+
+                                If (Not resultData.HasError) Then
+                                    'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for ISE Tests 
+                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
+                                                               Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
+                                                             AndAlso a.ExecutionType = "PREP_ISE" _
+                                                              Select a).ToList()
+
+                                    If (lstSampleClassExecutions.Count > 0) Then
+                                        For Each sampleIseOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
+                                            'Get the list of Elements required for the Control or Patient ISE Order Test 
+                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleIseOT.SampleClass, sampleIseOT.OrderTestID)
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
+
+                                                'Verify if at least one of the required Elements is not positioned
+                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
+                                                                Where b.ElementStatus = "NOPOS" _
+                                                               Select b).ToList.Count()
+
+                                                'The Executions for the Control or Patient ISE Order Test will be marked as LOCKED if there are not positioned elements
+                                                sampleIseOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
+                                                If Not sampleIseOT.IsLockedByLISNull AndAlso sampleIseOT.LockedByLIS Then sampleIseOT.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+                                            Else
+                                                Exit For
+                                            End If
+                                        Next
+
+                                        'Finally, update the status of the Executions for each Control or Patient ISE Order Test
+                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
+                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
+                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
+                                    End If
+
+                                    If (Not resultData.HasError) Then
+                                        'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for STANDARD Tests 
+                                        lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
+                                                                   Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
+                                                                 AndAlso a.ExecutionType = "PREP_STD" _
+                                                                  Select a).ToList()
+
+                                        If (lstSampleClassExecutions.Count > 0) Then
+                                            For Each sampleStdOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
+                                                'Get the list of Elements required for the Control or Patient STANDARD Order Test 
+                                                resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleStdOT.SampleClass, sampleStdOT.OrderTestID)
+                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                    reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
+
+                                                    'Verify if at least one of the required Elements is not positioned
+                                                    noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
+                                                                    Where b.ElementStatus = "NOPOS" _
+                                                                   Select b).ToList.Count()
+
+                                                    newExecStatus = "PENDING"
+                                                    If Not sampleStdOT.IsLockedByLISNull AndAlso sampleStdOT.LockedByLIS Then newExecStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
+
+                                                    If (noPOSElements > 0) Then
+                                                        'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
+                                                        newExecStatus = "LOCKED"
+                                                    ElseIf newExecStatus = "PENDING" Then 'Else 'AG 25/03/2013 - improve change Else for Else PENDING and reduce queries
+                                                        'Elements required for the Control or Patient are positioned, verify if the elements needed for the Calibrator are also positioned
+                                                        resultData = VerifyLockedCalibrator(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
+                                                                                            reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
+                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then
+                                                                newExecStatus = "LOCKED"
+                                                            Else
+                                                                'Verify if the elements needed for the Blank are also positioned
+                                                                resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
+                                                                                               reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
+
+                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                    If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+                                                                Else
+                                                                    Exit For
+                                                                End If
+                                                            End If
+                                                        Else
+                                                            Exit For
+                                                        End If
+                                                    End If
+                                                    sampleStdOT.ExecutionStatus = newExecStatus
+                                                Else
+                                                    Exit For
+                                                End If
+                                            Next
+
+                                            'Finally, update the status of the Executions for each Control or Patient ISE Order Test
+                                            lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
+                                            lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
+                                            If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            lstSampleClassExecutions = Nothing
+                            lstToPENDING = Nothing
+                            lstToLOCKED = Nothing
+>>>>>>> 1b400d194b83db741a6535af90bed6d58e0d4c9d
 
                             If (Not resultData.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed

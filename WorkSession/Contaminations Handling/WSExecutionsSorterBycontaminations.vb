@@ -7,10 +7,13 @@ Imports Biosystems.Ax00.Types
 ''' </summary>
 ''' <remarks></remarks>
 Public Class WSExecutionsSorter
+
     Sub New(executions As ExecutionsDS, activeAnalyzer As String)
         Me.Executions = executions
         Me.activeAnalyzer = activeAnalyzer
     End Sub
+
+#Region "Public properties"
 
     ''' <summary>
     '''     This property contains the WSexecutions dataset.
@@ -24,6 +27,8 @@ Public Class WSExecutionsSorter
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property activeAnalyzer As String = ""
+
+#End Region
 
 #Region "attributes"
 
@@ -144,66 +149,293 @@ Public Class WSExecutionsSorter
     ''' <param name="pDBConnection"></param>
     ''' <returns>True if the sort could be performed without errors</returns>
     ''' <remarks>After calling this method, the ExecutionsDS property will contain sorted results</remarks>
+    Public Function SortByGroupContamination(ByVal pDBConnection As SqlClient.SqlConnection) As Boolean
 
-    Public Function SortByGroupContamination(ByVal pDBConnection As SqlConnection) As Boolean
+        Dim success = False
+        Dim pExecutions = Executions
+
         'Dim resultData As GlobalDataTO = Nothing
-        Dim success As Boolean = False
-        Dim dbConnection As SqlConnection = Nothing
+        Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        Dim bestContaminationNumber As Integer = Integer.MaxValue
+        'Dim currentContaminationNumber As Integer
+        'Dim contaminationsDataDS As ContaminationsDS = Nothing
 
         Try
-            Dim connection = GetSafeOpenDBConnection(pDBConnection)
-            If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
-                dbConnection = connection.SetDatos
-                If (dbConnection IsNot Nothing) Then
-                    'Get all R1 Contaminations
-                    InitializeAttributes(dbConnection)
+            Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+            'If (connection.SetDatos IsNot Nothing) Then
+            dbConnection = connection.SetDatos
+            If (Not dbConnection Is Nothing) Then
+                'Get all R1 Contaminations 
 
-                    Dim returnDS As New ExecutionsDS
-                    Dim previousElementLastReagentID As Integer = -1
-                    Dim PreviousReagentsIDList As New List(Of Integer) _
-                    'List of previous reagents sent before the current previousElementLastReagentID,
-                    '                                                   remember this information in order to check the high contamination persistance
-                    '                                                   (One Item for each different OrderTest)
+                InitializeAttributes(dbConnection)
+                Dim Stats() As Boolean = {True, False}
 
-                    Dim previousElementLastMaxReplicates As Integer = 1
-                    Dim previousOrderTestMaxReplicatesList As New List(Of Integer) _
-                    'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
+                Dim stdOrderTestsCount As Integer = 0
 
-                    For Each StatFlag In ExecutionsStatValues 'Stats
+                Dim returnDS As New ExecutionsDS
+                Dim previousElementLastReagentID As Integer = -1
+                Dim PreviousReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
+                '                                                   remember this information in order to check the high contamination persistance
+                '                                                   (One Item for each different OrderTest)
+
+                Dim previousElementLastMaxReplicates As Integer = 1
+                Dim previousOrderTestMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
+
+                Dim OrderContaminationNumber As Integer = 0
+
+                For Each StatFlag In Stats
+                    If ExecutionsStatValues.Contains(StatFlag) Then
 
                         For Each SampleClass In allPossibleSampleClasses
                             If ExecutionsSampleClasses.Contains(SampleClass) Then
 
-                                Dim Elements = (From wse In Executions.twksWSExecutions _
-                                        Where wse.SampleClass = SampleClass _
-                                        Select wse.ElementID Distinct)
+                                'AG 27/04/2012 AG + RH - Search the elementid for each sampleClass (the elementid code can be repeated from different sampleclasses)
+                                'Dim Elements = (From wse In pExecutions.twksWSExecutions _
+                                '              Select wse.ElementID Distinct).ToList()
+                                Dim Elements = (From wse In pExecutions.twksWSExecutions _
+                                                Where wse.SampleClass = SampleClass _
+                                                Select wse.ElementID Distinct).ToList()
                                 'AG 27/04/2012
 
                                 For Each elementID In Elements
-                                    ProcessElementSampleTypes(dbConnection, SampleClass, StatFlag, elementID,
-                                                              previousElementLastReagentID,
-                                                              previousElementLastMaxReplicates, PreviousReagentsIDList,
-                                                              returnDS,
-                                                              previousOrderTestMaxReplicatesList)
-                                Next elementID
+                                    Dim ID = elementID
+                                    Dim Stat As Boolean = StatFlag
+                                    Dim SClass As String = SampleClass
+
+                                    For Each sortedSampleType In allPossibleSampleTypes
+                                        'AG 30/08/2012 - add OrElse differentSampleTypeValues.Contains("") because when create a ws only with blanks there not exists sampletype!!
+                                        If ExecutionsSampleTypes.Contains(sortedSampleType) OrElse _
+                                           (ExecutionsSampleClasses.Count = 1 AndAlso ExecutionsSampleClasses.Contains("BLANK")) Then
+
+                                            Dim SType As String = sortedSampleType
+
+                                            Dim StandardAndIseOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
+                                            Dim StandardOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests
+
+                                            'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
+                                            If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
+                                                StandardAndIseOrderTests = (From wse In pExecutions.twksWSExecutions _
+                                                                 Where wse.StatFlag = Stat AndAlso _
+                                                                 wse.SampleClass = SClass AndAlso _
+                                                                 wse.SampleType = SType AndAlso _
+                                                                 wse.ElementID = ID _
+                                                                 Select wse Order By wse.ExecutionType).ToList()
+
+                                                If StandardAndIseOrderTests.Count > 0 Then
+                                                    'Look for the STD orderTests
+                                                    StandardOrderTests = (From wse In pExecutions.twksWSExecutions _
+                                                             Where wse.StatFlag = Stat AndAlso _
+                                                             wse.SampleClass = SClass AndAlso _
+                                                             wse.SampleType = SType AndAlso _
+                                                             wse.ElementID = ID AndAlso _
+                                                             wse.ExecutionType = "PREP_STD" _
+                                                             Select wse).ToList()
+                                                    stdOrderTestsCount = StandardOrderTests.Count
+                                                Else
+                                                    stdOrderTestsCount = 0
+                                                End If
+
+                                            Else 'Do not apply OrderBy & do not take care about sample type order inside the same SAMPLE
+                                                StandardAndIseOrderTests = (From wse In pExecutions.twksWSExecutions _
+                                                                         Where wse.StatFlag = Stat AndAlso _
+                                                                         wse.SampleClass = SClass AndAlso _
+                                                                         wse.ElementID = ID _
+                                                                         Select wse).ToList()
+
+                                                If StandardAndIseOrderTests.Count > 0 Then
+                                                    'Look for the STD orderTests
+                                                    StandardOrderTests = (From wse In pExecutions.twksWSExecutions _
+                                                                  Where wse.StatFlag = Stat AndAlso _
+                                                                  wse.SampleClass = SClass AndAlso _
+                                                                  wse.ElementID = ID AndAlso _
+                                                                  wse.ExecutionType = "PREP_STD" _
+                                                                  Select wse).ToList()
+                                                    stdOrderTestsCount = StandardOrderTests.Count
+                                                Else
+                                                    stdOrderTestsCount = 0
+                                                End If
+                                            End If
+
+
+                                            If stdOrderTestsCount > 0 Then
+                                                OrderContaminationNumber = 0
+
+                                                'Only move the contaminated tests, so no changes into first element tests and also when the
+                                                'last reagent on previous element do not contaminates the first reagent in current element
+                                                If previousElementLastReagentID <> -1 Then
+                                                    Dim pendingOrderTestInNewElement = (From wse In StandardOrderTests _
+                                                                                                Where wse.ExecutionStatus = "PENDING" _
+                                                                                                Select wse).ToList()
+                                                    If pendingOrderTestInNewElement.Count > 0 Then
+                                                        'Search contamination between Elements
+                                                        Dim existContamination = (From wse In contaminationsDataDS.tparContaminations _
+                                                                                    Where wse.ReagentContaminatorID = previousElementLastReagentID _
+                                                                                    AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
+                                                                                    Select wse).ToList()
+
+                                                        If existContamination.Count > 0 Then
+                                                            'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+                                                            OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
+
+                                                        ElseIf highContaminationPersitance > 0 Then
+                                                            'If no LOW contamination exists between consecutive executions take care about the previous due the high contamination
+                                                            'has persistance > 1 (Evaluate only when last OrderTest has MaxReplicates < pHighContaminationPersistance)
+                                                            If previousElementLastMaxReplicates < highContaminationPersitance Then
+
+                                                                'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
+                                                                For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To PreviousReagentsIDList.Count - 2
+                                                                    Dim auxHighIndex = highIndex
+                                                                    If auxHighIndex >= 0 Then 'Avoid overflow
+                                                                        existContamination = (From wse In contaminationsDataDS.tparContaminations _
+                                                                                          Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
+                                                                                          AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
+                                                                                          AndAlso Not wse.IsWashingSolutionR1Null _
+                                                                                          Select wse).ToList()
+                                                                        If existContamination.Count > 0 Then
+                                                                            Exit For
+                                                                        End If
+                                                                    End If
+                                                                Next
+
+                                                                'If previous step has no contamination then evaluate if the LAST reagent sent contaminates (HIGH contamination) the second, third,... reagent pending to be sent
+                                                                If existContamination.Count = 0 Then
+                                                                    Dim newPendingOrderTestMaxReplicates As Integer = 1
+                                                                    newPendingOrderTestMaxReplicates = (From wse In pendingOrderTestInNewElement _
+                                                                                                        Select wse.ReplicateNumber).Max
+                                                                    If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
+                                                                        For i = 1 To highContaminationPersitance - 1
+                                                                            Dim aux_i = i
+                                                                            If aux_i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
+                                                                                existContamination = (From wse In contaminationsDataDS.tparContaminations _
+                                                                                                  Where wse.ReagentContaminatorID = PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) _
+                                                                                                  AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(aux_i).ReagentID _
+                                                                                                  AndAlso Not wse.IsWashingSolutionR1Null _
+                                                                                                  Select wse).ToList()
+                                                                                If existContamination.Count > 0 Then
+                                                                                    Exit For
+                                                                                End If
+                                                                            End If
+                                                                        Next
+                                                                    End If
+                                                                End If
+
+                                                                If existContamination.Count > 0 Then
+                                                                    'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+                                                                    OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
+                                                                End If
+
+                                                            End If 'If previousElementLastMaxReplicates < highContaminationPersitance Then
+                                                        End If ' If existContamination.Count > 0 Then
+
+                                                    End If 'If pendingOrderTestInNewElement.Count > 0 Then
+                                                End If 'If previousElementLastReagentID <> -1 Then
+
+                                                ManageContaminations(dbConnection, returnDS, StandardOrderTests, StandardAndIseOrderTests, OrderContaminationNumber, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+
+                                                'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
+                                                StandardOrderTests = (From wse In returnDS.twksWSExecutions _
+                                                                Where wse.StatFlag = Stat AndAlso _
+                                                                wse.SampleClass = SClass AndAlso _
+                                                                wse.ElementID = ID AndAlso _
+                                                                wse.ExecutionStatus = "PENDING" _
+                                                                Select wse).ToList()
+
+                                                If StandardOrderTests.Count > 0 Then
+                                                    'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
+                                                    'The last reagentID used has the higher indexes
+                                                    Dim maxReplicates As Integer
+                                                    For item = 0 To StandardOrderTests.Count - 1
+                                                        Dim itemIndex = item
+                                                        maxReplicates = (From wse In returnDS.twksWSExecutions _
+                                                                                            Where wse.OrderTestID = StandardOrderTests(itemIndex).OrderTestID _
+                                                                                            Select wse.ReplicateNumber).Max
+
+                                                        If PreviousReagentsIDList.Count = 0 Then
+                                                            PreviousReagentsIDList.Add(StandardOrderTests(itemIndex).ReagentID)
+                                                            previousOrderTestMaxReplicatesList.Add(maxReplicates)
+
+                                                            'When reagent changes
+                                                        ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> StandardOrderTests(itemIndex).ReagentID Then
+                                                            PreviousReagentsIDList.Add(StandardOrderTests(itemIndex).ReagentID)
+                                                            previousOrderTestMaxReplicatesList.Add(maxReplicates)
+                                                        End If
+
+                                                        If itemIndex = StandardOrderTests.Count - 1 Then
+                                                            previousElementLastReagentID = StandardOrderTests(itemIndex).ReagentID
+                                                            previousElementLastMaxReplicates = maxReplicates
+                                                        End If
+                                                        'AG 19/12/2011
+                                                    Next
+                                                Else
+                                                    'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
+                                                    'WS could contain a Element LOCKED completely
+                                                End If
+                                                'AG 07/11/2011
+                                            Else
+                                                'AG 14/12/2011 - Different test types
+                                                For Each wse In StandardAndIseOrderTests
+                                                    returnDS.twksWSExecutions.ImportRow(wse)
+                                                Next
+                                                'AG 14/12/2011
+                                            End If
+
+                                            If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
+
+                                            'AG 20/02/2014 - #1514
+                                            StandardAndIseOrderTests = Nothing
+                                            StandardOrderTests = Nothing
+                                            'AG 20/02/2014 - #1514
+
+                                        End If
+                                    Next 'For Each mySampleType
+
+                                Next 'For each elementID
+
 
                             End If
-                        Next SampleClass
+                        Next 'For each SampleClass
 
-                    Next StatFlag
+                    End If
+                Next 'For each StatFlag
 
-                    'resultData.SetDatos = returnDS
-                    Executions = returnDS
-                    success = True
-                End If
+                'resultData.SetDatos = returnDS
+                Executions = returnDS
+                success = True
+                'AG 20/02/2014 - #1514
+                ExecutionsStatValues = Nothing
+                ExecutionsSampleClasses = Nothing
+                ExecutionsSampleTypes = Nothing
+                PreviousReagentsIDList = Nothing
+                previousOrderTestMaxReplicatesList = Nothing
+                'AG 20/02/2014 - #1514
+                'End If
+
+                'End If
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
+            'resultData = New GlobalDataTO()
+            'resultData.HasError = True
+            'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+            'resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex) '.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
+
         End Try
+        'AG 19/02/2014 - #1514
+        bestResult = Nothing
+        currentResult = Nothing
+        'AG 19/02/2014 - #1514
 
         Return success
     End Function
+
+
+
 
 #End Region
 
@@ -396,216 +628,7 @@ Public Class WSExecutionsSorter
         Return lista
     End Function
 
-    Private Function ProcessElementSampleTypes(ByVal dbConnection As SqlConnection, ByVal sampleClass As String,
-                                               ByVal Stat As Boolean, ByVal ID As Integer,
-                                               ByVal previousElementLastReagentID As Integer,
-                                               ByVal previousElementLastMaxReplicates As Integer,
-                                               ByVal PreviousReagentsIDList As List(Of Integer),
-                                               ByVal returnDS As ExecutionsDS,
-                                               ByVal previousOrderTestMaxReplicatesList As List(Of Integer)) _
-        As ExecutionsDS
 
-        For Each sortedSampleType In allPossibleSampleTypes
-            'AG 30/08/2012 - add OrElse differentSampleTypeValues.Contains("") because when create a ws only with blanks there not exists sampletype!!
-            If ExecutionsSampleTypes.Contains(sortedSampleType) OrElse
-               (ExecutionsSampleClasses.Count = 1 AndAlso ExecutionsSampleClasses.Contains("BLANK")) Then
-
-                Dim sampleType As String = sortedSampleType
-
-                Dim AllTestTypeOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
-                Dim standardExecutionTypeOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow) = Nothing _
-                'Only STD test order tests
-
-                'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
-                If sampleClass = "PATIENT" OrElse sampleClass = "CTRL" Then _
-                    'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
-                    AllTestTypeOrderTests = GetOrderTestsByExecutionType(sampleClass, Stat, sampleType, ID)
-                    standardExecutionTypeOrderTests = GetStandardExecutionTypeOrderTestsForPatients(sampleClass, Stat,
-                                                                                                    sampleType, ID)
-
-                Else 'Do not apply OrderBy & do not take care about sample type order inside the same SAMPLE
-                    AllTestTypeOrderTests = GetOrderTestsByReadingCycle2(sampleClass, Stat, ID)
-                    standardExecutionTypeOrderTests =
-                        GetStandardExecutionTypeOrderTestsForBlanksAndCallibrators(sampleClass, Stat, ID)
-                End If
-
-                returnDS = SortByElementGroupContamination(sampleClass, Stat, ID, standardExecutionTypeOrderTests,
-                                                           previousElementLastReagentID,
-                                                           previousElementLastMaxReplicates, PreviousReagentsIDList,
-                                                           dbConnection, returnDS, AllTestTypeOrderTests,
-                                                           previousOrderTestMaxReplicatesList)
-
-                If sampleClass <> "PATIENT" AndAlso sampleClass <> "CTRL" Then Exit For _
-                'For blank, calib do not take care about the sample type inside the same SAMPLE
-
-            End If
-        Next 'For Each mySampleType
-        Return returnDS
-    End Function
-
-    Private Function SortByElementGroupContamination(ByVal sampleClass As String, ByVal Stat As Boolean,
-                                                     ByVal ID As Integer,
-                                                     ByVal standardExecutionTypeOrderTests As  _
-                                                        IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
-                                                     ByRef previousElementLastReagentID As Integer,
-                                                     ByRef previousElementLastMaxReplicates As Integer,
-                                                     ByVal PreviousReagentsIDList As List(Of Integer),
-                                                     ByVal dbConnection As SqlConnection, ByVal returnDS As ExecutionsDS,
-                                                     ByVal AllTestTypeOrderTests As  _
-                                                        IEnumerable(Of ExecutionsDS.twksWSExecutionsRow),
-                                                     ByVal previousOrderTestMaxReplicatesList As List(Of Integer)) _
-        As ExecutionsDS
-
-        If standardExecutionTypeOrderTests.Count > 0 Then
-            Dim orderContaminationNumber = 0
-
-            'Only move the contaminated tests, so no changes into first element tests and also when the
-            'last reagent on previous element do not contaminates the first reagent in current element
-
-            If previousElementLastReagentID <> -1 Then '-1 are blanks, so they do not contaminate.
-                Dim pendingOrderTestInNewElement = (From wse In standardExecutionTypeOrderTests _
-                        Where wse.ExecutionStatus = "PENDING" _
-                        Select wse)
-                If pendingOrderTestInNewElement.Any Then
-                    'Search contamination between Elements
-                    Dim auxPreviousElementReagentID = previousElementLastReagentID
-                    Dim existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                            Where wse.ReagentContaminatorID = auxPreviousElementReagentID _
-                                  AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement.First.ReagentID _
-                            Select wse)
-
-                    If existContamination.Any Then
-                        'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
-                        orderContaminationNumber = 1 +
-                                                   ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS,
-                                                                                             standardExecutionTypeOrderTests,
-                                                                                             highContaminationPersitance)
-
-                    ElseIf highContaminationPersitance > 0 Then
-                        'If no LOW contamination exists between consecutive executions take care about the previous due the high contamination
-                        'has persistance > 1 (Evaluate only when last OrderTest has MaxReplicates < pHighContaminationPersistance)
-                        If previousElementLastMaxReplicates < highContaminationPersitance Then
-
-                            'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
-                            For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To _
-                                PreviousReagentsIDList.Count - 2
-                                Dim auxHighIndex = highIndex
-                                If auxHighIndex >= 0 Then 'Avoid overflow
-                                    existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                        Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
-                                              AndAlso
-                                              wse.ReagentContaminatedID = pendingOrderTestInNewElement.First.ReagentID _
-                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                        Select wse)
-                                    If existContamination.Any Then
-                                        Exit For
-                                    End If
-                                End If
-                            Next
-
-                            'If previous step has no contamination then evaluate if the LAST reagent sent contaminates (HIGH contamination) the second, third,... reagent pending to be sent
-                            If existContamination.Any Then
-
-                                Dim newPendingOrderTestMaxReplicates = (From wse In pendingOrderTestInNewElement _
-                                        Select wse.ReplicateNumber).Max
-                                If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
-                                    For i = 1 To highContaminationPersitance - 1
-                                        Dim auxI = i
-                                        If auxI <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
-                                            existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                Where _
-                                                    wse.ReagentContaminatorID =
-                                                    PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) AndAlso
-                                                    wse.ReagentContaminatedID =
-                                                    pendingOrderTestInNewElement.ElementAt(auxI).ReagentID AndAlso
-                                                    Not wse.IsWashingSolutionR1Null
-                                                Select wse)
-                                            If existContamination.Any Then
-                                                Exit For
-                                            End If
-                                        End If
-                                    Next
-                                End If
-                            End If
-
-                            If existContamination.Any Then
-                                'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
-                                orderContaminationNumber = 1 +
-                                                           ExecutionsDelegate.GetContaminationNumber(
-                                                               contaminationsDataDS, standardExecutionTypeOrderTests,
-                                                               highContaminationPersitance)
-                            End If
-
-                        End If 'If previousElementLastMaxReplicates < highContaminationPersitance Then
-                    End If ' If existContamination.Count > 0 Then
-
-                End If 'If pendingOrderTestInNewElement.Count > 0 Then
-            End If 'If previousElementLastReagentID <> -1 Then
-
-            ManageContaminations(dbConnection, returnDS, standardExecutionTypeOrderTests, AllTestTypeOrderTests,
-                                 orderContaminationNumber, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
-
-            'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
-            standardExecutionTypeOrderTests = (From wse In returnDS.twksWSExecutions _
-                Where wse.StatFlag = Stat AndAlso
-                      wse.SampleClass = sampleClass AndAlso
-                      wse.ElementID = ID AndAlso
-                      wse.ExecutionStatus = "PENDING" _
-                Select wse)
-
-            If standardExecutionTypeOrderTests.Any Then
-                'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
-                'The last reagentID used has the higher indexes
-                For item = 0 To standardExecutionTypeOrderTests.Count - 1
-                    Dim itemIndex = item
-                    Dim maxReplicates = (From wse In returnDS.twksWSExecutions _
-                            Where wse.OrderTestID = standardExecutionTypeOrderTests(itemIndex).OrderTestID _
-                            Select wse.ReplicateNumber).Max
-
-                    If Not PreviousReagentsIDList.Any Then
-                        PreviousReagentsIDList.Add(standardExecutionTypeOrderTests(itemIndex).ReagentID)
-                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
-
-                        'When reagent changes
-                    ElseIf PreviousReagentsIDList.Last <> standardExecutionTypeOrderTests(itemIndex).ReagentID Then
-                        PreviousReagentsIDList.Add(standardExecutionTypeOrderTests(itemIndex).ReagentID)
-                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
-                    End If
-
-                    If itemIndex = standardExecutionTypeOrderTests.Count - 1 Then
-                        previousElementLastReagentID = standardExecutionTypeOrderTests(itemIndex).ReagentID
-                        previousElementLastMaxReplicates = maxReplicates
-                    End If
-                    'AG 19/12/2011
-                Next
-            Else
-                'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
-                'WS could contain a Element LOCKED completely
-            End If
-            'AG 07/11/2011
-        Else
-            'AG 14/12/2011 - Different test types
-            For Each wse In AllTestTypeOrderTests
-                returnDS.twksWSExecutions.ImportRow(wse)
-            Next
-            'AG 14/12/2011
-        End If
-        Return returnDS
-    End Function
-
-    Private Function GetOrderTestsByReadingCycle2(ByVal sampleClass As String, ByVal Stat As Boolean,
-                                                    ByVal ID As Integer) _
-        As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)
-        Dim AllTestTypeOrderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)
-
-        AllTestTypeOrderTests = (From wse In Executions.twksWSExecutions
-            Where wse.StatFlag = Stat AndAlso
-                  wse.SampleClass = sampleClass AndAlso
-                  wse.ElementID = ID
-            Select wse)
-
-        Return AllTestTypeOrderTests
-    End Function
 
     Private Function GetOrderTestsByReadingCycle(ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer) _
     As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)

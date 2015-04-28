@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 Option Infer On
+
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.App
 
@@ -339,6 +340,18 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
+        Dim RL As New RangedList(Of String)(1, 10)
+        RL.AllowOutOfRange = True
+        For i = 0 To 100
+            RL.Add("Hola " & i)
+        Next
+        RL(-10) = "New value"
+        Debug.WriteLine(RL.Count)
+        RL.RemoveOutOfRangeItems()
+        Debug.WriteLine(RL.Count)
+        For Each S In RL
+            Debug.WriteLine(S)
+        Next
 
     End Sub
 End Class
