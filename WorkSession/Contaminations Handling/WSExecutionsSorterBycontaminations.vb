@@ -7,10 +7,13 @@ Imports Biosystems.Ax00.Types
 ''' </summary>
 ''' <remarks></remarks>
 Public Class WSExecutionsSorter
+
     Sub New(executions As ExecutionsDS, activeAnalyzer As String)
         Me.Executions = executions
         Me.activeAnalyzer = activeAnalyzer
     End Sub
+
+#Region "Public properties"
 
     ''' <summary>
     '''     This property contains the WSexecutions dataset.
@@ -24,6 +27,8 @@ Public Class WSExecutionsSorter
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property activeAnalyzer As String = ""
+
+#End Region
 
 #Region "attributes"
 
@@ -144,8 +149,6 @@ Public Class WSExecutionsSorter
     ''' <param name="pDBConnection"></param>
     ''' <returns>True if the sort could be performed without errors</returns>
     ''' <remarks>After calling this method, the ExecutionsDS property will contain sorted results</remarks>
-
-
     Public Function SortByGroupContamination(ByVal pDBConnection As SqlClient.SqlConnection) As Boolean
 
         Dim success = False
@@ -432,6 +435,8 @@ Public Class WSExecutionsSorter
     End Function
 
 
+
+
 #End Region
 
 #Region "Private methods"
@@ -623,7 +628,7 @@ Public Class WSExecutionsSorter
         Return lista
     End Function
 
-    
+
 
     Private Function GetOrderTestsByReadingCycle(ByVal sampleClass As String, ByVal Stat As Boolean, ByVal ID As Integer) _
     As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)

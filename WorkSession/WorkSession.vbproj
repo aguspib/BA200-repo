@@ -140,6 +140,7 @@
     <Compile Include="BarcodeWSDelegate.vb" />
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
     <Compile Include="ContaminationManager.vb" />
+    <Compile Include="Contaminations Handling\Context.vb" />
     <Compile Include="Contaminations Handling\WSExecutionsSorterBycontaminations.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />

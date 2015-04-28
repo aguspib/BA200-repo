@@ -782,69 +782,41 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         Private Function SortAndManageContaminations() As GlobalDataTO
+
             Dim StartTime = Now
             Dim resultData As New GlobalDataTO()
             If (pendingExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                                                        "ExecutionType, ExecutionStatus DESC, ReadingCycle DESC"
+                pendingExecutionsDS.twksWSExecutions.DefaultView.Sort =
+                    "StatFlag DESC, SampleClass, ElementID, SampleType, ExecutionType, ExecutionStatus DESC, ReadingCycle DESC"
 
-                Dim executionDataDS = CType(pendingExecutionsDS, ExecutionsDS)
-
-                'Sort by Contamination
+                ' ReSharper disable once InconsistentNaming
+                Dim executionDataDS = pendingExecutionsDS
 
                 Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                If sorter.SortByContamination(pDBConnection) Then
-                    resultData.SetDatos = sorter.Executions
-                    executionDataDS = sorter.Executions
+
+                Dim success = sorter.SortByContamination(pDBConnection)
+                If success Then success = sorter.SortByElementGroupTime()
+                If success Then success = sorter.SortByGroupContamination(pDBConnection)
+
+                executionDataDS = sorter.Executions
+
+                'Finally, save the sorted PENDING executions
+                If (success) Then
+                    If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
+                        resultData = Create(pDBConnection, executionDataDS)
+                    Else
+                        resultData = myDao.Create(pDBConnection, executionDataDS)
+                    End If
                 Else
-                    resultData.SetDatos = Nothing
-                    resultData.HasError = True
+                    resultdata = New GlobalDataTO
+                    resultdata.HasError = True
+                    resultdata.SetDatos = Nothing
                 End If
-
-                If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
-                    ''Sort Orders by ReadingCycle
-                    'If sorter.SortByElementGroupTime() Then
-                    '    resultData.SetDatos = sorter.Executions
-                    '    executionDataDS = sorter.Executions
-                    'Else
-                    '    resultData.SetDatos = Nothing
-                    '    resultData.HasError = True
-                    'End If
-
-                    If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
-
-
-                        'Dim myExecutionsDelegate = New ExecutionsDelegate
-                        'resultData = myExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, pDBConnection, executionDataDS) 'AG 07/11/2011
-
-                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        '    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                        'End If
-
-
-                        If sorter.SortByGroupContamination(pDBConnection) Then
-                            resultData.SetDatos = sorter.Executions
-                            executionDataDS = sorter.Executions
-                        Else
-                            resultData.SetDatos = Nothing
-                            resultData.HasError = True
-                        End If
-                    End If
-                    End If
-
-                    'Finally, save the sorted PENDING executions
-                    If (Not resultData.HasError) Then
-                        If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
-                            resultData = Create(pDBConnection, executionDataDS)
-                        Else
-                            resultData = myDao.Create(pDBConnection, executionDataDS)
-                        End If
-                    End If
-                End If
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                Return resultData
+            End If
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+            Return resultData
         End Function
 
         Private Function UpdatePausedFlag() As GlobalDataTO
