@@ -6,12 +6,12 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.App
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Core.Services
-
 
 Public Class Ax00MainForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -340,18 +340,17 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        Dim RL As New RangedList(Of String)(1, 10)
+        Dim RL As New RangedCollection(Of String)(1, 10)
         RL.AllowOutOfRange = True
-        For i = 0 To 100
+        For i = RL.WorkingRange.minimum To RL.WorkingRange.maximum + 100
             RL.Add("Hola " & i)
         Next
-        RL(-10) = "New value"
+        RL(1) = "New value"
         Debug.WriteLine(RL.Count)
         RL.RemoveOutOfRangeItems()
         Debug.WriteLine(RL.Count)
         For Each S In RL
             Debug.WriteLine(S)
         Next
-
     End Sub
 End Class
