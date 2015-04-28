@@ -134,7 +134,7 @@
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Global\Global\Global.vbproj">
+    <ProjectReference Include="..\..\..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>

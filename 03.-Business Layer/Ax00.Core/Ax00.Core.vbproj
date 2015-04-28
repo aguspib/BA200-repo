@@ -158,6 +158,10 @@
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
       <Name>ConfigurationSetup</Name>
@@ -174,17 +178,9 @@
       <Project>{51863cf3-a3e9-4e41-8924-c69704796fb9}</Project>
       <Name>DataAccessLayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Global\Global\Global.vbproj">
-      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
-      <Name>Global</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\InfoAnalyzer\InfoAnalyzer.vbproj">
       <Project>{6471ee6c-c00c-4db6-881c-bfca99aba928}</Project>
       <Name>InfoAnalyzer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ParameterPrograming\ParametersPrograming.vbproj">
-      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
-      <Name>ParametersPrograming</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WorkSession\WorkSession.vbproj">
       <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>

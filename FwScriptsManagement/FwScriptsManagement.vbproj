@@ -207,6 +207,10 @@
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
       <Name>ConfigurationSetup</Name>
@@ -222,10 +226,6 @@
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
       <Project>{51863CF3-A3E9-4E41-8924-C69704796FB9}</Project>
       <Name>DataAccessLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Global\Global\Global.vbproj">
-      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
-      <Name>Global</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

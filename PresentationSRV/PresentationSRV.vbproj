@@ -721,6 +721,18 @@
       <Project>{052cf005-d448-4768-a25a-48ff53644469}</Project>
       <Name>UpdateVersion</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\History\History.vbproj">
+      <Project>{2f6892a0-72d7-45f6-b429-61dbad015128}</Project>
+      <Name>History</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
       <Name>ConfigurationSetup</Name>
@@ -745,21 +757,9 @@
       <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
       <Name>FwScriptsManagement</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Global\Global\Global.vbproj">
-      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
-      <Name>Global</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\History\History.vbproj">
-      <Project>{2f6892a0-72d7-45f6-b429-61dbad015128}</Project>
-      <Name>History</Name>
-    </ProjectReference>
     <ProjectReference Include="..\InfoAnalyzer\InfoAnalyzer.vbproj">
       <Project>{6471EE6C-C00C-4DB6-881C-BFCA99ABA928}</Project>
       <Name>InfoAnalyzer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ParameterPrograming\ParametersPrograming.vbproj">
-      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
-      <Name>ParametersPrograming</Name>
     </ProjectReference>
     <ProjectReference Include="..\PresentationCOM\PresentationCOM.vbproj">
       <Project>{A139D1D6-0C60-4DA2-B073-E73E2F2893D8}</Project>

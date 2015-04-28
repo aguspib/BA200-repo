@@ -126,13 +126,13 @@
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
       <Name>Calculations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Global\Global\Global.vbproj">
-      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
-      <Name>Global</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

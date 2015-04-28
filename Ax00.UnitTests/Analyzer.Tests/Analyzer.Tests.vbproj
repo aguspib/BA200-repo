@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D84217F0-03D7-4ED7-BD18-88E97DC90B0F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AnalyzerTests2</RootNamespace>
-    <AssemblyName>AnalyzerTests2</AssemblyName>
+    <RootNamespace>AnalyzerTests</RootNamespace>
+    <AssemblyName>AnalyzerTests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>AnalyzerTests2.xml</DocumentationFile>
+    <DocumentationFile>AnalyzerTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>AnalyzerTests2.xml</DocumentationFile>
+    <DocumentationFile>AnalyzerTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -124,7 +124,7 @@
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Global\Global\Global.vbproj">
+    <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>
