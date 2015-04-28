@@ -2,6 +2,14 @@
 
 Public Class ContaminationsContext
 
+<<<<<<< HEAD
+    ''' <summary>
+    ''' We will define a context range from [-Persistence to + Persitence] we'll considere index 0 the current reagent, that is, the context "center"
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public ReadOnly ContextRange As Range(Of Integer)
+=======
+>>>>>>> 1ad1746436cfdc551c6bb58d3b93d419e5a19f6c
 
     Public ReadOnly Reagents As RangedCollection(Of ReagentDispensing)
 
