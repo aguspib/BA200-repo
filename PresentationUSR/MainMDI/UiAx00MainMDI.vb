@@ -4767,8 +4767,8 @@ Partial Public Class UiAx00MainMDI
                 ''AG 31/03/2014 - #1565
 
                 GlobalBase.CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
-                Dim myExecutionDelegate As New ExecutionsDelegate
-                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                'Dim myExecutionDelegate As New ExecutionsDelegate
+                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
 
                 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter AllowScanInRunning)
                 'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
