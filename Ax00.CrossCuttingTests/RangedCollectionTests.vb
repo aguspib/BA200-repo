@@ -10,10 +10,10 @@ Namespace Biosystems.Ax00.CC.Tests
         Const max = 10, min = 10
 
         <Test()>
-        Public Sub NewTest()
+        Public Sub IntegersConstructorTest()
             '1.- Test indexes creation
             Dim RangedCol As New RangedCollection(Of String)(min, max)
-            If RangedCol.WorkingRange.minimum <> min OrElse RangedCol.WorkingRange.maximum <> max Then
+            If RangedCol.Range.minimum <> min OrElse RangedCol.Range.maximum <> max Then
                 Assert.Fail()
             Else
                 Assert.Pass()
@@ -21,9 +21,9 @@ Namespace Biosystems.Ax00.CC.Tests
 
         End Sub
 
-        <Test()> Public Sub NewTest1()
+        <Test()> Public Sub RangeConstructorTest()
             Dim RangedCol As New RangedCollection(Of String)(New Range(Of Integer)(min, max))
-            If RangedCol.WorkingRange.minimum <> min OrElse RangedCol.WorkingRange.maximum <> max Then
+            If RangedCol.Range.minimum <> min OrElse RangedCol.Range.maximum <> max Then
                 Assert.Fail()
             Else
                 Assert.Pass()
@@ -50,7 +50,7 @@ Namespace Biosystems.Ax00.CC.Tests
 
         <Test()> Public Sub RemoveOutOfRangeItemsTest()
             Dim RangedCol As New RangedCollection(Of String)(min, max)
-            If RangedCol.WorkingRange.minimum <> min OrElse RangedCol.WorkingRange.maximum <> max Then
+            If RangedCol.Range.minimum <> min OrElse RangedCol.Range.maximum <> max Then
                 Assert.Fail()
             Else
                 Assert.Pass()

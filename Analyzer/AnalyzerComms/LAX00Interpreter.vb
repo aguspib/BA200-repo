@@ -1,5 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports System.Text
 Imports Biosystems.Ax00.Global
@@ -21,8 +22,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </remarks>
         Public Function Write(ByVal myParametersList As List(Of ParametersTO)) As TypedGlobalDataTo(Of String)
             'Dim myResult As String = ""
-
-            Dim myResultSB As New StringBuilder(256)    'Initial expected pattern size, but it'll auto-adjust. Ideally we would get a per-thread preallocated SB here that does not release memory, but reuses it instead.
+            Const BufferSize = 1024
+            <ThreadStatic> Static myResultSB As New StringBuilder(BufferSize)
+            myResultSB.Clear()
             Try
                 'Dim myInstruction As New Instructions()
                 If myParametersList.Count > 0 Then
@@ -50,61 +52,70 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
         End Function
 
+
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="pInsturction"></param>
+        ''' <param name="pInstruction"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' CREATE BY: TR 13/04/2010
         ''' AG 11/10/2011
+        ''' MI 29/04/2015 Made thread safe and rewritten to prevent garbage
         ''' </remarks>
-        Public Function Read(ByVal pInsturction As String) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO()
+        Public Function Read(ByVal pInstruction As String) As GlobalDataTO
             Try
                 Dim myInstruction As New Instructions()
-                myInstruction.Clear()
-                If pInsturction <> "" Then
-                    For Each myParameter As String In pInsturction.Split(CChar(";"))
-                        If myParameter.Trim <> "" Then  'AG 21/04/2010 - Last ; is the end instruction (isn't a parameter, dont add)
-                            If myParameter.Contains(":") Then
+                myInstruction.Clear()   '<-Added for crosscompatibility, but it should do nothing
+                Const ParameterSeparator = ";"c
+                Const ValueOperator = ":"c
 
-                                'AG 11/10/2011 - some data can contain also the ":" character so we have to count the occurences
-                                'myInstruction.Add(myParameter.Split(CChar(":"))(0), myParameter.Split(CChar(":"))(1))
-                                Dim tempStr As String() = Split(myParameter, ":")
-                                Dim occurenceNumber As Integer = tempStr.Count - 1
-                                If occurenceNumber > 1 Then
-                                    Dim myParameterValue As String = ""
-                                    Dim addText As String = ""
-                                    For i As Integer = 1 To tempStr.Length - 1
-                                        If i > 1 Then addText = ":"
-                                        myParameterValue &= addText & tempStr(i)
-                                    Next
-                                    myInstruction.Add(myParameter.Split(CChar(":"))(0), myParameterValue)
-                                Else
-                                    myInstruction.Add(myParameter.Split(CChar(":"))(0), myParameter.Split(CChar(":"))(1))
-                                End If
-                                'AG 11/10/2011
-
+                If pInstruction <> String.Empty Then
+                    Dim index As Integer = 0
+                    Dim parameterName As String = "", value As String = String.Empty
+                    <ThreadStatic> Static buffer As New StringBuilder(1024)
+                    buffer.Clear()
+                    Dim CloseInstruction =
+                        Sub()
+                            If parameterName = String.Empty Then
+                                parameterName = buffer.ToString()
                             Else
-                                myInstruction.Add(myParameter)
+                                value = buffer.ToString
                             End If
-                        End If
+                            If parameterName <> String.Empty Then myInstruction.Add(parameterName, value)
+                            parameterName = ""  'Resharper fails. this parameter IS used! Do not "fix"
+                            value = ""
+                            buffer.Clear()
+                        End Sub
 
-                    Next myParameter
+                    While index < pInstruction.Length
+                        Dim curChar = pInstruction(index)
+
+                        Select Case curChar
+                            Case ParameterSeparator
+                                CloseInstruction()
+                            Case ValueOperator
+                                If parameterName = String.Empty Then
+                                    parameterName = buffer.ToString()
+                                    buffer.Clear()
+                                Else
+                                    buffer.Append(curChar)
+                                End If
+                            Case Else
+                                buffer.Append(curChar)
+                        End Select
+                        index += 1
+                    End While
+                    CloseInstruction()
                 End If
-                myGlobalDataTO.SetDatos = myInstruction.ParameterList
+                Return New GlobalDataTO With {.SetDatos = myInstruction}
             Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
+                Return New GlobalDataTO() With {.HasError = True, .ErrorCode = "SYSTEM_ERROR", .ErrorMessage = ex.Message}
             End Try
-            Return myGlobalDataTO
-        End Function
 
+
+        End Function
 
         ''' <summary>
         ''' Apply additional business into lax00 interpretation due exists data using the reserved lax00 characters ';'
@@ -204,7 +215,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return myGlobalDataTO
         End Function
-
 
 #Region "SERVICE SOFTWARE"
         ''' <summary>

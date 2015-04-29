@@ -4,12 +4,12 @@
         Implements IEnumerable(Of T)
 
         Dim internalList As New List(Of T)
-        Public ReadOnly WorkingRange As Range(Of Integer)
+        Public ReadOnly Range As Range(Of Integer)
 
         Public Property AllowOutOfRange As Boolean = True
 
         Sub New(workingRange As Range(Of Integer))
-            Me.WorkingRange = workingRange
+            Me.Range = workingRange
         End Sub
 
         Sub New(minimum As Integer, maximum As Integer)
@@ -66,11 +66,11 @@
         End Function
 
         Private Function convertIndex(index As Integer) As Integer
-            Return index - WorkingRange.minimum
+            Return index - Range.minimum
         End Function
 
         Private Function GetMaxIndex() As Integer
-            Return (WorkingRange.maximum - WorkingRange.minimum)
+            Return (Range.maximum - Range.minimum)
         End Function
 
         Public Function GetTypedEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
