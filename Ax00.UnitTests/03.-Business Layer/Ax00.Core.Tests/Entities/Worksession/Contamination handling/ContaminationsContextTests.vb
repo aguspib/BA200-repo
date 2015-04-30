@@ -1,5 +1,6 @@
 ﻿Imports NUnit.Framework
 Imports Biosystems.Ax00.CC
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Telerik.JustMock
 
 Namespace Tests

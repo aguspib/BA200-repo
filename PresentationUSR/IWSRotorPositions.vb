@@ -6397,7 +6397,7 @@ Public Class UiWSRotorPositions
             ''AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
             'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
 
-            resultData = WSExecutionCreator.Instance.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
+            resultData = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
 
             If (resultData.HasError) Then
                 ErrorOnCreateWSExecutions = String.Format("{0}|{1}", resultData.ErrorCode, resultData.ErrorMessage)

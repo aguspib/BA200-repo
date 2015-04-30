@@ -83,6 +83,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DelegatesToCoreBusinesGlueTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -120,9 +121,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
       <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
       <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
     </ProjectReference>
     <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
       <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>

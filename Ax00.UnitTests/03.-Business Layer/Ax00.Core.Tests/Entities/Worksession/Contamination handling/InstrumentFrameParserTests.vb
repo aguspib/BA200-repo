@@ -1,4 +1,5 @@
-﻿Imports NUnit.Framework
+﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports NUnit.Framework
 
 
 Namespace Tests

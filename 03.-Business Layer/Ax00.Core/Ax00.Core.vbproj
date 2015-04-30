@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
+    <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
@@ -198,7 +199,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Entities\WorkSession\Contaminations\Interfaces\" />
+    <Folder Include="Entities\WorkSession\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

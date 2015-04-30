@@ -7,8 +7,9 @@ Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
+Imports Biosystems.Ax00.BL
 
-Namespace Biosystems.Ax00.BL
+Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
     ''' <summary>
     ''' Class WSExecutionCreator. Implements a class which creates the WSExecution. It's implements through the Singleton pattern, 
@@ -16,6 +17,7 @@ Namespace Biosystems.Ax00.BL
     ''' </summary>
     ''' <remarks></remarks>
     Public NotInheritable Class WSExecutionCreator
+        Implements IWSExecutionCreator
         Private Shared _instance As WSExecutionCreator = Nothing
         Private Shared ReadOnly myObject As Object = New Object()
 
@@ -81,7 +83,7 @@ Namespace Biosystems.Ax00.BL
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
-                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO
+                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO Implements IWSExecutionCreator.CreateWS
 
             'Initialization from parameters
             pDBConnection = ppDBConnection
@@ -132,7 +134,7 @@ Namespace Biosystems.Ax00.BL
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
                     If (ppDBConnection Is Nothing AndAlso Not pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(pDBConnection)
                 End If
-                
+
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
@@ -808,9 +810,9 @@ Namespace Biosystems.Ax00.BL
                         resultData = myDao.Create(pDBConnection, executionDataDS)
                     End If
                 Else
-                    resultdata = New GlobalDataTO
-                    resultdata.HasError = True
-                    resultdata.SetDatos = Nothing
+                    resultData = New GlobalDataTO
+                    resultData.HasError = True
+                    resultData.SetDatos = Nothing
                 End If
             End If
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -841,7 +843,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             End If
 
-            Return resultdata
+            Return resultData
         End Function
 
         Private Function UpdatePositionsRotorSample() As GlobalDataTO

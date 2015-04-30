@@ -101,7 +101,7 @@ Namespace Biosystems.Ax00.BL
                                           Optional ByVal pLISDownloadProcess As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-
+            Dim glue = New DelegatesToCoreBusinesGlue
             Try
                 'BT #1536 - When value of parameter pLISDownloadProcess is TRUE, the DBConnection received as parameter is used instead of Nothing
                 If (pLISDownloadProcess) Then dbConnection = pDBConnection
@@ -141,7 +141,8 @@ Namespace Biosystems.Ax00.BL
 
                         'Use NOTHING as ISEElectrodes, False as pauseMode (do not affect for reruns and  pManualRerun parameter)
                         'myGlobal = myExecutionDelegate.CreateWSExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
-                        myGlobal = WSExecutionCreator.Instance.CreateWS(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
+
+                        myGlobal = DelegatesToCoreBusinesGlue.CreateWS(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
                         'AG 31/03/2014 - #1565
 
                         'If the Required Element needed for the OrderTestID is marked as FINISHED, unmark it
