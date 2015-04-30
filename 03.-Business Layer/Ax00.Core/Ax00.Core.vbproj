@@ -99,7 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorterBycontaminations.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
