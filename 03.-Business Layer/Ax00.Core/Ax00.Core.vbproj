@@ -98,6 +98,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorterBycontaminations.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
@@ -154,6 +156,10 @@
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
@@ -192,7 +198,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Entities\" />
+    <Folder Include="Entities\WorkSession\Contaminations\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

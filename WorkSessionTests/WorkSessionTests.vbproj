@@ -83,8 +83,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contaminations Handling\ContaminationsContextTests.vb" />
-    <Compile Include="Contaminations Handling\InstrumentFrameParserTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -130,6 +128,9 @@
       <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>
       <Name>WorkSession</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Contaminations Handling\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -140,8 +140,6 @@
     <Compile Include="BarcodeWSDelegate.vb" />
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
     <Compile Include="ContaminationManager.vb" />
-    <Compile Include="Contaminations Handling\Context.vb" />
-    <Compile Include="Contaminations Handling\WSExecutionsSorterBycontaminations.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
     <Compile Include="OperateCalculatedTestDelegate.vb" />
@@ -262,7 +260,9 @@
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Contaminations Handling\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
