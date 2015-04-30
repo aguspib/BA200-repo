@@ -717,9 +717,9 @@
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\bax00framework\DAL\UpdateVersion\UpdateVersion.vbproj">
-      <Project>{052cf005-d448-4768-a25a-48ff53644469}</Project>
-      <Name>UpdateVersion</Name>
+    <ProjectReference Include="..\bax00framework\04.-Data Access Layer\Ax00.Framework.Data\Ax00.Framework.Data.vbproj">
+      <Project>{6e5cfa24-ba4a-4fb2-b0b1-88e33d7017a1}</Project>
+      <Name>Ax00.Framework.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
