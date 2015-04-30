@@ -53,7 +53,7 @@ Public Class DelegatesToCoreBusinesGlue
     End Function
 
 
-    Public Shared ReadOnly Property AssemblyDirectory() As String
+    Private Shared ReadOnly Property AssemblyDirectory() As String
         Get
             <ThreadStatic> Static location As String
             If location <> String.Empty Then Return location

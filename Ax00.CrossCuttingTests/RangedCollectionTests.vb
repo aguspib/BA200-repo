@@ -85,14 +85,16 @@ Namespace Biosystems.Ax00.CC.Tests
 
         <Test()> Public Sub GetTypedEnumeratorTest()
             Dim RangedCol As New RangedCollection(Of String)(min, max)
-            For i = 1 To 20
+            Const items = 20
+            For i = 1 To items
                 RangedCol.Add("Sample " & 1)
             Next
             Dim counter = 0
+            'forEach uses GetTypedEnumerator internally, so it's the way to test it
             For Each cadena In RangedCol
                 counter += 1
             Next
-
+            Assert.AreEqual(counter, items)
         End Sub
 
         <Test()> Public Sub AllowOutOfRange()

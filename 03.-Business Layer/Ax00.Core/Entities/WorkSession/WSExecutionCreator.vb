@@ -19,7 +19,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
     Public NotInheritable Class WSExecutionCreator
         Implements IWSExecutionCreator
         Private Shared _instance As WSExecutionCreator = Nothing
-        Private Shared ReadOnly myObject As Object = New Object()
 
         'Parameters for create the Work Session Executions
 
@@ -68,6 +67,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <remarks></remarks>
         Public Shared ReadOnly Property Instance As WSExecutionCreator
             Get
+                Static myObject As Object = New Object()
+
                 If IsNothing(_instance) Then
                     SyncLock myObject
                         If IsNothing(_instance) Then
