@@ -1457,8 +1457,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim indexNextToSend As Integer = 0
 
                         If toSendList.Any() Then '(3)
-
-                            Dim contaminationFound = SeachContaminationBetweenPreviousAndFirsToSend(pContaminationsDS, toSendList(0).ReagentID)
+                            Dim previousReagentIDSentList As New List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
+                            Dim contaminationFound = SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList, pContaminationsDS, toSendList(0).ReagentID, pHighContaminationPersitance)
 
                             ''1) Search contamination between previous reagents and the first in toSendList
                             'Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
@@ -1564,7 +1564,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'When a WRUN instruction has to be sent ... these variables contains contaminatorID and wash type ("" or WS1 or WS2 or ...)
                             Dim myContaminationID As Integer = -1
                             Dim myWashSolutionType As String = ""
-
+                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
                             If contaminationFound Then '(4)
                                 Dim myExDlgte As New ExecutionsDelegate
                                 Dim contaminNumber As Integer = 0
@@ -1758,35 +1758,30 @@ Namespace Biosystems.Ax00.Core.Entities
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
 
-                'Dim auxOrderTestID As Integer = -1
+                Dim auxOrderTestID As Integer = -1
                 Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                 otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
                                     Where a.OrderTestID = toSendList(0).OrderTestID _
                                    Select a).ToList()
-                toSendList(0).ElementID = otInfo(0).ElementID
 
-                'For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
-                '    If row.OrderTestID <> auxOrderTestID Then
-                '        auxOrderTestID = row.OrderTestID
-                '        'Search information for the Calibrator or control or patient ordertest
-                '        otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                '                    Where a.OrderTestID = auxOrderTestID _
-                '                   Select a).ToList()
-                '    End If
+                For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
+                    If row.OrderTestID <> auxOrderTestID Then
+                        auxOrderTestID = row.OrderTestID
+                        'Search information for the Calibrator or control or patient ordertest
+                        otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    Where a.OrderTestID = auxOrderTestID _
+                                   Select a).ToList()
+                    End If
 
-                '    If otInfo.Count >= 1 Then 'AG 10/04/2012 old condition fails when same test has 2 control levels (If otInfo.Count = 1 Then)
-                '        row.BeginEdit()
-                '        If pSampleClass = "PATIENT" Then
-                '            row.ElementID = otInfo(0).CreationOrder
-                '        Else
-                '            row.ElementID = otInfo(0).ElementID 'CalibratorID or ControlID
-                '        End If
-                '        row.AcceptChanges()
-                '        row.EndEdit()
-                '    End If
-                'Next
-                'otInfo = Nothing
+                    If otInfo.Count >= 1 Then 'AG 10/04/2012 old condition fails when same test has 2 control levels (If otInfo.Count = 1 Then)
+                        row.BeginEdit()
+                        row.ElementID = otInfo(0).ElementID
+                        row.AcceptChanges()
+                        row.EndEdit()
+                    End If
+                Next
+                otInfo = Nothing
 
                 Dim auxElementID = toSendList(0).ElementID 'Apply linq using the same ElementID as the first item in toSendLinq previous results
 
@@ -1823,9 +1818,8 @@ Namespace Biosystems.Ax00.Core.Entities
             Return toSendList
         End Function
 
-        Private Function SeachContaminationBetweenPreviousAndFirsToSend(pContaminationsDS As ContaminationsDS, ReagentID As Integer) As Boolean
+        Private Function SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentID As Integer, pHighContaminationPersitance As Integer) As Boolean
             '1) Search contamination between previous reagents and the first in toSendList
-            Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
             Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
             Dim contaminationFound As Boolean = False
 
