@@ -149,8 +149,6 @@
     <Compile Include="AnalyzerManager\Actions\ProcessArmStatusRecived.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
-    <Compile Include="AnalyzerManager\BA200AnalyzerEntity.vb" />
-    <Compile Include="AnalyzerManager\BA400AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\DynamicBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\Shared\ConstantParameters.vb" />
     <Compile Include="AnalyzerManager\Shared\Preparation.vb" />

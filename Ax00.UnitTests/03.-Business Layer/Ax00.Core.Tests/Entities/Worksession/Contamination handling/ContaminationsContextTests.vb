@@ -12,7 +12,7 @@ Namespace Tests
             Const after = 2
             Const dispensesPerStep = 2  'Maximum 2 dispenses per Step or Cycle.
 
-            Dim contaminations = Telerik.JustMock.Mock.Create(Of AnalyzerContaminationsSpecification)()
+            Dim contaminations = Telerik.JustMock.Mock.Create(Of IAnalyzerContaminationsSpecification)()
             Mock.Arrange(Function() contaminations.DispensesPerStep()).Returns(dispensesPerStep)
             Mock.Arrange(Function() contaminations.ContaminationsContextRange).Returns(New Range(Of Integer)(before, after))
             Mock.Arrange(Function() contaminations.DispensingFactory).Returns(AddressOf DispensingMockFactory)
@@ -28,8 +28,8 @@ Namespace Tests
 
         End Sub
 
-        Private Function DispensingMockFactory() As ReagentDispensing
-            Dim dispensing = Mock.Create(Of ReagentDispensing)()
+        Private Function DispensingMockFactory() As IReagentDispensing
+            Dim dispensing = Mock.Create(Of IReagentDispensing)()
             'dispensing.AnalysisMode = Biosystems.Ax00.Core.OptimizationPolicyApplier.AnalysisMode.MonoReactive
             Return dispensing
         End Function

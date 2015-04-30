@@ -141,7 +141,6 @@
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
     <Compile Include="ContaminationManager.vb" />
     <Compile Include="Contaminations Handling\IWSExecutionCreator.vb" />
-    <Compile Include="DelegatesToCoreBusinesGlue.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
     <Compile Include="OperateCalculatedTestDelegate.vb" />

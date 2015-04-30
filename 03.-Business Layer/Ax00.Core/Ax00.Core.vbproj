@@ -98,7 +98,17 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\BA200AnalyzerEntity.vb" />
+    <Compile Include="Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="Entities\WorkSession\BA200ReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\DisposingContaminationDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\EmptyWashing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Interfaces\IAnalyzerContaminationSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Interfaces\IReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
@@ -198,9 +208,7 @@
       <Name>WorkSession</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities\WorkSession\Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
