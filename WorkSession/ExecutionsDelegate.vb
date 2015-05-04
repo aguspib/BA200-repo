@@ -8138,8 +8138,8 @@ Namespace Biosystems.Ax00.BL
                                                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
 
-            Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-
+            'Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            Dim myContaminationManager = DelegatesToCoreBusinesGlue.CreateContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
             ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
             'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
@@ -8153,11 +8153,13 @@ Namespace Biosystems.Ax00.BL
             'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
 
             'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
-            myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
-            currentContaminationNumber = myContaminationManager.currentContaminationNumber
-            Return myContaminationManager.bestResult
+            'MANEL
+            'myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
 
+            'currentContaminationNumber = myContaminationManager.currentContaminationNumber
+            'Return myContaminationManager.bestResult
+            '/MANEL
         End Function
 
     End Class

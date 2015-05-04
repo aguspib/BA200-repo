@@ -2,6 +2,7 @@
 Imports System.IO
 Imports System.Reflection
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Types
 
 Public Class DelegatesToCoreBusinesGlue
     Public Shared Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
@@ -36,8 +37,48 @@ Public Class DelegatesToCoreBusinesGlue
             Return New GlobalDataTO With {.HasError = True, .SetDatos = Nothing, .ErrorMessage = "Reflection error. Can't createWS"}
         End Try
 
+    End Function
+
+    Public Shared Function CreateContaminationManager(ByVal pCon As SqlConnection,
+                       ByVal Analyzer As String,
+                       ByVal currentCont As Integer,
+                       ByVal pHighCont As Integer,
+                       ByVal contaminsDS As ContaminationsDS,
+                       ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                       Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
+                       Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Object
+
+        Const TypeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.ContaminationManager"
+        Dim obj = DelegatesToCoreBusinesGlue.BsCoreAssembly.GetType(TypeName)
+        <ThreadStatic> Static method As MethodInfo
+        <ThreadStatic> Static instance As Object = Nothing
+
+        Try
+            If method Is Nothing Then
+                For Each m In obj.GetMethods()
+                    Debug.WriteLine(m.ToString)
+                Next
+
+                instance = obj
+
+                instance = obj.GetProperty("Instance").GetGetMethod.Invoke(Nothing, {})
+                method = obj.GetMethod("CreateWS")
+            End If
+            Dim result = method.Invoke(
+                            instance, {
+                                    pCon, Analyzer, currentCont, pHighCont, contaminsDS,
+                                    OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates
+                                }
+                            )
+
+            Return DirectCast(result, GlobalDataTO)
+
+        Catch ex As Exception
+            Return New GlobalDataTO With {.HasError = True, .SetDatos = Nothing, .ErrorMessage = "Reflection error. Can't createWS"}
+        End Try
 
 
+        Return New Object
 
     End Function
 

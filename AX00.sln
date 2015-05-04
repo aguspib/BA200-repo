@@ -91,6 +91,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Ax00.CrossCuttingTests", "A
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WorkSessionTests", "WorkSessionTests\WorkSessionTests.vbproj", "{8CC11E0A-DC4D-4E99-9213-AD150B5DC5C1}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "GlobalTests1", "GlobalTests1\GlobalTests1.vbproj", "{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -547,6 +549,18 @@ Global
 		{8CC11E0A-DC4D-4E99-9213-AD150B5DC5C1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8CC11E0A-DC4D-4E99-9213-AD150B5DC5C1}.Release|x64.ActiveCfg = Release|Any CPU
 		{8CC11E0A-DC4D-4E99-9213-AD150B5DC5C1}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
