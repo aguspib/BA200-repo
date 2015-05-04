@@ -110,7 +110,7 @@
     <Compile Include="Entities\WorkSession\Contaminations\Interfaces\IReagentDispensing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\WSExecutionsSorter.vb" />
+    <Compile Include="Entities\WorkSession\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
