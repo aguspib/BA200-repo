@@ -8,8 +8,8 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 
-Namespace Biosystems.Ax00.BL
-    Public Class OptimizationDPolicyApplier: Inherits OptimizationPolicyApplier
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
+    Public Class OptimizationDPolicyApplier : Inherits OptimizationPolicyApplier
 
         Public Sub New()
             MyBase.New()

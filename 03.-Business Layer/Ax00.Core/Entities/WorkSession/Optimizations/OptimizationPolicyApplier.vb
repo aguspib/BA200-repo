@@ -7,8 +7,9 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
+Imports Biosystems.Ax00.BL
 
-Namespace Biosystems.Ax00.BL
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
     ''' <summary>
     ''' Class that implements the different optimization's policies that are currently available

@@ -1,4 +1,5 @@
 ﻿Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
