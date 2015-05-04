@@ -84,6 +84,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DelegatesToCoreBusinesGlueTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -121,6 +122,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
+      <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Global\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>

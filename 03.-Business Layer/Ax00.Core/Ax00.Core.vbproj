@@ -100,15 +100,17 @@
   <ItemGroup>
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="Entities\WorkSession\BA200ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\BA200ReagentDispensing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\DisposingContaminationDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\DispensingContaminationDescription.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\EmptyWashing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Interfaces\IAnalyzerContaminationSpecification.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Interfaces\IReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\RegularWaterWashing.vb" />
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationAPolicyApplier.vb" />
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationBacktrackingApplier.vb" />
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationBPolicyApplier.vb" />
@@ -116,6 +118,7 @@
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationDPolicyApplier.vb" />
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationPolicyApplier.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
+    <Compile Include="Entities\WorkSession\ReagentDispensing.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />

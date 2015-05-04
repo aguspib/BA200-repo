@@ -9,13 +9,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Property R1ReagentID As Integer
 
-        Property TechniqueID As Integer  'ID of the associated technique
+        Property ExecutionID As Integer
 
         Property AnalysisMode As OptimizationPolicyApplier.AnalysisMode
 
-        Property Contamines As Dictionary(Of Integer, DisposingContaminationDescription)
+        Property Contamines As Dictionary(Of Integer, DispensingContaminationDescription)
 
-        Function RequiredWashingSolution(TechniqueID As Integer, scope As Integer) As WashingDescription
+        Function RequiredWashingSolution(Reagent As Integer, scope As Integer) As WashingDescription
 
     End Interface
 End Namespace

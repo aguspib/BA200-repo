@@ -39,48 +39,70 @@ Public Class DelegatesToCoreBusinesGlue
 
     End Function
 
-    Public Shared Function CreateContaminationManager(ByVal pCon As SqlConnection,
-                       ByVal Analyzer As String,
-                       ByVal currentCont As Integer,
-                       ByVal pHighCont As Integer,
-                       ByVal contaminsDS As ContaminationsDS,
-                       ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
-                       Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
-                       Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Object
 
-        Const TypeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.ContaminationManager"
-        Dim obj = DelegatesToCoreBusinesGlue.BsCoreAssembly.GetType(TypeName)
-        <ThreadStatic> Static method As MethodInfo
-        <ThreadStatic> Static instance As Object = Nothing
 
-        Try
-            If method Is Nothing Then
-                For Each m In obj.GetMethods()
-                    Debug.WriteLine(m.ToString)
-                Next
+    Class ContaminationManagerWrapper
+        Private ReadOnly _contaminationManagerInstance As Object
+        Private ReadOnly _contaminationManagerClass As Type
 
-                instance = obj
+        Public Sub New(ByVal pCon As SqlConnection,
+                   ByVal Analyzer As String,
+                   ByVal currentCont As Integer,
+                   ByVal pHighCont As Integer,
+                   ByVal contaminsDS As ContaminationsDS,
+                   ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
+                   Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
 
-                instance = obj.GetProperty("Instance").GetGetMethod.Invoke(Nothing, {})
-                method = obj.GetMethod("CreateWS")
-            End If
-            Dim result = method.Invoke(
-                            instance, {
+            Const contaminationManagerTypeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.ContaminationManager"
+            <ThreadStatic> Static contaminationManagerClass As Type = BsCoreAssembly.GetType(contaminationManagerTypeName)
+
+            Try
+                _contaminationManagerInstance = Activator.CreateInstance(contaminationManagerClass, {
                                     pCon, Analyzer, currentCont, pHighCont, contaminsDS,
                                     OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates
-                                }
-                            )
+                                })
+                _contaminationManagerClass = contaminationManagerClass
 
-            Return DirectCast(result, GlobalDataTO)
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
+            End Try
 
-        Catch ex As Exception
-            Return New GlobalDataTO With {.HasError = True, .SetDatos = Nothing, .ErrorMessage = "Reflection error. Can't createWS"}
-        End Try
+        End Sub
 
 
-        Return New Object
+        Public Sub ApplyOptimizations(pCon As SqlConnection, ActiveAnalyzer As String, OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
 
-    End Function
+            Const typeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.Optimizations.OptimizationBacktrackingApplier"
+
+            Dim backTrackingClass = BsCoreAssembly.GetType(typeName)
+            Dim backtrackingOptimizerInstance = Activator.CreateInstance(backTrackingClass, {pCon, ActiveAnalyzer})
+
+            _contaminationManagerClass.GetMethod("ApplyOptimizations").Invoke(_contaminationManagerInstance, {backtrackingOptimizerInstance, OrderTests})
+
+
+        End Sub
+
+        Public Function bestResult() As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim result = _contaminationManagerClass.GetProperty("bestResult").GetMethod.Invoke(_contaminationManagerInstance, {})
+            If result IsNot Nothing Then
+                Return TryCast(result, List(Of ExecutionsDS.twksWSExecutionsRow))
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Function currentContaminationNumber() As Integer
+            Dim result = _contaminationManagerClass.GetProperty("currentContaminationNumber").GetMethod.Invoke(_contaminationManagerInstance, {})
+            If result IsNot Nothing Then
+                Return CInt(result) 'TryCast(result, Integer)
+            Else
+                Return Nothing
+            End If
+
+        End Function
+    End Class
 
     Public Shared Function BsCoreAssembly() As Reflection.Assembly
         Static block As New Object

@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
@@ -130,6 +131,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 FinishTransaction(resultData, ppDBConnection)
 
                 orderTestLockedByLISList = Nothing
+
+                'MIC: WIP!!
+                Dim C = New ContaminationsContext(New BA200ContaminationsSpecification)
+                'C.FillContentsFromExecutionDS(Me.pendingExecutionsDS)
+                ContaminationsContext.DebugContentsFromExecutionDS(Me.pendingExecutionsDS, 0)
+                C.FillContextInStatic(Me.pendingExecutionsDS)
+                '/MIC WIP
+
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
@@ -147,6 +156,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 ReleaseSemaphoreToAvailable()
             End Try
+
             Return resultData
         End Function
 

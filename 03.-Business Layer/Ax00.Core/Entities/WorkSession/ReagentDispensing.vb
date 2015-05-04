@@ -1,14 +1,32 @@
 ﻿Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
+Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-    Public Class BA200ReagentDispensing
+    Public MustInherit Class ReagentDispensing
         Implements IReagentDispensing
 
-
-
         Public Function RequiredWashingSolution(Reagent As Integer, scope As Integer) As WashingDescription
-            Throw New NotImplementedException("Not yet ready!")
+            If scope = 0 Then   'A reagent can't contamine itself
+                Return New EmptyWashing
+
+            ElseIf scope > 0 Then   'A reagent can't contamine somethig that was already sent
+                Throw New Exception("A later dispensing can't contamine us")
+
+            ElseIf Me.Contamines Is Nothing OrElse Me.Contamines.ContainsKey(Reagent) = False Then
+                Return New EmptyWashing
+            Else
+
+                Dim washing = Me.Contamines(Reagent)
+                If washing.RequiredWashing.CleaningPower < Math.Abs(scope) Then
+                    Return New EmptyWashing
+                Else
+                    'Dim newCleaning = New WashingDescription(washing.RequiredWashing.CleaningPower + scope, washing.RequiredWashing.WashingSolutionID)
+
+                    Dim newCleaning = New WashingDescription(washing.RequiredWashing.CleaningPower, washing.RequiredWashing.WashingSolutionID)
+                    Return newCleaning
+                End If
+            End If
         End Function
 
         Public Property AnalysisMode As OptimizationPolicyApplier.AnalysisMode Implements IReagentDispensing.AnalysisMode
