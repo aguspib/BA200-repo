@@ -24,7 +24,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Function DispensingFactory() As IReagentDispensing
+        Function CreateDispensing() As IReagentDispensing
+
+        Property AdditionalPredilutionSteps As Integer
 
     End Interface
 End Namespace

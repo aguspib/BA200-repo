@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Public Property ReagentNumber As Integer Implements IReagentDispensing.ReagentNumber
 
-        Public Function RequiredWashingSolution1(TechniqueID As Integer, scope As Integer) As WashingDescription Implements IReagentDispensing.RequiredWashingSolution
+        Public Function RequiredWashingSolution1(dispensing As IReagentDispensing, scope As Integer) As WashingDescription Implements IReagentDispensing.RequiredWashingSolution
             Throw (New NotImplementedException("Not yet ready!"))
         End Function
 

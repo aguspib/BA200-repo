@@ -6,21 +6,42 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ContaminationsContext
 
         Public ReadOnly Steps As RangedCollection(Of ContextStep)
-        Public ReadOnly AnalyzerContaminationsHandler As IAnalyzerContaminationsSpecification
+        Public ReadOnly AnalyzerContaminationsDescriptor As IAnalyzerContaminationsSpecification
 
-        Sub New(contaminationDesign As IAnalyzerContaminationsSpecification)
+        Sub New(analyzerContaminationsDescriptor As IAnalyzerContaminationsSpecification)
 
-            AnalyzerContaminationsHandler = contaminationDesign
-            Dim range = contaminationDesign.ContaminationsContextRange
+            Me.AnalyzerContaminationsDescriptor = analyzerContaminationsDescriptor
+            Dim range = analyzerContaminationsDescriptor.ContaminationsContextRange
 
             Steps = New RangedCollection(Of ContextStep)(range)
 
             Steps.AllowOutOfRange = False
             For i = range.Minimum To range.Maximum
-                Steps.Add(New ContextStep(contaminationDesign.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
+                Steps.Add(New ContextStep(analyzerContaminationsDescriptor.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
             Next
 
         End Sub
+
+        Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As WashingDescription
+
+            Dim result As WashingDescription = New EmptyWashing, requiredWashingPower = 0
+
+            For curStep = Steps.Range.Minimum To Steps.Range.Maximum
+                If Steps(curStep) Is Nothing Then Continue For
+                For curDispensing = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+
+                    If Steps(curStep)(curDispensing) Is Nothing Then Continue For
+                    Dim dispensingToAsk = Steps(curStep)(curDispensing)
+                    Dim requiredWashing = dispensingToAsk.RequiredWashingSolution(dispensing, curStep)
+                    requiredWashingPower += requiredWashing.CleaningPower
+                    If result.CleaningPower < requiredWashing.CleaningPower Then result = requiredWashing
+
+                Next
+            Next
+
+            If requiredWashingPower = 0 Then Return New EmptyWashing Else Return New WashingDescription(requiredWashingPower, result.WashingSolutionID)
+
+        End Function
 
         Public Sub FillContentsFromAnalyzer(instructionParameters As IEnumerable(Of InstructionParameterTO))
             AnalyzerFrame = New LAx00Frame(instructionParameters)
@@ -35,6 +56,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         ' ReSharper disable once InconsistentNaming
         Public Shared Sub DebugContentsFromExecutionDS(executions As ExecutionsDS, currentIndex As Integer)
+
             Dim table = executions.twksWSExecutions, count As Integer = 0
             Debug.WriteLine("Listing executions:")
             For Each R In table
@@ -74,7 +96,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub FillContextInRunning(executions As ExecutionsDS)
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                For curDispense = 1 To AnalyzerContaminationsHandler.DispensesPerStep
+                For curDispense = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
 
                     Dim dispensing = Steps(curStep)(curDispense)
                     Dim rows = executions.twksWSExecutions.Where(Function(element As twksWSExecutionsRow) element.ExecutionID = dispensing.ExecutionID)
@@ -97,9 +119,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Sub FillContextInStatic(expectedExecutions As ExecutionsDS)
             'We fill all Steps and ContexttStep collections with data:
             For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
-                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(AnalyzerContaminationsHandler.DispensesPerStep)
-                For i As Integer = 1 To AnalyzerContaminationsHandler.DispensesPerStep
-                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (AnalyzerContaminationsHandler.DispensingFactory())
+                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(AnalyzerContaminationsDescriptor.DispensesPerStep)
+                For i As Integer = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (AnalyzerContaminationsDescriptor.CreateDispensing())
                 Next
             Next
             'We update the already filled data:
@@ -124,17 +146,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Private Sub FillSteps()
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                For curDispense = 1 To AnalyzerContaminationsHandler.DispensesPerStep
+                For curDispense = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
 
                     If curStep < 0 Then   'Before step(s).
-                        Steps(curStep)(curDispense) = AnalyzerContaminationsHandler.DispensingFactory()
+                        Steps(curStep)(curDispense) = AnalyzerContaminationsDescriptor.CreateDispensing()
                         Dim parameterName = String.Format("R{0}B{1}", curDispense, Math.Abs(curStep))
                         Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
 
                     ElseIf curStep = 0 Then   'Current step
 
                     ElseIf curStep > 0 Then   'After step(s)
-                        Steps(curStep)(curDispense) = AnalyzerContaminationsHandler.DispensingFactory()
+                        Steps(curStep)(curDispense) = AnalyzerContaminationsDescriptor.CreateDispensing()
                         Dim parameterName = String.Format("R{0}A{1}", curDispense, curStep)
                         Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
 
@@ -155,7 +177,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If contamination.IsWashingSolutionR1Null Then
                     description.RequiredWashing = New RegularWaterWashing
                 Else
-                    description.RequiredWashing = New WashingDescription(Math.Abs(AnalyzerContaminationsHandler.ContaminationsContextRange.Minimum), contamination.WashingSolutionR1)
+                    description.RequiredWashing = New WashingDescription(Math.Abs(AnalyzerContaminationsDescriptor.ContaminationsContextRange.Minimum), contamination.WashingSolutionR1)
                 End If
 
                 dispensing.Contamines.Add(contamination.ReagentContaminatedID, description)

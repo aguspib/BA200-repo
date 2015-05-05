@@ -104,7 +104,7 @@
     <Compile Include="Entities\WorkSession\BA200ReagentDispensing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\Context.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContaminationsContext.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\DispensingContaminationDescription.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\EmptyWashing.vb" />

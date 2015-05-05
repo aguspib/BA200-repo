@@ -45,9 +45,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             BiReactive = 2
         End Enum
 
-        Protected Enum AnalyzerModelEnum
-            BA400
-            BA200
+        Public Enum AnalyzerModelEnum
+            A400
+            A200
         End Enum
 #End Region
 
@@ -68,9 +68,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Me.New()
             dbConnection = pConn
             If ActiveAnalyzer = "A200" Then
-                AnalyzerModel = AnalyzerModelEnum.BA200
+                AnalyzerModel = AnalyzerModelEnum.A200
             Else
-                AnalyzerModel = AnalyzerModelEnum.BA400
+                AnalyzerModel = AnalyzerModelEnum.A400
             End If
         End Sub
 
@@ -230,7 +230,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 19/03/2015
         ''' </remarks>
         Protected Sub SetExpectedTypeReagent()
-            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+            If AnalyzerModel = AnalyzerModelEnum.A200 Then
                 SetExpectedTypeReagent200()
             End If
         End Sub
@@ -260,7 +260,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 18/03/2015
         ''' </remarks>
         Protected Function ReagentsAreCompatibleType() As Boolean
-            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+            If AnalyzerModel = AnalyzerModelEnum.A200 Then
                 Return ReagentsAreCompatibleType200()
             End If
             Return True
@@ -298,7 +298,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 18/03/2015 by AJG
         ''' </remarks>
         Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            If AnalyzerModel = AnalyzerModelEnum.BA200 Then
+            If AnalyzerModel = AnalyzerModelEnum.A200 Then
                 Return GetTypeReagentInTest200(pDBConnection, reagentID)
             End If
 
