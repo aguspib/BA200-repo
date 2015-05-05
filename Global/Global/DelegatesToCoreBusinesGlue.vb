@@ -2,6 +2,7 @@
 Imports System.IO
 Imports System.Reflection
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Types
 
 Public Class DelegatesToCoreBusinesGlue
     Public Shared Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
@@ -36,10 +37,72 @@ Public Class DelegatesToCoreBusinesGlue
             Return New GlobalDataTO With {.HasError = True, .SetDatos = Nothing, .ErrorMessage = "Reflection error. Can't createWS"}
         End Try
 
-
-
-
     End Function
+
+
+
+    Class ContaminationManagerWrapper
+        Private ReadOnly _contaminationManagerInstance As Object
+        Private ReadOnly _contaminationManagerClass As Type
+
+        Public Sub New(ByVal pCon As SqlConnection,
+                   ByVal Analyzer As String,
+                   ByVal currentCont As Integer,
+                   ByVal pHighCont As Integer,
+                   ByVal contaminsDS As ContaminationsDS,
+                   ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
+                   Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
+
+            Const contaminationManagerTypeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.ContaminationManager"
+            <ThreadStatic> Static contaminationManagerClass As Type = BsCoreAssembly.GetType(contaminationManagerTypeName)
+
+            Try
+                _contaminationManagerInstance = Activator.CreateInstance(contaminationManagerClass, {
+                                    pCon, Analyzer, currentCont, pHighCont, contaminsDS,
+                                    OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates
+                                })
+                _contaminationManagerClass = contaminationManagerClass
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
+            End Try
+
+        End Sub
+
+
+        Public Sub ApplyOptimizations(pCon As SqlConnection, ActiveAnalyzer As String, OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
+
+            Const typeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.Optimizations.OptimizationBacktrackingApplier"
+
+            Dim backTrackingClass = BsCoreAssembly.GetType(typeName)
+            Dim backtrackingOptimizerInstance = Activator.CreateInstance(backTrackingClass, {pCon, ActiveAnalyzer})
+
+            _contaminationManagerClass.GetMethod("ApplyOptimizations").Invoke(_contaminationManagerInstance, {backtrackingOptimizerInstance, OrderTests})
+
+
+        End Sub
+
+        Public Function bestResult() As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim result = _contaminationManagerClass.GetProperty("bestResult").GetMethod.Invoke(_contaminationManagerInstance, {})
+            If result IsNot Nothing Then
+                Return TryCast(result, List(Of ExecutionsDS.twksWSExecutionsRow))
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Function currentContaminationNumber() As Integer
+            Dim result = _contaminationManagerClass.GetProperty("currentContaminationNumber").GetMethod.Invoke(_contaminationManagerInstance, {})
+            If result IsNot Nothing Then
+                Return CInt(result) 'TryCast(result, Integer)
+            Else
+                Return Nothing
+            End If
+
+        End Function
+    End Class
 
     Public Shared Function BsCoreAssembly() As Reflection.Assembly
         Static block As New Object

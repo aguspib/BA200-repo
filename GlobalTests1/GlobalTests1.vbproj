@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7AB498E6-B54C-4635-94BF-D3D3ABAF1761}</ProjectGuid>
+    <ProjectGuid>{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Global.Tests</RootNamespace>
-    <AssemblyName>Global.Tests</AssemblyName>
+    <RootNamespace>GlobalTests1</RootNamespace>
+    <AssemblyName>GlobalTests1</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Global.Tests.xml</DocumentationFile>
+    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -33,8 +33,9 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Global.Tests.xml</DocumentationFile>
+    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -50,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -65,11 +66,7 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -84,7 +81,6 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DelegatesToCoreBusinesGlueTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -100,7 +96,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="TypedGlobalDataToTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -120,18 +115,19 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
       <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
       <Name>Ax00.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Global\Global\Global.vbproj">
-      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
       <Name>Global</Name>
     </ProjectReference>
   </ItemGroup>

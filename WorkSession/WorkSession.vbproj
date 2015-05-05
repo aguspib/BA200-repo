@@ -139,17 +139,10 @@
     <Compile Include="AutoReportsDelegate.vb" />
     <Compile Include="BarcodeWSDelegate.vb" />
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
-    <Compile Include="ContaminationManager.vb" />
     <Compile Include="Contaminations Handling\IWSExecutionCreator.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
     <Compile Include="OperateCalculatedTestDelegate.vb" />
-    <Compile Include="OptimizationAPolicyApplier.vb" />
-    <Compile Include="OptimizationBacktrackingApplier.vb" />
-    <Compile Include="OptimizationBPolicyApplier.vb" />
-    <Compile Include="OptimizationCPolicyApplier.vb" />
-    <Compile Include="OptimizationDPolicyApplier.vb" />
-    <Compile Include="OptimizationPolicyApplier.vb" />
     <Compile Include="OrderTestsLISInfoDelegate.vb" />
     <Compile Include="PreparationTestDataDelegate.vb" />
     <Compile Include="ReactionsRotorDelegate.vb" />

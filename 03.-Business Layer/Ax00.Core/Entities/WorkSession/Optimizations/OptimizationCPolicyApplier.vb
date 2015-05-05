@@ -8,8 +8,8 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 
-Namespace Biosystems.Ax00.BL
-    Public Class OptimizationCPolicyApplier: Inherits OptimizationPolicyApplier
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
+    Public Class OptimizationCPolicyApplier : Inherits OptimizationPolicyApplier
 
         Public Sub New()
             MyBase.New()
@@ -157,7 +157,7 @@ Namespace Biosystems.Ax00.BL
                     If contaminations.Count > 0 Then Exit For
 
                     'If ReagentsAreCompatibleType() Then Exit For
-                    
+
                     'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                     'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
                     If auxJj = leftLimit Then

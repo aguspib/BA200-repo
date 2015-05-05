@@ -25,6 +25,12 @@
             Me.New(New Range(Of Integer)(minimum, maximum))
         End Sub
 
+        Public Sub Preallocate()
+            While _internalList.Count < GetZeroBasedMaxIndex() + 1
+                _internalList.Add(Nothing)
+            End While
+        End Sub
+
         ''' <summary>
         ''' This allows any item into the collection to be accessed by its index. <para>Notice that the index starts in Range.Minimum </para>
         ''' </summary>

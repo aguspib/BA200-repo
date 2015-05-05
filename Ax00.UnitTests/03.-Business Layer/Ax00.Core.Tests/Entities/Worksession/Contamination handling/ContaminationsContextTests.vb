@@ -30,7 +30,7 @@ Namespace Tests
 
         Private Function DispensingMockFactory() As IReagentDispensing
             Dim dispensing = Mock.Create(Of IReagentDispensing)()
-            'dispensing.AnalysisMode = Biosystems.Ax00.Core.OptimizationPolicyApplier.AnalysisMode.MonoReactive
+            'dispensing.AnalysisMode = Biosystems.Ax00.Core.entities.
             Return dispensing
         End Function
 

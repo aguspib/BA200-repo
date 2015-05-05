@@ -2,9 +2,10 @@
 Option Strict On
 
 Imports System.Data.SqlClient
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
-Namespace Biosystems.Ax00.BL
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
     Public Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier
 
         Private bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -106,7 +107,7 @@ Namespace Biosystems.Ax00.BL
                     End If
                 End If
             Next
-            Return SolutionSet
+            Return solutionSet
         End Function
 
         Private Function IsViable(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal elem As ExecutionsDS.twksWSExecutionsRow) As Boolean
