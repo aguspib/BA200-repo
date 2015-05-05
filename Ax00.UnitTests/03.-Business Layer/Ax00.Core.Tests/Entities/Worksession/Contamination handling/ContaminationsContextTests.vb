@@ -15,7 +15,7 @@ Namespace Tests
             Dim contaminations = Telerik.JustMock.Mock.Create(Of IAnalyzerContaminationsSpecification)()
             Mock.Arrange(Function() contaminations.DispensesPerStep()).Returns(dispensesPerStep)
             Mock.Arrange(Function() contaminations.ContaminationsContextRange).Returns(New Range(Of Integer)(before, after))
-            Mock.Arrange(Function() contaminations.DispensingFactory).Returns(AddressOf DispensingMockFactory)
+            Mock.Arrange(Function() contaminations.CreateDispensing).Returns(AddressOf DispensingMockFactory)
 
             Dim cont As New ContaminationsContext(contaminations)
             Const testFrame = "BA350;ANSINF;R1B2:12;R2B2:9;R1B1:13;R2B1:24;R1A1:6;R2A1:9;R1A2:123;R2A2:8"
