@@ -1459,6 +1459,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim previousReagentIDSentList As New List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
                             Dim contaminationFound = SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList, pContaminationsDS, toSendList(0).ReagentID, pHighContaminationPersitance)
 
+#If DEBUG Then
+                            If contaminationFound Then
+                                Debug.Print(String.Format("Contamination found between PreviousReagentIDSentList and toSendList(0).ReagentID = {0} \n", toSendList(0).ReagentID))
+                            End If
+
+                            For Each element In previousReagentIDSentList
+                                Debug.Print(String.Format("Elem: ExecutionID={0}; ReagentID={1}; OrderID={2}; OrderTestID={3} \n", element.ExecutionID, element.ReagentID, element.OrderID, element.OrderTestID))
+                            Next
+#End If
+
                             '2) If exists contamination between previous reagents sent and next in list, so sort the pending executions using the same algortihm 
                             'as in WS Creation and try found a better solution, then send the FIRST
                             '<Take a look of method ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew>
