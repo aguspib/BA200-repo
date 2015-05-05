@@ -108,7 +108,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End While
                     CloseInstruction()
                 End If
-                Return New GlobalDataTO With {.SetDatos = myInstruction}
+                Return New GlobalDataTO With {.SetDatos = myInstruction.ParameterList}
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex)
                 Return New GlobalDataTO() With {.HasError = True, .ErrorCode = "SYSTEM_ERROR", .ErrorMessage = ex.Message}
