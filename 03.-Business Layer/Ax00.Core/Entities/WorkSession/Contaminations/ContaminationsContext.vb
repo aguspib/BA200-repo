@@ -1,4 +1,7 @@
 ﻿Imports Biosystems.Ax00.CC
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
@@ -24,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As WashingDescription
 
-            Dim result As WashingDescription = New EmptyWashing, requiredWashingPower = 0
+            Dim result As IWashingDescription = New EmptyWashing, requiredWashingPower = 0
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
                 If Steps(curStep) Is Nothing Then Continue For
@@ -33,8 +36,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
                     Dim requiredWashing = dispensingToAsk.RequiredWashingSolution(dispensing, curStep)
-                    requiredWashingPower += requiredWashing.CleaningPower
-                    If result.CleaningPower < requiredWashing.CleaningPower Then result = requiredWashing
+                    requiredWashingPower += requiredWashing.WashingStrength
+                    If result.WashingStrength < requiredWashing.WashingStrength Then result = requiredWashing
 
                 Next
             Next
@@ -167,7 +170,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Private Sub FillDispenseContaminations(dispensing As IReagentDispensing)
             If dispensing.Contamines IsNot Nothing Then Return
-            dispensing.Contamines = New Dictionary(Of Integer, DispensingContaminationDescription)()
+            dispensing.Contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
             Dim contaminations = tparContaminationsDAO.GetAllContaminationsForAReagent(dispensing.R1ReagentID)
             For Each contamination In contaminations.SetDatos
                 If contamination.ContaminationType <> "R1" Then Continue For

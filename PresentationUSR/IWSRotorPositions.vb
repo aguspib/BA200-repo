@@ -6397,6 +6397,7 @@ Public Class UiWSRotorPositions
             ''AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
             'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
 
+            Dim contaminathings = Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer
             resultData = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
 
             If (resultData.HasError) Then

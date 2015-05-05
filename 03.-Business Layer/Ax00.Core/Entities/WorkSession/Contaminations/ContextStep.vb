@@ -1,4 +1,6 @@
 ﻿Imports Biosystems.Ax00.CC
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ContextStep

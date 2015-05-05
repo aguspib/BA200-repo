@@ -1,6 +1,9 @@
 ﻿Imports NUnit.Framework
 Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Telerik.JustMock
 
 Namespace Tests
@@ -24,7 +27,7 @@ Namespace Tests
             Assert.AreEqual(cont.Steps(-2)(2).ExecutionID, 9)
 
             'Obtener la washing solution necesaria si le doy la técnica 12
-            cont.Steps(-2)(2).RequiredWashingSolution(New BA200ReagentDispensing With {.R1ReagentID = 12}, -2)
+            cont.Steps(-2)(2).RequiredWashingSolution(New ReagentDispensing With {.R1ReagentID = 12}, -2)
 
         End Sub
 

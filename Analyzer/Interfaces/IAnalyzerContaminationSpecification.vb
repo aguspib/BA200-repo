@@ -1,6 +1,8 @@
 ﻿Imports Biosystems.Ax00.CC
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
     Public Interface IAnalyzerContaminationsSpecification
         ''' <summary>
         ''' This represents the amount of dispenses per step (that is, how many reagents are dispenses in a running cycle. In BA200 and BA400 that is always 2, R1 and R2)

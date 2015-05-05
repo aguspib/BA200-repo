@@ -155,8 +155,12 @@
     <Compile Include="AnalyzerManager\SN- Temporal Testing and Old Methods.vb" />
     <Compile Include="AnalyzerManager\StaticBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\ToIntegrate.vb" />
+    <Compile Include="Interfaces\IAnalyzerContaminationSpecification.vb" />
     <Compile Include="Interfaces\IAnalyzerManager.vb" />
+    <Compile Include="Interfaces\IDispensingContaminationDescription.vb" />
     <Compile Include="Interfaces\IISEManager.vb" />
+    <Compile Include="Interfaces\IReagentDispensing.vb" />
+    <Compile Include="Interfaces\IWashingDescription.vb" />
     <Compile Include="ISE\ISEManager.vb" />
     <Compile Include="ISE\ISEReception.vb" />
     <Compile Include="ISE\ToIntegrate.vb" />
@@ -205,6 +209,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>

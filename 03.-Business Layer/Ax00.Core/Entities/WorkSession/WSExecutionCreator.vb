@@ -9,6 +9,8 @@ Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
@@ -18,7 +20,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
     ''' </summary>
     ''' <remarks></remarks>
     Public NotInheritable Class WSExecutionCreator
-        Implements IWSExecutionCreator
         Private Shared _instance As WSExecutionCreator = Nothing
 
         'Parameters for create the Work Session Executions
@@ -81,11 +82,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End Get
         End Property
 
+        Public Property ContaminationsDescriptor As IAnalyzerContaminationsSpecification
+
         Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
-                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO Implements IWSExecutionCreator.CreateWS
+                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO 'Implements IWSExecutionCreator.CreateWS
+
+            Me.ContaminationsDescriptor = ContaminationsDescriptor
 
             'Initialization from parameters
             pDBConnection = ppDBConnection
@@ -133,10 +138,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 orderTestLockedByLISList = Nothing
 
                 'MIC: WIP!!
-                Dim C = New ContaminationsContext(New BA200ContaminationsSpecification)
-                'C.FillContentsFromExecutionDS(Me.pendingExecutionsDS)
-                ContaminationsContext.DebugContentsFromExecutionDS(Me.pendingExecutionsDS, 0)
-                C.FillContextInStatic(Me.pendingExecutionsDS)
+                Dim Context = New ContaminationsContext(ContaminationsDescriptor)
+                Context.FillContextInStatic(Me.pendingExecutionsDS)
+                Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 12})
+                Debug.WriteLine(wash.WashingStrength)
                 '/MIC WIP
 
             Catch ex As Exception
@@ -150,7 +155,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
             Finally
                 If (ppDBConnection Is Nothing AndAlso Not pDBConnection Is Nothing) Then pDBConnection.Close()
 

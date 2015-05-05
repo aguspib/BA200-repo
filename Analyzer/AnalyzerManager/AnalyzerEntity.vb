@@ -2,11 +2,13 @@
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Data
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
     Partial Public MustInherit Class AnalyzerManager
         Implements IAnalyzerManager
+
 
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
@@ -70,5 +72,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #End Region
 
+        Public MustOverride Function CreateContaminationsDescriptor() As IAnalyzerContaminationsSpecification Implements IAnalyzerManager.CreateContaminationsDescriptor
     End Class
 End Namespace

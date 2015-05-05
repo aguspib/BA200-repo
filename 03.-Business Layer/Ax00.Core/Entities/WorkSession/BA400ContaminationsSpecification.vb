@@ -1,13 +1,13 @@
 ﻿Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
-Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-    Public Class BA200ContaminationsSpecification
+    Public Class BA400ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
 
@@ -16,11 +16,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             'This is BA200 dependant:
             AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, "A200").SetDatos
 
-            Dim contaminationPersitance = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+            Dim contaminationPersitence = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
 
-            ContaminationsContextRange = New Range(Of Integer)(-contaminationPersitance, AdditionalPredilutionSteps + contaminationPersitance - 1)
+            ContaminationsContextRange = New Range(Of Integer)(-contaminationPersitence, +contaminationPersitence)
 
-            DispensesPerStep = 2    'The analyzer has R1 and R2
         End Sub
 
         Public Property ContaminationsContextRange As Range(Of Integer) Implements IAnalyzerContaminationsSpecification.ContaminationsContextRange

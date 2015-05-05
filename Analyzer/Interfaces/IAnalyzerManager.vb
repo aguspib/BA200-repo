@@ -2,9 +2,11 @@
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.Data.SqlClient
+Imports Biosystems.Ax00.Core.Entities.Worksession
 
 Namespace Biosystems.Ax00.Core.Interfaces
 
@@ -56,7 +58,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
         ReadOnly Property ValidALIGHT() As Boolean
         ReadOnly Property ExistsALIGHT() As Boolean
-        ReadOnly Property ValidFLIGHT() As Boolean        
+        ReadOnly Property ValidFLIGHT() As Boolean
         Property CurrentWell() As Integer
         Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
@@ -241,7 +243,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                           Optional ByVal pAddAlwaysFlag As Boolean = False)
 
         Sub InitializeTimerStartTaskControl(ByVal pInterval As Integer, Optional ByVal pNotUseOffset As Boolean = False)
-        Sub InitializeTimerSTATEControl(ByVal pInterval As Integer)        
+        Sub InitializeTimerSTATEControl(ByVal pInterval As Integer)
         Function ManageStandByStatus(ByVal pAx00ActionCode As AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
         Function ManageRunningStatus(ByVal pAx00ActionCode As AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
         Sub InitializeTimerControl(ByVal pInterval As Integer)
@@ -285,6 +287,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
         Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
         Sub ResetFLIGHT()
+
+        Function CreateContaminationsDescriptor() As IAnalyzerContaminationsSpecification
 #End Region
 
     End Interface

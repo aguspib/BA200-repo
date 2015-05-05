@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 #End Region
 
 #Region "Enums"
-        Public Enum AnalysisMode As Integer
+        Public Enum AnalysisMode 'As Integer
             MonoReactive = 1
             BiReactive = 2
         End Enum
