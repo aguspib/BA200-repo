@@ -22,7 +22,26 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
+        Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As WashingDescription
 
+            Dim result As WashingDescription = New EmptyWashing, requiredWashingPower = 0
+
+            For curStep = Steps.Range.Minimum To Steps.Range.Maximum
+                If Steps(curStep) Is Nothing Then Continue For
+                For curDispensing = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+
+                    If Steps(curStep)(curDispensing) Is Nothing Then Continue For
+                    Dim dispensingToAsk = Steps(curStep)(curDispensing)
+                    Dim requiredWashing = dispensingToAsk.RequiredWashingSolution(dispensing, curStep)
+                    requiredWashingPower += requiredWashing.CleaningPower
+                    If result.CleaningPower < requiredWashing.CleaningPower Then result = requiredWashing
+
+                Next
+            Next
+
+            If requiredWashingPower = 0 Then Return New EmptyWashing Else Return New WashingDescription(requiredWashingPower, result.WashingSolutionID)
+
+        End Function
 
         Public Sub FillContentsFromAnalyzer(instructionParameters As IEnumerable(Of InstructionParameterTO))
             AnalyzerFrame = New LAx00Frame(instructionParameters)
@@ -37,6 +56,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         ' ReSharper disable once InconsistentNaming
         Public Shared Sub DebugContentsFromExecutionDS(executions As ExecutionsDS, currentIndex As Integer)
+
             Dim table = executions.twksWSExecutions, count As Integer = 0
             Debug.WriteLine("Listing executions:")
             For Each R In table

@@ -15,7 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Property Contamines As Dictionary(Of Integer, DispensingContaminationDescription)
 
-        Function RequiredWashingSolution(Reagent As Integer, scope As Integer) As WashingDescription
+        Function RequiredWashingSolution(Reagent As IReagentDispensing, scope As Integer) As WashingDescription
 
     End Interface
 End Namespace
