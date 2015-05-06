@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Implements IAnalyzerContaminationsSpecification
 
 
+
         Sub New()
 
             'This is BA200 dependant:
@@ -31,5 +32,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Function
 
         Public Property AdditionalPredilutionSteps As Integer Implements IAnalyzerContaminationsSpecification.AdditionalPredilutionSteps
+
+        Public Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode Implements IAnalyzerContaminationsSpecification.GetAnalysisModeForReagent
+            Return AnalysisMode.MonoReactive
+        End Function
     End Class
 End Namespace

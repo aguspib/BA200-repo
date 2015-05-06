@@ -143,7 +143,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                           Select wse).ToList()
 
                 If contam.Count = 0 Then
-                    contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                    contaminatorType = GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
                     If contaminatorType = AnalysisMode.BiReactive Then
                         If lastBireactiveID.Count > 0 Then
                             contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS)
@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     End If
                 End If
             Else
-                contaminatorType = GetTypeReagentInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                contaminatorType = GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
                 If contaminatorType = AnalysisMode.BiReactive Then
                     lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
                 End If

@@ -8350,9 +8350,9 @@ Partial Public Class UiAx00MainMDI
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
 
                 'AG 10/11/2014 BA-2082 use the AnalyzerModel read from database instead of the enumerate AnalyzerModelEnum (inform the analyzer model before createAnalyzer)
-                MyClass.AnalyzerModel = AnalyzerModelAttribute
+                AnalyzerModel = AnalyzerModelAttribute
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 

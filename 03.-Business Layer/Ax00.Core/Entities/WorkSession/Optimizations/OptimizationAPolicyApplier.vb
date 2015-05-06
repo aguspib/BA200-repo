@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                                 Where a.OrderTestID = sortedOTList(indexI + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, ContaminDS)
-                        typeResult = GetTypeReagentInTest(dbConnection, newContaminatedID)
+                        typeResult = GetAnalysisModeInTest(dbConnection, newContaminatedID)
                     End If
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
@@ -166,7 +166,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                              Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                    typeResult = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
+                    typeResult = GetAnalysisModeInTest(dbConnection, ReagentContaminatorID)
 
                     If aux_jj = indexJ Then 'search for contamination (low or high level)
                         contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)

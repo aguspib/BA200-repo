@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
@@ -40,10 +41,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 #End Region
 
 #Region "Enums"
-        Public Enum AnalysisMode 'As Integer
-            MonoReactive = 1
-            BiReactive = 2
-        End Enum
+
 
         Public Enum AnalyzerModelEnum
             A400
@@ -142,6 +140,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return ContaminationNumber
         End Function
 
+        Public ReadOnly Property ContaminationsDescriptor() As IAnalyzerContaminationsSpecification
+            Get
+                Return WSExecutionCreator.Instance.ContaminationsDescriptor
+            End Get
+        End Property
+
 #End Region
 
 #Region "Overridable methods"
@@ -211,8 +215,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 19/03/2015
         ''' </remarks>
         Private Sub SetExpectedTypeReagent200()
-            TypeContaminator = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
-            TypeContaminated = GetTypeReagentInTest(dbConnection, ReagentContaminatedID)
+            TypeContaminator = GetAnalysisModeInTest(dbConnection, ReagentContaminatorID)
+            TypeContaminated = GetAnalysisModeInTest(dbConnection, ReagentContaminatedID)
 
             If TypeContaminator = AnalysisMode.BiReactive AndAlso TypeContaminated = AnalysisMode.BiReactive Then
                 typeExpectedResult = AnalysisMode.BiReactive
@@ -266,27 +270,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return True
         End Function
 
-        ''' <summary>
-        ''' Gets the type of reagent, given a reagentID. This code is the version for the analyzer "A200" model
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to database</param>
-        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
-        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
-        ''' <remarks>
-        ''' Created on 19/03/2015 by AJG
-        ''' </remarks>
-        Private Function GetTypeReagentInTest200(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            Static testReagentsDataDS As TestReagentsDS
-
-            If testReagentsDataDS Is Nothing Then
-                testReagentsDataDS = GetAllReagents(pDBConnection)
-            End If
-
-            Dim result = (From a In testReagentsDataDS.tparTestReagents
-                          Where a.ReagentID = reagentID Select a.ReagentsNumber).First
-
-            Return CType(result, AnalysisMode)
-        End Function
 
         ''' <summary>
         ''' Gets the type of reagent, given a reagentID
@@ -297,36 +280,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' <remarks>
         ''' Created on 18/03/2015 by AJG
         ''' </remarks>
-        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                Return GetTypeReagentInTest200(pDBConnection, reagentID)
-            End If
-
-            Return AnalysisMode.MonoReactive
-        End Function
-
-        ''' <summary>
-        ''' Gets all the reagents and their type of reagent from DB
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to DB</param>
-        ''' <returns>A testReagentsDS with the info</returns>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
-            Dim TestReagentsDAO As New tparTestReagentsDAO()
-            Static testReagentsDataDS As TestReagentsDS
-            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
-
-            If testReagentsDataDS Is Nothing Then
-                resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
-
-                If Not resultData.HasError Then
-                    testReagentsDataDS = resultData.SetDatos
-                End If
-            End If
-
-            Return testReagentsDataDS
+        Protected Function GetAnalysisModeInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
+            Return Me.ContaminationsDescriptor.GetAnalysisModeForReagent(reagentID)
         End Function
 
         ''' <summary>

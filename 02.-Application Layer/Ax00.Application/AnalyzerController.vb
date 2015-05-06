@@ -6,6 +6,7 @@ Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.App
@@ -77,9 +78,9 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerManager Implements IAnalyzerController.CreateAnalyzer
             Select Case analyzerModel
-                Case AnalyzerModelEnum.A200.ToString 'BA200
+                Case OptimizationPolicyApplier.AnalyzerModelEnum.A200.ToString 'BA200
                     _factory = New BA200AnalyzerFactory()
-                Case AnalyzerModelEnum.A400.ToString 'BA400
+                Case OptimizationPolicyApplier.AnalyzerModelEnum.A400.ToString 'BA400
                     _factory = New BA400AnalyzerFactory()
             End Select
 
@@ -286,10 +287,10 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Function IsValidBaseline() As Boolean
             Try
-                If AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A200.ToString AndAlso _
+                If AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = OptimizationPolicyApplier.AnalyzerModelEnum.A200.ToString AndAlso _
                     Analyzer.ValidALIGHT AndAlso Analyzer.ValidFLIGHT Then
                     Return True
-                ElseIf AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A400.ToString AndAlso _
+                ElseIf AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = OptimizationPolicyApplier.AnalyzerModelEnum.A400.ToString AndAlso _
                     Analyzer.ValidALIGHT Then
                     Return True
                 End If

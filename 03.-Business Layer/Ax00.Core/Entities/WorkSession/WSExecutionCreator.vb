@@ -137,12 +137,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 orderTestLockedByLISList = Nothing
 
-                'MIC: WIP!!
-                Dim Context = New ContaminationsContext(ContaminationsDescriptor)
-                Context.FillContextInStatic(Me.pendingExecutionsDS)
-                Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 130})
-                Debug.WriteLine(wash.WashingStrength)
-                '/MIC WIP
+                'TODO: DELETE THIS BLOCK 
+                'Dim Context = New ContaminationsContext(ContaminationsDescriptor)
+                'Context.FillContextInStatic(Me.pendingExecutionsDS)
+                'Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 130})
+                'Debug.WriteLine(wash.WashingStrength)
+                ''/MIC WIP
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed

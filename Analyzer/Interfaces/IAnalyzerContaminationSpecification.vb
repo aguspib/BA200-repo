@@ -30,5 +30,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
         Property AdditionalPredilutionSteps As Integer
 
+        Function GetAnalysisModeForReagent(ByVal reagentID As Integer) As AnalysisMode
+
     End Interface
 End Namespace
