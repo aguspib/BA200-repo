@@ -140,7 +140,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 'MIC: WIP!!
                 Dim Context = New ContaminationsContext(ContaminationsDescriptor)
                 Context.FillContextInStatic(Me.pendingExecutionsDS)
-                Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 12})
+                Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 130})
                 Debug.WriteLine(wash.WashingStrength)
                 '/MIC WIP
 

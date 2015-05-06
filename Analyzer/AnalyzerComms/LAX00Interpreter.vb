@@ -72,11 +72,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 If pInstruction <> String.Empty Then
                     Dim index As Integer = 0
-                    Dim parameterName As String = "", value As String = String.Empty
+                    Dim parameterName As String = "" ', value As String = String.Empty
                     <ThreadStatic> Static buffer As New StringBuilder(1024)
                     buffer.Clear()
                     Dim CloseInstruction =
                         Sub()
+                            Dim value As String = ""
                             If parameterName = String.Empty Then
                                 parameterName = buffer.ToString()
                             Else
@@ -84,7 +85,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
                             If parameterName <> String.Empty Then myInstruction.Add(parameterName, value)
                             parameterName = ""  'Resharper fails. this parameter IS used! Do not "fix"
-                            value = ""
                             buffer.Clear()
                         End Sub
 
