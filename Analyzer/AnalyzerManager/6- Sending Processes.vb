@@ -1570,18 +1570,18 @@ Namespace Biosystems.Ax00.Core.Entities
             Return toSendList
         End Function
 
-        Private Function SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentID As Integer, pHighContaminationPersitance As Integer) As Boolean
+        Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentID As Integer, pHighContaminationPersitance As Integer) As Boolean
             '1) Search contamination between previous reagents and the first in toSendList
             Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
             Dim contaminationFound As Boolean = False
 
-            previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+            Dim auxList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
 
-            If previousReagentIDSentList.Any() Then '(3.bis)
+            If auxList.Any() Then '(3.bis)
                 '1.1) Check if exists contamination between last reagent and next reagent (LOW or HIGH contamiantion)
                 contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                        Where wse.ReagentContaminatorID = previousReagentIDSentList(previousReagentIDSentList.Count - 1).ReagentID _
+                                        Where wse.ReagentContaminatorID = auxList(auxList.Count - 1).ReagentID _
                                         AndAlso wse.ReagentContaminatedID = ReagentID _
                                         Select wse).ToList()
 
@@ -1590,9 +1590,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Check if the required wash has been already sent or not
                     Dim requiredWash As String = ""
-                    If Not previousReagentIDSentList(previousReagentIDSentList.Count - 1).IsWashSolution1Null Then requiredWash = previousReagentIDSentList(previousReagentIDSentList.Count - 1).WashSolution1
+                    If Not auxList(auxList.Count - 1).IsWashSolution1Null Then requiredWash = auxList(auxList.Count - 1).WashSolution1
 
-                    Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(previousReagentIDSentList.Count - 1).ExecutionID
+                    Dim previousExecutionsIDSent As Integer = auxList(auxList.Count - 1).ExecutionID
 
                     Dim i As Integer = 0
 
@@ -1609,10 +1609,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     '1.2) If no LOW contamination exists between the last reagent used and next take care about the previous due the high contamination
                     'has persistance > 1
                     Dim highIndex As Integer = 0
-                    For highIndex = previousReagentIDSentList.Count - pHighContaminationPersitance To previousReagentIDSentList.Count - 2 'The index -1 has already been evaluated
+                    For highIndex = auxList.Count - pHighContaminationPersitance To auxList.Count - 2 'The index -1 has already been evaluated
                         If highIndex >= 0 Then 'Avoid overflow
                             contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                              Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
+                                              Where wse.ReagentContaminatorID = auxList(highIndex).ReagentID _
                                               AndAlso wse.ReagentContaminatedID = ReagentID _
                                               AndAlso Not wse.IsWashingSolutionR1Null _
                                               Select wse).ToList()
@@ -1621,10 +1621,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Check if the required wash has been already sent or not
                                 Dim requiredWash As String = ""
-                                If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then requiredWash = previousReagentIDSentList(highIndex).WashSolution1
+                                If Not auxList(highIndex).IsWashSolution1Null Then requiredWash = auxList(highIndex).WashSolution1
 
                                 'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
-                                Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
+                                Dim previousExecutionsIDSent As Integer = auxList(highIndex).ExecutionID
 
                                 Dim i As Integer = 0
                                 'Search the proper row in mySentPreparationsDS.sentPreparations
@@ -1658,6 +1658,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If '(EndIf 4)
 
             End If
+
+            previousReagentIDSentList = auxList
 
             Return contaminationFound
         End Function
@@ -2096,9 +2098,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim highIndex As Integer = 0
             Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
             For highIndex = previousReagentIDSentList.Count - 1 To previousReagentIDSentList.Count - pHighContaminationPersitance Step -1
-                If highIndex < 0 Then
-
-                Else
+                If highIndex >= 0 Then
                     If highIndex < previousReagentIDSentList.Count - 1 Then 'Evaluate only High contamination
                         contaminations = (From wse In pContaminationsDS.tparContaminations _
                                           Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
@@ -2124,6 +2124,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
                         Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
 
+#If DEBUG Then
+                        Debug.Print(String.Format("CheckIfContaminationStillExist: Washing Solution Found={0}; previousExeutionsIDSent to find={1} \n"), myWashSolutionType, previousExecutionsIDSent)
+#End If
+
                         Dim aux As Integer = 0
                         'Search the proper row in mySentPreparationsDS.sentPreparations
                         For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
@@ -2138,6 +2142,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             aux = i
                         Next
 
+#If DEBUG Then
+                        Debug.Print(String.Format("CheckIfContaminationStillExist: Value for aux = {0} \n"), aux)
+#End If
+
                         'Search if the proper wash has been already sent or not
                         Dim contaminationFound = True
                         nextExecutionFound = False
@@ -2148,6 +2156,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 contaminationFound = False
                                 nextExecutionFound = True
                                 indexNextToSend = 0
+#If DEBUG Then
+                                Debug.Print(String.Format("CheckIfContaminationStillExist: Found proper wash already sent in step {0} \n"), i)
+#End If
                                 Exit For
                             End If
                         Next
