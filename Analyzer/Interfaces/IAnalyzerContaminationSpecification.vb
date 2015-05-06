@@ -22,7 +22,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         Property ContaminationsContextRange As Range(Of Integer)
 
         ''' <summary>
-        ''' This method provides Dispensing instances. Those instances will be responsible to return the contamination they generate when they're placed in the reactions rotor
+        ''' This is a factory-like method that provides Dispensing instances.<para>Those instances will be responsible to return the contamination they generate when they're placed in the reactions rotor</para>
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
@@ -31,6 +31,12 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         Property AdditionalPredilutionSteps As Integer
 
         Function GetAnalysisModeForReagent(ByVal reagentID As Integer) As AnalysisMode
+
+        Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean
+
+        Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode
+
+        ReadOnly Property AnalyzerID As String
 
     End Interface
 End Namespace

@@ -288,7 +288,6 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
         Sub ResetFLIGHT()
 
-        Function CreateContaminationsDescriptor() As IAnalyzerContaminationsSpecification
 #End Region
 
     End Interface

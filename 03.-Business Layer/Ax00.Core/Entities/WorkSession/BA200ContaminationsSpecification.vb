@@ -15,7 +15,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Implements IAnalyzerContaminationsSpecification
 
 
-
         Sub New()
 
             'This is BA200 dependant:
@@ -83,5 +82,28 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             Return testReagentsDataDS
         End Function
+
+        Public Function AnalysisModesAreCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean Implements IAnalyzerContaminationsSpecification.AreAnalysisModesCompatible
+            If (expected = current OrElse expected = AnalysisMode.MonoReactive) Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode Implements IAnalyzerContaminationsSpecification.RequiredAnalysisModeBetweenReactions
+            If contaminator = AnalysisMode.BiReactive AndAlso contamined = AnalysisMode.BiReactive Then
+                Return AnalysisMode.BiReactive
+            Else
+                Return AnalysisMode.MonoReactive
+            End If
+        End Function
+
+        Public ReadOnly Property AnalyzerID As String Implements IAnalyzerContaminationsSpecification.AnalyzerID
+            Get
+                Return Enums.AnalyzerModelEnum.A200.ToString
+            End Get
+        End Property
     End Class
 End Namespace

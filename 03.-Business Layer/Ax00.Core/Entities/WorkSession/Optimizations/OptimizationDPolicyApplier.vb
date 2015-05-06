@@ -117,7 +117,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                 Execute_jj_loop(pExecutions, aux_j, aux_j, (aux_j - HighContaminationPersistence - 1))
 
-                If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
+                If contaminations.Count = 0 AndAlso ReagentAnalysisModesAreCompatible() Then
                     'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -129,12 +129,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                                 Where a.OrderTestID = sortedOTList(indexI - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, ContaminDS)
-                        typeResult = GetAnalysisModeInTest(dbConnection, newContaminatorID)
+                        typeResult = ContaminationsDescriptor.GetAnalysisModeForReagent(newContaminatorID) 'GetAnalysisModeInTest(dbConnection, newContaminatorID)
                     End If
 
                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j-1)) be carefull is not contaminated by OrderTest(j-1) (and future OrderTest(j-2))
                     'Simplication: In this point do not take care about High contamination persistance
-                    If contaminations.Count = 0 AndAlso ReagentsAreCompatibleType() Then
+                    If contaminations.Count = 0 AndAlso ReagentAnalysisModesAreCompatible() Then
                         If aux_j > 0 Then
                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                Where a.OrderTestID = sortedOTList(aux_j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -176,7 +176,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                             Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                    typeResult = GetAnalysisModeInTest(dbConnection, ReagentContaminatedID)
+                    typeResult = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatedID) 'GetAnalysisModeInTest(dbConnection, ReagentContaminatedID)
 
                     If auxJj = indexJ Then 'search for contamination (low or high level)
                         contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)
@@ -186,7 +186,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                     If contaminations.Count > 0 Then Exit For
 
-                    If Not ReagentsAreCompatibleType() Then Exit For
+                    If Not ReagentAnalysisModesAreCompatible() Then Exit For
 
                     'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                     'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)

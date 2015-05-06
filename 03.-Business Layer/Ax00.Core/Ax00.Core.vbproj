@@ -98,6 +98,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
     <Compile Include="Entities\WorkSession\BA400ContaminationsSpecification.vb" />

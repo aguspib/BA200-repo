@@ -37,16 +37,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property TypeContaminated As AnalysisMode
         Protected Property typeExpectedResult As AnalysisMode
         Protected Property typeResult As AnalysisMode
-        Protected Property AnalyzerModel As AnalyzerModelEnum
+        'Protected Property AnalyzerModel As AnalyzerModelEnum
 #End Region
 
 #Region "Enums"
 
 
-        Public Enum AnalyzerModelEnum
-            A400
-            A200
-        End Enum
+        'Public Enum AnalyzerModelEnum
+        '    A400
+        '    A200
+        'End Enum
 #End Region
 
 #Region "Constructor"
@@ -65,11 +65,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
             Me.New()
             dbConnection = pConn
-            If ActiveAnalyzer = "A200" Then
-                AnalyzerModel = AnalyzerModelEnum.A200
-            Else
-                AnalyzerModel = AnalyzerModelEnum.A400
-            End If
+
         End Sub
 
 #End Region
@@ -208,25 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 #End Region
 
 #Region "Private methods"
-        ''' <summary>
-        ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated when the analyzer is a "A200" model
-        ''' </summary>
-        ''' <remarks>
-        ''' Created on 19/03/2015
-        ''' </remarks>
-        Private Sub SetExpectedTypeReagent200()
-            TypeContaminator = GetAnalysisModeInTest(dbConnection, ReagentContaminatorID)
-            TypeContaminated = GetAnalysisModeInTest(dbConnection, ReagentContaminatedID)
-
-            If TypeContaminator = AnalysisMode.BiReactive AndAlso TypeContaminated = AnalysisMode.BiReactive Then
-                typeExpectedResult = AnalysisMode.BiReactive
-            Else
-                typeExpectedResult = AnalysisMode.MonoReactive
-            End If
-
-            typeResult = AnalysisMode.MonoReactive
-        End Sub
-
+        
         ''' <summary>
         ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
         ''' </summary>
@@ -234,55 +212,27 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 19/03/2015
         ''' </remarks>
         Protected Sub SetExpectedTypeReagent()
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                SetExpectedTypeReagent200()
-            End If
+            TypeContaminator = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatorID)
+            TypeContaminated = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatedID)
+
+            typeExpectedResult = ContaminationsDescriptor.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
+
+            typeResult = AnalysisMode.MonoReactive
+
         End Sub
 
         ''' <summary>
-        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
-        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are.
-        ''' This is the version for the analyzer "A200" model
-        ''' </summary>
-        ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
-        ''' <remarks>
-        ''' Created on 19/03/2015
-        ''' </remarks>
-        Private Function ReagentsAreCompatibleType200() As Boolean
-            If (typeExpectedResult = typeResult OrElse typeExpectedResult = AnalysisMode.MonoReactive) Then
-                Return True
-            End If
-            Return False
-        End Function
-
-        ''' <summary>
-        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
-        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are
+        ''' Regarding contaminations, this method determines if the current candidate analysis mode (bi or monoreactive) is compatible with the expected reactive analysis mdoe (bi or monoreactive). 
+        ''' <para>As instance, in some analyzers, a monoreactive reagent requires another monoreactive reagent when possible.</para>
         ''' </summary>
         ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
         ''' <remarks>
         ''' Created on 18/03/2015
         ''' </remarks>
-        Protected Function ReagentsAreCompatibleType() As Boolean
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                Return ReagentsAreCompatibleType200()
-            End If
-            Return True
+        Protected Function ReagentAnalysisModesAreCompatible() As Boolean
+            Return ContaminationsDescriptor.AreAnalysisModesCompatible(typeResult, typeExpectedResult)
         End Function
 
-
-        ''' <summary>
-        ''' Gets the type of reagent, given a reagentID
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to database</param>
-        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
-        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Protected Function GetAnalysisModeInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            Return Me.ContaminationsDescriptor.GetAnalysisModeForReagent(reagentID)
-        End Function
 
         ''' <summary>
         ''' This is the last part of the algorithm for applying optimizations because of contaminations.This part is common to all of them

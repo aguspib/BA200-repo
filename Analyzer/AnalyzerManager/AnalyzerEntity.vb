@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Implements IAnalyzerManager
 
 
+
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
 
@@ -72,6 +73,5 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #End Region
 
-        Public MustOverride Function CreateContaminationsDescriptor() As IAnalyzerContaminationsSpecification Implements IAnalyzerManager.CreateContaminationsDescriptor
     End Class
 End Namespace

@@ -11,11 +11,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Implements IAnalyzerContaminationsSpecification
 
 
-
         Sub New()
 
             'This is BA200 dependant:
-            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, "A200").SetDatos
+            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, "A400").SetDatos
 
             Dim contaminationPersitence = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
 
@@ -36,5 +35,19 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode Implements IAnalyzerContaminationsSpecification.GetAnalysisModeForReagent
             Return AnalysisMode.MonoReactive
         End Function
+
+        Public Function AnalysisModesAreCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean Implements IAnalyzerContaminationsSpecification.AreAnalysisModesCompatible
+            Return True
+        End Function
+
+        Public Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode Implements IAnalyzerContaminationsSpecification.RequiredAnalysisModeBetweenReactions
+            Return AnalysisMode.MonoReactive
+        End Function
+
+        Public ReadOnly Property AnalyzerID As String Implements IAnalyzerContaminationsSpecification.AnalyzerID
+            Get
+                Return Enums.AnalyzerModelEnum.A400.ToString
+            End Get
+        End Property
     End Class
 End Namespace
