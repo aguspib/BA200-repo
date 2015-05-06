@@ -1461,11 +1461,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #If DEBUG Then
                             If contaminationFound Then
-                                Debug.Print(String.Format("Contamination found between PreviousReagentIDSentList and toSendList(0).ReagentID = {0} \n", toSendList(0).ReagentID))
+                                Debug.Print(String.Format("Contamination found between PreviousReagentIDSentList and toSendList(0).ReagentID = {0} \n", toSendList(0).ReagentID.ToString()))
                             End If
 
                             For Each element In previousReagentIDSentList
-                                Debug.Print(String.Format("Elem: ExecutionID={0}; ReagentID={1}; OrderID={2}; OrderTestID={3} \n", element.ExecutionID, element.ReagentID, element.OrderID, element.OrderTestID))
+                                Debug.Print(String.Format("Elem: ExecutionID={0}; ReagentID={1}; OrderID={2}; OrderTestID={3} \n",
+                                                          element.ExecutionID.ToString(), element.ReagentID.ToString(), element.OrderID.ToString(), element.OrderTestID.ToString()))
                             Next
 #End If
 
@@ -1486,8 +1487,24 @@ Namespace Biosystems.Ax00.Core.Entities
                                 indexNextToSend = 0
                             End If '(End 4)If contaminationFound Then
 
+#If DEBUG Then
+                            If contaminationFound Then
+                                Debug.Print("Contamination Found after ObtainNextPreparationOrWash method \n")
+
+                            Else
+                                Debug.Print("Contamination NOT found after ObtainNextPreparationOrWash method \n")
+
+                            End If
+#End If
                             'Once the best option is found prepare the variable to return
                             resultData.SetDatos = ReturnNextExecution(toSendList, myContaminationID, myWashSolutionType, nextExecutionFound, indexNextToSend, pFound)
+
+#If DEBUG Then
+                            Debug.Print(String.Format("Those are the results from ReturnNextExecution: toSendList = {0}; myContaminationID = {1}; myWashSolutionType = {2}; nextExecutionFound = {3}; indexNextToSend = {4}; pFound = {5}",
+                                                      toSendList.Count().ToString(), myContaminationID.ToString(), myWashSolutionType.ToString(), nextExecutionFound.ToString(), indexNextToSend.ToString(), pFound.ToString()))
+
+#End If
+                            previousReagentIDSentList.Clear()
                         End If '(End 3)
                     End If '(End 2)
                 End If '(End 1)
@@ -2057,10 +2074,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myMaxReplicatesList As New List(Of Integer) 'Same item number as previous list, indicates the replicate number for each item in previous list
                 GetMaxReplicatesList(myReagentsIDList, myMaxReplicatesList, previousReagentIDSentList)
 
+#If DEBUG Then
+                Debug.Print(String.Format("After GetMaxReplicatesList: myReagentsIDList = {0}; myMaxReplicatesList = {1}; previousReagentIDSentList = {2} \n",
+                                          myReagentsIDList.Count, myMaxReplicatesList.Count, previousReagentIDSentList.Count))
+#End If
+
                 '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
                 Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
                 currentResultList = toSendList.ToList() 'Initial order                                    
                 toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+
+#If DEBUG Then
+                Debug.Print(String.Format("Executed backtraking algorithm. toSendList = {0} \n", toSendList.Count().ToString()))
+#End If
 
                 '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
                 CheckIfContaminationStillExist(previousReagentIDSentList, pHighContaminationPersitance, myContaminationID, myWashSolutionType, indexNextToSend, nextExecutionFound, pContaminationsDS, toSendList)
@@ -2070,7 +2096,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
-        Private Sub GetMaxReplicatesList(myReagentsIDList As List(Of Integer), myMaxReplicatesList As List(Of Integer), previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow))
+        Private Sub GetMaxReplicatesList(ByRef myReagentsIDList As List(Of Integer), ByRef myMaxReplicatesList As List(Of Integer), previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow))
             'Transform previousReagentIDSentList List(Of AnalyzerManagerDS.sentPreparationsRow) into List (Of Integer): PreviousReagentsIDList and previousMaxReplicatesList
             '(the nearest reagents use the higher indexs)
             Dim maxReplicates As Integer = 0
@@ -2097,6 +2123,12 @@ Namespace Biosystems.Ax00.Core.Entities
             'NOTE: previousReagentIDSentList contains the last reagents used, the nearest in time used are the higher array indexes
             Dim highIndex As Integer = 0
             Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
+
+#If DEBUG Then
+            Debug.Print(String.Format("Number of elements previousReagentIDSentList = {0}; pHighContaminationPersistance = {1} \n", previousReagentIDSentList.Count().ToString(),
+                                       pHighContaminationPersitance.ToString()))
+
+#End If
             For highIndex = previousReagentIDSentList.Count - 1 To previousReagentIDSentList.Count - pHighContaminationPersitance Step -1
                 If highIndex >= 0 Then
                     If highIndex < previousReagentIDSentList.Count - 1 Then 'Evaluate only High contamination
@@ -2125,7 +2157,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
 
 #If DEBUG Then
-                        Debug.Print(String.Format("CheckIfContaminationStillExist: Washing Solution Found={0}; previousExeutionsIDSent to find={1} \n"), myWashSolutionType, previousExecutionsIDSent)
+                        Try
+                            Debug.Print(String.Format("CheckIfContaminationStillExist: Washing Solution Found={0}; previousExeutionsIDSent to find={1} \n", myWashSolutionType, previousExecutionsIDSent.ToString()))
+                        Catch ex As Exception
+                        End Try
 #End If
 
                         Dim aux As Integer = 0
@@ -2143,7 +2178,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         Next
 
 #If DEBUG Then
-                        Debug.Print(String.Format("CheckIfContaminationStillExist: Value for aux = {0} \n"), aux)
+                        Try
+                            Debug.Print(String.Format("CheckIfContaminationStillExist: Value for aux = {0} \n", aux.ToString()))
+                        Catch ex As Exception
+                        End Try
 #End If
 
                         'Search if the proper wash has been already sent or not
@@ -2157,7 +2195,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 nextExecutionFound = True
                                 indexNextToSend = 0
 #If DEBUG Then
-                                Debug.Print(String.Format("CheckIfContaminationStillExist: Found proper wash already sent in step {0} \n"), i)
+                                Try
+                                    Debug.Print(String.Format("CheckIfContaminationStillExist: Found proper wash already sent in step {0} \n", i.ToString()))
+                                Catch ex As Exception
+                                End Try
 #End If
                                 Exit For
                             End If
@@ -2165,7 +2206,21 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If contaminationFound Then Exit For
 
+                    Else
+#If DEBUG Then
+                        Try
+                            Debug.Print("There aren't any contamination (inside the for loop)... highIndex = {0} \n", highIndex.ToString())
+                        Catch ex As Exception
+                        End Try
+#End If
                     End If
+                Else
+#If DEBUG Then
+                    Try
+                        Debug.Print("highIndex is negative = {0} \n", highIndex.ToString())
+                    Catch ex As Exception
+                    End Try
+#End If
                 End If
             Next
 
@@ -2174,6 +2229,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 nextExecutionFound = True
                 indexNextToSend = 0
             End If
+
+#If DEBUG Then
+            Debug.Print(String.Format("Quitting CheckIfContaminationStillExist, values: nextExecutionFound = {0}; indexNextToSend = {1} \n", nextExecutionFound.ToString(), indexNextToSend.ToString()))
+#End If
         End Sub
 
         Private Function ReturnNextExecution(toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), myContaminationID As Integer, myWashSolutionType As String,
