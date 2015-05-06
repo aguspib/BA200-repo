@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)
-            WSExecutionCreator.Instance.ContaminationsDescriptor = CreateContaminationsDescriptor()
+            WSExecutionCreator.Instance.ContaminationsDescriptor = New BA400ContaminationsSpecification()
 
         End Sub
 
@@ -39,9 +39,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #End Region
 
-        Public Overrides Function CreateContaminationsDescriptor() As IAnalyzerContaminationsSpecification
-            Return New BA400ContaminationsSpecification
-        End Function
+ 
     End Class
 
 End Namespace

@@ -6398,7 +6398,7 @@ Public Class UiWSRotorPositions
             'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
 
             Dim contaminathings = Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer
-            resultData = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
+            resultData = DelegatesToCoreBusinesGlue.CreateWS(Nothing, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
 
             If (resultData.HasError) Then
                 ErrorOnCreateWSExecutions = String.Format("{0}|{1}", resultData.ErrorCode, resultData.ErrorMessage)

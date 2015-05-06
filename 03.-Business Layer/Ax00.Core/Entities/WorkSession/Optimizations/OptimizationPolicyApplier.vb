@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
@@ -36,19 +37,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property TypeContaminated As AnalysisMode
         Protected Property typeExpectedResult As AnalysisMode
         Protected Property typeResult As AnalysisMode
-        Protected Property AnalyzerModel As AnalyzerModelEnum
+        'Protected Property AnalyzerModel As AnalyzerModelEnum
 #End Region
 
 #Region "Enums"
-        Public Enum AnalysisMode 'As Integer
-            MonoReactive = 1
-            BiReactive = 2
-        End Enum
 
-        Public Enum AnalyzerModelEnum
-            A400
-            A200
-        End Enum
+
+        'Public Enum AnalyzerModelEnum
+        '    A400
+        '    A200
+        'End Enum
 #End Region
 
 #Region "Constructor"
@@ -67,11 +65,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
             Me.New()
             dbConnection = pConn
-            If ActiveAnalyzer = "A200" Then
-                AnalyzerModel = AnalyzerModelEnum.A200
-            Else
-                AnalyzerModel = AnalyzerModelEnum.A400
-            End If
+
         End Sub
 
 #End Region
@@ -142,6 +136,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return ContaminationNumber
         End Function
 
+        Public ReadOnly Property ContaminationsDescriptor() As IAnalyzerContaminationsSpecification
+            Get
+                Return WSExecutionCreator.Instance.ContaminationsDescriptor
+            End Get
+        End Property
+
 #End Region
 
 #Region "Overridable methods"
@@ -204,25 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 #End Region
 
 #Region "Private methods"
-        ''' <summary>
-        ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated when the analyzer is a "A200" model
-        ''' </summary>
-        ''' <remarks>
-        ''' Created on 19/03/2015
-        ''' </remarks>
-        Private Sub SetExpectedTypeReagent200()
-            TypeContaminator = GetTypeReagentInTest(dbConnection, ReagentContaminatorID)
-            TypeContaminated = GetTypeReagentInTest(dbConnection, ReagentContaminatedID)
-
-            If TypeContaminator = AnalysisMode.BiReactive AndAlso TypeContaminated = AnalysisMode.BiReactive Then
-                typeExpectedResult = AnalysisMode.BiReactive
-            Else
-                typeExpectedResult = AnalysisMode.MonoReactive
-            End If
-
-            typeResult = AnalysisMode.MonoReactive
-        End Sub
-
+        
         ''' <summary>
         ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
         ''' </summary>
@@ -230,104 +212,27 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 19/03/2015
         ''' </remarks>
         Protected Sub SetExpectedTypeReagent()
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                SetExpectedTypeReagent200()
-            End If
+            TypeContaminator = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatorID)
+            TypeContaminated = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatedID)
+
+            typeExpectedResult = ContaminationsDescriptor.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
+
+            typeResult = AnalysisMode.MonoReactive
+
         End Sub
 
         ''' <summary>
-        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
-        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are.
-        ''' This is the version for the analyzer "A200" model
-        ''' </summary>
-        ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
-        ''' <remarks>
-        ''' Created on 19/03/2015
-        ''' </remarks>
-        Private Function ReagentsAreCompatibleType200() As Boolean
-            If (typeExpectedResult = typeResult OrElse typeExpectedResult = AnalysisMode.MonoReactive) Then
-                Return True
-            End If
-            Return False
-        End Function
-
-        ''' <summary>
-        ''' It determines if the current candidate reagent is from the same type of reagent as expected, or the expected type is mono-reactive.
-        ''' If the expected result is bi-reactive, the current candidate needs to be bi-reactive too. In any other case, it doesn't matter the type they are
+        ''' Regarding contaminations, this method determines if the current candidate analysis mode (bi or monoreactive) is compatible with the expected reactive analysis mdoe (bi or monoreactive). 
+        ''' <para>As instance, in some analyzers, a monoreactive reagent requires another monoreactive reagent when possible.</para>
         ''' </summary>
         ''' <returns>A boolean value that indicates if the current candidate complies the expected type of reagent</returns>
         ''' <remarks>
         ''' Created on 18/03/2015
         ''' </remarks>
-        Protected Function ReagentsAreCompatibleType() As Boolean
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                Return ReagentsAreCompatibleType200()
-            End If
-            Return True
+        Protected Function ReagentAnalysisModesAreCompatible() As Boolean
+            Return ContaminationsDescriptor.AreAnalysisModesCompatible(typeResult, typeExpectedResult)
         End Function
 
-        ''' <summary>
-        ''' Gets the type of reagent, given a reagentID. This code is the version for the analyzer "A200" model
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to database</param>
-        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
-        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
-        ''' <remarks>
-        ''' Created on 19/03/2015 by AJG
-        ''' </remarks>
-        Private Function GetTypeReagentInTest200(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            Static testReagentsDataDS As TestReagentsDS
-
-            If testReagentsDataDS Is Nothing Then
-                testReagentsDataDS = GetAllReagents(pDBConnection)
-            End If
-
-            Dim result = (From a In testReagentsDataDS.tparTestReagents
-                          Where a.ReagentID = reagentID Select a.ReagentsNumber).First
-
-            Return CType(result, AnalysisMode)
-        End Function
-
-        ''' <summary>
-        ''' Gets the type of reagent, given a reagentID
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to database</param>
-        ''' <param name="reagentID">ID for the reagent that need to retrieve its type of reagent</param>
-        ''' <returns>the type of reagent of the given reagent. It's an enumerated</returns>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Protected Function GetTypeReagentInTest(ByVal pDBConnection As SqlConnection, ByVal reagentID As Integer) As AnalysisMode
-            If AnalyzerModel = AnalyzerModelEnum.A200 Then
-                Return GetTypeReagentInTest200(pDBConnection, reagentID)
-            End If
-
-            Return AnalysisMode.MonoReactive
-        End Function
-
-        ''' <summary>
-        ''' Gets all the reagents and their type of reagent from DB
-        ''' </summary>
-        ''' <param name="pDBConnection">Connection to DB</param>
-        ''' <returns>A testReagentsDS with the info</returns>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Private Function GetAllReagents(ByVal pDBConnection As SqlConnection) As TestReagentsDS
-            Dim TestReagentsDAO As New tparTestReagentsDAO()
-            Static testReagentsDataDS As TestReagentsDS
-            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
-
-            If testReagentsDataDS Is Nothing Then
-                resultData = TestReagentsDAO.GetAllReagents(pDBConnection)
-
-                If Not resultData.HasError Then
-                    testReagentsDataDS = resultData.SetDatos
-                End If
-            End If
-
-            Return testReagentsDataDS
-        End Function
 
         ''' <summary>
         ''' This is the last part of the algorithm for applying optimizations because of contaminations.This part is common to all of them

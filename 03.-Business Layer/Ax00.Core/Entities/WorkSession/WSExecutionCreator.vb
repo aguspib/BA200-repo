@@ -25,7 +25,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         'Parameters for create the Work Session Executions
 
         Private pDBConnection As SqlConnection
-        Private pAnalyzerID As String
         Private pWorkSessionID As String
         Private pWorkInRunningMode As Boolean
         Private pOrderTestID As Integer = -1
@@ -84,7 +83,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Public Property ContaminationsDescriptor As IAnalyzerContaminationsSpecification
 
-        Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
+        Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
@@ -94,7 +93,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             'Initialization from parameters
             pDBConnection = ppDBConnection
-            pAnalyzerID = ppAnalyzerID
+            'pAnalyzerID = ppAnalyzerID
             pWorkSessionID = ppWorkSessionID
             pWorkInRunningMode = ppWorkInRunningMode
             pOrderTestID = ppOrderTestID
@@ -137,13 +136,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 orderTestLockedByLISList = Nothing
 
-                'MIC: WIP!!
-                Dim Context = New ContaminationsContext(ContaminationsDescriptor)
-                Context.FillContextInStatic(Me.pendingExecutionsDS)
-                Dim wash = Context.GetWashingRequiredForAGivenDispensing(New ReagentDispensing() With {.R1ReagentID = 130})
-                Debug.WriteLine(wash.WashingStrength)
-                '/MIC WIP
-
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
@@ -166,7 +158,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         End Function
 
         Private Function GetOrderTestsLockedByLIS() As List(Of Integer)
-            Dim resultData = myDao.GetOrderTestsLockedByLIS(pDBConnection, pAnalyzerID, pWorkSessionID, True)
+            Dim resultData = myDao.GetOrderTestsLockedByLIS(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, True)
             Dim orderTestLockedByLISList As New List(Of Integer)
             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 For Each row As ExecutionsDS.twksWSExecutionsRow In DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions
@@ -320,21 +312,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         Private Function SearchNotInCourseExecutionsToDelete() As GlobalDataTO
             Dim StartTime = Now
             'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
-            Dim resultData = myDao.SearchNotInCourseExecutionsToDelete(pDBConnection, pAnalyzerID, pWorkSessionID, pOrderTestID)
+            Dim resultData = myDao.SearchNotInCourseExecutionsToDelete(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pOrderTestID)
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myOrderTestsToDelete As OrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsDS)
 
                 If (myOrderTestsToDelete.twksOrderTests.Count > 0) Then
                     'Delete all Readings of the Executions for all OrderTests returned by the previous called function
                     Dim myReadingsDelegate As New WSReadingsDelegate
-                    resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(pDBConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
+                    resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, myOrderTestsToDelete)
 
                     If (Not resultData.HasError) Then
                         'Delete the Executions for all OrderTests returned by the previous called function
                         If GlobalConstants.CreateWSExecutionsWithMultipleTransactions Then
-                            resultData = DeleteNotInCourseExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
+                            resultData = DeleteNotInCourseExecutionsNEW(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, myOrderTestsToDelete)
                         Else
-                            resultData = myDao.DeleteNotInCourseExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
+                            resultData = myDao.DeleteNotInCourseExecutionsNEW(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, myOrderTestsToDelete)
                         End If
                     End If
                 End If
@@ -347,7 +339,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Private Function CreateExecutionsOrderTestsNotStarted() As GlobalDataTO
             Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-            Dim resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(pDBConnection, pAnalyzerID, pWorkSessionID)
+            Dim resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID)
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
@@ -636,19 +628,19 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             'Get all executions for PATIENT SAMPLES included in the WorkSession
             myPatientExecutionsDS = Nothing
 
-            Dim resultData = ExecutionsDelegate.CreateBlankExecutions(pDBConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+            Dim resultData = ExecutionsDelegate.CreateBlankExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
             End If
-            resultData = ExecutionsDelegate.CreateCalibratorExecutions(pDBConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+            resultData = ExecutionsDelegate.CreateCalibratorExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
             End If
-            resultData = ExecutionsDelegate.CreateControlExecutions(pDBConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+            resultData = ExecutionsDelegate.CreateControlExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
             End If
-            resultData = ExecutionsDelegate.CreatePatientExecutions(pDBConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
+            resultData = ExecutionsDelegate.CreatePatientExecutions(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
             End If
@@ -847,7 +839,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 Dim myWSPausedOrderTestsDS As WSPausedOrderTestsDS
                 Dim myWSPausedOrderTestsDelegate As New WSPausedOrderTestsDelegate
 
-                resultData = myWSPausedOrderTestsDelegate.ReadByAnalyzerAndWorkSession(pDBConnection, pAnalyzerID, pWorkSessionID)
+                resultData = myWSPausedOrderTestsDelegate.ReadByAnalyzerAndWorkSession(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID)
                 If (Not resultData.HasError) Then
                     myWSPausedOrderTestsDS = DirectCast(resultData.SetDatos, WSPausedOrderTestsDS)
 
@@ -866,7 +858,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Dim resultData As GlobalDataTO
             'Read the current content of all positions in Samples Rotor
             Dim rcp_del As New WSRotorContentByPositionDelegate
-            resultData = rcp_del.ReadByCellNumber(pDBConnection, pAnalyzerID, pWorkSessionID, "SAMPLES", -1)
+            resultData = rcp_del.ReadByCellNumber(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, "SAMPLES", -1)
 
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Dim samplesRotorDS As WSRotorContentByPositionDS = DirectCast(resultData.SetDatos, WSRotorContentByPositionDS)
@@ -881,7 +873,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 Dim newStatus As String = ""
                 For Each row In linqRes
                     newStatus = row.Status
-                    resultData = rcp_del.UpdateSamplePositionStatus(pDBConnection, -1, pWorkSessionID, pAnalyzerID, row.ElementID, _
+                    resultData = rcp_del.UpdateSamplePositionStatus(pDBConnection, -1, pWorkSessionID, ContaminationsDescriptor.AnalyzerID, row.ElementID, _
                                                                     row.TubeContent, 1, newStatus, row.CellNumber)
                 Next
             End If
@@ -895,12 +887,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             'check if there are Electrodes with wrong Calibration
             If (Not pISEElectrodesList Is Nothing AndAlso pISEElectrodesList.Count > 0) Then
                 For Each electrode As String In pISEElectrodesList
-                    resultData = New ExecutionsDelegate().UpdateStatusByISETestType(pDBConnection, pWorkSessionID, pAnalyzerID, electrode, "PENDING", "LOCKED")
+                    resultData = New ExecutionsDelegate().UpdateStatusByISETestType(pDBConnection, pWorkSessionID, ContaminationsDescriptor.AnalyzerID, electrode, "PENDING", "LOCKED")
                     If (resultData.HasError) Then Exit For
                 Next
             ElseIf (Not pIsISEModuleReady) Then
                 'ISE Module cannot be used; all pending ISE Preparations are LOCKED
-                resultData = New ExecutionsDelegate().UpdateStatusByExecutionTypeAndStatus(pDBConnection, pWorkSessionID, pAnalyzerID, "PREP_ISE", "PENDING", "LOCKED")
+                resultData = New ExecutionsDelegate().UpdateStatusByExecutionTypeAndStatus(pDBConnection, pWorkSessionID, ContaminationsDescriptor.AnalyzerID, "PREP_ISE", "PENDING", "LOCKED")
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -912,7 +904,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Private Function RecalculateStatusForNotDeletedExecutions() As GlobalDataTO
             Dim StartTime = Now
-            Dim resultData = RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
+            Dim resultData = RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, ContaminationsDescriptor.AnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -943,7 +935,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 End If
             Next
             If myOT.Count > 0 AndAlso myOT.Count = myRerun.Count Then
-                resultData = New ExecutionsDelegate().UpdatePaused(pDBConnection, myOT, myRerun, True, pAnalyzerID, pWorkSessionID)
+                resultData = New ExecutionsDelegate().UpdatePaused(pDBConnection, myOT, myRerun, True, ContaminationsDescriptor.AnalyzerID, pWorkSessionID)
             End If
             myOT.Clear()
             myRerun.Clear()
