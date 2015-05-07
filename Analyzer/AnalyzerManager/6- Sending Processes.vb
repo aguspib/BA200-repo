@@ -2188,6 +2188,14 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim contaminationFound = True
                         nextExecutionFound = False
                         For i = aux To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+#If DEBUG Then
+                            Try
+                                Debug.Print(String.Format("Inside the For. Loop variable i = {0}; SentPreparations(i).ReagentWashFlag = {1}; SentPreparations(i).WashSolution1 = {2}; SentPreparations(i).ExecutionID = {3} ",
+                                                          i.ToString(), mySentPreparationsDS.sentPreparations(i).ReagentWashFlag.ToString(), mySentPreparationsDS.sentPreparations(i).WashSolution1.ToString(), mySentPreparationsDS.sentPreparations(i).ExecutionID.ToString()))
+                            Catch ex As Exception
+
+                            End Try
+#End If
                             If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
                                 mySentPreparationsDS.sentPreparations(i).WashSolution1 = myWashSolutionType Then
 
