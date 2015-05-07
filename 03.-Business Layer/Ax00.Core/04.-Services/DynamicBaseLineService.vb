@@ -108,7 +108,6 @@ Namespace Biosystems.Ax00.Core.Services
 
 #End Region
 
-
 #Region "Private methods"
         Private Sub Initialize()
 
@@ -454,7 +453,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             'Clean up event listening:
             '_analyzer = Nothing
-            GC.Collect()
+            'GC.Collect()
 
         End Sub
 
@@ -594,7 +593,6 @@ Namespace Biosystems.Ax00.Core.Services
 
         End Sub
 #End Region
-
 
 
     End Class
