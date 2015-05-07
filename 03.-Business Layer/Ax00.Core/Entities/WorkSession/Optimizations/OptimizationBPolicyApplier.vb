@@ -15,8 +15,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             MyBase.New()
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
-            MyBase.New(pConn, ActiveAnalyzer)
+        Public Sub New(ByVal pConn As SqlConnection) ', ByVal ActiveAnalyzer As String)
+            MyBase.New(pConn) ', ActiveAnalyzer)
         End Sub
 
         Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _

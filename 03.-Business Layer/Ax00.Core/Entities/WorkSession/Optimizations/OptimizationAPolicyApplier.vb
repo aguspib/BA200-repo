@@ -15,8 +15,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             MyBase.New()
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
-            MyBase.New(pConn, ActiveAnalyzer)
+        Public Sub New(ByVal pConn As SqlConnection)
+            MyBase.New(pConn)
         End Sub
 
         Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                                 Where a.OrderTestID = sortedOTList(indexI + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(MainContaminatorID, newContaminatedID, ContaminDS)
-                        typeResult = ContaminationsDescriptor.GetAnalysisModeForReagent(newContaminatedID) 'GetAnalysisModeInTest(dbConnection, newContaminatedID)
+                        typeResult = ContaminationsSpecification.GetAnalysisModeForReagent(newContaminatedID)
                     End If
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
@@ -166,7 +166,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                              Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                    typeResult = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatorID) 'GetAnalysisModeInTest(dbConnection, ReagentContaminatorID)
+                    typeResult = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatorID) 'GetAnalysisModeInTest(dbConnection, ReagentContaminatorID)
 
                     If aux_jj = indexJ Then 'search for contamination (low or high level)
                         contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)

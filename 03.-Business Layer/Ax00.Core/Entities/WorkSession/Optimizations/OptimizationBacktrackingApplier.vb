@@ -16,8 +16,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             MyBase.New()
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
-            MyBase.New(pConn, ActiveAnalyzer)
+        Public Sub New(ByVal pConn As SqlConnection)
+            MyBase.New(pConn)
         End Sub
 
         Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
@@ -143,7 +143,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                           Select wse).ToList()
 
                 If contam.Count = 0 Then
-                    contaminatorType = ContaminationsDescriptor.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID)  'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                    contaminatorType = ContaminationsSpecification.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID)  'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
                     If contaminatorType = AnalysisMode.BiReactive Then
                         If lastBireactiveID.Count > 0 Then
                             contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS)
@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     End If
                 End If
             Else
-                contaminatorType = ContaminationsDescriptor.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID) 'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                contaminatorType = ContaminationsSpecification.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID) 'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
                 If contaminatorType = AnalysisMode.BiReactive Then
                     lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
                 End If

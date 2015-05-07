@@ -82,7 +82,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End Get
         End Property
 
-        Public Property ContaminationsDescriptor As IAnalyzerContaminationsSpecification
+        Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
 
         Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
                                            Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO 'Implements IWSExecutionCreator.CreateWS
 
-            Me.ContaminationsDescriptor = ContaminationsDescriptor
+            Me.ContaminationsSpecification = ContaminationsSpecification
 
             'Initialization from parameters
             pDBConnection = ppDBConnection

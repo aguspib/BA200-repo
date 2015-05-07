@@ -20,6 +20,7 @@ Public Class DelegatesToCoreBusinesGlue
 
         Try
             If method Is Nothing Then
+                Debug.WriteLine("CreateWS method found.")
                 instance = obj.GetProperty("Instance").GetGetMethod.Invoke(Nothing, {})
                 method = obj.GetMethod("CreateWS")
             End If
@@ -78,7 +79,7 @@ Public Class DelegatesToCoreBusinesGlue
             Const typeName As String = "Biosystems.Ax00.Core.Entities.WorkSession.Optimizations.OptimizationBacktrackingApplier"
 
             Dim backTrackingClass = BsCoreAssembly.GetType(typeName)
-            Dim backtrackingOptimizerInstance = Activator.CreateInstance(backTrackingClass, {pCon, ActiveAnalyzer})
+            Dim backtrackingOptimizerInstance = Activator.CreateInstance(backTrackingClass, {pCon})
 
             _contaminationManagerClass.GetMethod("ApplyOptimizations").Invoke(_contaminationManagerInstance, {backtrackingOptimizerInstance, OrderTests})
 

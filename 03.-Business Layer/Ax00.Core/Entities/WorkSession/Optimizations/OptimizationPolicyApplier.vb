@@ -37,16 +37,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property TypeContaminated As AnalysisMode
         Protected Property typeExpectedResult As AnalysisMode
         Protected Property typeResult As AnalysisMode
-        'Protected Property AnalyzerModel As AnalyzerModelEnum
 #End Region
 
 #Region "Enums"
 
 
-        'Public Enum AnalyzerModelEnum
-        '    A400
-        '    A200
-        'End Enum
 #End Region
 
 #Region "Constructor"
@@ -62,7 +57,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             typeResult = AnalysisMode.MonoReactive
         End Sub
 
-        Public Sub New(ByVal pConn As SqlConnection, ByVal ActiveAnalyzer As String)
+        Public Sub New(ByVal pConn As SqlConnection) ', ByVal ActiveAnalyzer As String)
             Me.New()
             dbConnection = pConn
 
@@ -136,9 +131,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return ContaminationNumber
         End Function
 
-        Public ReadOnly Property ContaminationsDescriptor() As IAnalyzerContaminationsSpecification
+        Public ReadOnly Property ContaminationsSpecification() As IAnalyzerContaminationsSpecification
             Get
-                Return WSExecutionCreator.Instance.ContaminationsDescriptor
+                Return WSExecutionCreator.Instance.ContaminationsSpecification
             End Get
         End Property
 
@@ -204,7 +199,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 #End Region
 
 #Region "Private methods"
-        
+
         ''' <summary>
         ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
         ''' </summary>
@@ -212,10 +207,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 19/03/2015
         ''' </remarks>
         Protected Sub SetExpectedTypeReagent()
-            TypeContaminator = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatorID)
-            TypeContaminated = ContaminationsDescriptor.GetAnalysisModeForReagent(ReagentContaminatedID)
+            TypeContaminator = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatorID)
+            TypeContaminated = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatedID)
 
-            typeExpectedResult = ContaminationsDescriptor.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
+            typeExpectedResult = ContaminationsSpecification.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
 
             typeResult = AnalysisMode.MonoReactive
 
@@ -230,7 +225,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' Created on 18/03/2015
         ''' </remarks>
         Protected Function ReagentAnalysisModesAreCompatible() As Boolean
-            Return ContaminationsDescriptor.AreAnalysisModesCompatible(typeResult, typeExpectedResult)
+            Return ContaminationsSpecification.AreAnalysisModesCompatible(typeResult, typeExpectedResult)
         End Function
 
 

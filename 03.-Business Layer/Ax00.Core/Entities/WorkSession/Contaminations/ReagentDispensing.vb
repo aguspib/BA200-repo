@@ -54,15 +54,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Set(value As Integer)
                 If _r1ReagentID <> value Then
                     _r1ReagentID = value
-                    _analysisMode = ContaminationsDescriptor.GetAnalysisModeForReagent(_r1ReagentID)
+                    _analysisMode = ContaminationsSpecification.GetAnalysisModeForReagent(_r1ReagentID)
                     FillContaminations()
                 End If
             End Set
         End Property
 
-        Public ReadOnly Property ContaminationsDescriptor As IAnalyzerContaminationsSpecification
+        Public ReadOnly Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
             Get
-                Return WSExecutionCreator.Instance.ContaminationsDescriptor
+                Return WSExecutionCreator.Instance.ContaminationsSpecification
             End Get
         End Property
 
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If contamination.IsWashingSolutionR1Null Then
                     description.RequiredWashing = New RegularWaterWashing
                 Else
-                    description.RequiredWashing = New WashingDescription(Math.Abs(ContaminationsDescriptor.ContaminationsContextRange.Minimum), contamination.WashingSolutionR1)
+                    description.RequiredWashing = New WashingDescription(Math.Abs(ContaminationsSpecification.ContaminationsContextRange.Minimum), contamination.WashingSolutionR1)
                 End If
 
                 _contamines.Add(contamination.ReagentContaminatedID, description)
